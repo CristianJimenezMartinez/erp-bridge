@@ -99,12 +99,13 @@ async function main() {
         agent.setFactusolDbPath(dbPath);
         console.log('\n🎉 ¡Base de datos Factusol configurada con éxito!');
         console.log(`   Ruta: ${dbPath}\n`);
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       } catch (err: unknown) {
         console.error('\n❌ Error al configurar la base de datos Factusol:', err instanceof Error ? err.message : String(err));
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
-      break;
     }
 
     case 'set-api': {
@@ -118,19 +119,21 @@ async function main() {
       if (!apiUrl) {
         console.error('❌ Error: Debes especificar la URL del servidor API.');
         console.error('Uso: erp-bridge-agent set-api <URL>\n');
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
       const agent = new LocalAgent();
       try {
         agent.setApiBaseUrl(apiUrl);
         console.log('\n🎉 ¡Servidor API configurado con éxito!');
         console.log(`   URL: ${apiUrl}\n`);
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       } catch (err: unknown) {
         console.error('\n❌ Error al configurar la URL del servidor:', err instanceof Error ? err.message : String(err));
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
-      break;
     }
 
     case 'pair': {
@@ -144,7 +147,8 @@ async function main() {
       if (!token) {
         console.error('❌ Error: Debes especificar el código de emparejamiento.');
         console.error('Uso: erp-bridge-agent pair <TOKEN> [NOMBRE_AGENTE]\n');
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
       const customName = args[2];
       const agent = new LocalAgent();
@@ -155,13 +159,14 @@ async function main() {
         console.log(`   Factusol detectado: ${result.detectedFactusol.length} instancia(s)`);
         console.log('\nPara iniciar el servicio ejecute:');
         console.log('   pnpm start (o ejecute el comando como servicio)\n');
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error('\n❌ Fallo al emparejar el agente:', msg);
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
-      break;
     }
 
     case 'status': {
@@ -203,16 +208,18 @@ async function main() {
           console.log(`   Plan: ${res.plan}`);
           console.log(`   Expira: ${res.expiresAt || 'Sin expiración'}`);
           console.log(`   Período de gracia offline: ${res.gracePeriodDays || 7} días\n`);
-          process.exit(0);
+          process.exitCode = 0;
+          return;
         } else {
           console.error('\n❌ No se pudo activar la licencia:', res.error);
-          process.exit(1);
+          process.exitCode = 1;
+          return;
         }
       } catch (err: unknown) {
         console.error('\n❌ Error al comunicarse con el servidor:', err instanceof Error ? err.message : String(err));
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
-      break;
     }
 
     case 'deactivate': {
@@ -221,12 +228,13 @@ async function main() {
       try {
         await agent.deactivateLicense(key);
         console.log('\n✓ Licencia desactivada correctamente de este equipo.\n');
-        process.exit(0);
+        process.exitCode = 0;
+        return;
       } catch (err: unknown) {
         console.error('\n❌ Error al desactivar:', err instanceof Error ? err.message : String(err));
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
-      break;
     }
 
     case 'license-info': {
@@ -239,8 +247,8 @@ async function main() {
       console.log(`   Plan: ${lic.plan || 'Ninguno'}`);
       if (lic.message) console.log(`   Detalle: ${lic.message}`);
       console.log('');
-      process.exit(0);
-      break;
+      process.exitCode = 0;
+      return;
     }
 
     case 'start':
