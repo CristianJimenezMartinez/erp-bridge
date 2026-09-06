@@ -69,6 +69,7 @@ agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, n
         agentId: validated.agentId,
         currentVersion: agentVersion,
         platform: 'win32',
+        arch: 'x64',
         channel: 'stable',
       });
       if (check.available) {

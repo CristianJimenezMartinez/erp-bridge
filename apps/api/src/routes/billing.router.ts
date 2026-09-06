@@ -1,4 +1,4 @@
-﻿import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { LicenseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 
@@ -72,6 +72,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
   } catch (error) {
     logger.error('Error procesando webhook de Stripe', error);
     next(error);
+    return;
   }
 });
 
@@ -89,5 +90,6 @@ billingRouter.get('/billing/licenses-by-email', async (req: Request, res: Respon
     return res.json({ data: list });
   } catch (error) {
     next(error);
+    return;
   }
 });
