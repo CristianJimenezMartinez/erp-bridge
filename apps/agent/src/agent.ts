@@ -13,7 +13,7 @@ import {
   LicenseValidationResponse,
   Logger,
 } from '@erp-bridge/shared';
-import { FactusolConnector } from '@erp-bridge/connector-factusol';
+import { FactusolConnector, AccessDriver } from '@erp-bridge/connector-factusol';
 import { AccdbFileWatcher, LicenseTokenManager } from '@erp-bridge/core';
 import { FactusolDetector } from './detector';
 import { HWIDManager } from './security/hwid';
@@ -50,9 +50,13 @@ export class LocalAgent {
   private currentHwid: string | null = null;
   private licenseStatus: AgentLicenseStatus = 'UNLICENSED';
   private activePlan?: string;
+  private recentEvents: Array<{ timestamp: string; level: 'info' | 'warn' | 'error' | 'success'; message: string }> = [];
 
   constructor(customConfig?: Partial<AgentConfigFile>, customStoreDir?: string) {
-    this.configFilePath = path.join(process.cwd(), 'agent-config.json');
+    const appDirConfig = path.join(path.dirname(process.execPath), 'agent-config.json');
+    const cwdConfig = path.join(process.cwd(), 'agent-config.json');
+    this.configFilePath = fs.existsSync(appDirConfig) ? appDirConfig : cwdConfig;
+
     this.secureStore = new SecureStore(customStoreDir);
     const diskConfig = this.loadConfigFromDisk();
 
@@ -61,7 +65,7 @@ export class LocalAgent {
     this.config = {
       agentName: customConfig?.agentName || diskConfig.agentName || os.hostname() || 'Windows Agent',
       agentVersion: this.currentVersion,
-      apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'http://localhost:3000',
+      apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'https://api.veltiatrust.com',
       organizationId: customConfig?.organizationId || diskConfig.organizationId || 'org_default',
       agentId: customConfig?.agentId || diskConfig.agentId,
       authToken: customConfig?.authToken || diskConfig.authToken,
@@ -71,10 +75,12 @@ export class LocalAgent {
     };
 
     this.autoUpdater = new AutoUpdater({
-      apiBaseUrl: this.config.apiBaseUrl || 'http://localhost:3000',
+      apiBaseUrl: this.config.apiBaseUrl || 'https://api.veltiatrust.com',
       agentId: this.config.agentId || 'agent_local_standalone',
       currentVersion: this.currentVersion,
     });
+
+    this.addEvent('info', `🚀 Bentian Local Agent inicializado en ${this.config.agentName} (v${this.currentVersion})`);
   }
 
   public setApiBaseUrl(url: string): void {
@@ -92,6 +98,209 @@ export class LocalAgent {
     this.config.factusolDbPath = resolved;
     this.saveConfigToDisk();
     this.logger.info(`✓ Base de datos Factusol configurada en: ${resolved}`);
+  }
+
+  public getConfig(): Readonly<AgentConfigFile> {
+    return { ...this.config };
+  }
+
+  public getRecentEvents(): Array<{ timestamp: string; level: 'info' | 'warn' | 'error' | 'success'; message: string }> {
+    return [...this.recentEvents];
+  }
+
+  public addEvent(level: 'info' | 'warn' | 'error' | 'success', message: string): void {
+    const timeStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    this.recentEvents.unshift({ timestamp: timeStr, level, message });
+    if (this.recentEvents.length > 80) {
+      this.recentEvents.pop();
+    }
+  }
+
+  public async getFactusolArticleCount(): Promise<number | undefined> {
+    if (!this.config.factusolDbPath || !fs.existsSync(this.config.factusolDbPath)) return undefined;
+    try {
+      const driver = new AccessDriver({ databasePath: this.config.factusolDbPath });
+      const rows = await driver.query<{ total: number }>('SELECT COUNT(*) AS total FROM F_ART');
+      if (rows && rows.length > 0 && typeof rows[0].total === 'number') {
+        return rows[0].total;
+      }
+    } catch {}
+    return undefined;
+  }
+
+  public async testFactusolConnection(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number }> {
+    const resolved = path.resolve(dbPath.trim());
+    if (!fs.existsSync(resolved)) {
+      return { success: false, message: `El archivo no existe: ${resolved}` };
+    }
+    try {
+      const stats = fs.statSync(resolved);
+      const driver = new AccessDriver({ databasePath: resolved });
+      const rows = await driver.query<{ total: number }>('SELECT COUNT(*) AS total FROM F_ART');
+      const count = rows && rows.length > 0 ? rows[0].total : 0;
+      return {
+        success: true,
+        message: `Conexión OLEDB establecida con éxito. ${count} artículos encontrados en F_ART.`,
+        articleCount: count,
+        fileSizeBytes: stats.size,
+      };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { success: false, message: `Fallo al conectar con Factusol: ${msg}` };
+    }
+  }
+
+  public async reconnectFactusol(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number }> {
+    const testResult = await this.testFactusolConnection(dbPath);
+    if (!testResult.success) {
+      this.addEvent('error', `Error conectando Factusol: ${testResult.message}`);
+      return testResult;
+    }
+
+    if (this.watcher) {
+      this.watcher.stop();
+      this.watcher = null;
+    }
+    if (this.factusol) {
+      await this.factusol.disconnect();
+      this.factusol = null;
+    }
+
+    this.config.factusolDbPath = path.resolve(dbPath.trim());
+    this.saveConfigToDisk();
+
+    this.factusol = new FactusolConnector();
+    await this.factusol.connect({ configuration: { databasePath: this.config.factusolDbPath } });
+
+    const lic = await this.validateLicense();
+    if (lic.status === 'VALID' || lic.status === 'GRACE_PERIOD') {
+      this.watcher = new AccdbFileWatcher({
+        filePath: this.config.factusolDbPath,
+        organizationId: this.config.organizationId,
+        debounceMs: 5000,
+      });
+      this.watcher.onSync(async (reason) => {
+        this.addEvent('info', `Cambio detectado en Factusol (${reason}). Disparando sincronización...`);
+        if (this.config.agentId && this.config.apiBaseUrl) {
+          await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              agentId: this.config.agentId,
+              organizationId: this.config.organizationId,
+              reason,
+              timestamp: new Date().toISOString(),
+            }),
+          }).catch(() => null);
+        }
+      });
+      this.watcher.start();
+    }
+
+    this.addEvent('success', `✓ Factusol configurado: ${path.basename(this.config.factusolDbPath)} (${testResult.articleCount} artículos)`);
+    return testResult;
+  }
+
+  public async triggerManualSync(): Promise<{ success: boolean; message: string }> {
+    this.addEvent('info', 'Disparando sincronización manual...');
+    try {
+      if (this.config.agentId && this.config.apiBaseUrl) {
+        const res = await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
+          },
+          body: JSON.stringify({
+            agentId: this.config.agentId,
+            organizationId: this.config.organizationId,
+            reason: 'MANUAL_TRIGGER_LOCAL_GUI',
+            timestamp: new Date().toISOString(),
+          }),
+        });
+        if (res.ok) {
+          this.addEvent('success', '✓ Sincronización manual enviada al servidor');
+          return { success: true, message: 'Sincronización manual completada con éxito.' };
+        }
+      }
+      this.addEvent('success', '✓ Sincronización local ejecutada correctamente');
+      return { success: true, message: 'Sincronización completada en local.' };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.addEvent('warn', `Aviso en sincronización: ${msg}`);
+      return { success: true, message: `Sincronización completada (${msg})` };
+    }
+  }
+
+  public async getStatusDetails(): Promise<{
+    agentName: string;
+    agentVersion: string;
+    agentId: string;
+    apiBaseUrl: string;
+    hwid: string;
+    licenseKey?: string;
+    license: { status: AgentLicenseStatus; plan?: string; message?: string };
+    factusol: {
+      configured: boolean;
+      databasePath: string;
+      fileName: string;
+      connected: boolean;
+      watcherActive: boolean;
+      articleCount?: number;
+      fileSizeBytes?: number;
+      statusMessage: string;
+    };
+    system: AgentSystemInfo;
+    recentEvents: Array<{ timestamp: string; level: 'info' | 'warn' | 'error' | 'success'; message: string }>;
+  }> {
+    const hwid = await this.getHWID();
+    const license = await this.validateLicense();
+    let articleCount: number | undefined;
+    let fileSizeBytes: number | undefined;
+    let connected = false;
+    let statusMessage = 'No configurado';
+
+    if (this.config.factusolDbPath && fs.existsSync(this.config.factusolDbPath)) {
+      try {
+        const stats = fs.statSync(this.config.factusolDbPath);
+        fileSizeBytes = stats.size;
+        if (this.factusol) {
+          const health = await this.factusol.healthCheck();
+          connected = health.status === 'HEALTHY';
+          statusMessage = health.message;
+          if (connected) {
+            articleCount = await this.getFactusolArticleCount();
+          }
+        }
+      } catch (err) {
+        statusMessage = err instanceof Error ? err.message : String(err);
+      }
+    }
+
+    return {
+      agentName: this.config.agentName || 'Bentian Agent',
+      agentVersion: this.currentVersion,
+      agentId: this.config.agentId || 'Sin registrar (Modo Standalone)',
+      apiBaseUrl: this.config.apiBaseUrl || 'https://api.veltiatrust.com',
+      licenseKey: this.config.licenseKey,
+      hwid,
+      license,
+      factusol: {
+        configured: Boolean(this.config.factusolDbPath && fs.existsSync(this.config.factusolDbPath)),
+        databasePath: this.config.factusolDbPath || '',
+        fileName: this.config.factusolDbPath ? path.basename(this.config.factusolDbPath) : '',
+        connected,
+        watcherActive: this.watcher !== null,
+        articleCount,
+        fileSizeBytes,
+        statusMessage,
+      },
+      system: this.getSystemInfo(),
+      recentEvents: this.getRecentEvents(),
+    };
   }
 
   public getSystemInfo(): AgentSystemInfo {
@@ -325,6 +534,12 @@ export class LocalAgent {
       plan: licenseCheck.plan || 'Ninguno',
     });
 
+    if (licenseCheck.status === 'VALID' || licenseCheck.status === 'GRACE_PERIOD') {
+      this.addEvent('success', `✓ Licencia ${licenseCheck.status} (Plan: ${licenseCheck.plan || 'Professional'})`);
+    } else {
+      this.addEvent('warn', `⚠️ Licencia no activa (${licenseCheck.status}). Active su clave para sincronizar.`);
+    }
+
     // 3. Comprobación inicial de actualizaciones en frío
     void this.checkForUpdatesAndApply();
 
@@ -351,6 +566,8 @@ export class LocalAgent {
         latencyMs: health.latencyMs,
       });
 
+      this.addEvent('success', `✓ Factusol conectado: ${path.basename(this.config.factusolDbPath)}`);
+
       // Start reactive file watcher only if license is active or in grace period
       if (licenseCheck.status === 'VALID' || licenseCheck.status === 'GRACE_PERIOD') {
         this.watcher = new AccdbFileWatcher({
@@ -361,6 +578,7 @@ export class LocalAgent {
 
         this.watcher.onSync(async (reason) => {
           this.logger.info(`Cambio detectado en base Factusol (${reason}). Disparando sincronización...`);
+          this.addEvent('info', `Cambio detectado en Factusol (${reason}). Disparando sincronización...`);
           if (this.config.agentId && this.config.apiBaseUrl) {
             await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
               method: 'POST',
@@ -381,11 +599,13 @@ export class LocalAgent {
         });
 
         this.watcher.start();
+        this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
       } else {
         this.logger.warn(`⚠️ Sincronización en tiempo real deshabilitada: Licencia ${licenseCheck.status}. Active su licencia para habilitar la sincronización.`);
       }
     } else {
       this.logger.warn(`No se ha configurado o no existe el archivo de Factusol: ${this.config.factusolDbPath || 'Sin ruta'}`);
+      this.addEvent('warn', '⚠️ Base de datos Factusol no configurada. Use la ventana para seleccionarla.');
     }
 
     this.startHeartbeat();

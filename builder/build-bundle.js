@@ -74,7 +74,7 @@ async function buildAgentBundle(options = {}) {
   const configDest = path.resolve(outDir, 'agent-config.json');
   if (!fs.existsSync(configDest)) {
     const defaultAgentConfig = {
-      apiBaseUrl: 'https://api.bentian.es',
+      apiBaseUrl: 'https://api.veltiatrust.com',
       organizationId: 'org_default'
     };
     fs.writeFileSync(configDest, JSON.stringify(defaultAgentConfig, null, 2), 'utf8');

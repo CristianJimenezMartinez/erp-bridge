@@ -4,6 +4,7 @@ import readline from 'readline';
 import { execSync } from 'child_process';
 import { LocalAgent } from './agent';
 import { FactusolDetector } from './detector';
+import { LocalGuiServer, openDesktopWindow, openWindowsFileDialog } from './gui';
 
 async function promptUserForInput(promptMessage: string, windowTitle: string): Promise<string> {
   if (process.stdin.isTTY) {
@@ -19,21 +20,6 @@ async function promptUserForInput(promptMessage: string, windowTitle: string): P
     const escapedMsg = promptMessage.replace(/'/g, "''");
     const escapedTitle = windowTitle.replace(/'/g, "''");
     const psCmd = `Add-Type -AssemblyName Microsoft.VisualBasic; [Microsoft.VisualBasic.Interaction]::InputBox('${escapedMsg}', '${escapedTitle}')`;
-    const res = execSync(`powershell -NoProfile -Command "${psCmd}"`, { encoding: 'utf8' }).trim();
-    return res;
-  } catch {
-    return '';
-  }
-}
-
-function openWindowsFileDialog(title: string, filter: string): string {
-  if (process.platform !== 'win32') {
-    return '';
-  }
-  try {
-    const escapedTitle = title.replace(/'/g, "''");
-    const escapedFilter = filter.replace(/'/g, "''");
-    const psCmd = `Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.OpenFileDialog; $dialog.Filter = '${escapedFilter}'; $dialog.Title = '${escapedTitle}'; if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $dialog.FileName }`;
     const res = execSync(`powershell -NoProfile -Command "${psCmd}"`, { encoding: 'utf8' }).trim();
     return res;
   } catch {
@@ -251,13 +237,28 @@ async function main() {
       return;
     }
 
+    case 'gui':
     case 'start':
     default: {
+      const isHeadless = args.includes('--headless') || process.env['HEADLESS'] === 'true';
       const agent = new LocalAgent();
       await agent.start();
 
+      let guiServer: LocalGuiServer | null = null;
+      if (!isHeadless) {
+        guiServer = new LocalGuiServer(agent);
+        const { url } = await guiServer.start();
+        console.log(`\n🖥️ Interfaz gráfica de escritorio lista en: ${url}`);
+        openDesktopWindow(url);
+      }
+
+      console.log('💡 Agente local ejecutándose en segundo plano. Presione Ctrl+C para detener.\n');
+
       process.on('SIGINT', async () => {
         console.log('\nDeteniendo agente local...');
+        if (guiServer) {
+          await guiServer.stop();
+        }
         await agent.stop();
         process.exit(0);
       });
@@ -266,7 +267,11 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error('Error no controlado en CLI:', err);
-  process.exit(1);
-});
+export { LocalAgent, LocalGuiServer, FactusolDetector, openDesktopWindow, openWindowsFileDialog };
+
+if (!process.env['ERP_BRIDGE_TEST_MODE']) {
+  main().catch((err) => {
+    console.error('Error no controlado en CLI:', err);
+    process.exit(1);
+  });
+}
