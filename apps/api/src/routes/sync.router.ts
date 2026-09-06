@@ -132,7 +132,7 @@ syncRouter.post('/sync/run-reactive', async (req: Request, res: Response, next: 
     const executionResults = [];
     for (const job of activeJobs) {
       try {
-        const execution = await syncService.runJob(orgId, job.id, { dryRun: false });
+        const execution = await syncService.runJob(orgId, job.id, { forceFullSync: false });
         executionResults.push({ jobId: job.id, status: execution.status, count: execution.processedCount });
       } catch (jobErr) {
         executionResults.push({ jobId: job.id, status: 'FAILED', error: jobErr instanceof Error ? jobErr.message : String(jobErr) });
