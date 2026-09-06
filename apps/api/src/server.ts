@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { Logger } from '@erp-bridge/shared';
 import {
   ConnectorRegistry,
