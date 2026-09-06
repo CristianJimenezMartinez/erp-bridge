@@ -14,6 +14,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* tsconfig.base.json* tsconfig.json* ./
 COPY packages ./packages
 COPY apps/api ./apps/api
+COPY dashboard.html* ./
 RUN mkdir -p releases
 
 # Install dependencies and build TypeScript packages

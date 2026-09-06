@@ -86,6 +86,30 @@ export async function bootstrapApp(): Promise<Express> {
   const releasesDir = path.resolve(__dirname, '../../../releases');
   app.use('/releases', express.static(releasesDir));
 
+  // Servir landing page de descargas y dashboard web
+  const publicDir = path.resolve(__dirname, '../public');
+  app.use(express.static(publicDir));
+  app.get('/', (_req, res) => {
+    const indexPath = path.join(publicDir, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    return res.json({ message: 'Bentian ERP Bridge API', status: 'OK', docs: '/health' });
+  });
+
+  app.get('/dashboard', (_req, res) => {
+    const dashCandidates = [
+      path.resolve(__dirname, '../../../dashboard.html'),
+      path.resolve(__dirname, '../../dashboard.html'),
+      path.resolve(process.cwd(), 'dashboard.html')
+    ];
+    const target = dashCandidates.find(p => fs.existsSync(p));
+    if (target) {
+      return res.sendFile(target);
+    }
+    return res.status(404).send('Dashboard file not found');
+  });
+
   // 4. Start Scheduler & FlowEngine for reactive automations
   void SyncScheduler.getInstance().start('org_default');
   FlowEngine.getInstance().startListening();
