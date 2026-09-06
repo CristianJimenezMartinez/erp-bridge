@@ -1,0 +1,18 @@
+{
+  "appName": "Bentian Agent",
+  "appId": "com.bentian.agent",
+  "version": "0.1.0",
+  "author": "Bentian",
+  "channel": "stable",
+  "platform": "win32_x64",
+  "entryPoint": "../apps/agent/src/cli.ts",
+  "outputDir": "../releases",
+  "apiBaseUrl": "http://localhost:3000",
+  "defaultInstallDir": "{autopf}\\Bentian Agent",
+  "serviceName": "BentianAgentService",
+  "serviceDisplayName": "Bentian ERP Bridge Agent",
+  "serviceDescription": "Sincronizador en segundo plano de Factusol con plataformas eCommerce",
+  "supportedERPs": [
+    "Factusol"
+  ]
+}

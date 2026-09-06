@@ -1,0 +1,17 @@
+{
+  "name": "@erp-bridge/shared",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/canonical.test.ts && ts-node test/canonical-order.test.ts && ts-node test/canonical-stock.test.ts && ts-node test/canonical-invoice.test.ts && ts-node test/license.test.ts && ts-node test/update.test.ts"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.2"
+  }
+}

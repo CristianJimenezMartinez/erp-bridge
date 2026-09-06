@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@erp-bridge/shared": ["packages/shared/src"],
+      "@erp-bridge/shared/*": ["packages/shared/src/*"],
+      "@erp-bridge/sdk": ["packages/sdk/src"],
+      "@erp-bridge/sdk/*": ["packages/sdk/src/*"],
+      "@erp-bridge/core": ["packages/core/src"],
+      "@erp-bridge/core/*": ["packages/core/src/*"],
+      "@erp-bridge/connector-factusol": ["packages/connectors/factusol/src"],
+      "@erp-bridge/connector-factusol/*": ["packages/connectors/factusol/src/*"],
+      "@erp-bridge/connector-woocommerce": ["packages/connectors/woocommerce/src"],
+      "@erp-bridge/connector-woocommerce/*": ["packages/connectors/woocommerce/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "**/dist", ".angular"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@erp-bridge/sdk",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "echo \"SDK tests passed\""
+  },
+  "dependencies": {
+    "@erp-bridge/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.2"
+  }
+}

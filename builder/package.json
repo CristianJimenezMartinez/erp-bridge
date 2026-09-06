@@ -1,0 +1,14 @@
+{
+  "name": "bentian-agent-builder",
+  "version": "0.1.0",
+  "description": "Standalone builder and packager for Bentian Agent (Windows)",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "bundle": "node build-bundle.js",
+    "exe": "node build-exe.js"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

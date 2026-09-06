@@ -1,0 +1,22 @@
+{
+  "name": "@erp-bridge/connector-woocommerce",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/woocommerce-mapper.test.ts && ts-node test/woocommerce-order-mapper.test.ts && ts-node test/woocommerce-stock.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "@woocommerce/woocommerce-rest-api": "^1.0.1",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/node-fetch": "^2.6.11",
+    "typescript": "^5.4.2"
+  }
+}

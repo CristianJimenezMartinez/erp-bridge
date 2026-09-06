@@ -1,0 +1,31 @@
+{
+  "name": "erp-bridge-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal connectivity layer for business software",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "start:api": "pnpm --filter @erp-bridge/api run start",
+    "dev:api": "pnpm --filter @erp-bridge/api run dev",
+    "start:agent": "pnpm --filter @erp-bridge/agent run start",
+    "dev:agent": "pnpm --filter @erp-bridge/agent run dev",
+    "start:dashboard": "pnpm --filter @erp-bridge/dashboard run start"
+  },
+  "keywords": [
+    "erp",
+    "integration",
+    "factusol",
+    "woocommerce",
+    "local-first",
+    "sync"
+  ],
+  "author": "Bentian",
+  "license": "BSL-1.1",
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

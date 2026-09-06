@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # Bentian ERP Bridge — Core API Backend
+  # -------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bentian-api:latest
+    container_name: bentian-api-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Conexión Gestionada a Supabase (PostgreSQL Frankfurt) con SSL
+      - DATABASE_URL=${DATABASE_URL}
+      # Seguridad y Autenticación Administrativa
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@bentian.es}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Bentian2026!}
+      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
+      # Licenciamiento y Stripe
+      - LICENSE_JWT_SECRET=${LICENSE_JWT_SECRET}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+    volumes:
+      - ./releases:/app/releases:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # -------------------------------------------------------------
+  # Opcional: Cloudflare Zero Trust Tunnel (Cero puertos abiertos)
+  # Descomentar si se usa túnel Cloudflare en lugar de proxy Nginx
+  # -------------------------------------------------------------
+  # tunnel:
+  #   image: cloudflare/cloudflared:latest
+  #   container_name: bentian-cloudflared
+  #   restart: always
+  #   command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+  #   depends_on:
+  #     - api

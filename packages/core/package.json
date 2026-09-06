@@ -1,0 +1,23 @@
+{
+  "name": "@erp-bridge/core",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/mapping.test.ts && ts-node test/event-bus.test.ts && ts-node test/retry.test.ts && ts-node test/scheduler.test.ts && ts-node test/watcher.test.ts && ts-node test/agent-service.test.ts && ts-node test/flow-engine.test.ts && ts-node test/invoice-sync.test.ts && ts-node test/license-key.test.ts && ts-node test/license-token.test.ts && ts-node test/license-service.test.ts && ts-node test/update-service.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "pg": "^8.13.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/pg": "^8.11.2",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5.4.2"
+  }
+}

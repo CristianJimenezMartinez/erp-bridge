@@ -1,0 +1,30 @@
+{
+  "name": "@erp-bridge/agent",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "erp-bridge-agent": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/cli.js start",
+    "scan": "ts-node src/cli.ts scan",
+    "status": "ts-node src/cli.ts status",
+    "pair": "ts-node src/cli.ts pair",
+    "test": "ts-node test/detector.test.ts && ts-node test/hwid.test.ts && ts-node test/secure-store.test.ts && ts-node test/auto-updater.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/connector-factusol": "workspace:*",
+    "@erp-bridge/core": "workspace:*",
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

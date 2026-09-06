@@ -1,0 +1,5 @@
+﻿{
+  "main": "builder/dist/bentian-agent.bundle.cjs",
+  "output": "builder/dist/sea-prep.blob",
+  "disableExperimentalSEAWarning": true
+}

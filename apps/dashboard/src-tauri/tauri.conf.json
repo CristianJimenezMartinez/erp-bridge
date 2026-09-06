@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "build": {
+    "beforeBuildCommand": "npx ng build",
+    "beforeDevCommand": "npx ng serve --port 4200",
+    "devPath": "http://localhost:4200",
+    "distDir": "../dist/dashboard"
+  },
+  "package": {
+    "productName": "Bentian ERP Bridge",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "notification": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "Business",
+      "copyright": "Copyright © 2026 Bentian. All rights reserved.",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/Square150x150Logo.png",
+        "icons/icon.png",
+        "icons/icon.ico"
+      ],
+      "identifier": "es.bentian.erpbridge",
+      "longDescription": "Puente de integracion local-first entre Factusol y WooCommerce con sincronizacion continua de catalogo, stock, pedidos y facturas.",
+      "macOS": {
+        "frameworks": [],
+        "minimumSystemVersion": "",
+        "exceptionDomain": "",
+        "signingIdentity": null,
+        "entitlements": null
+      },
+      "resources": [],
+      "shortDescription": "Sincronizador Factusol y WooCommerce",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "systemTray": {
+      "iconAsTemplate": true,
+      "iconPath": "icons/icon.png"
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 840,
+        "resizable": true,
+        "title": "Bentian ERP Bridge",
+        "width": 1280,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true
+      }
+    ]
+  }
+}

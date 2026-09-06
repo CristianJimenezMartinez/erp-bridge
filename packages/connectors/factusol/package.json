@@ -1,0 +1,20 @@
+{
+  "name": "@erp-bridge/connector-factusol",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/factusol-mapper.test.ts && ts-node test/factusol-order-mapper.test.ts && ts-node test/factusol-stock.test.ts && ts-node test/factusol-invoice-mapper.test.ts && ts-node test/real-factusol-e2e.test.ts && ts-node test/real-factusol-order-e2e.test.ts && ts-node test/real-factusol-stock-e2e.test.ts && ts-node test/real-factusol-invoice-e2e.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "node-adodb": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.4.2"
+  }
+}

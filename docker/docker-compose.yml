@@ -1,0 +1,44 @@
+﻿version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.6
+    container_name: bentian-mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_123
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password_123
+    ports:
+      - "3308:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:php8.2-apache
+    container_name: bentian-wordpress
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password_123
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_data:/var/www/html
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bentian-cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://wordpress:80
+    depends_on:
+      - wordpress
+
+volumes:
+  mariadb_data:
+  wordpress_data:

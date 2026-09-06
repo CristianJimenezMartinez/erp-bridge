@@ -1,0 +1,62 @@
+name: Build & Release Bentian Desktop (Tauri Windows)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-tauri-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar Rust Toolchain Estable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache de Dependencias Rust / Cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/dashboard/src-tauri
+
+      - name: Instalar Dependencias del Dashboard Angular
+        working-directory: apps/dashboard
+        run: npm install
+
+      - name: Compilar Dashboard Angular a Produccion
+        working-directory: apps/dashboard
+        run: npx ng build
+
+      - name: Compilar Instaladores de Windows con Tauri (MSI & Setup.exe)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/dashboard/src-tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Bentian ERP Bridge Desktop ${{ github.ref_name }}'
+          releaseBody: |
+            ## Bentian ERP Bridge — Instalador Oficial de Escritorio Windows
+            - Aplicación nativa independiente con integración en la Bandeja del Sistema (System Tray).
+            - Motor ligero WebView2 integrado (menos de 8 MB).
+            - Sincronización continua en segundo plano para Factusol y WooCommerce.
+          releaseDraft: false
+          prerelease: false
+
+      - name: Subir Instaladores como Artefactos de GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: bentian-desktop-windows-installer
+          path: |
+            apps/dashboard/src-tauri/target/release/bundle/msi/*.msi
+            apps/dashboard/src-tauri/target/release/bundle/nsis/*.exe
