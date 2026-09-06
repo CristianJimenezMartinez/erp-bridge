@@ -19,6 +19,7 @@ releases/
 *.so
 license.enc
 agent-config.json
+sync-history.json
 
 # Databases
 *.accdb

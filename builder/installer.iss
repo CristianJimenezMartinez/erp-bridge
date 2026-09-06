@@ -53,5 +53,5 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BentianAgent"; ValueData: """{app}\{#MyAppExeName}"" start"; Flags: uninsdeletevalue; Tasks: autostart
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden
 

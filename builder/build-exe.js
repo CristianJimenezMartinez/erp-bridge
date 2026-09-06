@@ -46,6 +46,9 @@ async function buildExecutable(options = {}) {
     overwrite: true
   });
 
+  // Parchear PE Header a IMAGE_SUBSYSTEM_WINDOWS_GUI (0x0002) para eliminar 100% la consola negra
+  patchPeSubsystemToGui(exePath);
+
   // Asegurar que adodb.js acompaña al ejecutable
   if (!fs.existsSync(adodbDest)) {
     fs.copyFileSync(adodbSource, adodbDest);
@@ -70,6 +73,37 @@ async function buildExecutable(options = {}) {
     sizeBytes: stats.size
   };
 }
+function patchPeSubsystemToGui(exePath) {
+  const fd = fs.openSync(exePath, 'r+');
+  try {
+    const eLfanewBuf = Buffer.alloc(4);
+    fs.readSync(fd, eLfanewBuf, 0, 4, 0x3C);
+    const peOffset = eLfanewBuf.readUInt32LE(0);
+
+    const peSigBuf = Buffer.alloc(4);
+    fs.readSync(fd, peSigBuf, 0, 4, peOffset);
+    if (peSigBuf.toString('ascii') !== 'PE\0\0') {
+      throw new Error(`Firma PE inválida en offset 0x${peOffset.toString(16)}: ${peSigBuf.toString('hex')}`);
+    }
+
+    const subsystemOffset = peOffset + 24 + 68;
+    const subBuf = Buffer.alloc(2);
+    fs.readSync(fd, subBuf, 0, 2, subsystemOffset);
+    const currentSubsystem = subBuf.readUInt16LE(0);
+
+    console.log(`[PE Patcher] Subsistema PE actual: 0x${currentSubsystem.toString(16).padStart(4, '0')} (${currentSubsystem === 3 ? 'CUI / Consola' : currentSubsystem === 2 ? 'GUI' : 'Otro'})`);
+
+    if (currentSubsystem !== 2) {
+      subBuf.writeUInt16LE(2, 0);
+      fs.writeSync(fd, subBuf, 0, 2, subsystemOffset);
+      console.log(`[PE Patcher] ✓ Subsistema parcheado a IMAGE_SUBSYSTEM_WINDOWS_GUI (0x0002). ¡Ventana cmd eliminada al 100%!`);
+    } else {
+      console.log('[PE Patcher] ✓ El binario ya tiene subsistema GUI.');
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+}
 
 if (require.main === module) {
   buildExecutable().catch(err => {
@@ -78,4 +112,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildExecutable };
+module.exports = { buildExecutable, patchPeSubsystemToGui };

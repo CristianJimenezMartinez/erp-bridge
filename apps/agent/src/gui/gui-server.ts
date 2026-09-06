@@ -98,7 +98,16 @@ export class LocalGuiServer {
               return;
             }
 
-            // 6. Save Configuration & Reconnect
+            // 6. Save Full Configuration
+            if (pathname === '/api/local/save-full-config' && req.method === 'POST') {
+              const body = await readRequestBody(req);
+              const result = await this.agent.saveFullConfig(body);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(result));
+              return;
+            }
+
+            // Legacy Save Configuration fallback
             if (pathname === '/api/local/save-config' && req.method === 'POST') {
               const body = await readRequestBody(req);
               let success = true;
@@ -125,7 +134,51 @@ export class LocalGuiServer {
               return;
             }
 
-            // 7. Activate License
+            // 7. Factusol Metadata (Tariffs, Warehouses, Series)
+            if (pathname === '/api/local/factusol/metadata' && req.method === 'GET') {
+              const metadata = await this.agent.getFactusolMetadata();
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(metadata));
+              return;
+            }
+
+            // 8. Factusol Preview Articles
+            if (pathname === '/api/local/factusol/preview' && req.method === 'GET') {
+              const preview = await this.agent.getFactusolPreviewArticles(25);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(preview));
+              return;
+            }
+
+            // 9. Test WooCommerce Connection
+            if (pathname === '/api/local/test-woocommerce' && req.method === 'POST') {
+              const body = await readRequestBody(req);
+              const result = await this.agent.testWooCommerceConnection(body);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(result));
+              return;
+            }
+
+            // 10. Sync History & Executions
+            if (pathname === '/api/local/history' && req.method === 'GET') {
+              const history = this.agent.getSyncHistory();
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(history));
+              return;
+            }
+
+            // 11. Export Diagnostics
+            if (pathname === '/api/local/export-diagnostic' && req.method === 'GET') {
+              const diagnosticText = this.agent.exportDiagnostic();
+              res.writeHead(200, {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Content-Disposition': 'attachment; filename="bentian-diagnostics.txt"',
+              });
+              res.end(diagnosticText);
+              return;
+            }
+
+            // 12. Activate License
             if (pathname === '/api/local/activate-license' && req.method === 'POST') {
               const body = await readRequestBody(req);
               const result = await this.agent.activateLicense(body.licenseKey || '');
@@ -134,7 +187,7 @@ export class LocalGuiServer {
               return;
             }
 
-            // 8. Manual Sync Trigger
+            // 13. Manual Sync Trigger
             if (pathname === '/api/local/sync-now' && req.method === 'POST') {
               const result = await this.agent.triggerManualSync();
               res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -142,7 +195,7 @@ export class LocalGuiServer {
               return;
             }
 
-            // 9. Activity Logs
+            // 14. Activity Logs
             if (pathname === '/api/local/logs' && req.method === 'GET') {
               const logs = this.agent.getRecentEvents();
               res.writeHead(200, { 'Content-Type': 'application/json' });

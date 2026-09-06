@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+if (process.platform === 'win32') {
+  process.stdout?.on('error', () => {});
+  process.stderr?.on('error', () => {});
+}
 import path from 'path';
 import readline from 'readline';
 import { execSync } from 'child_process';

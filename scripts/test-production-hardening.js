@@ -37,7 +37,9 @@ async function runHardeningTests() {
   if (!setApiOutput.includes('Servidor API configurado con éxito')) {
     throw new Error(`set-api falló. Salida: ${setApiOutput}`);
   }
-  const configPath = path.resolve(rootDir, 'agent-config.json');
+  const configPath = fs.existsSync(path.resolve(path.dirname(agentExe), 'agent-config.json'))
+    ? path.resolve(path.dirname(agentExe), 'agent-config.json')
+    : path.resolve(rootDir, 'agent-config.json');
   const configContent = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   if (configContent.apiBaseUrl !== testApiUrl) {
     throw new Error(`agent-config.json no tiene la URL esperada: ${configContent.apiBaseUrl}`);
