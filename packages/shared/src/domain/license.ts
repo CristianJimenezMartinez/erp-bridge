@@ -24,7 +24,7 @@ export interface License {
 export const LicenseSchema = z.object({
   id: z.string().uuid(),
   key: z.string().regex(/^EB-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}$/),
-  organizationId: z.string().uuid(),
+  organizationId: z.string().min(1),
   plan: LicensePlanSchema,
   status: LicenseStatusSchema,
   maxActivations: z.number().int().min(1),
@@ -86,7 +86,7 @@ export interface LicenseTokenPayload {
 
 export const LicenseTokenPayloadSchema = z.object({
   licenseId: z.string().uuid(),
-  organizationId: z.string().uuid(),
+  organizationId: z.string().min(1),
   plan: LicensePlanSchema,
   hwid: z.string().min(16),
   agentId: z.string().uuid().optional(),
@@ -165,7 +165,7 @@ export interface CreateLicenseDto {
 }
 
 export const CreateLicenseDtoSchema = z.object({
-  organizationId: z.string().uuid(),
+  organizationId: z.string().min(1),
   plan: LicensePlanSchema,
   maxActivations: z.number().int().min(1).default(1),
   expiresAt: z.union([z.coerce.date(), z.null()]).optional(),
