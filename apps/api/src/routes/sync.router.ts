@@ -119,3 +119,36 @@ syncRouter.get('/sync-executions/:id', async (req: Request, res: Response, next:
     next(error);
   }
 });
+
+syncRouter.post('/sync/run-reactive', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orgId = getOrgId(req);
+    const { agentId, reason, timestamp } = req.body || {};
+    
+    // Buscar trabajos activos de sincronización para esta organización
+    const jobs = await syncService.listJobs(orgId);
+    const activeJobs = jobs.filter((j) => j.status === 'ACTIVE');
+    
+    const executionResults = [];
+    for (const job of activeJobs) {
+      try {
+        const execution = await syncService.runJob(orgId, job.id, { dryRun: false });
+        executionResults.push({ jobId: job.id, status: execution.status, count: execution.processedCount });
+      } catch (jobErr) {
+        executionResults.push({ jobId: job.id, status: 'FAILED', error: jobErr instanceof Error ? jobErr.message : String(jobErr) });
+      }
+    }
+    
+    res.json({
+      success: true,
+      agentId,
+      reason,
+      timestamp,
+      triggeredJobs: executionResults.length,
+      executions: executionResults,
+      message: `Sincronización reactiva procesada (${executionResults.length} trabajo(s) ejecutado(s))`
+    });
+  } catch (error) {
+    next(error);
+  }
+});

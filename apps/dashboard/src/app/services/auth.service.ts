@@ -22,7 +22,16 @@ export interface LoginResponse {
 export class AuthService {
   private readonly TOKEN_KEY = 'bentian_admin_token';
   private readonly USER_KEY = 'bentian_admin_user';
-  private baseUrl = 'http://localhost:3000/api/v1';
+  private get baseUrl(): string {
+    if (typeof window !== 'undefined' && window.location) {
+      const origin = window.location.origin;
+      if (origin.startsWith('http://localhost:4200')) {
+        return 'http://localhost:3000/api/v1';
+      }
+      return `${origin}/api/v1`;
+    }
+    return '/api/v1';
+  }
 
   public currentUser = signal<AdminUser | null>(this.loadUserFromStorage());
 

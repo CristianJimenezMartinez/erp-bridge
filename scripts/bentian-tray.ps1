@@ -24,10 +24,14 @@ $itemExit = $contextMenu.Items.Add("Salir")
 
 function Open-BentianWindow {
     $edgePath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    $chromePath = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    $dashboardUrl = "https://api.veltiatrust.com/dashboard"
     if (Test-Path $edgePath) {
-        Start-Process $edgePath -ArgumentList "--app=http://localhost:4200", "--window-size=1260,840"
+        Start-Process $edgePath -ArgumentList "--app=$dashboardUrl", "--window-size=1280,840"
+    } elseif (Test-Path $chromePath) {
+        Start-Process $chromePath -ArgumentList "--app=$dashboardUrl", "--window-size=1280,840"
     } else {
-        Start-Process "http://localhost:4200"
+        Start-Process $dashboardUrl
     }
 }
 

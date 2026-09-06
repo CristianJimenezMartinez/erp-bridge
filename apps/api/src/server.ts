@@ -98,15 +98,17 @@ export async function bootstrapApp(): Promise<Express> {
     return res.json({ message: 'Bentian ERP Bridge API', status: 'OK', docs: '/health' });
   });
 
-  app.get('/dashboard', (_req, res) => {
-    const dashCandidates = [
-      path.resolve(__dirname, '../../../dashboard.html'),
-      path.resolve(__dirname, '../../dashboard.html'),
-      path.resolve(process.cwd(), 'dashboard.html')
-    ];
-    const target = dashCandidates.find(p => fs.existsSync(p));
-    if (target) {
-      return res.sendFile(target);
+  // Servir Dashboard Angular 17 SPA real
+  const dashboardDir = path.join(publicDir, 'dashboard');
+  app.use('/dashboard', express.static(dashboardDir));
+  app.get('/dashboard*', (_req, res) => {
+    const angularIndex = path.join(dashboardDir, 'index.html');
+    if (fs.existsSync(angularIndex)) {
+      return res.sendFile(angularIndex);
+    }
+    const dashFallback = path.resolve(process.cwd(), 'dashboard.html');
+    if (fs.existsSync(dashFallback)) {
+      return res.sendFile(dashFallback);
     }
     return res.status(404).send('Dashboard file not found');
   });
