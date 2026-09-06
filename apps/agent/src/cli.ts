@@ -178,8 +178,8 @@ async function main() {
       console.log(`   Node.js: ${info.nodeVersion}`);
       console.log(`   HWID: ${hwid.substring(0, 24)}...`);
       console.log(`   Licencia: ${lic.status}${lic.plan ? ` (Plan: ${lic.plan})` : ''}\n`);
-      process.exit(0);
-      break;
+      process.exitCode = 0;
+      return;
     }
 
     case 'activate': {
