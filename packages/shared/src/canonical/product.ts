@@ -14,6 +14,7 @@ export const CanonicalImageSchema = z.object({
   url: z.string().url().or(z.string()),
   alt: z.string().optional(),
   position: z.number().optional(),
+  hash: z.string().optional(), // Hash MD5 para deduplicación y blindaje en WordPress
 });
 
 export type CanonicalImage = z.infer<typeof CanonicalImageSchema>;
@@ -26,6 +27,14 @@ export const CanonicalCategorySchema = z.object({
 });
 
 export type CanonicalCategory = z.infer<typeof CanonicalCategorySchema>;
+
+export const B2BPriceEntrySchema = z.object({
+  tariffCode: z.string(),
+  price: z.number().nonnegative(),
+  discountPercent: z.number().min(0).max(100).optional(),
+});
+
+export type B2BPriceEntry = z.infer<typeof B2BPriceEntrySchema>;
 
 export const ProductStatusSchema = z.enum(['draft', 'published', 'archived', 'private']);
 export type ProductStatus = z.infer<typeof ProductStatusSchema>;
@@ -50,6 +59,12 @@ export const CanonicalProductSchema = z.object({
   images: z.array(CanonicalImageSchema).default([]),
   attributes: z.record(z.string(), z.string()).default({}),
   rawSourceData: z.record(z.string(), z.unknown()).optional(),
+  b2bPrices: z.array(B2BPriceEntrySchema).optional(),
+  parentId: z.string().optional(),
+  combinationId: z.union([z.string(), z.number()]).optional(),
+  dataHash: z.string().optional(),
+  priceHash: z.string().optional(),
+  stockHash: z.string().optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });

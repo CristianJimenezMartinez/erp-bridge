@@ -208,7 +208,8 @@ export class WooCommerceConnector implements Connector {
 
   public async updateProduct(
     product: CanonicalProduct,
-    targetIdentifier?: string
+    targetIdentifier?: string,
+    options?: { skipImages?: boolean }
   ): Promise<ProductMutationResult> {
     if (!this.client) {
       throw new ConnectionError(ErrorCode.CONNECTION_NOT_FOUND, 'WooCommerce no está conectado');
@@ -223,7 +224,8 @@ export class WooCommerceConnector implements Connector {
 
     try {
       const numericId = parseInt(targetIdentifier, 10);
-      const payload = mapCanonicalToWooCommerce(product, numericId);
+      const skipImages = options?.skipImages ?? true;
+      const payload = mapCanonicalToWooCommerce(product, numericId, { skipImages });
       const response = await this.client.put<{ id: number; sku: string }>(`products/${numericId}`, payload);
       return {
         success: true,
@@ -244,7 +246,8 @@ export class WooCommerceConnector implements Connector {
 
   public async batchUpsertProducts(
     products: CanonicalProduct[],
-    existingMappings?: Map<string, string>
+    existingMappings?: Map<string, string>,
+    options?: { skipImagesOnUpdate?: boolean }
   ): Promise<BatchSyncResult> {
     if (!this.client) {
       throw new ConnectionError(ErrorCode.CONNECTION_NOT_FOUND, 'WooCommerce no está conectado');
@@ -253,23 +256,25 @@ export class WooCommerceConnector implements Connector {
     const creates: WooCommerceProductPayload[] = [];
     const updates: WooCommerceProductPayload[] = [];
     const itemResults: Array<{ sku: string; success: boolean; externalId?: string; error?: string }> = [];
+    const skipImagesOnUpdate = options?.skipImagesOnUpdate ?? true;
 
     for (const product of products) {
       const targetIdStr = existingMappings?.get(product.sku);
       if (targetIdStr) {
         const targetId = parseInt(targetIdStr, 10);
-        updates.push(mapCanonicalToWooCommerce(product, targetId));
+        updates.push(mapCanonicalToWooCommerce(product, targetId, { skipImages: skipImagesOnUpdate }));
       } else {
         creates.push(mapCanonicalToWooCommerce(product));
       }
     }
 
-    const CHUNK_SIZE = 50;
+    const CHUNK_SIZE = 25;
     let succeeded = 0;
     let failed = 0;
 
     for (let i = 0; i < creates.length; i += CHUNK_SIZE) {
       const chunk = creates.slice(i, i + CHUNK_SIZE);
+      const chunkStart = Date.now();
       try {
         const response = await this.client.post<{
           create?: Array<{ id: number; sku: string; error?: { message: string } }>;
@@ -293,10 +298,17 @@ export class WooCommerceConnector implements Connector {
           itemResults.push({ sku: item.sku, success: false, error: errMessage });
         }
       }
+
+      const elapsed = Date.now() - chunkStart;
+      if (elapsed > 1500 && i + CHUNK_SIZE < creates.length) {
+        this.logger.warn(`Latencia alta detectada en WooCommerce (${elapsed}ms > 1500ms). Aplicando throttling adaptativo de 750ms...`);
+        await new Promise((resolve) => setTimeout(resolve, 750));
+      }
     }
 
     for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
       const chunk = updates.slice(i, i + CHUNK_SIZE);
+      const chunkStart = Date.now();
       try {
         const response = await this.client.post<{
           update?: Array<{ id: number; sku: string; error?: { message: string } }>;
@@ -319,6 +331,12 @@ export class WooCommerceConnector implements Connector {
           failed++;
           itemResults.push({ sku: item.sku, success: false, error: errMessage });
         }
+      }
+
+      const elapsed = Date.now() - chunkStart;
+      if (elapsed > 1500 && i + CHUNK_SIZE < updates.length) {
+        this.logger.warn(`Latencia alta detectada en WooCommerce (${elapsed}ms > 1500ms). Aplicando throttling adaptativo de 750ms...`);
+        await new Promise((resolve) => setTimeout(resolve, 750));
       }
     }
 
@@ -523,12 +541,13 @@ export class WooCommerceConnector implements Connector {
       }
     }
 
-    const CHUNK_SIZE = 50;
+    const CHUNK_SIZE = 25;
     let succeeded = 0;
     let failed = itemResults.length;
 
     for (let i = 0; i < updates.length; i += CHUNK_SIZE) {
       const chunk = updates.slice(i, i + CHUNK_SIZE);
+      const chunkStart = Date.now();
       try {
         const response = await this.client.post<{
           update?: Array<{ id: number; sku: string; error?: { message: string } }>;
@@ -551,6 +570,12 @@ export class WooCommerceConnector implements Connector {
           failed++;
           itemResults.push({ sku: item.sku || String(item.id), success: false, error: errMessage });
         }
+      }
+
+      const elapsed = Date.now() - chunkStart;
+      if (elapsed > 1500 && i + CHUNK_SIZE < updates.length) {
+        this.logger.warn(`Latencia alta detectada en WooCommerce Stock (${elapsed}ms > 1500ms). Aplicando throttling adaptativo de 750ms...`);
+        await new Promise((resolve) => setTimeout(resolve, 750));
       }
     }
 

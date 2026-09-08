@@ -40,6 +40,7 @@ export const CanonicalCustomerSchema = z.object({
   accountingCode: z.number().optional(), // CCOCLI
   paymentMethod: z.string().optional(),  // FPACLI
   priceList: z.number().optional(),      // TARCLI
+  hasEquivalenceSurcharge: z.boolean().default(false), // REQCLI (Recargo de Equivalencia para minoristas)
   rawSourceData: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
@@ -85,6 +86,12 @@ export const CanonicalOrderSchema = z.object({
   totalAmount: z.number().nonnegative(),                // TOTPCL
   warehouse: z.string().default('GEN'),                 // ALMPCL
   notes: z.string().optional(),                         // OB1PCL
+  hasEquivalenceSurcharge: z.boolean().default(false),  // REQPCL en Factusol (1 si aplica R.E., 0 si no)
+  equivalenceSurchargeRate: z.number().optional(),      // % de R.E. (5.2%, 1.4%, 0.5%)
+  trackingNumber: z.string().optional(),                // Número de seguimiento de expedición
+  carrierName: z.string().optional(),                   // Transportista (GLS, MRW, SEUR, Correos Express)
+  carrierCode: z.string().optional(),
+  shippedAt: z.date().optional(),
   rawSourceData: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),

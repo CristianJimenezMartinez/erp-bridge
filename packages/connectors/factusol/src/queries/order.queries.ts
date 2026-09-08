@@ -102,6 +102,7 @@ export function insertOrderHeaderQuery(
   const taxAmount = Number(order.taxAmount || 0).toFixed(2);
   const shippingAmount = Number(order.shippingAmount || 0).toFixed(2);
   const totalAmount = Number(order.totalAmount || 0).toFixed(2);
+  const reqSurcharge = (order.customer?.hasEquivalenceSurcharge || order.hasEquivalenceSurcharge) ? 1 : 0;
 
   return `
     INSERT INTO F_PCL (
@@ -124,7 +125,7 @@ export function insertOrderHeaderQuery(
       '${nif}',
       '${phone}',
       0,
-      0,
+      ${reqSurcharge},
       0,
       '${warehouse}',
       ${netAmount},

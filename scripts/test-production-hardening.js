@@ -3,6 +3,41 @@ const fs = require('fs');
 const http = require('http');
 const { execSync } = require('child_process');
 
+const Module = require('module');
+
+const root = path.resolve(__dirname, '..');
+const origResolve = Module._resolveFilename;
+Module._resolveFilename = function (request, parent, isMain) {
+  if (request === '@erp-bridge/shared') {
+    return path.join(root, 'packages/shared/dist/index.js');
+  }
+  if (request === '@erp-bridge/sdk') {
+    return path.join(root, 'packages/sdk/dist/index.js');
+  }
+  if (request === '@erp-bridge/connector-factusol') {
+    return path.join(root, 'packages/connectors/factusol/dist/index.js');
+  }
+  if (request === '@erp-bridge/connector-woocommerce') {
+    return path.join(root, 'packages/connectors/woocommerce/dist/index.js');
+  }
+  if (request === '@erp-bridge/connector-simplygest') {
+    return path.join(root, 'packages/connectors/simplygest/dist/index.js');
+  }
+  if (request === '@erp-bridge/core') {
+    return path.join(root, 'packages/core/dist/index.js');
+  }
+  try {
+    return origResolve.call(this, request, parent, isMain);
+  } catch (err) {
+    try {
+      const builderCandidate = path.join(root, 'builder/node_modules', request);
+      return origResolve.call(this, builderCandidate, parent, isMain);
+    } catch {
+      throw err;
+    }
+  }
+};
+
 module.paths.push(
   path.resolve(__dirname, '../node_modules/.pnpm/express@4.22.2_supports-color@8.1.1/node_modules'),
   path.resolve(__dirname, '../node_modules/.pnpm/zod@3.25.76/node_modules'),

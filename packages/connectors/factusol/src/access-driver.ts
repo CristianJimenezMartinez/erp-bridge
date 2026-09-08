@@ -77,7 +77,10 @@ export class AccessDriver {
     );
   }
 
-  private async tryCandidates(action: 'query' | 'execute', sql: string): Promise<string> {
+  private async tryCandidates(
+    action: 'query' | 'execute' | 'transaction',
+    sqlOrSqls: string | string[]
+  ): Promise<string> {
     const candidates: Array<{ cscript: string; provider: string }> = [
       { cscript: 'C:\\Windows\\SysWOW64\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.12.0' },
       { cscript: 'C:\\Windows\\SysWOW64\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.16.0' },
@@ -92,7 +95,10 @@ export class AccessDriver {
 
       try {
         const testConn = `Provider=${cand.provider};Data Source=${this.databasePath};Persist Security Info=False;`;
-        const testInput = JSON.stringify({ connection: testConn, sql });
+        const payload = action === 'transaction'
+          ? { connection: testConn, sqls: sqlOrSqls }
+          : { connection: testConn, sql: sqlOrSqls };
+        const testInput = JSON.stringify(payload);
         const res = await this.runAdodbWith(cand.cscript, action, testInput);
         this.logger.info(
           `✓ Conexión OLEDB auto-reparada y adaptada: cscript=${cand.cscript}, provider=${cand.provider}`
@@ -107,7 +113,11 @@ export class AccessDriver {
     throw new Error('Ninguna combinación de proveedor OLEDB / arquitectura de Windows fue capaz de abrir la base de datos.');
   }
 
-  private runAdodbWith(cscript: string, action: 'query' | 'execute', input: string): Promise<string> {
+  private runAdodbWith(
+    cscript: string,
+    action: 'query' | 'execute' | 'transaction',
+    input: string
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       const child = childProcess.spawn(cscript, ['//Nologo', this.adodbJsPath, action], {
         windowsHide: true,
@@ -154,7 +164,7 @@ export class AccessDriver {
     });
   }
 
-  private runAdodb(action: 'query' | 'execute', input: string): Promise<string> {
+  private runAdodb(action: 'query' | 'execute' | 'transaction', input: string): Promise<string> {
     return this.runAdodbWith(this.cscriptPath, action, input);
   }
 
@@ -235,6 +245,52 @@ export class AccessDriver {
         `Error ejecutando comando Access: ${errorMessage}`,
         {
           sql,
+          databasePath: this.databasePath,
+          cscriptPath: this.cscriptPath,
+          rawError: errorMessage,
+        }
+      );
+    }
+  }
+
+  public async executeTransaction(sqlStatements: string[]): Promise<void> {
+    const validStatements = (sqlStatements || []).filter((s) => s && s.trim().length > 0);
+    if (validStatements.length === 0) return;
+
+    this.verifyFileExists();
+
+    const connectionString = this.getConnectionString();
+    const input = JSON.stringify({
+      connection: connectionString,
+      sqls: validStatements,
+    });
+
+    const startTime = Date.now();
+    try {
+      await this.runAdodb('transaction', input);
+      this.logger.debug(
+        `Transacción atómica ejecutada (${validStatements.length} sentencias) en ${Date.now() - startTime}ms`
+      );
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      const errorMessage = err?.message || 'Error desconocido al ejecutar transacción en Access';
+
+      if (this.isProviderOrArchError(errorMessage)) {
+        try {
+          this.logger.warn(`Detectado posible conflicto de arquitectura OLEDB (${errorMessage}). Probando arquitecturas alternativas...`);
+          await this.tryCandidates('transaction', validStatements);
+          return;
+        } catch {
+          // Continúa hacia el throw si fallan los candidatos
+        }
+      }
+
+      this.logger.error(`Error ejecutando transacción Access (${validStatements.length} sentencias)`, error);
+      throw new ConnectionError(
+        ErrorCode.CONNECTION_FAILED,
+        `Error ejecutando transacción Access: ${errorMessage}`,
+        {
+          statementCount: validStatements.length,
           databasePath: this.databasePath,
           cscriptPath: this.cscriptPath,
           rawError: errorMessage,

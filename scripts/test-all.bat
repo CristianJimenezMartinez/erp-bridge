@@ -72,7 +72,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [8/8] Ejecutando Pruebas de Facturacion Stripe, Checkout y Webhooks (13 tests)...
+echo [8/10] Ejecutando Pruebas de Facturacion Stripe, Checkout y Webhooks (17 tests)...
 node scripts\test-billing-api.js
 if %errorlevel% neq 0 (
     echo.
@@ -81,8 +81,26 @@ if %errorlevel% neq 0 (
 )
 
 echo.
+echo [9/10] Ejecutando Pruebas de Blindaje de Sync, Recargo de Equivalencia y Micro-Lotes (10 tests)...
+node scripts\test-blindaje-sync.js
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Fallaron las pruebas de blindaje de sync y fiscalidad.
+    exit /b 1
+)
+
+echo.
+echo [10/10] Ejecutando Pruebas de Conector SimplyGest y Datos.mdb (7 tests)...
+node scripts\test-simplygest.js
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Fallaron las pruebas de SimplyGest.
+    exit /b 1
+)
+
+echo.
 echo ========================================================================
-echo    TODAS LAS BATERIAS DE PRUEBAS (70 TESTS) PASARON EXITOSAMENTE (100%%)
+echo    TODAS LAS BATERIAS DE PRUEBAS (91 TESTS) PASARON EXITOSAMENTE (100%%)
 echo           EL SISTEMA ESTA 100%% LISTO PARA SALIDA A PRODUCCION           
 echo ========================================================================
 echo.

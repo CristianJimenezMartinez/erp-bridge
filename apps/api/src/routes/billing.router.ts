@@ -7,86 +7,150 @@ const licenseService = new LicenseService();
 const logger = new Logger('BillingRouter');
 
 const STRIPE_SECRET_KEY = process.env['STRIPE_SECRET_KEY'] || '';
-const DEFAULT_DASHBOARD_URL = process.env['DASHBOARD_URL'] || 'https://api.veltiatrust.com/dashboard/';
+const DEFAULT_DASHBOARD_URL = process.env['DASHBOARD_URL'] || 'https://bridge.cristianjm.com/dashboard/';
 
-const PLAN_SEATS: Record<string, number> = {
-  starter: 1,
-  professional: 3,
-  business: 10,
-  enterprise: 25,
-};
+export interface PlanDefinition {
+  id: string;
+  name: string;
+  priceEur: number;
+  promoPriceEur?: number;
+  billingCycle: 'annual' | 'monthly' | 'one_off';
+  mode: 'subscription' | 'payment';
+  popular?: boolean;
+  seats: number;
+  storesIncluded: number;
+  description: string;
+  features: string[];
+}
 
-const PLAN_PRICES: Record<string, { eur: number; name: string }> = {
-  starter: { eur: 29, name: 'Bentian ERP Bridge — Starter (1 Puesto)' },
-  professional: { eur: 59, name: 'Bentian ERP Bridge — Profesional (3 Puestos)' },
-  business: { eur: 99, name: 'Bentian ERP Bridge — Flota / Business (10 Puestos)' },
-};
+export const CATALOG_PLANS: PlanDefinition[] = [
+  {
+    id: 'base_annual',
+    name: 'Plan Base Todo Incluido (Anual)',
+    priceEur: 249,
+    promoPriceEur: 199,
+    billingCycle: 'annual',
+    mode: 'subscription',
+    popular: true,
+    seats: 3,
+    storesIncluded: 1,
+    description: 'Sincronización completa sin límites artificiales para 1 ERP y 1 Tienda Online.',
+    features: [
+      'Catálogo ilimitado de productos (sin límites de SKUs)',
+      'Sincronización de pedidos y clientes ilimitada',
+      '1 ERP (Factusol / SimplyGest) ⇄ 1 Tienda Online (WooCommerce / PrestaShop)',
+      'Hasta 3 puestos locales de trabajo incluidos',
+      'Delta Sync por triada de hashes (descarte en local <100ms)',
+      'Blindaje de imágenes por MD5 y Recargo de Equivalencia (R.E.)',
+      'Centro de Control Local nativo y System Tray permanente',
+      'Prueba de 14 días gratis sin tarjeta',
+      'Actualizaciones continuas y soporte técnico por email',
+    ],
+  },
+  {
+    id: 'base_monthly',
+    name: 'Plan Base Todo Incluido (Mensual)',
+    priceEur: 29,
+    billingCycle: 'monthly',
+    mode: 'subscription',
+    seats: 3,
+    storesIncluded: 1,
+    description: 'Máxima flexibilidad mensual sin compromiso de permanencia.',
+    features: [
+      'Catálogo ilimitado de productos y pedidos',
+      '1 ERP ⇄ 1 Tienda Online conectada',
+      'Hasta 3 puestos locales incluidos',
+      'Delta Sync y blindaje de imágenes',
+      'Prueba de 14 días gratis sin tarjeta',
+      'Sin permanencia: cancelable en cualquier momento en 1 clic',
+    ],
+  },
+  {
+    id: 'addon_extra_store_annual',
+    name: 'Add-on Tienda Extra (Anual)',
+    priceEur: 99,
+    billingCycle: 'annual',
+    mode: 'subscription',
+    seats: 0,
+    storesIncluded: 1,
+    description: '+1 Conexión de Tienda Online adicional (ej. WooCommerce B2B + Shopify B2C).',
+    features: [
+      '+1 Tienda Online conectada al mismo ERP',
+      'Sincronización simultánea multi-tienda',
+      'Filtrado por almacenes y tarifas específicas por tienda',
+    ],
+  },
+  {
+    id: 'addon_extra_store_monthly',
+    name: 'Add-on Tienda Extra (Mensual)',
+    priceEur: 12,
+    billingCycle: 'monthly',
+    mode: 'subscription',
+    seats: 0,
+    storesIncluded: 1,
+    description: '+1 Tienda Online adicional con facturación mensual.',
+    features: [
+      '+1 Tienda Online conectada al mismo ERP',
+      'Cancelable mensualmente',
+    ],
+  },
+  {
+    id: 'setup_assisted',
+    name: 'Puesta en Marcha Asistida (Setup One-Off)',
+    priceEur: 99,
+    billingCycle: 'one_off',
+    mode: 'payment',
+    seats: 0,
+    storesIncluded: 0,
+    description: 'Sesión remota guiada de 45 min por AnyDesk con un ingeniero para dejar todo funcionando.',
+    features: [
+      'Instalación del Agente en el equipo con Factusol / SimplyGest',
+      'Vinculación segura de credenciales de WooCommerce / PrestaShop',
+      'Configuración de familias, tarifas y Recargo de Equivalencia',
+      'Prueba de sincronización en vivo de artículos y pedido de test',
+    ],
+  },
+  {
+    id: 'setup_vip',
+    name: 'Implementación Completa & Mapeo VIP',
+    priceEur: 249,
+    billingCycle: 'one_off',
+    mode: 'payment',
+    seats: 0,
+    storesIncluded: 0,
+    description: 'Implantación llave en mano para catálogos complejos con matrices de tallas y tarifas B2B.',
+    features: [
+      'Todo lo incluido en la Puesta en Marcha Asistida',
+      'Mapeo exhaustivo de matrices de tallas y colores',
+      'Configuración de tarifas mayoristas B2B escalonadas',
+      '30 días de soporte prioritario directo por WhatsApp',
+    ],
+  },
+];
 
 /**
- * 1. Catálogo público de planes y precios
+ * 1. Catálogo público de planes, add-ons y servicios
  */
 billingRouter.get('/billing/plans', (_req: Request, res: Response) => {
   return res.json({
-    plans: [
-      {
-        id: 'starter',
-        name: 'Starter',
-        priceEur: 29,
-        billingCycle: 'monthly',
-        seats: 1,
-        description: 'Ideal para 1 tienda física con Factusol y 1 tienda online WooCommerce.',
-        features: [
-          '1 Puesto de Factusol vinculado',
-          'Sincronización bidireccional automática',
-          'Gestión de stock, pedidos y facturas',
-          'Centro de Control Local nativo',
-          'Actualizaciones automáticas',
-        ],
-      },
-      {
-        id: 'professional',
-        name: 'Profesional',
-        popular: true,
-        priceEur: 59,
-        billingCycle: 'monthly',
-        seats: 3,
-        description: 'Perfecto para pymes con varias cajas o puestos en almacén y tienda.',
-        features: [
-          'Hasta 3 Puestos de Factusol incluidos',
-          'Sincronización en tiempo real con AccdbFileWatcher',
-          'Soporte multi-tarifa y almacenes específicos',
-          'Autoservicio de mudanza de PC (desvinculación HWID)',
-          'Soporte prioritario por email y WhatsApp',
-        ],
-      },
-      {
-        id: 'business',
-        name: 'Business / Flota',
-        priceEur: 99,
-        billingCycle: 'monthly',
-        seats: 10,
-        description: 'Para cadenas de tiendas, almacenes centrales y distribución masiva.',
-        features: [
-          'Hasta 10 Puestos de Factusol incluidos',
-          'Panel Cloud central de flota multi-clave',
-          'Sincronización concurrente de alta velocidad',
-          'Cola de reintentos inteligente y diagnóstico exportable',
-          'Soporte dedicado con atención directa de ingeniería',
-        ],
-      },
-    ],
+    currency: 'EUR',
+    trialDays: 14,
+    trialCardRequired: false,
+    plans: CATALOG_PLANS,
   });
 });
 
 /**
- * 2. Crear sesión de Stripe Checkout para contratación de licencias
+ * 2. Crear sesión de Stripe Checkout (Planes Anuales/Mensuales, Add-ons o Setup)
  */
 billingRouter.post('/billing/create-checkout-session', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {
-      plan = 'professional',
+      plan = 'base_annual',
       email,
       organizationId: customOrgId,
+      billingCycle = 'annual',
+      isEarlyBird = true,
       successUrl = `${DEFAULT_DASHBOARD_URL}?checkout=success`,
       cancelUrl = `${DEFAULT_DASHBOARD_URL}?checkout=cancel`,
     } = req.body;
@@ -95,33 +159,60 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       return res.status(400).json({ error: { message: 'El parámetro email es obligatorio para generar la suscripción.' } });
     }
 
-    const cleanPlan = (plan in PLAN_PRICES ? plan : 'professional') as string;
-    const seats = PLAN_SEATS[cleanPlan] || 3;
-    const planInfo = PLAN_PRICES[cleanPlan] || { eur: 59, name: 'Bentian ERP Bridge' };
+    // Normalizar identificador de plan
+    let matchedPlan = CATALOG_PLANS.find(p => p.id === plan);
+    if (!matchedPlan) {
+      // Compatibilidad con identificadores antiguos ('starter', 'professional', 'business')
+      if (plan === 'starter' || plan === 'base' || plan === 'base_annual' || plan === 'annual') {
+        matchedPlan = CATALOG_PLANS[0];
+      } else if (plan === 'base_monthly' || plan === 'monthly') {
+        matchedPlan = CATALOG_PLANS[1];
+      } else if (plan === 'setup' || plan === 'setup_assisted') {
+        matchedPlan = CATALOG_PLANS[4];
+      } else {
+        matchedPlan = CATALOG_PLANS[0]; // Por defecto Plan Base Anual
+      }
+    }
+
     const orgId = customOrgId || `org_${Buffer.from(email).toString('hex').substring(0, 10)}`;
+    const isSubscription = matchedPlan.mode === 'subscription';
+    const interval = matchedPlan.billingCycle === 'monthly' ? 'month' : 'year';
 
-    logger.info(`Iniciando creación de Checkout Session para ${email} (Plan: ${cleanPlan}, Puestos: ${seats})`);
+    // Determinar precio real (aplicar oferta de lanzamiento Early Bird de 199€ si corresponde)
+    const finalPriceEur = (matchedPlan.id === 'base_annual' && isEarlyBird && matchedPlan.promoPriceEur)
+      ? matchedPlan.promoPriceEur
+      : matchedPlan.priceEur;
 
-    // Si Stripe está configurado en producción con su API Key:
+    logger.info(`Iniciando Checkout Session: ${matchedPlan.name} para ${email} (${finalPriceEur}€)`);
+
+    // Si Stripe está configurado con clave real (live o test):
     if (STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
       const params = new URLSearchParams();
-      params.append('mode', 'subscription');
+      params.append('mode', matchedPlan.mode);
       params.append('customer_email', email);
       params.append('success_url', successUrl.includes('{CHECKOUT_SESSION_ID}') ? successUrl : `${successUrl}&session_id={CHECKOUT_SESSION_ID}`);
       params.append('cancel_url', cancelUrl);
       params.append('metadata[organizationId]', orgId);
-      params.append('metadata[plan]', cleanPlan);
-      params.append('metadata[maxActivations]', String(seats));
-      params.append('subscription_data[metadata][organizationId]', orgId);
-      params.append('subscription_data[metadata][plan]', cleanPlan);
-      params.append('subscription_data[metadata][maxActivations]', String(seats));
+      params.append('metadata[planId]', matchedPlan.id);
+      params.append('metadata[planName]', matchedPlan.name);
+      params.append('metadata[maxActivations]', String(matchedPlan.seats || 3));
+      params.append('metadata[storesIncluded]', String(matchedPlan.storesIncluded || 1));
 
-      // Línea de producto recurrente
+      if (isSubscription) {
+        params.append('subscription_data[metadata][organizationId]', orgId);
+        params.append('subscription_data[metadata][planId]', matchedPlan.id);
+        params.append('subscription_data[metadata][maxActivations]', String(matchedPlan.seats || 3));
+      }
+
+      // Línea de producto
       params.append('line_items[0][price_data][currency]', 'eur');
-      params.append('line_items[0][price_data][recurring][interval]', 'month');
-      params.append('line_items[0][price_data][unit_amount]', String(planInfo.eur * 100));
-      params.append('line_items[0][price_data][product_data][name]', planInfo.name);
+      params.append('line_items[0][price_data][unit_amount]', String(finalPriceEur * 100));
+      params.append('line_items[0][price_data][product_data][name]', matchedPlan.name);
       params.append('line_items[0][quantity]', '1');
+
+      if (isSubscription) {
+        params.append('line_items[0][price_data][recurring][interval]', interval);
+      }
 
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
@@ -135,11 +226,11 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       const sessionData = (await response.json()) as any;
 
       if (!response.ok) {
-        logger.error('Error devuelto por la API de Stripe:', sessionData);
+        logger.error('Error devuelto por Stripe API:', sessionData);
         return res.status(502).json({ error: { message: sessionData.error?.message || 'Error al conectar con Stripe' } });
       }
 
-      logger.info(`✓ Sesión Stripe Checkout creada con éxito: ${sessionData.id}`);
+      logger.info(`✓ Sesión Stripe Checkout creada: ${sessionData.id}`);
       return res.json({
         success: true,
         sessionId: sessionData.id,
@@ -147,12 +238,14 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       });
     }
 
-    // Modo Mock / Desarrollo local si no hay clave de Stripe configurada
-    logger.warn('STRIPE_SECRET_KEY no configurada o en modo demo. Retornando URL de éxito simulada.');
+    // Modo Mock / Desarrollo local
+    logger.warn('STRIPE_SECRET_KEY no configurada. Retornando Checkout Session simulada.');
     return res.json({
       success: true,
       sessionId: `cs_test_mock_${Date.now()}`,
-      url: `${successUrl}&demo_mode=true&plan=${cleanPlan}`,
+      url: `${successUrl}&demo_mode=true&plan=${matchedPlan.id}&price=${finalPriceEur}`,
+      plan: matchedPlan.id,
+      amountEur: finalPriceEur,
       demo: true,
     });
   } catch (error) {
@@ -191,7 +284,6 @@ billingRouter.post('/billing/create-portal-session', async (req: Request, res: R
       }
     }
 
-    // Fallback amigable
     return res.json({
       success: true,
       url: 'https://billing.stripe.com/p/login/test',
@@ -206,7 +298,7 @@ billingRouter.post('/billing/create-portal-session', async (req: Request, res: R
 
 /**
  * 4. Stripe Webhook Handler:
- * Procesa pagos y suscripciones de Stripe, generando y revocando claves de licencia de forma automática.
+ * Alta y revocación automática de licencias en base de datos.
  */
 billingRouter.post('/billing/webhook', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -214,21 +306,20 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
     logger.info(`Stripe Webhook recibido: ${event.type || 'unknown'}`);
 
     switch (event.type) {
-      // Pago completado o factura cobrada -> Generar licencia multi-puesto
       case 'checkout.session.completed':
       case 'invoice.payment_succeeded': {
         const session = event.data?.object || {};
         const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@bentian.es';
         const organizationId = session.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
-        const plan = (session.metadata?.plan || 'professional') as 'starter' | 'professional' | 'enterprise';
-        const maxActivations = Number(session.metadata?.maxActivations) || PLAN_SEATS[plan] || 3;
+        const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
+        const maxActivations = Number(session.metadata?.maxActivations) || 3;
         const alias = session.metadata?.alias || 'Puesto Principal (Facturación)';
 
-        logger.info(`Generando licencia tras pago de ${customerEmail} (Plan: ${plan}, Puestos: ${maxActivations})...`);
+        logger.info(`Generando licencia tras pago de ${customerEmail} (Plan: ${planId}, Puestos: ${maxActivations})...`);
 
         const license = await licenseService.createLicense({
           organizationId,
-          plan,
+          plan: 'professional', // Mapeo de compatibilidad con schema DB existente
           maxActivations,
           alias,
         });
@@ -238,14 +329,13 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         return res.json({
           received: true,
           licenseKey: license.key,
-          plan: license.plan,
+          plan: planId,
           alias: license.alias,
           maxActivations: license.maxActivations,
           organizationId: license.organizationId,
         });
       }
 
-      // Suscripción cancelada o impago -> Revocar licencia asociada
       case 'customer.subscription.deleted':
       case 'invoice.payment_failed': {
         const subscription = event.data?.object || {};

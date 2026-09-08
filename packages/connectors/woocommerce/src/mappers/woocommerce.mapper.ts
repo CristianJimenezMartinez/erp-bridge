@@ -22,7 +22,15 @@ export interface WooCommerceProductPayload {
   };
 }
 
-export function mapCanonicalToWooCommerce(product: CanonicalProduct, targetId?: number): WooCommerceProductPayload {
+export interface MapToWooCommerceOptions {
+  skipImages?: boolean;
+}
+
+export function mapCanonicalToWooCommerce(
+  product: CanonicalProduct,
+  targetId?: number,
+  options?: MapToWooCommerceOptions
+): WooCommerceProductPayload {
   const payload: WooCommerceProductPayload = {
     name: product.name,
     type: 'simple',
@@ -51,7 +59,7 @@ export function mapCanonicalToWooCommerce(product: CanonicalProduct, targetId?: 
     payload.categories = product.categories.map((c) => ({ name: c.name }));
   }
 
-  if (product.images && product.images.length > 0) {
+  if (!options?.skipImages && product.images && product.images.length > 0) {
     payload.images = product.images.map((img) => ({
       src: img.url,
       alt: img.alt || product.name,

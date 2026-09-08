@@ -158,6 +158,7 @@ export class FactusolOrderMapper {
         taxId: header.CNIPCL ? String(header.CNIPCL).trim() : undefined,
         fiscalName: String(header.CNOPCL ?? '').trim() || `Cliente #${header.CLIPCL}`,
         phone: header.TELPCL ? String(header.TELPCL).trim() : undefined,
+        hasEquivalenceSurcharge: Number(header.REQPCL) === 1,
         address: {
           street: header.CDOPCL ? String(header.CDOPCL).trim() : undefined,
           city: header.CPOPCL ? String(header.CPOPCL).trim() : undefined,
@@ -194,6 +195,7 @@ export class FactusolOrderMapper {
       shippingAmount: Number(header.IPOR1PCL) || 0,
       discountAmount: 0,
       totalAmount: Number(header.TOTPCL) || 0,
+      hasEquivalenceSurcharge: Number(header.REQPCL) === 1,
       warehouse: String(header.ALMPCL ?? 'GEN').trim(),
       rawSourceData: header as unknown as Record<string, unknown>,
       createdAt: dateVal,

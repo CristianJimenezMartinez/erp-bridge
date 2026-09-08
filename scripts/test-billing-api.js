@@ -67,12 +67,14 @@ function generateLicenseKey() {
   return `EB-${fullBody.substring(0, 5)}-${fullBody.substring(5, 10)}-${fullBody.substring(10, 15)}-${fullBody.substring(15, 20)}`;
 }
 
-const PLAN_SEATS = { starter: 1, professional: 3, business: 10, enterprise: 25 };
-const PLAN_PRICES = {
-  starter: { eur: 29, name: 'Bentian ERP Bridge — Starter (1 Puesto)' },
-  professional: { eur: 59, name: 'Bentian ERP Bridge — Profesional (3 Puestos)' },
-  business: { eur: 99, name: 'Bentian ERP Bridge — Flota / Business (10 Puestos)' },
-};
+const CATALOG_PLANS = [
+  { id: 'base_annual', name: 'Plan Base Todo Incluido (Anual)', priceEur: 249, promoPriceEur: 199, billingCycle: 'annual', mode: 'subscription', seats: 3, storesIncluded: 1 },
+  { id: 'base_monthly', name: 'Plan Base Todo Incluido (Mensual)', priceEur: 29, billingCycle: 'monthly', mode: 'subscription', seats: 3, storesIncluded: 1 },
+  { id: 'addon_extra_store_annual', name: 'Add-on Tienda Extra (Anual)', priceEur: 99, billingCycle: 'annual', mode: 'subscription', seats: 0, storesIncluded: 1 },
+  { id: 'addon_extra_store_monthly', name: 'Add-on Tienda Extra (Mensual)', priceEur: 12, billingCycle: 'monthly', mode: 'subscription', seats: 0, storesIncluded: 1 },
+  { id: 'setup_assisted', name: 'Puesta en Marcha Asistida (Setup One-Off)', priceEur: 99, billingCycle: 'one_off', mode: 'payment', seats: 0, storesIncluded: 0 },
+  { id: 'setup_vip', name: 'Implementación Completa & Mapeo VIP', priceEur: 249, billingCycle: 'one_off', mode: 'payment', seats: 0, storesIncluded: 0 },
+];
 
 async function runBillingTests() {
   console.log('===============================================================');
@@ -111,24 +113,29 @@ async function runBillingTests() {
         if (pathname === '/api/v1/billing/plans' && method === 'GET') {
           res.statusCode = 200;
           return res.end(JSON.stringify({
-            plans: [
-              { id: 'starter', name: 'Starter', priceEur: 29, seats: 1 },
-              { id: 'professional', name: 'Profesional', priceEur: 59, seats: 3 },
-              { id: 'business', name: 'Business / Flota', priceEur: 99, seats: 10 },
-            ]
+            currency: 'EUR',
+            trialDays: 14,
+            trialCardRequired: false,
+            plans: CATALOG_PLANS,
           }));
         }
 
         // 2. POST /api/v1/billing/create-checkout-session
         if (pathname === '/api/v1/billing/create-checkout-session' && method === 'POST') {
           const body = JSON.parse(bodyStr || '{}');
-          const plan = body.plan || 'professional';
-          const seats = PLAN_SEATS[plan] || 3;
+          const planId = body.plan || 'base_annual';
+          const matched = CATALOG_PLANS.find(p => p.id === planId) || CATALOG_PLANS[0];
+          const isEarlyBird = body.isEarlyBird !== false;
+          const finalPrice = (matched.id === 'base_annual' && isEarlyBird) ? (matched.promoPriceEur || 199) : matched.priceEur;
+
           res.statusCode = 200;
           return res.end(JSON.stringify({
             success: true,
             sessionId: `cs_test_${Date.now()}`,
-            url: `https://checkout.stripe.com/c/pay/cs_test_mock?plan=${plan}&seats=${seats}`,
+            url: `https://checkout.stripe.com/c/pay/cs_test_mock?plan=${matched.id}&price=${finalPrice}&mode=${matched.mode}`,
+            plan: matched.id,
+            mode: matched.mode,
+            amountEur: finalPrice,
           }));
         }
 
@@ -148,7 +155,7 @@ async function runBillingTests() {
           if (event.type === 'checkout.session.completed') {
             const session = event.data?.object || {};
             const orgId = session.metadata?.organizationId || testOrgId;
-            const plan = session.metadata?.plan || 'professional';
+            const plan = session.metadata?.plan || 'base_annual';
             const maxActivations = Number(session.metadata?.maxActivations) || 3;
             const alias = session.metadata?.alias || 'Puesto Principal';
             const licKey = generateLicenseKey();
@@ -164,7 +171,7 @@ async function runBillingTests() {
             // Insertar en PostgreSQL de forma atómica
             await executePostgres(`
               INSERT INTO licenses (id, organization_id, key, status, plan, max_activations, current_activations, alias, created_at)
-              VALUES ('${licId}', '${orgId}', '${licKey}', 'active', '${plan}', ${maxActivations}, 0, '${alias}', NOW());
+              VALUES ('${licId}', '${orgId}', '${licKey}', 'active', 'professional', ${maxActivations}, 0, '${alias}', NOW());
             `);
 
             res.statusCode = 200;
@@ -196,7 +203,6 @@ async function runBillingTests() {
 
         // 5. GET /api/v1/billing/licenses-by-email
         if (pathname === '/api/v1/billing/licenses-by-email' && method === 'GET') {
-          const email = parsedUrl.searchParams.get('email');
           const lics = await queryPostgresJson(`
             SELECT id, key, alias, plan, status, max_activations, current_activations
             FROM licenses
@@ -221,22 +227,32 @@ async function runBillingTests() {
   const baseUrl = `http://127.0.0.1:${port}/api/v1`;
 
   try {
-    // 1. Probar catálogo de planes
+    // 1. Probar catálogo de planes (Plan Único Todo Incluido + Addons)
     const plansRes = await fetch(`${baseUrl}/billing/plans`);
     const plansData = await plansRes.json();
     assert(plansRes.status === 200, 'GET /billing/plans responde HTTP 200');
-    assert(plansData.plans && plansData.plans.length === 3, 'Retorna 3 planes públicos (Starter, Profesional, Business)');
-    assert(plansData.plans[1].seats === 3 && plansData.plans[1].priceEur === 59, 'Plan Profesional: 3 puestos a 59€/mes');
+    assert(plansData.trialDays === 14 && plansData.trialCardRequired === false, 'Prueba de 14 días gratis sin tarjeta incluida');
+    assert(plansData.plans && plansData.plans.length === 6, 'Catálogo completo retornado (Plan Base Anual, Mensual, Addons Tienda y Setups)');
 
-    // 2. Probar creación de sesión Stripe Checkout
+    const baseAnnual = plansData.plans.find(p => p.id === 'base_annual');
+    assert(baseAnnual && baseAnnual.priceEur === 249 && baseAnnual.promoPriceEur === 199, 'Plan Base Anual: 249€ (Early Bird 199€)');
+    assert(baseAnnual.storesIncluded === 1 && baseAnnual.seats === 3, 'Plan Base incluye 1 tienda y hasta 3 puestos locales');
+
+    const baseMonthly = plansData.plans.find(p => p.id === 'base_monthly');
+    assert(baseMonthly && baseMonthly.priceEur === 29, 'Plan Base Mensual: 29€/mes sin permanencia');
+
+    const setupAssisted = plansData.plans.find(p => p.id === 'setup_assisted');
+    assert(setupAssisted && setupAssisted.priceEur === 99 && setupAssisted.mode === 'payment', 'Puesta en marcha asistida (One-Off 99€ en modo payment)');
+
+    // 2. Probar creación de sesión Stripe Checkout para Plan Base con Early Bird
     const checkoutRes = await fetch(`${baseUrl}/billing/create-checkout-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: 'professional', email: testEmail })
+      body: JSON.stringify({ plan: 'base_annual', isEarlyBird: true, email: testEmail })
     });
     const checkoutData = await checkoutRes.json();
     assert(checkoutRes.status === 200 && checkoutData.success === true, 'POST /billing/create-checkout-session responde éxito');
-    assert(checkoutData.url.includes('checkout.stripe.com'), 'URL de pasarela Stripe retornada con éxito');
+    assert(checkoutData.amountEur === 199 && checkoutData.mode === 'subscription', 'Checkout generado con precio Early Bird (199€)');
 
     // 3. Probar Stripe Customer Portal
     const portalRes = await fetch(`${baseUrl}/billing/create-portal-session`, {
@@ -260,7 +276,7 @@ async function runBillingTests() {
             customer_details: { email: testEmail },
             metadata: {
               organizationId: testOrgId,
-              plan: 'professional',
+              plan: 'base_annual',
               maxActivations: '3',
               alias: 'Sede Principal Almacén',
             }

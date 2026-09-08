@@ -1,0 +1,21 @@
+{
+  "name": "@erp-bridge/connector-simplygest",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "node dist/test/read-products.spec.js"
+  },
+  "dependencies": {
+    "@erp-bridge/connector-factusol": "workspace:*",
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "node-adodb": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.4.2"
+  }
+}

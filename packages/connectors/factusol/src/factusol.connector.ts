@@ -326,14 +326,9 @@ export class FactusolConnector implements Connector {
 
       const maxRows = await this.driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
       const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-
       const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode);
-      await this.driver.execute(headerSql);
-
-      for (const line of order.lines) {
-        const lineSql = insertOrderLineQuery(line, nextOrderCode, series);
-        await this.driver.execute(lineSql);
-      }
+      const lineSqls = order.lines.map((line) => insertOrderLineQuery(line, nextOrderCode, series));
+      await this.driver.executeTransaction([headerSql, ...lineSqls]);
 
       this.logger.info(`Pedido creado exitosamente en Factusol (CODPCL=${nextOrderCode}, Serie='${series}') para ref ${reference}`);
 
