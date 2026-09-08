@@ -63,6 +63,7 @@ export function mapSimplyGestOrderToCanonical(
       name: String(ln.DESCR ?? '').trim() || String(ln.CODIGO_ART ?? '').trim(),
       quantity: qty,
       unitPrice,
+      discountPercent: 0,
       subtotal: total,
       total,
       vatPercent: 21,
@@ -82,6 +83,7 @@ export function mapSimplyGestOrderToCanonical(
       id: `sg_cli_${raw.CLIENTE}`,
       customerNumber: String(raw.CLIENTE),
       fiscalName: `Cliente #${raw.CLIENTE}`,
+      hasEquivalenceSurcharge: false,
     },
     lines: canonicalLines.length > 0 ? canonicalLines : [
       {
@@ -91,6 +93,7 @@ export function mapSimplyGestOrderToCanonical(
         name: 'Línea de pedido',
         quantity: 1,
         unitPrice: netAmount,
+        discountPercent: 0,
         subtotal: netAmount,
         total: totalAmount,
         vatPercent: 21,

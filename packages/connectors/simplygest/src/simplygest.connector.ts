@@ -7,12 +7,12 @@ import {
   ConnectorMetadata,
   DEFAULT_CAPABILITIES,
   HealthCheckResult,
-  ProductMutationResult,
   OrderMutationResult,
   StockMutationResult,
   CustomerMutationResult,
   ReadProductsOptions,
   ReadOrdersOptions,
+  ReadStockOptions,
   ConnectionError,
   ErrorCode,
 } from '@erp-bridge/sdk';
@@ -26,9 +26,7 @@ import {
 import { AccessDriver } from '@erp-bridge/connector-factusol';
 import {
   getArticlesQuery,
-  getArticleBySkuQuery,
   updateStockQuery,
-  getCustomersQuery,
   findCustomerByCifQuery,
   findCustomerByEmailQuery,
   insertCustomerQuery,
@@ -83,7 +81,7 @@ export class SimplyGestConnector implements Connector {
       supportsReadOrders: true,
       supportsWriteOrders: true,
       supportsBatchOperations: true,
-      supportsRealtimeEvents: false,
+      supportsWebhooks: false,
     };
   }
 
@@ -127,7 +125,7 @@ export class SimplyGestConnector implements Connector {
     this.logger.info('Conector SimplyGest desconectado.');
   }
 
-  public async testConnection(): Promise<HealthCheckResult> {
+  public async healthCheck(): Promise<HealthCheckResult> {
     const start = Date.now();
     if (!this.driver || !this.config) {
       return {
@@ -152,13 +150,13 @@ export class SimplyGestConnector implements Connector {
 
       const fileStats = fs.statSync(this.config.databasePath);
       return {
-        status: 'UP',
+        status: 'HEALTHY',
         latencyMs,
         message: 'Conexión a base de datos de SimplyGest (Datos.mdb) operativa',
         details: {
           databasePath: this.config.databasePath,
           fileSizeBytes: fileStats.size,
-          lastModified: fileStats.mtime,
+          lastModified: fileStats.mtime.toISOString(),
         },
       };
     } catch (error: unknown) {
@@ -171,6 +169,10 @@ export class SimplyGestConnector implements Connector {
         details: { databasePath: this.config?.databasePath },
       };
     }
+  }
+
+  public async testConnection(): Promise<HealthCheckResult> {
+    return this.healthCheck();
   }
 
   // --- Product Operations ---
@@ -193,11 +195,12 @@ export class SimplyGestConnector implements Connector {
 
   // --- Stock Operations ---
 
-  public async readStock(skus?: string[]): Promise<CanonicalStock[]> {
+  public async readStock(options?: ReadStockOptions): Promise<CanonicalStock[]> {
     if (!this.driver || !this.config) {
       throw new ConnectionError(ErrorCode.CONNECTION_NOT_FOUND, 'SimplyGest no está conectado.');
     }
 
+    const skus = options?.skus;
     let rawArticles: SimplyGestArticleRaw[];
     if (skus && skus.length > 0) {
       const escaped = skus.map((s) => `'${String(s).replace(/'/g, "''").trim()}'`).join(',');
@@ -212,11 +215,10 @@ export class SimplyGestConnector implements Connector {
       const sku = String(raw.CODIGO ?? '').trim();
       const qty = Number(raw.STOCK) || 0;
       return {
-        id: `sg_stk_${sku}`,
         sku,
         quantity: qty,
-        inStock: qty > 0,
-        updatedAt: new Date(),
+        warehouse: options?.warehouse || 'GEN',
+        lastUpdated: new Date(),
       };
     });
   }
