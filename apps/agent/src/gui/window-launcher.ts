@@ -36,6 +36,10 @@ export function findBrowserAppExecutable(): string | null {
  * sin barra de direcciones ni pestañas (modo cromeless app).
  */
 export function openDesktopWindow(url: string): boolean {
+  if (process.env['HEADLESS'] === 'true') {
+    logger.info(`Modo headless/test activo: apertura de ventana simulada para ${url}`);
+    return true;
+  }
   try {
     const browserExe = findBrowserAppExecutable();
     const windowArgs = [

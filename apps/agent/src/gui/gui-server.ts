@@ -3,7 +3,7 @@ import { Logger } from '@erp-bridge/shared';
 import { LocalAgent } from '../agent';
 import { FactusolDetector } from '../detector';
 import { renderDashboardHtml } from './ui-template';
-import { openWindowsFileDialog } from './window-launcher';
+import { openWindowsFileDialog, openDesktopWindow } from './window-launcher';
 
 const logger = new Logger('LocalGuiServer');
 
@@ -200,6 +200,31 @@ export class LocalGuiServer {
               const logs = this.agent.getRecentEvents();
               res.writeHead(200, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify(logs));
+              return;
+            }
+
+            // 15. Open Desktop Window (called from System Tray)
+            if (pathname === '/api/local/open-window' && (req.method === 'GET' || req.method === 'POST')) {
+              logger.info('Solicitud de apertura de ventana recibida desde System Tray.');
+              const opened = openDesktopWindow(this.getUrl());
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: opened, url: this.getUrl() }));
+              return;
+            }
+
+            // 16. Graceful Shutdown (called from System Tray)
+            if (pathname === '/api/local/shutdown' && req.method === 'POST') {
+              logger.info('Solicitud de apagado del agente recibida desde System Tray.');
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true, message: 'Apagando Bentian Agent...' }));
+
+              setTimeout(async () => {
+                try {
+                  await this.stop();
+                  await this.agent.stop();
+                } catch { }
+                process.exit(0);
+              }, 300);
               return;
             }
 

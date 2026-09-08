@@ -888,11 +888,22 @@
       showToast(`Clave ${key} copiada al portapapeles`, 'success');
     }
 
-    function openStripePortal() {
-      showToast('Redirigiendo al Portal de Clientes de Stripe...', 'info');
-      setTimeout(() => {
-        showToast('Portal de facturación disponible con credenciales de producción', 'info');
-      }, 1000);
+    async function openStripePortal() {
+      showToast('Conectando con el Portal de Facturación de Stripe...', 'info');
+      try {
+        const email = currentUser?.email || 'admin@bentian.es';
+        const res = await apiFetch('/api/v1/billing/create-portal-session', {
+          method: 'POST',
+          body: JSON.stringify({ email })
+        });
+        if (res && res.url) {
+          window.open(res.url, '_blank');
+        } else {
+          showToast('No se pudo generar la sesión de facturación.', 'error');
+        }
+      } catch (err) {
+        showToast('Error al contactar con Stripe: ' + err.message, 'error');
+      }
     }
 
     function showToast(msg, type = 'success') {

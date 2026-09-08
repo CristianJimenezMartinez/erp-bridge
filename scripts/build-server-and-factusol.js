@@ -11,6 +11,7 @@ async function build() {
       path.resolve(rootDir, 'apps/api/src/server.ts'),
       path.resolve(rootDir, 'apps/api/src/routes/auth.router.ts'),
       path.resolve(rootDir, 'apps/api/src/routes/licenses.router.ts'),
+      path.resolve(rootDir, 'apps/api/src/routes/billing.router.ts'),
     ],
     outdir: path.resolve(rootDir, 'apps/api/dist'),
     outbase: path.resolve(rootDir, 'apps/api/src'),

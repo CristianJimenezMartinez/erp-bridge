@@ -49,6 +49,9 @@ async function buildExecutable(options = {}) {
   // Parchear PE Header a IMAGE_SUBSYSTEM_WINDOWS_GUI (0x0002) para eliminar 100% la consola negra
   patchPeSubsystemToGui(exePath);
 
+  // Compilar System Tray nativo de Windows (BentianTray.exe)
+  const trayExe = compileSystemTray(distDir);
+
   // Asegurar que adodb.js acompaña al ejecutable
   if (!fs.existsSync(adodbDest)) {
     fs.copyFileSync(adodbSource, adodbDest);
@@ -59,6 +62,7 @@ async function buildExecutable(options = {}) {
   console.log(`\n✓ Ejecutable nativo generado con éxito en: ${exePath}`);
   console.log(`  Tamaño: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
   console.log(`  Driver OLEDB adodb.js presente: ${fs.existsSync(adodbDest)}`);
+  console.log(`  System Tray BentianTray.exe presente: ${fs.existsSync(path.resolve(distDir, 'BentianTray.exe'))}`);
   console.log(`  Tiempo: ${(durationMs / 1000).toFixed(2)}s\n`);
 
   // Smoke test de verificación inmediata
@@ -105,6 +109,33 @@ function patchPeSubsystemToGui(exePath) {
   }
 }
 
+function compileSystemTray(distDir) {
+  const cscPath = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe';
+  const traySource = path.resolve(__dirname, '../apps/agent/src/gui/tray/BentianTray.cs');
+  const trayDest = path.resolve(distDir, 'BentianTray.exe');
+  const iconPath = path.resolve(__dirname, '../apps/dashboard/src-tauri/icons/icon.ico');
+
+  if (!fs.existsSync(cscPath) || !fs.existsSync(traySource)) {
+    console.log('[Tray Builder] Advertencia: csc.exe o BentianTray.cs no encontrados.');
+    return null;
+  }
+
+  const iconFlag = fs.existsSync(iconPath) ? `/win32icon:"${iconPath}"` : '';
+  const cmd = `"${cscPath}" /target:winexe ${iconFlag} /out:"${trayDest}" /r:System.Windows.Forms.dll /r:System.Drawing.dll "${traySource}"`;
+
+  try {
+    childProcess.execSync(cmd, { stdio: 'ignore' });
+    if (fs.existsSync(trayDest)) {
+      const stats = fs.statSync(trayDest);
+      console.log(`[Tray Builder] ✓ BentianTray.exe compilado con éxito (${(stats.size / 1024).toFixed(1)} KB)`);
+      return trayDest;
+    }
+  } catch (err) {
+    console.error('[Tray Builder] Error compilando BentianTray.exe:', err.message);
+  }
+  return null;
+}
+
 if (require.main === module) {
   buildExecutable().catch(err => {
     console.error('ERROR EN BUILD-EXE:', err);
@@ -112,4 +143,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildExecutable, patchPeSubsystemToGui };
+module.exports = { buildExecutable, patchPeSubsystemToGui, compileSystemTray };

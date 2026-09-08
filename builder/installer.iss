@@ -37,6 +37,7 @@ Name: "autostart"; Description: "Iniciar Bentian Agent automáticamente al encen
 
 [Files]
 Source: "{#SourceDir}\BentianAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourceDir}\BentianTray.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#SourceDir}\adodb.js"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\agent-config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist
 

@@ -54,7 +54,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [6/6] Ejecutando Pruebas de Licencias Multi-Puesto y Mudanza de PC (10 tests)...
+echo [6/8] Ejecutando Pruebas de Licencias Multi-Puesto y Mudanza de PC (10 tests)...
 node scripts\test-multiseat-licenses.js
 if %errorlevel% neq 0 (
     echo.
@@ -63,8 +63,26 @@ if %errorlevel% neq 0 (
 )
 
 echo.
+echo [7/8] Ejecutando Pruebas de System Tray Nativo de Windows y Loopback (9 tests)...
+node scripts\test-system-tray.js
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Fallaron las pruebas de System Tray nativo.
+    exit /b 1
+)
+
+echo.
+echo [8/8] Ejecutando Pruebas de Facturacion Stripe, Checkout y Webhooks (13 tests)...
+node scripts\test-billing-api.js
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Fallaron las pruebas de Stripe y facturacion.
+    exit /b 1
+)
+
+echo.
 echo ========================================================================
-echo    TODAS LAS BATERIAS DE PRUEBAS (48 TESTS) PASARON EXITOSAMENTE (100%%)
+echo    TODAS LAS BATERIAS DE PRUEBAS (70 TESTS) PASARON EXITOSAMENTE (100%%)
 echo           EL SISTEMA ESTA 100%% LISTO PARA SALIDA A PRODUCCION           
 echo ========================================================================
 echo.

@@ -8,7 +8,7 @@ import readline from 'readline';
 import { execSync } from 'child_process';
 import { LocalAgent } from './agent';
 import { FactusolDetector } from './detector';
-import { LocalGuiServer, openDesktopWindow, openWindowsFileDialog } from './gui';
+import { LocalGuiServer, openDesktopWindow, openWindowsFileDialog, SystemTrayManager } from './gui';
 
 async function promptUserForInput(promptMessage: string, windowTitle: string): Promise<string> {
   if (process.stdin.isTTY) {
@@ -251,15 +251,21 @@ async function main() {
       let guiServer: LocalGuiServer | null = null;
       if (!isHeadless) {
         guiServer = new LocalGuiServer(agent);
-        const { url } = await guiServer.start();
+        const { port, url } = await guiServer.start();
         console.log(`\n🖥️ Interfaz gráfica de escritorio lista en: ${url}`);
         openDesktopWindow(url);
+
+        // Iniciar icono permanente en la bandeja del sistema (System Tray de Windows)
+        if (process.platform === 'win32') {
+          SystemTrayManager.start(port);
+        }
       }
 
       console.log('💡 Agente local ejecutándose en segundo plano. Presione Ctrl+C para detener.\n');
 
       process.on('SIGINT', async () => {
         console.log('\nDeteniendo agente local...');
+        SystemTrayManager.stop();
         if (guiServer) {
           await guiServer.stop();
         }
@@ -271,7 +277,7 @@ async function main() {
   }
 }
 
-export { LocalAgent, LocalGuiServer, FactusolDetector, openDesktopWindow, openWindowsFileDialog };
+export { LocalAgent, LocalGuiServer, FactusolDetector, openDesktopWindow, openWindowsFileDialog, SystemTrayManager };
 
 if (!process.env['ERP_BRIDGE_TEST_MODE']) {
   main().catch((err) => {
