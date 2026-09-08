@@ -74,6 +74,7 @@ async function buildExecutable(options = {}) {
   return {
     exePath,
     adodbPath: adodbDest,
+    trayPath: trayExe || path.resolve(distDir, 'BentianTray.exe'),
     sizeBytes: stats.size
   };
 }

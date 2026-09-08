@@ -60,7 +60,7 @@
     <section class="max-w-6xl mx-auto px-6 pt-20 pb-16 text-center">
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-800/40 text-xs font-medium text-cyan-300 mb-8 shadow-sm">
         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-        Versión Oficial v0.1.0 para Windows x64
+        <span id="version-badge">Versión Oficial v0.1.0 para Windows x64</span>
       </div>
 
       <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight sm:leading-none">
@@ -77,7 +77,7 @@
 
       <!-- Download CTA -->
       <div id="descargas" class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" 
+        <a id="btn-download-exe" href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" 
            class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-base shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-3 transition transform hover:-translate-y-0.5">
           <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
             <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/>
@@ -86,7 +86,7 @@
           <span class="text-xs bg-white/20 px-2 py-0.5 rounded font-mono">24 MB</span>
         </a>
 
-        <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.zip" 
+        <a id="btn-download-zip" href="/releases/v0.1.0/Bentian-Setup-v0.1.0.zip" 
            class="w-full sm:w-auto px-6 py-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-sm border border-slate-800 flex items-center justify-center gap-2 transition">
           <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
@@ -94,7 +94,7 @@
           Instalador en ZIP (.zip)
         </a>
 
-        <a href="/releases/v0.1.0/BentianAgent-v0.1.0-Portable.zip" 
+        <a id="btn-download-portable" href="/releases/v0.1.0/BentianAgent-v0.1.0-Portable.zip" 
            class="w-full sm:w-auto px-6 py-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white font-medium text-sm border border-slate-800 flex items-center justify-center gap-2 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -177,8 +177,8 @@
           Sumas de Verificación Oficiales (SHA-256):
         </div>
         <div class="text-slate-400 space-y-1.5 break-all">
-          <div><span class="text-cyan-400">Bentian-Setup-v0.1.0.exe:</span> 03ffdc99d49394094d755270e411f0b9733c081afa104f5743c3887468ede6e0</div>
-          <div><span class="text-cyan-400">BentianAgent.exe:</span> b4e88ce4fd89ef126c6b4dfacf55d7884e8d30d40f3c213903ebe97c3b66639d</div>
+          <div><span class="text-cyan-400" id="hash-installer-label">Bentian-Setup-v0.1.0.exe:</span> <span id="hash-installer">20fb0498dd2c2ec196d50feaf3486580e2beec77d4af7010c9980e704c4ba409</span></div>
+          <div><span class="text-cyan-400" id="hash-agent-label">BentianAgent.exe:</span> <span id="hash-agent">b082f6572809a271575a44e0aa27b820de5406b6f1383244f0c8b52475636672</span></div>
         </div>
       </div>
     <!-- Pricing Section: Plan Base Todo Incluido -->
@@ -321,6 +321,31 @@
         alert('Error al conectar con la pasarela: ' + err.message);
       }
     }
+
+    // Auto-hidratación en tiempo real desde /releases/latest.json
+    (function initReleaseLinks() {
+      fetch('/releases/latest.json')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (!data || !data.latestVersion) return;
+          var v = data.latestVersion;
+          var stable = data.stable || {};
+          var badge = document.getElementById('version-badge');
+          if (badge) badge.innerText = 'Versión Oficial v' + v + ' para Windows x64';
+          var btnExe = document.getElementById('btn-download-exe');
+          if (btnExe) btnExe.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.exe';
+          var btnZip = document.getElementById('btn-download-zip');
+          if (btnZip) btnZip.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.zip';
+          var btnPort = document.getElementById('btn-download-portable');
+          if (btnPort) btnPort.href = '/releases/v' + v + '/BentianAgent-v' + v + '-Portable.zip';
+          var hashInstLbl = document.getElementById('hash-installer-label');
+          if (hashInstLbl) hashInstLbl.innerText = 'Bentian-Setup-v' + v + '.exe:';
+          var hashInst = document.getElementById('hash-installer');
+          if (hashInst && stable.installer) hashInst.innerText = stable.installer.sha256;
+          var hashAgent = document.getElementById('hash-agent');
+          if (hashAgent && stable.sha256) hashAgent.innerText = stable.sha256;
+        }).catch(function() {});
+    })();
   </script>
 
   <!-- Footer -->
