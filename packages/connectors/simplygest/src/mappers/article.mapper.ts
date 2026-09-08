@@ -46,7 +46,7 @@ export function mapSimplyGestArticleToCanonical(raw: SimplyGestArticleRaw): Cano
     images: [],
     attributes: {
       taxClass,
-      simplygestImpuesto: taxCode,
+      simplygestImpuesto: String(taxCode),
     },
     rawSourceData: raw as unknown as Record<string, unknown>,
   };

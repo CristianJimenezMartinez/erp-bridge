@@ -54,6 +54,7 @@ export interface FactusolCustomerRaw {
   TELCLI?: string;
   TARCLI?: number;
   OBSCLI?: string;
+  REQCLI?: number;
 }
 
 export class FactusolOrderMapper {
@@ -109,6 +110,7 @@ export class FactusolOrderMapper {
         country: 'ES',
       },
       priceList: raw.TARCLI ? Number(raw.TARCLI) : 1,
+      hasEquivalenceSurcharge: Boolean(raw.REQCLI && Number(raw.REQCLI) === 1),
       rawSourceData: raw as unknown as Record<string, unknown>,
     };
   }

@@ -24,6 +24,7 @@ export function mapSimplyGestCustomerToCanonical(raw: SimplyGestCustomerRaw): Ca
     customerNumber: code,
     taxId: cif,
     fiscalName: name,
+    hasEquivalenceSurcharge: false,
     email,
     phone,
     address: {

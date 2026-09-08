@@ -130,6 +130,7 @@ export class WooCommerceOrderMapper {
       email: billing.email || undefined,
       phone: billing.phone || undefined,
       address: this.toCanonicalAddress(billing),
+      hasEquivalenceSurcharge: false,
       rawSourceData: { billing: order.billing, customer_id: order.customer_id },
     };
   }
@@ -181,6 +182,7 @@ export class WooCommerceOrderMapper {
       reference: String(raw.number || raw.id),
       date: isNaN(dateVal.getTime()) ? new Date() : dateVal,
       status: this.mapStatus(raw.status),
+      hasEquivalenceSurcharge: false,
       customer,
       shippingAddress,
       billingAddress,

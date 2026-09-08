@@ -75,7 +75,10 @@ export function mapSimplyGestOrderToCanonical(
   return {
     id: `sg_order_${orderNumber}`,
     orderNumber,
+    series: '',
     reference: ref,
+    warehouse: 'GEN',
+    hasEquivalenceSurcharge: false,
     date: isNaN(dateVal.getTime()) ? new Date() : dateVal,
     status: mapStatusCodeToOrderStatus(raw.ESTADO),
     currency: 'EUR',
