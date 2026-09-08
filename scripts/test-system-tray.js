@@ -54,7 +54,7 @@ async function runSystemTrayTests() {
 
   // 4. Iniciar agente y servidor GUI en puerto efímero
   const agent = new LocalAgent({
-    apiBaseUrl: 'https://api.veltiatrust.com',
+    apiBaseUrl: 'https://bridge.cristianjm.com',
   });
   await agent.start();
   const guiServer = new LocalGuiServer(agent, 39992);

@@ -26,7 +26,7 @@ async function runGuiServerTests() {
   console.log('\nTEST 1: Instanciando LocalAgent e iniciando LocalGuiServer en puerto dinámico...');
   const agent = new LocalAgent({
     factusolDbPath: testFactusolDb,
-    apiBaseUrl: 'https://api.veltiatrust.com',
+    apiBaseUrl: 'https://bridge.cristianjm.com',
   });
 
   const guiServer = new LocalGuiServer(agent, 39299);

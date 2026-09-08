@@ -14,7 +14,7 @@ namespace Bentian.Tray
         private static ContextMenuStrip contextMenu;
         private static int port = 39281;
         private static int parentPid = -1;
-        private static string cloudUrl = "https://api.veltiatrust.com/dashboard/";
+        private static string cloudUrl = "https://bridge.cristianjm.com/dashboard/";
         private static System.Windows.Forms.Timer watchdogTimer;
         private static System.Windows.Forms.Timer statusPollTimer;
 

@@ -7,7 +7,7 @@
   "platform": "win32_x64",
   "entryPoint": "../apps/agent/src/cli.ts",
   "outputDir": "../releases",
-  "apiBaseUrl": "https://api.veltiatrust.com",
+  "apiBaseUrl": "https://bridge.cristianjm.com",
   "defaultInstallDir": "{autopf}\\Bentian Agent",
   "serviceName": "BentianAgentService",
   "serviceDisplayName": "Bentian ERP Bridge Agent",

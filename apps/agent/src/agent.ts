@@ -116,7 +116,7 @@ export class LocalAgent {
     this.config = {
       agentName: customConfig?.agentName || diskConfig.agentName || os.hostname() || 'Windows Agent',
       agentVersion: this.currentVersion,
-      apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'https://api.veltiatrust.com',
+      apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'https://bridge.cristianjm.com',
       organizationId: customConfig?.organizationId || diskConfig.organizationId || 'org_default',
       agentId: customConfig?.agentId || diskConfig.agentId,
       authToken: customConfig?.authToken || diskConfig.authToken,
@@ -154,7 +154,7 @@ export class LocalAgent {
     };
 
     this.autoUpdater = new AutoUpdater({
-      apiBaseUrl: this.config.apiBaseUrl || 'https://api.veltiatrust.com',
+      apiBaseUrl: this.config.apiBaseUrl || 'https://bridge.cristianjm.com',
       agentId: this.config.agentId || 'agent_local_standalone',
       currentVersion: this.currentVersion,
     });
@@ -725,7 +725,7 @@ export class LocalAgent {
       agentName: this.config.agentName || 'Bentian Agent',
       agentVersion: this.currentVersion,
       agentId: this.config.agentId || 'Sin registrar (Modo Standalone)',
-      apiBaseUrl: this.config.apiBaseUrl || 'https://api.veltiatrust.com',
+      apiBaseUrl: this.config.apiBaseUrl || 'https://bridge.cristianjm.com',
       licenseKey: this.config.licenseKey,
       hwid,
       license,

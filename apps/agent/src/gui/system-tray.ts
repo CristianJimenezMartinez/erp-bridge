@@ -63,7 +63,7 @@ export class SystemTrayManager {
   /**
    * Inicia el icono del System Tray en Windows en segundo plano.
    */
-  public static start(port: number, cloudUrl = 'https://api.veltiatrust.com/dashboard/'): boolean {
+  public static start(port: number, cloudUrl = 'https://bridge.cristianjm.com/dashboard/'): boolean {
     if (process.platform !== 'win32') {
       return false;
     }

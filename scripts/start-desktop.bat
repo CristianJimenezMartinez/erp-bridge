@@ -15,7 +15,7 @@ start "" powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File
 echo.
 echo [2/2] Abriendo Ventana Nativa de Escritorio (Sin Pestañas / Sin Marcos)...
 
-set DASHBOARD_URL=https://api.veltiatrust.com/dashboard
+set DASHBOARD_URL=https://bridge.cristianjm.com/dashboard
 set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 set CHROME="C:\Program Files\Google\Chrome\Application\chrome.exe"
 
