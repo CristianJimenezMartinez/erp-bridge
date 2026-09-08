@@ -18,6 +18,8 @@ const filesToUpload = [
   { local: path.join(localReleasesDir, 'v0.1.0/checksums.txt'), remote: `${remoteReleasesDir}/v0.1.0/checksums.txt` },
   { local: path.join(localReleasesDir, 'v0.1.0/adodb.js'), remote: `${remoteReleasesDir}/v0.1.0/adodb.js` },
   { local: path.join(localReleasesDir, 'v0.1.0/Bentian-Setup-v0.1.0.exe'), remote: `${remoteReleasesDir}/v0.1.0/Bentian-Setup-v0.1.0.exe` },
+  { local: path.join(localReleasesDir, 'v0.1.0/Bentian-Setup-v0.1.0.zip'), remote: `${remoteReleasesDir}/v0.1.0/Bentian-Setup-v0.1.0.zip` },
+  { local: path.join(localReleasesDir, 'v0.1.0/BentianAgent-v0.1.0-Portable.zip'), remote: `${remoteReleasesDir}/v0.1.0/BentianAgent-v0.1.0-Portable.zip` },
   { local: path.join(localReleasesDir, 'v0.1.0/BentianAgent.exe'), remote: `${remoteReleasesDir}/v0.1.0/BentianAgent.exe` }
 ];
 
