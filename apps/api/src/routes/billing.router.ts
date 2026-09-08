@@ -162,16 +162,16 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
     // Normalizar identificador de plan
     let matchedPlan = CATALOG_PLANS.find(p => p.id === plan);
     if (!matchedPlan) {
-      // Compatibilidad con identificadores antiguos ('starter', 'professional', 'business')
-      if (plan === 'starter' || plan === 'base' || plan === 'base_annual' || plan === 'annual') {
-        matchedPlan = CATALOG_PLANS[0];
-      } else if (plan === 'base_monthly' || plan === 'monthly') {
-        matchedPlan = CATALOG_PLANS[1];
+      if (billingCycle === 'monthly' || plan === 'base_monthly' || plan === 'monthly') {
+        matchedPlan = CATALOG_PLANS[1]!;
       } else if (plan === 'setup' || plan === 'setup_assisted') {
-        matchedPlan = CATALOG_PLANS[4];
+        matchedPlan = CATALOG_PLANS[4]!;
       } else {
-        matchedPlan = CATALOG_PLANS[0]; // Por defecto Plan Base Anual
+        matchedPlan = CATALOG_PLANS[0]!; // Por defecto Plan Base Anual
       }
+    }
+    if (!matchedPlan) {
+      matchedPlan = CATALOG_PLANS[0]!;
     }
 
     const orgId = customOrgId || `org_${Buffer.from(email).toString('hex').substring(0, 10)}`;

@@ -23,6 +23,7 @@ RUN pnpm --filter @erp-bridge/shared build || true
 RUN pnpm --filter @erp-bridge/sdk build || true
 RUN pnpm --filter @erp-bridge/connector-factusol build || true
 RUN pnpm --filter @erp-bridge/connector-woocommerce build || true
+RUN pnpm --filter @erp-bridge/connector-simplygest build || true
 RUN pnpm --filter @erp-bridge/core build || true
 RUN pnpm --filter @erp-bridge/api build || true
 
