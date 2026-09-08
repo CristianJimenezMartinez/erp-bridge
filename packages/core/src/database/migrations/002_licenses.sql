@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS licenses (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   key           VARCHAR(30) UNIQUE NOT NULL,
   organization_id VARCHAR(64) NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  alias         VARCHAR(100),
   plan          VARCHAR(20) NOT NULL DEFAULT 'starter',
   status        VARCHAR(20) NOT NULL DEFAULT 'active',
   max_activations INTEGER NOT NULL DEFAULT 1,
@@ -14,6 +15,8 @@ CREATE TABLE IF NOT EXISTS licenses (
   revoked_at    TIMESTAMPTZ,
   revoked_reason TEXT
 );
+
+ALTER TABLE licenses ADD COLUMN IF NOT EXISTS alias VARCHAR(100);
 
 CREATE TABLE IF NOT EXISTS license_activations (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),

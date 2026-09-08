@@ -7,6 +7,7 @@ export interface ILicenseRepository {
   findLicenseByKey(key: string): Promise<License | null>;
   listLicensesByOrganization(organizationId: string): Promise<License[]>;
   updateLicense(license: License): Promise<License>;
+  updateLicenseAlias(id: string, alias: string): Promise<void>;
   createActivation(activation: LicenseActivation): Promise<LicenseActivation>;
   findActivation(licenseId: string, hwid: string): Promise<LicenseActivation | null>;
   listActivationsByLicense(licenseId: string): Promise<LicenseActivation[]>;
@@ -25,14 +26,15 @@ export class PostgresLicenseRepository implements ILicenseRepository {
 
     try {
       await this.db.query(
-        `INSERT INTO licenses (id, key, organization_id, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        `INSERT INTO licenses (id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          ON CONFLICT (id) DO UPDATE
-         SET status = $5, current_activations = $7, expires_at = $9, revoked_at = $11, revoked_reason = $12`,
+         SET alias = $4, status = $6, current_activations = $8, expires_at = $10, revoked_at = $12, revoked_reason = $13`,
         [
           license.id,
           license.key,
           license.organizationId,
+          license.alias || null,
           license.plan,
           license.status,
           license.maxActivations,
@@ -55,7 +57,7 @@ export class PostgresLicenseRepository implements ILicenseRepository {
 
     try {
       const res = await this.db.query(
-        `SELECT id, key, organization_id, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
+        `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
          FROM licenses
          WHERE id = $1`,
         [id]
@@ -75,7 +77,7 @@ export class PostgresLicenseRepository implements ILicenseRepository {
 
     try {
       const res = await this.db.query(
-        `SELECT id, key, organization_id, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
+        `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
          FROM licenses
          WHERE key = $1`,
         [key]
@@ -95,7 +97,7 @@ export class PostgresLicenseRepository implements ILicenseRepository {
 
     try {
       const res = await this.db.query(
-        `SELECT id, key, organization_id, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
+        `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
          FROM licenses
          WHERE organization_id = $1
          ORDER BY created_at DESC`,
@@ -117,10 +119,11 @@ export class PostgresLicenseRepository implements ILicenseRepository {
     try {
       await this.db.query(
         `UPDATE licenses
-         SET plan = $2, status = $3, max_activations = $4, current_activations = $5, expires_at = $6, trial_ends_at = $7, revoked_at = $8, revoked_reason = $9
+         SET alias = $2, plan = $3, status = $4, max_activations = $5, current_activations = $6, expires_at = $7, trial_ends_at = $8, revoked_at = $9, revoked_reason = $10
          WHERE id = $1`,
         [
           license.id,
+          license.alias || null,
           license.plan,
           license.status,
           license.maxActivations,
@@ -134,6 +137,16 @@ export class PostgresLicenseRepository implements ILicenseRepository {
     } catch {}
 
     return license;
+  }
+
+  async updateLicenseAlias(id: string, alias: string): Promise<void> {
+    const mem = PostgresLicenseRepository.memoryLicenses.get(id);
+    if (mem) {
+      mem.alias = alias;
+    }
+    try {
+      await this.db.query(`UPDATE licenses SET alias = $1 WHERE id = $2`, [alias, id]);
+    } catch {}
   }
 
   async createActivation(activation: LicenseActivation): Promise<LicenseActivation> {
@@ -243,6 +256,7 @@ export class PostgresLicenseRepository implements ILicenseRepository {
       id: row['id'] as string,
       key: row['key'] as string,
       organizationId: row['organization_id'] as string,
+      alias: row['alias'] ? (row['alias'] as string) : undefined,
       plan: row['plan'] as License['plan'],
       status: row['status'] as License['status'],
       maxActivations: Number(row['max_activations']),

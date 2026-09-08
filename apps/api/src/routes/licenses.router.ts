@@ -13,18 +13,29 @@ function getOrgId(req: Request): string {
   return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || 'org_default';
 }
 
-// 1. List all licenses for organization
+// 1. List all licenses for organization (with activations)
 licensesRouter.get('/licenses', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const list = await licenseService.listLicenses(orgId);
+    const list = await licenseService.listLicensesWithActivations(orgId);
     res.json({ data: list });
   } catch (error) {
     next(error);
   }
 });
 
-// 2. Create a new license
+// 1.1 Fleet Overview KPI summary
+licensesRouter.get('/licenses/fleet-overview', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orgId = getOrgId(req);
+    const overview = await licenseService.getFleetOverview(orgId);
+    res.json({ data: overview });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 2. Create a new license (with optional alias)
 licensesRouter.post('/licenses', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
@@ -36,6 +47,39 @@ licensesRouter.post('/licenses', async (req: Request, res: Response, next: NextF
     res.status(201).json({ data: license });
   } catch (error) {
     next(error);
+  }
+});
+
+// 2.1 Update license alias
+licensesRouter.patch('/licenses/:id/alias', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params['id']!;
+    const { alias } = req.body as { alias: string };
+    if (!alias || typeof alias !== 'string') {
+      return res.status(400).json({ error: { message: 'El alias no puede estar vacío' } });
+    }
+    await licenseService.updateLicenseAlias(id, alias.trim());
+    return res.json({ success: true, id, alias: alias.trim() });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// 2.2 Unbind machine activation (Mudar PC)
+licensesRouter.post('/licenses/:id/unbind', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params['id']!;
+    const { hwid } = req.body as { hwid: string };
+    if (!hwid) {
+      return res.status(400).json({ error: { message: 'Se requiere el HWID de la máquina a desvincular' } });
+    }
+    const result = await licenseService.unbindMachine(id, hwid);
+    if (!result.success) {
+      return res.status(400).json({ error: { message: result.message } });
+    }
+    return res.json({ data: result });
+  } catch (error) {
+    return next(error);
   }
 });
 

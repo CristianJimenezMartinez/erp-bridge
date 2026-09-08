@@ -5,13 +5,15 @@ const esbuild = require('../builder/node_modules/esbuild');
 async function build() {
   const rootDir = path.resolve(__dirname, '..');
 
-  // Build auth router and server
+  // Build auth router, licenses router and server
   await esbuild.build({
     entryPoints: [
       path.resolve(rootDir, 'apps/api/src/server.ts'),
       path.resolve(rootDir, 'apps/api/src/routes/auth.router.ts'),
+      path.resolve(rootDir, 'apps/api/src/routes/licenses.router.ts'),
     ],
     outdir: path.resolve(rootDir, 'apps/api/dist'),
+    outbase: path.resolve(rootDir, 'apps/api/src'),
     platform: 'node',
     format: 'cjs',
     target: 'node20',

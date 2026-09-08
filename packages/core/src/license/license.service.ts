@@ -11,6 +11,7 @@ import {
   LicenseValidationRequest,
   LicenseValidationRequestSchema,
   LicenseValidationResponse,
+  LicenseWithActivations,
   Logger,
 } from '@erp-bridge/shared';
 import { ILicenseRepository, PostgresLicenseRepository } from '../database/repositories/license.repository';
@@ -47,6 +48,7 @@ export class LicenseService {
       id: uuidv4(),
       key,
       organizationId: validated.organizationId,
+      alias: validated.alias || null,
       plan: validated.plan,
       status: 'active',
       maxActivations: validated.maxActivations ?? 1,
@@ -76,6 +78,78 @@ export class LicenseService {
 
   public async listActivations(licenseId: string): Promise<LicenseActivation[]> {
     return this.repository.listActivationsByLicense(licenseId);
+  }
+
+  public async listLicensesWithActivations(organizationId: string): Promise<LicenseWithActivations[]> {
+    const licenses = await this.repository.listLicensesByOrganization(organizationId);
+    const result: LicenseWithActivations[] = [];
+    for (const lic of licenses) {
+      const activations = await this.repository.listActivationsByLicense(lic.id);
+      result.push({
+        ...lic,
+        activations,
+      });
+    }
+    return result;
+  }
+
+  public async updateLicenseAlias(licenseId: string, alias: string): Promise<void> {
+    await this.repository.updateLicenseAlias(licenseId, alias);
+    this.logger.info(`Alias de licencia ${licenseId} actualizado a: "${alias}"`);
+  }
+
+  public async unbindMachine(licenseId: string, hwid: string): Promise<{ success: boolean; message?: string }> {
+    const license = await this.repository.findLicenseById(licenseId);
+    if (!license) {
+      return { success: false, message: 'Licencia no encontrada' };
+    }
+    const activation = await this.repository.findActivation(license.id, hwid);
+    if (!activation) {
+      return { success: false, message: 'No se encontró activación para este equipo' };
+    }
+    await this.repository.deactivateActivation(activation.id);
+    license.currentActivations = Math.max(0, license.currentActivations - 1);
+    await this.repository.updateLicense(license);
+    this.logger.info(`✓ Equipo HWID ${hwid.substring(0, 16)}... desvinculado con éxito de la licencia ${license.key}`);
+    return { success: true };
+  }
+
+  public async getFleetOverview(organizationId: string): Promise<{
+    totalLicenses: number;
+    totalAllowedSeats: number;
+    activeSeats: number;
+    onlineSeats: number;
+    plan: string;
+    licenses: LicenseWithActivations[];
+  }> {
+    const licenses = await this.listLicensesWithActivations(organizationId);
+    let totalAllowedSeats = 0;
+    let activeSeats = 0;
+    let onlineSeats = 0;
+    const now = Date.now();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    for (const lic of licenses) {
+      totalAllowedSeats += lic.maxActivations;
+      activeSeats += lic.activations.length;
+      for (const act of lic.activations) {
+        const lastVal = new Date(act.lastValidatedAt).getTime();
+        if (now - lastVal < twentyFourHours) {
+          onlineSeats++;
+        }
+      }
+    }
+
+    const primaryPlan = licenses[0]?.plan || 'starter';
+
+    return {
+      totalLicenses: licenses.length,
+      totalAllowedSeats: Math.max(totalAllowedSeats, 1),
+      activeSeats,
+      onlineSeats,
+      plan: primaryPlan,
+      licenses,
+    };
   }
 
   public async activateLicense(request: LicenseActivationRequest): Promise<LicenseActivationResponse> {

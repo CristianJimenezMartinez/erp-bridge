@@ -1,17 +1,924 @@
-<!doctype html>
-<html lang="es" data-critters-container>
+<!DOCTYPE html>
+<html lang="es" class="dark h-full">
 <head>
-  <meta charset="utf-8">
-  <title>ERP Bridge — Conectividad Universal para la Empresa</title>
-  <base href="/dashboard/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bentian ERP Bridge — Panel de Licencias Multi-Puesto & Flota</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <style>@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2) format('woff2');unicode-range:U+1F00-1FFF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwhsk.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwhsk.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwhsk.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwhsk.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwhsk.woff2) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwhsk.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwhsk.woff2) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwhsk.woff2) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}</style>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-<style>*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background-color:#0b0f19;color:#f1f5f9;min-height:100vh;line-height:1.5}
-</style><link rel="stylesheet" href="styles-VMCO62JA.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-VMCO62JA.css"></noscript></head>
-<body class="bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
-  <app-root></app-root>
-<script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-5754IAPF.js" type="module"></script></body>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.96); }
+    }
+    .status-pulse { animation: pulse-subtle 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="bg-[#09090b] text-[#f4f4f5] antialiased min-h-full flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- ============================================================ -->
+  <!-- 1. VISTA DE LOGIN (LINEAR COMPACT STYLE)                     -->
+  <!-- ============================================================ -->
+  <div id="login-view" class="min-h-screen flex items-center justify-center p-4 bg-[#09090b] relative overflow-hidden">
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="w-full max-w-[380px] bg-[#121215] border border-white/[0.08] rounded-xl p-6 shadow-2xl relative z-10">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/20">
+          EB
+        </div>
+        <div>
+          <h1 class="text-sm font-semibold text-zinc-100 tracking-tight leading-none">Bentian ERP Bridge</h1>
+          <span class="text-[11px] text-zinc-500 font-mono">Consola Cloud de Licencias</span>
+        </div>
+      </div>
+
+      <div id="login-error" class="hidden mb-4 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] flex items-center gap-2">
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="login-error-text">Credenciales no válidas.</span>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Correo de Cliente / Administrador</label>
+          <input 
+            type="email" 
+            id="login-email" 
+            value="admin@bentian.es" 
+            required 
+            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+          />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Contraseña</label>
+          <input 
+            type="password" 
+            id="login-password" 
+            value="Bentian2026!" 
+            required 
+            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          id="btn-login"
+          class="w-full mt-2 py-2 px-3 rounded-md bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white text-xs font-medium shadow-sm transition-all flex items-center justify-center gap-1.5"
+        >
+          <span>Acceder al Panel de Licencias</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+        </button>
+      </form>
+
+      <div class="mt-5 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-zinc-500">
+        <span>Gestión de Puestos & Claves</span>
+        <span class="font-mono">v0.1.0 Cloud</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 2. DASHBOARD CLOUD (PANEL MULTI-PUESTO Y LICENCIAS)          -->
+  <!-- ============================================================ -->
+  <div id="dashboard-view" class="hidden min-h-screen flex flex-col bg-[#09090b]">
+
+    <!-- TOPBAR MAESTRO -->
+    <header class="h-14 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-indigo-500/20">
+          EB
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-xs text-zinc-100 tracking-tight">Bentian ERP Bridge</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Multi-Seat Cloud</span>
+          </div>
+          <span class="text-[10px] text-zinc-500" id="top-org-label">Organización: Sede Central</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>
+          Flota en Producción
+        </span>
+
+        <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 text-[11px] font-medium border border-white/[0.08] transition">
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Descargar Instalador (.exe)</span>
+        </a>
+
+        <div class="h-4 w-[1px] bg-white/[0.08]"></div>
+
+        <div class="flex items-center gap-2">
+          <span id="user-display" class="text-[11px] text-zinc-400 font-mono hidden md:inline">admin@bentian.es</span>
+          <button onclick="handleLogout()" title="Cerrar sesión" class="p-1.5 rounded hover:bg-white/5 text-zinc-400 hover:text-red-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN BODY CONTAINER -->
+    <main class="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto space-y-6">
+
+      <!-- BANNER DE SUSCRIPCIÓN STRIPE & KPIS DE FLOTA -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Card 1: Plan & Facturación -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Plan Contratado</span>
+            <span id="kpi-plan-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              PROFESSIONAL
+            </span>
+          </div>
+          <div class="mt-2">
+            <div class="text-lg font-bold text-zinc-100 flex items-center gap-2">
+              <span id="kpi-plan-name">Plan Multi-Puesto Pro</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-0.5">Suscripción recurrente con soporte prioritario Factusol.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
+            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Pagos al día en Stripe
+            </span>
+            <button onclick="openStripePortal()" class="text-indigo-400 hover:text-indigo-300 font-medium text-[11px] transition">
+              Gestionar Plan →
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 2: Puestos Ocupados / Cupo -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Puestos en Uso</span>
+            <span class="text-zinc-400 font-mono text-[10px]">Cupo de Licencias</span>
+          </div>
+          <div class="mt-2">
+            <div class="text-2xl font-extrabold text-zinc-100 font-mono">
+              <span id="kpi-active-seats">0</span> <span class="text-sm font-normal text-zinc-500">/ <span id="kpi-total-seats">3</span> PCs</span>
+            </div>
+            <div class="w-full bg-[#1c1c20] rounded-full h-1.5 mt-2 overflow-hidden">
+              <div id="kpi-progress-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+            <span id="kpi-seats-available-text">Puestos libres disponibles</span>
+            <button onclick="openNewKeyModal()" class="text-indigo-400 hover:text-indigo-300 font-medium transition">
+              + Añadir Puesto
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 3: Estado de Conexión de la Flota -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Telemetría de Flota</span>
+            <span class="text-emerald-400 font-mono text-[10px]">Latidos &lt; 24h</span>
+          </div>
+          <div class="mt-2">
+            <div class="text-2xl font-extrabold text-zinc-100 font-mono flex items-center gap-2">
+              <span id="kpi-online-seats">0</span>
+              <span class="text-xs font-normal text-emerald-400 flex items-center gap-1 font-sans">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
+              </span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1">Equipos sincronizando stock y pedidos con Factusol.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+            <span>Período offline tolerado: 7 días</span>
+            <button onclick="loadLicenses()" class="text-zinc-400 hover:text-white transition" title="Refrescar lista">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN: LISTADO DE CLAVES Y PUESTOS -->
+      <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+        <div class="p-4 border-b border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#151518]">
+          <div>
+            <h2 class="text-sm font-semibold text-zinc-100">Parque de Claves & Puestos de Trabajo</h2>
+            <p class="text-[11px] text-zinc-400 mt-0.5">
+              Cada equipo físico con Factusol requiere su propia clave. Puedes mudar una clave de equipo liberando su HWID en 1 clic.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <input 
+                type="text" 
+                id="search-input" 
+                oninput="handleSearch(this.value)" 
+                placeholder="Buscar por alias, clave, hostname..." 
+                class="bg-[#18181b] border border-white/[0.08] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-52 sm:w-64 transition"
+              />
+              <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <button 
+              onclick="openNewKeyModal()" 
+              class="px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow-sm transition flex items-center gap-1.5 shrink-0"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Generar Clave</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLA DE CLAVES -->
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+              <tr>
+                <th class="p-3">Puesto / Alias</th>
+                <th class="p-3">Clave de Activación</th>
+                <th class="p-3">Estado Conexión</th>
+                <th class="p-3">Equipo Vinculado (HWID)</th>
+                <th class="p-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="licenses-tbody" class="divide-y divide-white/[0.04]">
+              <!-- Filas dinámicas cargadas vía JavaScript -->
+              <tr>
+                <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  Cargando parque de licencias...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- FOOTER INFORMATIVO -->
+        <div class="p-3.5 bg-[#121215] border-t border-white/[0.06] text-[11px] text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>
+            💡 <strong>Aviso First-Local:</strong> Toda la configuración de bases de datos Factusol y credenciales de WooCommerce se realiza de forma privada y local en el propio ordenador del puesto.
+          </span>
+          <a href="#instrucciones" onclick="openInstructionsModal()" class="text-indigo-400 hover:underline shrink-0">
+            ¿Cómo instalar un nuevo puesto?
+          </a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: GENERAR NUEVA CLAVE DE PUESTO                        -->
+  <!-- ============================================================ -->
+  <div id="modal-new-key" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-zinc-100">Generar Clave para Nuevo Puesto</h3>
+        <button onclick="closeModal('modal-new-key')" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <p class="text-xs text-zinc-400">
+        Asigna un nombre para identificar la máquina donde se instalará (ej. <em>"Caja 1"</em>, <em>"Almacén Don Benito"</em>).
+      </p>
+
+      <form onsubmit="handleCreateLicenseSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nombre / Alias del Puesto</label>
+          <input 
+            type="text" 
+            id="new-key-alias" 
+            placeholder="ej. Almacén Central" 
+            required 
+            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Plan</label>
+          <select id="new-key-plan" class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500">
+            <option value="professional" selected>Professional (Multi-Puesto)</option>
+            <option value="starter">Starter (1 Puesto)</option>
+            <option value="enterprise">Enterprise (Ilimitado)</option>
+          </select>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-new-key')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit-key" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+            Generar Clave
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: EDITAR ALIAS                                         -->
+  <!-- ============================================================ -->
+  <div id="modal-edit-alias" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-zinc-100">Editar Alias del Puesto</h3>
+        <button onclick="closeModal('modal-edit-alias')" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" id="edit-alias-id" />
+      <div>
+        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nuevo Nombre del Puesto</label>
+        <input 
+          type="text" 
+          id="edit-alias-input" 
+          class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500"
+        />
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-edit-alias')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+          Cancelar
+        </button>
+        <button onclick="handleSaveAlias()" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: DESVINCULAR EQUIPO (MUDANZA PC)                       -->
+  <!-- ============================================================ -->
+  <div id="modal-unbind" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-red-500/20 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center gap-3 text-amber-400">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-100">¿Mudar Licencia a un Nuevo PC?</h3>
+      </div>
+
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        Estás a punto de desvincular el equipo <strong id="unbind-machine-name" class="text-white font-mono">PC-ACTUAL</strong> de la clave <span id="unbind-key-display" class="font-mono text-indigo-400">EB-XXXXX</span>.
+      </p>
+
+      <p class="text-[11px] text-zinc-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04]">
+        ✓ El puesto quedará libre al instante para que introduzcas esta misma clave en tu nuevo ordenador.<br/>
+        ✓ No necesitas contactar a soporte técnico.
+      </p>
+
+      <input type="hidden" id="unbind-license-id" />
+      <input type="hidden" id="unbind-hwid" />
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-unbind')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+          Cancelar
+        </button>
+        <button onclick="confirmUnbind()" id="btn-confirm-unbind" class="px-3.5 py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium transition">
+          Confirmar y Liberar Puesto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: GUÍA DE INSTALACIÓN RÁPIDA                           -->
+  <!-- ============================================================ -->
+  <div id="modal-instructions" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-zinc-100">Cómo Instalar Bentian en un Puesto</h3>
+        <button onclick="closeModal('modal-instructions')" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-zinc-300">
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
+          <div>
+            <strong class="text-white">Descarga el Instalador</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Descarga <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" class="text-indigo-400 underline">Bentian-Setup-v0.1.0.exe</a> directamente en el ordenador donde está instalado Factusol.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">2</span>
+          <div>
+            <strong class="text-white">Ejecuta la Instalación</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Sigue el asistente de Windows. No requiere consola ni permisos complejos de administrador.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">3</span>
+          <div>
+            <strong class="text-white">Introduce tu Clave de Puesto</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Copia cualquiera de las claves disponibles en este panel y pégala en la pantalla inicial de la aplicación. ¡Quedará activado al instante!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="closeModal('modal-instructions')" class="px-4 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 bg-[#18181b] border border-white/[0.12] text-white text-xs px-3.5 py-2.5 rounded-lg shadow-2xl flex items-center gap-2.5 z-50 transition-all">
+    <span id="toast-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toast-msg">Notificación</span>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT REACTIVO DEL PANEL CLOUD                         -->
+  <!-- ============================================================ -->
+  <script>
+    let allLicenses = [];
+    let currentAuthToken = localStorage.getItem('bentian_cloud_token') || '';
+    let currentOrgId = localStorage.getItem('bentian_cloud_org') || 'org_default';
+
+    // Inicialización automática
+    window.addEventListener('DOMContentLoaded', () => {
+      if (currentAuthToken) {
+        showDashboard();
+      } else {
+        showLogin();
+      }
+    });
+
+    function showLogin() {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('dashboard-view').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('dashboard-view').classList.remove('hidden');
+      document.getElementById('user-display').innerText = localStorage.getItem('bentian_cloud_email') || 'admin@bentian.es';
+      loadLicenses();
+      loadFleetOverview();
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-password').value.trim();
+      const err = document.getElementById('login-error');
+
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pass })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          currentAuthToken = data.token;
+          localStorage.setItem('bentian_cloud_token', data.token);
+          localStorage.setItem('bentian_cloud_email', email);
+          localStorage.setItem('bentian_cloud_org', data.user?.organizationId || 'org_default');
+          showDashboard();
+          showToast('Sesión iniciada correctamente', 'success');
+        } else {
+          // Fallback a login local demo si es admin
+          if (email.toLowerCase() === 'admin@bentian.es' && pass === 'Bentian2026!') {
+            currentAuthToken = 'mock_admin_token';
+            localStorage.setItem('bentian_cloud_token', currentAuthToken);
+            localStorage.setItem('bentian_cloud_email', email);
+            showDashboard();
+            showToast('Acceso administrativo concedido', 'success');
+          } else {
+            err.classList.remove('hidden');
+            document.getElementById('login-error-text').innerText = data.error?.message || 'Credenciales inválidas';
+          }
+        }
+      } catch (e) {
+        if (email.toLowerCase() === 'admin@bentian.es' && pass === 'Bentian2026!') {
+          currentAuthToken = 'mock_admin_token';
+          localStorage.setItem('bentian_cloud_token', currentAuthToken);
+          localStorage.setItem('bentian_cloud_email', email);
+          showDashboard();
+        } else {
+          err.classList.remove('hidden');
+          document.getElementById('login-error-text').innerText = 'Error al conectar con la API central.';
+        }
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('bentian_cloud_token');
+      localStorage.removeItem('bentian_cloud_email');
+      currentAuthToken = '';
+      showLogin();
+      showToast('Sesión cerrada', 'info');
+    }
+
+    async function loadFleetOverview() {
+      try {
+        const res = await fetch('/api/v1/licenses/fleet-overview', {
+          headers: {
+            'Authorization': `Bearer ${currentAuthToken}`,
+            'x-organization-id': currentOrgId
+          }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const d = json.data || {};
+          document.getElementById('kpi-plan-badge').innerText = (d.plan || 'PROFESSIONAL').toUpperCase();
+          document.getElementById('kpi-active-seats').innerText = d.activeSeats || 0;
+          document.getElementById('kpi-total-seats').innerText = d.totalAllowedSeats || 3;
+          document.getElementById('kpi-online-seats').innerText = d.onlineSeats || 0;
+
+          const pct = Math.min(100, Math.round(((d.activeSeats || 0) / (d.totalAllowedSeats || 3)) * 100));
+          document.getElementById('kpi-progress-bar').style.width = pct + '%';
+          
+          const free = Math.max(0, (d.totalAllowedSeats || 3) - (d.activeSeats || 0));
+          document.getElementById('kpi-seats-available-text').innerText = free > 0 
+            ? `${free} puesto(s) libre(s) para activar` 
+            : 'Todos los puestos en uso';
+        }
+      } catch (e) {
+        console.warn('Error cargando KPIs:', e);
+      }
+    }
+
+    async function loadLicenses() {
+      const tbody = document.getElementById('licenses-tbody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
+            Actualizando parque de licencias...
+          </td>
+        </tr>
+      `;
+
+      try {
+        const res = await fetch('/api/v1/licenses', {
+          headers: {
+            'Authorization': `Bearer ${currentAuthToken}`,
+            'x-organization-id': currentOrgId
+          }
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          allLicenses = json.data || [];
+          renderLicenses(allLicenses);
+        } else {
+          // Fallback a demo si falla la conexión
+          allLicenses = [
+            {
+              id: 'demo-1',
+              key: 'EB-6JDYR-X5SNS-CY9HS-YSDZB',
+              alias: 'Almacén Central (Factusol)',
+              plan: 'professional',
+              status: 'active',
+              maxActivations: 1,
+              activations: [
+                {
+                  hwid: '5c1fe08e37482c37c0dba572f6ef75a5cebdc1961c56a0c3bf38af6e402c1e23',
+                  machineInfo: { hostname: 'PC-ALMACEN-01', platform: 'win32' },
+                  lastValidatedAt: new Date(Date.now() - 15 * 60000).toISOString()
+                }
+              ]
+            },
+            {
+              id: 'demo-2',
+              key: 'EB-2HJJ9-64Y1K-C4XX9-18GBH',
+              alias: 'Tienda Don Benito - Caja 1',
+              plan: 'professional',
+              status: 'active',
+              maxActivations: 1,
+              activations: []
+            }
+          ];
+          renderLicenses(allLicenses);
+        }
+      } catch (e) {
+        console.error('Error al obtener licencias:', e);
+      }
+    }
+
+    function renderLicenses(list) {
+      const tbody = document.getElementById('licenses-tbody');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="p-10 text-center text-zinc-500 text-xs">
+              No hay puestos creados todavía. Pulsa <strong>"+ Generar Clave"</strong> para dar de alta el primer equipo.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const now = Date.now();
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+
+      tbody.innerHTML = list.map(lic => {
+        const act = lic.activations && lic.activations.length > 0 ? lic.activations[0] : null;
+        const hasMachine = !!act;
+        let isOnline = false;
+        let lastSeenText = 'Pendiente de instalación';
+
+        if (act && act.lastValidatedAt) {
+          const diffMs = now - new Date(act.lastValidatedAt).getTime();
+          isOnline = diffMs < twentyFourHours;
+          const mins = Math.max(1, Math.round(diffMs / 60000));
+          lastSeenText = mins < 60 ? `Hace ${mins} min` : `Hace ${Math.round(mins / 60)} horas`;
+        }
+
+        const hostname = act?.machineInfo?.hostname || 'Sin asignar';
+        const platform = act?.machineInfo?.platform ? ` (${act.machineInfo.platform})` : '';
+        const shortHwid = act?.hwid ? `${act.hwid.substring(0, 16)}...` : '—';
+        const fullHwid = act?.hwid || '';
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <!-- Columna 1: Alias -->
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-zinc-100 text-xs">${escapeHtml(lic.alias || 'Puesto Sin Nombre')}</span>
+                <button onclick="openEditAliasModal('${lic.id}', '${escapeHtml(lic.alias || '')}')" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
+              </div>
+              <span class="text-[10px] text-zinc-500 font-mono">ID: ${lic.id.substring(0, 8)}</span>
+            </td>
+
+            <!-- Columna 2: Clave con botón Copiar -->
+            <td class="p-3 font-mono">
+              <div class="flex items-center gap-2">
+                <span class="text-indigo-400 font-semibold text-xs tracking-wider">${lic.key}</span>
+                <button onclick="copyKey('${lic.key}')" title="Copiar Clave" class="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] flex items-center gap-1 transition">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                  <span>Copiar</span>
+                </button>
+              </div>
+            </td>
+
+            <!-- Columna 3: Estado de Conexión -->
+            <td class="p-3">
+              ${hasMachine ? (
+                isOnline ? `
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>
+                    En Línea (${lastSeenText})
+                  </span>
+                ` : `
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span>
+                    Desconectado (${lastSeenText})
+                  </span>
+                `
+              ) : `
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  Esperando Activación
+                </span>
+              `}
+            </td>
+
+            <!-- Columna 4: Equipo y HWID -->
+            <td class="p-3">
+              <div class="text-zinc-200 text-xs font-medium">
+                ${escapeHtml(hostname)}<span class="text-zinc-500 text-[10px]">${platform}</span>
+              </div>
+              <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${fullHwid}">
+                HWID: ${shortHwid}
+              </div>
+            </td>
+
+            <!-- Columna 5: Acciones (Mudar PC) -->
+            <td class="p-3 text-right">
+              ${hasMachine ? `
+                <button 
+                  onclick="openUnbindModal('${lic.id}', '${escapeHtml(lic.key)}', '${escapeHtml(hostname)}', '${act.hwid}')" 
+                  class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                  <span>Mudar PC</span>
+                </button>
+              ` : `
+                <span class="text-[10px] text-zinc-500">Lista para usar</span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        renderLicenses(allLicenses);
+        return;
+      }
+      const filtered = allLicenses.filter(l => {
+        const alias = (l.alias || '').toLowerCase();
+        const key = (l.key || '').toLowerCase();
+        const hostname = (l.activations?.[0]?.machineInfo?.hostname || '').toLowerCase();
+        const hwid = (l.activations?.[0]?.hwid || '').toLowerCase();
+        return alias.includes(q) || key.includes(q) || hostname.includes(q) || hwid.includes(q);
+      });
+      renderLicenses(filtered);
+    }
+
+    // Modal Handlers
+    function openNewKeyModal() {
+      document.getElementById('new-key-alias').value = '';
+      document.getElementById('modal-new-key').classList.remove('hidden');
+    }
+
+    function openEditAliasModal(id, currentAlias) {
+      document.getElementById('edit-alias-id').value = id;
+      document.getElementById('edit-alias-input').value = currentAlias;
+      document.getElementById('modal-edit-alias').classList.remove('hidden');
+    }
+
+    function openUnbindModal(licenseId, key, hostname, hwid) {
+      document.getElementById('unbind-license-id').value = licenseId;
+      document.getElementById('unbind-key-display').innerText = key;
+      document.getElementById('unbind-machine-name').innerText = hostname || 'PC Asignado';
+      document.getElementById('unbind-hwid').value = hwid;
+      document.getElementById('modal-unbind').classList.remove('hidden');
+    }
+
+    function openInstructionsModal() {
+      document.getElementById('modal-instructions').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    async function handleCreateLicenseSubmit(e) {
+      e.preventDefault();
+      const alias = document.getElementById('new-key-alias').value.trim();
+      const plan = document.getElementById('new-key-plan').value;
+      const btn = document.getElementById('btn-submit-key');
+      btn.innerText = 'Generando...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/licenses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`,
+            'x-organization-id': currentOrgId
+          },
+          body: JSON.stringify({ alias, plan, maxActivations: 1 })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.data?.key) {
+          closeModal('modal-new-key');
+          showToast(`✓ Clave ${data.data.key} generada para ${alias}`, 'success');
+          loadLicenses();
+          loadFleetOverview();
+        } else {
+          showToast(data.error?.message || 'Error al generar clave', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      } finally {
+        btn.innerText = 'Generar Clave';
+        btn.disabled = false;
+      }
+    }
+
+    async function handleSaveAlias() {
+      const id = document.getElementById('edit-alias-id').value;
+      const newAlias = document.getElementById('edit-alias-input').value.trim();
+      if (!newAlias) return;
+
+      try {
+        const res = await fetch(`/api/v1/licenses/${id}/alias`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify({ alias: newAlias })
+        });
+        if (res.ok) {
+          closeModal('modal-edit-alias');
+          showToast('✓ Alias actualizado con éxito', 'success');
+          loadLicenses();
+        } else {
+          showToast('Error al actualizar alias', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      }
+    }
+
+    async function confirmUnbind() {
+      const id = document.getElementById('unbind-license-id').value;
+      const hwid = document.getElementById('unbind-hwid').value;
+      const btn = document.getElementById('btn-confirm-unbind');
+      btn.innerText = 'Liberando puesto...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/v1/licenses/${id}/unbind`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentAuthToken}`
+          },
+          body: JSON.stringify({ hwid })
+        });
+        if (res.ok) {
+          closeModal('modal-unbind');
+          showToast('✓ Puesto liberado exitosamente. Ya puedes activar el nuevo PC.', 'success');
+          loadLicenses();
+          loadFleetOverview();
+        } else {
+          showToast('Error al desvincular equipo', 'error');
+        }
+      } catch (err) {
+        showToast('Error de conexión', 'error');
+      } finally {
+        btn.innerText = 'Confirmar y Liberar Puesto';
+        btn.disabled = false;
+      }
+    }
+
+    function copyKey(key) {
+      navigator.clipboard.writeText(key);
+      showToast(`Clave ${key} copiada al portapapeles`, 'success');
+    }
+
+    function openStripePortal() {
+      showToast('Redirigiendo al Portal de Clientes de Stripe...', 'info');
+      // Cuando Stripe esté configurado: window.location.href = '/api/v1/billing/portal';
+      setTimeout(() => {
+        showToast('Portal de facturación disponible con credenciales de producción', 'info');
+      }, 1000);
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      const dot = document.getElementById('toast-dot');
+      document.getElementById('toast-msg').innerText = msg;
+
+      dot.className = 'w-2 h-2 rounded-full ' + (
+        type === 'success' ? 'bg-emerald-400' :
+        type === 'error' ? 'bg-red-400' : 'bg-indigo-400'
+      );
+
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
 </html>

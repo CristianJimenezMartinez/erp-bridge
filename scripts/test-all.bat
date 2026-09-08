@@ -45,7 +45,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [5/5] Ejecutando Pruebas de Servidor GUI Local y Asistente Factusol (7 tests)...
+echo [5/6] Ejecutando Pruebas de Servidor GUI Local y Asistente Factusol (7 tests)...
 node scripts\test-gui-server.js
 if %errorlevel% neq 0 (
     echo.
@@ -54,8 +54,17 @@ if %errorlevel% neq 0 (
 )
 
 echo.
+echo [6/6] Ejecutando Pruebas de Licencias Multi-Puesto y Mudanza de PC (10 tests)...
+node scripts\test-multiseat-licenses.js
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Fallaron las pruebas de licencias multi-puesto y mudanza de PC.
+    exit /b 1
+)
+
+echo.
 echo ========================================================================
-echo    TODAS LAS BATERIAS DE PRUEBAS (38 TESTS) PASARON EXITOSAMENTE (100%%)
+echo    TODAS LAS BATERIAS DE PRUEBAS (48 TESTS) PASARON EXITOSAMENTE (100%%)
 echo           EL SISTEMA ESTA 100%% LISTO PARA SALIDA A PRODUCCION           
 echo ========================================================================
 echo.

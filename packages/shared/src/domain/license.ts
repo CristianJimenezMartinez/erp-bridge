@@ -10,6 +10,7 @@ export interface License {
   id: string;
   key: string;
   organizationId: string;
+  alias?: string | null;
   plan: LicensePlan;
   status: LicenseStatus;
   maxActivations: number;
@@ -25,6 +26,7 @@ export const LicenseSchema = z.object({
   id: z.string().uuid(),
   key: z.string().regex(/^EB-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}$/),
   organizationId: z.string().min(1),
+  alias: z.string().max(100).nullable().optional(),
   plan: LicensePlanSchema,
   status: LicenseStatusSchema,
   maxActivations: z.number().int().min(1),
@@ -159,6 +161,7 @@ export const LicenseValidationResponseSchema = z.object({
 export interface CreateLicenseDto {
   organizationId: string;
   plan: LicensePlan;
+  alias?: string | null;
   maxActivations?: number;
   expiresAt?: Date | string | null;
   trialDays?: number;
@@ -167,7 +170,12 @@ export interface CreateLicenseDto {
 export const CreateLicenseDtoSchema = z.object({
   organizationId: z.string().min(1),
   plan: LicensePlanSchema,
+  alias: z.string().max(100).nullable().optional(),
   maxActivations: z.number().int().min(1).default(1),
   expiresAt: z.union([z.coerce.date(), z.null()]).optional(),
   trialDays: z.number().int().min(1).optional(),
 });
+
+export interface LicenseWithActivations extends License {
+  activations: LicenseActivation[];
+}
