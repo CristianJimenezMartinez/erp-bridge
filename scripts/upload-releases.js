@@ -117,14 +117,20 @@ async function uploadReleases(options = {}) {
               });
             }
 
-            // Landing page index.html actualizada
-            const localIndexHtml = path.resolve(__dirname, '../apps/api/public/index.html');
-            if (fs.existsSync(localIndexHtml)) {
-              uploadQueue.push({
-                local: localIndexHtml,
-                remote: `${remotePublicDir}/index.html`,
-                name: 'public/index.html'
-              });
+            // Archivos públicos (index.html, robots.txt, sitemap.xml)
+            const localPublicDir = path.resolve(__dirname, '../apps/api/public');
+            if (fs.existsSync(localPublicDir)) {
+              const publicFiles = ['index.html', 'robots.txt', 'sitemap.xml'];
+              for (const pf of publicFiles) {
+                const localPf = path.join(localPublicDir, pf);
+                if (fs.existsSync(localPf)) {
+                  uploadQueue.push({
+                    local: localPf,
+                    remote: `${remotePublicDir}/${pf}`,
+                    name: `public/${pf}`
+                  });
+                }
+              }
             }
 
             console.log(`>>> [3/4] Transfiriendo ${uploadQueue.length} archivos a producción...`);
