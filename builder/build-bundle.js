@@ -47,7 +47,10 @@ async function buildAgentBundle(options = {}) {
     }
   };
 
-  console.log('[3/4] Compilando y empaquetando con esbuild en un solo archivo CommonJS...');
+  const shouldMinify = options.minify !== undefined ? options.minify : true;
+  const shouldSourcemap = options.sourcemap !== undefined ? options.sourcemap : false;
+
+  console.log(`[3/4] Compilando y empaquetando con esbuild (Minify: ${shouldMinify}, Sourcemap: ${shouldSourcemap})...`);
   const result = await esbuild.build({
     entryPoints: [entryFile],
     outfile: outBundle,
@@ -55,8 +58,18 @@ async function buildAgentBundle(options = {}) {
     platform: 'node',
     target: 'node20',
     format: 'cjs',
-    sourcemap: true,
-    minify: false, // mantenemos legible para depuración en v0.1
+    sourcemap: shouldSourcemap,
+    minify: shouldMinify,
+    legalComments: 'none',
+    banner: {
+      js: `/**
+ * (c) 2026 Cristian Jiménez Martínez / Bentian. Todos los derechos reservados.
+ * INFORMACIÓN CONFIDENCIAL Y PROPIETARIA.
+ * Protegido como Secreto Empresarial bajo la Ley 1/2019 de Secretos Empresariales (España)
+ * y la Directiva (UE) 2016/943. Queda prohibida la reproducción, descompilación,
+ * ingeniería inversa o distribución no autorizada.
+ */`
+    },
     nodePaths: [path.resolve(__dirname, 'node_modules')],
     plugins: [aliasPlugin],
     external: []

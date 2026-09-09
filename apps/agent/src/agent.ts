@@ -831,10 +831,11 @@ export class LocalAgent {
       return { status: 'UNLICENSED', message: 'No hay token de licencia guardado en este equipo' };
     }
 
-    // 1. Check local token payload (for grace period fallback)
-    const localPayload: LicenseTokenPayload | null = LicenseTokenManager.decodeUnverified(token);
+    // 1. Check local token payload with cryptographic verification and HWID binding
+    const verification = LicenseTokenManager.verifyToken(token);
+    const localPayload: LicenseTokenPayload | null = verification.valid && verification.payload ? verification.payload : null;
     const now = Date.now();
-    const isLocalTokenValid = localPayload ? now <= localPayload.expiresAt : false;
+    const isLocalTokenValid = localPayload ? (now <= localPayload.expiresAt && (!localPayload.hwid || localPayload.hwid === hwid)) : false;
 
     // 2. Attempt online validation and token renewal
     try {

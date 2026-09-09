@@ -1,0 +1,21 @@
+CONTRATO DE LICENCIA DE USUARIO FINAL (EULA) - BENTIAN LOCAL AGENT
+(c) 2026 Cristian Jiménez Martínez. Todos los derechos reservados.
+
+1. CONCESIÓN DE LICENCIA LIMITADA
+Bentian otorga al Usuario una licencia no exclusiva, intransferible, revocable y limitada para instalar y ejecutar una (1) instancia de Bentian Local Agent en un único equipo o servidor, vinculada al identificador de hardware (HWID) registrado y a la suscripción activa.
+
+2. PROHIBICIÓN ESTRICTA DE INGENIERÍA INVERSA Y EXTRACCIÓN DE CÓDIGO
+El Usuario no podrá, ni permitirá a terceros:
+a) Descompilar, desensamblar, aplicar ingeniería inversa o intentar descifrar el código fuente, la estructura interna o los esquemas de bases de datos del Software.
+b) Modificar, adaptar, traducir o crear obras derivadas basadas en el Software.
+c) Monitorizar, interceptar o analizar las comunicaciones y llamadas a APIs generadas por el Software con fines de replicación tecnológica o benchmarking competitivo.
+d) Sublicenciar, alquilar, arrendar o revender el Software a terceros sin autorización expresa por escrito de Bentian.
+
+3. AUDITORÍA Y PROTECCIÓN TÉCNICA
+El Software incorpora medidas tecnológicas de protección (TPM) y detección de manipulaciones. Cualquier intento de evasión del sistema de licencias, modificación del token de activación o manipulación del binario provocará la revocación inmediata de la licencia sin derecho a reembolso, reservándose Bentian las acciones civiles y penales previstas en la Ley de Propiedad Intelectual y en el Código Penal español.
+
+4. EXENCIÓN Y LIMITACIÓN DE RESPONSABILIDAD
+El Software interactúa en modo de lectura/escritura con el software de gestión (ERP) y la tienda online del Usuario. Bentian no será responsable de daños directos, indirectos, lucro cesante o pérdida de datos derivados de caídas de red, incompatibilidades de versiones no soportadas del ERP, o bloqueos ocasionados por bases de datos dañadas del cliente. La responsabilidad máxima total de Bentian frente al Usuario por cualquier concepto quedará limitada al importe efectivamente pagado por el Usuario en los tres (3) meses anteriores al hecho causante.
+
+5. ARQUITECTURA LOCAL-FIRST Y PROTECCIÓN DE DATOS (RGPD ART. 28)
+El Software opera bajo una arquitectura técnica "Local-First". Toda la extracción, transformación y mapeo de datos de clientes, pedidos y facturas se realiza estrictamente en el equipo local del Usuario, transmitiéndose directamente de forma cifrada punto a punto (TLS 1.3) a la plataforma de destino. Bentian no custodia, no almacena ni realiza copias de seguridad de las bases de datos contables o fiscales en la nube.

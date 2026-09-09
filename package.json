@@ -18,7 +18,8 @@
     "release:deploy": "node builder/build.js --deploy",
     "deploy:patch": "node builder/build.js patch --deploy",
     "deploy:minor": "node builder/build.js minor --deploy",
-    "deploy": "node scripts/upload-releases.js"
+    "deploy": "node scripts/upload-releases.js",
+    "seal:legal": "node scripts/seal-opentimestamps.js"
   },
   "keywords": [
     "erp",
