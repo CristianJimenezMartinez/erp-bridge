@@ -121,7 +121,8 @@ export class LocalAgent {
     const diskConfig = this.loadConfigFromDisk();
     this.syncHistory = this.loadSyncHistory();
 
-    this.currentVersion = process.env['APP_VERSION'] || customConfig?.agentVersion || diskConfig.agentVersion || '0.1.0';
+    const compiledVersion = (typeof process !== 'undefined' && (process.env.APP_VERSION || process.env.AGENT_VERSION)) ? (process.env.APP_VERSION || process.env.AGENT_VERSION) : '0.1.5';
+    this.currentVersion = customConfig?.agentVersion || compiledVersion || diskConfig.agentVersion || '0.1.5';
 
     const diskFactusol = diskConfig.factusol || {};
     const diskWoo = diskConfig.woocommerce || {};

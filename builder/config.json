@@ -1,7 +1,7 @@
 {
   "appName": "Bentian Agent",
   "appId": "com.bentian.agent",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Bentian",
   "channel": "stable",
   "platform": "win32_x64",

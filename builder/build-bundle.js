@@ -77,6 +77,8 @@ async function buildAgentBundle(options = {}) {
     define: {
       'process.env.APP_VERSION': JSON.stringify(agentVersion),
       'process.env.AGENT_VERSION': JSON.stringify(agentVersion),
+      "process.env['APP_VERSION']": JSON.stringify(agentVersion),
+      "process.env['AGENT_VERSION']": JSON.stringify(agentVersion),
     },
     plugins: [aliasPlugin],
     external: []
