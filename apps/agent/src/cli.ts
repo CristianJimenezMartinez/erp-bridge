@@ -244,6 +244,23 @@ async function main() {
     case 'start':
     default: {
       const isHeadless = args.includes('--headless') || process.env['HEADLESS'] === 'true';
+
+      // Si no es headless, comprobar si ya existe una instancia en ejecución en el puerto por defecto (39281)
+      if (!isHeadless) {
+        try {
+          const checkReq = await fetch('http://127.0.0.1:39281/api/local/open-gui', {
+            method: 'POST',
+            signal: AbortSignal.timeout(500),
+          });
+          if (checkReq.ok) {
+            console.log('✓ Ya existe una instancia de Bentian Agent en ejecución. Ventana abierta.');
+            process.exit(0);
+          }
+        } catch {
+          // No hay instancia previa en ejecución, continuar con el arranque normal
+        }
+      }
+
       const agent = new LocalAgent();
       await agent.start();
 

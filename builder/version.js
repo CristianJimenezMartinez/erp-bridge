@@ -99,6 +99,16 @@ function applyVersionToAll(newVersion) {
     updatedCount++;
   }
 
+  const trayCsPath = path.resolve(rootDir, 'apps/agent/src/gui/tray/BentianTray.cs');
+  if (fs.existsSync(trayCsPath)) {
+    let trayContent = fs.readFileSync(trayCsPath, 'utf8');
+    trayContent = trayContent.replace(/AssemblyVersion\("\d+\.\d+\.\d+\.\d+"\)/g, `AssemblyVersion("${targetVer}.0")`);
+    trayContent = trayContent.replace(/AssemblyFileVersion\("\d+\.\d+\.\d+\.\d+"\)/g, `AssemblyFileVersion("${targetVer}.0")`);
+    fs.writeFileSync(trayCsPath, trayContent, 'utf8');
+    console.log(`  ✓ apps/agent/src/gui/tray/BentianTray.cs           AssemblyVersion -> ${targetVer}.0`);
+    updatedCount++;
+  }
+
   console.log(`\n✓ ${updatedCount} ficheros actualizados con éxito a v${targetVer}.\n`);
   return targetVer;
 }

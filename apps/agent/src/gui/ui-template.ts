@@ -1,4 +1,4 @@
-export function renderDashboardHtml(): string {
+export function renderDashboardHtml(agentVersion: string = '0.1.5'): string {
   return `<!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
@@ -189,7 +189,7 @@ export function renderDashboardHtml(): string {
         <div class="brand-title">Bentian ERP Bridge</div>
         <div class="brand-subtitle">
           <span>Agente Local</span>
-          <span id="brand-version" class="tag tag-blue">v0.1.4</span>
+          <span id="brand-version" class="tag tag-blue">v${agentVersion}</span>
         </div>
       </div>
     </div>
@@ -1096,7 +1096,7 @@ export function renderDashboardHtml(): string {
     function renderStatus(data) {
       if (!data) return;
 
-      document.getElementById('brand-version').textContent = 'v' + (data.agentVersion || '0.1.4');
+      document.getElementById('brand-version').textContent = 'v' + (data.agentVersion || '${agentVersion}');
       document.getElementById('sidebar-hostname').textContent = (data.system && data.system.hostname) ? data.system.hostname : 'Local';
       document.getElementById('sidebar-hwid').textContent = data.hwid ? (data.hwid.substring(0, 12) + '...') : '---';
 

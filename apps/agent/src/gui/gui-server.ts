@@ -58,7 +58,7 @@ export class LocalGuiServer {
             // 1. UI Entrypoint
             if (pathname === '/' || pathname === '/index.html') {
               res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-              res.end(renderDashboardHtml());
+              res.end(renderDashboardHtml(this.agent.getVersion()));
               return;
             }
 

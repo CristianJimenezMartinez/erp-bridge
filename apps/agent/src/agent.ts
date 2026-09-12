@@ -244,6 +244,10 @@ export class LocalAgent {
     }
   }
 
+  public getVersion(): string {
+    return this.currentVersion;
+  }
+
   public async reconnectFactusol(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number }> {
     const testResult = await this.testFactusolConnection(dbPath);
     if (!testResult.success) {
