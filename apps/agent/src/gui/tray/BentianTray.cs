@@ -3,13 +3,25 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+
+[assembly: System.Reflection.AssemblyTitle("Bentian ERP Bridge Agent")]
+[assembly: System.Reflection.AssemblyDescription("Conector Empresarial y Sincronización B2B")]
+[assembly: System.Reflection.AssemblyCompany("Bentian")]
+[assembly: System.Reflection.AssemblyProduct("Bentian ERP Bridge")]
+[assembly: System.Reflection.AssemblyCopyright("(c) 2026 Cristian Jiménez Martínez")]
+[assembly: System.Reflection.AssemblyVersion("0.1.4.0")]
+[assembly: System.Reflection.AssemblyFileVersion("0.1.4.0")]
 
 namespace Bentian.Tray
 {
     static class Program
     {
+        [DllImport("shell32.dll", SetLastError = true)]
+        private static extern int SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string AppID);
+
         private static NotifyIcon trayIcon;
         private static ContextMenuStrip contextMenu;
         private static int port = 39281;
@@ -21,6 +33,12 @@ namespace Bentian.Tray
         [STAThread]
         static void Main(string[] args)
         {
+            // Registrar AppUserModelID oficial para Windows 10/11 Action Center & Notificaciones
+            try
+            {
+                SetCurrentProcessExplicitAppUserModelID("Bentian.ERPBridge.Agent");
+            }
+            catch { }
             // Parse arguments
             for (int i = 0; i < args.Length; i++)
             {
@@ -45,28 +63,28 @@ namespace Bentian.Tray
             contextMenu = new ContextMenuStrip();
             contextMenu.ShowImageMargin = false;
 
-            var openItem = new ToolStripMenuItem("🖥️  Abrir Centro de Control");
+            var openItem = new ToolStripMenuItem("Abrir Centro de Control");
             openItem.Font = new Font(openItem.Font, FontStyle.Bold);
             openItem.Click += (s, e) => OpenControlCenter();
             contextMenu.Items.Add(openItem);
 
-            var syncItem = new ToolStripMenuItem("⚡  Forzar Sincronización Ahora");
+            var syncItem = new ToolStripMenuItem("Forzar Sincronización Ahora");
             syncItem.Click += (s, e) => TriggerSync();
             contextMenu.Items.Add(syncItem);
 
-            var logsItem = new ToolStripMenuItem("📋  Ver Registro de Actividad");
+            var logsItem = new ToolStripMenuItem("Ver Registro de Actividad");
             logsItem.Click += (s, e) => OpenLogs();
             contextMenu.Items.Add(logsItem);
 
             contextMenu.Items.Add(new ToolStripSeparator());
 
-            var portalItem = new ToolStripMenuItem("🌐  Portal Web de Licencias");
+            var portalItem = new ToolStripMenuItem("Portal Web de Licencias (Cloud)");
             portalItem.Click += (s, e) => OpenWebPortal();
             contextMenu.Items.Add(portalItem);
 
             contextMenu.Items.Add(new ToolStripSeparator());
 
-            var exitItem = new ToolStripMenuItem("❌  Salir de Bentian Agent");
+            var exitItem = new ToolStripMenuItem("Salir de Bentian Agent");
             exitItem.Click += (s, e) => ExitAgent();
             contextMenu.Items.Add(exitItem);
 
@@ -74,10 +92,18 @@ namespace Bentian.Tray
             trayIcon = new NotifyIcon();
             trayIcon.Text = "Bentian ERP Bridge — Activo";
 
-            // Try to extract embedded icon from the executable
+            // Try to extract embedded icon or icon.ico from executable directory
             try
             {
-                trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                string iconBeside = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "icon.ico");
+                if (File.Exists(iconBeside))
+                {
+                    trayIcon.Icon = new Icon(iconBeside);
+                }
+                else
+                {
+                    trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+                }
             }
             catch
             {
@@ -193,7 +219,7 @@ namespace Bentian.Tray
                     req.Timeout = 30000;
                     using (var resp = req.GetResponse())
                     {
-                        trayIcon.ShowBalloonTip(3000, "Bentian ERP Bridge", "✓ Sincronización completada con éxito.", ToolTipIcon.Info);
+                        trayIcon.ShowBalloonTip(3000, "Bentian ERP Bridge", "Sincronización completada con éxito.", ToolTipIcon.Info);
                     }
                 }
                 catch (Exception ex)

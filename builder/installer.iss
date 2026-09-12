@@ -26,7 +26,8 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64compatible
-UninstallDisplayIcon={app}\{#MyAppExeName}
+SetupIconFile={#SourceDir}\icon.ico
+UninstallDisplayIcon={app}\icon.ico
 LicenseFile=EULA.txt
 
 [Languages]
@@ -39,20 +40,26 @@ Name: "autostart"; Description: "Iniciar Bentian Agent automáticamente al encen
 [Files]
 Source: "{#SourceDir}\BentianAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\BentianTray.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#SourceDir}\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\adodb.js"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\agent-config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{group}\Configurar Factusol"; Filename: "{app}\{#MyAppExeName}"; Parameters: "set-db"
-Name: "{group}\Configurar Servidor API"; Filename: "{app}\{#MyAppExeName}"; Parameters: "set-api"
-Name: "{group}\Activar Licencia {#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "activate"
-Name: "{group}\Comprobar Estado"; Filename: "{app}\{#MyAppExeName}"; Parameters: "status"
-Name: "{group}\Desinstalar {#MyAppName}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"
+Name: "{group}\Configurar Factusol"; Filename: "{app}\{#MyAppExeName}"; Parameters: "set-db"; IconFilename: "{app}\icon.ico"
+Name: "{group}\Configurar Servidor API"; Filename: "{app}\{#MyAppExeName}"; Parameters: "set-api"; IconFilename: "{app}\icon.ico"
+Name: "{group}\Activar Licencia {#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "activate"; IconFilename: "{app}\icon.ico"
+Name: "{group}\Comprobar Estado"; Filename: "{app}\{#MyAppExeName}"; Parameters: "status"; IconFilename: "{app}\icon.ico"
+Name: "{group}\Desinstalar {#MyAppName}"; Filename: "{uninstallexe}"; IconFilename: "{app}\icon.ico"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BentianAgent"; ValueData: """{app}\{#MyAppExeName}"" start"; Flags: uninsdeletevalue; Tasks: autostart
+; Registrar AppUserModelId oficial para que Windows 10/11 permita notificaciones Toast
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; ValueType: string; ValueName: "DisplayName"; ValueData: "Bentian ERP Bridge"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; ValueType: string; ValueName: "IconUri"; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Bentian.ERPBridge.Agent"; ValueType: dword; ValueName: "ShowInActionCenter"; ValueData: 1; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Bentian.ERPBridge.Agent"; ValueType: dword; ValueName: "Enabled"; ValueData: 1; Flags: uninsdeletekey
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden

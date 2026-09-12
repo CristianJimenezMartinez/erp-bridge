@@ -74,6 +74,16 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
   `.trim();
 }
 
+export function mapPaymentMethodToFactusol(method?: string): string {
+  if (!method) return 'TAR';
+  const m = method.toLowerCase();
+  if (m.includes('redsys') || m.includes('stripe') || m.includes('card') || m.includes('tarjeta') || m.includes('tpv')) return 'TAR';
+  if (m.includes('bacs') || m.includes('transfer') || m.includes('wire') || m.includes('bbva')) return 'TR';
+  if (m.includes('cod') || m.includes('reembolso') || m.includes('cash')) return 'EFE';
+  if (m.includes('paypal')) return 'PAY';
+  return sanitizeSql(method).substring(0, 3).toUpperCase() || 'TAR';
+}
+
 export function insertOrderHeaderQuery(
   order: CanonicalOrder,
   orderCode: number,
@@ -81,7 +91,10 @@ export function insertOrderHeaderQuery(
 ): string {
   const series = sanitizeSql(order.series || ' ');
   const ref = sanitizeSql(order.reference || order.orderNumber).substring(0, 50);
-  const dateFormatted = formatAccessDate(order.date || new Date());
+  const orderDate = order.date ? new Date(order.date) : new Date();
+  const dateFormatted = formatAccessDate(orderDate);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const orderTimeFormatted = `#${pad(orderDate.getHours())}:${pad(orderDate.getMinutes())}:${pad(orderDate.getSeconds())}#`;
   
   const shipAddr: CanonicalAddress = order.shippingAddress || order.billingAddress || order.customer.address || { country: 'ES' };
   const recipientName = sanitizeSql(
@@ -97,6 +110,9 @@ export function insertOrderHeaderQuery(
   const phone = sanitizeSql(shipAddr.phone || order.customer.phone || '').substring(0, 50);
   const nif = sanitizeSql(order.customer.taxId || '').substring(0, 18);
   const warehouse = sanitizeSql(order.warehouse || 'GEN').substring(0, 3);
+  const customerEmail = sanitizeSql(shipAddr.email || order.customer.email || '').substring(0, 50);
+  const orderNotes = sanitizeSql(order.notes || '').substring(0, 50);
+  const paymentMethodCode = mapPaymentMethodToFactusol(order.paymentMethod);
 
   const netAmount = Number(order.netAmount || 0).toFixed(2);
   const taxAmount = Number(order.taxAmount || 0).toFixed(2);
@@ -109,7 +125,8 @@ export function insertOrderHeaderQuery(
       TIPPCL, CODPCL, REFPCL, FECPCL, AGEPCL, CLIPCL,
       CNOPCL, CDOPCL, CPOPCL, CCPPCL, CPRPCL, CNIPCL,
       TELPCL, TIVPCL, REQPCL, ESTPCL, ALMPCL,
-      NET1PCL, PIVA1PCL, PIVA2PCL, PIVA3PCL, IIVA1PCL, IPOR1PCL, TOTPCL
+      NET1PCL, BAS1PCL, PIVA1PCL, PIVA2PCL, PIVA3PCL, IIVA1PCL, IPOR1PCL, TOTPCL,
+      FOPPCL, OB1PCL, CEMPCL, HORPCL
     ) VALUES (
       '${series}',
       ${orderCode},
@@ -129,12 +146,17 @@ export function insertOrderHeaderQuery(
       0,
       '${warehouse}',
       ${netAmount},
+      ${netAmount},
       21.00,
       10.00,
       4.00,
       ${taxAmount},
       ${shippingAmount},
-      ${totalAmount}
+      ${totalAmount},
+      '${paymentMethodCode}',
+      '${orderNotes}',
+      '${customerEmail}',
+      ${orderTimeFormatted}
     )
   `.trim();
 }
@@ -151,11 +173,12 @@ export function insertOrderLineQuery(
   const price = Number(line.unitPrice || 0).toFixed(4);
   const discount = Number(line.discountPercent || 0).toFixed(2);
   const total = Number(line.total || (Number(qty) * Number(price))).toFixed(2);
-  const vatType = line.vatType ?? 0;
+  const vatRate = Number(line.vatRate ?? 21).toFixed(2);
+  const vatBracket = vatRate === '21.00' ? 1 : vatRate === '10.00' ? 2 : vatRate === '4.00' ? 3 : 0;
 
   return `
     INSERT INTO F_LPC (
-      TIPLPC, CODLPC, POSLPC, ARTLPC, DESLPC, CANLPC, DT1LPC, IVALPC, PRELPC, TOTLPC
+      TIPLPC, CODLPC, POSLPC, ARTLPC, DESLPC, CANLPC, DT1LPC, IVALPC, PRELPC, TOTLPC, PIVLPC, TIVLPC
     ) VALUES (
       '${sanitizedSeries}',
       ${orderCode},
@@ -164,9 +187,11 @@ export function insertOrderLineQuery(
       '${name}',
       ${qty},
       ${discount},
-      ${vatType},
+      0,
       ${price},
-      ${total}
+      ${total},
+      ${vatRate},
+      ${vatBracket}
     )
   `.trim();
 }

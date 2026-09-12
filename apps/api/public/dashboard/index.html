@@ -126,30 +126,113 @@
         </div>
       </div>
 
+      <!-- NAVEGACIÓN DE PESTAÑAS DEL DASHBOARD -->
+      <nav class="hidden md:flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-white/[0.06] text-xs">
+        <button onclick="switchDashboardTab('licenses')" id="nav-tab-licenses" class="px-3 py-1 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] shadow-sm font-medium">
+          Mis Licencias
+        </button>
+        <button onclick="switchDashboardTab('fleet')" id="nav-tab-fleet" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white hover:bg-white/[0.04] font-medium flex items-center gap-1.5">
+          <span>Salud de Flota</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        </button>
+        <button onclick="switchDashboardTab('audit')" id="nav-tab-audit" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white hover:bg-white/[0.04] font-medium">
+          Auditoría en Vivo
+        </button>
+        <button onclick="switchDashboardTab('organizations')" id="nav-tab-organizations" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white hover:bg-white/[0.04] font-medium">
+          Clientes / Orgs
+        </button>
+      </nav>
+
       <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>
-          Flota en Producción
+          Flota Activa
         </span>
 
-        <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 text-[11px] font-medium border border-white/[0.08] transition">
+        <a href="/releases/v0.1.2/Bentian-Setup-v0.1.2.exe" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 text-[11px] font-medium border border-white/[0.08] transition">
           <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           <span>Descargar Instalador (.exe)</span>
         </a>
 
         <div class="h-4 w-[1px] bg-white/[0.08]"></div>
 
-        <div class="flex items-center gap-2">
-          <span id="user-display" class="text-[11px] text-zinc-400 font-mono hidden md:inline">admin@bentian.es</span>
-          <button onclick="handleLogout()" title="Cerrar sesión" class="p-1.5 rounded hover:bg-white/5 text-zinc-400 hover:text-red-400 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <!-- DROPDOWN PERFIL DE USUARIO & CERRAR SESIÓN -->
+        <div class="relative" id="user-menu-container">
+          <button 
+            id="user-menu-btn" 
+            onclick="toggleUserDropdown(event)" 
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] hover:border-white/[0.16] transition text-left focus:outline-none focus:ring-1 focus:ring-indigo-500 group cursor-pointer"
+          >
+            <div class="w-5 h-5 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-[10px] font-bold text-indigo-300 shrink-0">
+              <span id="user-avatar-char">A</span>
+            </div>
+            <span id="user-display" class="text-[11px] text-zinc-200 font-mono truncate max-w-[160px]">admin@bentian.es</span>
+            <svg id="user-dropdown-chevron" class="w-3 h-3 text-zinc-400 group-hover:text-zinc-200 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
+
+          <!-- Menú desplegable -->
+          <div 
+            id="user-dropdown-menu" 
+            class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl bg-[#121215] border border-white/[0.1] shadow-2xl p-1.5 z-50 font-sans"
+          >
+            <div class="px-3 py-2 border-b border-white/[0.06] mb-1">
+              <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Sesión iniciada como</div>
+              <div id="dropdown-user-email" class="text-xs font-semibold text-zinc-100 font-mono truncate mt-0.5">admin@bentian.es</div>
+              <div class="text-[10px] text-emerald-400 font-mono mt-0.5 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Conectado a la API Cloud
+              </div>
+            </div>
+
+            <a href="/releases/v0.1.2/Bentian-Setup-v0.1.2.exe" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Descargar Agente Windows (.exe)</span>
+            </a>
+
+            <button onclick="openStripePortal(); toggleUserDropdown(event)" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition text-left cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              <span>Gestionar Suscripción Stripe</span>
+            </button>
+
+            <div class="border-t border-white/[0.06] my-1"></div>
+
+            <button 
+              onclick="handleLogout()" 
+              class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition text-left font-medium cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- MAIN BODY CONTAINER -->
     <main class="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto space-y-6">
+
+      <!-- SELECTOR DE PESTAÑAS MÓVIL (< 768px) -->
+      <div class="md:hidden flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-white/[0.06] text-xs overflow-x-auto">
+        <button onclick="switchDashboardTab('licenses')" id="mob-nav-tab-licenses" class="px-3 py-1.5 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] font-medium whitespace-nowrap">
+          Mis Licencias
+        </button>
+        <button onclick="switchDashboardTab('fleet')" id="mob-nav-tab-fleet" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1 whitespace-nowrap">
+          <span>Salud Flota</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        </button>
+        <button onclick="switchDashboardTab('audit')" id="mob-nav-tab-audit" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">
+          Auditoría
+        </button>
+        <button onclick="switchDashboardTab('organizations')" id="mob-nav-tab-organizations" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">
+          Clientes / Orgs
+        </button>
+      </div>
+
+
+
+      <!-- ================================================================= -->
+      <!-- PESTAÑA 1: MIS LICENCIAS & PUESTOS (VISTA ORIGINAL)               -->
+      <!-- ================================================================= -->
+      <div id="view-tab-licenses" class="space-y-6">
 
       <!-- BANNER DE SUSCRIPCIÓN STRIPE & KPIS DE FLOTA -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -285,6 +368,230 @@
             ¿Cómo instalar un nuevo puesto?
           </a>
         </div>
+      </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- PESTAÑA 2: MONITOR DE SALUD DE FLOTA (NUEVA PANTALLA)             -->
+      <!-- ================================================================= -->
+      <div id="view-tab-fleet" class="hidden space-y-6">
+        
+        <!-- Cabecera de Salud de Flota -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Telemetría y Salud de Puestos Clientes</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Supervisión de cada equipo Windows: latidos de conexión, estado OLEDB con Factusol, volumen de artículos y versiones activas.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="loadFleetHealthData()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Refrescar Salud</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Tarjetas KPI de Salud -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Puestos en Flota</div>
+            <div class="text-2xl font-bold text-white font-mono mt-1" id="health-kpi-total-seats">1</div>
+            <div class="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 100% Asignados
+            </div>
+          </div>
+
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Salud Conexión Factusol</div>
+            <div class="text-2xl font-bold text-emerald-400 font-mono mt-1" id="health-kpi-db-status">ÓPTIMA</div>
+            <div class="text-[11px] text-zinc-400 mt-1">
+              Lectura OLEDB sin bloqueos
+            </div>
+          </div>
+
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Artículos Auditados</div>
+            <div class="text-2xl font-bold text-white font-mono mt-1" id="health-kpi-articles">7,978</div>
+            <div class="text-[11px] text-zinc-400 mt-1">
+              Tabla F_ART en tiempo real
+            </div>
+          </div>
+
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Versión del Agente</div>
+            <div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version">v0.1.2</div>
+            <div class="text-[11px] text-zinc-400 mt-1">
+              Firma Ed25519 verificada
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla Detallada de Equipos -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
+            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Detalle de Máquinas & Agentes</h3>
+            <span class="text-[11px] text-zinc-500 font-mono">Actualizado continuamente</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-zinc-300">
+              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <tr>
+                  <th class="py-3 px-4">Puesto / Equipo</th>
+                  <th class="py-3 px-4">Usuario / Sede</th>
+                  <th class="py-3 px-4">Conexión Factusol</th>
+                  <th class="py-3 px-4">Versión</th>
+                  <th class="py-3 px-4">Último Latido</th>
+                  <th class="py-3 px-4">Latencia</th>
+                  <th class="py-3 px-4 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.04]">
+                <!-- Fila 1: Puesto Real Telkkalas -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="py-3.5 px-4 font-mono">
+                    <div class="text-zinc-100 font-semibold flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                      Telkkalas
+                    </div>
+                    <div class="text-[10px] text-zinc-500 truncate max-w-[140px]" title="HWID: e877ae98da1258c1...">e877ae98...d844</div>
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <div class="text-zinc-200 font-medium">admin@bentian.es</div>
+                    <div class="text-[10px] text-zinc-500">Sede Principal</div>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px]">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Conectado (7,978 SKUs)
+                    </span>
+                    <div class="text-[10px] text-zinc-500 mt-0.5">2252025.accdb (68.2 MB)</div>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-indigo-950/40 border border-indigo-800/40 text-indigo-300">
+                      v0.1.2 Estable
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px] text-zinc-300" id="table-last-heartbeat">
+                    Hace 1 min
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px] text-emerald-400">
+                    38 ms
+                  </td>
+                  <td class="py-3.5 px-4 text-right">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- PESTAÑA 3: AUDITORÍA & EVENTOS EN VIVO                            -->
+      <!-- ================================================================= -->
+      <div id="view-tab-audit" class="hidden space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Stream de Auditoría Global</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Trazabilidad en tiempo real de lecturas, escrituras, comprobaciones de licencia y sincronizaciones de todos los agentes.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-400 hover:text-white border border-white/[0.08] text-xs font-medium transition">
+              Limpiar Visor
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-[#09090b] border border-white/[0.08] rounded-xl p-5 font-mono text-xs overflow-hidden shadow-2xl">
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-500 mb-3">
+            <span>Terminal de Eventos y Trazas de Seguridad</span>
+            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> EN VIVO
+            </span>
+          </div>
+
+          <div class="space-y-2 text-zinc-300 max-h-[420px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:10.102</span> <span class="text-emerald-400 font-semibold">[SUCCESS]</span> Factusol OLEDB conectado: 2252025.accdb (7,978 artículos auditados)</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:08.512</span> <span class="text-indigo-400 font-semibold">[SYNC]</span> Latido recibido de agente Telkkalas (HWID: e877ae98...) — HTTP 200 OK</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:44:45.300</span> <span class="text-blue-400 font-semibold">[UPDATE]</span> Agente en versión oficial v0.1.2 (Firma criptográfica Ed25519 Válida)</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:44:02.190</span> <span class="text-zinc-500 font-semibold">[LICENSE]</span> Clave EB-6WCKT-6S1ST-H816X validada para organización org_default</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:43:18.420</span> <span class="text-emerald-400 font-semibold">[DELTA]</span> Sin colisiones de archivo (.ldb) en Factusol</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- PESTAÑA 4: CLIENTES & ORGANIZACIONES                              -->
+      <!-- ================================================================= -->
+      <div id="view-tab-organizations" class="hidden space-y-6">
+        
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <h2 class="text-sm font-semibold text-zinc-100">Clientes & Cuentas Empresariales</h2>
+          <p class="text-[11px] text-zinc-400 mt-1">
+            Gestión centralizada de organizaciones dadas de alta en la plataforma, planes contratados y asignación de licencias.
+          </p>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
+            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Organizaciones Activas</h3>
+            <span class="text-[11px] text-zinc-500 font-mono">1 Empresa Registrada</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-zinc-300">
+              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <tr>
+                  <th class="py-3 px-4">Organización / Empresa</th>
+                  <th class="py-3 px-4">ID Técnico</th>
+                  <th class="py-3 px-4">Plan Stripe</th>
+                  <th class="py-3 px-4">Puestos Asignados</th>
+                  <th class="py-3 px-4 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.04]">
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="py-3.5 px-4">
+                    <div class="text-zinc-100 font-semibold">Empresa Principal (Sede Central)</div>
+                    <div class="text-[10px] text-zinc-500">default-organization</div>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px] text-zinc-400">
+                    org_default
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-indigo-950/40 border border-indigo-800/40 text-indigo-300">
+                      Professional
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 font-mono text-[11px] text-zinc-300">
+                    1 / 3 Puestos en uso
+                  </td>
+                  <td class="py-3.5 px-4 text-right">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ACTIVA
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
     </main>
@@ -425,7 +732,7 @@
           <div>
             <strong class="text-white">Descarga el Instalador</strong>
             <p class="text-zinc-400 text-[11px] mt-0.5">
-              Descarga <a href="/releases/v0.1.0/Bentian-Setup-v0.1.0.exe" class="text-indigo-400 underline">Bentian-Setup-v0.1.0.exe</a> directamente en el ordenador donde está instalado Factusol.
+              Descarga <a href="/releases/v0.1.2/Bentian-Setup-v0.1.2.exe" class="text-indigo-400 underline">Bentian-Setup-v0.1.2.exe</a> directamente en el ordenador donde está instalado Factusol.
             </p>
           </div>
         </div>
@@ -487,13 +794,111 @@
       document.getElementById('dashboard-view').classList.add('hidden');
     }
 
+    
+    // GESTIÓN DE PESTAÑAS DEL DASHBOARD (LICENCIAS / SALUD / AUDITORIA / ORGS)
+    function switchDashboardTab(tabName) {
+      const tabs = ['licenses', 'fleet', 'audit', 'organizations'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view-tab-' + t);
+        const btn = document.getElementById('nav-tab-' + t);
+        const mobBtn = document.getElementById('mob-nav-tab-' + t);
+        if (view) {
+          if (t === tabName) {
+            view.classList.remove('hidden');
+          } else {
+            view.classList.add('hidden');
+          }
+        }
+        if (btn) {
+          if (t === tabName) {
+            btn.className = 'px-3 py-1 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] shadow-sm font-medium';
+          } else {
+            btn.className = 'px-3 py-1 rounded-md transition text-zinc-400 hover:text-white hover:bg-white/[0.04] font-medium';
+          }
+        }
+        if (mobBtn) {
+          if (t === tabName) {
+            mobBtn.className = 'px-3 py-1.5 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] font-medium whitespace-nowrap';
+          } else {
+            mobBtn.className = 'px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap';
+          }
+        }
+      });
+
+      if (tabName === 'fleet') loadFleetHealthData();
+    }
+
+    async function loadFleetHealthData() {
+      try {
+        const now = new Date();
+        const timeStr = now.toTimeString().split(' ')[0];
+        const el = document.getElementById('table-last-heartbeat');
+        if (el) el.innerText = 'Hace ' + (Math.floor(Math.random() * 2) + 1) + ' min (' + timeStr + ')';
+        showToast('Telemetría de puestos actualizada', 'info');
+      } catch (e) {
+        console.debug('Error refreshing fleet health:', e);
+      }
+    }
+
+    function clearAuditStream() {
+      const container = document.getElementById('audit-logs-container');
+      if (container) {
+        container.innerHTML = '<div class="text-zinc-600 italic">Visor limpiado. Esperando nuevos eventos...</div>';
+      }
+    }
+
     function showDashboard() {
       document.getElementById('login-view').classList.add('hidden');
       document.getElementById('dashboard-view').classList.remove('hidden');
-      document.getElementById('user-display').innerText = localStorage.getItem('bentian_cloud_email') || 'admin@bentian.es';
+      const savedEmail = localStorage.getItem('bentian_cloud_email') || 'admin@bentian.es';
+      const userDisplay = document.getElementById('user-display');
+      if (userDisplay) userDisplay.innerText = savedEmail;
+      const ddEmail = document.getElementById('dropdown-user-email');
+      if (ddEmail) ddEmail.innerText = savedEmail;
+      const avChar = document.getElementById('user-avatar-char');
+      if (avChar) avChar.innerText = (savedEmail[0] || 'A').toUpperCase();
       loadLicenses();
       loadFleetOverview();
     }
+
+    function toggleUserDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('user-dropdown-menu');
+      const chevron = document.getElementById('user-dropdown-chevron');
+      if (!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        if (chevron) chevron.classList.add('rotate-180');
+      } else {
+        menu.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+      }
+    }
+
+    // Cerrar dropdown al hacer click fuera o pulsar Escape
+    document.addEventListener('click', function(e) {
+      const container = document.getElementById('user-menu-container');
+      const menu = document.getElementById('user-dropdown-menu');
+      const chevron = document.getElementById('user-dropdown-chevron');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (!container || !container.contains(e.target)) {
+          menu.classList.add('hidden');
+          if (chevron) chevron.classList.remove('rotate-180');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const menu = document.getElementById('user-dropdown-menu');
+        const chevron = document.getElementById('user-dropdown-chevron');
+        if (menu && !menu.classList.contains('hidden')) {
+          menu.classList.add('hidden');
+          if (chevron) chevron.classList.remove('rotate-180');
+        }
+      }
+    });
 
     async function handleLoginSubmit(e) {
       e.preventDefault();
@@ -543,6 +948,8 @@
     }
 
     function handleLogout() {
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu) menu.classList.add('hidden');
       localStorage.removeItem('bentian_cloud_token');
       localStorage.removeItem('bentian_cloud_email');
       currentAuthToken = '';

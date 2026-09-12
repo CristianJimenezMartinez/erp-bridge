@@ -49,7 +49,7 @@ export class AccessDriver {
   }
 
   public getConnectionString(): string {
-    return `Provider=${this.provider};Data Source=${this.databasePath};Persist Security Info=False;`;
+    return `Provider=${this.provider};Data Source=${this.databasePath};Mode=Share Deny None;Persist Security Info=False;`;
   }
 
   public getDatabasePath(): string {
@@ -57,6 +57,13 @@ export class AccessDriver {
   }
 
   public verifyFileExists(): void {
+    if (process.platform !== 'win32') {
+      throw new ConnectionError(
+        ErrorCode.NOT_SUPPORTED,
+        `El conector nativo OLEDB de Factusol requiere Windows con el motor Microsoft Access Database Engine (ACE.OLEDB) instalado (plataforma detectada: ${process.platform}).`,
+        { platform: process.platform, path: this.databasePath }
+      );
+    }
     if (!fs.existsSync(this.databasePath)) {
       throw new ConnectionError(
         ErrorCode.CONNECTION_FAILED,

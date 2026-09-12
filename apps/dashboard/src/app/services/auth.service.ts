@@ -26,11 +26,11 @@ export class AuthService {
     if (typeof window !== 'undefined' && window.location) {
       const origin = window.location.origin;
       if (origin.startsWith('http://localhost:4200')) {
-        return 'http://localhost:3000/api/v1';
+        return 'https://bridge.cristianjm.com/api/v1';
       }
       return `${origin}/api/v1`;
     }
-    return '/api/v1';
+    return 'https://bridge.cristianjm.com/api/v1';
   }
 
   public currentUser = signal<AdminUser | null>(this.loadUserFromStorage());

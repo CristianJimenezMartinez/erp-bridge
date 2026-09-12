@@ -1,0 +1,40 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: bentian-woo-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: bentian_root_pass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password_123
+    volumes:
+      - bentian_woo_db_data:/var/lib/mysql
+    networks:
+      - bentian-sandbox-net
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    container_name: bentian-woo-sandbox
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    ports:
+      - "8089:80"
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password_123
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - bentian_woo_wp_data:/var/www/html
+    networks:
+      - bentian-sandbox-net
+
+volumes:
+  bentian_woo_db_data:
+  bentian_woo_wp_data:
+
+networks:
+  bentian-sandbox-net:
+    driver: bridge

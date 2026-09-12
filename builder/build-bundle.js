@@ -2,8 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const esbuild = require('./node_modules/esbuild');
 
+const { getCurrentVersion } = require('./version');
+
 async function buildAgentBundle(options = {}) {
   const startTime = Date.now();
+  const agentVersion = options.version || getCurrentVersion();
   console.log('\n======================================================');
   console.log('   BENTIAN AGENT BUILDER — PASO 1: BUNDLE JS         ');
   console.log('======================================================\n');
@@ -71,6 +74,10 @@ async function buildAgentBundle(options = {}) {
  */`
     },
     nodePaths: [path.resolve(__dirname, 'node_modules')],
+    define: {
+      'process.env.APP_VERSION': JSON.stringify(agentVersion),
+      'process.env.AGENT_VERSION': JSON.stringify(agentVersion),
+    },
     plugins: [aliasPlugin],
     external: []
   });

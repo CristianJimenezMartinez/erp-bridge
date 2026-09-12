@@ -142,11 +142,11 @@ async function runMasterBuild() {
 
   // 1. Bundle JS
   console.log('>>> [1/6] Compilando JavaScript Bundle...');
-  await buildAgentBundle({ outDir: distDir });
+  await buildAgentBundle({ outDir: distDir, version });
 
   // 2. Native Windows Executable
   console.log('>>> [2/6] Generando Ejecutable Nativo BentianAgent.exe...');
-  const exeResult = await buildExecutable({ distDir, forceRebuild: false });
+  const exeResult = await buildExecutable({ distDir, forceRebuild: true });
 
   // 3. Inno Setup Installer
   console.log('>>> [3/6] Compilando Instalador de Windows (Inno Setup)...');
@@ -273,7 +273,7 @@ async function runMasterBuild() {
   }
 
   // Manifest.json
-  const downloadBase = process.env.RELEASES_DOWNLOAD_BASE_URL || '/releases';
+  const downloadBase = process.env.RELEASES_DOWNLOAD_BASE_URL || 'https://bridge.cristianjm.com/releases';
   const manifest = {
     version,
     channel: 'stable',

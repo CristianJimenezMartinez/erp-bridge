@@ -39,6 +39,10 @@ async function buildExecutable(options = {}) {
   console.log(`[4/5] Clonando host ejecutable desde: ${process.execPath}...`);
   fs.copyFileSync(process.execPath, exePath);
 
+  // Inyectar icono personalizado y metadatos de producto ANTES de postject
+  const iconPath = path.resolve(distDir, 'icon.ico');
+  applyCustomIconAndMetadata(exePath, iconPath);
+
   console.log('[5/5] Inyectando blob en BentianAgent.exe mediante postject...');
   const blobBuffer = fs.readFileSync(blobPath);
   await inject(exePath, 'NODE_SEA_BLOB', blobBuffer, {
@@ -110,11 +114,32 @@ function patchPeSubsystemToGui(exePath) {
   }
 }
 
+function applyCustomIconAndMetadata(targetExe, iconPath) {
+  const rcedit = path.win32.normalize(path.resolve(__dirname, 'tools/rcedit-x64.exe'));
+  const normExe = path.win32.normalize(targetExe);
+  const normIcon = path.win32.normalize(iconPath);
+
+  if (fs.existsSync(rcedit) && fs.existsSync(normIcon)) {
+    try {
+      const { getCurrentVersion } = require('./version');
+      const v = getCurrentVersion();
+      console.log(`  [rcedit] Incrustando icono personalizado y metadatos de producto (v${v})...`);
+      const cmd = `"${rcedit}" "${normExe}" --set-icon "${normIcon}" --set-version-string FileDescription "Bentian ERP Bridge Agent" --set-version-string ProductName "Bentian ERP Bridge" --set-version-string CompanyName "Bentian" --set-file-version ${v}.0 --set-product-version ${v}.0`;
+      childProcess.execSync(cmd, { stdio: 'ignore' });
+      console.log('  ✓ Icono y metadatos incrustados con éxito en BentianAgent.exe.');
+    } catch (err) {
+      console.warn('  [rcedit] Advertencia al inyectar icono en exe:', err.message);
+    }
+  } else {
+    console.log('  [rcedit] Info: rcedit o icon.ico no encontrados, omitiendo inyección.');
+  }
+}
+
 function compileSystemTray(distDir) {
   const cscPath = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe';
-  const traySource = path.resolve(__dirname, '../apps/agent/src/gui/tray/BentianTray.cs');
-  const trayDest = path.resolve(distDir, 'BentianTray.exe');
-  const iconPath = path.resolve(__dirname, '../apps/dashboard/src-tauri/icons/icon.ico');
+  const traySource = path.win32.normalize(path.resolve(__dirname, '../apps/agent/src/gui/tray/BentianTray.cs'));
+  const trayDest = path.win32.normalize(path.resolve(distDir, 'BentianTray.exe'));
+  const iconPath = path.win32.normalize(path.resolve(distDir, 'icon.ico'));
 
   if (!fs.existsSync(cscPath) || !fs.existsSync(traySource)) {
     console.log('[Tray Builder] Advertencia: csc.exe o BentianTray.cs no encontrados.');

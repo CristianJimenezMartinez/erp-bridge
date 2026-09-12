@@ -180,11 +180,11 @@ export class ApiService {
     if (typeof window !== 'undefined' && window.location) {
       const origin = window.location.origin;
       if (origin.startsWith('http://localhost:4200')) {
-        return 'http://localhost:3000/api/v1';
+        return 'https://bridge.cristianjm.com/api/v1';
       }
       return `${origin}/api/v1`;
     }
-    return '/api/v1';
+    return 'https://bridge.cristianjm.com/api/v1';
   }
 
   constructor(private http: HttpClient) {}
@@ -192,7 +192,7 @@ export class ApiService {
   getHealth(): Observable<HealthResponse> {
     const healthUrl = (typeof window !== 'undefined' && window.location && !window.location.origin.startsWith('http://localhost:4200'))
       ? `${window.location.origin}/health`
-      : 'http://localhost:3000/health';
+      : 'https://bridge.cristianjm.com/health';
     return this.http.get<HealthResponse>(healthUrl);
   }
 

@@ -48,14 +48,24 @@ export class AccdbFileWatcher {
       return;
     }
 
-    if (!fs.existsSync(this.config.filePath)) {
-      this.logger.warn(`El archivo .accdb a vigilar no existe en disco: ${this.config.filePath}`);
+    const isUnc = this.config.filePath.startsWith('\\\\');
+    if (isUnc) {
+      this.logger.info(`Detectada ruta de red UNC / NAS para Factusol: ${this.config.filePath}. Modo sondeo activo (SMB polling).`);
     }
 
-    const pollingInterval = this.config.pollingIntervalMs || 5000;
+    if (!fs.existsSync(this.config.filePath)) {
+      this.logger.warn(`El archivo .accdb a vigilar no existe o la ruta de red no es accesible actualmente: ${this.config.filePath}`);
+    }
+
+    const pollingInterval = this.config.pollingIntervalMs || (isUnc ? 8000 : 5000);
 
     fs.watchFile(this.config.filePath, { interval: pollingInterval }, (curr, prev) => {
-      if (curr.mtimeMs !== prev.mtimeMs || curr.size !== prev.size) {
+      try {
+        if (!curr || curr.nlink === 0) {
+          // El archivo puede haberse desconectado temporalmente por red
+          return;
+        }
+        if (curr.mtimeMs !== prev.mtimeMs || curr.size !== prev.size) {
         this.lastChangeDetectedAt = new Date();
         this.totalTriggers++;
         this.logger.info(`♻️ Cambio detectado en el archivo Factusol: ${this.config.filePath} (mtime modificado)`);
@@ -72,6 +82,9 @@ export class AccdbFileWatcher {
         }).catch(() => {});
 
         this.scheduleSync('file-changed');
+        }
+      } catch (err) {
+        this.logger.debug('Excepción menor en sondeo de archivo Factusol (posible desconexión temporal de red)', err);
       }
     });
 

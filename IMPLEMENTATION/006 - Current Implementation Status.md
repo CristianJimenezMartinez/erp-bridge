@@ -61,18 +61,14 @@
 
 # 2. QUÉ ESTÁ EN PROGRESO
 
-En este momento **todas las operaciones en curso han sido concluidas y no hay procesos a medio ejecutar**. No existen ramas rotas ni archivos parcialmente editados.
+En este momento **todas las operaciones del ciclo han sido concluidas con éxito y el entorno de pruebas está levantado al 100%**.
 
-Sin embargo, respecto al MVP técnico completo, quedan las siguientes tareas **planeadas y delimitadas** (pendientes de inicio formal):
+Tareas futuras planeadas fuera del ciclo actual:
 1. **Autenticación en API y Dashboard (PLANEADO):**
    - El router `/api/v1/auth` con emisión y verificación de JWT.
    - El interceptor HTTP y la vista de Login en Angular con `AuthGuard`.
-2. **Conexión reactiva del Watcher en el Local Agent (PLANEADO):**
-   - El archivo `accdb-file-watcher.ts` está probado al 100% de forma unitaria en `packages/core`, pero su invocación dentro del bucle de arranque de `apps/agent/src/agent.ts` todavía no está enlazada al handler de sincronización automática inmediata de stock.
-3. **Editor dinámico de Mapeos de Campos en Dashboard (PLANEADO):**
+2. **Editor dinámico de Mapeos de Campos en Dashboard (PLANEADO):**
    - La pantalla `/mappings` del Dashboard muestra la tabla estática de mapeos canónicos, pero no cuenta con botones de edición inline / guardado contra la API.
-4. **Scripts de conveniencia para Windows en el Agent (PLANEADO):**
-   - Scripts `.bat` (`iniciar-agente.bat` y `vincular-agente.bat`) para instalación y pairing en un clic por parte del cliente sin requerir abrir PowerShell manualmente.
 
 ---
 
@@ -83,6 +79,32 @@ Sin embargo, respecto al MVP técnico completo, quedan las siguientes tareas **p
 * **Archivos afectados:** `101`, `104`, `106`, `201`, `301`, `303`, `304`, `310`, `501`, `502`.
 * **Resultado:** 10 documentos actualizados; 14 documentos congelados intactos; sin enlaces rotos ni desajustes de numeración.
 * **Validaciones realizadas:** Script automatizado de auditoría `scratch/audit_blueprint.js`.
+* **Resultado:** **10 / 10 PASS (0 errores)**.
+
+### Tarea E: Detección Reactiva de Cambios y Vigilante AccdbFileWatcher en Local Agent
+* **Objetivo:** Integrar el vigilante reactivo de archivos Access con soporte para rutas de red/NAS y debounce de 5s.
+* **Archivos afectados:** `packages/core/src/watcher/accdb-file-watcher.ts`, `apps/agent/src/agent.ts`.
+* **Resultado:** Detección de cambios locales y compartidos vía SMB con sondeo activo `fs.watchFile` / `stat` interval.
+
+### Tarea F: Instalador Inno Setup, Tray Nativo y Eliminación de Ventana CMD (PE 0x0002)
+* **Objetivo:** Experiencia de instalación profesional en Windows en un clic, sin abrir consolas negras ni requerir terminal.
+* **Archivos afectados:** `builder/installer.iss`, `builder/build-exe.js`, `apps/agent/src/gui/tray/BentianTray.cs`.
+* **Resultado:** Parcheo a PE Subsystem `0x0002`, instalador `Bentian-Setup-v0.1.3.exe` (24.1 MB) y menú de bandeja nativo.
+
+### Tarea G: Auditoría Exhaustiva de Esquema Factusol (169 tablas) y Mapeos
+* **Objetivo:** Identificar campos obligatorios omitidos en pedidos (`F_PCL`), líneas (`F_LPC`) y formas de pago (`F_FPA`).
+* **Archivos afectados:** `packages/connectors/factusol/src/queries/order.queries.ts`, `packages/connectors/factusol/src/access-driver.ts`.
+* **Resultado:** Incorporación de `FOPPCL` (forma de pago), `BAS1PCL` (base imponible), `OB1PCL` (notas), `CEMPCL`, `HORPCL` e impuestos desglosados (`PIVLPC`/`TIVLPC`). Conexión no bloqueante `Mode=Share Deny None;`.
+
+### Tarea H: Laboratorio Sandbox Mock WooCommerce (:8088) y Sincronización Bidireccional Real
+* **Objetivo:** Probar el ciclo completo Factusol ↔ WooCommerce sin requerir Factusol instalado ni tienda real.
+* **Archivos afectados:** `sandbox/mock-woocommerce-server.js`, `sandbox/docker-compose.sandbox.yml`, `apps/agent/src/agent.ts`.
+* **Resultado:** Sincronización de stock (Factusol ➔ WooCommerce) y pedidos (WooCommerce ➔ Factusol) probada con idempotencia (0 duplicados en ejecuciones consecutivas).
+
+### Tarea I: Armonización Global de Dominio (bridge.cristianjm.com) y Despliegue en Hetzner
+* **Objetivo:** Erradicar dominios provisionales y desplegar la release oficial v0.1.3 en producción.
+* **Archivos afectados:** `apps/agent/src/gui/ui-template.ts`, `builder/dist/`, `/etc/caddy/Caddyfile`, `apps/api/public/index.html`.
+* **Resultado:** Cero menciones a dominios antiguos, redirección 301 en Caddy y entregables publicados en `https://bridge.cristianjm.com/releases/v0.1.3/`.
 * **Resultado:** **10 / 10 PASS (0 errores)**.
 
 ### Tarea B: Sistema Anti-Piratería y Licenciamiento por HWID

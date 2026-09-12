@@ -13,7 +13,7 @@ import {
   LicenseValidationResponse,
   Logger,
 } from '@erp-bridge/shared';
-import { FactusolConnector, AccessDriver } from '@erp-bridge/connector-factusol';
+import { FactusolConnector, AccessDriver, insertOrderHeaderQuery, insertOrderLineQuery } from '@erp-bridge/connector-factusol';
 import { AccdbFileWatcher, LicenseTokenManager } from '@erp-bridge/core';
 import { FactusolDetector } from './detector';
 import { HWIDManager } from './security/hwid';
@@ -84,6 +84,8 @@ export class LocalAgent {
   private isUpdating = false;
   private heartbeatTimer: NodeJS.Timeout | null = null;
   private licenseCheckTimer: NodeJS.Timeout | null = null;
+  private autoSyncTimer: NodeJS.Timeout | null = null;
+  private isSyncing = false;
   private isRunning = false;
   private factusol: FactusolConnector | null = null;
   private watcher: AccdbFileWatcher | null = null;
@@ -107,7 +109,7 @@ export class LocalAgent {
     const diskConfig = this.loadConfigFromDisk();
     this.syncHistory = this.loadSyncHistory();
 
-    this.currentVersion = customConfig?.agentVersion || diskConfig.agentVersion || process.env['APP_VERSION'] || '0.1.0';
+    this.currentVersion = process.env['APP_VERSION'] || customConfig?.agentVersion || diskConfig.agentVersion || '0.1.0';
 
     const diskFactusol = diskConfig.factusol || {};
     const diskWoo = diskConfig.woocommerce || {};
@@ -124,18 +126,18 @@ export class LocalAgent {
       heartbeatIntervalMs: customConfig?.heartbeatIntervalMs || diskConfig.heartbeatIntervalMs || 30000,
       licenseKey: customConfig?.licenseKey || diskConfig.licenseKey,
       factusol: {
-        databasePath: customConfig?.factusolDbPath || diskConfig.factusolDbPath || diskFactusol.databasePath || '',
-        tariffCode: diskFactusol.tariffCode || '1',
-        orderSeries: diskFactusol.orderSeries || 'A',
-        invoiceSeries: diskFactusol.invoiceSeries || '1',
-        warehouseCode: diskFactusol.warehouseCode || 'GEN',
-        activeOnly: diskFactusol.activeOnly !== false,
+        databasePath: customConfig?.factusolDbPath || customConfig?.factusol?.databasePath || diskConfig.factusolDbPath || diskFactusol.databasePath || '',
+        tariffCode: customConfig?.factusol?.tariffCode || diskFactusol.tariffCode || '1',
+        orderSeries: customConfig?.factusol?.orderSeries || diskFactusol.orderSeries || '1',
+        invoiceSeries: customConfig?.factusol?.invoiceSeries || diskFactusol.invoiceSeries || '1',
+        warehouseCode: customConfig?.factusol?.warehouseCode || diskFactusol.warehouseCode || 'GEN',
+        activeOnly: customConfig?.factusol?.activeOnly ?? (diskFactusol.activeOnly !== false),
       },
       woocommerce: {
-        storeUrl: diskWoo.storeUrl || '',
-        consumerKey: diskWoo.consumerKey || '',
-        consumerSecret: diskWoo.consumerSecret || '',
-        orderStatusMapping: diskWoo.orderStatusMapping || {
+        storeUrl: customConfig?.woocommerce?.storeUrl || diskWoo.storeUrl || '',
+        consumerKey: customConfig?.woocommerce?.consumerKey || diskWoo.consumerKey || '',
+        consumerSecret: customConfig?.woocommerce?.consumerSecret || diskWoo.consumerSecret || '',
+        orderStatusMapping: customConfig?.woocommerce?.orderStatusMapping || diskWoo.orderStatusMapping || {
           pending: 'pedido',
           processing: 'albaran',
           completed: 'factura',
@@ -251,33 +253,33 @@ export class LocalAgent {
     this.factusol = new FactusolConnector();
     await this.factusol.connect({ configuration: { databasePath: this.config.factusolDbPath } });
 
-    const lic = await this.validateLicense();
-    if (lic.status === 'VALID' || lic.status === 'GRACE_PERIOD') {
-      this.watcher = new AccdbFileWatcher({
-        filePath: this.config.factusolDbPath,
-        organizationId: this.config.organizationId,
-        debounceMs: 5000,
-      });
-      this.watcher.onSync(async (reason) => {
-        this.addEvent('info', `Cambio detectado en Factusol (${reason}). Disparando sincronización...`);
-        if (this.config.agentId && this.config.apiBaseUrl) {
-          await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
-            },
-            body: JSON.stringify({
-              agentId: this.config.agentId,
-              organizationId: this.config.organizationId,
-              reason,
-              timestamp: new Date().toISOString(),
-            }),
-          }).catch(() => null);
-        }
-      });
-      this.watcher.start();
-    }
+    this.watcher = new AccdbFileWatcher({
+      filePath: this.config.factusolDbPath,
+      organizationId: this.config.organizationId,
+      debounceMs: 5000,
+    });
+    this.watcher.onSync(async (reason) => {
+      this.addEvent('info', `Cambio detectado en Factusol (${reason}). Sincronizando stock de forma autónoma...`);
+      if (!this.isSyncing) {
+        void this.triggerManualSync();
+      }
+      if (this.config.agentId && this.config.apiBaseUrl) {
+        await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
+          },
+          body: JSON.stringify({
+            agentId: this.config.agentId,
+            organizationId: this.config.organizationId,
+            reason,
+            timestamp: new Date().toISOString(),
+          }),
+        }).catch(() => null);
+      }
+    });
+    this.watcher.start();
 
     this.addEvent('success', `✓ Factusol configurado: ${path.basename(this.config.factusolDbPath)} (${testResult.articleCount} artículos)`);
     return testResult;
@@ -324,28 +326,181 @@ export class LocalAgent {
 
   public async triggerManualSync(): Promise<{ success: boolean; message: string }> {
     const start = Date.now();
-    this.addEvent('info', 'Disparando sincronización manual...');
+    this.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
+    let itemsUpdated = 0;
+    let ordersImported = 0;
+
+    const dbPath = this.config.factusol?.databasePath || this.config.factusolDbPath;
+    const woo = this.config.woocommerce || {};
+
     try {
-      let itemsUpdated = 12;
-      let ordersImported = 1;
-      if (this.config.factusolDbPath && fs.existsSync(this.config.factusolDbPath)) {
-        const count = await this.getFactusolArticleCount();
-        if (count) itemsUpdated = Math.min(count, 50);
-      }
-      if (this.config.agentId && this.config.apiBaseUrl) {
-        await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
-          },
-          body: JSON.stringify({
-            agentId: this.config.agentId,
-            organizationId: this.config.organizationId,
-            reason: 'MANUAL_TRIGGER_LOCAL_GUI',
-            timestamp: new Date().toISOString(),
-          }),
-        }).catch(() => null);
+      if (dbPath && fs.existsSync(dbPath) && woo.storeUrl && woo.consumerKey && woo.consumerSecret) {
+        const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
+        const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
+        const driver = new AccessDriver({ databasePath: dbPath });
+
+        // 1. SINCRONIZACIÓN DE STOCK (Factusol -> WooCommerce)
+        try {
+          const resProducts = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100`, {
+            headers: { Authorization: authHeader },
+            signal: AbortSignal.timeout(10000),
+          });
+
+          if (resProducts.ok) {
+            const wcProducts = (await resProducts.json()) as Array<{ id: number; sku: string; name: string }>;
+            const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
+
+            for (const prod of wcProducts) {
+              if (!prod.sku) continue;
+              const sanitizedSku = prod.sku.replace(/'/g, "''").trim();
+              try {
+                const stockRows = await driver.query<{ totalStock: any }>(
+                  `SELECT SUM(DISSTO) AS totalStock FROM F_STO WHERE ARTSTO = '${sanitizedSku}'`
+                );
+                let stockQty = 0;
+                if (stockRows && stockRows.length > 0 && stockRows[0].totalStock !== null) {
+                  stockQty = Math.max(0, Math.round(Number(stockRows[0].totalStock) || 0));
+                } else {
+                  const artRows = await driver.query<{ PHAART: any }>(
+                    `SELECT PHAART FROM F_ART WHERE CODART = '${sanitizedSku}'`
+                  );
+                  if (artRows && artRows.length > 0) {
+                    stockQty = Math.max(0, Math.round(Number(artRows[0].PHAART) || 0));
+                  }
+                }
+                batchUpdates.push({ id: prod.id, stock_quantity: stockQty });
+              } catch (err) {
+                this.logger.debug(`No se pudo leer stock para SKU ${prod.sku}: ${String(err)}`);
+              }
+            }
+
+            if (batchUpdates.length > 0) {
+              const batchRes = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
+                method: 'POST',
+                headers: {
+                  Authorization: authHeader,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ update: batchUpdates }),
+                signal: AbortSignal.timeout(15000),
+              });
+              if (batchRes.ok) {
+                itemsUpdated = batchUpdates.length;
+                this.addEvent('success', `✓ Stock sincronizado en ${itemsUpdated} productos de WooCommerce`);
+              }
+            }
+          }
+        } catch (stockErr) {
+          this.logger.warn(`Aviso en sincronización de stock: ${String(stockErr)}`);
+        }
+
+        // 2. SINCRONIZACIÓN DE PEDIDOS (WooCommerce -> Factusol)
+        try {
+          const resOrders = await fetch(`${cleanUrl}/wp-json/wc/v3/orders?status=processing`, {
+            headers: { Authorization: authHeader },
+            signal: AbortSignal.timeout(10000),
+          });
+
+          if (resOrders.ok) {
+            const wcOrders = (await resOrders.json()) as any[];
+            const series = this.config.factusol?.orderSeries || '1';
+
+            for (const wcOrder of wcOrders) {
+              const externalRef = String(wcOrder.id);
+              // Comprobar idempotencia en F_PCL
+              const existing = await driver.query<{ CODPCL: any }>(
+                `SELECT CODPCL FROM F_PCL WHERE REFPCL = '${externalRef}'`
+              );
+
+              if (existing && existing.length > 0) {
+                continue; // Ya importado previamente
+              }
+
+              // Calcular siguiente CODPCL
+              const maxRows = await driver.query<{ maxid: any }>(
+                `SELECT MAX(CODPCL) AS maxid FROM F_PCL WHERE TIPPCL = '${series}'`
+              );
+              const nextCode = (Number(maxRows[0]?.maxid) || 0) + 1;
+
+              const canonicalOrder = {
+                id: externalRef,
+                orderNumber: externalRef,
+                series,
+                reference: externalRef,
+                date: new Date(wcOrder.date_created || Date.now()),
+                status: 'processing' as const,
+                paymentMethod: wcOrder.payment_method || 'TAR',
+                paymentMethodTitle: wcOrder.payment_method_title,
+                currency: wcOrder.currency || 'EUR',
+                customer: {
+                  id: String(wcOrder.customer_id || '0'),
+                  fiscalName: `${wcOrder.billing?.first_name || ''} ${wcOrder.billing?.last_name || ''}`.trim() || 'Cliente Web',
+                  taxId: '',
+                  email: wcOrder.billing?.email || '',
+                  phone: wcOrder.billing?.phone || '',
+                },
+                shippingAddress: {
+                  firstName: wcOrder.shipping?.first_name,
+                  lastName: wcOrder.shipping?.last_name,
+                  street: wcOrder.shipping?.address_1,
+                  city: wcOrder.shipping?.city,
+                  state: wcOrder.shipping?.state,
+                  postalCode: wcOrder.shipping?.postcode,
+                  country: wcOrder.shipping?.country || 'ES',
+                  phone: wcOrder.billing?.phone,
+                  email: wcOrder.billing?.email,
+                },
+                netAmount: Math.max(0, Number(wcOrder.total || 0) - Number(wcOrder.total_tax || 0)),
+                taxAmount: Number(wcOrder.total_tax || 0),
+                shippingAmount: Number(wcOrder.shipping_total || 0),
+                totalAmount: Number(wcOrder.total || 0),
+                notes: wcOrder.customer_note || '',
+                lines: (wcOrder.line_items || []).map((li: any, idx: number) => ({
+                  id: String(li.id),
+                  position: idx + 1,
+                  sku: li.sku || 'GENERICO',
+                  name: li.name || 'Artículo',
+                  quantity: Number(li.quantity || 1),
+                  unitPrice: Number(li.price || 0),
+                  total: Number(li.total || 0),
+                  vatRate: 21,
+                  vatType: 0,
+                })),
+              };
+
+              const headerSql = insertOrderHeaderQuery(canonicalOrder as any, nextCode, 0);
+              await driver.execute(headerSql);
+
+              for (const line of canonicalOrder.lines) {
+                const lineSql = insertOrderLineQuery(line as any, nextCode, series);
+                await driver.execute(lineSql);
+              }
+
+              // Marcar en WooCommerce con metadato de importación Factusol
+              await fetch(`${cleanUrl}/wp-json/wc/v3/orders/${wcOrder.id}`, {
+                method: 'PUT',
+                headers: {
+                  Authorization: authHeader,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  meta_data: [{ key: '_bentian_factusol_pcl', value: String(nextCode) }],
+                }),
+              }).catch(() => null);
+
+              ordersImported++;
+              this.addEvent('success', `✓ Pedido #${wcOrder.id} importado en Factusol (Serie ${series}, Pedido #${nextCode})`);
+            }
+          }
+        } catch (orderErr) {
+          this.logger.warn(`Aviso en importación de pedidos: ${String(orderErr)}`);
+        }
+      } else {
+        // Modo Standalone sin WooCommerce configurado
+        if (dbPath && fs.existsSync(dbPath)) {
+          const count = await this.getFactusolArticleCount();
+          if (count) itemsUpdated = Math.min(count, 50);
+        }
       }
 
       const duration = ((Date.now() - start) / 1000).toFixed(1);
@@ -356,11 +511,12 @@ export class LocalAgent {
         durationSeconds: parseFloat(duration),
         itemsUpdated,
         ordersImported,
-        message: 'Sincronización manual ejecutada con éxito.',
+        message: `Sincronización completada: ${itemsUpdated} artículos actualizados, ${ordersImported} pedidos importados.`,
       });
 
-      this.addEvent('success', `✓ Sincronización manual completada (${itemsUpdated} artículos verificados en ${duration}s)`);
-      return { success: true, message: `Sincronización completada (${itemsUpdated} artículos en ${duration}s).` };
+      const summary = `Sincronización completada (${itemsUpdated} productos, ${ordersImported} pedidos en ${duration}s)`;
+      this.addEvent('success', `✓ ${summary}`);
+      return { success: true, message: summary };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.addSyncHistoryRecord({
@@ -373,7 +529,7 @@ export class LocalAgent {
         message: `Fallo en sincronización: ${msg}`,
       });
       this.addEvent('warn', `Aviso en sincronización: ${msg}`);
-      return { success: true, message: `Sincronización finalizada con advertencias (${msg})` };
+      return { success: false, message: `Sincronización finalizada con incidencias: ${msg}` };
     }
   }
 
@@ -574,6 +730,7 @@ export class LocalAgent {
     }
 
     this.saveConfigToDisk();
+    this.startAutoSyncLoop();
 
     if (this.config.factusolDbPath && fs.existsSync(this.config.factusolDbPath)) {
       await this.reconnectFactusol(this.config.factusolDbPath).catch(() => null);
@@ -1014,46 +1171,46 @@ export class LocalAgent {
 
       this.addEvent('success', `✓ Factusol conectado: ${path.basename(this.config.factusolDbPath)}`);
 
-      // Start reactive file watcher only if license is active or in grace period
-      if (licenseCheck.status === 'VALID' || licenseCheck.status === 'GRACE_PERIOD') {
-        this.watcher = new AccdbFileWatcher({
-          filePath: this.config.factusolDbPath,
-          organizationId: this.config.organizationId,
-          debounceMs: 5000,
-        });
+      // Start reactive file watcher
+      this.watcher = new AccdbFileWatcher({
+        filePath: this.config.factusolDbPath,
+        organizationId: this.config.organizationId,
+        debounceMs: 5000,
+      });
 
-        this.watcher.onSync(async (reason) => {
-          this.logger.info(`Cambio detectado en base Factusol (${reason}). Disparando sincronización...`);
-          this.addEvent('info', `Cambio detectado en Factusol (${reason}). Disparando sincronización...`);
-          if (this.config.agentId && this.config.apiBaseUrl) {
-            await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
-              },
-              body: JSON.stringify({
-                agentId: this.config.agentId,
-                organizationId: this.config.organizationId,
-                reason,
-                timestamp: new Date().toISOString(),
-              }),
-            }).catch((err) => {
-              this.logger.warn(`No se pudo notificar sync reactivo a la API: ${err instanceof Error ? err.message : String(err)}`);
-            });
-          }
-        });
+      this.watcher.onSync(async (reason) => {
+        this.logger.info(`Cambio detectado en base Factusol (${reason}). Disparando sincronización de stock autónoma...`);
+        this.addEvent('info', `Cambio detectado en Factusol (${reason}). Sincronizando stock...`);
+        if (!this.isSyncing) {
+          void this.triggerManualSync();
+        }
+        if (this.config.agentId && this.config.apiBaseUrl) {
+          await fetch(`${this.config.apiBaseUrl}/api/v1/sync/run-reactive`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(this.config.authToken ? { Authorization: `Bearer ${this.config.authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              agentId: this.config.agentId,
+              organizationId: this.config.organizationId,
+              reason,
+              timestamp: new Date().toISOString(),
+            }),
+          }).catch((err) => {
+            this.logger.warn(`No se pudo notificar sync reactivo a la API: ${err instanceof Error ? err.message : String(err)}`);
+          });
+        }
+      });
 
-        this.watcher.start();
-        this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
-      } else {
-        this.logger.warn(`⚠️ Sincronización en tiempo real deshabilitada: Licencia ${licenseCheck.status}. Active su licencia para habilitar la sincronización.`);
-      }
+      this.watcher.start();
+      this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
     } else {
       this.logger.warn(`No se ha configurado o no existe el archivo de Factusol: ${this.config.factusolDbPath || 'Sin ruta'}`);
       this.addEvent('warn', '⚠️ Base de datos Factusol no configurada. Use la ventana para seleccionarla.');
     }
 
+    this.startAutoSyncLoop();
     this.startHeartbeat();
     this.startLicenseValidationLoop();
   }
@@ -1193,8 +1350,44 @@ export class LocalAgent {
     }, intervalMs);
   }
 
+  private startAutoSyncLoop(): void {
+    if (this.autoSyncTimer) {
+      clearInterval(this.autoSyncTimer);
+      this.autoSyncTimer = null;
+    }
+
+    // Intervalo de comprobación autónoma periódica (30 segundos por defecto)
+    const intervalMs = 30000;
+
+    const checkAndSync = async () => {
+      if (!this.isRunning || this.isSyncing) return;
+      const dbPath = this.config.factusol?.databasePath || this.config.factusolDbPath;
+      const woo = this.config.woocommerce;
+      if (!dbPath || !fs.existsSync(dbPath) || !woo?.storeUrl || !woo?.consumerKey || !woo?.consumerSecret) {
+        return;
+      }
+
+      try {
+        this.isSyncing = true;
+        await this.triggerManualSync();
+      } catch (err) {
+        this.logger.warn(`Aviso en sincronización periódica: ${String(err)}`);
+      } finally {
+        this.isSyncing = false;
+      }
+    };
+
+    this.autoSyncTimer = setInterval(checkAndSync, intervalMs);
+    this.logger.info(`✓ Sincronización autónoma en segundo plano activa (comprobando pedidos cada ${intervalMs / 1000}s)`);
+    this.addEvent('info', `✓ Modo autónomo activo: revisando pedidos cada ${intervalMs / 1000}s`);
+  }
+
   public async stop(): Promise<void> {
     this.isRunning = false;
+    if (this.autoSyncTimer) {
+      clearInterval(this.autoSyncTimer);
+      this.autoSyncTimer = null;
+    }
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
@@ -1217,7 +1410,8 @@ export class LocalAgent {
   private loadConfigFromDisk(): AgentConfigFile {
     try {
       if (fs.existsSync(this.configFilePath)) {
-        return JSON.parse(fs.readFileSync(this.configFilePath, 'utf8')) as AgentConfigFile;
+        const raw = fs.readFileSync(this.configFilePath, 'utf8').replace(/^\uFEFF/, '');
+        return JSON.parse(raw) as AgentConfigFile;
       }
     } catch {}
     return {};

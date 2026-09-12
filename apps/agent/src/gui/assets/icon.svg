@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <!-- Gradiente del Puente de Datos (De Local a Cloud) -->
+    <linearGradient id="bridgeFlow" x1="16" y1="48" x2="48" y2="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Fondo Squircle Dark-Tech Editorial -->
+    <linearGradient id="bgDark" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#18181b" />
+      <stop offset="100%" stop-color="#09090b" />
+    </linearGradient>
+
+    <!-- Resplandor del núcleo central -->
+    <filter id="coreGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Contenedor Base Estilo Windows App (Squircle continuo) -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bgDark)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+
+  <!-- Rejilla técnica sutil de ingeniería (coordenadas de sincronización) -->
+  <circle cx="32" cy="32" r="20" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="2 3" />
+  <line x1="14" y1="32" x2="50" y2="32" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+  <line x1="32" y1="14" x2="32" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+
+  <!-- Conducto de Ida (Local ➔ Cloud): Bézier Cúbica tangencial -->
+  <path d="M 18 44 C 18 26, 32 18, 46 20" stroke="url(#bridgeFlow)" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Conducto de Retorno (Cloud ➔ Local): Simetría C2 exacta -->
+  <path d="M 46 20 C 46 38, 32 46, 18 44" stroke="url(#bridgeFlow)" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Travesaño estructural de anclaje (El "Puente") -->
+  <path d="M 25 27 L 39 37" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="1 3" />
+
+  <!-- Núcleo Central de Sincronización (Motor Canónico) -->
+  <circle cx="32" cy="32" r="3.5" fill="#ffffff" filter="url(#coreGlow)" />
+
+  <!-- Terminal Local (Factusol ERP) en (18, 44) -->
+  <circle cx="18" cy="44" r="5" fill="#121215" stroke="#6366f1" stroke-width="2.5" />
+  <circle cx="18" cy="44" r="2" fill="#818cf8" />
+
+  <!-- Terminal Cloud (WooCommerce API) en (46, 20) -->
+  <circle cx="46" cy="20" r="5" fill="#121215" stroke="#38bdf8" stroke-width="2.5" />
+  <circle cx="46" cy="20" r="2" fill="#38bdf8" />
+</svg>
