@@ -39,6 +39,15 @@ export interface AgentWooCommerceSettings {
   orderStatusMapping?: Record<string, string>;
 }
 
+export interface AgentUniversalBridgeSettings {
+  storeUrl?: string;
+  secretKey?: string;
+  dbName?: string;
+  dbUser?: string;
+  dbPass?: string;
+  enabled?: boolean;
+}
+
 export interface AgentSyncRules {
   enableFileWatcher?: boolean;
   debounceSeconds?: number;
@@ -74,6 +83,8 @@ export interface AgentConfigFile {
   licenseKey?: string;
   factusol?: AgentFactusolSettings;
   woocommerce?: AgentWooCommerceSettings;
+  universalBridge?: AgentUniversalBridgeSettings;
+  channelType?: 'woocommerce' | 'universal_bridge';
   syncRules?: AgentSyncRules;
 }
 
@@ -768,9 +779,231 @@ export class LocalAgent {
     }
   }
 
+  public resolveFactusolPath(inputPath: string): {
+    success: boolean;
+    resolvedPath: string;
+    isDirectory: boolean;
+    message: string;
+    candidates: string[];
+  } {
+    try {
+      const cleanPath = (inputPath || '').trim().replace(/^["']|["']$/g, '');
+      if (!cleanPath) {
+        return { success: false, resolvedPath: '', isDirectory: false, message: 'Ruta vacía', candidates: [] };
+      }
+
+      if (fs.existsSync(cleanPath)) {
+        const stat = fs.statSync(cleanPath);
+        if (stat.isDirectory()) {
+          const files = fs.readdirSync(cleanPath)
+            .filter(f => f.toLowerCase().endsWith('.accdb') || f.toLowerCase().endsWith('.mdb'))
+            .map(f => {
+              const full = path.join(cleanPath, f);
+              try {
+                const fStat = fs.statSync(full);
+                return { path: full, name: f, mtime: fStat.mtimeMs, size: fStat.size };
+              } catch {
+                return { path: full, name: f, mtime: 0, size: 0 };
+              }
+            })
+            .filter(f => !f.name.startsWith('.~') && !f.name.toLowerCase().endsWith('.ldb') && !f.name.toLowerCase().endsWith('.laccdb'))
+            .sort((a, b) => b.mtime - a.mtime);
+
+          const best = files[0];
+          if (best) {
+            return {
+              success: true,
+              resolvedPath: best.path,
+              isDirectory: true,
+              message: `Se detectó la base de datos de Factusol más reciente: ${best.name}`,
+              candidates: files.map(f => f.path),
+            };
+          } else {
+            return {
+              success: false,
+              resolvedPath: cleanPath,
+              isDirectory: true,
+              message: 'No se encontraron archivos .accdb de Factusol en la carpeta seleccionada.',
+              candidates: [],
+            };
+          }
+        } else {
+          return {
+            success: true,
+            resolvedPath: cleanPath,
+            isDirectory: false,
+            message: `Archivo seleccionado: ${path.basename(cleanPath)}`,
+            candidates: [cleanPath],
+          };
+        }
+      }
+
+      return {
+        success: false,
+        resolvedPath: cleanPath,
+        isDirectory: false,
+        message: 'La ruta indicada no existe en el equipo.',
+        candidates: [],
+      };
+    } catch (err) {
+      return {
+        success: false,
+        resolvedPath: inputPath,
+        isDirectory: false,
+        message: `Error al comprobar la ruta: ${String(err)}`,
+        candidates: [],
+      };
+    }
+  }
+
+  public async testUniversalBridge(settings: {
+    storeUrl: string;
+    secretKey?: string;
+  }): Promise<{
+    success: boolean;
+    message: string;
+    checks: {
+      serverOnline: boolean;
+      sslValid: boolean;
+      endpointFound: boolean;
+      databaseReady: boolean;
+    };
+    details?: any;
+  }> {
+    let cleanUrl = (settings.storeUrl || '').trim();
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      cleanUrl = 'https://' + cleanUrl;
+    }
+    cleanUrl = cleanUrl.replace(/\/+$/, '');
+
+    const checks = {
+      serverOnline: false,
+      sslValid: false,
+      endpointFound: false,
+      databaseReady: false,
+    };
+
+    let serverDetails: any = null;
+
+    // Check 1: Intentar ping directo al endpoint para verificar servidor, SSL y existencia
+    try {
+      const pingUrl = `${cleanUrl}/erp-bridge-endpoint.php?action=ping`;
+      const resPing = await fetch(pingUrl, {
+        method: 'GET',
+        signal: AbortSignal.timeout(7000),
+      });
+
+      if (resPing.ok) {
+        const pingData = await resPing.json().catch(() => null) as any;
+        if (pingData && (pingData.status === 'ok' || pingData.service)) {
+          checks.serverOnline = true;
+          checks.sslValid = cleanUrl.startsWith('https://');
+          checks.endpointFound = true;
+          serverDetails = pingData;
+        }
+      } else if (resPing.status === 404) {
+        checks.serverOnline = true;
+        checks.sslValid = cleanUrl.startsWith('https://');
+        return {
+          success: false,
+          message: 'Tu web está activa, pero no se ha encontrado el archivo erp-bridge-endpoint.php. Súbelo a la carpeta raíz de tu hosting (public_html, httpdocs o www).',
+          checks,
+        };
+      }
+    } catch (err: any) {
+      // Si falla ping, probar al menos si la raíz de la web responde
+      try {
+        await fetch(cleanUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+        checks.serverOnline = true;
+        checks.sslValid = cleanUrl.startsWith('https://');
+      } catch {}
+    }
+
+    if (!checks.serverOnline) {
+      return {
+        success: false,
+        message: 'No se puede conectar con tu sitio web. Comprueba que el dominio esté bien escrito y disponible.',
+        checks,
+      };
+    }
+
+    if (!checks.endpointFound) {
+      return {
+        success: false,
+        message: 'Tu web responde, pero falta el archivo erp-bridge-endpoint.php en la raíz de tu dominio.',
+        checks,
+      };
+    }
+
+    // Check 4: Comprobar conexión con MariaDB/MySQL mediante ?action=health
+    try {
+      const healthUrl = `${cleanUrl}/erp-bridge-endpoint.php?action=health`;
+      const secret = settings.secretKey ? settings.secretKey.trim() : '';
+      const headers: Record<string, string> = {};
+      if (secret) {
+        headers['Authorization'] = `Bearer ${secret}`;
+      }
+
+      const resHealth = await fetch(healthUrl, {
+        method: 'GET',
+        headers,
+        signal: AbortSignal.timeout(7000),
+      });
+
+      if (resHealth.ok) {
+        const healthData = await resHealth.json().catch(() => null) as any;
+        if (healthData && healthData.databaseConnected && healthData.tablesReady) {
+          checks.databaseReady = true;
+          return {
+            success: true,
+            message: `¡Conexión Universal Exitosa! Servidor PHP v${healthData.phpVersion || '8.x'} y base de datos MariaDB listos.`,
+            checks,
+            details: healthData,
+          };
+        } else if (healthData && healthData.databaseConnected) {
+          checks.databaseReady = true;
+          return {
+            success: true,
+            message: 'Conexión con MariaDB establecida y tablas inicializadas correctamente.',
+            checks,
+            details: healthData,
+          };
+        } else {
+          return {
+            success: false,
+            message: 'El archivo responde, pero falta configurar la base de datos MariaDB/MySQL en erp-bridge-endpoint.php.',
+            checks,
+            details: healthData,
+          };
+        }
+      } else if (resHealth.status === 401) {
+        return {
+          success: false,
+          message: 'El archivo erp-bridge-endpoint.php fue detectado, pero la clave de seguridad no coincide.',
+          checks: { ...checks, databaseReady: false },
+        };
+      }
+    } catch (err: any) {
+      return {
+        success: false,
+        message: `Error al comprobar la base de datos: ${err?.message || String(err)}`,
+        checks,
+      };
+    }
+
+    return {
+      success: checks.serverOnline && checks.sslValid && checks.endpointFound && checks.databaseReady,
+      message: 'Comprobación finalizada.',
+      checks,
+      details: serverDetails,
+    };
+  }
+
   public async saveFullConfig(updates: {
     factusol?: AgentFactusolSettings;
     woocommerce?: AgentWooCommerceSettings;
+    universalBridge?: AgentUniversalBridgeSettings;
+    channelType?: 'woocommerce' | 'universal_bridge';
     syncRules?: AgentSyncRules;
     licenseKey?: string;
   }): Promise<{ success: boolean; message: string }> {
@@ -783,6 +1016,14 @@ export class LocalAgent {
 
     if (updates.woocommerce) {
       this.config.woocommerce = { ...(this.config.woocommerce || {}), ...updates.woocommerce };
+    }
+
+    if (updates.universalBridge) {
+      this.config.universalBridge = { ...(this.config.universalBridge || {}), ...updates.universalBridge };
+    }
+
+    if (updates.channelType) {
+      this.config.channelType = updates.channelType;
     }
 
     if (updates.syncRules) {
@@ -918,6 +1159,8 @@ export class LocalAgent {
     };
     factusolSettings?: AgentFactusolSettings;
     woocommerceSettings?: AgentWooCommerceSettings;
+    universalBridgeSettings?: AgentUniversalBridgeSettings;
+    channelType?: string;
     syncRules?: AgentSyncRules;
     syncHistory?: SyncHistoryRecord[];
     system: AgentSystemInfo;
@@ -969,6 +1212,8 @@ export class LocalAgent {
       },
       factusolSettings: this.config.factusol,
       woocommerceSettings: this.config.woocommerce,
+      universalBridgeSettings: this.config.universalBridge,
+      channelType: this.config.channelType || 'woocommerce',
       syncRules: this.config.syncRules,
       syncHistory: this.getSyncHistory(),
       system: this.getSystemInfo(),

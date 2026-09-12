@@ -1,4 +1,6 @@
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
 import { Logger } from '@erp-bridge/shared';
 import { LocalAgent } from '../agent';
 import { FactusolDetector } from '../detector';
@@ -156,6 +158,63 @@ export class LocalGuiServer {
               const result = await this.agent.testWooCommerceConnection(body);
               res.writeHead(200, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify(result));
+              return;
+            }
+
+            // 9.1 Test Universal Web Bridge (Cualquier web / Hosting)
+            if (pathname === '/api/local/test-universal-bridge' && req.method === 'POST') {
+              const body = await readRequestBody(req);
+              const result = await this.agent.testUniversalBridge(body);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(result));
+              return;
+            }
+
+            // 9.2 Resolve Factusol Folder / Path Heuristically
+            if (pathname === '/api/local/resolve-factusol-path' && req.method === 'POST') {
+              const body = await readRequestBody(req);
+              const result = this.agent.resolveFactusolPath(body.path || '');
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(result));
+              return;
+            }
+
+            // 9.3 Download Universal Companion PHP Script
+            if (pathname === '/api/local/download-companion' && req.method === 'GET') {
+              const secret = parsedUrl.searchParams.get('secretKey') || ('EB_SEC_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12));
+              const dbName = parsedUrl.searchParams.get('dbName') || '';
+              const dbUser = parsedUrl.searchParams.get('dbUser') || '';
+              const dbPass = parsedUrl.searchParams.get('dbPass') || '';
+
+              let phpTemplate = '';
+              const candidatePaths = [
+                path.resolve(__dirname, '../../../../packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
+                path.resolve(process.cwd(), 'packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
+                path.resolve(__dirname, 'erp-bridge-endpoint.php'),
+              ];
+              for (const p of candidatePaths) {
+                if (fs.existsSync(p)) {
+                  phpTemplate = fs.readFileSync(p, 'utf-8');
+                  break;
+                }
+              }
+
+              if (!phpTemplate) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Plantilla erp-bridge-endpoint.php no encontrada' }));
+                return;
+              }
+
+              let customized = phpTemplate.replace(/%%EB_SECRET_KEY%%/g, secret);
+              if (dbName) customized = customized.replace(/%%EB_DB_NAME%%/g, dbName);
+              if (dbUser) customized = customized.replace(/%%EB_DB_USER%%/g, dbUser);
+              if (dbPass) customized = customized.replace(/%%EB_DB_PASS%%/g, dbPass);
+
+              res.writeHead(200, {
+                'Content-Type': 'application/x-php; charset=utf-8',
+                'Content-Disposition': 'attachment; filename="erp-bridge-endpoint.php"',
+              });
+              res.end(customized);
               return;
             }
 
