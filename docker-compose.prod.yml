@@ -19,8 +19,8 @@ services:
       # Conexión Gestionada a Supabase (PostgreSQL Frankfurt) con SSL
       - DATABASE_URL=${DATABASE_URL}
       # Seguridad y Autenticación Administrativa
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@bentian.es}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Bentian2026!}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
       # Licenciamiento y Stripe
       - LICENSE_JWT_SECRET=${LICENSE_JWT_SECRET}

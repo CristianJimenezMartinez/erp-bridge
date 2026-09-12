@@ -131,10 +131,10 @@ import { AuthService } from './services/auth.service';
             >
               <!-- Avatar Circle -->
               <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.75rem;">
-                AD
+                {{ (auth.currentUser()?.email || 'U').substring(0, 2).toUpperCase() }}
               </div>
               <div style="text-align: left; line-height: 1.2;">
-                <div style="font-size: 0.8125rem; font-weight: 600; color: #f4f4f5;">{{ auth.currentUser()?.email || 'admin@bentian.es' }}</div>
+                <div style="font-size: 0.8125rem; font-weight: 600; color: #f4f4f5;">{{ auth.currentUser()?.email || 'Usuario' }}</div>
                 <div style="font-size: 0.6875rem; color: #71717a;">Administrador</div>
               </div>
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #a1a1aa; margin-left: 0.25rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -148,9 +148,9 @@ import { AuthService } from './services/auth.service';
             >
               <!-- Info del Usuario -->
               <div style="padding: 0.5rem 0.625rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 0.5rem;">
-                <div style="font-size: 0.8125rem; font-weight: 600; color: #f4f4f5;">{{ auth.currentUser()?.email || 'admin@bentian.es' }}</div>
-                <div style="font-size: 0.6875rem; color: #818cf8; font-weight: 500; margin-top: 0.15rem;">Rol: Administrador Principal</div>
-                <div style="font-size: 0.6875rem; color: #71717a; margin-top: 0.15rem;">Organización: Bentian S.L.</div>
+                <div style="font-size: 0.8125rem; font-weight: 600; color: #f4f4f5;">{{ auth.currentUser()?.email || 'Usuario' }}</div>
+                <div style="font-size: 0.6875rem; color: #818cf8; font-weight: 500; margin-top: 0.15rem;">Rol: {{ auth.currentUser()?.role || 'Administrador' }}</div>
+                <div style="font-size: 0.6875rem; color: #71717a; margin-top: 0.15rem;">Organización: {{ auth.currentUser()?.organizationId || 'Principal' }}</div>
               </div>
 
               <!-- Estado de Conexión -->

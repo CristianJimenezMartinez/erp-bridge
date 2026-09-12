@@ -147,7 +147,7 @@ async function runHardeningTests() {
       res.setHeader('Content-Type', 'application/json');
       if (req.method === 'POST' && req.url === '/api/v1/auth/login') {
         const parsed = JSON.parse(body);
-        if (parsed.email === 'admin@bentian.es' && parsed.password === 'Bentian2026!') {
+        if (parsed.email === 'test@hardening.local' && parsed.password === 'TestSecurePass123!') {
           const exp = Date.now() + 24 * 3600 * 1000;
           const token = AuthService.createToken({
             sub: parsed.email,
@@ -255,8 +255,8 @@ async function runHardeningTests() {
 
   // 3b. Login correcto
   const goodLogin = await postJson('/api/v1/auth/login', {
-    email: 'admin@bentian.es',
-    password: 'Bentian2026!',
+    email: 'test@hardening.local',
+    password: 'TestSecurePass123!',
   });
   if (goodLogin.status !== 200 || !goodLogin.body.token) {
     throw new Error(`Login válido falló: ${JSON.stringify(goodLogin.body)}`);

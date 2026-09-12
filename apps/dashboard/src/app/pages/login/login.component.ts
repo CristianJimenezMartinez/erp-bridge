@@ -41,7 +41,7 @@ import { AuthService } from '../../services/auth.service';
               name="email"
               [(ngModel)]="email" 
               required
-              placeholder="admin@bentian.es"
+              placeholder="usuario@dominio.com"
               style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 0.75rem 1rem; color: #f8fafc; font-size: 0.9375rem; outline: none; transition: border-color 0.2s;"
               (focus)="errorMessage = ''"
             />
@@ -72,17 +72,6 @@ import { AuthService } from '../../services/auth.service';
             <span>{{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}</span>
           </button>
         </form>
-
-        <!-- Quick Credentials Hint for Cristian -->
-        <div style="margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
-          <button 
-            type="button" 
-            (click)="fillDefaultCredentials()"
-            style="background: none; border: none; color: #818cf8; font-size: 0.75rem; cursor: pointer; text-decoration: underline;"
-          >
-            Autocompletar credenciales de administrador (Demo)
-          </button>
-        </div>
       </div>
     </div>
   `,
@@ -98,12 +87,6 @@ export class LoginComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {}
-
-  public fillDefaultCredentials(): void {
-    this.email = 'admin@bentian.es';
-    this.password = 'Bentian2026!';
-    this.errorMessage = '';
-  }
 
   public onSubmit(): void {
     if (!this.email || !this.password) {

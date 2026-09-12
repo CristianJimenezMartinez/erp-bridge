@@ -66,7 +66,9 @@ const server = http.createServer((req, res) => {
     if (req.method === 'POST' && req.url === '/api/v1/auth/login') {
       try {
         const parsed = JSON.parse(body || '{}');
-        if (parsed.email === 'admin@bentian.es' && parsed.password === 'Bentian2026!') {
+        const expectedEmail = process.env.ADMIN_EMAIL || 'dev@local.test';
+        const expectedPass = process.env.ADMIN_PASSWORD || 'DevLocalTest123!';
+        if (parsed.email === expectedEmail && parsed.password === expectedPass) {
           const exp = Date.now() + 24 * 3600 * 1000;
           const token = AuthService.createToken({
             sub: parsed.email,

@@ -33,7 +33,7 @@ function base64UrlDecode(str: string): string {
 
 export class AuthService {
   private static readonly SECRET =
-    process.env['ADMIN_JWT_SECRET'] || 'bentian-admin-jwt-secret-replace-in-prod-v1';
+    process.env['ADMIN_JWT_SECRET'] || (process.env['NODE_ENV'] === 'production' ? crypto.randomBytes(32).toString('hex') : 'bentian-dev-jwt-secret');
 
   public static createToken(payload: AdminJwtPayload): string {
     const header = { alg: 'HS256', typ: 'JWT' };
@@ -131,11 +131,23 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
   }
 
   const { email, password } = parsed.data;
-  const adminEmail = process.env['ADMIN_EMAIL'] || 'admin@bentian.es';
-  const adminPassword = process.env['ADMIN_PASSWORD'] || 'Bentian2026!';
+  const adminEmail = process.env['ADMIN_EMAIL'];
+  const adminPassword = process.env['ADMIN_PASSWORD'];
+
+  if (!adminEmail || !adminPassword) {
+    res.status(500).json({
+      error: {
+        code: 'AUTH_CONFIG_ERROR',
+        message: 'Las credenciales de administrador no están configuradas en las variables de entorno del servidor',
+      },
+    });
+    return;
+  }
 
   const isEmailMatch = email.toLowerCase() === adminEmail.toLowerCase();
-  const isPassMatch = password === adminPassword;
+  const inputHash = crypto.createHash('sha256').update(password).digest();
+  const targetHash = crypto.createHash('sha256').update(adminPassword).digest();
+  const isPassMatch = crypto.timingSafeEqual(inputHash, targetHash);
 
   if (!isEmailMatch || !isPassMatch) {
     res.status(401).json({
