@@ -20,6 +20,7 @@ import {
   CanonicalCustomer,
   CanonicalInvoice,
   CanonicalOrder,
+  CanonicalOrderLine,
   CanonicalProduct,
   CanonicalStock,
   Logger,
@@ -34,6 +35,10 @@ import {
   FactusolRawStock,
   findCustomerByEmailQuery,
   findCustomerByNifQuery,
+  findDeliveryAddressQuery,
+  getNextDeliveryAddressIdQuery,
+  insertDeliveryAddressQuery,
+  normalizeTaxId,
   findOrderByReferenceQuery,
   getNextCustomerIdQuery,
   getNextOrderIdQuery,
@@ -290,6 +295,7 @@ export class FactusolConnector implements Connector {
     const reference = order.reference || order.orderNumber;
 
     try {
+      // 1. Verificar idempotencia con findOrderByReferenceQuery
       if (reference) {
         const existing = await this.driver.query<FactusolOrderRaw>(findOrderByReferenceQuery(reference));
         if (existing.length > 0) {
@@ -305,38 +311,116 @@ export class FactusolConnector implements Connector {
         }
       }
 
+      // 2. Deduplicar cliente buscando por NIF normalizado o email. Si no existe, crear con createCustomer()
       let customerCode = 0;
       if (order.customer.customerNumber && !isNaN(Number(order.customer.customerNumber))) {
         customerCode = Number(order.customer.customerNumber);
       } else {
+        const normalizedTaxId = normalizeTaxId(order.customer.taxId);
         const found = await this.findCustomer({
-          taxId: order.customer.taxId,
+          taxId: normalizedTaxId || order.customer.taxId,
           email: order.customer.email,
         });
 
         if (found && found.customerNumber) {
           customerCode = Number(found.customerNumber);
         } else {
-          const createdCust = await this.createCustomer(order.customer);
+          const customerToCreate: CanonicalCustomer = {
+            ...order.customer,
+            taxId: normalizedTaxId || order.customer.taxId,
+          };
+          const createdCust = await this.createCustomer(customerToCreate);
           if (createdCust.success && createdCust.externalId) {
             customerCode = Number(createdCust.externalId);
+          } else {
+            throw new Error(`No se pudo crear cliente para el pedido: ${createdCust.error || 'Error desconocido'}`);
           }
         }
       }
 
-      const maxRows = await this.driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
-      const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-      const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode);
-      const lineSqls = order.lines.map((line) => insertOrderLineQuery(line, nextOrderCode, series));
-      await this.driver.executeTransaction([headerSql, ...lineSqls]);
+      // 3. Si la dirección de envío difiere de la fiscal, buscar o crear la dirección alternativa en F_DCL
+      const fiscalAddr = order.billingAddress || order.customer.address;
+      const shipAddr = order.shippingAddress;
+      const isDifferentAddress = Boolean(
+        shipAddr &&
+        fiscalAddr &&
+        (
+          (shipAddr.street && fiscalAddr.street && shipAddr.street.trim().toLowerCase() !== fiscalAddr.street.trim().toLowerCase()) ||
+          (shipAddr.postalCode && fiscalAddr.postalCode && shipAddr.postalCode.trim().toLowerCase() !== fiscalAddr.postalCode.trim().toLowerCase()) ||
+          (shipAddr.city && fiscalAddr.city && shipAddr.city.trim().toLowerCase() !== fiscalAddr.city.trim().toLowerCase())
+        )
+      );
 
-      this.logger.info(`Pedido creado exitosamente en Factusol (CODPCL=${nextOrderCode}, Serie='${series}') para ref ${reference}`);
+      if (isDifferentAddress && shipAddr && shipAddr.street && customerCode > 0) {
+        const street = shipAddr.street.trim();
+        const postalCode = (shipAddr.postalCode || '').trim();
+        try {
+          const existingAddr = await this.driver.query<Record<string, unknown>>(
+            findDeliveryAddressQuery(customerCode, street, postalCode)
+          );
+
+          if (!existingAddr || existingAddr.length === 0) {
+            const maxDirRows = await this.driver.query<{ maxid: number }>(
+              getNextDeliveryAddressIdQuery(customerCode)
+            );
+            const nextDirCode = (Number(maxDirRows[0]?.maxid) || 0) + 1;
+            const recipientName = [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' ') ||
+              order.customer.fiscalName ||
+              'Destinatario';
+
+            const insertDirSql = insertDeliveryAddressQuery(
+              customerCode,
+              nextDirCode,
+              shipAddr,
+              recipientName
+            );
+            await this.driver.execute(insertDirSql);
+            this.logger.info(`Dirección de entrega alternativa creada en F_DCL (CODDCL=${nextDirCode}) para cliente ${customerCode}`);
+          }
+        } catch (addrErr) {
+          this.logger.warn(`Aviso al gestionar dirección alternativa F_DCL: ${addrErr instanceof Error ? addrErr.message : String(addrErr)}`);
+        }
+      }
+
+      // 4. Transacción atómica: agrupar cabecera y líneas en un único executeTransaction([headerSql, ...lineSqls])
+      // 5. Bucle de reintento automático (hasta 5 intentos con backoff) ante colisión de correlativo en CODPCL
+      const MAX_RETRIES = 5;
+      let lastError: unknown = null;
+      let orderCreated = false;
+      let finalOrderCode = 0;
+
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const maxRows = await this.driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
+          const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
+          const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode);
+          const lineSqls = order.lines.map((line: CanonicalOrderLine) => insertOrderLineQuery(line, nextOrderCode, series));
+
+          await this.driver.executeTransaction([headerSql, ...lineSqls]);
+
+          finalOrderCode = nextOrderCode;
+          orderCreated = true;
+          this.logger.info(`Pedido creado exitosamente en Factusol (CODPCL=${nextOrderCode}, Serie='${series}') para ref ${reference} (intento ${attempt})`);
+          break;
+        } catch (err: unknown) {
+          lastError = err;
+          this.logger.warn(`Colisión o fallo en intento ${attempt}/${MAX_RETRIES} al insertar pedido ${reference} en Factusol: ${err instanceof Error ? err.message : String(err)}`);
+          if (attempt < MAX_RETRIES) {
+            const backoffMs = 100 * Math.pow(2, attempt - 1);
+            await new Promise((resolve) => setTimeout(resolve, backoffMs));
+          }
+        }
+      }
+
+      if (!orderCreated) {
+        throw lastError || new Error(`No se pudo crear el pedido tras ${MAX_RETRIES} intentos`);
+      }
 
       return {
         success: true,
         orderId: order.id,
-        externalId: String(nextOrderCode),
-        orderNumber: String(nextOrderCode),
+        externalId: String(finalOrderCode),
+        orderNumber: String(finalOrderCode),
         status: 'pending',
       };
     } catch (error: unknown) {

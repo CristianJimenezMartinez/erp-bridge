@@ -59,7 +59,7 @@ export class AccessDriver {
   public verifyFileExists(): void {
     if (process.platform !== 'win32') {
       throw new ConnectionError(
-        ErrorCode.NOT_SUPPORTED,
+        ErrorCode.CONNECTOR_UNSUPPORTED_OPERATION,
         `El conector nativo OLEDB de Factusol requiere Windows con el motor Microsoft Access Database Engine (ACE.OLEDB) instalado (plataforma detectada: ${process.platform}).`,
         { platform: process.platform, path: this.databasePath }
       );

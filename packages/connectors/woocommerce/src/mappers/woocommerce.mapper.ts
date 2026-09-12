@@ -1,5 +1,20 @@
 import { CanonicalProduct } from '@erp-bridge/shared';
 
+export interface WooCommerceAttributePayload {
+  id?: number;
+  name: string;
+  position?: number;
+  visible?: boolean;
+  variation?: boolean;
+  options: string[];
+}
+
+export interface WooCommerceMetaDataPayload {
+  id?: number;
+  key: string;
+  value: unknown;
+}
+
 export interface WooCommerceProductPayload {
   id?: number;
   name: string;
@@ -20,6 +35,8 @@ export interface WooCommerceProductPayload {
     width?: string;
     height?: string;
   };
+  attributes?: WooCommerceAttributePayload[];
+  meta_data?: WooCommerceMetaDataPayload[];
 }
 
 export interface MapToWooCommerceOptions {
@@ -56,14 +73,35 @@ export function mapCanonicalToWooCommerce(
   }
 
   if (product.categories && product.categories.length > 0) {
-    payload.categories = product.categories.map((c) => ({ name: c.name }));
+    payload.categories = product.categories.map((c: { name?: string }) => ({ name: c.name }));
   }
 
   if (!options?.skipImages && product.images && product.images.length > 0) {
-    payload.images = product.images.map((img) => ({
+    payload.images = product.images.map((img: { url: string; alt?: string }) => ({
       src: img.url,
       alt: img.alt || product.name,
     }));
+  }
+
+  // Mapear unidad de medida (product.attributes.unit) a atributos de WooCommerce (pa_unidad) y metadatos (_unit, _measurement_unit)
+  const unit = product.attributes?.unit;
+  if (unit && typeof unit === 'string' && unit.trim()) {
+    const unitClean = unit.trim();
+    payload.attributes = [
+      ...(payload.attributes || []),
+      {
+        name: 'pa_unidad',
+        position: 0,
+        visible: true,
+        variation: false,
+        options: [unitClean],
+      },
+    ];
+    payload.meta_data = [
+      ...(payload.meta_data || []),
+      { key: '_unit', value: unitClean },
+      { key: '_measurement_unit', value: unitClean },
+    ];
   }
 
   return payload;

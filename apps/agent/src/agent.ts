@@ -5,6 +5,7 @@ import {
   AgentHeartbeatPayload,
   AgentPairingRequest,
   AgentSystemInfo,
+  CanonicalOrder,
   FactusolDetectedInstance,
   LicenseActivationRequest,
   LicenseActivationResponse,
@@ -13,7 +14,7 @@ import {
   LicenseValidationResponse,
   Logger,
 } from '@erp-bridge/shared';
-import { FactusolConnector, AccessDriver, insertOrderHeaderQuery, insertOrderLineQuery } from '@erp-bridge/connector-factusol';
+import { FactusolConnector, AccessDriver } from '@erp-bridge/connector-factusol';
 import { AccdbFileWatcher, LicenseTokenManager } from '@erp-bridge/core';
 import { FactusolDetector } from './detector';
 import { HWIDManager } from './security/hwid';
@@ -202,8 +203,8 @@ export class LocalAgent {
     try {
       const driver = new AccessDriver({ databasePath: this.config.factusolDbPath });
       const rows = await driver.query<{ total: number }>('SELECT COUNT(*) AS total FROM F_ART');
-      if (rows && rows.length > 0 && typeof rows[0].total === 'number') {
-        return rows[0].total;
+      if (rows && rows.length > 0 && typeof rows[0]?.total === 'number') {
+        return rows[0]!.total;
       }
     } catch {}
     return undefined;
@@ -218,7 +219,7 @@ export class LocalAgent {
       const stats = fs.statSync(resolved);
       const driver = new AccessDriver({ databasePath: resolved });
       const rows = await driver.query<{ total: number }>('SELECT COUNT(*) AS total FROM F_ART');
-      const count = rows && rows.length > 0 ? rows[0].total : 0;
+      const count = rows && rows.length > 0 ? (rows[0]?.total ?? 0) : 0;
       return {
         success: true,
         message: `Conexión OLEDB establecida con éxito. ${count} artículos encontrados en F_ART.`,
@@ -324,6 +325,28 @@ export class LocalAgent {
     return [...this.syncHistory];
   }
 
+  private extractTaxIdFromWcOrder(wcOrder: any): string {
+    const metaList = Array.isArray(wcOrder.meta_data) ? wcOrder.meta_data : [];
+    const targetKeys = [
+      'billing_nif', '_billing_nif',
+      'cif', '_cif',
+      'nif', '_nif',
+      'vat_number', '_vat_number',
+      'billing_cif', '_billing_cif',
+      'billing_dni', '_billing_dni',
+      'dni', '_dni',
+    ];
+    for (const key of targetKeys) {
+      const found = metaList.find((m: any) => m && String(m.key || '').trim().toLowerCase() === key);
+      if (found && found.value && String(found.value).trim()) {
+        return String(found.value).trim();
+      }
+    }
+    if (wcOrder.billing?.nif) return String(wcOrder.billing.nif).trim();
+    if (wcOrder.billing?.tax_id) return String(wcOrder.billing.tax_id).trim();
+    return '';
+  }
+
   public async triggerManualSync(): Promise<{ success: boolean; message: string }> {
     const start = Date.now();
     this.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
@@ -341,54 +364,84 @@ export class LocalAgent {
 
         // 1. SINCRONIZACIÓN DE STOCK (Factusol -> WooCommerce)
         try {
-          const resProducts = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100`, {
-            headers: { Authorization: authHeader },
-            signal: AbortSignal.timeout(10000),
-          });
+          const warehouse = (this.config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
+          // Consulta agrupada instantánea para eliminar el bucle N+1
+          const stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
+            `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
+          ).catch(() => []);
 
-          if (resProducts.ok) {
-            const wcProducts = (await resProducts.json()) as Array<{ id: number; sku: string; name: string }>;
-            const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
+          const stockMap = new Map<string, number>();
+          for (const row of stockRows) {
+            const sku = String(row.ARTSTO || '').trim().toUpperCase();
+            if (sku) {
+              stockMap.set(sku, Math.max(0, Math.round(Number(row.totalStock) || 0)));
+            }
+          }
 
-            for (const prod of wcProducts) {
-              if (!prod.sku) continue;
-              const sanitizedSku = prod.sku.replace(/'/g, "''").trim();
-              try {
-                const stockRows = await driver.query<{ totalStock: any }>(
-                  `SELECT SUM(DISSTO) AS totalStock FROM F_STO WHERE ARTSTO = '${sanitizedSku}'`
-                );
-                let stockQty = 0;
-                if (stockRows && stockRows.length > 0 && stockRows[0].totalStock !== null) {
-                  stockQty = Math.max(0, Math.round(Number(stockRows[0].totalStock) || 0));
-                } else {
-                  const artRows = await driver.query<{ PHAART: any }>(
-                    `SELECT PHAART FROM F_ART WHERE CODART = '${sanitizedSku}'`
-                  );
-                  if (artRows && artRows.length > 0) {
-                    stockQty = Math.max(0, Math.round(Number(artRows[0].PHAART) || 0));
-                  }
-                }
-                batchUpdates.push({ id: prod.id, stock_quantity: stockQty });
-              } catch (err) {
-                this.logger.debug(`No se pudo leer stock para SKU ${prod.sku}: ${String(err)}`);
-              }
+          // Paginación completa de productos de WooCommerce (en lotes de 100 con bucle while (hasMore))
+          const allWcProducts: Array<{ id: number; sku: string; stock_quantity?: number | null }> = [];
+          let page = 1;
+          let hasMore = true;
+
+          while (hasMore) {
+            const resProducts: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100&page=${page}`, {
+              headers: { Authorization: authHeader },
+              signal: AbortSignal.timeout(15000),
+            });
+
+            if (!resProducts.ok) {
+              this.logger.warn(`Error al paginar productos de WooCommerce (página ${page}): HTTP ${resProducts.status}`);
+              break;
             }
 
-            if (batchUpdates.length > 0) {
-              const batchRes = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
+            const batch = (await resProducts.json()) as Array<{ id: number; sku: string; stock_quantity?: number | null }>;
+            if (!batch || batch.length === 0) {
+              hasMore = false;
+            } else {
+              allWcProducts.push(...batch);
+              if (batch.length < 100) {
+                hasMore = false;
+              } else {
+                page++;
+              }
+            }
+          }
+
+          // Dirty-checking: enviar a WooCommerce batch únicamente los artículos cuyo stock haya variado
+          const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
+          for (const prod of allWcProducts) {
+            if (!prod.sku) continue;
+            const skuNorm = prod.sku.trim().toUpperCase();
+            const newStock = stockMap.get(skuNorm) ?? 0;
+            const currentStock = typeof prod.stock_quantity === 'number' ? prod.stock_quantity : null;
+
+            if (currentStock === null || currentStock !== newStock) {
+              batchUpdates.push({ id: prod.id, stock_quantity: newStock });
+            }
+          }
+
+          if (batchUpdates.length > 0) {
+            const CHUNK_SIZE = 100;
+            for (let i = 0; i < batchUpdates.length; i += CHUNK_SIZE) {
+              const chunk = batchUpdates.slice(i, i + CHUNK_SIZE);
+              const batchRes: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
                 method: 'POST',
                 headers: {
                   Authorization: authHeader,
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ update: batchUpdates }),
-                signal: AbortSignal.timeout(15000),
+                body: JSON.stringify({ update: chunk }),
+                signal: AbortSignal.timeout(20000),
               });
               if (batchRes.ok) {
-                itemsUpdated = batchUpdates.length;
-                this.addEvent('success', `✓ Stock sincronizado en ${itemsUpdated} productos de WooCommerce`);
+                itemsUpdated += chunk.length;
+              } else {
+                this.logger.warn(`Fallo al enviar lote de stock a WooCommerce: HTTP ${batchRes.status}`);
               }
             }
+            this.addEvent('success', `✓ Stock sincronizado en ${itemsUpdated} productos de WooCommerce (dirty-check)`);
+          } else {
+            this.logger.info('Dirty-check: Todos los stocks en WooCommerce se encuentran al día.');
           }
         } catch (stockErr) {
           this.logger.warn(`Aviso en sincronización de stock: ${String(stockErr)}`);
@@ -396,7 +449,7 @@ export class LocalAgent {
 
         // 2. SINCRONIZACIÓN DE PEDIDOS (WooCommerce -> Factusol)
         try {
-          const resOrders = await fetch(`${cleanUrl}/wp-json/wc/v3/orders?status=processing`, {
+          const resOrders: any = await fetch(`${cleanUrl}/wp-json/wc/v3/orders?status=processing`, {
             headers: { Authorization: authHeader },
             signal: AbortSignal.timeout(10000),
           });
@@ -405,39 +458,48 @@ export class LocalAgent {
             const wcOrders = (await resOrders.json()) as any[];
             const series = this.config.factusol?.orderSeries || '1';
 
+            if (!this.factusol) {
+              this.factusol = new FactusolConnector();
+              await this.factusol.connect({
+                configuration: {
+                  databasePath: dbPath,
+                  orderSeries: series,
+                  defaultWarehouse: this.config.factusol?.warehouseCode || 'GEN',
+                  tariffCode: this.config.factusol?.tariffCode || '1',
+                },
+              });
+            }
+
             for (const wcOrder of wcOrders) {
               const externalRef = String(wcOrder.id);
-              // Comprobar idempotencia en F_PCL
-              const existing = await driver.query<{ CODPCL: any }>(
-                `SELECT CODPCL FROM F_PCL WHERE REFPCL = '${externalRef}'`
-              );
+              const extractedNif = this.extractTaxIdFromWcOrder(wcOrder);
 
-              if (existing && existing.length > 0) {
-                continue; // Ya importado previamente
-              }
-
-              // Calcular siguiente CODPCL
-              const maxRows = await driver.query<{ maxid: any }>(
-                `SELECT MAX(CODPCL) AS maxid FROM F_PCL WHERE TIPPCL = '${series}'`
-              );
-              const nextCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-
-              const canonicalOrder = {
+              const canonicalOrder: CanonicalOrder = {
                 id: externalRef,
                 orderNumber: externalRef,
                 series,
                 reference: externalRef,
                 date: new Date(wcOrder.date_created || Date.now()),
-                status: 'processing' as const,
+                status: 'processing',
                 paymentMethod: wcOrder.payment_method || 'TAR',
                 paymentMethodTitle: wcOrder.payment_method_title,
                 currency: wcOrder.currency || 'EUR',
                 customer: {
                   id: String(wcOrder.customer_id || '0'),
                   fiscalName: `${wcOrder.billing?.first_name || ''} ${wcOrder.billing?.last_name || ''}`.trim() || 'Cliente Web',
-                  taxId: '',
+                  taxId: extractedNif,
                   email: wcOrder.billing?.email || '',
                   phone: wcOrder.billing?.phone || '',
+                  hasEquivalenceSurcharge: false,
+                  address: {
+                    street: wcOrder.billing?.address_1,
+                    city: wcOrder.billing?.city,
+                    state: wcOrder.billing?.state,
+                    postalCode: wcOrder.billing?.postcode,
+                    country: wcOrder.billing?.country || 'ES',
+                    phone: wcOrder.billing?.phone,
+                    email: wcOrder.billing?.email,
+                  },
                 },
                 shippingAddress: {
                   firstName: wcOrder.shipping?.first_name,
@@ -447,6 +509,17 @@ export class LocalAgent {
                   state: wcOrder.shipping?.state,
                   postalCode: wcOrder.shipping?.postcode,
                   country: wcOrder.shipping?.country || 'ES',
+                  phone: wcOrder.billing?.phone,
+                  email: wcOrder.billing?.email,
+                },
+                billingAddress: {
+                  firstName: wcOrder.billing?.first_name,
+                  lastName: wcOrder.billing?.last_name,
+                  street: wcOrder.billing?.address_1,
+                  city: wcOrder.billing?.city,
+                  state: wcOrder.billing?.state,
+                  postalCode: wcOrder.billing?.postcode,
+                  country: wcOrder.billing?.country || 'ES',
                   phone: wcOrder.billing?.phone,
                   email: wcOrder.billing?.email,
                 },
@@ -464,32 +537,30 @@ export class LocalAgent {
                   unitPrice: Number(li.price || 0),
                   total: Number(li.total || 0),
                   vatRate: 21,
-                  vatType: 0,
                 })),
               };
 
-              const headerSql = insertOrderHeaderQuery(canonicalOrder as any, nextCode, 0);
-              await driver.execute(headerSql);
+              // Delegar en FactusolConnector.createOrder() para idempotencia, deduplicación, F_DCL y reintentos
+              const orderRes = await this.factusol.createOrder(canonicalOrder);
 
-              for (const line of canonicalOrder.lines) {
-                const lineSql = insertOrderLineQuery(line as any, nextCode, series);
-                await driver.execute(lineSql);
+              if (orderRes.success) {
+                // Marcar en WooCommerce con metadato de importación Factusol
+                await fetch(`${cleanUrl}/wp-json/wc/v3/orders/${wcOrder.id}`, {
+                  method: 'PUT',
+                  headers: {
+                    Authorization: authHeader,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    meta_data: [{ key: '_bentian_factusol_pcl', value: String(orderRes.externalId) }],
+                  }),
+                }).catch(() => null);
+
+                ordersImported++;
+                this.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${orderRes.externalId})`);
+              } else {
+                this.logger.warn(`No se pudo importar pedido #${wcOrder.id} a Factusol: ${orderRes.error}`);
               }
-
-              // Marcar en WooCommerce con metadato de importación Factusol
-              await fetch(`${cleanUrl}/wp-json/wc/v3/orders/${wcOrder.id}`, {
-                method: 'PUT',
-                headers: {
-                  Authorization: authHeader,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  meta_data: [{ key: '_bentian_factusol_pcl', value: String(nextCode) }],
-                }),
-              }).catch(() => null);
-
-              ordersImported++;
-              this.addEvent('success', `✓ Pedido #${wcOrder.id} importado en Factusol (Serie ${series}, Pedido #${nextCode})`);
             }
           }
         } catch (orderErr) {
@@ -868,7 +939,7 @@ export class LocalAgent {
         if (this.factusol) {
           const health = await this.factusol.healthCheck();
           connected = health.status === 'HEALTHY';
-          statusMessage = health.message;
+          statusMessage = health.message || '';
           if (connected) {
             articleCount = await this.getFactusolArticleCount();
           }

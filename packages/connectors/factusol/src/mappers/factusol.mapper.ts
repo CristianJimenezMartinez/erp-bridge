@@ -75,8 +75,14 @@ export function mapFactusolArticleToCanonical(
     weight,
     images: imgStr ? [{ url: imgStr, alt: name }] : [],
     attributes: {
-      unit: String(raw.UUMART ?? '').trim(),
+      unit: String(raw.DESUME ?? raw.UMEART ?? raw.UUMART ?? '').trim(),
       familyCode,
+      cp1: raw.CP1ART ? String(raw.CP1ART).trim() : undefined,
+      cp2: raw.CP2ART ? String(raw.CP2ART).trim() : undefined,
+      cp3: raw.CP3ART ? String(raw.CP3ART).trim() : undefined,
+      cp4: raw.CP4ART ? String(raw.CP4ART).trim() : undefined,
+      cp5: raw.CP5ART ? String(raw.CP5ART).trim() : undefined,
+      webMemo: raw.MEWART ? String(raw.MEWART).trim() : undefined,
     },
     rawSourceData: raw as unknown as Record<string, unknown>,
   };

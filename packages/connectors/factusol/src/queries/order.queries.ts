@@ -29,12 +29,60 @@ export function getNextCustomerIdQuery(): string {
   return `SELECT MAX(CODCLI) AS maxid FROM F_CLI`;
 }
 
+export function normalizeTaxId(taxId?: string): string {
+  if (!taxId) return '';
+  const cleaned = String(taxId).replace(/[\s\-_.]/g, '').toUpperCase();
+  if (cleaned.startsWith('ES') && cleaned.length > 2) {
+    return cleaned.substring(2);
+  }
+  return cleaned;
+}
+
 export function findCustomerByNifQuery(nif: string): string {
-  return `SELECT * FROM F_CLI WHERE NIFCLI = '${sanitizeSql(nif)}'`;
+  const clean = normalizeTaxId(nif);
+  const withEs = `ES${clean}`;
+  return `SELECT * FROM F_CLI WHERE NIFCLI = '${sanitizeSql(clean)}' OR NIFCLI = '${sanitizeSql(withEs)}'`;
 }
 
 export function findCustomerByEmailQuery(email: string): string {
   return `SELECT * FROM F_CLI WHERE EMACLI = '${sanitizeSql(email)}' OR OBSCLI LIKE '%${sanitizeSql(email)}%'`;
+}
+
+export function findDeliveryAddressQuery(customerCode: number, street: string, postalCode: string): string {
+  return `SELECT * FROM F_DCL WHERE CLIDCL = ${customerCode} AND DOMDCL = '${sanitizeSql(street).substring(0, 100)}' AND CPODCL = '${sanitizeSql(postalCode).substring(0, 10)}'`;
+}
+
+export function getNextDeliveryAddressIdQuery(customerCode: number): string {
+  return `SELECT MAX(CODDCL) AS maxid FROM F_DCL WHERE CLIDCL = ${customerCode}`;
+}
+
+export function insertDeliveryAddressQuery(
+  customerCode: number,
+  dirCode: number,
+  shipAddr: CanonicalAddress,
+  recipientName: string
+): string {
+  const name = sanitizeSql(recipientName).substring(0, 100);
+  const street = sanitizeSql(shipAddr.street || '').substring(0, 100);
+  const city = sanitizeSql(shipAddr.city || '').substring(0, 30);
+  const postalCode = sanitizeSql(shipAddr.postalCode || '').substring(0, 10);
+  const province = sanitizeSql(shipAddr.state || '').substring(0, 40);
+  const phone = sanitizeSql(shipAddr.phone || '').substring(0, 50);
+
+  return `
+    INSERT INTO F_DCL (
+      CLIDCL, CODDCL, NOMDCL, DOMDCL, POBDCL, CPODCL, PRODCL, TELDCL
+    ) VALUES (
+      ${customerCode},
+      ${dirCode},
+      '${name}',
+      '${street}',
+      '${city}',
+      '${postalCode}',
+      '${province}',
+      '${phone}'
+    )
+  `.trim();
 }
 
 export function findOrderByReferenceQuery(ref: string): string {
@@ -45,7 +93,7 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
   const addr: CanonicalAddress = customer.address || { country: 'ES' };
   const nofcli = sanitizeSql(customer.fiscalName).substring(0, 100);
   const noccli = sanitizeSql(customer.commercialName || customer.fiscalName).substring(0, 100);
-  const nifcli = sanitizeSql(customer.taxId || '').substring(0, 18);
+  const nifcli = sanitizeSql(normalizeTaxId(customer.taxId) || customer.taxId || '').substring(0, 18);
   const domcli = sanitizeSql(addr.street || '').substring(0, 100);
   const pobcli = sanitizeSql(addr.city || '').substring(0, 30);
   const cpocli = sanitizeSql(addr.postalCode || '').substring(0, 10);
@@ -53,10 +101,11 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
   const telcli = sanitizeSql(customer.phone || addr.phone || '').substring(0, 50);
   const email = sanitizeSql(customer.email || '').substring(0, 100);
   const tarcli = customer.priceList ?? 1;
+  const falcli = formatAccessDate(new Date());
 
   return `
     INSERT INTO F_CLI (
-      CODCLI, NOFCLI, NOCCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, PROCLI, TELCLI, TARCLI, EMACLI, OBSCLI
+      CODCLI, NOFCLI, NOCCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, PROCLI, TELCLI, TARCLI, EMACLI, OBSCLI, CPACLI, REQCLI, FALCLI
     ) VALUES (
       ${customerCode},
       '${nofcli}',
@@ -69,7 +118,10 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
       '${telcli}',
       ${tarcli},
       '${email}',
-      '${email}'
+      '${email}',
+      '724',
+      0,
+      ${falcli}
     )
   `.trim();
 }

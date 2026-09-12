@@ -211,7 +211,7 @@ export class FactusolInvoiceMapper {
   }> {
     const series = (invoice.series || '1').substring(0, 1);
 
-    return invoice.lines.map((ln, index) => {
+    return invoice.lines.map((ln: any, index: number) => {
       const qty = ln.quantity || 1;
       const unitPrice = ln.unitPrice || 0;
       const lineTotal = ln.lineTotal || qty * unitPrice;

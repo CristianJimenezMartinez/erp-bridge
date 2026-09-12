@@ -431,7 +431,7 @@ export class WooCommerceConnector implements Connector {
           email: order.billingAddress?.email || order.customer.email || '',
           phone: order.billingAddress?.phone || order.customer.phone || '',
         },
-        line_items: order.lines.map((ln) => ({
+        line_items: order.lines.map((ln: any) => ({
           name: ln.name,
           sku: ln.sku,
           quantity: ln.quantity,
