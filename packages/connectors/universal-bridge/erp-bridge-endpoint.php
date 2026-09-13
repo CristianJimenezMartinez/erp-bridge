@@ -213,7 +213,7 @@ if ($action === 'health') {
     exit;
 }
 
-if ($action === 'catalog') {
+if ($action === 'catalog' || $action === 'articles') {
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -222,14 +222,133 @@ if ($action === 'catalog') {
     }
     ensureTablesExist($pdo);
     $stmt = $pdo->query("
-        SELECT p.*, COALESCE(s.stock, 0) as stock 
+        SELECT 
+            p.code AS codart,
+            p.name AS desart,
+            p.description AS dewart,
+            p.price AS pcoart,
+            p.price_with_vat AS pvp,
+            p.family_code AS famart,
+            p.barcode AS eanart,
+            p.unit_of_measure AS measure,
+            p.vat_rate AS tivart,
+            '' AS imgart,
+            p.active,
+            p.section_code,
+            p.section_name,
+            p.family_name,
+            COALESCE(s.stock, 0) AS stock 
         FROM eb_products p 
         LEFT JOIN eb_stock s ON p.code = s.code 
         WHERE p.active = 1
         ORDER BY p.name ASC
     ");
     $items = $stmt->fetchAll();
-    echo json_encode(['success' => true, 'count' => count($items), 'articles' => $items]);
+
+    // Obtener medidas distintas
+    $stmtMeasures = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
+    $measures = $stmtMeasures->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
+
+    echo json_encode(['success' => true, 'count' => count($items), 'articles' => $items, 'measures' => $measures]);
+    exit;
+}
+
+if ($action === 'family') {
+    $pdo = getDbConnection();
+    if (!$pdo) {
+        http_response_code(503);
+        echo json_encode(['error' => 'Base de datos no disponible']);
+        exit;
+    }
+    ensureTablesExist($pdo);
+    $famId = isset($_GET['id']) ? trim($_GET['id']) : (isset($_GET['famId']) ? trim($_GET['famId']) : '');
+    $stmt = $pdo->prepare("
+        SELECT 
+            p.code AS codart,
+            p.name AS desart,
+            p.description AS dewart,
+            p.price AS pcoart,
+            p.price_with_vat AS pvp,
+            p.family_code AS famart,
+            p.barcode AS eanart,
+            p.unit_of_measure AS measure,
+            p.vat_rate AS tivart,
+            '' AS imgart,
+            COALESCE(s.stock, 0) AS stock 
+        FROM eb_products p 
+        LEFT JOIN eb_stock s ON p.code = s.code 
+        WHERE p.active = 1 AND p.family_code = :famId
+        ORDER BY p.name ASC
+    ");
+    $stmt->execute([':famId' => $famId]);
+    $items = $stmt->fetchAll();
+    echo json_encode($items);
+    exit;
+}
+
+if ($action === 'measures') {
+    $pdo = getDbConnection();
+    if (!$pdo) {
+        http_response_code(503);
+        echo json_encode(['error' => 'Base de datos no disponible']);
+        exit;
+    }
+    ensureTablesExist($pdo);
+    $stmt = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
+    $measures = $stmt->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
+    echo json_encode(['measures' => $measures]);
+    exit;
+}
+
+// Endpoint público para que la tienda Angular cree pedidos
+if ($action === 'create_order') {
+    $pdo = getDbConnection();
+    if (!$pdo) {
+        http_response_code(503);
+        echo json_encode(['error' => 'Base de datos no disponible']);
+        exit;
+    }
+    ensureTablesExist($pdo);
+
+    $rawBody = file_get_contents('php://input');
+    $payload = json_decode($rawBody, true) ?: [];
+
+    $shipping = $payload['shippingData'] ?? [];
+    $orderData = $payload['order'] ?? [];
+    $lines = $orderData['lines'] ?? $payload['lines'] ?? [];
+    $total = floatval($orderData['total'] ?? $payload['total'] ?? 0);
+    $subtotal = floatval($orderData['subtotal'] ?? $payload['subtotal'] ?? $total);
+    $taxTotal = floatval($orderData['taxTotal'] ?? $payload['taxTotal'] ?? 0);
+    $shippingCost = floatval($payload['shippingCost'] ?? 0);
+    $orderNumber = 'WEB-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+
+    $stmt = $pdo->prepare("
+        INSERT INTO `eb_orders`
+          (`order_number`, `status`, `customer_data`, `order_lines`, `payment_method`, `payment_status`, `payment_reference`, `subtotal`, `tax_total`, `shipping_cost`, `total`, `created_at`)
+        VALUES
+          (:orderNum, 'PENDING', :custData, :linesData, :payMethod, :payStatus, :payRef, :subtotal, :taxTotal, :shipCost, :total, NOW())
+    ");
+
+    $success = $stmt->execute([
+        ':orderNum' => $orderNumber,
+        ':custData' => json_encode($shipping, JSON_UNESCAPED_UNICODE),
+        ':linesData' => json_encode($lines, JSON_UNESCAPED_UNICODE),
+        ':payMethod' => substr($payload['paymentMethodType'] ?? 'pasarela', 0, 50),
+        ':payStatus' => 'COMPLETED',
+        ':payRef' => substr($payload['paymentMethodId'] ?? '', 0, 100),
+        ':subtotal' => $subtotal,
+        ':taxTotal' => $taxTotal,
+        ':shipCost' => $shippingCost,
+        ':total' => $total,
+    ]);
+
+    $newId = $pdo->lastInsertId();
+    echo json_encode([
+        'success' => $success,
+        'pedidoId' => intval($newId),
+        'orderNumber' => $orderNumber,
+        'message' => 'Pedido registrado correctamente en espera de Factusol',
+    ]);
     exit;
 }
 

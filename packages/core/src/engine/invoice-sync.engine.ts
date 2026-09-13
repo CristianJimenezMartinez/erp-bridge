@@ -14,7 +14,7 @@ export class InvoiceSyncEngine {
   constructor(private readonly eventBus: EventBus = EventBus.getInstance()) {}
 
   public orderToInvoice(order: CanonicalOrder, series = '1'): CanonicalInvoice {
-    const lines: CanonicalInvoiceLine[] = order.lines.map((ln, index) => {
+    const lines: CanonicalInvoiceLine[] = order.lines.map((ln: any, index: number) => {
       const unitPrice = ln.unitPrice;
       const quantity = ln.quantity;
       const lineTotal = ln.subtotal !== undefined ? ln.subtotal : unitPrice * quantity;

@@ -84,7 +84,9 @@ export class AccdbFileWatcher {
         this.scheduleSync('file-changed');
         }
       } catch (err) {
-        this.logger.debug('Excepción menor en sondeo de archivo Factusol (posible desconexión temporal de red)', err);
+        this.logger.debug('Excepción menor en sondeo de archivo Factusol (posible desconexión temporal de red)', {
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     });
 

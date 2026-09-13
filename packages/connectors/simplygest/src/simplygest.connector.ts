@@ -376,7 +376,7 @@ export class SimplyGestConnector implements Connector {
 
       // Multi-statement atomic transaction: header + all lines
       const headerSql = insertOrderHeaderQuery(order, nextOrderNumber, customerCode);
-      const lineSqls = order.lines.map((line, idx) =>
+      const lineSqls = order.lines.map((line: any, idx: number) =>
         insertOrderLineQuery(line, nextOrderNumber, idx + 1)
       );
 
