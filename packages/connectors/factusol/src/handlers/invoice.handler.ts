@@ -66,77 +66,95 @@ export class FactusolInvoiceHandler {
         }
       }
 
-      // 2. Calculate next available invoice ID in F_FAC and F_LFA for this series
-      const maxHeaderRows = await this.driver.query<{ maxid: number }>(`SELECT MAX(CODFAC) AS maxid FROM F_FAC WHERE TIPFAC = '${series}'`);
-      const maxLineRows = await this.driver.query<{ maxid: number }>(`SELECT MAX(CODLFA) AS maxid FROM F_LFA WHERE TIPLFA = '${series}'`);
-      const maxHeader = Number(maxHeaderRows[0]?.maxid) || 0;
-      const maxLine = Number(maxLineRows[0]?.maxid) || 0;
-      const nextInvoiceId = Math.max(maxHeader, maxLine) + 1;
+      // 2. Retry loop for atomic transaction execution (up to 5 attempts with backoff) against CODFAC collisions
+      const MAX_RETRIES = 5;
+      let lastError: unknown = null;
+      let invoiceCreated = false;
+      let finalInvoiceId = 0;
 
-      // 3. Map to Factusol header & lines
-      const header = FactusolInvoiceMapper.toFactusolHeader(invoice, nextInvoiceId, this.config.defaultWarehouse);
-      const lines = FactusolInvoiceMapper.toFactusolLines(invoice, nextInvoiceId);
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const maxHeaderRows = await this.driver.query<{ maxid: number }>(`SELECT MAX(CODFAC) AS maxid FROM F_FAC WHERE TIPFAC = '${series}'`);
+          const maxLineRows = await this.driver.query<{ maxid: number }>(`SELECT MAX(CODLFA) AS maxid FROM F_LFA WHERE TIPLFA = '${series}'`);
+          const maxHeader = Number(maxHeaderRows[0]?.maxid) || 0;
+          const maxLine = Number(maxLineRows[0]?.maxid) || 0;
+          const nextInvoiceId = Math.max(maxHeader, maxLine) + 1;
 
-      // 4. Insert Header
-      const headerSql = `
-        INSERT INTO F_FAC (
-          TIPFAC, CODFAC, REFFAC, FECFAC, ESTFAC, ALMFAC, AGEFAC, CLIFAC,
-          CNOFAC, CDOFAC, CPOFAC, CCPFAC, CPRFAC, TELFAC, CEMFAC, CPAFAC,
-          PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC, IIVA1FAC, NET1FAC, TOTFAC
-        ) VALUES (
-          '${header.tipfac}',
-          ${header.codfac},
-          '${header.reffac.replace(/'/g, "''")}',
-          ${header.fecfac},
-          ${header.estfac},
-          '${header.almfac}',
-          ${header.agefac ? header.agefac : 0},
-          ${header.clifac},
-          '${header.cnofac.replace(/'/g, "''")}',
-          ${header.cdofac ? `'${header.cdofac.replace(/'/g, "''")}'` : "''"},
-          ${header.cpofac ? `'${header.cpofac.replace(/'/g, "''")}'` : "''"},
-          ${header.ccpfac ? `'${header.ccpfac.replace(/'/g, "''")}'` : "''"},
-          ${header.cprfac ? `'${header.cprfac.replace(/'/g, "''")}'` : "''"},
-          ${header.telfac ? `'${header.telfac.replace(/'/g, "''")}'` : "''"},
-          ${header.cemfac ? `'${header.cemfac.replace(/'/g, "''")}'` : "''"},
-          ${header.cpafac ? `'${header.cpafac.replace(/'/g, "''")}'` : "''"},
-          ${header.piva1fac},
-          ${header.piva2fac},
-          ${header.piva3fac},
-          ${header.ipor1fac},
-          ${header.iiva1fac},
-          ${header.net1fac},
-          ${header.totfac}
-        )
-      `;
-      await this.driver.execute(headerSql);
+          const header = FactusolInvoiceMapper.toFactusolHeader(invoice, nextInvoiceId, this.config.defaultWarehouse);
+          const lines = FactusolInvoiceMapper.toFactusolLines(invoice, nextInvoiceId);
 
-      // 5. Insert Lines
-      for (const line of lines) {
-        const lineSql = `
-          INSERT INTO F_LFA (
-            TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA
-          ) VALUES (
-            '${line.tiplfa}',
-            ${line.codlfa},
-            ${line.poslfa},
-            '${line.artlfa.replace(/'/g, "''")}',
-            '${line.deslfa.replace(/'/g, "''")}',
-            ${line.canlfa},
-            ${line.prelfa},
-            ${line.totlfa}
-          )
-        `;
-        await this.driver.execute(lineSql);
+          const headerSql = `
+            INSERT INTO F_FAC (
+              TIPFAC, CODFAC, REFFAC, FECFAC, ESTFAC, ALMFAC, AGEFAC, CLIFAC,
+              CNOFAC, CDOFAC, CPOFAC, CCPFAC, CPRFAC, TELFAC, CEMFAC, CPAFAC,
+              PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC, IIVA1FAC, NET1FAC, TOTFAC
+            ) VALUES (
+              '${header.tipfac}',
+              ${header.codfac},
+              '${header.reffac.replace(/'/g, "''")}',
+              ${header.fecfac},
+              ${header.estfac},
+              '${header.almfac}',
+              ${header.agefac ? header.agefac : 0},
+              ${header.clifac},
+              '${header.cnofac.replace(/'/g, "''")}',
+              ${header.cdofac ? `'${header.cdofac.replace(/'/g, "''")}'` : "''"},
+              ${header.cpofac ? `'${header.cpofac.replace(/'/g, "''")}'` : "''"},
+              ${header.ccpfac ? `'${header.ccpfac.replace(/'/g, "''")}'` : "''"},
+              ${header.cprfac ? `'${header.cprfac.replace(/'/g, "''")}'` : "''"},
+              ${header.telfac ? `'${header.telfac.replace(/'/g, "''")}'` : "''"},
+              ${header.cemfac ? `'${header.cemfac.replace(/'/g, "''")}'` : "''"},
+              ${header.cpafac ? `'${header.cpafac.replace(/'/g, "''")}'` : "''"},
+              ${header.piva1fac},
+              ${header.piva2fac},
+              ${header.piva3fac},
+              ${header.ipor1fac},
+              ${header.iiva1fac},
+              ${header.net1fac},
+              ${header.totfac}
+            )
+          `.trim();
+
+          const lineSqls = lines.map((line) => `
+            INSERT INTO F_LFA (
+              TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA
+            ) VALUES (
+              '${line.tiplfa}',
+              ${line.codlfa},
+              ${line.poslfa},
+              '${line.artlfa.replace(/'/g, "''")}',
+              '${line.deslfa.replace(/'/g, "''")}',
+              ${line.canlfa},
+              ${line.prelfa},
+              ${line.totlfa}
+            )
+          `.trim());
+
+          await this.driver.executeTransaction([headerSql, ...lineSqls]);
+
+          finalInvoiceId = nextInvoiceId;
+          invoiceCreated = true;
+          this.logger.info(`Factura creada exitosamente en Factusol (CODFAC=${nextInvoiceId}, Serie='${series}') para ref ${ref} (intento ${attempt})`);
+          break;
+        } catch (err: unknown) {
+          lastError = err;
+          this.logger.warn(`Colisión o fallo en intento ${attempt}/${MAX_RETRIES} al insertar factura ${ref} en Factusol: ${err instanceof Error ? err.message : String(err)}`);
+          if (attempt < MAX_RETRIES) {
+            const backoffMs = 100 * Math.pow(2, attempt - 1);
+            await new Promise((resolve) => setTimeout(resolve, backoffMs));
+          }
+        }
       }
 
-      this.logger.info(`Factura creada exitosamente en Factusol (CODFAC=${nextInvoiceId}, Serie='${series}') para ref ${ref}`);
+      if (!invoiceCreated) {
+        throw lastError || new Error(`No se pudo crear la factura tras ${MAX_RETRIES} intentos`);
+      }
 
       return {
         success: true,
         invoiceId: invoice.id,
-        externalId: String(nextInvoiceId),
-        invoiceNumber: String(nextInvoiceId),
+        externalId: String(finalInvoiceId),
+        invoiceNumber: String(finalInvoiceId),
         series,
         status: 'issued',
       };

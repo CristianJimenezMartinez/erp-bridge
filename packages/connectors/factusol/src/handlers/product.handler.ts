@@ -36,9 +36,32 @@ export class FactusolProductHandler {
 
     const rawArticles = await this.driver.query<FactusolRawArticle>(articleQuery);
 
+    if (rawArticles.length === 0) {
+      this.logger.info('No se encontraron artículos en Factusol.');
+      return [];
+    }
+
+    const skus = rawArticles.map((a) => a.CODART);
+    const tariffCode = this.config.tariffCode || '1';
+
     // 2. Fetch stock, prices, and families sequentially for enrichment
-    const stocks = await this.driver.query<FactusolRawStock>(FACTUSOL_QUERIES.getStock()).catch(() => [] as FactusolRawStock[]);
-    const prices = await this.driver.query<FactusolRawPrice>(FACTUSOL_QUERIES.getPrices(this.config.tariffCode || '1')).catch(() => [] as FactusolRawPrice[]);
+    // Query in batches of 100 SKUs if skus.length > 150 to stay within Access query length limits
+    const queryInBatches = async <T>(queryFn: (chunk: string[]) => string): Promise<T[]> => {
+      if (skus.length > 150) {
+        const results: T[] = [];
+        const chunkSize = 100;
+        for (let i = 0; i < skus.length; i += chunkSize) {
+          const chunk = skus.slice(i, i + chunkSize);
+          const chunkResults = await this.driver.query<T>(queryFn(chunk)).catch(() => [] as T[]);
+          results.push(...chunkResults);
+        }
+        return results;
+      }
+      return this.driver.query<T>(queryFn(skus)).catch(() => [] as T[]);
+    };
+
+    const stocks = await queryInBatches<FactusolRawStock>((chunk) => FACTUSOL_QUERIES.getStock(chunk));
+    const prices = await queryInBatches<FactusolRawPrice>((chunk) => FACTUSOL_QUERIES.getPrices(tariffCode, chunk));
     const families = await this.driver.query<FactusolRawFamily>(FACTUSOL_QUERIES.getFamilies()).catch(() => [] as FactusolRawFamily[]);
 
     const stockMap = buildStockMap(stocks);

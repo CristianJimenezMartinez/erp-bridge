@@ -81,19 +81,34 @@ export const FACTUSOL_QUERIES = {
     `.trim();
   },
 
-  getStock: (): string => {
+  getStock: (skus?: string[]): string => {
+    const whereClause =
+      skus && skus.length > 0
+        ? `WHERE ARTSTO IN (${skus.map((s) => `'${String(s).replace(/'/g, "''")}'`).join(', ')})`
+        : '';
     return `
       SELECT ARTSTO, ALMSTO, ACTSTO, DISSTO
       FROM F_STO
+      ${whereClause}
     `.trim();
   },
 
-  getPrices: (tarifaCode = '1'): string => {
-    const tarifaNum = parseInt(tarifaCode, 10) || 1;
+  getPrices: (tarifaCode = '1', skus?: string[]): string => {
+    const safeTarifa = String(tarifaCode ?? '1').replace(/'/g, "''").trim() || '1';
+    const isNumeric = /^\d+$/.test(safeTarifa);
+    const tarifaCondition = isNumeric
+      ? `(TARLTA = ${safeTarifa} OR CStr(TARLTA) = '${safeTarifa}')`
+      : `CStr(TARLTA) = '${safeTarifa}'`;
+
+    const skuClause =
+      skus && skus.length > 0
+        ? `AND ARTLTA IN (${skus.map((s) => `'${String(s).replace(/'/g, "''")}'`).join(', ')})`
+        : '';
+
     return `
       SELECT TARLTA, ARTLTA, PRELTA
       FROM F_LTA
-      WHERE TARLTA = ${tarifaNum}
+      WHERE ${tarifaCondition} ${skuClause}
     `.trim();
   },
 

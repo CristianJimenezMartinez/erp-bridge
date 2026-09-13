@@ -21,37 +21,53 @@ export class WooCommerceProductHandler {
   ) {}
 
   public async readProducts(options?: ReadProductsOptions): Promise<CanonicalProduct[]> {
-    const params: Record<string, unknown> = {
-      per_page: options?.limit || 50,
-      page: options?.offset ? Math.floor(options.offset / (options.limit || 50)) + 1 : 1,
-    };
+    const requestedLimit = options?.limit;
+    const pageSize = Math.min(requestedLimit || 100, 100);
+    let page = options?.offset ? Math.floor(options.offset / pageSize) + 1 : 1;
+    const allProducts: CanonicalProduct[] = [];
+    let hasMore = true;
 
-    if (options?.modifiedSince) {
-      params['after'] = options.modifiedSince.toISOString();
+    while (hasMore) {
+      const params: Record<string, unknown> = {
+        per_page: pageSize,
+        page,
+      };
+
+      if (options?.modifiedSince) {
+        params['after'] = options.modifiedSince.toISOString();
+      }
+
+      const response = await this.client.get<Array<Record<string, unknown>>>('products', params);
+      if (!Array.isArray(response) || response.length === 0) {
+        break;
+      }
+
+      for (const item of response) {
+        allProducts.push(mapWooCommerceToCanonical(item));
+        if (requestedLimit && allProducts.length >= requestedLimit) {
+          hasMore = false;
+          break;
+        }
+      }
+
+      if (response.length < pageSize) {
+        hasMore = false;
+      }
+
+      page++;
     }
 
-    const response = await this.client.get<Array<Record<string, unknown>>>('products', params);
-    return response.map((item) => mapWooCommerceToCanonical(item));
+    return allProducts;
   }
 
   public async createProduct(product: CanonicalProduct): Promise<ProductMutationResult> {
     try {
       const payload = mapCanonicalToWooCommerce(product);
       const response = await this.client.post<{ id: number; sku: string }>('products', payload);
-      return {
-        success: true,
-        externalId: String(response.id),
-        sku: product.sku,
-        rawResponse: response,
-      };
+      return { success: true, externalId: String(response.id), sku: product.sku, rawResponse: response };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        externalId: '',
-        sku: product.sku,
-        error: msg,
-      };
+      return { success: false, externalId: '', sku: product.sku, error: msg };
     }
   }
 
@@ -72,20 +88,10 @@ export class WooCommerceProductHandler {
       const skipImages = options?.skipImages ?? true;
       const payload = mapCanonicalToWooCommerce(product, numericId, { skipImages });
       const response = await this.client.put<{ id: number; sku: string }>(`products/${numericId}`, payload);
-      return {
-        success: true,
-        externalId: String(response.id),
-        sku: product.sku,
-        rawResponse: response,
-      };
+      return { success: true, externalId: String(response.id), sku: product.sku, rawResponse: response };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        externalId: targetIdentifier,
-        sku: product.sku,
-        error: msg,
-      };
+      return { success: false, externalId: targetIdentifier, sku: product.sku, error: msg };
     }
   }
 
@@ -112,69 +118,44 @@ export class WooCommerceProductHandler {
     let succeeded = 0;
     let failed = 0;
 
-    // Process creates with adaptive throttling
-    await BatchThrottler.processChunks(
-      creates,
-      async (chunk) => {
-        try {
-          const response = await this.client.post<{
-            create?: Array<{ id: number; sku: string; error?: { message: string } }>;
-          }>('products/batch', { create: chunk });
+    const processBatch = async (action: 'create' | 'update', payloads: WooCommerceProductPayload[]) => {
+      if (payloads.length === 0) return;
+      await BatchThrottler.processChunks(
+        payloads,
+        async (chunk) => {
+          try {
+            const response = await this.client.post<{
+              create?: Array<{ id: number; sku: string; error?: { message: string } }>;
+              update?: Array<{ id: number; sku: string; error?: { message: string } }>;
+            }>('products/batch', { [action]: chunk });
 
-          if (response.create) {
-            for (const item of response.create) {
-              if (item.error) {
-                failed++;
-                itemResults.push({ sku: item.sku, success: false, error: item.error.message });
-              } else {
-                succeeded++;
-                itemResults.push({ sku: item.sku, success: true, externalId: String(item.id) });
+            const items = response[action];
+            if (items) {
+              for (const item of items) {
+                if (item.error) {
+                  failed++;
+                  itemResults.push({ sku: item.sku, success: false, error: item.error.message });
+                } else {
+                  succeeded++;
+                  itemResults.push({ sku: item.sku, success: true, externalId: String(item.id) });
+                }
               }
             }
-          }
-        } catch (error: unknown) {
-          const errMessage = error instanceof Error ? error.message : String(error);
-          for (const item of chunk) {
-            failed++;
-            itemResults.push({ sku: item.sku, success: false, error: errMessage });
-          }
-        }
-        return [];
-      },
-      this.logger
-    );
-
-    // Process updates with adaptive throttling
-    await BatchThrottler.processChunks(
-      updates,
-      async (chunk) => {
-        try {
-          const response = await this.client.post<{
-            update?: Array<{ id: number; sku: string; error?: { message: string } }>;
-          }>('products/batch', { update: chunk });
-
-          if (response.update) {
-            for (const item of response.update) {
-              if (item.error) {
-                failed++;
-                itemResults.push({ sku: item.sku, success: false, error: item.error.message });
-              } else {
-                succeeded++;
-                itemResults.push({ sku: item.sku, success: true, externalId: String(item.id) });
-              }
+          } catch (error: unknown) {
+            const errMessage = error instanceof Error ? error.message : String(error);
+            for (const item of chunk) {
+              failed++;
+              itemResults.push({ sku: item.sku, success: false, error: errMessage });
             }
           }
-        } catch (error: unknown) {
-          const errMessage = error instanceof Error ? error.message : String(error);
-          for (const item of chunk) {
-            failed++;
-            itemResults.push({ sku: item.sku, success: false, error: errMessage });
-          }
-        }
-        return [];
-      },
-      this.logger
-    );
+          return [];
+        },
+        this.logger
+      );
+    };
+
+    await processBatch('create', creates);
+    await processBatch('update', updates);
 
     return {
       total: products.length,

@@ -37,7 +37,7 @@ async function runTest() {
   const products = await connector.readProducts({ limit: 5, activeOnly: false });
   console.log(`Leídos ${products.length} productos con éxito:`);
   products.forEach((p, idx) => {
-    console.log(`  [${idx + 1}] SKU: ${p.sku} | Nombre: ${p.name} | Precio: ${p.regularPrice}€ | Stock: ${p.stockQuantity} | Categorías: ${p.categories.map(c => c.name).join(', ')}`);
+    console.log(`  [${idx + 1}] SKU: ${p.sku} | Nombre: ${p.name} | Precio: ${p.regularPrice}€ | Stock: ${p.stockQuantity} | Categorías: ${p.categories.map((c: any) => c.name).join(', ')}`);
   });
 
   assert(products.length > 0, 'Debe devolver al menos 1 producto');

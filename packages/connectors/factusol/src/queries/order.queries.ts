@@ -105,7 +105,7 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
 
   return `
     INSERT INTO F_CLI (
-      CODCLI, NOFCLI, NOCCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, PROCLI, TELCLI, TARCLI, EMACLI, OBSCLI, CPACLI, REQCLI, FALCLI
+      CODCLI, NOFCLI, NOCCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, PROCLI, TELCLI, TARCLI, EMACLI, OBSCLI, REQCLI, FALCLI
     ) VALUES (
       ${customerCode},
       '${nofcli}',
@@ -119,7 +119,6 @@ export function insertCustomerQuery(customer: CanonicalCustomer, customerCode: n
       ${tarcli},
       '${email}',
       '${email}',
-      '724',
       0,
       ${falcli}
     )
