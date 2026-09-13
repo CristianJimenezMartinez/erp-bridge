@@ -66,57 +66,68 @@ export class LocalSyncEngine {
           const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
           const stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
             `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-          ).catch(() => []);
+          ).catch((err) => {
+            this.logger.warn('Error al consultar stock en Factusol:', err);
+            return null;
+          });
 
-          const stockMap = new Map<string, number>();
-          for (const row of stockRows) {
-            const sku = String(row.ARTSTO || '').trim().toUpperCase();
-            if (sku) {
-              stockMap.set(sku, Math.max(0, Math.round(Number(row.totalStock) || 0)));
-            }
-          }
-
-          // Paginación completa de productos de WooCommerce (en lotes de 100 con bucle while (hasMore))
-          const allWcProducts: Array<{ id: number; sku: string; stock_quantity?: number | null }> = [];
-          let page = 1;
-          let hasMore = true;
-
-          while (hasMore) {
-            const resProducts: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100&page=${page}`, {
-              headers: { Authorization: authHeader },
-              signal: AbortSignal.timeout(15000),
-            });
-
-            if (!resProducts.ok) {
-              this.logger.warn(`Error al paginar productos de WooCommerce (página ${page}): HTTP ${resProducts.status}`);
-              break;
-            }
-
-            const batch = (await resProducts.json()) as Array<{ id: number; sku: string; stock_quantity?: number | null }>;
-            if (!batch || batch.length === 0) {
-              hasMore = false;
-            } else {
-              allWcProducts.push(...batch);
-              if (batch.length < 100) {
-                hasMore = false;
-              } else {
-                page++;
+          if (!stockRows || stockRows.length === 0) {
+            this.logger.warn('La consulta de stock en Factusol devolvió 0 registros o falló. Se aborta la sincronización de stock preventivamente para evitar vaciado en WooCommerce.');
+            this.eventBus.addEvent('warn', 'Lectura de stock en Factusol inaccesible. Sincronización de stock omitida preventivamente.');
+          } else {
+            const stockMap = new Map<string, number>();
+            for (const row of stockRows) {
+              const sku = String(row.ARTSTO || '').trim().toUpperCase();
+              if (sku) {
+                stockMap.set(sku, Math.max(0, Math.round(Number(row.totalStock) || 0)));
               }
             }
-          }
 
-          // Dirty-checking: enviar a WooCommerce batch únicamente los artículos cuyo stock haya variado
-          const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
-          for (const prod of allWcProducts) {
-            if (!prod.sku) continue;
-            const skuNorm = prod.sku.trim().toUpperCase();
-            const newStock = stockMap.get(skuNorm) ?? 0;
-            const currentStock = typeof prod.stock_quantity === 'number' ? prod.stock_quantity : null;
+            // Paginación completa de productos de WooCommerce (en lotes de 100 con bucle while (hasMore))
+            const allWcProducts: Array<{ id: number; sku: string; stock_quantity?: number | null }> = [];
+            let page = 1;
+            let hasMore = true;
 
-            if (currentStock === null || currentStock !== newStock) {
-              batchUpdates.push({ id: prod.id, stock_quantity: newStock });
+            while (hasMore) {
+              const resProducts: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100&page=${page}`, {
+                headers: { Authorization: authHeader },
+                signal: AbortSignal.timeout(15000),
+              });
+
+              if (!resProducts.ok) {
+                this.logger.warn(`Error al paginar productos de WooCommerce (página ${page}): HTTP ${resProducts.status}`);
+                break;
+              }
+
+              const batch = (await resProducts.json()) as Array<{ id: number; sku: string; stock_quantity?: number | null }>;
+              if (!batch || batch.length === 0) {
+                hasMore = false;
+              } else {
+                allWcProducts.push(...batch);
+                if (batch.length < 100) {
+                  hasMore = false;
+                } else {
+                  page++;
+                }
+              }
             }
-          }
+
+            // Dirty-checking: enviar a WooCommerce batch únicamente los artículos gestionados en Factusol cuyo stock haya variado
+            const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
+            for (const prod of allWcProducts) {
+              if (!prod.sku) continue;
+              const skuNorm = prod.sku.trim().toUpperCase();
+              if (!stockMap.has(skuNorm)) {
+                // Si el artículo no está en Factusol, no se toca en la tienda online
+                continue;
+              }
+              const newStock = stockMap.get(skuNorm)!;
+              const currentStock = typeof prod.stock_quantity === 'number' ? prod.stock_quantity : null;
+
+              if (currentStock === null || currentStock !== newStock) {
+                batchUpdates.push({ id: prod.id, stock_quantity: newStock });
+              }
+            }
 
           if (batchUpdates.length > 0) {
             const CHUNK_SIZE = 100;
@@ -141,7 +152,8 @@ export class LocalSyncEngine {
           } else {
             this.logger.info('Dirty-check: Todos los stocks en WooCommerce se encuentran al día.');
           }
-        } catch (stockErr) {
+        }
+      } catch (stockErr) {
           this.logger.warn(`Aviso en sincronización de stock: ${String(stockErr)}`);
         }
 

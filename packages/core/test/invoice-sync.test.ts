@@ -79,8 +79,8 @@ assert.strictEqual(invoice.totalAmount, 84.2);
 assert.strictEqual(invoice.lines.length, 2);
 
 // Verify Tax breakdown contains both 21% and 10%
-const vat21 = invoice.taxBreakdown.find((t) => t.rate === 21);
-const vat10 = invoice.taxBreakdown.find((t) => t.rate === 10);
+const vat21 = invoice.taxBreakdown.find((t: any) => t.rate === 21);
+const vat10 = invoice.taxBreakdown.find((t: any) => t.rate === 10);
 assert(vat21, 'Debe incluir desglose de IVA 21%');
 assert.strictEqual(vat21.baseAmount, 20.0);
 assert.strictEqual(vat21.taxAmount, 4.2);
