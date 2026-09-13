@@ -1,0 +1,22 @@
+{
+  "name": "@erp-bridge/connector-prestashop",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/prestashop-mapper.test.ts && ts-node test/prestashop-connector.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "axios": "^1.7.9",
+    "fast-xml-parser": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}
