@@ -58,6 +58,48 @@ export class SystemController {
     };
   }
 
+  public static checkUpdate(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      logger.info('Solicitud de comprobación de actualización recibida desde la GUI.');
+      try {
+        const channel = ctx.body?.channel;
+        const checkResult = await agent.checkForUpdates(channel);
+        const status = agent.getUpdateStatus();
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            success: true,
+            available: checkResult.available,
+            update: status.pendingUpdate,
+            status: status.status,
+            currentVersion: status.currentVersion,
+            checkResult,
+          })
+        );
+      } catch (err) {
+        logger.error(`Error comprobando actualizaciones: ${String(err)}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: String(err) }));
+      }
+    };
+  }
+
+  public static applyUpdate(agent: LocalAgent): RouteHandler {
+    return async (_req, res) => {
+      logger.info('Solicitud de aplicación de actualización recibida desde la GUI.');
+      try {
+        const result = await agent.applyUpdate();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        logger.error(`Error aplicando actualización: ${String(err)}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: String(err) }));
+      }
+    };
+  }
+
   public static shutdown(agent: LocalAgent, stopServer: () => Promise<void>): RouteHandler {
     return (_req, res) => {
       logger.info('Solicitud de apagado del agente recibida.');

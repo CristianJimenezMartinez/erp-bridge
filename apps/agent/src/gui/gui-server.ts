@@ -61,6 +61,8 @@ export class LocalGuiServer {
     // 7. System & Config
     router.post('/api/local/save-full-config', SystemController.saveFullConfig(this.agent));
     router.post('/api/local/save-config', SystemController.saveConfig(this.agent));
+    router.any(['GET', 'POST'], '/api/local/check-update', SystemController.checkUpdate(this.agent));
+    router.post('/api/local/apply-update', SystemController.applyUpdate(this.agent));
     router.any(['GET', 'POST'], '/api/local/open-window', SystemController.openWindow(() => this.getUrl()));
     router.any(['GET', 'POST'], '/api/local/open-gui', SystemController.openWindow(() => this.getUrl()));
     router.post('/api/local/shutdown', SystemController.shutdown(this.agent, () => this.stop()));

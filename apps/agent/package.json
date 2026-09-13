@@ -13,7 +13,7 @@
     "scan": "ts-node src/cli.ts scan",
     "status": "ts-node src/cli.ts status",
     "pair": "ts-node src/cli.ts pair",
-    "test": "ts-node test/detector.test.ts && ts-node test/hwid.test.ts && ts-node test/secure-store.test.ts && ts-node test/auto-updater.test.ts"
+    "test": "ts-node test/detector.test.ts && ts-node test/hwid.test.ts && ts-node test/secure-store.test.ts && ts-node test/auto-updater.test.ts && ts-node test/update-system.test.ts"
   },
   "dependencies": {
     "@erp-bridge/connector-factusol": "workspace:*",

@@ -1,10 +1,12 @@
+import { EventEmitter } from 'events';
 import { LogEvent } from './diagnostics.types';
 
-export class EventBus {
+export class EventBus extends EventEmitter {
   private recentEvents: LogEvent[] = [];
   private readonly maxEvents: number;
 
   constructor(maxEvents = 80) {
+    super();
     this.maxEvents = maxEvents;
   }
 

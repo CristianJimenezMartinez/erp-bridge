@@ -127,7 +127,7 @@ export class AutoUpdater {
    * but NTFS permits renaming them on the same volume. We rename to .old,
    * copy the new binary, launch the new version detached, and exit cleanly.
    */
-  public async applyUpdate(newBinaryPath: string, targetBinaryPath?: string): Promise<void> {
+  public async applyUpdate(newBinaryPath: string, targetBinaryPath?: string, launchNew: boolean = true): Promise<void> {
     if (!fs.existsSync(newBinaryPath)) {
       throw new Error(`El archivo de actualización no existe: ${newBinaryPath}`);
     }
@@ -173,18 +173,28 @@ export class AutoUpdater {
       }
 
       // 5. Lanzar nuevo proceso desacoplado si estamos corriendo como ejecutable
-      const isCompiledExe = targetExe.toLowerCase().endsWith('.exe') && !targetExe.toLowerCase().includes('node.exe');
+      const isCompiledExe =
+        !targetBinaryPath &&
+        targetExe.toLowerCase().endsWith('.exe') &&
+        !targetExe.toLowerCase().includes('node.exe') &&
+        process.env.NODE_ENV !== 'test' &&
+        launchNew;
+
       if (isCompiledExe) {
         this.logger.info('🚀 Lanzando nueva versión desacoplada (detached)...');
-        const child = childProcess.spawn(targetExe, ['start', '--post-update'], {
-          detached: true,
-          stdio: 'ignore',
-          cwd: targetDir,
-        });
-        child.unref();
+        try {
+          const child = childProcess.spawn(targetExe, ['start', '--post-update'], {
+            detached: true,
+            stdio: 'ignore',
+            cwd: targetDir,
+          });
+          child.unref();
 
-        this.logger.info('👋 Proceso anterior finalizado exitosamente para liberar recursos.');
-        process.exit(0);
+          this.logger.info('👋 Proceso anterior finalizado exitosamente para liberar recursos.');
+          process.exit(0);
+        } catch (spawnErr) {
+          this.logger.warn(`No se pudo relanzar binario: ${String(spawnErr)}`);
+        }
       }
     } else {
       fs.copyFileSync(newBinaryPath, targetExe);
@@ -218,28 +228,43 @@ export class AutoUpdater {
   /**
    * Restores the previous binary in case of critical health check failure.
    */
-  public async rollback(targetBinaryPath?: string): Promise<void> {
-    const targetExe = targetBinaryPath || process.execPath;
-    const oldExePath = `${targetExe}.old`;
+  public async rollback(targetOrBackupPath?: string, maybeTargetBinaryPath?: string): Promise<void> {
+    let backupPath: string;
+    let targetExe: string;
 
-    if (fs.existsSync(oldExePath)) {
+    if (maybeTargetBinaryPath) {
+      backupPath = targetOrBackupPath!;
+      targetExe = maybeTargetBinaryPath;
+    } else if (targetOrBackupPath && (targetOrBackupPath.endsWith('.bak') || targetOrBackupPath.endsWith('.old'))) {
+      backupPath = targetOrBackupPath;
+      targetExe = targetOrBackupPath.replace(/\.(bak|old)$/, '');
+    } else {
+      targetExe = targetOrBackupPath || process.execPath;
+      backupPath = fs.existsSync(`${targetExe}.bak`) ? `${targetExe}.bak` : `${targetExe}.old`;
+    }
+
+    if (fs.existsSync(backupPath)) {
       try {
         if (fs.existsSync(targetExe)) {
           try { fs.unlinkSync(targetExe); } catch {}
         }
-        fs.renameSync(oldExePath, targetExe);
-        this.logger.warn(`⏪ Rollback completado. Restaurada versión previa desde: ${oldExePath}`);
+        fs.copyFileSync(backupPath, targetExe);
+        this.logger.warn(`⏪ Rollback completado. Restaurada versión previa desde: ${backupPath}`);
 
         await this.reportStatus(this.config.currentVersion, 'rollback', 'Fallo en comprobación post-actualización');
 
-        if (process.platform === 'win32' && targetExe.toLowerCase().endsWith('.exe')) {
-          const child = childProcess.spawn(targetExe, ['start'], {
-            detached: true,
-            stdio: 'ignore',
-            cwd: path.dirname(targetExe),
-          });
-          child.unref();
-          process.exit(1);
+        if (process.platform === 'win32' && !maybeTargetBinaryPath && targetExe.toLowerCase().endsWith('.exe') && !targetExe.toLowerCase().includes('node.exe') && process.env.NODE_ENV !== 'test') {
+          try {
+            const child = childProcess.spawn(targetExe, ['start'], {
+              detached: true,
+              stdio: 'ignore',
+              cwd: path.dirname(targetExe),
+            });
+            child.unref();
+            process.exit(1);
+          } catch (spawnErr) {
+            this.logger.warn(`Aviso al relanzar en rollback: ${String(spawnErr)}`);
+          }
         }
       } catch (err) {
         this.logger.error(`Error crítico ejecutando rollback: ${String(err)}`);

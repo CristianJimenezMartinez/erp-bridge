@@ -8,9 +8,16 @@ import {
   FactusolDetectedInstance,
   LicenseActivationResponse,
   Logger,
+  UpdateChannel,
+  UpdateCheckResponse,
 } from '@erp-bridge/shared';
 import { FactusolDetector } from './detector';
-import { AutoUpdater } from './update/auto-updater';
+import {
+  AutoUpdater,
+  UpdateClient,
+  UpdateClientState,
+  UpdateOptions,
+} from './update';
 
 // Submódulos modulares en árbol
 import {
@@ -36,6 +43,7 @@ export * from './license';
 export * from './factusol';
 export * from './channels';
 export * from './sync';
+export * from './update';
 
 export class LocalAgent {
   private readonly logger = new Logger('LocalAgent');
@@ -49,6 +57,7 @@ export class LocalAgent {
   public readonly fileWatcherService: FileWatcherService;
   public readonly syncEngine: LocalSyncEngine;
   public readonly autoUpdater: AutoUpdater;
+  public readonly updateClient: UpdateClient;
 
   private isRunning = false;
   private isUpdating = false;
@@ -64,11 +73,15 @@ export class LocalAgent {
     this.syncEngine = new LocalSyncEngine(this.configManager, this.factusolService, this.historyManager, this.eventBus);
 
     const cfg = this.configManager.get();
-    this.autoUpdater = new AutoUpdater({
+    const updateOptions: UpdateOptions = {
       apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
       agentId: cfg.agentId || 'agent_local_standalone',
       currentVersion: this.configManager.getVersion(),
-    });
+      checkIntervalMs: 60 * 60 * 1000,
+    };
+
+    this.autoUpdater = new AutoUpdater(updateOptions);
+    this.updateClient = new UpdateClient(updateOptions, this.eventBus);
 
     this.addEvent('info', `🚀 Bentian Local Agent inicializado en ${cfg.agentName} (v${this.configManager.getVersion()})`);
   }
@@ -411,6 +424,7 @@ export class LocalAgent {
     this.syncEngine.startAutoSyncLoop(() => this.isRunning);
     this.startHeartbeat();
     this.licenseService.startValidationLoop();
+    this.updateClient.startPeriodicCheck();
   }
 
   private startHeartbeat(): void {
@@ -518,13 +532,25 @@ export class LocalAgent {
     }
   }
 
+  public async checkForUpdates(channel?: UpdateChannel): Promise<UpdateCheckResponse> {
+    return this.updateClient.checkForUpdates(channel);
+  }
+
+  public async applyUpdate(): Promise<{ success: boolean; message: string }> {
+    return this.updateClient.applyUpdate();
+  }
+
+  public getUpdateStatus(): UpdateClientState {
+    return this.updateClient.getStatus();
+  }
+
   public async checkForUpdatesAndApply(): Promise<void> {
     if (this.isUpdating) return;
     try {
-      const check = await this.autoUpdater.checkForUpdate();
+      const check = await this.checkForUpdates();
       if (check.available && check.version && check.downloadUrl && check.sha256 && check.signature) {
         this.logger.info(`Nueva versión detectada al iniciar: v${check.version}`);
-        await this.applyUpdateFromInfo(check as any);
+        await this.applyUpdate();
       }
     } catch (err) {
       this.logger.warn(`Aviso en comprobación inicial de actualizaciones: ${String(err)}`);
@@ -538,6 +564,7 @@ export class LocalAgent {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
+    this.updateClient.stopPeriodicCheck();
     this.licenseService.stopValidationLoop();
     this.fileWatcherService.stop();
     await this.factusolService.disconnect();
