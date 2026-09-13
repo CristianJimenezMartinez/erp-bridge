@@ -54,6 +54,7 @@ export class LocalGuiServer {
     // 5. Sync & History
     router.get('/api/local/history', SyncController.getHistory(this.agent));
     router.post('/api/local/sync-now', SyncController.syncNow(this.agent));
+    router.post('/api/local/upload-catalog', SyncController.uploadCatalog(this.agent));
 
     // 6. License
     router.post('/api/local/activate-license', LicenseController.activateLicense(this.agent));

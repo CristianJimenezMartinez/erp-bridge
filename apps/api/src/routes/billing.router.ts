@@ -1,6 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { LicenseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
+import { requireAuth } from './auth.router';
 
 export const billingRouter = Router();
 const licenseService = new LicenseService();
@@ -297,13 +299,93 @@ billingRouter.post('/billing/create-portal-session', async (req: Request, res: R
 });
 
 /**
+ * Helper criptográfico para verificar la firma de Webhooks de Stripe (HMAC-SHA256)
+ */
+export function verifyStripeWebhookSignature(
+  rawBody: string | Buffer,
+  signatureHeader: string,
+  webhookSecret: string,
+  toleranceSeconds = 300
+): { valid: boolean; error?: string } {
+  if (!signatureHeader || !webhookSecret) {
+    return { valid: false, error: 'Cabecera stripe-signature o STRIPE_WEBHOOK_SECRET ausente' };
+  }
+
+  const items = signatureHeader.split(',');
+  let timestamp = '';
+  const signatures: string[] = [];
+
+  for (const item of items) {
+    const [prefix, val] = item.trim().split('=');
+    if (prefix === 't' && val) {
+      timestamp = val;
+    } else if (prefix === 'v1' && val) {
+      signatures.push(val);
+    }
+  }
+
+  if (!timestamp || signatures.length === 0) {
+    return { valid: false, error: 'Formato de cabecera stripe-signature no válido' };
+  }
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const tsNum = parseInt(timestamp, 10);
+  if (isNaN(tsNum) || Math.abs(nowSeconds - tsNum) > toleranceSeconds) {
+    return { valid: false, error: 'Timestamp de firma expirado o fuera de tolerancia' };
+  }
+
+  const payload = Buffer.isBuffer(rawBody)
+    ? Buffer.concat([Buffer.from(`${timestamp}.`, 'utf8'), rawBody])
+    : Buffer.from(`${timestamp}.${rawBody}`, 'utf8');
+
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(payload)
+    .digest('hex');
+
+  const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+
+  const match = signatures.some((sig) => {
+    try {
+      const sigBuffer = Buffer.from(sig, 'hex');
+      return sigBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(sigBuffer, expectedBuffer);
+    } catch {
+      return false;
+    }
+  });
+
+  if (!match) {
+    return { valid: false, error: 'La firma del webhook no coincide con el secret configurado' };
+  }
+
+  return { valid: true };
+}
+
+/**
  * 4. Stripe Webhook Handler:
- * Alta y revocación automática de licencias en base de datos.
+ * Alta y revocación automática de licencias en base de datos con verificación criptográfica de firma.
  */
 billingRouter.post('/billing/webhook', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET'];
+    const signature = req.headers['stripe-signature'] as string;
+    const rawBody = (req as any).rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+
+    if (webhookSecret) {
+      const verification = verifyStripeWebhookSignature(rawBody, signature, webhookSecret);
+      if (!verification.valid) {
+        logger.warn(`Intento de webhook de Stripe no autorizado rechazado: ${verification.error}`);
+        return res.status(400).json({ error: { message: verification.error || 'Firma de webhook no válida' } });
+      }
+    } else if (process.env['NODE_ENV'] === 'production') {
+      logger.error('CRÍTICO: STRIPE_WEBHOOK_SECRET no configurado en entorno de producción. Rechazando webhook.');
+      return res.status(500).json({ error: { message: 'Webhook secret no configurado en el servidor' } });
+    } else {
+      logger.warn('STRIPE_WEBHOOK_SECRET no configurado. Procesando en modo de desarrollo local.');
+    }
+
     const event = req.body;
-    logger.info(`Stripe Webhook recibido: ${event.type || 'unknown'}`);
+    logger.info(`Stripe Webhook recibido y validado: ${event.type || 'unknown'}`);
 
     switch (event.type) {
       case 'checkout.session.completed':
@@ -368,9 +450,9 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 });
 
 /**
- * 5. Consulta de licencias por email (Autoservicio)
+ * 5. Consulta de licencias por email (Autoservicio protegido)
  */
-billingRouter.get('/billing/licenses-by-email', async (req: Request, res: Response, next: NextFunction) => {
+billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const email = req.query['email'] as string;
     if (!email) {

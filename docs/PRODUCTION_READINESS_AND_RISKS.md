@@ -80,3 +80,21 @@
 - **Fase de Lanzamiento (1 - 50 clientes):** ~**4,50 € - 5,00 € / mes** (VPS Hetzner + Supabase Free + Cloudflare Free).
 - **Mantenimiento Técnico Requerido:** **0 horas/semana** de administración de bases de datos. Todo el foco de Cristian permanece en producto y ventas.
 
+---
+
+## 5. Alineación Comercial y Operativa para Lanzamiento
+
+### 5.1. Foco Comercial Exclusivo: Factusol ↔ WooCommerce
+Aunque el repositorio cuenta con paquetes y conectores modulares implementados para otros ecosistemas (como `@erp-bridge/connector-prestashop` y SimplyGest), **la oferta comercial oficial de lanzamiento y el soporte activo se centran al 100% en la integración Factusol ↔ WooCommerce**. Esta decisión evita la dispersión de esfuerzos de venta y soporte, consolidando a Bentian como la solución de referencia para este nicho.
+
+### 5.2. Programa de Partners y Liquidación Manual de Comisiones
+- **Comisión recurrente:** **25% trimestral** sobre las suscripciones activas referidas por partners (agencias de desarrollo web, mantenedores de Factusol, consultores IT locales).
+- **Operativa inicial (5 - 10 partners):** Sin sobreingeniería de Stripe Connect. Se liquida trimestralmente contra factura del partner mediante transferencia bancaria estándar tras cruce de reporte de licencias activas en el Dashboard.
+
+### 5.3. Mitigación de Alerta Windows Defender SmartScreen
+Dado que los binarios iniciales no cuentan con un costoso certificado Authenticode EV, los usuarios encontrarán la pantalla azul de aviso ("Editor desconocido"):
+- **Protocolo de Onboarding:** Se documenta en el email de bienvenida, web de descarga y manual de inicio rápido con captura explicativa:
+  1. Clic en el enlace *"Más información"*.
+  2. Clic en el botón *"Ejecutar de todas formas"*.
+
+

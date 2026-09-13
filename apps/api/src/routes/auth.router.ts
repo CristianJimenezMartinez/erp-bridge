@@ -75,7 +75,8 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(base64UrlDecode(encodedPayload)) as AdminJwtPayload;
-      if (payload.exp && Date.now() > payload.exp) {
+      const expMs = payload.exp ? (payload.exp > 1e11 ? payload.exp : payload.exp * 1000) : 0;
+      if (expMs && Date.now() > expMs) {
         return { valid: false, reason: 'El token ha expirado' };
       }
       return { valid: true, payload };

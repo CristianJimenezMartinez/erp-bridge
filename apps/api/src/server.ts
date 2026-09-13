@@ -37,7 +37,12 @@ export async function bootstrapApp(): Promise<Express> {
 
   // Middleware
   app.use(cors({ origin: '*' }));
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({
+    limit: '10mb',
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }));
   app.use(express.urlencoded({ extended: true }));
 
   // 1. Initialize & Register Connectors in Core Registry

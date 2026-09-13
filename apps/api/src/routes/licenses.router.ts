@@ -5,6 +5,7 @@ import {
   LicenseActivationRequestSchema,
   LicenseValidationRequestSchema,
 } from '@erp-bridge/shared';
+import { requireAuth } from './auth.router';
 
 export const licensesRouter = Router();
 const licenseService = new LicenseService();
@@ -14,7 +15,7 @@ function getOrgId(req: Request): string {
 }
 
 // 1. List all licenses for organization (with activations)
-licensesRouter.get('/licenses', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.get('/licenses', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
     const list = await licenseService.listLicensesWithActivations(orgId);
@@ -25,7 +26,7 @@ licensesRouter.get('/licenses', async (req: Request, res: Response, next: NextFu
 });
 
 // 1.1 Fleet Overview KPI summary
-licensesRouter.get('/licenses/fleet-overview', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.get('/licenses/fleet-overview', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
     const overview = await licenseService.getFleetOverview(orgId);
@@ -36,7 +37,7 @@ licensesRouter.get('/licenses/fleet-overview', async (req: Request, res: Respons
 });
 
 // 2. Create a new license (with optional alias)
-licensesRouter.post('/licenses', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
     const validated = CreateLicenseDtoSchema.parse({
@@ -51,7 +52,7 @@ licensesRouter.post('/licenses', async (req: Request, res: Response, next: NextF
 });
 
 // 2.1 Update license alias
-licensesRouter.patch('/licenses/:id/alias', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
     const { alias } = req.body as { alias: string };
@@ -66,7 +67,7 @@ licensesRouter.patch('/licenses/:id/alias', async (req: Request, res: Response, 
 });
 
 // 2.2 Unbind machine activation (Mudar PC)
-licensesRouter.post('/licenses/:id/unbind', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
     const { hwid } = req.body as { hwid: string };
@@ -84,7 +85,7 @@ licensesRouter.post('/licenses/:id/unbind', async (req: Request, res: Response, 
 });
 
 // 3. Get license details and its activations
-licensesRouter.get('/licenses/:key', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.get('/licenses/:key', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const key = req.params['key']!;
     const license = await licenseService.getLicenseByKey(key);
@@ -144,7 +145,7 @@ licensesRouter.post('/licenses/deactivate', async (req: Request, res: Response, 
 });
 
 // 7. Revoke license (admin)
-licensesRouter.post('/licenses/:id/revoke', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/:id/revoke', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const reason = (req.body.reason as string) || 'Revocada por el administrador';
     const revoked = await licenseService.revokeLicense(req.params['id']!, reason);

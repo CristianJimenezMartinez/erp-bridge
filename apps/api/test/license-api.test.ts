@@ -1,6 +1,7 @@
 import assert from 'assert';
 import http from 'http';
 import { bootstrapApp } from '../src/server';
+import { AuthService } from '../src/routes/auth.router';
 
 async function run() {
   console.log('--- Running License API E2E Tests ---');
@@ -14,12 +15,33 @@ async function run() {
 
   const port = (server.address() as { port: number }).port;
   const baseUrl = `http://127.0.0.1:${port}`;
+  const authToken = AuthService.createToken({
+    sub: 'admin_123',
+    role: 'ADMIN',
+    organizationId: 'org_default',
+    exp: Math.floor(Date.now() / 1000) + 3600,
+  });
 
   try {
-    // 1. Create License via API
-    const createRes = await fetch(`${baseUrl}/api/v1/licenses`, {
+    // 0. Verify unauthenticated access returns 401
+    const unauthRes = await fetch(`${baseUrl}/api/v1/licenses`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        organizationId: '11111111-2222-3333-4444-555555555555',
+        plan: 'starter',
+        maxActivations: 1,
+      }),
+    });
+    assert.strictEqual(unauthRes.status, 401, 'Unauthenticated request must return 401');
+
+    // 1. Create License via API with valid admin token
+    const createRes = await fetch(`${baseUrl}/api/v1/licenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+      },
       body: JSON.stringify({
         organizationId: '11111111-2222-3333-4444-555555555555',
         plan: 'starter',
@@ -66,8 +88,10 @@ async function run() {
     assert.strictEqual(valJson.data.valid, true);
     assert(valJson.data.renewedToken);
 
-    // 4. Get License info with activations
-    const infoRes = await fetch(`${baseUrl}/api/v1/licenses/${licenseKey}`);
+    // 4. Get License info with activations (Admin protected)
+    const infoRes = await fetch(`${baseUrl}/api/v1/licenses/${licenseKey}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
     assert.strictEqual(infoRes.status, 200);
     const infoJson = (await infoRes.json()) as { data: { activations: any[] } };
     assert.strictEqual(infoJson.data.activations.length, 1);

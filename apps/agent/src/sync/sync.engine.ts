@@ -5,7 +5,7 @@ import { ConfigManager } from '../config/config.manager';
 import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { FactusolService } from '../factusol/factusol.service';
-import { SyncManualResult } from './sync.types';
+import { SyncManualResult, CatalogUploadResult } from './sync.types';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -335,6 +335,197 @@ export class LocalSyncEngine {
     if (this.autoSyncTimer) {
       clearInterval(this.autoSyncTimer);
       this.autoSyncTimer = null;
+    }
+  }
+
+  public async uploadCatalog(options?: { limit?: number; onlyMissing?: boolean }): Promise<CatalogUploadResult> {
+    const start = Date.now();
+    this.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
+
+    const config = this.configManager.get();
+    const dbPath = config.factusol?.databasePath || config.factusolDbPath;
+    const woo = config.woocommerce || {};
+
+    if (!dbPath || !fs.existsSync(dbPath)) {
+      const msg = 'Base de datos de Factusol no configurada o inaccesible.';
+      this.eventBus.addEvent('error', `❌ ${msg}`);
+      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+    }
+
+    if (!woo.storeUrl || !woo.consumerKey || !woo.consumerSecret) {
+      const msg = 'Credenciales de WooCommerce no configuradas.';
+      this.eventBus.addEvent('error', `❌ ${msg}`);
+      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+    }
+
+    try {
+      const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
+      const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
+
+      // 1. Conectar a Factusol y leer artículos canónicos
+      let factusolConnector = this.factusolService.getConnector();
+      if (!factusolConnector) {
+        factusolConnector = new FactusolConnector();
+        await factusolConnector.connect({
+          configuration: {
+            databasePath: dbPath,
+            orderSeries: config.factusol?.orderSeries || '1',
+            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+            tariffCode: config.factusol?.tariffCode || '1',
+          },
+        });
+      }
+
+      this.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
+      const factusolProducts = await factusolConnector.readProducts({
+        limit: options?.limit,
+        activeOnly: true,
+      });
+
+      if (!factusolProducts || factusolProducts.length === 0) {
+        const msg = 'No se encontraron artículos activos en Factusol para subir.';
+        this.eventBus.addEvent('warn', msg);
+        return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+      }
+
+      this.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de Factusol. Comprobando catálogo existente en WooCommerce...`);
+
+      // 2. Obtener lista de SKUs existentes en WooCommerce para no duplicar si onlyMissing=true
+      const onlyMissing = options?.onlyMissing ?? true;
+      const existingWcSkus = new Set<string>();
+
+      if (onlyMissing) {
+        let page = 1;
+        let hasMore = true;
+        while (hasMore) {
+          const res: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100&page=${page}&_fields=id,sku`, {
+            headers: { Authorization: authHeader },
+            signal: AbortSignal.timeout(15000),
+          }).catch(() => null);
+
+          if (!res || !res.ok) break;
+          const items = (await res.json()) as Array<{ id: number; sku: string }>;
+          if (!items || items.length === 0) {
+            hasMore = false;
+          } else {
+            for (const it of items) {
+              if (it.sku) existingWcSkus.add(it.sku.trim().toUpperCase());
+            }
+            if (items.length < 100) hasMore = false;
+            page++;
+          }
+        }
+      }
+
+      // 3. Filtrar artículos que deben crearse en WooCommerce
+      const toUpload = factusolProducts.filter((p) => {
+        if (!p.sku) return false;
+        if (onlyMissing && existingWcSkus.has(p.sku.trim().toUpperCase())) {
+          return false;
+        }
+        return true;
+      });
+
+      const skippedCount = factusolProducts.length - toUpload.length;
+      let uploadedCount = 0;
+      let failedCount = 0;
+
+      if (toUpload.length === 0) {
+        const msg = `Todos los artículos de Factusol (${factusolProducts.length}) ya existen en WooCommerce. No se requieren altas.`;
+        this.eventBus.addEvent('success', `✓ ${msg}`);
+        return {
+          success: true,
+          totalArticles: factusolProducts.length,
+          uploadedCount: 0,
+          skippedCount,
+          failedCount: 0,
+          message: msg,
+        };
+      }
+
+      this.eventBus.addEvent('info', `Subiendo ${toUpload.length} productos nuevos a WooCommerce (Omitidos ya existentes: ${skippedCount})...`);
+
+      // 4. Subir en lotes de 50 a WooCommerce Batch API
+      const BATCH_SIZE = 50;
+      for (let i = 0; i < toUpload.length; i += BATCH_SIZE) {
+        const chunk = toUpload.slice(i, i + BATCH_SIZE);
+        const payload = chunk.map((p) => ({
+          name: p.name || `Artículo ${p.sku}`,
+          sku: p.sku.trim(),
+          type: 'simple',
+          regular_price: p.price > 0 ? String(p.price) : '0',
+          manage_stock: true,
+          stock_quantity: Math.max(0, p.stock || 0),
+          description: p.description || '',
+          categories: p.family ? [{ name: p.family }] : undefined,
+          status: 'publish',
+        }));
+
+        const batchRes: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
+          method: 'POST',
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ create: payload }),
+          signal: AbortSignal.timeout(30000),
+        }).catch((err) => {
+          this.logger.error('Fallo en petición batch de WooCommerce', err);
+          return null;
+        });
+
+        if (batchRes && batchRes.ok) {
+          const resJson = (await batchRes.json()) as { create?: Array<{ id: number; error?: any }> };
+          const created = resJson.create || [];
+          for (const item of created) {
+            if (item.error) {
+              failedCount++;
+            } else {
+              uploadedCount++;
+            }
+          }
+        } else {
+          failedCount += chunk.length;
+        }
+
+        // Breve pausa para no saturar servidores compartidos
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      const duration = ((Date.now() - start) / 1000).toFixed(1);
+      const summary = `Subida inicial completada en ${duration}s: ${uploadedCount} productos creados, ${skippedCount} ya existentes, ${failedCount} incidencias.`;
+      this.eventBus.addEvent('success', `✓ ${summary}`);
+
+      this.historyManager.addSyncHistoryRecord({
+        type: 'manual',
+        mode: 'full',
+        status: failedCount === 0 ? 'success' : 'warning',
+        durationSeconds: parseFloat(duration),
+        itemsUpdated: uploadedCount,
+        ordersImported: 0,
+        message: summary,
+      });
+
+      return {
+        success: true,
+        totalArticles: factusolProducts.length,
+        uploadedCount,
+        skippedCount,
+        failedCount,
+        message: summary,
+      };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error('Error durante la subida inicial de catálogo', err);
+      this.eventBus.addEvent('error', `❌ Error al subir catálogo: ${msg}`);
+      return {
+        success: false,
+        totalArticles: 0,
+        uploadedCount: 0,
+        skippedCount: 0,
+        failedCount: 0,
+        message: msg,
+      };
     }
   }
 }

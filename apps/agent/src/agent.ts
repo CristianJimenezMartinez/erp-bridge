@@ -33,7 +33,7 @@ import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusD
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
-import { SyncManualResult, FileWatcherService, LocalSyncEngine } from './sync';
+import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 
 // Re-exportar tipos para 100% de compatibilidad externa
 export * from './config';
@@ -306,6 +306,10 @@ export class LocalAgent {
   // --- Métodos de Sincronización ---
   public async triggerManualSync(): Promise<SyncManualResult> {
     return this.syncEngine.triggerManualSync();
+  }
+
+  public async uploadCatalog(options?: { limit?: number; onlyMissing?: boolean }): Promise<CatalogUploadResult> {
+    return this.syncEngine.uploadCatalog(options);
   }
 
   // --- Ciclo de Vida del Agente ---

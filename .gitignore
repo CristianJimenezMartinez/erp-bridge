@@ -31,6 +31,10 @@ sync-history.json
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+builder/keys/*private*.pem
+!builder/keys/update-public.pem
 
 # Logs & System
 *.log

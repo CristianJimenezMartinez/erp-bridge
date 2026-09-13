@@ -5,9 +5,13 @@ import {
   TestConnectionDtoSchema,
   UpdateConnectionDtoSchema,
 } from '@erp-bridge/shared';
+import { requireAuth } from './auth.router';
 
 export const connectionsRouter = Router();
 const connectionService = new ConnectionService();
+
+// Require JWT authentication for all connection operations
+connectionsRouter.use('/connections', requireAuth);
 
 // Helper to extract organizationId header or fallback
 function getOrgId(req: Request): string {
