@@ -1,0 +1,108 @@
+<!-- 13. PREGUNTAS FRECUENTES (FAQ PARA OBJECIONES REALES)                     -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-6 border-b border-white/[0.06]" id="faq">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+          <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Preguntas Frecuentes</span>
+          <h2 class="text-3xl font-bold text-white mt-2 tracking-tight">
+            Respuestas claras a objeciones reales.
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Tengo que cambiar o modificar mi versión actual de Factusol?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              No. El agente se conecta a tu base de datos existente de Factusol mediante lectura OLEDB estándar sin alterar la estructura de tus tablas ni obligarte a cambiar de versión. Es compatible con versiones 2024, 2025 y 2026.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Dónde se almacenan los datos de mis clientes y facturas?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Tus datos se quedan en tu propio equipo. La plataforma sigue una arquitectura Local-First: los ficheros de Factusol nunca se suben ni se replican en servidores cloud externos; solo se transmite el delta necesario cifrado punto a punto hacia tu WooCommerce.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Qué ocurre si el ordenador del almacén se apaga o se corta la conexión?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              No se pierde ningún dato. Los pedidos que tus clientes hagan en la tienda online se retienen de forma segura en la cola de Store-and-Forward. En cuanto el ordenador vuelve a encenderse o se recupera la red, el agente descarga y genera los pedidos en Factusol automáticamente.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Tengo que abrir puertos en el router o configurar una IP fija?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              No. El agente realiza conexiones salientes seguras HTTPS por el puerto 443 estándar. No necesitas abrir puertos en tu router, ni configurar DMZ, ni disponer de una IP fija en tu empresa.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Soporta Recargo de Equivalencia (R.E.) y múltiples tarifas?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. Está específicamente desarrollado para el mercado español. Gestiona clientes con y sin Recargo de Equivalencia y te permite elegir qué tarifa de precios de Factusol (Tarifa 1, 2, etc.) debe publicarse en tu tienda online.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Puedo instalarlo en varios puestos de trabajo?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. El plan base incluye hasta 3 puestos locales bajo la misma licencia empresarial (por ejemplo, el ordenador de facturación, el de almacén y el de oficina).
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Cómo se actualiza el agente?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Es completamente normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en <strong>"Más información"</strong> y luego en <strong>"Ejecutar de todas formas"</strong>.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Puedo cancelar la suscripción si no la necesito?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Por supuesto. Puedes cancelar desde tu panel de usuario de Stripe en cualquier momento con un solo clic. Sin permanencias, sin penalizaciones y sin preguntas.
+            </p>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+  </main>

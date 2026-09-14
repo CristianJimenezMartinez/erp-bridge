@@ -1,0 +1,49 @@
+﻿:root {
+  --bg: #09090b;
+  --surface: #121215;
+  --surface-elevated: #18181b;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --accent-indigo: #6366f1;
+}
+
+/* Micro-animaciones sutiles y respetuosas */
+@keyframes pulse-signal {
+  0%, 100% { opacity: 0.3; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes data-stream-left {
+  0% { transform: translateX(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(180px); opacity: 0; }
+}
+
+.data-packet-lr {
+  animation: data-stream-left 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Selección de texto limpia */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: #ffffff;
+}
+
+/* Barra de desplazamiento refinada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}

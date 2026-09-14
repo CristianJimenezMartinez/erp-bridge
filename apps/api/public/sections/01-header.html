@@ -1,0 +1,42 @@
+<!-- 1. HEADER MINIMALISTA & DESACOPLADO                                       -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-50 border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      
+      <!-- Marca Desacoplada (BRAND_MARK + BRAND_NAME + PRODUCT_NAME) -->
+      <a href="#" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg py-1 px-1">
+        <div class="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center border border-white/[0.12] group-hover:border-indigo-500/50 transition">
+          <!-- Logo Oficial de Bentian -->
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="32" height="32">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white" data-brand-name>Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded" data-product-name>ERP Bridge</span>
+        </div>
+      </a>
+
+      <!-- Navegación Principal -->
+      <nav class="hidden lg:flex items-center gap-5 xl:gap-7 text-xs text-zinc-400 font-medium">
+        <a href="#arquitectura" class="hover:text-white transition">Arquitectura</a>
+        <a href="#no-cambies-erp" class="hover:text-white transition">Filosofía</a>
+        <a href="#como-funciona" class="hover:text-white transition">Cómo Funciona</a>
+        <a href="#agente-local" class="hover:text-white transition">Agente Windows</a>
+        <a href="#observabilidad" class="hover:text-white transition">Observabilidad</a>
+        <a href="#conectores" class="hover:text-white transition">Conectores</a>
+        <a href="#seguridad" class="hover:text-white transition">Seguridad</a>
+        <a href="#precios" class="hover:text-white transition">Tarifas</a>
+        <a href="#faq" class="hover:text-white transition">FAQ</a>
+      </nav>
+
+      <!-- Botones de Acción (Con margen y divisor visual de separación) -->
+      <div class="flex items-center gap-3.5 shrink-0 ml-auto lg:ml-8 pl-6 lg:pl-8 border-l border-white/[0.08]">
+        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition flex items-center gap-2 whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Acceso Clientes
+        </a>
+        <a href="#descargas" class="text-xs font-semibold px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm whitespace-nowrap">
+          Descargar Agente
+        </a>
+      </div>
+    </div>
+  </header>

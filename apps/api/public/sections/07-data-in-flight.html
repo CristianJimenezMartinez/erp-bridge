@@ -1,0 +1,62 @@
+<!-- 7. DEMOSTRACIÓN DE DATOS EN VUELO (DATA IN FLIGHT)                       -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-6 border-b border-white/[0.06] bg-[#0c0c0f]">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Datos en Vuelo</span>
+            <h2 class="text-3xl font-bold text-white mt-2 tracking-tight">
+              Transformación canónica en milisegundos.
+            </h2>
+            <p class="text-zinc-400 text-sm mt-2 max-w-xl">
+              Comprueba cómo los registros de Factusol se convierten en payloads limpios de WooCommerce sin pérdida de precisión ni descuadres contables.
+            </p>
+          </div>
+          <button id="btn-simulate-sync" class="px-4 py-2 rounded-lg bg-[#18181b] hover:bg-[#222228] text-xs font-mono text-zinc-200 border border-white/[0.1] transition flex items-center gap-2 self-start md:self-auto">
+            <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Simular Modificación de Stock
+          </button>
+        </div>
+
+        <!-- Terminal de Comparación de Datos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 font-mono text-xs">
+          
+          <!-- Panel Izquierdo: Factusol Access Record -->
+          <div class="rounded-xl bg-[#121215] border border-white/[0.08] p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-400 mb-3">
+              <span class="font-semibold text-zinc-200">Factusol — Registro F_ART + F_STO</span>
+              <span class="text-[10px] text-zinc-500">OLEDB ACCDB</span>
+            </div>
+            <pre class="text-zinc-300 leading-relaxed overflow-x-auto"><code>{
+  <span class="text-zinc-500">"CODART"</span>: <span class="text-indigo-400">"FS-28492"</span>,
+  <span class="text-zinc-500">"DESART"</span>: <span class="text-zinc-200">"Válvula Esfera Latón 1/2 Pulgada"</span>,
+  <span class="text-zinc-500">"ACTSTO"</span>: <span class="text-emerald-400 font-bold" id="demo-factusol-stock">42.000</span>,
+  <span class="text-zinc-500">"PCOART"</span>: <span class="text-zinc-400">12.45</span>,
+  <span class="text-zinc-500">"PVIART"</span>: <span class="text-zinc-200">19.90</span>,
+  <span class="text-zinc-500">"TVIART"</span>: <span class="text-zinc-400">1</span>, <span class="text-zinc-500">// IVA General 21%</span>
+  <span class="text-zinc-500">"REQART"</span>: <span class="text-amber-400">true</span> <span class="text-zinc-500">// R.E. 5.2%</span>
+}</code></pre>
+          </div>
+
+          <!-- Panel Derecho: WooCommerce REST Payload -->
+          <div class="rounded-xl bg-[#121215] border border-white/[0.08] p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-400 mb-3">
+              <span class="font-semibold text-zinc-200">WooCommerce — Payload REST API v3</span>
+              <span class="text-[10px] text-emerald-400" id="demo-sync-status">● Sincronizado (420ms)</span>
+            </div>
+            <pre class="text-zinc-300 leading-relaxed overflow-x-auto"><code>{
+  <span class="text-zinc-500">"sku"</span>: <span class="text-indigo-400">"FS-28492"</span>,
+  <span class="text-zinc-500">"name"</span>: <span class="text-zinc-200">"Válvula Esfera Latón 1/2 Pulgada"</span>,
+  <span class="text-zinc-500">"stock_quantity"</span>: <span class="text-emerald-400 font-bold" id="demo-wc-stock">42</span>,
+  <span class="text-zinc-500">"manage_stock"</span>: <span class="text-zinc-400">true</span>,
+  <span class="text-zinc-500">"regular_price"</span>: <span class="text-zinc-200">"19.90"</span>,
+  <span class="text-zinc-500">"tax_status"</span>: <span class="text-zinc-400">"taxable"</span>,
+  <span class="text-zinc-500">"meta_data"</span>: [{ <span class="text-zinc-500">"key"</span>: <span class="text-zinc-400">"_recargo_equiv"</span>, <span class="text-zinc-500">"value"</span>: <span class="text-amber-400">"yes"</span> }]
+}</code></pre>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->

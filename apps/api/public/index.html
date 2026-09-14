@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -50,7 +50,6 @@
 
   <!-- ========================================================================= -->
   <!-- GEO IA & RICH SNIPPETS: ESTRUCTURAS JSON-LD SCHEMA.ORG PARA MOTORES IA     -->
-  <!-- (Optimizado para Google Gemini, SearchGPT, Perplexity AI, Claude y SERP) -->
   <!-- ========================================================================= -->
   <script type="application/ld+json">
   {
@@ -224,86 +223,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS Engine -->
+  <!-- Tailwind CSS CDN & Configuración Externa -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            bg: '#09090b',
-            surface: {
-              DEFAULT: '#121215',
-              elevated: '#18181b',
-              card: '#141418',
-              hover: '#1e1e24',
-            },
-            accent: {
-              DEFAULT: '#6366f1',
-              hover: '#4f46e5',
-              glow: 'rgba(99, 102, 241, 0.15)',
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <script src="/js/tailwind.config.js"></script>
 
-  <style>
-    :root {
-      --bg: #09090b;
-      --surface: #121215;
-      --surface-elevated: #18181b;
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --border-medium: rgba(255, 255, 255, 0.12);
-      --accent-indigo: #6366f1;
-    }
-
-    /* Micro-animaciones sutiles y respetuosas */
-    @keyframes pulse-signal {
-      0%, 100% { opacity: 0.3; transform: scale(0.98); }
-      50% { opacity: 1; transform: scale(1.02); }
-    }
-    @keyframes data-stream-left {
-      0% { transform: translateX(0); opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { transform: translateX(180px); opacity: 0; }
-    }
-
-    .data-packet-lr {
-      animation: data-stream-left 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    }
-
-    /* Selección de texto limpia */
-    ::selection {
-      background-color: rgba(99, 102, 241, 0.3);
-      color: #ffffff;
-    }
-
-    /* Barra de desplazamiento refinada */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #09090b;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #27272a;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #3f3f46;
-    }
-  </style>
+  <!-- Hoja de Estilos CSS Externa (Animaciones, Variables, Scrollbar) -->
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="min-h-full flex flex-col bg-[#09090b] text-[#f4f4f5] font-sans antialiased selection:bg-indigo-500/30">
 
-  <!-- ========================================================================= -->
   <!-- 1. HEADER MINIMALISTA & DESACOPLADO                                       -->
   <!-- ========================================================================= -->
   <header class="sticky top-0 z-50 border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md">
@@ -347,9 +275,8 @@
     </div>
   </header>
 
-  <main class="flex-1">
 
-    <!-- ========================================================================= -->
+  <main class="flex-1">
     <!-- 2. HERO EDITORIAL & DYNAMIC SYSTEM FLOW                                   -->
     <!-- ========================================================================= -->
     <section class="relative pt-20 pb-24 px-6 overflow-hidden border-b border-white/[0.06]">
@@ -549,7 +476,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 3. SECCIÓN EL PROBLEMA: LA FRAGMENTACIÓN OCULTA                           -->
+
+
+  <!-- 3. SECCIÓN EL PROBLEMA: LA FRAGMENTACIÓN OCULTA                           -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]">
       <div class="max-w-6xl mx-auto">
@@ -600,7 +529,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 4. SECCIÓN LA SOLUCIÓN: CAPA DE INFRAESTRUCTURA CANÓNICA                  -->
+
+
+  <!-- 4. SECCIÓN LA SOLUCIÓN: CAPA DE INFRAESTRUCTURA CANÓNICA                  -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]">
       <div class="max-w-6xl mx-auto">
@@ -649,7 +580,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 5. SECCIÓN ESPECIAL: NO CAMBIES TU ERP (KEEP WHAT WORKS)                 -->
+
+
+  <!-- 5. SECCIÓN ESPECIAL: NO CAMBIES TU ERP (KEEP WHAT WORKS)                 -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] bg-[#0c0c0f]" id="no-cambies-erp">
       <div class="max-w-6xl mx-auto">
@@ -717,7 +650,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 6. SECCIÓN CÓMO FUNCIONA (CONNECT, SYNC, RECONCILE)                       -->
+
+
+  <!-- 6. SECCIÓN CÓMO FUNCIONA (CONNECT, SYNC, RECONCILE)                       -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="como-funciona">
       <div class="max-w-6xl mx-auto">
@@ -777,7 +712,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 7. DEMOSTRACIÓN DE DATOS EN VUELO (DATA IN FLIGHT)                       -->
+
+
+  <!-- 7. DEMOSTRACIÓN DE DATOS EN VUELO (DATA IN FLIGHT)                       -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] bg-[#0c0c0f]">
       <div class="max-w-6xl mx-auto">
@@ -839,7 +776,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
+
+
+  <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="agente-local">
       <div class="max-w-6xl mx-auto">
@@ -937,7 +876,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 9. SECCIÓN OBSERVABILIDAD Y REGISTRO DE AUDITORÍA                         -->
+
+
+  <!-- 9. SECCIÓN OBSERVABILIDAD Y REGISTRO DE AUDITORÍA                         -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="observabilidad">
       <div class="max-w-6xl mx-auto">
@@ -978,7 +919,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 10. SECCIÓN CONECTORES (DISPONIBLES HOY VS EXPANSIÓN)                    -->
+
+
+  <!-- 10. SECCIÓN CONECTORES (DISPONIBLES HOY VS EXPANSIÓN)                    -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="conectores">
       <div class="max-w-6xl mx-auto">
@@ -1071,7 +1014,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 11. SECCIÓN SEGURIDAD Y CRIPTOGRAFÍA                                      -->
+
+
+  <!-- 11. SECCIÓN SEGURIDAD Y CRIPTOGRAFÍA                                      -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="seguridad">
       <div class="max-w-6xl mx-auto">
@@ -1122,7 +1067,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 12. TARIFAS TRANSPARENTES (PRICING MODULAR)                               -->
+
+
+  <!-- 12. TARIFAS TRANSPARENTES (PRICING MODULAR)                               -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="precios">
       <div class="max-w-6xl mx-auto">
@@ -1245,7 +1192,9 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- 13. PREGUNTAS FRECUENTES (FAQ PARA OBJECIONES REALES)                     -->
+
+
+  <!-- 13. PREGUNTAS FRECUENTES (FAQ PARA OBJECIONES REALES)                     -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]" id="faq">
       <div class="max-w-4xl mx-auto">
@@ -1354,7 +1303,8 @@
 
   </main>
 
-  <!-- ========================================================================= -->
+  </main>
+
   <!-- 14. FOOTER MINIMALISTA & DESACOPLADO                                      -->
   <!-- ========================================================================= -->
   <footer class="border-t border-white/[0.07] bg-[#09090b] py-12 px-6 text-xs text-zinc-500">
@@ -1385,123 +1335,11 @@
     </div>
   </footer>
 
-  <!-- ========================================================================= -->
-  <!-- SCRIPTS FUNCIONALES: STRIPE CHECKOUT & AUTO-HIDRATACIÓN DE RELEASES       -->
-  <!-- ========================================================================= -->
-  <script>
-    // Configuración global de Marca (facilidad de reemplazo)
-    window.__BRAND_CONFIG__ = {
-      productName: "Bentian ERP Bridge",
-      brandName: "Bentian"
-    };
 
-    // Función de Checkout con Stripe
-    async function iniciarCheckout(planId) {
-      const email = prompt('Introduce tu correo electrónico para vincular tu licencia:');
-      if (!email || !email.trim()) return;
-
-      try {
-        const res = await fetch('/api/v1/billing/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ plan: planId, email: email.trim(), isEarlyBird: true })
-        });
-        const data = await res.json();
-        if (data && data.url) {
-          window.location.href = data.url;
-        } else {
-          alert('No se pudo generar la sesión de pago. Por favor, contacta con soporte.');
-        }
-      } catch (err) {
-        alert('Error al conectar con la pasarela de facturación: ' + err.message);
-      }
-    }
-
-    // Auto-hidratación en tiempo real desde /releases/latest.json
-    (function initReleaseMetadata() {
-      fetch('/releases/latest.json')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data || !data.latestVersion) return;
-          var v = data.latestVersion;
-          var stable = data.stable || {};
-
-          // Actualizar badges
-          var heroBadge = document.getElementById('hero-version-tag');
-          if (heroBadge) heroBadge.innerText = 'Release Oficial v' + v + ' para Windows x64';
-
-          // Actualizar enlaces de descarga del Hero
-          var btnHeroExe = document.getElementById('btn-hero-download');
-          if (btnHeroExe) btnHeroExe.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.exe';
-
-          var btnHeroZip = document.getElementById('btn-hero-zip');
-          if (btnHeroZip) btnHeroZip.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.zip';
-
-          // Actualizar enlaces de descarga del Agente
-          var btnAgentExe = document.getElementById('btn-agent-exe');
-          if (btnAgentExe) btnAgentExe.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.exe';
-
-          var btnAgentZip = document.getElementById('btn-agent-zip');
-          if (btnAgentZip) btnAgentZip.href = '/releases/v' + v + '/Bentian-Setup-v' + v + '.zip';
-
-          // Actualizar Hashes SHA-256
-          var heroHash = document.getElementById('hero-hash-preview');
-          if (heroHash && stable.installer && stable.installer.sha256) {
-            heroHash.innerText = stable.installer.sha256;
-          }
-
-          var agentHash = document.getElementById('agent-sha256');
-          if (agentHash && stable.sha256) {
-            agentHash.innerText = stable.sha256;
-          }
-
-          // Tamaño de archivo
-          var agentSize = document.getElementById('agent-file-size');
-          if (agentSize && stable.fileSize) {
-            var mb = (stable.fileSize / (1024 * 1024)).toFixed(1);
-            agentSize.innerText = mb + ' MB';
-          }
-        })
-        .catch(function(err) {
-          console.debug('Aviso al hidratar releases:', err);
-        });
-    })();
-
-    // Micro-interacción: Simulación de Modificación de Stock
-    (function initStockSimulator() {
-      var btn = document.getElementById('btn-simulate-sync');
-      var factusolStock = document.getElementById('demo-factusol-stock');
-      var wcStock = document.getElementById('demo-wc-stock');
-      var statusTag = document.getElementById('demo-sync-status');
-      var packetStock = document.getElementById('live-packet-stock');
-      var packetTs = document.getElementById('live-packet-ts');
-
-      var currentStock = 42;
-      if (!btn) return;
-
-      btn.addEventListener('click', function() {
-        currentStock = currentStock === 42 ? 41 : (currentStock === 41 ? 39 : 42);
-        
-        if (statusTag) {
-          statusTag.innerHTML = '<span class="text-amber-400">● Propagando delta...</span>';
-        }
-
-        setTimeout(function() {
-          if (factusolStock) factusolStock.innerText = currentStock.toFixed(3);
-          if (wcStock) wcStock.innerText = currentStock.toString();
-          if (packetStock) packetStock.innerText = currentStock.toString();
-          
-          var now = new Date();
-          var timeStr = now.toTimeString().split(' ')[0];
-          if (packetTs) packetTs.innerText = timeStr;
-
-          if (statusTag) {
-            statusTag.innerHTML = '<span class="text-emerald-400">● Sincronizado (' + (280 + Math.floor(Math.random() * 150)) + 'ms)</span>';
-          }
-        }, 320);
-      });
-    })();
-  </script>
+  <!-- Scripts Funcionales Modulares: Stripe Checkout, Releases y Simulador -->
+  <script src="/js/checkout.js"></script>
+  <script src="/js/releases.js"></script>
+  <script src="/js/simulator.js"></script>
 
 </body>
 </html>

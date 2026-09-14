@@ -1,0 +1,98 @@
+<!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-6 border-b border-white/[0.06]" id="agente-local">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          <div>
+            <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Agente de Escritorio</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+              Tus sistemas locales permanecen estrictamente locales.
+            </h2>
+            <p class="mt-4 text-zinc-400 text-sm leading-relaxed">
+              El agente es un ejecutable Windows x64 autónomo empaquetado para correr en segundo plano. Sin terminales negros, sin comandos CMD y con panel de control accesible desde la bandeja del sistema (System Tray).
+            </p>
+
+            <div class="mt-8 space-y-4 text-xs font-mono text-zinc-300">
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Cero consola: interfaz gráfica limpia y discreta en la bandeja del reloj</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Microservidor loopback protegido en <code class="text-zinc-200">127.0.0.1:39281</code></span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Auto-actualizaciones firmadas con clave Ed25519 en segundo plano</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Periodo de gracia offline de 30 días para continuar operando sin cortes</span>
+              </div>
+            </div>
+
+            <!-- Botonera de descargas directas del agente -->
+            <div class="mt-10 flex flex-wrap items-center gap-4">
+              <a id="btn-agent-exe" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
+                <span>Descargar Instalador Oficial (.exe)</span>
+              </a>
+
+              <a id="btn-agent-zip" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
+                Paquete .zip
+              </a>
+            </div>
+          </div>
+
+          <!-- Representación de la Ficha Técnica del Binario -->
+          <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-6 font-mono text-xs">
+            <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-400">
+              <span class="text-white font-semibold flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                BentianAgent.exe
+              </span>
+              <span class="text-zinc-500" id="agent-file-size">~24 MB</span>
+            </div>
+
+            <div class="py-4 space-y-3 text-zinc-400">
+              <div class="flex justify-between">
+                <span>Arquitectura:</span>
+                <span class="text-zinc-200">win32_x64 (Native Node SEA)</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Subsistema Windows:</span>
+                <span class="text-zinc-200">IMAGE_SUBSYSTEM_WINDOWS_GUI</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Compatibilidad:</span>
+                <span class="text-zinc-200">Windows 10, 11, Windows Server</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Factusol soportado:</span>
+                <span class="text-zinc-200">Versiones 2024, 2025 y 2026</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Driver de lectura:</span>
+                <span class="text-indigo-400">Microsoft.ACE.OLEDB.12.0/16.0</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Almacenamiento seguro:</span>
+                <span class="text-emerald-400">Windows DPAPI (AES-256)</span>
+              </div>
+            </div>
+
+            <!-- Hash SHA-256 en vivo -->
+            <div class="pt-4 border-t border-white/[0.06] text-[11px]">
+              <div class="text-zinc-500">Hash SHA-256 Verificado:</div>
+              <div class="text-zinc-300 break-all mt-1" id="agent-sha256">
+                adfb0e8722e5096c03a36e8e4f2c9fc26e35803cf3b127c7f2079933776a8ecc
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->

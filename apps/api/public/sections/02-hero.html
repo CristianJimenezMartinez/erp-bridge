@@ -1,0 +1,199 @@
+<!-- 2. HERO EDITORIAL & DYNAMIC SYSTEM FLOW                                   -->
+    <!-- ========================================================================= -->
+    <section class="relative pt-20 pb-24 px-6 overflow-hidden border-b border-white/[0.06]">
+      <div class="max-w-6xl mx-auto">
+        
+        <!-- Badge de Versión Oficial y Arquitectura -->
+        <div class="flex items-center gap-3 mb-8">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#121215] border border-white/[0.1] text-xs font-mono text-zinc-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="hero-version-tag">Release Oficial v0.1.2 para Windows x64</span>
+          </div>
+          <span class="text-xs font-mono text-zinc-500 hidden sm:inline">Arquitectura Store-and-Forward / Local-First</span>
+        </div>
+
+        <!-- Headline de Alto Impacto -->
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.08] max-w-4xl">
+          Tus sistemas empresariales.<br/>
+          <span class="text-zinc-400 font-normal">Por fin trabajando juntos.</span>
+        </h1>
+
+        <!-- Subheadline Honesto -->
+        <p class="mt-6 text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
+          Conecta tu ERP físico con tu comercio electrónico sin sustituir el software que tu empresa lleva años utilizando. Catálogo, stock, tarifas y pedidos sincronizados de forma autónoma sin exponer jamás tu base de datos a internet.
+        </p>
+
+        <!-- CTAs Primarios -->
+        <div class="mt-10 flex flex-wrap items-center gap-4" id="descargas">
+          <a id="btn-hero-download" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.exe" 
+             class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm flex items-center gap-2.5 transition shadow-lg shadow-indigo-600/20">
+            <!-- Icono Windows SVG fino -->
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/>
+            </svg>
+            <span>Descargar Agente Windows (.exe)</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-black/25 text-zinc-200">24 MB</span>
+          </a>
+
+          <a href="#como-funciona" class="px-5 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 hover:text-white border border-white/[0.08] font-medium text-sm transition flex items-center gap-2">
+            <span>Ver Cómo Funciona</span>
+            <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a id="btn-hero-zip" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.zip" class="text-xs text-zinc-500 hover:text-zinc-300 font-mono underline underline-offset-4 ml-2 transition">
+            Descargar versión .zip
+          </a>
+        </div>
+
+        <!-- Aviso Informativo Windows Defender SmartScreen -->
+        <div class="mt-4 flex items-start gap-3 max-w-xl p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/20 text-xs text-zinc-300">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="leading-relaxed">
+            <strong class="text-zinc-200 font-semibold">Aviso de instalación en Windows:</strong> Al ser una versión reciente, Windows Defender SmartScreen puede mostrar una pantalla azul informativa. Para continuar, haz clic en <span class="text-indigo-300 font-semibold">"Más información"</span> y luego en <span class="text-indigo-300 font-semibold">"Ejecutar de todas formas"</span>.
+          </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- MASTERPIECE: VISUALIZACIÓN DINÁMICA DEL FLUJO DE SISTEMAS                -->
+        <!-- ========================================================================= -->
+        <div class="mt-16 rounded-2xl bg-[#121215] border border-white/[0.08] p-6 lg:p-8 relative overflow-hidden" id="arquitectura">
+          <!-- Fondo sutil con cuadrícula técnica -->
+          <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+          <!-- Cabecera de la Visualización -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06] relative z-10">
+            <div>
+              <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-950/40 border border-indigo-800/40 px-2 py-0.5 rounded">Topología de Flujo Activo</span>
+              <h2 class="text-base font-semibold text-white mt-1">Conexión de Sistemas en Tiempo Real</h2>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Motor Activo</span>
+              <span class="text-zinc-600">|</span>
+              <span class="text-zinc-400">Canal: <strong class="text-zinc-200">Stable x64</strong></span>
+              <span class="text-zinc-600">|</span>
+              <span class="text-zinc-400">Latencia: <strong class="text-emerald-400 font-mono">38ms</strong></span>
+            </div>
+          </div>
+
+          <!-- Malla de los 3 Nodos del Flujo -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 relative z-10 items-stretch">
+            
+            <!-- NODO A: FACTUSOL (Local System) -->
+            <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Sistema Origen (ERP)</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> LOCAL
+                  </span>
+                </div>
+                <div class="text-xl font-bold text-white tracking-tight">Factusol</div>
+                <div class="text-xs text-zinc-400 mt-1">Base de datos local Access (<code class="text-zinc-300 font-mono">.accdb</code>)</div>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
+                <div class="flex justify-between text-zinc-400">
+                  <span>Catálogo auditado:</span>
+                  <span class="text-white font-semibold">7,978 Artículos</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Modo acceso:</span>
+                  <span class="text-indigo-300">OLEDB Driver Nativo</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Bloqueo concurrente:</span>
+                  <span class="text-emerald-400">0% (Lectura Limpia)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- NODO CENTRAL: CAPA DE INTEGRACIÓN (PRODUCT_NAME) -->
+            <div class="rounded-xl bg-[#18181b]/90 border border-indigo-500/30 p-5 flex flex-col justify-between shadow-lg shadow-indigo-950/20 relative">
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full shadow">
+                Sync Engine
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-mono text-indigo-300 uppercase tracking-wider" data-product-name>Bentian Sync Engine</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/40">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping"></span> ACTIVO
+                  </span>
+                </div>
+                <div class="text-xl font-bold text-white tracking-tight">Normalización Canónica</div>
+                <div class="text-xs text-zinc-400 mt-1">Transformación de datos & Store-and-Forward</div>
+              </div>
+
+              <!-- Paquete de datos en vuelo (animación visual sutil) -->
+              <div class="my-4 py-2.5 px-3 rounded-lg bg-[#09090b] border border-white/[0.06] font-mono text-[11px]">
+                <div class="text-zinc-400 flex items-center justify-between">
+                  <span>Evento: <strong class="text-zinc-200">StockDeltaUpdate</strong></span>
+                  <span class="text-indigo-400 text-[10px]" id="live-packet-ts">14:32:08</span>
+                </div>
+                <div class="text-zinc-500 mt-1 truncate">
+                  SKU: <span class="text-zinc-300" id="live-packet-sku">FS-28492</span> | Stock: <span class="text-emerald-400 font-bold" id="live-packet-stock">42</span> | R.E.: <span class="text-zinc-300">5.2%</span>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-white/[0.06] space-y-2 font-mono text-xs">
+                <div class="flex justify-between text-zinc-400">
+                  <span>Esquema:</span>
+                  <span class="text-zinc-200">CanonicalModel v1</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Cola offline:</span>
+                  <span class="text-emerald-400">Tolerancia 30 Días</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- NODO B: WOOCOMMERCE (eCommerce Destination) -->
+            <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Sistema Destino (Tienda)</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-blue-400 bg-blue-950/40 px-2 py-0.5 rounded border border-blue-800/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> CLOUD
+                  </span>
+                </div>
+                <div class="text-xl font-bold text-white tracking-tight">WooCommerce</div>
+                <div class="text-xs text-zinc-400 mt-1">Canal de venta web online (<code class="text-zinc-300 font-mono">REST API v3</code>)</div>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
+                <div class="flex justify-between text-zinc-400">
+                  <span>Pedidos gestionados:</span>
+                  <span class="text-white font-semibold">428 Pedidos</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Protocolo:</span>
+                  <span class="text-blue-300">HTTPS / HMAC SHA256</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Sincronización:</span>
+                  <span class="text-emerald-400">Bidireccional (24/7)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Barra de Integridad Criptográfica y Estado -->
+          <div class="rounded-lg bg-[#09090b] border border-white/[0.06] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-zinc-400">
+            <div class="flex items-center gap-2">
+              <!-- Shield Check SVG -->
+              <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Verificación de Integridad: <strong class="text-zinc-200">Firma Ed25519 Válida</strong></span>
+            </div>
+            <div class="truncate text-zinc-500 max-w-md">
+              SHA-256: <span class="text-zinc-400" id="hero-hash-preview">7c80650833087e3f3d4ea9b95f3dd7b5d5cdf9ce576c4dd1d7abf5ab4e578ede</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->

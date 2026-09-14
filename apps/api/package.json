@@ -4,7 +4,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build:landing": "ts-node scripts/build-landing.ts",
+    "build": "ts-node scripts/build-landing.ts && tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
     "test": "ts-node test/license-api.test.ts && ts-node test/update-api.test.ts"
