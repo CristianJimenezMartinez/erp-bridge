@@ -19,7 +19,7 @@ if (!fs.existsSync(dbPath)) {
 async function runTest() {
   const connector = new FactusolConnector();
 
-  console.log(`1. Conectando a Factusol en: ${dbPath}...`);
+  console.log('1. Conectando a Factusol en: ' + dbPath + '...');
   await connector.connect({
     configuration: {
       databasePath: dbPath,
@@ -27,6 +27,12 @@ async function runTest() {
       activeOnly: false,
     },
   });
+
+  console.log('1b. Obteniendo ejercicios fiscales disponibles...');
+  const fiscalYears = connector.getFiscalYears();
+  console.log('Ejercicios fiscales detectados:', fiscalYears);
+  assert(fiscalYears.length > 0, 'Debe devolver al menos el ejercicio actual');
+  assert(fiscalYears.some((fy) => fy.year === 2025), 'Debe incluir el ejercicio 2025');
 
   console.log('2. Ejecutando Health Check...');
   const health = await connector.healthCheck();

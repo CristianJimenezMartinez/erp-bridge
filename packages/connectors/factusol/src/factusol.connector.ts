@@ -27,6 +27,7 @@ import {
 } from '@erp-bridge/shared';
 import { AccessDriver } from './access-driver';
 import { FACTUSOL_QUERIES } from './queries';
+import { FactusolYearResolver } from './access/year-resolver';
 import {
   FactusolProductHandler,
   FactusolCustomerHandler,
@@ -43,6 +44,7 @@ export interface FactusolConnectionConfig {
   orderSeries?: string;
   invoiceSeries?: string;
   defaultWarehouse?: string;
+  autoRollover?: boolean;
 }
 
 export class FactusolConnector implements Connector {
@@ -94,26 +96,46 @@ export class FactusolConnector implements Connector {
       );
     }
 
-    if (!fs.existsSync(dbPath)) {
+    const autoRollover = rawConfig.autoRollover !== false;
+    let activeDbPath = dbPath;
+
+    if (autoRollover) {
+      const resolution = FactusolYearResolver.resolveActiveDatabase(dbPath, true);
+      if (resolution.switched) {
+        this.logger.info(
+          `Cambio automático de ejercicio fiscal detectado en Factusol: ejercicio ${resolution.previousYear} -> ${resolution.currentYear}`,
+          {
+            previousYear: resolution.previousYear,
+            currentYear: resolution.currentYear,
+            configuredPath: dbPath,
+            activePath: resolution.activePath,
+          }
+        );
+        activeDbPath = resolution.activePath;
+      }
+    }
+
+    if (!fs.existsSync(activeDbPath)) {
       throw new ConnectionError(
         ErrorCode.CONNECTION_FAILED,
-        `No se encuentra el archivo de base de datos Factusol: ${dbPath}`,
-        { databasePath: dbPath }
+        `No se encuentra el archivo de base de datos Factusol: ${activeDbPath}`,
+        { databasePath: activeDbPath }
       );
     }
 
     this.config = {
-      databasePath: dbPath,
+      databasePath: activeDbPath,
       tariffCode: rawConfig.tariffCode || '1',
       activeOnly: rawConfig.activeOnly !== false,
       provider: rawConfig.provider,
       orderSeries: rawConfig.orderSeries || ' ',
       invoiceSeries: rawConfig.invoiceSeries || '1',
       defaultWarehouse: rawConfig.defaultWarehouse || 'GEN',
+      autoRollover,
     };
 
     this.driver = new AccessDriver({
-      databasePath: dbPath,
+      databasePath: activeDbPath,
       provider: rawConfig.provider,
     });
 
@@ -237,6 +259,14 @@ export class FactusolConnector implements Connector {
   ): Promise<InvoiceMutationResult> {
     this.ensureConnected();
     return this.invoiceHandler!.updateInvoiceStatus(invoiceId, status);
+  }
+
+  /**
+   * Obtiene la lista de ejercicios fiscales disponibles en el directorio de la empresa.
+   */
+  public getFiscalYears(): { year: number; path: string }[] {
+    this.ensureConnected();
+    return FactusolYearResolver.getAvailableYears(this.config!.databasePath);
   }
 
   private ensureConnected(): void {
