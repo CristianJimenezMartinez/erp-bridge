@@ -27,6 +27,10 @@ import {
   WooCommerceProductHandler,
   WooCommerceOrderHandler,
   WooCommerceStockHandler,
+  WooCommerceVariationHandler,
+  groupProductsByParent,
+  toWooCommerceVariationPayload,
+  ParentProductGroup,
 } from './handlers';
 
 export interface WooCommerceConnectionConfig {
@@ -45,6 +49,7 @@ export class WooCommerceConnector implements Connector {
   private productHandler: WooCommerceProductHandler | null = null;
   private orderHandler: WooCommerceOrderHandler | null = null;
   private stockHandler: WooCommerceStockHandler | null = null;
+  private variationHandler: WooCommerceVariationHandler | null = null;
 
   public getMetadata(): ConnectorMetadata {
     return {
@@ -70,6 +75,7 @@ export class WooCommerceConnector implements Connector {
       supportsWebhooks: true,
       supportsReadOrders: true,
       supportsWriteOrders: true,
+      supportsVariations: true,
     };
   }
 
@@ -120,6 +126,7 @@ export class WooCommerceConnector implements Connector {
     this.productHandler = new WooCommerceProductHandler(this.client, this.logger);
     this.orderHandler = new WooCommerceOrderHandler(this.client, this.logger);
     this.stockHandler = new WooCommerceStockHandler(this.client, this.logger);
+    this.variationHandler = new WooCommerceVariationHandler(this.client, this.logger);
 
     this.logger.info('WooCommerce connector configured successfully', { url });
   }
@@ -130,6 +137,7 @@ export class WooCommerceConnector implements Connector {
     this.productHandler = null;
     this.orderHandler = null;
     this.stockHandler = null;
+    this.variationHandler = null;
     this.logger.info('WooCommerce connector disconnected');
   }
 
@@ -235,6 +243,49 @@ export class WooCommerceConnector implements Connector {
   ): Promise<BatchStockUpdateResult> {
     this.ensureConnected();
     return this.stockHandler!.batchUpdateStock(stockUpdates, existingMappings);
+  }
+
+  // --- Variation Operations ---
+  public groupProductsByParent(
+    products: CanonicalProduct[]
+  ): Map<string, ParentProductGroup> {
+    return this.variationHandler
+      ? this.variationHandler.groupProductsByParent(products)
+      : groupProductsByParent(products);
+  }
+
+  public toWooCommerceVariationPayload(canonical: CanonicalProduct): Record<string, unknown> {
+    return this.variationHandler
+      ? this.variationHandler.toWooCommerceVariationPayload(canonical)
+      : toWooCommerceVariationPayload(canonical);
+  }
+
+  public async syncVariationStock(
+    productId: number,
+    variationId: number,
+    stockQuantity: number
+  ): Promise<boolean> {
+    this.ensureConnected();
+    return this.variationHandler!.syncVariationStock(productId, variationId, stockQuantity);
+  }
+
+  public async createVariation(
+    productId: number,
+    canonical: CanonicalProduct
+  ): Promise<Record<string, unknown>> {
+    this.ensureConnected();
+    return this.variationHandler!.createVariation(productId, canonical);
+  }
+
+  public async readVariations(
+    productId: number
+  ): Promise<Array<Record<string, unknown>>> {
+    this.ensureConnected();
+    return this.variationHandler!.readVariations(productId);
+  }
+
+  public getVariationHandler(): WooCommerceVariationHandler | null {
+    return this.variationHandler;
   }
 
   private ensureConnected(): void {

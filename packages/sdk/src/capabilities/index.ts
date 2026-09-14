@@ -9,6 +9,7 @@ export interface ConnectorCapabilities {
   supportsWriteCustomers: boolean;
   supportsWebhooks: boolean;
   supportsBatchOperations: boolean;
+  supportsVariations?: boolean;
 }
 
 export const DEFAULT_CAPABILITIES: ConnectorCapabilities = {
@@ -22,4 +23,5 @@ export const DEFAULT_CAPABILITIES: ConnectorCapabilities = {
   supportsWriteCustomers: false,
   supportsWebhooks: false,
   supportsBatchOperations: false,
+  supportsVariations: false,
 };
