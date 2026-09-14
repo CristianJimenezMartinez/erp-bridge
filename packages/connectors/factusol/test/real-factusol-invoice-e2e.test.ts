@@ -106,12 +106,19 @@ async function runRealInvoiceTests() {
   console.log('✓ Estado de factura actualizado a paid (ESTFAC = 2)');
 
   // 5. Clean up test record in Access
-  console.log('5. Limpiando registros de prueba en F_FAC, F_LFA...');
+  console.log('5. Limpiando registros de prueba en F_FAC, F_LFA, F_COB, F_LCO...');
   const driver = (connector as any).driver;
   if (driver) {
+    const cobRows = await driver.query(`SELECT MULLCO FROM F_LCO WHERE TFALCO = '1' AND CFALCO = ${createdCodfac}`).catch(() => []);
     await driver.execute(`DELETE FROM F_FAC WHERE TIPFAC = '1' AND CODFAC = ${createdCodfac}`);
     await driver.execute(`DELETE FROM F_LFA WHERE TIPLFA = '1' AND CODLFA = ${createdCodfac}`);
-    console.log('✓ Limpieza de factura de prueba completada con éxito.');
+    await driver.execute(`DELETE FROM F_LCO WHERE TFALCO = '1' AND CFALCO = ${createdCodfac}`);
+    for (const cob of cobRows) {
+      if (cob.MULLCO) {
+        await driver.execute(`DELETE FROM F_COB WHERE CODCOB = ${cob.MULLCO}`).catch(() => {});
+      }
+    }
+    console.log('✓ Limpieza de factura y cobro de prueba completada con éxito.');
   }
 
   await connector.disconnect();

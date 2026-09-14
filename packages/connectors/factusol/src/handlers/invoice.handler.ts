@@ -10,6 +10,13 @@ import {
   SELECT_INVOICES_HEADER_QUERY,
   SELECT_INVOICE_LINES_QUERY,
   insertInvoiceHeaderQuery,
+  getNextPaymentIdQuery,
+  insertPaymentRecordQuery,
+  insertInvoicePaymentLineQuery,
+  selectPaymentsByInvoiceQuery,
+  deletePaymentByIdQuery,
+  deleteInvoicePaymentLinesQuery,
+  PaymentRecordParams,
 } from '../queries';
 import { FactusolInvoiceMapper } from '../mappers';
 import { FactusolConnectionConfig } from '../factusol.connector';
@@ -101,7 +108,32 @@ export class FactusolInvoiceHandler {
             )
           `.trim());
 
-          await this.driver.executeTransaction([headerSql, ...lineSqls]);
+          const txStatements: string[] = [headerSql, ...lineSqls];
+
+          // 3. Si la factura viene con status === 'paid' y recordPayments !== false, registrar cobro en F_COB y F_LCO
+          const shouldRecordPayment = invoice.status === 'paid' && this.config.recordPayments !== false;
+          if (shouldRecordPayment) {
+            const maxPaymentRows = await this.driver.query<{ maxid: number }>(getNextPaymentIdQuery(series));
+            const maxPayment = Number(maxPaymentRows[0]?.maxid) || 0;
+            const nextPaymentId = maxPayment + 1;
+
+            const paymentParams: PaymentRecordParams = {
+              id: nextPaymentId,
+              series,
+              invoiceNumber: nextInvoiceId,
+              date: invoice.issueDate || new Date(),
+              amount: invoice.totalAmount,
+              paymentMethod: header.fopfac,
+              customerCode: header.clifac,
+              status: 2,
+            };
+
+            const paymentSql = insertPaymentRecordQuery(paymentParams);
+            const paymentLineSql = insertInvoicePaymentLineQuery(paymentParams);
+            txStatements.push(paymentSql, paymentLineSql);
+          }
+
+          await this.driver.executeTransaction(txStatements);
 
           finalInvoiceId = nextInvoiceId;
           invoiceCreated = true;
@@ -127,7 +159,7 @@ export class FactusolInvoiceHandler {
         externalId: String(finalInvoiceId),
         invoiceNumber: String(finalInvoiceId),
         series,
-        status: 'issued',
+        status: invoice.status || 'issued',
       };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
@@ -154,8 +186,63 @@ export class FactusolInvoiceHandler {
     const statusCode = FactusolInvoiceMapper.mapCanonicalStatusToFactusol(status as any);
 
     const updateSql = `UPDATE F_FAC SET ESTFAC = ${statusCode} WHERE TIPFAC = '${series}' AND CODFAC = ${invoiceNum}`;
+    const txStatements: string[] = [updateSql];
 
-    await this.driver.execute(updateSql);
+    const shouldRecordPayment = status === 'paid' && this.config.recordPayments !== false;
+
+    if (shouldRecordPayment) {
+      // Comprobar si ya existe cobro registrado para esta factura
+      const existingCob = await this.driver.query<{ MULLCO: number }>(
+        selectPaymentsByInvoiceQuery(series, invoiceNum)
+      ).catch(() => []);
+
+      if (existingCob.length === 0) {
+        const facRows = await this.driver.query<{
+          TOTFAC: number;
+          CLIFAC: number;
+          FOPFAC: string;
+          FECFAC: string;
+        }>(`SELECT TOTFAC, CLIFAC, FOPFAC, FECFAC FROM F_FAC WHERE TIPFAC = '${series}' AND CODFAC = ${invoiceNum}`).catch(() => []);
+
+        if (facRows.length > 0) {
+          const fac = facRows[0]!;
+          const maxPaymentRows = await this.driver.query<{ maxid: number }>(getNextPaymentIdQuery(series));
+          const maxPayment = Number(maxPaymentRows[0]?.maxid) || 0;
+          const nextPaymentId = maxPayment + 1;
+
+          const paymentParams: PaymentRecordParams = {
+            id: nextPaymentId,
+            series,
+            invoiceNumber: invoiceNum,
+            date: fac.FECFAC ? new Date(fac.FECFAC) : new Date(),
+            amount: Number(fac.TOTFAC) || 0,
+            paymentMethod: fac.FOPFAC || 'TAR',
+            customerCode: Number(fac.CLIFAC) || 1,
+            status: 2,
+          };
+
+          const paymentSql = insertPaymentRecordQuery(paymentParams);
+          const paymentLineSql = insertInvoicePaymentLineQuery(paymentParams);
+          txStatements.push(paymentSql, paymentLineSql);
+        }
+      }
+    } else if (status !== 'paid') {
+      // Mantener integridad: si la factura deja de estar pagada, revertir apuntes de cobro asociados
+      const existingCob = await this.driver.query<{ MULLCO: number }>(
+        selectPaymentsByInvoiceQuery(series, invoiceNum)
+      ).catch(() => []);
+
+      if (existingCob.length > 0) {
+        txStatements.push(deleteInvoicePaymentLinesQuery(series, invoiceNum));
+        for (const cob of existingCob) {
+          if (cob.MULLCO) {
+            txStatements.push(deletePaymentByIdQuery(cob.MULLCO));
+          }
+        }
+      }
+    }
+
+    await this.driver.executeTransaction(txStatements);
     this.logger.info(`Estado de factura actualizado en Factusol: CODFAC=${invoiceNum}, ESTFAC=${statusCode} (${status})`);
 
     return {

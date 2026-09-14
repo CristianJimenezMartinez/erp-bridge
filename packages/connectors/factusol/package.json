@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "ts-node test/year-resolver.test.ts && ts-node test/factusol-mapper.test.ts && ts-node test/factusol-order-mapper.test.ts && ts-node test/factusol-stock.test.ts && ts-node test/factusol-invoice-mapper.test.ts && ts-node test/real-factusol-e2e.test.ts && ts-node test/real-factusol-order-e2e.test.ts && ts-node test/real-factusol-stock-e2e.test.ts && ts-node test/real-factusol-invoice-e2e.test.ts"
+    "test": "ts-node test/year-resolver.test.ts && ts-node test/factusol-mapper.test.ts && ts-node test/factusol-order-mapper.test.ts && ts-node test/factusol-stock.test.ts && ts-node test/factusol-invoice-mapper.test.ts && ts-node test/factusol-payment.test.ts && ts-node test/real-factusol-e2e.test.ts && ts-node test/real-factusol-order-e2e.test.ts && ts-node test/real-factusol-stock-e2e.test.ts && ts-node test/real-factusol-invoice-e2e.test.ts"
   },
   "dependencies": {
     "@erp-bridge/sdk": "workspace:*",

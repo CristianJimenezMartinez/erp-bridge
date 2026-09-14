@@ -45,6 +45,7 @@ export interface FactusolConnectionConfig {
   invoiceSeries?: string;
   defaultWarehouse?: string;
   autoRollover?: boolean;
+  recordPayments?: boolean;
 }
 
 export class FactusolConnector implements Connector {
