@@ -62,6 +62,28 @@ async function testGuiServer() {
     assert.strictEqual(resUpdate.status, 200, 'GET /api/local/check-update debe responder 200 OK');
     console.log('  ✓ GET /api/local/check-update respondió 200 OK.');
 
+    // 7. Test GET /api/local/autostart
+    console.log('7. Probando GET /api/local/autostart...');
+    const resAutoStartGet = await fetch(`${url}/api/local/autostart`);
+    assert.strictEqual(resAutoStartGet.status, 200, 'GET /api/local/autostart debe responder 200 OK');
+    const autostartGetJson = await resAutoStartGet.json() as any;
+    assert.strictEqual(autostartGetJson.success, true);
+    assert.strictEqual(typeof autostartGetJson.enabled, 'boolean');
+    console.log(`  ✓ GET /api/local/autostart respondió 200 OK (enabled: ${autostartGetJson.enabled}).`);
+
+    // 8. Test POST /api/local/autostart
+    console.log('8. Probando POST /api/local/autostart...');
+    const resAutoStartPost = await fetch(`${url}/api/local/autostart`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: autostartGetJson.enabled }),
+    });
+    assert.strictEqual(resAutoStartPost.status, 200, 'POST /api/local/autostart debe responder 200 OK');
+    const autostartPostJson = await resAutoStartPost.json() as any;
+    assert.strictEqual(typeof autostartPostJson.success, 'boolean');
+    assert.strictEqual(typeof autostartPostJson.enabled, 'boolean');
+    console.log('  ✓ POST /api/local/autostart respondió 200 OK.');
+
   } finally {
     await server.stop();
     console.log('✓ LocalGuiServer detenido limpiamente.');

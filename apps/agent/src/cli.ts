@@ -240,10 +240,28 @@ async function main() {
       return;
     }
 
+    case 'autostart': {
+      const sub = (args[1] || 'status').toLowerCase();
+      const agent = new LocalAgent();
+      if (sub === 'enable' || sub === 'on') {
+        const ok = await agent.setAutoStart(true);
+        console.log(ok ? '✓ Arranque automático con Windows activado.' : '❌ No se pudo activar el arranque automático.');
+      } else if (sub === 'disable' || sub === 'off') {
+        const ok = await agent.setAutoStart(false);
+        console.log(ok ? '✓ Arranque automático con Windows desactivado.' : '❌ No se pudo desactivar el arranque automático.');
+      } else {
+        const enabled = await agent.isAutoStartEnabled();
+        console.log(`Arranque automático con Windows: ${enabled ? 'ACTIVADO' : 'DESACTIVADO'}`);
+      }
+      process.exit(0);
+      break;
+    }
+
     case 'gui':
     case 'start':
     default: {
       const isHeadless = args.includes('--headless') || process.env['HEADLESS'] === 'true';
+      const isMinimized = args.includes('--minimized') || process.argv.includes('--minimized');
 
       // Si no es headless, comprobar si ya existe una instancia en ejecución en el puerto por defecto (39281)
       if (!isHeadless) {
@@ -269,7 +287,9 @@ async function main() {
         guiServer = new LocalGuiServer(agent);
         const { port, url } = await guiServer.start();
         console.log(`\n🖥️ Interfaz gráfica de escritorio lista en: ${url}`);
-        openDesktopWindow(url);
+        if (!isMinimized) {
+          openDesktopWindow(url);
+        }
 
         // Iniciar icono permanente en la bandeja del sistema (System Tray de Windows)
         if (process.platform === 'win32') {

@@ -34,6 +34,7 @@ import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './l
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
+import { AutoStartService } from './system';
 
 // Re-exportar tipos para 100% de compatibilidad externa
 export * from './config';
@@ -44,6 +45,7 @@ export * from './factusol';
 export * from './channels';
 export * from './sync';
 export * from './update';
+export * from './system';
 
 export class LocalAgent {
   private readonly logger = new Logger('LocalAgent');
@@ -58,6 +60,7 @@ export class LocalAgent {
   public readonly syncEngine: LocalSyncEngine;
   public readonly autoUpdater: AutoUpdater;
   public readonly updateClient: UpdateClient;
+  public readonly autoStartService: AutoStartService;
 
   private isRunning = false;
   private isUpdating = false;
@@ -71,6 +74,7 @@ export class LocalAgent {
     this.factusolService = new FactusolService(this.configManager, this.eventBus);
     this.fileWatcherService = new FileWatcherService();
     this.syncEngine = new LocalSyncEngine(this.configManager, this.factusolService, this.historyManager, this.eventBus);
+    this.autoStartService = new AutoStartService();
 
     const cfg = this.configManager.get();
     const updateOptions: UpdateOptions = {
@@ -559,6 +563,19 @@ export class LocalAgent {
     } catch (err) {
       this.logger.warn(`Aviso en comprobación inicial de actualizaciones: ${String(err)}`);
     }
+  }
+
+  // --- Métodos de Arranque Automático (Windows) ---
+  public async isAutoStartEnabled(): Promise<boolean> {
+    return this.autoStartService.isEnabled();
+  }
+
+  public async setAutoStart(enabled: boolean): Promise<boolean> {
+    const success = enabled ? await this.autoStartService.enable() : await this.autoStartService.disable();
+    if (success) {
+      this.addEvent('info', enabled ? '✓ Arranque automático con Windows activado' : 'Arranque automático con Windows desactivado');
+    }
+    return success;
   }
 
   public async stop(): Promise<void> {

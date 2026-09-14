@@ -100,6 +100,40 @@ export class SystemController {
     };
   }
 
+  public static getAutoStart(agent: LocalAgent): RouteHandler {
+    return async (_req, res) => {
+      try {
+        const enabled = await agent.isAutoStartEnabled();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, enabled }));
+      } catch (err) {
+        logger.error(`Error consultando estado de auto-start: ${String(err)}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, enabled: false, message: String(err) }));
+      }
+    };
+  }
+
+  public static setAutoStart(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      try {
+        const enabled = Boolean(ctx.body?.enabled);
+        const success = await agent.setAutoStart(enabled);
+        const currentStatus = await agent.isAutoStartEnabled();
+        const message = success
+          ? `Arranque automático ${enabled ? 'habilitado' : 'deshabilitado'} con éxito.`
+          : `No se pudo ${enabled ? 'habilitar' : 'deshabilitar'} el arranque automático.`;
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success, enabled: currentStatus, message }));
+      } catch (err) {
+        logger.error(`Error actualizando auto-start: ${String(err)}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, enabled: false, message: String(err) }));
+      }
+    };
+  }
+
   public static shutdown(agent: LocalAgent, stopServer: () => Promise<void>): RouteHandler {
     return (_req, res) => {
       logger.info('Solicitud de apagado del agente recibida.');

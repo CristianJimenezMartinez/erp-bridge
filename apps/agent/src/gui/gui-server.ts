@@ -60,6 +60,8 @@ export class LocalGuiServer {
     router.post('/api/local/activate-license', LicenseController.activateLicense(this.agent));
 
     // 7. System & Config
+    router.get('/api/local/autostart', SystemController.getAutoStart(this.agent));
+    router.post('/api/local/autostart', SystemController.setAutoStart(this.agent));
     router.post('/api/local/save-full-config', SystemController.saveFullConfig(this.agent));
     router.post('/api/local/save-config', SystemController.saveConfig(this.agent));
     router.any(['GET', 'POST'], '/api/local/check-update', SystemController.checkUpdate(this.agent));
