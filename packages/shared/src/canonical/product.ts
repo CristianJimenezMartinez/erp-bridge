@@ -54,6 +54,8 @@ export const CanonicalProductSchema = z.object({
   status: ProductStatusSchema.default('published'),
   categories: z.array(CanonicalCategorySchema).default([]),
   barcode: z.string().optional(),
+  barcodes: z.array(z.string()).optional(),
+  taxRate: z.number().optional(),
   weight: z.number().optional(),
   dimensions: CanonicalDimensionsSchema.optional(),
   images: z.array(CanonicalImageSchema).default([]),

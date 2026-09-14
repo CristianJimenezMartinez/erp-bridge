@@ -26,4 +26,18 @@ export class FactusolStockMapper {
       rawSourceData: raw as unknown as Record<string, unknown>,
     };
   }
+
+  public static toFactusolStock(stock: CanonicalStock): FactusolStockRaw {
+    return {
+      ARTSTO: stock.sku,
+      ALMSTO: stock.warehouse || 'GEN',
+      ACTSTO: stock.quantity,
+      DISSTO: stock.availableQuantity !== undefined && stock.availableQuantity !== null ? stock.availableQuantity : stock.quantity,
+      MINSTO: stock.minStock,
+    };
+  }
 }
+
+export const mapFactusolStockToCanonical = FactusolStockMapper.toCanonicalStock;
+export const mapCanonicalStockToFactusol = FactusolStockMapper.toFactusolStock;
+

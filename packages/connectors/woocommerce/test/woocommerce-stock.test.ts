@@ -30,4 +30,31 @@ const zeroPayload = WooCommerceStockMapper.mapToPayload(zeroStock, 988);
 assert.strictEqual(zeroPayload.stock_quantity, 0);
 assert.strictEqual(zeroPayload.in_stock, false);
 
+// Test overselling prevention: availableQuantity takes precedence over physical quantity
+const oversellProtectedStock: CanonicalStock = {
+  sku: '000003',
+  quantity: 50, // Physical stock (ACTSTO)
+  availableQuantity: 12, // Available stock after reservations (DISSTO)
+  warehouse: 'GEN',
+  lastUpdated: new Date(),
+};
+
+const protectedPayload = WooCommerceStockMapper.mapToPayload(oversellProtectedStock, 989);
+assert.strictEqual(protectedPayload.stock_quantity, 12, 'Must use availableQuantity to prevent overselling');
+assert.strictEqual(protectedPayload.in_stock, true);
+
+// Test negative available stock clamped to 0
+const negativeStock: CanonicalStock = {
+  sku: '000004',
+  quantity: 5,
+  availableQuantity: -3, // Oversold in ERP
+  warehouse: 'GEN',
+  lastUpdated: new Date(),
+};
+
+const negativePayload = WooCommerceStockMapper.mapToPayload(negativeStock, 990);
+assert.strictEqual(negativePayload.stock_quantity, 0, 'Negative stock must be clamped to 0');
+assert.strictEqual(negativePayload.in_stock, false);
+
 console.log('✓ WooCommerce Stock Mapper Tests Passed');
+

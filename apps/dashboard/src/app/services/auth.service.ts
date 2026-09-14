@@ -68,8 +68,9 @@ export class AuthService {
 
     try {
       const parts = token.split('.');
-      if (parts.length !== 3) return false;
-      const payload = JSON.parse(atob(parts[1]));
+      const payloadPart = parts[1];
+      if (parts.length !== 3 || !payloadPart) return false;
+      const payload = JSON.parse(atob(payloadPart));
       if (payload.exp && Date.now() >= payload.exp) {
         this.logout();
         return false;

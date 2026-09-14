@@ -4,12 +4,37 @@ import {
   FactusolRawFamily,
   FactusolRawPrice,
   FactusolRawStock,
+  FactusolRawBarcode,
 } from '../queries';
+export {
+  FactusolStockRaw,
+  FactusolStockMapper,
+  mapFactusolStockToCanonical,
+  mapCanonicalStockToFactusol,
+} from './stock.mapper';
 
 export interface FactusolEnrichmentData {
   stockMap?: Map<string, number>;
+  actualStockMap?: Map<string, number>;
   priceMap?: Map<string, number>;
   familyMap?: Map<string, string>;
+  barcodeMap?: Map<string, string[]>;
+}
+
+export function mapTivartToTaxRate(tivart?: number | string | null): number {
+  const code = Number(tivart);
+  switch (code) {
+    case 0:
+      return 21.0;
+    case 1:
+      return 10.0;
+    case 2:
+      return 4.0;
+    case 3:
+      return 0.0;
+    default:
+      return 21.0;
+  }
 }
 
 export function mapFactusolArticleToCanonical(
@@ -30,7 +55,7 @@ export function mapFactusolArticleToCanonical(
     }
   }
 
-  // Retrieve stock quantity
+  // Retrieve stock quantity (available quantity DISSTO preferred to prevent overselling)
   let stockQuantity = 0;
   if (enrichment?.stockMap && enrichment.stockMap.has(code)) {
     stockQuantity = enrichment.stockMap.get(code) || 0;
@@ -53,8 +78,17 @@ export function mapFactusolArticleToCanonical(
   const isWebActive = suwartStr === '1' || suwartStr === 'S' || suwartStr === 'True' || suwartStr === '-1';
   const status = isWebActive ? 'published' : 'draft';
 
-  const barcodeStr = String(raw.EANART ?? '').trim();
-  const barcode = barcodeStr ? barcodeStr : undefined;
+  // Barcodes: merge principal EANART with F_EAN auxiliary barcodes
+  const mainBarcode = String(raw.EANART ?? '').trim();
+  const auxBarcodes = enrichment?.barcodeMap?.get(code) || [];
+  const allBarcodes = [mainBarcode, ...auxBarcodes].map((b) => String(b).trim()).filter(Boolean);
+  const uniqueBarcodes = Array.from(new Set(allBarcodes));
+  const barcode = uniqueBarcodes[0] || undefined;
+  const barcodes = uniqueBarcodes;
+
+  // Tax rate from TIVART (0=21%, 1=10%, 2=4%, 3=0%)
+  const taxRate = mapTivartToTaxRate(raw.TIVART);
+
   const weight = typeof raw.PESART === 'number' && raw.PESART > 0 ? raw.PESART : undefined;
   const imgStr = String(raw.IMGART ?? '').trim();
 
@@ -72,11 +106,16 @@ export function mapFactusolArticleToCanonical(
     status,
     categories,
     barcode,
+    barcodes,
+    taxRate,
     weight,
     images: imgStr ? [{ url: imgStr, alt: name }] : [],
     attributes: {
       unit: String(raw.DESUME ?? raw.UMEART ?? raw.UUMART ?? '').trim(),
       familyCode,
+      taxRate: String(taxRate),
+      tivart: String(raw.TIVART ?? 0),
+      stoart: String(raw.STOART ?? ''),
       cp1: raw.CP1ART ? String(raw.CP1ART).trim() : undefined,
       cp2: raw.CP2ART ? String(raw.CP2ART).trim() : undefined,
       cp3: raw.CP3ART ? String(raw.CP3ART).trim() : undefined,
@@ -94,7 +133,32 @@ export function buildStockMap(stocks: FactusolRawStock[]): Map<string, number> {
     const code = String(s.ARTSTO ?? '').trim();
     if (!code) continue;
     const current = map.get(code) || 0;
+    // Map available quantity (DISSTO) if present, fallback to actual (ACTSTO)
+    const qty = typeof s.DISSTO === 'number' ? s.DISSTO : (typeof s.ACTSTO === 'number' ? s.ACTSTO : Number(s.DISSTO ?? s.ACTSTO) || 0);
+    map.set(code, current + qty);
+  }
+  return map;
+}
+
+export function buildActualStockMap(stocks: FactusolRawStock[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const s of stocks) {
+    const code = String(s.ARTSTO ?? '').trim();
+    if (!code) continue;
+    const current = map.get(code) || 0;
     const qty = typeof s.ACTSTO === 'number' ? s.ACTSTO : Number(s.ACTSTO) || 0;
+    map.set(code, current + qty);
+  }
+  return map;
+}
+
+export function buildAvailableStockMap(stocks: FactusolRawStock[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const s of stocks) {
+    const code = String(s.ARTSTO ?? '').trim();
+    if (!code) continue;
+    const current = map.get(code) || 0;
+    const qty = typeof s.DISSTO === 'number' ? s.DISSTO : Number(s.DISSTO) || 0;
     map.set(code, current + qty);
   }
   return map;
@@ -121,3 +185,19 @@ export function buildFamilyMap(families: FactusolRawFamily[]): Map<string, strin
   }
   return map;
 }
+
+export function buildBarcodeMap(barcodes: FactusolRawBarcode[]): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const b of barcodes) {
+    const code = String(b.ARTEAN ?? '').trim();
+    const barcode = String(b.EANEAN ?? '').trim();
+    if (!code || !barcode) continue;
+    const list = map.get(code) || [];
+    if (!list.includes(barcode)) {
+      list.push(barcode);
+    }
+    map.set(code, list);
+  }
+  return map;
+}
+

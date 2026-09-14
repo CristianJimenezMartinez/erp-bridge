@@ -10,7 +10,9 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
