@@ -68,7 +68,7 @@ export class FactusolCustomerHandler {
     shipAddr: any,
     fallbackRecipientName?: string
   ): Promise<void> {
-    if (!shipAddr || !shipAddr.street || customerCode <= 0) return;
+    if (!shipAddr || !shipAddr.street || customerCode <= 1) return;
 
     const street = shipAddr.street.trim();
     const postalCode = (shipAddr.postalCode || '').trim();
@@ -94,10 +94,12 @@ export class FactusolCustomerHandler {
           recipientName
         );
         await this.driver.execute(insertDirSql);
-        this.logger.info(`Dirección de entrega alternativa creada en F_DCL (CODDCL=${nextDirCode}) para cliente ${customerCode}`);
+        this.logger.info(`Dirección de entrega alternativa creada en F_OBR (CODOBR=${nextDirCode}) para cliente ${customerCode}`);
       }
     } catch (addrErr) {
-      this.logger.warn(`Aviso al gestionar dirección alternativa F_DCL: ${addrErr instanceof Error ? addrErr.message : String(addrErr)}`);
+      this.logger.warn(`Aviso al gestionar dirección alternativa F_OBR: ${addrErr instanceof Error ? addrErr.message : String(addrErr)}`);
     }
   }
 }
+
+

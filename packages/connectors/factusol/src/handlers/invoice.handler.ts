@@ -9,6 +9,7 @@ import { AccessDriver } from '../access-driver';
 import {
   SELECT_INVOICES_HEADER_QUERY,
   SELECT_INVOICE_LINES_QUERY,
+  insertInvoiceHeaderQuery,
 } from '../queries';
 import { FactusolInvoiceMapper } from '../mappers';
 import { FactusolConnectionConfig } from '../factusol.connector';
@@ -83,37 +84,7 @@ export class FactusolInvoiceHandler {
           const header = FactusolInvoiceMapper.toFactusolHeader(invoice, nextInvoiceId, this.config.defaultWarehouse);
           const lines = FactusolInvoiceMapper.toFactusolLines(invoice, nextInvoiceId);
 
-          const headerSql = `
-            INSERT INTO F_FAC (
-              TIPFAC, CODFAC, REFFAC, FECFAC, ESTFAC, ALMFAC, AGEFAC, CLIFAC,
-              CNOFAC, CDOFAC, CPOFAC, CCPFAC, CPRFAC, TELFAC, CEMFAC, CPAFAC,
-              PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC, IIVA1FAC, NET1FAC, TOTFAC
-            ) VALUES (
-              '${header.tipfac}',
-              ${header.codfac},
-              '${header.reffac.replace(/'/g, "''")}',
-              ${header.fecfac},
-              ${header.estfac},
-              '${header.almfac}',
-              ${header.agefac ? header.agefac : 0},
-              ${header.clifac},
-              '${header.cnofac.replace(/'/g, "''")}',
-              ${header.cdofac ? `'${header.cdofac.replace(/'/g, "''")}'` : "''"},
-              ${header.cpofac ? `'${header.cpofac.replace(/'/g, "''")}'` : "''"},
-              ${header.ccpfac ? `'${header.ccpfac.replace(/'/g, "''")}'` : "''"},
-              ${header.cprfac ? `'${header.cprfac.replace(/'/g, "''")}'` : "''"},
-              ${header.telfac ? `'${header.telfac.replace(/'/g, "''")}'` : "''"},
-              ${header.cemfac ? `'${header.cemfac.replace(/'/g, "''")}'` : "''"},
-              ${header.cpafac ? `'${header.cpafac.replace(/'/g, "''")}'` : "''"},
-              ${header.piva1fac},
-              ${header.piva2fac},
-              ${header.piva3fac},
-              ${header.ipor1fac},
-              ${header.iiva1fac},
-              ${header.net1fac},
-              ${header.totfac}
-            )
-          `.trim();
+          const headerSql = insertInvoiceHeaderQuery(header);
 
           const lineSqls = lines.map((line) => `
             INSERT INTO F_LFA (

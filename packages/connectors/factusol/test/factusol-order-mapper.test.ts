@@ -4,7 +4,7 @@ import {
   insertCustomerQuery,
   insertOrderHeaderQuery,
   insertOrderLineQuery,
-} from '../src/queries/order.queries';
+} from '../src/queries';
 import { CanonicalOrder } from '@erp-bridge/shared';
 
 console.log('--- Running Factusol Order Mapper Tests ---');
@@ -71,16 +71,198 @@ const customerSql = insertCustomerQuery(canonicalCust, 105);
 assert(customerSql.includes('INSERT INTO F_CLI'));
 assert(customerSql.includes('105'));
 assert(customerSql.includes('FONTANERIA GOMEZ SL'));
+assert(customerSql.includes('PAICLI'), 'Query must include PAICLI column');
+assert(customerSql.includes("'724'"), 'PAICLI must be 724 for Spain');
+assert(customerSql.includes('IVACLI'), 'Query must include IVACLI column');
+assert(customerSql.includes('FPACLI'), 'Query must include FPACLI column');
+assert(customerSql.includes("'TRF'"), 'Default payment method must be TRF');
+assert(customerSql.includes('ESTCLI'), 'Query must include ESTCLI column');
+
+// Test customer with equivalence surcharge
+const surchargeCust = { ...canonicalCust, hasEquivalenceSurcharge: true };
+const surchargeCustSql = insertCustomerQuery(surchargeCust, 106);
+assert(surchargeCustSql.includes('REQCLI'));
 
 const headerSql = insertOrderHeaderQuery(sampleOrder, 9901, 105);
 assert(headerSql.includes('INSERT INTO F_PCL'));
 assert(headerSql.includes("'1'"));
 assert(headerSql.includes('9901'));
 assert(headerSql.includes("'WC-9901'"));
+assert(headerSql.includes("'724'"), 'Header must include country code 724');
+assert(headerSql.includes('USUPCL'), 'Header must include USUPCL');
+assert(headerSql.includes('HORPCL'), 'Header must include HORPCL');
+assert(headerSql.includes('NET1PCL'), 'Header must include NET1PCL');
+assert(headerSql.includes('BAS1PCL'), 'Header must include BAS1PCL');
+assert(headerSql.includes('NET2PCL'), 'Header must include NET2PCL');
+assert(headerSql.includes('NET3PCL'), 'Header must include NET3PCL');
+assert(headerSql.includes('NET4PCL'), 'Header must include NET4PCL');
 
 const lineSql = insertOrderLineQuery(sampleOrder.lines[0]!, 9901, '1');
 assert(lineSql.includes('INSERT INTO F_LPC'));
 assert(lineSql.includes('9901'));
 assert(lineSql.includes("'000001'"));
+assert(lineSql.includes('PENLPC'), 'Line SQL must include PENLPC');
+assert(!lineSql.includes('ALMLPC'), 'F_LPC must NOT include ALMLPC');
+assert(!lineSql.includes('REQLPC'), 'F_LPC must NOT include REQLPC');
+
+// 4. Multi-tramo VAT breakdown test
+import {
+  calculateOrderVatBreakdown,
+  determineTivpcl,
+  decrementStockQuery,
+  insertDeliveryAddressQuery,
+} from '../src/queries';
+
+const multiVatOrder: CanonicalOrder = {
+  id: 'multi_vat',
+  orderNumber: '8801',
+  date: new Date('2026-09-14'),
+  status: 'pending',
+  customer: {
+    id: 'c1',
+    fiscalName: 'EMPRESA SL',
+    hasEquivalenceSurcharge: true,
+  },
+  lines: [
+    {
+      id: 'l1',
+      position: 1,
+      sku: 'SKU21',
+      name: 'Item 21%',
+      quantity: 2,
+      unitPrice: 10, // net = 20.00
+      vatRate: 21,
+      subtotal: 20,
+      total: 20,
+    },
+    {
+      id: 'l2',
+      position: 2,
+      sku: 'SKU10',
+      name: 'Item 10%',
+      quantity: 1,
+      unitPrice: 30, // net = 30.00
+      vatRate: 10,
+      subtotal: 30,
+      total: 30,
+    },
+    {
+      id: 'l3',
+      position: 3,
+      sku: 'SKU04',
+      name: 'Item 4%',
+      quantity: 5,
+      unitPrice: 2, // net = 10.00
+      vatRate: 4,
+      subtotal: 10,
+      total: 10,
+    },
+    {
+      id: 'l4',
+      position: 4,
+      sku: 'SKU00',
+      name: 'Item Exento',
+      quantity: 1,
+      unitPrice: 15, // net = 15.00
+      vatRate: 0,
+      subtotal: 15,
+      total: 15,
+    },
+  ],
+  shippingAmount: 5.0,
+  totalAmount: 90.42, // Exact total with RE
+  currency: 'EUR',
+};
+
+const breakdown = calculateOrderVatBreakdown(multiVatOrder);
+assert.strictEqual(breakdown.net1, 20.0);
+assert.strictEqual(breakdown.shipping, 5.0);
+assert.strictEqual(breakdown.bas1, 25.0, 'Identidad algebraica: BAS1 = NET1 + IPOR1');
+assert.strictEqual(breakdown.piva1, 21.0);
+assert.strictEqual(breakdown.iiva1, 5.25); // 25 * 0.21
+assert.strictEqual(breakdown.prec1, 5.2);
+assert.strictEqual(breakdown.irec1, 1.3); // 25 * 0.052
+
+assert.strictEqual(breakdown.net2, 30.0);
+assert.strictEqual(breakdown.bas2, 30.0);
+assert.strictEqual(breakdown.piva2, 10.0);
+assert.strictEqual(breakdown.iiva2, 3.0); // 30 * 0.10
+assert.strictEqual(breakdown.prec2, 1.4);
+assert.strictEqual(breakdown.irec2, 0.42); // 30 * 0.014
+
+assert.strictEqual(breakdown.net3, 10.0);
+assert.strictEqual(breakdown.bas3, 10.0);
+assert.strictEqual(breakdown.piva3, 4.0);
+assert.strictEqual(breakdown.iiva3, 0.4); // 10 * 0.04
+assert.strictEqual(breakdown.prec3, 0.5);
+assert.strictEqual(breakdown.irec3, 0.05); // 10 * 0.005
+
+assert.strictEqual(breakdown.net4, 15.0);
+assert.strictEqual(breakdown.bas4, 15.0);
+
+// 5. Cent Rounding (Ajuste del céntimo ±0.01)
+const orderWithCentDiff: CanonicalOrder = {
+  ...multiVatOrder,
+  totalAmount: 90.43, // Differs by +0.01 from 90.42
+};
+const centBreakdown = calculateOrderVatBreakdown(orderWithCentDiff);
+assert.strictEqual(centBreakdown.total, 90.43, 'Total must match target exactly');
+assert.strictEqual(centBreakdown.shipping, 5.01, 'Diff of 0.01 compensated in shipping');
+assert.strictEqual(centBreakdown.bas1, 25.01, 'BAS1 = NET1 + shipping adjusted');
+
+// 6. TIVPCL determination tests
+// Nacional
+assert.strictEqual(determineTivpcl({ ...sampleOrder, shippingAddress: { postalCode: '28001', country: 'ES' } }), 0);
+// Canarias
+assert.strictEqual(determineTivpcl({ ...sampleOrder, shippingAddress: { postalCode: '35001', country: 'ES' } }), 3);
+// Ceuta
+assert.strictEqual(determineTivpcl({ ...sampleOrder, shippingAddress: { postalCode: '51001', country: 'ES' } }), 3);
+// Melilla
+assert.strictEqual(determineTivpcl({ ...sampleOrder, shippingAddress: { postalCode: '52001', country: 'ES' } }), 3);
+// UE B2B con VIES
+assert.strictEqual(
+  determineTivpcl({
+    ...sampleOrder,
+    customer: { ...canonicalCust, taxId: 'FR123456789' },
+    shippingAddress: { postalCode: '75001', country: 'FR' },
+  }),
+  2
+);
+// Exportación terceros países
+assert.strictEqual(determineTivpcl({ ...sampleOrder, shippingAddress: { postalCode: '90210', country: 'US' } }), 3);
+
+// 7. PENLPC, PIVLPC, TIVLPC, IVALPC and memo long description test
+const lineLongDesc = {
+  id: 'ln_long',
+  position: 1,
+  sku: 'VERYLONGSKU001',
+  name: 'Nombre muy largo que supera los 50 caracteres para comprobar que se trunca correctamente en DESLPC',
+  quantity: 5,
+  unitPrice: 10,
+  vatRate: 21,
+  subtotal: 50,
+  total: 50,
+};
+const longLineSql = insertOrderLineQuery(lineLongDesc, 8801, '1');
+// ARTLPC truncado a 13
+assert(longLineSql.includes("'VERYLONGSKU00'"));
+// PENLPC = CANLPC = 5.00
+assert(longLineSql.includes('5.00'));
+// IVALPC = 0 (21%) and MEMLPC contains full description
+const normLineSql = longLineSql.replace(/\s+/g, ' ');
+assert(normLineSql.includes(", 0, 'Nombre muy largo"));
+// PIVLPC = 10 * 1.21 = 12.1000
+assert(longLineSql.includes('12.1000'));
+// TIVLPC = 50 * 1.21 = 60.50
+assert(longLineSql.includes('60.50'));
+
+// 8. Stock decrement query test
+const stockDecSql = decrementStockQuery('000001', 'GEN', 3);
+assert.strictEqual(stockDecSql, "UPDATE F_STO SET DISSTO = DISSTO - 3 WHERE ARTSTO = '000001' AND ALMSTO = 'GEN'");
+
+// 9. Delivery address with F_OBR (no F_DCL)
+const addrSql = insertDeliveryAddressQuery(105, 1, { street: 'Calle Obra 1', city: 'Madrid', postalCode: '28001' }, 'Almacén');
+assert(addrSql.includes('INSERT INTO F_OBR'), 'Must insert into F_OBR');
+assert(!addrSql.includes('F_DCL'), 'Must NOT refer to F_DCL');
 
 console.log('✓ Factusol Order Mapper Tests Passed');

@@ -17,6 +17,8 @@ import {
   getNextOrderIdQuery,
   insertOrderHeaderQuery,
   insertOrderLineQuery,
+  decrementStockQuery,
+  calculateOrderVatBreakdown,
   readOrderLinesQuery,
   readOrdersQuery,
   updateOrderStatusQuery,
@@ -59,15 +61,23 @@ export class FactusolOrderHandler {
         }
       }
 
-      // 2. Deduplicar cliente buscando por NIF normalizado o email. Si no existe, crear con createCustomer()
+      // 2. Cliente Contado Web o cliente registrado con CIF
       let customerCode = 0;
-      if (order.customer.customerNumber && !isNaN(Number(order.customer.customerNumber))) {
+      const normalizedTaxId = normalizeTaxId(order.customer?.taxId);
+      const hasCif = Boolean(normalizedTaxId && normalizedTaxId.trim().length > 0);
+
+      if (order.customer?.customerNumber && !isNaN(Number(order.customer.customerNumber)) && Number(order.customer.customerNumber) > 1) {
         customerCode = Number(order.customer.customerNumber);
+      } else if (!hasCif) {
+        // Invitado o particular sin CIF para factura: asignar cliente genérico 1 ("CLIENTE CONTADO WEB")
+        // Datos de envío y contacto se estampan directamente en la cabecera F_PCL
+        customerCode = 1;
+        this.logger.info(`Pedido ${reference} sin CIF: asignando cliente contado web (CODCLI=1)`);
       } else {
-        const normalizedTaxId = normalizeTaxId(order.customer.taxId);
+        // Cliente con CIF: buscar o crear en F_CLI
         const found = await this.customerHandler.findCustomer({
-          taxId: normalizedTaxId || order.customer.taxId,
-          email: order.customer.email,
+          taxId: normalizedTaxId,
+          email: order.customer?.email,
         });
 
         if (found && found.customerNumber) {
@@ -75,7 +85,7 @@ export class FactusolOrderHandler {
         } else {
           const customerToCreate: CanonicalCustomer = {
             ...order.customer,
-            taxId: normalizedTaxId || order.customer.taxId,
+            taxId: normalizedTaxId,
           };
           const createdCust = await this.customerHandler.createCustomer(customerToCreate);
           if (createdCust.success && createdCust.externalId) {
@@ -86,25 +96,36 @@ export class FactusolOrderHandler {
         }
       }
 
-      // 3. Si la dirección de envío difiere de la fiscal, buscar o crear la dirección alternativa en F_DCL
-      const fiscalAddr = order.billingAddress || order.customer.address;
-      const shipAddr = order.shippingAddress;
-      const isDifferentAddress = Boolean(
-        shipAddr &&
-        fiscalAddr &&
-        (
-          (shipAddr.street && fiscalAddr.street && shipAddr.street.trim().toLowerCase() !== fiscalAddr.street.trim().toLowerCase()) ||
-          (shipAddr.postalCode && fiscalAddr.postalCode && shipAddr.postalCode.trim().toLowerCase() !== fiscalAddr.postalCode.trim().toLowerCase()) ||
-          (shipAddr.city && fiscalAddr.city && shipAddr.city.trim().toLowerCase() !== fiscalAddr.city.trim().toLowerCase())
-        )
-      );
+      // 3. Si la dirección de envío difiere de la fiscal y es cliente registrado (> 1), registrar en F_OBR
+      if (customerCode > 1) {
+        const fiscalAddr = order.billingAddress || order.customer?.address;
+        const shipAddr = order.shippingAddress;
+        const isDifferentAddress = Boolean(
+          shipAddr &&
+          fiscalAddr &&
+          (
+            (shipAddr.street && fiscalAddr.street && shipAddr.street.trim().toLowerCase() !== fiscalAddr.street.trim().toLowerCase()) ||
+            (shipAddr.postalCode && fiscalAddr.postalCode && shipAddr.postalCode.trim().toLowerCase() !== fiscalAddr.postalCode.trim().toLowerCase()) ||
+            (shipAddr.city && fiscalAddr.city && shipAddr.city.trim().toLowerCase() !== fiscalAddr.city.trim().toLowerCase())
+          )
+        );
 
-      if (isDifferentAddress && shipAddr && shipAddr.street && customerCode > 0) {
-        await this.customerHandler.ensureDeliveryAddress(customerCode, shipAddr, order.customer.fiscalName);
+        if (isDifferentAddress && shipAddr && shipAddr.street) {
+          await this.customerHandler.ensureDeliveryAddress(customerCode, shipAddr, order.customer?.fiscalName);
+        }
       }
 
-      // 4. Transacción atómica: agrupar cabecera y líneas en un único executeTransaction([headerSql, ...lineSqls])
-      // 5. Bucle de reintento automático (hasta 5 intentos con backoff) ante colisión de correlativo en CODPCL
+      // 4. Desglose multi-tramo de IVA y cent rounding para cuadre exacto con pasarela
+      const vatBreakdown = calculateOrderVatBreakdown(order);
+
+      // 5. Decremento atómico de stock en Access (F_STO)
+      const warehouse = order.warehouse || this.config.defaultWarehouse || 'GEN';
+      const stockSqls = (order.lines || []).map((line: CanonicalOrderLine) =>
+        decrementStockQuery(line.sku, warehouse, line.quantity)
+      );
+
+      // 6. Transacción atómica: agrupar cabecera, líneas y decremento de stock
+      // Bucle de reintento automático (hasta 5 intentos con backoff) ante colisión de correlativo en CODPCL
       const MAX_RETRIES = 5;
       let lastError: unknown = null;
       let orderCreated = false;
@@ -114,10 +135,10 @@ export class FactusolOrderHandler {
         try {
           const maxRows = await this.driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
           const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-          const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode);
+          const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode, vatBreakdown);
           const lineSqls = order.lines.map((line: CanonicalOrderLine) => insertOrderLineQuery(line, nextOrderCode, series));
 
-          await this.driver.executeTransaction([headerSql, ...lineSqls]);
+          await this.driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
 
           finalOrderCode = nextOrderCode;
           orderCreated = true;

@@ -139,6 +139,8 @@ export class FactusolInvoiceMapper {
     codfac: number;
     reffac: string;
     fecfac: string;
+    horfac: string;
+    usufac: number;
     estfac: number;
     almfac: string;
     agefac: number | null;
@@ -148,13 +150,16 @@ export class FactusolInvoiceMapper {
     cpofac: string | null;
     ccpfac: string | null;
     cprfac: string | null;
+    cnifac: string;
     telfac: string | null;
     cemfac: string | null;
     cpafac: string | null;
+    fopfac: string;
     piva1fac: number;
     piva2fac: number;
     piva3fac: number;
     ipor1fac: number;
+    bas1fac: number;
     iiva1fac: number;
     net1fac: number;
     totfac: number;
@@ -164,16 +169,27 @@ export class FactusolInvoiceMapper {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     const accessDate = `#${year}-${month}-${day}#`;
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    const secs = String(d.getSeconds()).padStart(2, '0');
+    const accessTime = `#${hours}:${mins}:${secs}#`;
 
     const series = (invoice.series || '1').substring(0, 1);
     const clientCode = invoice.customer.customerCode ? parseInt(invoice.customer.customerCode, 10) : 1;
     const mainTaxRate = invoice.taxBreakdown && invoice.taxBreakdown[0] ? invoice.taxBreakdown[0].rate : 21;
+    const netAmount = invoice.netAmount || (invoice.totalAmount - (invoice.taxAmount || 0) - (invoice.shippingCost || 0));
+    const shippingCost = invoice.shippingCost || 0;
+    const bas1fac = Number((netAmount + shippingCost).toFixed(2));
+    const rawPayment = (invoice as unknown as Record<string, unknown>).paymentMethod;
+    const fopfac = typeof rawPayment === 'string' && rawPayment.trim() ? rawPayment.substring(0, 3).toUpperCase() : 'TAR';
 
     return {
       tipfac: series,
       codfac: invoiceNumber,
       reffac: (invoice.orderReference || invoice.invoiceNumber || '').substring(0, 20),
       fecfac: accessDate,
+      horfac: accessTime,
+      usufac: 0,
       estfac: this.mapCanonicalStatusToFactusol(invoice.status),
       almfac: warehouse.substring(0, 3),
       agefac: null,
@@ -183,15 +199,18 @@ export class FactusolInvoiceMapper {
       cpofac: invoice.customer.billingAddress?.postalCode ? invoice.customer.billingAddress.postalCode.substring(0, 5) : null,
       ccpfac: invoice.customer.billingAddress?.city ? invoice.customer.billingAddress.city.substring(0, 30) : null,
       cprfac: invoice.customer.billingAddress?.province ? invoice.customer.billingAddress.province.substring(0, 20) : null,
+      cnifac: (invoice.customer.taxId || '').substring(0, 18),
       telfac: invoice.customer.phone ? invoice.customer.phone.substring(0, 15) : null,
       cemfac: invoice.customer.email ? invoice.customer.email.substring(0, 50) : null,
       cpafac: invoice.customer.billingAddress?.country ? invoice.customer.billingAddress.country.substring(0, 30) : 'ESPAÑA',
+      fopfac,
       piva1fac: mainTaxRate,
       piva2fac: 10,
       piva3fac: 4,
-      ipor1fac: invoice.shippingCost || 0,
+      ipor1fac: shippingCost,
+      bas1fac,
       iiva1fac: invoice.taxAmount || 0,
-      net1fac: invoice.netAmount || (invoice.totalAmount - (invoice.taxAmount || 0) - (invoice.shippingCost || 0)),
+      net1fac: netAmount,
       totfac: invoice.totalAmount,
     };
   }
