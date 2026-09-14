@@ -115,7 +115,7 @@ const EU_COUNTRY_CODES = new Set([
  * 3 = Canarias / Ceuta / Melilla / Exportación extracomunitaria (Exento)
  */
 export function determineTivpcl(order: CanonicalOrder): number {
-  const shipAddr = order.shippingAddress || order.billingAddress || order.customer?.address || {};
+  const shipAddr: CanonicalAddress = order.shippingAddress || order.billingAddress || order.customer?.address || { country: 'ES' };
   const country = (shipAddr.country || order.customer?.address?.country || 'ES').trim().toUpperCase();
   const postalCode = (shipAddr.postalCode || order.customer?.address?.postalCode || '').trim();
 
@@ -133,10 +133,10 @@ export function determineTivpcl(order: CanonicalOrder): number {
     return 0;
   }
 
-  // 2. Unión Europea (no España)
-  const normTaxId = normalizeTaxId(order.customer?.taxId);
+  // 2. Unión Europea (VIES B2B = exento / inversión sujeto pasivo)
   if (EU_COUNTRY_CODES.has(country)) {
-    if (normTaxId && normTaxId.length > 0) {
+    const taxId = (order.customer?.taxId || '').trim();
+    if (taxId && !taxId.startsWith('ES') && taxId.length > 8) {
       return 2; // Intracomunitario B2B con VIES
     }
     return 0; // Nacional/destino estándar
@@ -191,7 +191,7 @@ export function getVatBracket(line: CanonicalOrderLine): { bracket: number; rate
     if (line.vatType === 3) return { bracket: 3, rate: 0.0 };
   }
 
-  const rate = Number(line.vatRate ?? line.vatPercent ?? 21);
+  const rate = Number((line as any).vatRate ?? line.vatPercent ?? 21);
   if (Math.abs(rate - 21) < 0.5) return { bracket: 0, rate: 21.0 };
   if (Math.abs(rate - 10) < 0.5) return { bracket: 1, rate: 10.0 };
   if (Math.abs(rate - 4) < 0.5) return { bracket: 2, rate: 4.0 };

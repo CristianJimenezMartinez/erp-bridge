@@ -66,10 +66,17 @@ async function runWooCommerceTests() {
           regular_price: '10.0',
         }));
       } else if (params.page === 2) {
-        return Array.from({ length: 30 }, (_, i) => ({
+        return Array.from({ length: 100 }, (_, i) => ({
           id: 100 + i + 1,
           sku: `SKU-${100 + i + 1}`,
           name: `Product ${100 + i + 1}`,
+          regular_price: '10.0',
+        }));
+      } else if (params.page === 3) {
+        return Array.from({ length: 50 }, (_, i) => ({
+          id: 200 + i + 1,
+          sku: `SKU-${200 + i + 1}`,
+          name: `Product ${200 + i + 1}`,
           regular_price: '10.0',
         }));
       }
@@ -79,18 +86,19 @@ async function runWooCommerceTests() {
 
   const handler = new WooCommerceProductHandler(mockClient, new Logger('TestWoo'));
   
-  // 1. Pagination across pages
+  // 1. Pagination across pages (>150 items: 250 total items)
   const products = await handler.readProducts();
-  assert.strictEqual(products.length, 130, 'Should accumulate all 130 products across pages');
-  assert.strictEqual(requestedCalls.length, 2, 'Should have requested 2 pages');
+  assert.strictEqual(products.length, 250, 'Should accumulate all 250 products across 3 pages');
+  assert.strictEqual(requestedCalls.length, 3, 'Should have requested 3 pages');
   assert.strictEqual(requestedCalls[0]?.params.page, 1);
   assert.strictEqual(requestedCalls[1]?.params.page, 2);
+  assert.strictEqual(requestedCalls[2]?.params.page, 3);
   assert.strictEqual(requestedCalls[0]?.params.per_page, 100);
 
-  // 2. Pagination with limit
+  // 2. Pagination with limit > 150 items
   requestedCalls.length = 0;
-  const limitedProducts = await handler.readProducts({ limit: 120 });
-  assert.strictEqual(limitedProducts.length, 120, 'Should respect limit of 120 products');
+  const limitedProducts = await handler.readProducts({ limit: 180 });
+  assert.strictEqual(limitedProducts.length, 180, 'Should respect limit of 180 products');
   assert.strictEqual(requestedCalls.length, 2, 'Should have queried page 1 and page 2');
 
   // 3. ModifiedSince filter
