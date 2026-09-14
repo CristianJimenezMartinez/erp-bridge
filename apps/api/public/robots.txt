@@ -1,6 +1,44 @@
+# ==============================================================================
+# BENTIAN ERP BRIDGE — ROBOTS.TXT & CRAWLER POLICIES (SEO & GEO IA)
+# Host: bridge.cristianjm.com
+# ==============================================================================
+
+# 1. Reglas Generales para Motores de Búsqueda (Google, Bing, Yahoo, DuckDuckGo)
 User-agent: *
 Allow: /
+Allow: /assets/
 Disallow: /api/
 Disallow: /dashboard/
 
+# 2. Permisos Explícitos para Motores de Inteligencia Artificial (GEO IA & LLMs)
+# Permite a ChatGPT, Perplexity, Claude y Google AI Overviews citar el conector
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# 3. Ubicación del Sitemap Canónico
 Sitemap: https://bridge.cristianjm.com/sitemap.xml
+Host: bridge.cristianjm.com
