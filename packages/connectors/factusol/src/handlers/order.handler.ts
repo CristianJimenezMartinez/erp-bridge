@@ -135,8 +135,10 @@ export class FactusolOrderHandler {
         try {
           const maxRows = await this.driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
           const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-          const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode, vatBreakdown);
-          const lineSqls = order.lines.map((line: CanonicalOrderLine) => insertOrderLineQuery(line, nextOrderCode, series));
+          const headerSql = insertOrderHeaderQuery(order, nextOrderCode, customerCode, vatBreakdown, series);
+          const lineSqls = order.lines.map((line: CanonicalOrderLine, idx: number) =>
+            insertOrderLineQuery(line, nextOrderCode, series, line.position || (idx + 1))
+          );
 
           await this.driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
 

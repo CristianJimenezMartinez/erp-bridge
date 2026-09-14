@@ -83,14 +83,14 @@ export class FactusolConnector implements Connector {
   }
 
   public async connect(config: ConnectionConfig): Promise<void> {
-    const rawConfig = config.configuration as unknown as FactusolConnectionConfig;
+    const rawConfig = (((config as unknown as { configuration?: FactusolConnectionConfig })?.configuration || config) as unknown) as FactusolConnectionConfig;
     const dbPath = rawConfig?.databasePath;
 
     if (!dbPath || typeof dbPath !== 'string') {
       throw new ConnectionError(
         ErrorCode.CONNECTION_FAILED,
         'La propiedad "databasePath" es obligatoria en la configuración de Factusol',
-        { config: config.configuration }
+        { config: rawConfig }
       );
     }
 

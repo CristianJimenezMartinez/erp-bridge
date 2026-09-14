@@ -318,9 +318,10 @@ export function insertOrderHeaderQuery(
   order: CanonicalOrder,
   orderCode: number,
   customerCode: number,
-  breakdownOverride?: OrderVatBreakdown
+  breakdownOverride?: OrderVatBreakdown,
+  seriesOverride?: string
 ): string {
-  const series = sanitizeSql(order.series || ' ');
+  const series = sanitizeSql(seriesOverride ?? order.series ?? ' ');
   const ref = sanitizeSql(order.reference || order.orderNumber).substring(0, 50);
   const orderDate = order.date ? new Date(order.date) : new Date();
   const fecpclFormatted = formatAccessDateOnly(orderDate);
@@ -410,7 +411,8 @@ export function insertOrderHeaderQuery(
 export function insertOrderLineQuery(
   line: CanonicalOrderLine,
   orderCode: number,
-  series = ' '
+  series = ' ',
+  position = 1
 ): string {
   const sanitizedSeries = sanitizeSql(series || ' ');
   const sku = sanitizeSql(line.sku).substring(0, 13);
@@ -432,6 +434,7 @@ export function insertOrderLineQuery(
   const priceWithVat = (Number(price) * (1 + vatRate / 100)).toFixed(4);
   // TIVLPC = Total línea con IVA incluido (TOTLPC * (1 + vatRate/100))
   const totalWithVat = (Number(total) * (1 + vatRate / 100)).toFixed(2);
+  const linePos = line.position || position || 1;
 
   return `
     INSERT INTO F_LPC (
@@ -440,7 +443,7 @@ export function insertOrderLineQuery(
     ) VALUES (
       '${sanitizedSeries}',
       ${orderCode},
-      ${line.position || 1},
+      ${linePos},
       '${sku}',
       '${name}',
       ${qty},
