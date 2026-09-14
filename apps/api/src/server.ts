@@ -27,6 +27,7 @@ import { licensesRouter } from './routes/licenses.router';
 import { updatesRouter } from './routes/updates.router';
 import { billingRouter } from './routes/billing.router';
 import { authRouter } from './routes/auth.router';
+import { monitoringRouter } from './routes/monitoring.router';
 
 dotenv.config();
 
@@ -89,6 +90,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', updatesRouter);
   app.use('/api/v1', billingRouter);
   app.use('/api/v1', authRouter);
+  app.use('/api/v1', monitoringRouter);
+  app.use(monitoringRouter);
 
   // Servir descargas de releases y actualizaciones del agente
   const releasesDir = path.resolve(__dirname, '../../../releases');

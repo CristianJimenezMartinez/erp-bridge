@@ -163,6 +163,21 @@ export class AgentService {
     });
   }
 
+  public async listAllAgents(): Promise<Agent[]> {
+    const agents = await this.agentRepo.listAll();
+    const now = Date.now();
+    const OFFLINE_THRESHOLD_MS = 90_000;
+
+    return agents.map((a: Agent) => {
+      const diff = now - new Date(a.lastSeenAt).getTime();
+      const status = diff > OFFLINE_THRESHOLD_MS ? 'OFFLINE' : a.status;
+      return {
+        ...a,
+        status,
+      };
+    });
+  }
+
   public async getAgentById(organizationId: string, id: string): Promise<Agent> {
     const agent = await this.agentRepo.findById(organizationId, id);
     if (!agent) {

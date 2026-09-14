@@ -5,6 +5,7 @@ export interface IAgentRepository {
   findById(organizationId: string, id: string): Promise<Agent | null>;
   findByIdGlobal(id: string): Promise<Agent | null>;
   listByOrganization(organizationId: string): Promise<Agent[]>;
+  listAll(): Promise<Agent[]>;
   create(agent: Agent): Promise<Agent>;
   update(agent: Agent): Promise<Agent>;
   heartbeat(id: string, ipAddress?: string): Promise<void>;
@@ -69,6 +70,25 @@ export class PostgresAgentRepository implements IAgentRepository {
          WHERE organization_id = $1
          ORDER BY last_seen_at DESC`,
         [organizationId]
+      );
+      const dbList = res.rows.map((row) => this.mapRow(row));
+      const map = new Map<string, Agent>();
+      for (const a of dbList) map.set(a.id, a);
+      for (const a of memList) map.set(a.id, a);
+      return Array.from(map.values());
+    } catch {
+      return memList;
+    }
+  }
+
+  async listAll(): Promise<Agent[]> {
+    const memList = Array.from(PostgresAgentRepository.memoryAgents.values());
+
+    try {
+      const res = await this.db.query(
+        `SELECT id, organization_id, name, status, version, last_seen_at, ip_address, platform, created_at, updated_at
+         FROM agents
+         ORDER BY last_seen_at DESC`
       );
       const dbList = res.rows.map((row) => this.mapRow(row));
       const map = new Map<string, Agent>();
