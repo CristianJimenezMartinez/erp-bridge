@@ -391,7 +391,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
       case 'checkout.session.completed':
       case 'invoice.payment_succeeded': {
         const session = event.data?.object || {};
-        const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@bentian.es';
+        const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com';
         const organizationId = session.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
         const maxActivations = Number(session.metadata?.maxActivations) || 3;

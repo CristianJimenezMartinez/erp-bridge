@@ -43,7 +43,7 @@
 
 | # | Riesgo / Preocupación | Causa Raíz | Impacto en Cliente | Solución / Mitigación |
 |---|---|---|---|---|
-| **R1** | **URL de API incorrecta en cliente** | El código usaba fallback `localhost:3000` si faltaba `agent-config.json`. | El agente no puede conectar al servidor en la máquina del cliente. | **Inyectar `agent-config.json` en el instalador con la URL pública (`https://api.bentian.es`) y comando CLI `set-api`.** |
+| **R1** | **URL de API incorrecta en cliente** | El código usaba fallback `localhost:3000` si faltaba `agent-config.json`. | El agente no puede conectar al servidor en la máquina del cliente. | **Inyectar `agent-config.json` en el instalador con la URL pública (`https://bridge.cristianjm.com`) y comando CLI `set-api`.** |
 | **R2** | **Factusol en Red Local o Ruta Inusual** | Factusol instalado en servidor local (ej: `Z:\FACTUSOL\DATOS\FS` o carpetas de red). | El escaneo automático no encuentra la base de datos `.accdb`. | **Comando `BentianAgent.exe set-db [RUTA]` con diálogo visual de Windows (explorador de archivos nativo) si no se especifica ruta.** |
 | **R3** | **Bloqueo Concurrente en Factusol (`.laccdb`)** | Varios puestos facturando simultáneamente en la tienda del cliente. | Fallos transitorios de lectura/escritura OLEDB en Access. | **El motor de reintentos ya maneja backoff; asegurar que cortes de red en shares SMB no maten el proceso.** |
 | **R4** | **Incompatibilidad 32-bit vs 64-bit en OLEDB** | Factusol es 32-bit; Windows es 64-bit. Motor ACE OLEDB requiere el host adecuado. | Error *"Proveedor OLEDB Microsoft.ACE no registrado"*. | **Selector dinámico en `adodb.js`: probar primero `SysWOW64\cscript.exe` (32-bit) y fallback a 64-bit.** |

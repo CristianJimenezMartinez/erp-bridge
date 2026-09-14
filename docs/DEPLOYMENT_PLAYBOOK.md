@@ -56,51 +56,35 @@
 5. Crea el archivo `.env` en la raíz del servidor:
    ```bash
    DATABASE_URL="postgresql://postgres.xxxxxx:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require"
-   ADMIN_EMAIL="admin@bentian.es"
+   ADMIN_EMAIL="cristian@cristianjm.com"
    ADMIN_PASSWORD="TuContraseñaSeguraAdmin2026!"
    ADMIN_JWT_SECRET="GeneraUnaClaveAleatoriaLargaAqui"
    LICENSE_JWT_SECRET="OtraClaveAleatoriaLargaAqui"
    STRIPE_SECRET_KEY="sk_live_..."
    STRIPE_WEBHOOK_SECRET="whsec_..."
    ```
-6. Arranca el contenedor de producción:
+6. Arranca el contenedor o servicio de producción:
    ```bash
    docker compose -f docker-compose.prod.yml up -d --build
    ```
 
-### 2.2. Conectar `api.bentian.es` con Cloudflare Tunnel (Cero Puertos Abiertos)
-*Con Cloudflare Tunnel no necesitas abrir el puerto 80 ni 443 en tu servidor, ni configurar Nginx, ni preocuparte por renovar certificados SSL.*
+### 2.2. Conectar `bridge.cristianjm.com` (Caddy / Reverse Proxy con SSL Automático)
+*El servidor Hetzner ya cuenta con Caddy configurado en `bridge.cristianjm.com`, emitiendo certificados Let's Encrypt de forma 100% automática.*
 
-1. En el panel de [Cloudflare](https://dash.cloudflare.com) -> Selecciona tu dominio `bentian.es`.
-2. En el menú lateral ve a **Zero Trust** -> **Networks** -> **Tunnels**.
-3. Haz clic en **"Add a tunnel"** -> Elige **Cloudflared** -> Nombre: `bentian-api-tunnel`.
-4. Cloudflare te dará un comando de instalación para Ubuntu. Cópialo y pégalo en la terminal de tu VPS (lo instalará como servicio de sistema que arranca solo).
-5. En la siguiente pantalla de Cloudflare (**Public Hostnames**):
-   - **Subdomain:** `api`
-   - **Domain:** `bentian.es`
-   - **Service Type:** `HTTP`
-   - **URL:** `localhost:3000`
-6. Haz clic en **Save Tunnel**.
-7. **¡Listo!** `https://api.bentian.es/health` estará respondiendo en internet con certificado SSL comercial gratis, protección contra ataques y máxima velocidad.
+1. El dominio `bridge.cristianjm.com` apunta a la IP del VPS (`178.105.87.40`).
+2. Caddy redirige el tráfico HTTPS directamente a la API interna (`localhost:3000`) y sirve los estáticos de la landing y releases.
+3. `https://bridge.cristianjm.com/health` responde en internet con certificado SSL comercial, protección y máxima velocidad.
 
 ---
 
-## Paso 3: Dashboard Web en Cloudflare Pages (`app.bentian.es`) — 3 Minutos
+## Paso 3: Dashboard Web y Releases (`bridge.cristianjm.com`)
 
-1. En tu máquina local, compila el Dashboard Angular:
-   ```bash
-   cd apps/dashboard
-   npm run build
-   ```
-   *(Los archivos estáticos se generarán en `apps/dashboard/dist/`)*.
-2. En el panel de Cloudflare:
-   - Ve a **Workers & Pages** -> **Create application** -> **Pages** -> **Upload assets**.
-   - Nombre del proyecto: `bentian-dashboard`.
-   - Arrastra y suelta la carpeta compilada de Angular (`browser`).
-3. Una vez subido:
-   - Ve a **Custom Domains** -> **Set up a custom domain** -> Escribe: `app.bentian.es`.
-   - Cloudflare configurará automáticamente el DNS y el certificado SSL.
-4. **¡Listo!** Ya puedes entrar a `https://app.bentian.es`, ver la pantalla de Login e iniciar sesión con `admin@bentian.es`.
+1. El Dashboard y la Landing residen en el servidor bajo `bridge.cristianjm.com`:
+   - Landing Web: `https://bridge.cristianjm.com/`
+   - Dashboard Clientes: `https://bridge.cristianjm.com/dashboard/`
+   - API Backend: `https://bridge.cristianjm.com/api/v1/`
+   - Manifiesto de Releases: `https://bridge.cristianjm.com/releases/latest.json`
+2. El acceso administrativo se realiza con `cristian@cristianjm.com`.
 
 ---
 
@@ -108,11 +92,11 @@
 
 1. Entra en tu panel de [Stripe](https://dashboard.stripe.com).
 2. Ve a **Product catalog** -> **Add product**:
-   - **Name:** `ERP Bridge — Factusol & WooCommerce`
+   - **Name:** `Bentian ERP Bridge — Factusol & WooCommerce`
    - **Pricing:** Recurrente mensual (29,00 € / mes) o anual (199,00 € promo / 249,00 € / año), incluyendo 3 puestos locales.
    - Haz clic en **Save product** y crea un **Payment Link** (enlace de pago). Este enlace es el que pones en tu botón "Comprar Ahora" en la web o envías al cliente.
 3. Ve a **Developers** -> **Webhooks** -> **Add endpoint**:
-   - **Endpoint URL:** `https://api.bentian.es/api/v1/billing/webhook`
+   - **Endpoint URL:** `https://bridge.cristianjm.com/api/v1/billing/webhook`
    - **Events to listen:** Selecciona:
      - `checkout.session.completed`
      - `customer.subscription.deleted`
@@ -123,7 +107,7 @@
      ```bash
      STRIPE_WEBHOOK_SECRET="whsec_..."
      ```
-   - Reinicia la API: `docker compose -f docker-compose.prod.yml restart api`.
+   - Reinicia la API: `pm2 restart erp-bridge-api` (o `docker compose restart api`).
 
 ---
 
@@ -133,7 +117,7 @@
 sequenceDiagram
     actor Cliente
     participant Stripe
-    participant API as api.bentian.es
+    participant API as bridge.cristianjm.com
     participant DB as Supabase (Postgres)
     participant Windows as PC Windows del Cliente
 
