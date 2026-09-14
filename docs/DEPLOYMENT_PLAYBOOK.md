@@ -109,10 +109,10 @@
 1. Entra en tu panel de [Stripe](https://dashboard.stripe.com).
 2. Ve a **Product catalog** -> **Add product**:
    - **Name:** `ERP Bridge — Factusol & WooCommerce`
-   - **Pricing:** Recurrente mensual (ej. 29,00 € o 49,00 € / mes).
+   - **Pricing:** Recurrente mensual (29,00 € / mes) o anual (199,00 € promo / 249,00 € / año), incluyendo 3 puestos locales.
    - Haz clic en **Save product** y crea un **Payment Link** (enlace de pago). Este enlace es el que pones en tu botón "Comprar Ahora" en la web o envías al cliente.
 3. Ve a **Developers** -> **Webhooks** -> **Add endpoint**:
-   - **Endpoint URL:** `https://api.bentian.es/api/v1/billing/webhook/stripe`
+   - **Endpoint URL:** `https://api.bentian.es/api/v1/billing/webhook`
    - **Events to listen:** Selecciona:
      - `checkout.session.completed`
      - `customer.subscription.deleted`

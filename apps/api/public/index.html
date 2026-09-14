@@ -208,6 +208,16 @@
           </a>
         </div>
 
+        <!-- Aviso Informativo Windows Defender SmartScreen -->
+        <div class="mt-4 flex items-start gap-3 max-w-xl p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/20 text-xs text-zinc-300">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="leading-relaxed">
+            <strong class="text-zinc-200 font-semibold">Aviso de instalación en Windows:</strong> Al ser una versión reciente, Windows Defender SmartScreen puede mostrar una pantalla azul informativa. Para continuar, haz clic en <span class="text-indigo-300 font-semibold">"Más información"</span> y luego en <span class="text-indigo-300 font-semibold">"Ejecutar de todas formas"</span>.
+          </div>
+        </div>
+
         <!-- ========================================================================= -->
         <!-- MASTERPIECE: VISUALIZACIÓN DINÁMICA DEL FLUJO DE SISTEMAS                -->
         <!-- ========================================================================= -->
@@ -1126,6 +1136,16 @@
             </summary>
             <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
               El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Es completamente normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en <strong>"Más información"</strong> y luego en <strong>"Ejecutar de todas formas"</strong>.
             </p>
           </details>
 

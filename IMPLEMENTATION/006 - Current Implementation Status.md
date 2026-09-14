@@ -110,7 +110,7 @@ Tareas futuras planeadas fuera del ciclo actual:
 ### Tarea B: Sistema Anti-Piratería y Licenciamiento por HWID
 * **Objetivo:** Proteger el software contra copias no autorizadas mediante fingerprint de hardware, activación en servidor y tokens offline cifrados con AES-256-GCM.
 * **Archivos afectados:** `packages/core/src/license/*`, `core/test/license-*`, `apps/agent/src/security/hwid.ts`, `apps/agent/src/security/secure-store.ts`, `apps/api/src/routes/licenses.router.ts`, `apps/dashboard/src/app/pages/licenses/*`.
-* **Resultado:** Generación de claves con checksum verifiable (formato `EB-XXXXX-...`), vinculación estricta a HWID (CPU + Placa base + Disco), validación offline de 30 días renovable, revocación remota y UI de gestión en Dashboard.
+* **Resultado:** Generación de claves con checksum verifiable (formato `EB-XXXXX-...`), vinculación estricta a HWID (PowerShell CIM nativo), validación offline de 7 días (168 horas) renovable con almacenamiento local cifrado AES-256-GCM, revocación remota y UI de gestión en Dashboard.
 * **Validaciones realizadas:** `pnpm test` (tests unitarios y de integración de licencias).
 * **Resultado:** **100% PASS** (`license-key.test.ts`, `license-token.test.ts`, `license-service.test.ts`, `hwid.test.ts`, `secure-store.test.ts`, `license-api.test.ts`).
 
