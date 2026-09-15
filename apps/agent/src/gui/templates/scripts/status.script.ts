@@ -53,9 +53,12 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (fSettings.orderSeries) document.getElementById('input-factusol-order-series').value = fSettings.orderSeries;
       if (fSettings.invoiceSeries) document.getElementById('input-factusol-inv-series').value = fSettings.invoiceSeries;
 
-      // Canal Web
+      // Canal Web: solo inicializar la selección en la primera carga para respetar la elección del usuario
       const chType = data.channelType || 'universal_bridge';
-      selectChannelType(chType);
+      if (!window.__channelTypeInitialized) {
+        selectChannelType(chType);
+        window.__channelTypeInitialized = true;
+      }
 
       const univ = data.universalBridgeSettings || {};
       if (univ.storeUrl && !document.getElementById('input-universal-url').value) {

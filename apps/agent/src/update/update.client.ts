@@ -263,7 +263,11 @@ export class UpdateClient {
     }
 
     if (this.isDownloading) {
-      throw new Error('Ya hay una descarga de actualización en curso.');
+      this.logger.info('Descarga ya en curso. Esperando finalización...');
+      while (this.isDownloading) {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      return update.downloadedFilePath || path.join(this.tempDir, `BentianAgent-v${update.version}.new.exe`);
     }
 
     this.isDownloading = true;
@@ -410,11 +414,18 @@ export class UpdateClient {
     }
 
     if (!update.downloadedFilePath || !fs.existsSync(update.downloadedFilePath)) {
-      this.logger.info('El binario aún no está descargado. Descargando automáticamente antes de aplicar...');
-      try {
-        await this.downloadUpdate(update);
-      } catch (err) {
-        return { success: false, message: `Fallo al descargar actualización: ${String(err)}` };
+      if (this.isDownloading) {
+        this.logger.info('Esperando a que concluya la descarga en segundo plano...');
+        while (this.isDownloading) {
+          await new Promise((r) => setTimeout(r, 500));
+        }
+      } else {
+        this.logger.info('El binario aún no está descargado. Descargando automáticamente antes de aplicar...');
+        try {
+          await this.downloadUpdate(update);
+        } catch (err) {
+          return { success: false, message: `Fallo al descargar actualización: ${String(err)}` };
+        }
       }
     }
 

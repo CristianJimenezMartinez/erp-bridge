@@ -77,6 +77,7 @@ export const coreScript = `
     // Channel Switcher
     function selectChannelType(type) {
       currentChannelType = type;
+      window.__channelTypeInitialized = true;
       const cardUniv = document.getElementById('card-choice-universal');
       const cardWoo = document.getElementById('card-choice-woo');
       const panelUniv = document.getElementById('panel-universal-bridge');

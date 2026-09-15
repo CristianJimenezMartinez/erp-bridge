@@ -269,6 +269,9 @@ async function main() {
         console.log('   Descargando y aplicando actualización de forma autónoma...');
         const applyRes = await agent.applyUpdate();
         console.log(applyRes.success ? '✓ Proceso de auto-actualización completado.' : `❌ ${applyRes.message}`);
+        if (applyRes.success) {
+          await new Promise((r) => setTimeout(r, 2500));
+        }
       } else {
         console.log('\n✓ El agente ya está en la versión más reciente. No hay actualizaciones pendientes.\n');
       }
