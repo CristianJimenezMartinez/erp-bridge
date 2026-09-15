@@ -48,7 +48,7 @@ $procsToKill = @(${procListStr})
 foreach ($pName in $procsToKill) {
     Log-Msg "Deteniendo proceso: $pName..."
     Stop-Process -Name $pName -Force -ErrorAction SilentlyContinue
-    taskkill /F /IM "$pName.exe" /T 2>&1 | Out-Null
+    taskkill /F /IM "$pName.exe" 2>&1 | Out-Null
 }
 Start-Sleep -Seconds 2
 
@@ -80,7 +80,7 @@ $launchArgs = @(${postArgs})
 $proc = Start-Process -FilePath "$targetExe" -ArgumentList $launchArgs -PassThru -WindowStyle Hidden
 
 if (-not $proc) {
-    Log-Msg "CRÍTICO: No se pudo lanzar el nuevo binario. Ejecutando rollback de emergencia..."
+    Log-Msg "CRITICO: No se pudo lanzar el nuevo binario. Ejecutando rollback de emergencia..."
     Remove-Item -Path "$targetExe" -Force -ErrorAction SilentlyContinue
     if (Test-Path "$backupExe") {
         Move-Item -Path "$backupExe" -Destination "$targetExe" -Force
@@ -98,25 +98,25 @@ for ($i = 1; $i -le $timeoutSecs; $i++) {
     Start-Sleep -Seconds 1
     if ($proc.HasExited) {
         $crashed = $true
-        Log-Msg "CRASH DETECTADO: El proceso finalizó inesperadamente en el segundo $i con código $($proc.ExitCode)!"
+        Log-Msg "CRASH DETECTADO: El proceso finalizo inesperadamente en el segundo $i con codigo $($proc.ExitCode)!"
         break
     }
 }
 
 if ($crashed) {
-    Log-Msg "⚠️ ACTIVANDO ROLLBACK DE SEGURIDAD AUTOMÁTICO..."
+    Log-Msg "[WARN] ACTIVANDO ROLLBACK DE SEGURIDAD AUTOMATICO..."
     Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
     Remove-Item -Path "$targetExe" -Force -ErrorAction SilentlyContinue
     if (Test-Path "$backupExe") {
-        Log-Msg "Restaurando versión previa desde $backupExe..."
+        Log-Msg "Restaurando version previa desde $backupExe..."
         Move-Item -Path "$backupExe" -Destination "$targetExe" -Force
         Start-Process -FilePath "$targetExe" -ArgumentList "start" -WindowStyle Hidden
-        Log-Msg "Rollback completado. Versión anterior restaurada y operativa."
+        Log-Msg "Rollback completado. Version anterior restaurada y operativa."
     }
     exit 1
 }
 
-Log-Msg "✓ Arranque verificado exitosamente tras $timeoutSecs segundos de supervisión continua. Actualización completada."
+Log-Msg "[OK] Arranque verificado exitosamente tras $timeoutSecs segundos de supervision continua. Actualizacion completada."
 exit 0
 `;
   }
@@ -155,8 +155,8 @@ if exist "%PS1_SCRIPT%" (
 
 rem Fallback nativo CMD si PowerShell no estuviera disponible:
 rem 1. Matar procesos
-taskkill /F /IM BentianAgent.exe /T >nul 2>&1
-taskkill /F /IM BentianTray.exe /T >nul 2>&1
+taskkill /F /IM BentianAgent.exe >nul 2>&1
+taskkill /F /IM BentianTray.exe >nul 2>&1
 timeout /t 2 /nobreak >nul
 
 rem 2. Renombrar actual a .bak
@@ -184,7 +184,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [%DATE% %TIME%] Actualización CMD completada exitosamente. >> "%LOG_FILE%"
+echo [%DATE% %TIME%] Actualizacion CMD completada exitosamente. >> "%LOG_FILE%"
 exit /b 0
 `;
   }
@@ -207,7 +207,8 @@ exit /b 0
     const ps1Content = this.generatePowerShellScript(options);
     const batContent = this.generateBatchScript(options, ps1Path);
 
-    fs.writeFileSync(ps1Path, ps1Content, { encoding: 'utf8' });
+    // Escribir con BOM UTF-8 (\uFEFF) para compatibilidad nativa con PowerShell 5.1
+    fs.writeFileSync(ps1Path, '\uFEFF' + ps1Content, { encoding: 'utf8' });
     fs.writeFileSync(batPath, batContent, { encoding: 'utf8' });
 
     this.logger.info(`Scripts de actualización generados:\n  - ${batPath}\n  - ${ps1Path}`);

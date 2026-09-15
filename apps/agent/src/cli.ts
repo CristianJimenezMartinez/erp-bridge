@@ -257,6 +257,25 @@ async function main() {
       break;
     }
 
+    case 'update':
+    case 'check-update': {
+      const agent = new LocalAgent();
+      console.log(`Versión actual del agente: v${agent.getVersion()}`);
+      console.log('Comprobando actualizaciones contra el servidor...');
+      const check = await agent.checkForUpdates();
+      if (check.available && check.version) {
+        console.log(`\n🔥 ¡Nueva versión disponible: v${check.version}!`);
+        console.log(`   Notas: ${check.releaseNotes || 'Sin notas adicionales'}`);
+        console.log('   Descargando y aplicando actualización de forma autónoma...');
+        const applyRes = await agent.applyUpdate();
+        console.log(applyRes.success ? '✓ Proceso de auto-actualización completado.' : `❌ ${applyRes.message}`);
+      } else {
+        console.log('\n✓ El agente ya está en la versión más reciente. No hay actualizaciones pendientes.\n');
+      }
+      process.exit(0);
+      break;
+    }
+
     case 'gui':
     case 'start':
     default: {
