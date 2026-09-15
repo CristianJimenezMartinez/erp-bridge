@@ -82,6 +82,10 @@ export class LocalAgent {
       agentId: cfg.agentId || 'agent_local_standalone',
       currentVersion: this.configManager.getVersion(),
       checkIntervalMs: 60 * 60 * 1000,
+      autoDownload: true,
+      autoApply: true,
+      publicKeyPem:
+        '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA2Sc3emV3VqjbPmw5RXc1aaeaz0dtpzwI7WP6eHhDpBU=\n-----END PUBLIC KEY-----',
     };
 
     this.autoUpdater = new AutoUpdater(updateOptions);

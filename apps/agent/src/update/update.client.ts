@@ -99,6 +99,23 @@ export class UpdateClient {
   }
 
   /**
+   * Compara dos versiones SemVer. Retorna true si remoteVer es estrictamente mayor que localVer.
+   */
+  private isNewer(remoteVer: string, localVer: string): boolean {
+    const rBase = (remoteVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
+    const lBase = (localVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
+    const cleanR = rBase.map((x) => parseInt(x, 10) || 0);
+    const cleanL = lBase.map((x) => parseInt(x, 10) || 0);
+    for (let i = 0; i < 3; i++) {
+      const r = cleanR[i] ?? 0;
+      const l = cleanL[i] ?? 0;
+      if (r > l) return true;
+      if (r < l) return false;
+    }
+    return false;
+  }
+
+  /**
    * Inicia el ciclo periódico de comprobación en segundo plano.
    */
   public startPeriodicCheck(intervalMs?: number): void {
@@ -150,20 +167,52 @@ export class UpdateClient {
       this.logger.info(`Comprobando actualizaciones contra ${this.options.apiBaseUrl}...`);
       const checkUrl = `${this.options.apiBaseUrl.replace(/\/$/, '')}/api/v1/updates/check`;
 
-      const res = await fetch(checkUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      let checkData: UpdateCheckResponse = { available: false };
 
-      this.state.lastCheckedAt = new Date();
+      try {
+        const res = await fetch(checkUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(8000),
+        });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        this.state.lastCheckedAt = new Date();
+
+        if (res.ok) {
+          const json = (await res.json()) as { data?: UpdateCheckResponse; available?: boolean };
+          checkData = (json.data || json) as UpdateCheckResponse;
+        }
+      } catch (apiErr) {
+        this.logger.debug(`API /updates/check no respondió: ${apiErr instanceof Error ? apiErr.message : String(apiErr)}. Consultando fallback CDN...`);
       }
 
-      const json = (await res.json()) as { data?: UpdateCheckResponse; available?: boolean };
-      const checkData: UpdateCheckResponse = (json.data || json) as UpdateCheckResponse;
+      // Fallback de alta resiliencia: Si la API no reportó actualización o falló, verificar releases/latest.json directamente en Caddy/Nginx
+      if (!checkData.available || !checkData.version) {
+        try {
+          const staticUrl = `${this.options.apiBaseUrl.replace(/\/$/, '')}/releases/latest.json`;
+          const staticRes = await fetch(staticUrl, { signal: AbortSignal.timeout(6000) });
+          if (staticRes.ok) {
+            const staticJson = (await staticRes.json()) as any;
+            const manifest = staticJson.stable || staticJson;
+            if (manifest && manifest.version && this.isNewer(manifest.version, this.options.currentVersion)) {
+              checkData = {
+                available: true,
+                version: manifest.version,
+                downloadUrl: manifest.downloadUrl,
+                sha256: manifest.sha256,
+                signature: manifest.signature,
+                fileSize: manifest.fileSize,
+                releaseNotes: manifest.releaseNotes,
+                mandatory: manifest.mandatory,
+                channel: manifest.channel || chosenChannel,
+              };
+            }
+          }
+        } catch (staticErr) {
+          this.logger.debug(`Fallback CDN no disponible: ${staticErr instanceof Error ? staticErr.message : String(staticErr)}`);
+        }
+      }
 
       if (checkData.available && checkData.version && checkData.downloadUrl && checkData.sha256 && checkData.signature) {
         const pending: PendingUpdate = {
