@@ -7,7 +7,7 @@ import { syncScript } from './sync.script';
 import { logsScript } from './logs.script';
 import { wizardScript } from './wizard.script';
 
-export function renderClientScript(agentVersion: string = '0.1.5'): string {
+export function renderClientScript(agentVersion: string = '0.2.0'): string {
   return [
     '  <!-- ================= SCRIPTS ================= -->',
     '  <script>',

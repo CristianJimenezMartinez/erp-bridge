@@ -16,6 +16,8 @@ const VERSIONED_FILES = [
   path.resolve(rootDir, 'packages/core/package.json'),
   path.resolve(rootDir, 'packages/connectors/factusol/package.json'),
   path.resolve(rootDir, 'packages/connectors/woocommerce/package.json'),
+  path.resolve(rootDir, 'packages/connectors/prestashop/package.json'),
+  path.resolve(rootDir, 'packages/connectors/simplygest/package.json'),
 ];
 
 /**

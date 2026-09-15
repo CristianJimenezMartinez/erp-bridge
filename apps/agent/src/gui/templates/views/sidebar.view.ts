@@ -1,4 +1,4 @@
-export function renderSidebar(agentVersion: string = '0.1.5'): string {
+export function renderSidebar(agentVersion: string = '0.2.0'): string {
   return `  <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar">
     <div class="brand">

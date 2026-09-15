@@ -24,7 +24,7 @@ export class WooCommerceTester {
         method: 'GET',
         headers: {
           Authorization: authHeader,
-          'User-Agent': 'Bentian-ERP-Bridge/0.1.5',
+          'User-Agent': 'Bentian-ERP-Bridge/0.2.0',
         },
         signal: AbortSignal.timeout(8000),
       });

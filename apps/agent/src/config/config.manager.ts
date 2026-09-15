@@ -17,10 +17,18 @@ export class ConfigManager {
 
     const diskConfig = this.loadConfigFromDisk();
 
+    let pkgVersion = '0.2.0';
+    try {
+      const pkgPath = path.resolve(__dirname, '../../package.json');
+      if (fs.existsSync(pkgPath)) {
+        pkgVersion = JSON.parse(fs.readFileSync(pkgPath, 'utf8')).version || '0.2.0';
+      }
+    } catch {}
+
     const compiledVersion = (typeof process !== 'undefined' && (process.env.APP_VERSION || process.env.AGENT_VERSION))
       ? (process.env.APP_VERSION || process.env.AGENT_VERSION)
-      : '0.1.5';
-    this.currentVersion = customConfig?.agentVersion || compiledVersion || diskConfig.agentVersion || '0.1.5';
+      : pkgVersion;
+    this.currentVersion = customConfig?.agentVersion || compiledVersion || diskConfig.agentVersion || pkgVersion;
 
     const diskFactusol = diskConfig.factusol || {};
     const diskWoo = diskConfig.woocommerce || {};

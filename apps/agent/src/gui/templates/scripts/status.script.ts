@@ -1,4 +1,4 @@
-export function renderStatusScript(agentVersion: string = '0.1.5'): string {
+export function renderStatusScript(agentVersion: string = '0.2.0'): string {
   return `
     // Status Polling
     async function fetchStatus() {
