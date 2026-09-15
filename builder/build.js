@@ -377,10 +377,14 @@ async function runMasterBuild() {
 }
 
 if (require.main === module) {
-  runMasterBuild().catch(err => {
-    console.error('\n❌ ERROR EN MASTER BUILDER:', err);
-    process.exit(1);
-  });
+  runMasterBuild()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('\n❌ ERROR EN MASTER BUILDER:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = { runMasterBuild };
