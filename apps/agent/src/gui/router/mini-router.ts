@@ -36,8 +36,48 @@ export class MiniRouter {
     const pathname = parsedUrl.pathname;
     const method = req.method || 'GET';
 
-    // CORS headers for loopback
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // 1. Host Validation: debe comenzar por 127.0.0.1 o localhost
+    const host = req.headers.host || '';
+    if (!host.startsWith('127.0.0.1') && !host.startsWith('localhost')) {
+      this.logger.warn(`Acceso denegado por cabecera Host no autorizada: "${host}"`);
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Acceso denegado: Host no autorizado' }));
+      return;
+    }
+
+    // 2. Anti-CSRF: Validación estricta de Origin y Referer para orígenes loopback
+    const loopbackOriginRegex = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
+    const origin = req.headers.origin;
+    if (origin) {
+      if (!loopbackOriginRegex.test(origin)) {
+        this.logger.warn(`Acceso bloqueado: Origin externo no permitido: ${origin}`);
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Acceso denegado: Origen no autorizado' }));
+        return;
+      }
+    }
+
+    const referer = req.headers.referer;
+    if (referer) {
+      try {
+        const refUrl = new URL(referer);
+        const refOrigin = `${refUrl.protocol}//${refUrl.host}`;
+        if (!loopbackOriginRegex.test(refOrigin)) {
+          this.logger.warn(`Acceso bloqueado: Referer externo no permitido: ${referer}`);
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Acceso denegado: Origen no autorizado' }));
+          return;
+        }
+      } catch {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Acceso denegado: Origen no autorizado' }));
+        return;
+      }
+    }
+
+    // 3. Cabeceras CORS restrictivas para loopback
+    const allowedOrigin = origin || `http://${host || '127.0.0.1'}`;
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 

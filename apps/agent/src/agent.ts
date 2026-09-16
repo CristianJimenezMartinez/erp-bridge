@@ -47,6 +47,11 @@ export * from './sync';
 export * from './update';
 export * from './system';
 
+export interface AgentGuiServer {
+  stop(): Promise<void>;
+  getUrl?(): string;
+}
+
 export class LocalAgent {
   private readonly logger = new Logger('LocalAgent');
 
@@ -65,6 +70,7 @@ export class LocalAgent {
   private isRunning = false;
   private isUpdating = false;
   private heartbeatTimer: NodeJS.Timeout | null = null;
+  private guiServer: AgentGuiServer | null = null;
 
   constructor(customConfig?: Partial<AgentConfigFile>, customStoreDir?: string) {
     this.configManager = new ConfigManager(customConfig);
@@ -582,6 +588,14 @@ export class LocalAgent {
     return success;
   }
 
+  public setGuiServer(server: AgentGuiServer | null): void {
+    this.guiServer = server;
+  }
+
+  public getGuiServer(): AgentGuiServer | null {
+    return this.guiServer;
+  }
+
   public async stop(): Promise<void> {
     this.isRunning = false;
     this.syncEngine.stopAutoSyncLoop();
@@ -592,6 +606,11 @@ export class LocalAgent {
     this.updateClient.stopPeriodicCheck();
     this.licenseService.stopValidationLoop();
     this.fileWatcherService.stop();
+    if (this.guiServer) {
+      await this.guiServer.stop();
+      this.guiServer = null;
+    }
+    this.eventBus.disconnectAllListeners();
     await this.factusolService.disconnect();
     this.logger.info('ERP Bridge Local Agent detenido con éxito.');
   }

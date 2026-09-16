@@ -110,14 +110,13 @@ async function runRealInvoiceTests() {
   const driver = (connector as any).driver;
   if (driver) {
     const cobRows = await driver.query(`SELECT MULLCO FROM F_LCO WHERE TFALCO = '1' AND CFALCO = ${createdCodfac}`).catch(() => []);
-    await driver.execute(`DELETE FROM F_FAC WHERE TIPFAC = '1' AND CODFAC = ${createdCodfac}`);
-    await driver.execute(`DELETE FROM F_LFA WHERE TIPLFA = '1' AND CODLFA = ${createdCodfac}`);
-    await driver.execute(`DELETE FROM F_LCO WHERE TFALCO = '1' AND CFALCO = ${createdCodfac}`);
-    for (const cob of cobRows) {
-      if (cob.MULLCO) {
-        await driver.execute(`DELETE FROM F_COB WHERE CODCOB = ${cob.MULLCO}`).catch(() => {});
-      }
-    }
+    const cleanupStmts = [
+      `DELETE FROM F_FAC WHERE TIPFAC = '1' AND CODFAC = ${createdCodfac}`,
+      `DELETE FROM F_LFA WHERE TIPLFA = '1' AND CODLFA = ${createdCodfac}`,
+      `DELETE FROM F_LCO WHERE TFALCO = '1' AND CFALCO = ${createdCodfac}`,
+      ...cobRows.filter((c: any) => c.MULLCO).map((c: any) => `DELETE FROM F_COB WHERE CODCOB = ${c.MULLCO}`),
+    ];
+    await driver.executeTransaction(cleanupStmts).catch(() => {});
     console.log('✓ Limpieza de factura y cobro de prueba completada con éxito.');
   }
 

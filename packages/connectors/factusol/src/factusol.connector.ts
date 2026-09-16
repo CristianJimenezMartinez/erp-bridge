@@ -36,17 +36,15 @@ import {
   FactusolInvoiceHandler,
 } from './handlers';
 
-export interface FactusolConnectionConfig {
-  databasePath: string;
-  tariffCode?: string;
-  activeOnly?: boolean;
-  provider?: string;
-  orderSeries?: string;
-  invoiceSeries?: string;
-  defaultWarehouse?: string;
-  autoRollover?: boolean;
-  recordPayments?: boolean;
-}
+import {
+  FactusolConnectionConfig,
+  FactusolConnectorOptions,
+} from './factusol.types';
+
+export {
+  FactusolConnectionConfig,
+  FactusolConnectorOptions,
+};
 
 export class FactusolConnector implements Connector {
   private readonly logger = new Logger('FactusolConnector');

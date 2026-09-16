@@ -23,13 +23,14 @@ import {
   readOrdersQuery,
   updateOrderStatusQuery,
   normalizeTaxId,
+  sanitizeAndTruncate,
 } from '../queries';
 import {
   FactusolOrderRaw,
   FactusolOrderLineRaw,
   FactusolOrderMapper,
 } from '../mappers';
-import { FactusolConnectionConfig } from '../factusol.connector';
+import { FactusolConnectionConfig } from '../factusol.types';
 import { FactusolCustomerHandler } from './customer.handler';
 
 export class FactusolOrderHandler {
@@ -62,27 +63,26 @@ export class FactusolOrderHandler {
       }
 
       // 2. Cliente Contado Web o cliente registrado con CIF
-      let customerCode = 0;
+      // Desacoplamiento total de ID CMS vs CODCLI de Factusol
+      let customerCode = 1;
       const normalizedTaxId = normalizeTaxId(order.customer?.taxId);
       const hasCif = Boolean(normalizedTaxId && normalizedTaxId.trim().length > 0);
 
-      if (order.customer?.customerNumber && !isNaN(Number(order.customer.customerNumber)) && Number(order.customer.customerNumber) > 1) {
-        customerCode = Number(order.customer.customerNumber);
-      } else if (!hasCif) {
+      if (!hasCif) {
         // Invitado o particular sin CIF para factura: asignar cliente genérico 1 ("CLIENTE CONTADO WEB")
         // Datos de envío y contacto se estampan directamente en la cabecera F_PCL
         customerCode = 1;
         this.logger.info(`Pedido ${reference} sin CIF: asignando cliente contado web (CODCLI=1)`);
       } else {
-        // Cliente con CIF: buscar o crear en F_CLI
+        // Cliente con CIF: buscar por CIF en F_CLI
         const found = await this.customerHandler.findCustomer({
           taxId: normalizedTaxId,
-          email: order.customer?.email,
         });
 
         if (found && found.customerNumber) {
           customerCode = Number(found.customerNumber);
         } else {
+          // Si no existe, genera nuevo cliente con getNextCustomerIdQuery()
           const customerToCreate: CanonicalCustomer = {
             ...order.customer,
             taxId: normalizedTaxId,
@@ -204,8 +204,44 @@ export class FactusolOrderHandler {
 
     const series = this.config.orderSeries || ' ';
     const statusCode = FactusolOrderMapper.mapOrderStatusToStatusCode(status);
+    const updateStatusSql = updateOrderStatusQuery(orderCode, series, statusCode);
 
-    await this.driver.execute(updateOrderStatusQuery(orderCode, series, statusCode));
+    // Reposición atómica de stock si el nuevo estado es cancelled o refunded
+    if (status === 'cancelled' || status === 'refunded') {
+      const sanitizedSeries = sanitizeAndTruncate(series || ' ', 1);
+
+      // 1. Consultar almacén del pedido
+      const headerRows = await this.driver.query<{ ALMPCL: string }>(
+        `SELECT ALMPCL FROM F_PCL WHERE CODPCL = ${orderCode} AND TIPPCL = '${sanitizedSeries}'`
+      ).catch(() => []);
+      const warehouse = (headerRows[0]?.ALMPCL && headerRows[0].ALMPCL.trim()) || this.config.defaultWarehouse || 'GEN';
+      const safeWarehouse = sanitizeAndTruncate(warehouse, 3);
+
+      // 2. Consultar líneas del pedido (F_LPC)
+      const lines = await this.driver.query<FactusolOrderLineRaw>(readOrderLinesQuery(orderCode, series)).catch(() => []);
+
+      // 3. Sentencias atómicas de reposición de stock
+      const stockRestoreSqls: string[] = [];
+      for (const line of lines) {
+        const qty = Number(line.CANLPC || 0);
+        const sku = sanitizeAndTruncate(line.ARTLPC, 13);
+        if (qty > 0 && sku) {
+          stockRestoreSqls.push(
+            `UPDATE F_STO SET DISSTO = DISSTO + ${qty} WHERE ARTSTO = '${sku}' AND ALMSTO = '${safeWarehouse}'`
+          );
+        }
+      }
+
+      if (stockRestoreSqls.length > 0) {
+        await this.driver.executeTransaction([updateStatusSql, ...stockRestoreSqls]);
+        this.logger.info(`Stock repuesto atómicamente para pedido cancelado/reembolsado (CODPCL=${orderCode}): ${stockRestoreSqls.length} líneas devueltas al almacén ${safeWarehouse}`);
+      } else {
+        await this.driver.execute(updateStatusSql);
+      }
+    } else {
+      await this.driver.execute(updateStatusSql);
+    }
+
     this.logger.info(`Estado de pedido actualizado en Factusol: CODPCL=${orderCode}, ESTPCL=${statusCode} (${status})`);
 
     return {

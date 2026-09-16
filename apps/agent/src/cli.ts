@@ -3,11 +3,111 @@ if (process.platform === 'win32') {
   process.stdout?.on('error', () => {});
   process.stderr?.on('error', () => {});
 }
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 import readline from 'readline';
 import { execSync } from 'child_process';
 import { LocalAgent } from './agent';
 import { FactusolDetector } from './detector';
 import { LocalGuiServer, openDesktopWindow, openWindowsFileDialog, SystemTrayManager } from './gui';
+
+function getPanicLogPath(): string {
+  const baseDir =
+    process.env.APPDATA ||
+    (os.platform() === 'darwin'
+      ? path.join(os.homedir(), 'Library', 'Application Support')
+      : path.join(os.homedir(), '.config'));
+
+  const primaryLogsDir = path.join(baseDir, 'erp-bridge', 'logs');
+  try {
+    if (!fs.existsSync(primaryLogsDir)) {
+      fs.mkdirSync(primaryLogsDir, { recursive: true });
+    }
+    return path.join(primaryLogsDir, 'panic.log');
+  } catch {
+    return path.resolve(process.cwd(), 'agent-panic.log');
+  }
+}
+
+function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string, err: unknown): string {
+  const logPath = getPanicLogPath();
+  try {
+    const timestamp = new Date().toISOString();
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? (err.stack || 'Sin traza de pila (stack trace)') : String(err);
+
+    const report = [
+      '================================================================================',
+      `🚨 [PANIC REPORT] ${timestamp}`,
+      `   Type: ${type}`,
+      `   Platform: ${process.platform} (${process.arch}) | Node: ${process.version} | PID: ${process.pid}`,
+      `   Executable: ${process.execPath}`,
+      '--------------------------------------------------------------------------------',
+      `Error: ${errorMessage}`,
+      'Stack Trace:',
+      stack,
+      '================================================================================\n\n',
+    ].join('\n');
+
+    fs.appendFileSync(logPath, report, 'utf8');
+
+    console.error('\n=============================================================');
+    console.error(`🚨 ERROR CRÍTICO DEL AGENTE [${type}]`);
+    console.error('=============================================================');
+    console.error(`Mensaje: ${errorMessage}`);
+    console.error(`Registro de auditoría guardado en:\n  ${logPath}`);
+    console.error('=============================================================\n');
+  } catch (fsErr) {
+    console.error('Fallo al escribir en panic.log:', fsErr, 'Error original:', err);
+  }
+  return logPath;
+}
+
+let activeAgentInstance: LocalAgent | null = null;
+let activeGuiServerInstance: LocalGuiServer | null = null;
+let isShuttingDown = false;
+
+async function handleGracefulShutdown(signal: string): Promise<void> {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(`\n🛑 Recibida señal ${signal}. Deteniendo agente local de forma segura...`);
+  try {
+    SystemTrayManager.stop();
+    if (activeGuiServerInstance) {
+      await activeGuiServerInstance.stop();
+      activeGuiServerInstance = null;
+    }
+    if (activeAgentInstance) {
+      await activeAgentInstance.stop();
+      activeAgentInstance = null;
+    }
+    console.log('✓ Todos los servicios y conexiones del agente detenidos correctamente.');
+  } catch (err) {
+    console.error('Error durante la detención de servicios:', err);
+  } finally {
+    process.exit(0);
+  }
+}
+
+// 1. Manejadores globales de ciclo de vida y pánicos al inicio del archivo
+process.on('unhandledRejection', (reason: unknown, _promise: Promise<unknown>) => {
+  writePanicLog('unhandledRejection', reason);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  writePanicLog('uncaughtException', error);
+  process.exit(1);
+});
+
+process.on('SIGTERM', () => {
+  void handleGracefulShutdown('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+  void handleGracefulShutdown('SIGINT');
+});
 
 async function promptUserForInput(promptMessage: string, windowTitle: string): Promise<string> {
   if (process.stdin.isTTY) {
@@ -302,11 +402,13 @@ async function main() {
       }
 
       const agent = new LocalAgent();
+      activeAgentInstance = agent;
       await agent.start();
 
       let guiServer: LocalGuiServer | null = null;
       if (!isHeadless) {
         guiServer = new LocalGuiServer(agent);
+        activeGuiServerInstance = guiServer;
         const { port, url } = await guiServer.start();
         console.log(`\n🖥️ Interfaz gráfica de escritorio lista en: ${url}`);
         if (!isMinimized) {
@@ -320,26 +422,26 @@ async function main() {
       }
 
       console.log('💡 Agente local ejecutándose en segundo plano. Presione Ctrl+C para detener.\n');
-
-      process.on('SIGINT', async () => {
-        console.log('\nDeteniendo agente local...');
-        SystemTrayManager.stop();
-        if (guiServer) {
-          await guiServer.stop();
-        }
-        await agent.stop();
-        process.exit(0);
-      });
       break;
     }
   }
 }
 
-export { LocalAgent, LocalGuiServer, FactusolDetector, openDesktopWindow, openWindowsFileDialog, SystemTrayManager };
+export {
+  LocalAgent,
+  LocalGuiServer,
+  FactusolDetector,
+  openDesktopWindow,
+  openWindowsFileDialog,
+  SystemTrayManager,
+  writePanicLog,
+  getPanicLogPath,
+  handleGracefulShutdown,
+};
 
 if (!process.env['ERP_BRIDGE_TEST_MODE']) {
   main().catch((err) => {
-    console.error('Error no controlado en CLI:', err);
+    writePanicLog('uncaughtException', err);
     process.exit(1);
   });
 }

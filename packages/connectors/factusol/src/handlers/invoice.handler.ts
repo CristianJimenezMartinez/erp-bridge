@@ -19,7 +19,7 @@ import {
   PaymentRecordParams,
 } from '../queries';
 import { FactusolInvoiceMapper } from '../mappers';
-import { FactusolConnectionConfig } from '../factusol.connector';
+import { FactusolConnectionConfig } from '../factusol.types';
 
 export class FactusolInvoiceHandler {
   constructor(

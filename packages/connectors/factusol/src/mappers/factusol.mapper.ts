@@ -17,6 +17,7 @@ export interface FactusolEnrichmentData {
   stockMap?: Map<string, number>;
   actualStockMap?: Map<string, number>;
   priceMap?: Map<string, number>;
+  defaultPriceMap?: Map<string, number>;
   familyMap?: Map<string, string>;
   barcodeMap?: Map<string, string[]>;
 }
@@ -46,8 +47,9 @@ export function mapFactusolArticleToCanonical(
   const description = String(raw.DEWART ?? '').trim() || name;
   const costPrice = typeof raw.PCOART === 'number' ? raw.PCOART : Number(raw.PCOART) || 0;
 
-  // Retrieve price from tariff map or fallback to cost price
-  let regularPrice = costPrice;
+  // Retrieve price from tariff map with fallback to default tariff 1 (PVP).
+  // JAMAS asignar PCOART (coste mayorista) como regularPrice.
+  let regularPrice = 0;
   if (enrichment?.priceMap && enrichment.priceMap.has(code)) {
     const tariffPrice = enrichment.priceMap.get(code);
     if (tariffPrice !== undefined && tariffPrice > 0) {
@@ -55,10 +57,21 @@ export function mapFactusolArticleToCanonical(
     }
   }
 
+  // Fallback to default price map (Tarifa 1 / PVP) if configured tariff has no price or <= 0
+  if (regularPrice <= 0 && enrichment?.defaultPriceMap && enrichment.defaultPriceMap.has(code)) {
+    const defaultPrice = enrichment.defaultPriceMap.get(code);
+    if (defaultPrice !== undefined && defaultPrice > 0) {
+      regularPrice = defaultPrice;
+    }
+  }
+
   // Retrieve stock quantity (available quantity DISSTO preferred to prevent overselling)
+  // Si no existe ningún precio público en ninguna tarifa, asigna regularPrice = 0 y stock 0 / no disponible para la venta web
   let stockQuantity = 0;
-  if (enrichment?.stockMap && enrichment.stockMap.has(code)) {
-    stockQuantity = enrichment.stockMap.get(code) || 0;
+  if (regularPrice > 0) {
+    if (enrichment?.stockMap && enrichment.stockMap.has(code)) {
+      stockQuantity = enrichment.stockMap.get(code) || 0;
+    }
   }
 
   // Retrieve family category
@@ -73,9 +86,9 @@ export function mapFactusolArticleToCanonical(
     });
   }
 
-  // Status check
+  // Status check: si no existe precio público válido, no disponible para la venta web ('draft')
   const suwartStr = String(raw.SUWART ?? '').trim();
-  const isWebActive = suwartStr === '1' || suwartStr === 'S' || suwartStr === 'True' || suwartStr === '-1';
+  const isWebActive = (suwartStr === '1' || suwartStr === 'S' || suwartStr === 'True' || suwartStr === '-1') && regularPrice > 0;
   const status = isWebActive ? 'published' : 'draft';
 
   // Barcodes: merge principal EANART with F_EAN auxiliary barcodes
@@ -102,7 +115,7 @@ export function mapFactusolArticleToCanonical(
     costPrice,
     stockQuantity,
     manageStock: true,
-    inStock: stockQuantity > 0,
+    inStock: regularPrice > 0 && stockQuantity > 0,
     status,
     categories,
     barcode,

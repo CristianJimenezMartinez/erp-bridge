@@ -1,3 +1,7 @@
+import { sanitizeAndTruncate } from './order.queries';
+
+export { sanitizeAndTruncate };
+
 export interface PaymentRecordParams {
   id: number;
   series: string;
@@ -51,11 +55,11 @@ export const GET_NEXT_PAYMENT_ID_QUERY = `SELECT MAX(CODCOB) AS maxid FROM F_COB
  */
 export function insertPaymentRecordQuery(params: PaymentRecordParams): string {
   const formattedDate = formatAccessDate(params.date);
-  const seriesStr = (params.series || '1').substring(0, 1);
+  const seriesStr = sanitizeAndTruncate(params.series || '1', 1);
   const invoiceNumPadded = String(params.invoiceNumber).padStart(6, '0');
   const defaultConcept = `COBRO FACTURA Nº: ${seriesStr} - ${invoiceNumPadded}`;
-  const concept = (params.concept || defaultConcept).substring(0, 40).replace(/'/g, "''");
-  const observations = (params.observations || '').replace(/'/g, "''");
+  const concept = sanitizeAndTruncate(params.concept || defaultConcept, 40);
+  const observations = sanitizeAndTruncate(params.observations || '', 50);
   const conceptAccount = typeof params.conceptAccount === 'number' ? params.conceptAccount : 1;
   const transferFlag = typeof params.transferFlag === 'number' ? params.transferFlag : 0;
   const type = typeof params.type === 'number' ? params.type : 0;
@@ -84,12 +88,12 @@ export function insertPaymentRecordQuery(params: PaymentRecordParams): string {
 export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): string {
   const formattedDate = formatAccessDate(params.date);
   const nowTimestamp = formatAccessTimestamp(new Date());
-  const seriesStr = (params.series || '1').substring(0, 1);
+  const seriesStr = sanitizeAndTruncate(params.series || '1', 1);
   const invoiceNumPadded = String(params.invoiceNumber).padStart(6, '0');
   const defaultConcept = `COBRO FACTURA Nº: ${seriesStr} - ${invoiceNumPadded}`;
-  const concept = (params.concept || defaultConcept).substring(0, 40).replace(/'/g, "''");
-  const paymentMethod = (params.paymentMethod || 'TAR').substring(0, 3).toUpperCase().replace(/'/g, "''");
-  const observations = (params.observations || '').replace(/'/g, "''");
+  const concept = sanitizeAndTruncate(params.concept || defaultConcept, 40);
+  const paymentMethod = sanitizeAndTruncate(params.paymentMethod || 'TAR', 3).toUpperCase();
+  const observations = sanitizeAndTruncate(params.observations || '', 50);
   const amount = Number(params.amount.toFixed(2));
 
   return `
@@ -129,7 +133,7 @@ export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): stri
  * Consulta para comprobar si ya existe un cobro registrado para una factura en F_LCO.
  */
 export function selectPaymentsByInvoiceQuery(series: string, invoiceNumber: number): string {
-  const cleanSeries = series.substring(0, 1).replace(/'/g, "''");
+  const cleanSeries = sanitizeAndTruncate(series, 1);
   return `SELECT TFALCO, CFALCO, LINLCO, MULLCO, IMPLCO, FECLCO, FPALCO FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${invoiceNumber}`;
 }
 
@@ -144,6 +148,6 @@ export function deletePaymentByIdQuery(paymentId: number): string {
  * Elimina las líneas de cobro de una factura en F_LCO.
  */
 export function deleteInvoicePaymentLinesQuery(series: string, invoiceNumber: number): string {
-  const cleanSeries = series.substring(0, 1).replace(/'/g, "''");
+  const cleanSeries = sanitizeAndTruncate(series, 1);
   return `DELETE FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${invoiceNumber}`;
 }

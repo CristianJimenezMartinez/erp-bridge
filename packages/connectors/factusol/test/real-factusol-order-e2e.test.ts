@@ -2,7 +2,6 @@ import assert from 'assert';
 import fs from 'fs';
 import { FactusolConnector } from '../src/factusol.connector';
 import { AccessDriver } from '../src/access-driver';
-import { CanonicalOrder } from '@erp-bridge/shared';
 
 import path from 'path';
 
@@ -44,18 +43,20 @@ async function runTest() {
   const testRef = `TEST_WC_${Date.now()}`;
   console.log(`3. Insertando pedido de prueba con referencia: ${testRef}...`);
 
-  const testOrder: CanonicalOrder = {
+  const testOrder: any = {
     id: `ord_${Date.now()}`,
     orderNumber: String(Date.now()).substring(5),
     series: '1',
     reference: testRef,
     date: new Date(),
     status: 'pending',
+    hasEquivalenceSurcharge: false,
     customer: {
       id: 'cust_test',
       fiscalName: 'CLIENTE PRUEBA ERP BRIDGE SL',
       taxId: 'B99999999',
       phone: '910000000',
+      hasEquivalenceSurcharge: false,
       address: {
         street: 'Calle Mayor 1',
         city: 'Madrid',
@@ -107,12 +108,31 @@ async function runTest() {
   assert.strictEqual(updateResult.success, true);
   console.log('✓ Estado de pedido actualizado a completed (ESTPCL = 2)');
 
+  // 5b. Test stock restoration on cancellation
+  console.log('5b. Verificando reposición atómica de stock en cancelación...');
+  const stockBefore = await driver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '000001' AND ALMSTO = 'GEN'`
+  );
+  const disstoBefore = Number(stockBefore[0]?.DISSTO || 0);
+
+  const cancelResult = await connector.updateOrderStatus(String(createdOrderCode), 'cancelled');
+  assert.strictEqual(cancelResult.success, true);
+
+  const stockAfter = await driver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '000001' AND ALMSTO = 'GEN'`
+  );
+  const disstoAfter = Number(stockAfter[0]?.DISSTO || 0);
+  assert.strictEqual(disstoAfter, disstoBefore + 2, 'El stock disponible DISSTO debe haberse incrementado en 2 tras cancelación');
+  console.log(`✓ Reposición de stock verificada: ${disstoBefore} -> ${disstoAfter}`);
+
   // 6. Cleanup test records so the real accdb stays unmodified
   console.log('6. Limpiando registros de prueba en F_PCL, F_LPC...');
   try {
-    await driver.execute(`DELETE FROM F_LPC WHERE CODLPC = ${createdOrderCode} AND TIPLPC = '1'`);
-    await driver.execute(`DELETE FROM F_PCL WHERE CODPCL = ${createdOrderCode} AND TIPPCL = '1'`);
-    await driver.execute(`DELETE FROM F_CLI WHERE NIFCLI = 'B99999999'`);
+    await driver.executeTransaction([
+      `DELETE FROM F_LPC WHERE CODLPC = ${createdOrderCode} AND TIPLPC = '1'`,
+      `DELETE FROM F_PCL WHERE CODPCL = ${createdOrderCode} AND TIPPCL = '1'`,
+      `DELETE FROM F_CLI WHERE NIFCLI = 'B99999999'`,
+    ]);
     console.log('✓ Limpieza completada con éxito.');
   } catch (cleanErr) {
     console.warn('Aviso durante limpieza:', cleanErr);

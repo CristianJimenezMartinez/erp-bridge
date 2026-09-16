@@ -35,6 +35,10 @@ export class AuthService {
   private static readonly SECRET =
     process.env['ADMIN_JWT_SECRET'] || (process.env['NODE_ENV'] === 'production' ? crypto.randomBytes(32).toString('hex') : 'bentian-dev-jwt-secret');
 
+  public static getSecret(): string {
+    return this.SECRET;
+  }
+
   public static createToken(payload: AdminJwtPayload): string {
     const header = { alg: 'HS256', typ: 'JWT' };
     const encodedHeader = base64UrlEncode(JSON.stringify(header));
@@ -115,10 +119,53 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
   next();
 }
 
+export interface LoginAttemptRecord {
+  count: number;
+  firstAttempt: number;
+  blockedUntil?: number;
+}
+
+export const MAX_LOGIN_ATTEMPTS = 5;
+export const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutos de bloqueo
+export const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // Ventana de 15 minutos
+export const loginAttempts = new Map<string, LoginAttemptRecord>();
+
+export function clearLoginAttempts(): void {
+  loginAttempts.clear();
+}
+
+function pruneLoginAttempts(now: number): void {
+  for (const [key, record] of loginAttempts.entries()) {
+    if (record.blockedUntil && now < record.blockedUntil) continue;
+    if (now - record.firstAttempt > ATTEMPT_WINDOW_MS) {
+      loginAttempts.delete(key);
+    }
+  }
+}
+
 export const authRouter = Router();
 
 // POST /api/v1/auth/login
 authRouter.post('/auth/login', (req: Request, res: Response): void => {
+  const forwarded = req.headers['x-forwarded-for'];
+  const clientIp = (typeof forwarded === 'string' ? forwarded.split(',')[0]?.trim() : null) || req.socket.remoteAddress || req.ip || '127.0.0.1';
+  const now = Date.now();
+  pruneLoginAttempts(now);
+
+  // Comprobar bloqueo activo por fuerza bruta
+  const attemptRecord = loginAttempts.get(clientIp);
+  if (attemptRecord?.blockedUntil && now < attemptRecord.blockedUntil) {
+    const remainingSeconds = Math.ceil((attemptRecord.blockedUntil - now) / 1000);
+    res.setHeader('Retry-After', String(remainingSeconds));
+    res.status(429).json({
+      error: {
+        code: 'TOO_MANY_ATTEMPTS',
+        message: `Demasiados intentos fallidos de inicio de sesión. Bloqueo de seguridad activo por ${remainingSeconds} segundos.`,
+      },
+    });
+    return;
+  }
+
   const parsed = LoginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
@@ -146,11 +193,46 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
   }
 
   const isEmailMatch = email.toLowerCase() === adminEmail.toLowerCase();
-  const inputHash = crypto.createHash('sha256').update(password).digest();
-  const targetHash = crypto.createHash('sha256').update(adminPassword).digest();
-  const isPassMatch = crypto.timingSafeEqual(inputHash, targetHash);
+
+  // Comparación segura con crypto.pbkdf2Sync (100.000 iteraciones, salt criptográfico) y crypto.timingSafeEqual
+  let isPassMatch = false;
+  try {
+    if (adminPassword.includes(':')) {
+      const [saltHex, storedHashHex] = adminPassword.split(':');
+      if (saltHex && storedHashHex) {
+        const derived = crypto.pbkdf2Sync(password, saltHex, 100000, 64, 'sha512');
+        const storedBuf = Buffer.from(storedHashHex, 'hex');
+        if (derived.length === storedBuf.length) {
+          isPassMatch = crypto.timingSafeEqual(derived, storedBuf);
+        }
+      }
+    }
+    if (!isPassMatch) {
+      // Contraseña en variable de entorno con salt criptográfico derivado del secret y email
+      const salt = crypto.createHash('sha256').update(`${adminEmail.toLowerCase()}:${AuthService.getSecret()}`).digest('hex');
+      const inputDerived = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512');
+      const targetDerived = crypto.pbkdf2Sync(adminPassword, salt, 100000, 64, 'sha512');
+      isPassMatch = crypto.timingSafeEqual(inputDerived, targetDerived);
+    }
+  } catch {
+    isPassMatch = false;
+  }
 
   if (!isEmailMatch || !isPassMatch) {
+    const current = loginAttempts.get(clientIp) || { count: 0, firstAttempt: now };
+    if (now - current.firstAttempt > ATTEMPT_WINDOW_MS) {
+      current.count = 1;
+      current.firstAttempt = now;
+      current.blockedUntil = undefined;
+    } else {
+      current.count += 1;
+    }
+
+    if (current.count >= MAX_LOGIN_ATTEMPTS) {
+      current.blockedUntil = now + LOCKOUT_MS;
+    }
+    loginAttempts.set(clientIp, current);
+
     res.status(401).json({
       error: {
         code: 'INVALID_CREDENTIALS',
@@ -159,6 +241,9 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
     });
     return;
   }
+
+  // Éxito: limpiar registro de intentos fallidos para esta IP
+  loginAttempts.delete(clientIp);
 
   const tokenExpiryHours = 24;
   const exp = Date.now() + tokenExpiryHours * 60 * 60 * 1000;

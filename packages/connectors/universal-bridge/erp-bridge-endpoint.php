@@ -143,7 +143,9 @@ function ensureTablesExist($pdo) {
 function verifyAuthentication() {
     $secret = EB_SECRET_KEY;
     if ($secret === '%%EB_SECRET_KEY%%' || empty($secret)) {
-        return true;
+        http_response_code(503);
+        echo json_encode(['error' => 'Endpoint no configurado: Clave secreta no establecida (EB_SECRET_KEY)']);
+        exit;
     }
 
     $headers = function_exists('getallheaders') ? getallheaders() : [];
@@ -214,6 +216,7 @@ if ($action === 'health') {
 }
 
 if ($action === 'catalog' || $action === 'articles') {
+    verifyAuthentication();
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -254,6 +257,7 @@ if ($action === 'catalog' || $action === 'articles') {
 }
 
 if ($action === 'family') {
+    verifyAuthentication();
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -287,6 +291,7 @@ if ($action === 'family') {
 }
 
 if ($action === 'measures') {
+    verifyAuthentication();
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -300,8 +305,9 @@ if ($action === 'measures') {
     exit;
 }
 
-// Endpoint público para que la tienda Angular cree pedidos
+// Endpoint protegido para creación de pedidos
 if ($action === 'create_order') {
+    verifyAuthentication();
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);

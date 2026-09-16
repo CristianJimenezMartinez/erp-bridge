@@ -1,8 +1,13 @@
 import { CanonicalAddress, CanonicalOrder, CanonicalOrderLine } from '@erp-bridge/shared';
 
+export function sanitizeAndTruncate(val: unknown, maxLen: number): string {
+  if (val === null || val === undefined) return '';
+  return String(val).trim().substring(0, maxLen).replace(/'/g, "''");
+}
+
 export function sanitizeSql(val: unknown): string {
   if (val === null || val === undefined) return '';
-  return String(val).replace(/'/g, "''").trim();
+  return String(val).trim().replace(/'/g, "''");
 }
 
 export function formatAccessDate(date: Date): string {
@@ -52,7 +57,7 @@ export function getNextOrderIdQuery(series = ''): string {
 
 // Direcciones de entrega / obras en Factusol: tabla F_OBR (CLIOBR, CODOBR, NOMOBR, DIROBR, POBOBR, CPOOBR, PROOBR, TELOBR)
 export function findDeliveryAddressQuery(customerCode: number, street: string, postalCode: string): string {
-  return `SELECT * FROM F_OBR WHERE CLIOBR = ${customerCode} AND DIROBR = '${sanitizeSql(street).substring(0, 50)}' AND CPOOBR = '${sanitizeSql(postalCode).substring(0, 5)}'`;
+  return `SELECT * FROM F_OBR WHERE CLIOBR = ${customerCode} AND DIROBR = '${sanitizeAndTruncate(street, 50)}' AND CPOOBR = '${sanitizeAndTruncate(postalCode, 5)}'`;
 }
 
 export function getNextDeliveryAddressIdQuery(customerCode: number): string {
@@ -65,12 +70,12 @@ export function insertDeliveryAddressQuery(
   shipAddr: CanonicalAddress,
   recipientName: string
 ): string {
-  const name = sanitizeSql(recipientName).substring(0, 50);
-  const street = sanitizeSql(shipAddr.street || '').substring(0, 50);
-  const city = sanitizeSql(shipAddr.city || '').substring(0, 30);
-  const postalCode = sanitizeSql(shipAddr.postalCode || '').substring(0, 5);
-  const province = sanitizeSql(shipAddr.state || '').substring(0, 30);
-  const phone = sanitizeSql(shipAddr.phone || '').substring(0, 15);
+  const name = sanitizeAndTruncate(recipientName, 50);
+  const street = sanitizeAndTruncate(shipAddr.street || '', 50);
+  const city = sanitizeAndTruncate(shipAddr.city || '', 30);
+  const postalCode = sanitizeAndTruncate(shipAddr.postalCode || '', 5);
+  const province = sanitizeAndTruncate(shipAddr.state || '', 30);
+  const phone = sanitizeAndTruncate(shipAddr.phone || '', 15);
 
   return `
     INSERT INTO F_OBR (
@@ -89,7 +94,7 @@ export function insertDeliveryAddressQuery(
 }
 
 export function findOrderByReferenceQuery(ref: string): string {
-  return `SELECT * FROM F_PCL WHERE REFPCL = '${sanitizeSql(ref)}'`;
+  return `SELECT * FROM F_PCL WHERE REFPCL = '${sanitizeAndTruncate(ref, 50)}'`;
 }
 
 export function mapPaymentMethodToFactusol(method?: string): string {
@@ -99,7 +104,7 @@ export function mapPaymentMethodToFactusol(method?: string): string {
   if (m.includes('bacs') || m.includes('transfer') || m.includes('wire') || m.includes('bbva')) return 'TR';
   if (m.includes('cod') || m.includes('reembolso') || m.includes('cash')) return 'EFE';
   if (m.includes('paypal')) return 'PAY';
-  return sanitizeSql(method).substring(0, 3).toUpperCase() || 'TAR';
+  return sanitizeAndTruncate(method, 3).toUpperCase() || 'TAR';
 }
 
 const EU_COUNTRY_CODES = new Set([
@@ -241,13 +246,46 @@ export function calculateOrderVatBreakdown(order: CanonicalOrder): OrderVatBreak
   net3 = Number(net3.toFixed(2));
   net4 = Number(net4.toFixed(2));
 
+  // 1. Deducción ponderada de order.discountAmount de las bases imponibles
+  const discountAmount = Number(order.discountAmount || 0);
+  if (discountAmount > 0) {
+    const totalNetBeforeDiscount = Number((net1 + net2 + net3 + net4).toFixed(2));
+    if (totalNetBeforeDiscount > 0) {
+      const disc1 = Number(((net1 / totalNetBeforeDiscount) * discountAmount).toFixed(2));
+      const disc2 = Number(((net2 / totalNetBeforeDiscount) * discountAmount).toFixed(2));
+      const disc3 = Number(((net3 / totalNetBeforeDiscount) * discountAmount).toFixed(2));
+      const disc4 = Number((discountAmount - disc1 - disc2 - disc3).toFixed(2));
+
+      net1 = Math.max(0, Number((net1 - disc1).toFixed(2)));
+      net2 = Math.max(0, Number((net2 - disc2).toFixed(2)));
+      net3 = Math.max(0, Number((net3 - disc3).toFixed(2)));
+      net4 = Math.max(0, Number((net4 - disc4).toFixed(2)));
+    }
+  }
+
   let shipping = Number(Number(order.shippingAmount || 0).toFixed(2));
 
-  // Identidad algebraica: BAS1PCL = NET1PCL + IPOR1PCL (no duplicar portes si ya están en NET1)
-  let bas1 = Number((net1 + shipping).toFixed(2));
+  // 2. Imputación de portes:
+  // Si el pedido tiene productos al 21%, imputa a BAS1 (identidad BAS1 = NET1 + IPOR1).
+  // Si el pedido NO tiene productos al 21% (p.ej. solo al 10% o al 4%), imputa al tipo impositivo preponderante.
+  let bas1 = net1;
   let bas2 = net2;
   let bas3 = net3;
   let bas4 = net4;
+
+  if (shipping > 0) {
+    if (net1 > 0 || (net2 === 0 && net3 === 0 && net4 === 0)) {
+      bas1 = Number((net1 + shipping).toFixed(2));
+    } else if (net2 >= net3 && net2 >= net4 && net2 > 0) {
+      bas2 = Number((net2 + shipping).toFixed(2));
+    } else if (net3 >= net2 && net3 >= net4 && net3 > 0) {
+      bas3 = Number((net3 + shipping).toFixed(2));
+    } else if (net4 > 0) {
+      bas4 = Number((net4 + shipping).toFixed(2));
+    } else {
+      bas1 = Number((net1 + shipping).toFixed(2));
+    }
+  }
 
   let iiva1 = isVatExempt ? 0 : Number((bas1 * 0.21).toFixed(2));
   let irec1 = isVatExempt || !hasReq ? 0 : Number((bas1 * 0.052).toFixed(2));
@@ -260,24 +298,36 @@ export function calculateOrderVatBreakdown(order: CanonicalOrder): OrderVatBreak
 
   let factusolTotal = Number((bas1 + iiva1 + irec1 + bas2 + iiva2 + irec2 + bas3 + iiva3 + irec3 + bas4).toFixed(2));
 
-  // Ajuste del céntimo (Cent Rounding) para cuadre 100% con Stripe / pasarela web
+  // 3. Ajuste del céntimo (Cent Rounding) para cuadre 100% con Stripe / pasarela web
   const targetTotal = Number(Number(order.totalAmount || 0).toFixed(2));
   if (targetTotal > 0) {
     const diff = Number((targetTotal - factusolTotal).toFixed(2));
     if (Math.abs(diff) > 0 && Math.abs(diff) <= 0.05) {
-      if (shipping > 0) {
-        shipping = Number((shipping + diff).toFixed(2));
-        bas1 = Number((net1 + shipping).toFixed(2));
+      if (net1 > 0 || (net2 === 0 && net3 === 0 && net4 === 0)) {
+        if (shipping > 0) {
+          shipping = Number((shipping + diff).toFixed(2));
+          bas1 = Number((net1 + shipping).toFixed(2));
+        } else {
+          bas1 = Number((bas1 + diff).toFixed(2));
+        }
         if (!isVatExempt) {
           iiva1 = Number((bas1 * 0.21).toFixed(2));
           if (hasReq) irec1 = Number((bas1 * 0.052).toFixed(2));
+        }
+      } else if (net2 >= net3 && net2 >= net4) {
+        bas2 = Number((bas2 + diff).toFixed(2));
+        if (!isVatExempt) {
+          iiva2 = Number((bas2 * 0.10).toFixed(2));
+          if (hasReq) irec2 = Number((bas2 * 0.014).toFixed(2));
+        }
+      } else if (net3 >= net2 && net3 >= net4) {
+        bas3 = Number((bas3 + diff).toFixed(2));
+        if (!isVatExempt) {
+          iiva3 = Number((bas3 * 0.04).toFixed(2));
+          if (hasReq) irec3 = Number((bas3 * 0.005).toFixed(2));
         }
       } else {
-        bas1 = Number((bas1 + diff).toFixed(2));
-        if (!isVatExempt) {
-          iiva1 = Number((bas1 * 0.21).toFixed(2));
-          if (hasReq) irec1 = Number((bas1 * 0.052).toFixed(2));
-        }
+        bas4 = Number((bas4 + diff).toFixed(2));
       }
       factusolTotal = targetTotal;
     }
@@ -321,32 +371,34 @@ export function insertOrderHeaderQuery(
   breakdownOverride?: OrderVatBreakdown,
   seriesOverride?: string
 ): string {
-  const series = sanitizeSql(seriesOverride ?? order.series ?? ' ');
-  const ref = sanitizeSql(order.reference || order.orderNumber).substring(0, 50);
+  const series = sanitizeAndTruncate(seriesOverride ?? order.series ?? ' ', 1);
+  const ref = sanitizeAndTruncate(order.reference || order.orderNumber, 50);
   const orderDate = order.date ? new Date(order.date) : new Date();
   const fecpclFormatted = formatAccessDateOnly(orderDate);
   const horpclFormatted = formatAccessTimeOnly(orderDate);
 
   const shipAddr: CanonicalAddress = order.shippingAddress || order.billingAddress || order.customer?.address || { country: 'ES' };
-  const recipientName = sanitizeSql(
+  const recipientName = sanitizeAndTruncate(
     [shipAddr.firstName, shipAddr.lastName].filter(Boolean).join(' ') ||
     order.customer?.fiscalName ||
-    'CLIENTE CONTADO WEB'
-  ).substring(0, 100);
+    'CLIENTE CONTADO WEB',
+    100
+  );
 
-  const street = sanitizeSql(shipAddr.street || order.billingAddress?.street || order.customer?.address?.street || '').substring(0, 100);
-  const city = sanitizeSql(shipAddr.city || order.billingAddress?.city || order.customer?.address?.city || '').substring(0, 30);
-  const postalCode = sanitizeSql(shipAddr.postalCode || order.billingAddress?.postalCode || order.customer?.address?.postalCode || '').substring(0, 10);
-  const province = sanitizeSql(shipAddr.state || order.billingAddress?.state || order.customer?.address?.state || '').substring(0, 40);
-  const phone = sanitizeSql(shipAddr.phone || order.customer?.phone || '').substring(0, 50);
-  const customerEmail = sanitizeSql(shipAddr.email || order.customer?.email || '').substring(0, 255);
-  const nif = sanitizeSql(normalizeTaxId(order.customer?.taxId) || order.customer?.taxId || '').substring(0, 18);
-  const warehouse = sanitizeSql(order.warehouse || 'GEN').substring(0, 3);
-  const orderNotes = sanitizeSql(order.notes || '').substring(0, 50);
+  const street = sanitizeAndTruncate(shipAddr.street || order.billingAddress?.street || order.customer?.address?.street || '', 100);
+  const city = sanitizeAndTruncate(shipAddr.city || order.billingAddress?.city || order.customer?.address?.city || '', 30);
+  const postalCode = sanitizeAndTruncate(shipAddr.postalCode || order.billingAddress?.postalCode || order.customer?.address?.postalCode || '', 10);
+  const province = sanitizeAndTruncate(shipAddr.state || order.billingAddress?.state || order.customer?.address?.state || '', 40);
+  const phone = sanitizeAndTruncate(shipAddr.phone || order.customer?.phone || '', 50);
+  const customerEmail = sanitizeAndTruncate(shipAddr.email || order.customer?.email || '', 255);
+  const nif = sanitizeAndTruncate(normalizeTaxId(order.customer?.taxId) || order.customer?.taxId || '', 18);
+  const warehouse = sanitizeAndTruncate(order.warehouse || 'GEN', 3);
+  const orderNotes = sanitizeAndTruncate(order.notes || '', 50);
   const paymentMethodCode = mapPaymentMethodToFactusol(order.paymentMethod);
 
   const breakdown = breakdownOverride || calculateOrderVatBreakdown(order);
   const hasReq = (order.customer?.hasEquivalenceSurcharge || order.hasEquivalenceSurcharge) ? 1 : 0;
+  const ipor1Val = breakdown.net1 > 0 ? breakdown.shipping : 0;
 
   return `
     INSERT INTO F_PCL (
@@ -370,8 +422,8 @@ export function insertOrderHeaderQuery(
       ${customerCode},
       '${recipientName}',
       '${street}',
-      '${city}',
       '${postalCode}',
+      '${city}',
       '${province}',
       '${nif}',
       '${phone}',
@@ -400,7 +452,7 @@ export function insertOrderHeaderQuery(
       ${breakdown.irec3.toFixed(2)},
       ${breakdown.net4.toFixed(2)},
       ${breakdown.bas4.toFixed(2)},
-      ${breakdown.shipping.toFixed(2)},
+      ${ipor1Val.toFixed(2)},
       ${breakdown.total.toFixed(2)},
       '${paymentMethodCode}',
       '${orderNotes}'
@@ -414,9 +466,9 @@ export function insertOrderLineQuery(
   series = ' ',
   position = 1
 ): string {
-  const sanitizedSeries = sanitizeSql(series || ' ');
-  const sku = sanitizeSql(line.sku).substring(0, 13);
-  const name = sanitizeSql(line.name).substring(0, 50);
+  const sanitizedSeries = sanitizeAndTruncate(series || ' ', 1);
+  const sku = sanitizeAndTruncate(line.sku, 13);
+  const name = sanitizeAndTruncate(line.name, 50);
   const longDesc = String(
     (line.rawSourceData as Record<string, unknown>)?.description ||
     (line as unknown as Record<string, unknown>).description ||
@@ -463,14 +515,24 @@ export function insertOrderLineQuery(
  * Decremento atómico de stock en Access (F_STO)
  */
 export function decrementStockQuery(sku: string, warehouse = 'GEN', quantity = 1): string {
-  const safeSku = sanitizeSql(sku).substring(0, 13);
-  const safeWarehouse = sanitizeSql(warehouse || 'GEN').substring(0, 3);
+  const safeSku = sanitizeAndTruncate(sku, 13);
+  const safeWarehouse = sanitizeAndTruncate(warehouse || 'GEN', 3);
   const qty = Number(quantity || 1);
   return `UPDATE F_STO SET DISSTO = DISSTO - ${qty} WHERE ARTSTO = '${safeSku}' AND ALMSTO = '${safeWarehouse}'`;
 }
 
+/**
+ * Reposición atómica de stock en Access (F_STO) para pedidos cancelados/reembolsados
+ */
+export function incrementStockQuery(sku: string, warehouse = 'GEN', quantity = 1): string {
+  const safeSku = sanitizeAndTruncate(sku, 13);
+  const safeWarehouse = sanitizeAndTruncate(warehouse || 'GEN', 3);
+  const qty = Number(quantity || 1);
+  return `UPDATE F_STO SET DISSTO = DISSTO + ${qty} WHERE ARTSTO = '${safeSku}' AND ALMSTO = '${safeWarehouse}'`;
+}
+
 export function updateOrderStatusQuery(orderCode: number, series = ' ', statusCode = 0): string {
-  const sanitizedSeries = sanitizeSql(series || ' ');
+  const sanitizedSeries = sanitizeAndTruncate(series || ' ', 1);
   return `
     UPDATE F_PCL
     SET ESTPCL = ${statusCode}
@@ -494,7 +556,7 @@ export function readOrdersQuery(limit = 50): string {
 }
 
 export function readOrderLinesQuery(orderCode: number, series = ' '): string {
-  const sanitizedSeries = sanitizeSql(series || ' ');
+  const sanitizedSeries = sanitizeAndTruncate(series || ' ', 1);
   return `
     SELECT 
       TIPLPC, CODLPC, POSLPC, ARTLPC, DESLPC, CANLPC, DT1LPC, PRELPC, TOTLPC,

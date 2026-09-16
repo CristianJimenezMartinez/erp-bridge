@@ -368,20 +368,18 @@ export function verifyStripeWebhookSignature(
 billingRouter.post('/billing/webhook', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const webhookSecret = process.env['STRIPE_WEBHOOK_SECRET'];
+    if (!webhookSecret) {
+      logger.error('CRÍTICO: STRIPE_WEBHOOK_SECRET no configurado en el servidor. Rechazando webhook.');
+      return res.status(500).json({ error: { message: 'Webhook secret no configurado en el servidor' } });
+    }
+
     const signature = req.headers['stripe-signature'] as string;
     const rawBody = (req as any).rawBody || (typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
 
-    if (webhookSecret) {
-      const verification = verifyStripeWebhookSignature(rawBody, signature, webhookSecret);
-      if (!verification.valid) {
-        logger.warn(`Intento de webhook de Stripe no autorizado rechazado: ${verification.error}`);
-        return res.status(400).json({ error: { message: verification.error || 'Firma de webhook no válida' } });
-      }
-    } else if (process.env['NODE_ENV'] === 'production') {
-      logger.error('CRÍTICO: STRIPE_WEBHOOK_SECRET no configurado en entorno de producción. Rechazando webhook.');
-      return res.status(500).json({ error: { message: 'Webhook secret no configurado en el servidor' } });
-    } else {
-      logger.warn('STRIPE_WEBHOOK_SECRET no configurado. Procesando en modo de desarrollo local.');
+    const verification = verifyStripeWebhookSignature(rawBody, signature, webhookSecret);
+    if (!verification.valid) {
+      logger.warn(`Intento de webhook de Stripe no autorizado rechazado: ${verification.error}`);
+      return res.status(400).json({ error: { message: verification.error || 'Firma de webhook no válida' } });
     }
 
     const event = req.body;

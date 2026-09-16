@@ -214,7 +214,13 @@ try {
   // Conectar con autoRollover: true (por defecto) apuntando a 2024
   // Nota: no inicializamos Access OLEDB driver real en este test unitario ligero,
   // pero verificamos la resolución en el conector antes de la creación del driver.
-  console.log('✓ Connector disconnected check passed');
+  // 5. Test AccessDatabaseTimeoutError
+  const { AccessDatabaseTimeoutError } = require('../src/access-driver');
+  const timeoutErr = new AccessDatabaseTimeoutError();
+  assert(timeoutErr instanceof Error);
+  assert.strictEqual(timeoutErr.name, 'AccessDatabaseTimeoutError');
+  assert(timeoutErr.message.includes('Tiempo de espera agotado al consultar la base de datos Access'));
+  console.log('✓ AccessDatabaseTimeoutError verified');
 } finally {
   // Limpieza del directorio temporal
   fs.rmSync(tempDir, { recursive: true, force: true });

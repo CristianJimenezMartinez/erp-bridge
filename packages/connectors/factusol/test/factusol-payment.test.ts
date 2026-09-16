@@ -13,7 +13,7 @@ import {
 import { FactusolInvoiceHandler } from '../src/handlers/invoice.handler';
 import { FactusolConnector } from '../src/factusol.connector';
 import { AccessDriver } from '../src/access-driver';
-import { CanonicalInvoice, Logger } from '@erp-bridge/shared';
+import { Logger } from '@erp-bridge/shared';
 
 async function runPaymentTests() {
   console.log('--- Running Factusol Payment & F_COB Unit Tests ---');
@@ -102,7 +102,7 @@ async function runPaymentTests() {
     new Logger('TestLogger')
   );
 
-  const testPaidInvoice: CanonicalInvoice = {
+  const testPaidInvoice: any = {
     id: 'inv_paid_test',
     series: '1',
     invoiceNumber: '',
@@ -178,7 +178,7 @@ async function runPaymentTests() {
     const realDriver = (connector as any).driver as AccessDriver;
     const testRef = `INV_PAY_${Date.now()}`;
 
-    const realPaidInvoice: CanonicalInvoice = {
+    const realPaidInvoice: any = {
       id: `inv_real_pay_${Date.now()}`,
       series: '1',
       invoiceNumber: '',
@@ -248,8 +248,10 @@ async function runPaymentTests() {
     console.log('✓ Integridad de cobros verificada tras cancelación de factura');
 
     // Clean up F_FAC and F_LFA
-    await realDriver.execute(`DELETE FROM F_FAC WHERE TIPFAC = '1' AND CODFAC = ${codfac}`);
-    await realDriver.execute(`DELETE FROM F_LFA WHERE TIPLFA = '1' AND CODLFA = ${codfac}`);
+    await realDriver.executeTransaction([
+      `DELETE FROM F_FAC WHERE TIPFAC = '1' AND CODFAC = ${codfac}`,
+      `DELETE FROM F_LFA WHERE TIPLFA = '1' AND CODLFA = ${codfac}`,
+    ]);
     console.log('✓ Limpieza de factura de prueba completada');
 
     await connector.disconnect();

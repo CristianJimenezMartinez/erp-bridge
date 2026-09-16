@@ -5,7 +5,6 @@ import {
   insertOrderHeaderQuery,
   insertOrderLineQuery,
 } from '../src/queries';
-import { CanonicalOrder } from '@erp-bridge/shared';
 
 console.log('--- Running Factusol Order Mapper Tests ---');
 
@@ -35,7 +34,7 @@ assert.strictEqual(canonicalCust.taxId, 'B12345678');
 assert.strictEqual(canonicalCust.email, 'info@fontaneriagomez.com');
 
 // 3. SQL generation
-const sampleOrder: CanonicalOrder = {
+const sampleOrder: any = {
   id: 'order_test',
   orderNumber: '9901',
   series: '1',
@@ -110,10 +109,12 @@ import {
   calculateOrderVatBreakdown,
   determineTivpcl,
   decrementStockQuery,
+  incrementStockQuery,
   insertDeliveryAddressQuery,
+  sanitizeAndTruncate,
 } from '../src/queries';
 
-const multiVatOrder: CanonicalOrder = {
+const multiVatOrder: any = {
   id: 'multi_vat',
   orderNumber: '8801',
   date: new Date('2026-09-14'),
@@ -131,7 +132,9 @@ const multiVatOrder: CanonicalOrder = {
       name: 'Item 21%',
       quantity: 2,
       unitPrice: 10, // net = 20.00
-      vatRate: 21,
+      vatPercent: 21,
+      vatType: 0,
+      discountPercent: 0,
       subtotal: 20,
       total: 20,
     },
@@ -142,7 +145,9 @@ const multiVatOrder: CanonicalOrder = {
       name: 'Item 10%',
       quantity: 1,
       unitPrice: 30, // net = 30.00
-      vatRate: 10,
+      vatPercent: 10,
+      vatType: 1,
+      discountPercent: 0,
       subtotal: 30,
       total: 30,
     },
@@ -153,7 +158,9 @@ const multiVatOrder: CanonicalOrder = {
       name: 'Item 4%',
       quantity: 5,
       unitPrice: 2, // net = 10.00
-      vatRate: 4,
+      vatPercent: 4,
+      vatType: 2,
+      discountPercent: 0,
       subtotal: 10,
       total: 10,
     },
@@ -164,7 +171,9 @@ const multiVatOrder: CanonicalOrder = {
       name: 'Item Exento',
       quantity: 1,
       unitPrice: 15, // net = 15.00
-      vatRate: 0,
+      vatPercent: 0,
+      vatType: 3,
+      discountPercent: 0,
       subtotal: 15,
       total: 15,
     },
@@ -201,7 +210,7 @@ assert.strictEqual(breakdown.net4, 15.0);
 assert.strictEqual(breakdown.bas4, 15.0);
 
 // 5. Cent Rounding (Ajuste del céntimo ±0.01)
-const orderWithCentDiff: CanonicalOrder = {
+const orderWithCentDiff: any = {
   ...multiVatOrder,
   totalAmount: 90.43, // Differs by +0.01 from 90.42
 };
@@ -239,7 +248,9 @@ const lineLongDesc = {
   name: 'Nombre muy largo que supera los 50 caracteres para comprobar que se trunca correctamente en DESLPC',
   quantity: 5,
   unitPrice: 10,
-  vatRate: 21,
+  vatPercent: 21,
+  vatType: 0,
+  discountPercent: 0,
   subtotal: 50,
   total: 50,
 };
@@ -261,8 +272,106 @@ const stockDecSql = decrementStockQuery('000001', 'GEN', 3);
 assert.strictEqual(stockDecSql, "UPDATE F_STO SET DISSTO = DISSTO - 3 WHERE ARTSTO = '000001' AND ALMSTO = 'GEN'");
 
 // 9. Delivery address with F_OBR (no F_DCL)
-const addrSql = insertDeliveryAddressQuery(105, 1, { street: 'Calle Obra 1', city: 'Madrid', postalCode: '28001' }, 'Almacén');
+const addrSql = insertDeliveryAddressQuery(105, 1, { country: 'ES', street: 'Calle Obra 1', city: 'Madrid', postalCode: '28001' }, 'Almacén');
 assert(addrSql.includes('INSERT INTO F_OBR'), 'Must insert into F_OBR');
 assert(!addrSql.includes('F_DCL'), 'Must NOT refer to F_DCL');
+
+// 10. Truncate-then-Escape SQL Sanitization Tests
+assert.strictEqual(sanitizeAndTruncate("O'Connor", 5), "O''Con", 'Truncate to 5 chars then escape quotes');
+assert.strictEqual(sanitizeAndTruncate("O'Connor", 2), "O''", 'Truncate right after quote and escape safely');
+assert.strictEqual(sanitizeAndTruncate("A'B'C'", 2), "A''", 'Truncate to 2 chars then escape quotes');
+assert.strictEqual(sanitizeAndTruncate(null, 10), '', 'Null becomes empty string');
+assert.strictEqual(sanitizeAndTruncate(undefined, 10), '', 'Undefined becomes empty string');
+assert.strictEqual(sanitizeAndTruncate("Normal Text", 6), "Normal", 'Normal string truncate');
+
+// 11. Atomic stock increment on order cancellation
+const stockIncSql = incrementStockQuery('000001', 'GEN', 3);
+assert.strictEqual(stockIncSql, "UPDATE F_STO SET DISSTO = DISSTO + 3 WHERE ARTSTO = '000001' AND ALMSTO = 'GEN'");
+
+// 12. Fiscal test: Shipping imputation when order has NO 21% products (Preponderant 10%)
+const order10Only: any = {
+  id: 'order_10',
+  orderNumber: '1001',
+  date: new Date('2026-09-14'),
+  status: 'pending',
+  customer: { id: 'c1', fiscalName: 'Test Alimentos SL', hasEquivalenceSurcharge: false },
+  lines: [
+    {
+      id: 'l1',
+      position: 1,
+      sku: 'FOOD1',
+      name: 'Alimento 10%',
+      quantity: 1,
+      unitPrice: 50,
+      vatPercent: 10,
+      vatType: 1,
+      discountPercent: 0,
+      subtotal: 50,
+      total: 50,
+    },
+  ],
+  shippingAmount: 10,
+  totalAmount: 66.0, // (50 + 10) * 1.10 = 66.00
+  currency: 'EUR',
+};
+
+const bd10 = calculateOrderVatBreakdown(order10Only);
+assert.strictEqual(bd10.net1, 0, 'No products at 21%');
+assert.strictEqual(bd10.bas1, 0, 'BAS1 must be 0 when no 21% products');
+assert.strictEqual(bd10.iiva1, 0, 'IIVA1 must be 0');
+assert.strictEqual(bd10.net2, 50.0);
+assert.strictEqual(bd10.bas2, 60.0, 'Portes imputados al tipo preponderante 10% (BAS2 = 50 + 10)');
+assert.strictEqual(bd10.iiva2, 6.0, '60 * 0.10 = 6.00');
+assert.strictEqual(bd10.total, 66.0, 'Total debe ser 66.00');
+
+// 13. Fiscal test: Weighted deduction of order.discountAmount
+const orderWithDiscount: any = {
+  id: 'order_disc',
+  orderNumber: '1002',
+  date: new Date('2026-09-14'),
+  status: 'pending',
+  customer: { id: 'c1', fiscalName: 'Test SL', hasEquivalenceSurcharge: false },
+  lines: [
+    {
+      id: 'l1',
+      position: 1,
+      sku: 'ITEM21',
+      name: 'Item 21%',
+      quantity: 1,
+      unitPrice: 60,
+      vatPercent: 21,
+      vatType: 0,
+      discountPercent: 0,
+      subtotal: 60,
+      total: 60,
+    },
+    {
+      id: 'l2',
+      position: 2,
+      sku: 'ITEM10',
+      name: 'Item 10%',
+      quantity: 1,
+      unitPrice: 40,
+      vatPercent: 10,
+      vatType: 1,
+      discountPercent: 0,
+      subtotal: 40,
+      total: 40,
+    },
+  ],
+  discountAmount: 20, // 20€ discount: 60% (12€) from 21%, 40% (8€) from 10%
+  shippingAmount: 0,
+  totalAmount: 93.28, // Net1: 48 * 1.21 = 58.08, Net2: 32 * 1.10 = 35.20 -> 93.28
+  currency: 'EUR',
+};
+
+const bdDisc = calculateOrderVatBreakdown(orderWithDiscount);
+assert.strictEqual(bdDisc.net1, 48.0, '60 - 12 = 48.00');
+assert.strictEqual(bdDisc.net2, 32.0, '40 - 8 = 32.00');
+assert.strictEqual(bdDisc.bas1, 48.0);
+assert.strictEqual(bdDisc.bas2, 32.0);
+assert.strictEqual(bdDisc.iiva1, 10.08); // 48 * 0.21
+assert.strictEqual(bdDisc.iiva2, 3.20);  // 32 * 0.10
+assert.strictEqual(bdDisc.total, 93.28, 'Factusol total concilia exactamente con total cobrado');
 
 console.log('✓ Factusol Order Mapper Tests Passed');

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { CanonicalOrder, Logger } from '@erp-bridge/shared';
-import { AccessDriver, FactusolConnector } from '@erp-bridge/connector-factusol';
+import { AccessDriver, FactusolConnector, FactusolYearResolver } from '@erp-bridge/connector-factusol';
 import { ConfigManager } from '../config/config.manager';
 import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
@@ -52,8 +52,34 @@ export class LocalSyncEngine {
     let ordersImported = 0;
 
     const config = this.configManager.get();
-    const dbPath = config.factusol?.databasePath || config.factusolDbPath;
+    let dbPath = config.factusol?.databasePath || config.factusolDbPath;
     const woo = config.woocommerce || {};
+
+    // Comprobación y resolución de Rollover Fiscal Automático de Factusol
+    if (dbPath) {
+      try {
+        const rollover = FactusolYearResolver.resolveActiveDatabase(dbPath);
+        if (rollover.switched && rollover.activePath && rollover.activePath !== dbPath) {
+          const oldFile = dbPath.split(/[/\\]/).pop() || dbPath;
+          const newFile = rollover.activePath.split(/[/\\]/).pop() || rollover.activePath;
+          this.logger.info(
+            `🔄 Rollover fiscal automático detectado: ${oldFile} -> ${newFile} (Ejercicio ${rollover.previousYear ?? '?'} -> ${rollover.currentYear ?? '?'})`
+          );
+          this.eventBus.addEvent(
+            'info',
+            `🔄 Cambio de ejercicio fiscal Factusol automático: ${oldFile} ➔ ${newFile}`
+          );
+          const newPath = rollover.activePath;
+          dbPath = newPath;
+          this.configManager.setFactusolDbPath(newPath);
+          await this.factusolService.reconnect(newPath).catch((err) => {
+            this.logger.warn(`Aviso al reconectar factusolService tras rollover fiscal: ${String(err)}`);
+          });
+        }
+      } catch (resolverErr) {
+        this.logger.warn(`Aviso al verificar rollover fiscal de Factusol: ${String(resolverErr)}`);
+      }
+    }
 
     try {
       if (dbPath && fs.existsSync(dbPath) && woo.storeUrl && woo.consumerKey && woo.consumerSecret) {
@@ -192,6 +218,9 @@ export class LocalSyncEngine {
                 reference: externalRef,
                 date: new Date(wcOrder.date_created || Date.now()),
                 status: 'processing',
+                hasEquivalenceSurcharge: false,
+                discountAmount: 0,
+                warehouse: 'GEN',
                 paymentMethod: wcOrder.payment_method || 'TAR',
                 paymentMethodTitle: wcOrder.payment_method_title,
                 currency: wcOrder.currency || 'EUR',
@@ -355,8 +384,33 @@ export class LocalSyncEngine {
     this.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
 
     const config = this.configManager.get();
-    const dbPath = config.factusol?.databasePath || config.factusolDbPath;
+    let dbPath = config.factusol?.databasePath || config.factusolDbPath;
     const woo = config.woocommerce || {};
+
+    if (dbPath) {
+      try {
+        const rollover = FactusolYearResolver.resolveActiveDatabase(dbPath);
+        if (rollover.switched && rollover.activePath && rollover.activePath !== dbPath) {
+          const oldFile = dbPath.split(/[/\\]/).pop() || dbPath;
+          const newFile = rollover.activePath.split(/[/\\]/).pop() || rollover.activePath;
+          this.logger.info(
+            `🔄 Rollover fiscal automático detectado en subida de catálogo: ${oldFile} -> ${newFile}`
+          );
+          this.eventBus.addEvent(
+            'info',
+            `🔄 Cambio de ejercicio fiscal Factusol automático: ${oldFile} ➔ ${newFile}`
+          );
+          const newPath = rollover.activePath;
+          dbPath = newPath;
+          this.configManager.setFactusolDbPath(newPath);
+          await this.factusolService.reconnect(newPath).catch((err) => {
+            this.logger.warn(`Aviso al reconectar factusolService tras rollover fiscal: ${String(err)}`);
+          });
+        }
+      } catch (resolverErr) {
+        this.logger.warn(`Aviso al verificar rollover fiscal de Factusol en catálogo: ${String(resolverErr)}`);
+      }
+    }
 
     if (!dbPath || !fs.existsSync(dbPath)) {
       const msg = 'Base de datos de Factusol no configurada o inaccesible.';
@@ -465,11 +519,11 @@ export class LocalSyncEngine {
           name: p.name || `Artículo ${p.sku}`,
           sku: p.sku.trim(),
           type: 'simple',
-          regular_price: p.price > 0 ? String(p.price) : '0',
+          regular_price: p.regularPrice > 0 ? String(p.regularPrice) : '0',
           manage_stock: true,
-          stock_quantity: Math.max(0, p.stock || 0),
+          stock_quantity: Math.max(0, p.stockQuantity || 0),
           description: p.description || '',
-          categories: p.family ? [{ name: p.family }] : undefined,
+          categories: p.categories && p.categories.length > 0 ? p.categories.map((c) => ({ name: c.name })) : undefined,
           status: 'publish',
         }));
 

@@ -1,4 +1,5 @@
 import http from 'http';
+import { Socket } from 'net';
 import { Logger } from '@erp-bridge/shared';
 import { LocalAgent } from '../agent';
 import { MiniRouter } from './router/mini-router';
@@ -17,6 +18,7 @@ export class LocalGuiServer {
   private server: http.Server | null = null;
   private activePort: number;
   private router: MiniRouter;
+  private readonly sockets = new Set<Socket>();
 
   constructor(
     private readonly agent: LocalAgent,
@@ -24,6 +26,7 @@ export class LocalGuiServer {
   ) {
     this.activePort = this.defaultPort;
     this.router = this.buildRouter();
+    this.agent.setGuiServer(this);
   }
 
   private buildRouter(): MiniRouter {
@@ -80,6 +83,13 @@ export class LocalGuiServer {
           this.router.handle(req, res);
         });
 
+        srv.on('connection', (socket: Socket) => {
+          this.sockets.add(socket);
+          socket.on('close', () => {
+            this.sockets.delete(socket);
+          });
+        });
+
         srv.once('error', (err: NodeJS.ErrnoException) => {
           if (err.code === 'EADDRINUSE') {
             logger.warn(`Puerto ${portToTry} ocupado. Intentando siguiente puerto disponible...`);
@@ -109,10 +119,32 @@ export class LocalGuiServer {
   }
 
   public async stop(): Promise<void> {
+    this.agent.setGuiServer(null);
+
     if (this.server) {
-      return new Promise((resolve) => {
-        this.server?.close(() => {
-          this.server = null;
+      const srv = this.server;
+      this.server = null;
+
+      // Close idle connections first if supported (Node.js 18.2+)
+      if (typeof (srv as any).closeIdleConnections === 'function') {
+        (srv as any).closeIdleConnections();
+      }
+
+      // Close active connections if supported (Node.js 18.2+)
+      if (typeof (srv as any).closeAllConnections === 'function') {
+        (srv as any).closeAllConnections();
+      }
+
+      // Forcefully destroy remaining sockets to avoid keep-alive hangs
+      for (const socket of this.sockets) {
+        if (!socket.destroyed) {
+          socket.destroy();
+        }
+      }
+      this.sockets.clear();
+
+      return new Promise<void>((resolve) => {
+        srv.close(() => {
           resolve();
         });
       });

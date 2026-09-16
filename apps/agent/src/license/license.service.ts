@@ -21,6 +21,7 @@ export class LicenseService {
   private licenseStatus: AgentLicenseStatus = 'UNLICENSED';
   private activePlan?: string;
   private licenseCheckTimer: NodeJS.Timeout | null = null;
+  private lastSeenTimestamp = 0;
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -77,6 +78,7 @@ export class LicenseService {
       this.configManager.setLicenseKey(licenseKey);
       this.licenseStatus = 'VALID';
       this.activePlan = activation.plan;
+      this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, Date.now());
       this.logger.info(`✓ Licencia activada con éxito. Plan: ${activation.plan}, Expira: ${activation.expiresAt}`);
       this.eventBus?.addEvent('success', `✓ Licencia activada (${activation.plan})`);
     }
@@ -99,6 +101,25 @@ export class LicenseService {
     const verification = LicenseTokenManager.verifyToken(token);
     const localPayload: LicenseTokenPayload | null = verification.valid && verification.payload ? verification.payload : null;
     const now = Date.now();
+
+    // Detección de manipulación de reloj (Clock Rollback)
+    if (this.lastSeenTimestamp > 0 && now < this.lastSeenTimestamp) {
+      this.logger.error(`Manipulación de reloj detectada: La hora actual del sistema (${now}) es anterior al último timestamp registrado (${this.lastSeenTimestamp}). Bloqueando período de gracia.`);
+      this.licenseStatus = 'EXPIRED';
+      this.activePlan = undefined;
+      this.eventBus?.addEvent('error', 'Manipulación de reloj detectada: La hora del sistema fue retrasada.');
+      return { status: 'EXPIRED', message: 'Manipulación del reloj del sistema detectada (Clock Rollback)' };
+    }
+
+    if (localPayload && now < localPayload.issuedAt) {
+      this.logger.error(`Manipulación de reloj detectada: La hora actual del sistema (${now}) es anterior a la emisión del token (${localPayload.issuedAt}).`);
+      this.licenseStatus = 'EXPIRED';
+      this.activePlan = undefined;
+      this.eventBus?.addEvent('error', 'Manipulación de reloj detectada: Fecha anterior a la emisión de la licencia.');
+      return { status: 'EXPIRED', message: 'Manipulación del reloj del sistema detectada: Fecha previa a la emisión de la licencia' };
+    }
+
+    this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, now);
     const isLocalTokenValid = localPayload ? (now <= localPayload.expiresAt && (!localPayload.hwid || localPayload.hwid === hwid)) : false;
 
     // 2. Attempt online validation and token renewal
@@ -188,5 +209,31 @@ export class LicenseService {
       clearInterval(this.licenseCheckTimer);
       this.licenseCheckTimer = null;
     }
+  }
+
+  public checkHealth(): { healthy: boolean; status: AgentLicenseStatus; lastSeenTimestamp: number; plan?: string } {
+    const now = Date.now();
+    if (this.lastSeenTimestamp > 0 && now < this.lastSeenTimestamp) {
+      this.logger.error(`Manipulación de reloj detectada en checkHealth: ${now} < ${this.lastSeenTimestamp}`);
+      this.licenseStatus = 'EXPIRED';
+      this.activePlan = undefined;
+      this.eventBus?.addEvent('error', 'Manipulación de reloj detectada en comprobación de salud.');
+      return { healthy: false, status: 'EXPIRED', lastSeenTimestamp: this.lastSeenTimestamp };
+    }
+    this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, now);
+    return {
+      healthy: this.licenseStatus === 'VALID' || this.licenseStatus === 'GRACE_PERIOD',
+      status: this.licenseStatus,
+      lastSeenTimestamp: this.lastSeenTimestamp,
+      plan: this.activePlan,
+    };
+  }
+
+  public getLastSeenTimestamp(): number {
+    return this.lastSeenTimestamp;
+  }
+
+  public setLastSeenTimestamp(ts: number): void {
+    this.lastSeenTimestamp = ts;
   }
 }

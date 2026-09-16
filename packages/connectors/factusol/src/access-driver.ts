@@ -4,6 +4,16 @@ import childProcess from 'child_process';
 import { ConnectionError, ErrorCode } from '@erp-bridge/sdk';
 import { Logger } from '@erp-bridge/shared';
 
+export class AccessDatabaseTimeoutError extends Error {
+  constructor(
+    message = 'Tiempo de espera agotado al consultar la base de datos Access (posible bloqueo exclusivo o compactación en curso)'
+  ) {
+    super(message);
+    this.name = 'AccessDatabaseTimeoutError';
+    Object.setPrototypeOf(this, AccessDatabaseTimeoutError.prototype);
+  }
+}
+
 export interface AccessDriverConfig {
   databasePath: string;
   provider?: string;
@@ -123,12 +133,28 @@ export class AccessDriver {
   private runAdodbWith(
     cscript: string,
     action: 'query' | 'execute' | 'transaction',
-    input: string
+    input: string,
+    timeoutMs = 30000
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       const child = childProcess.spawn(cscript, ['//Nologo', this.adodbJsPath, action], {
         windowsHide: true,
       });
+
+      let killed = false;
+      const timer = setTimeout(() => {
+        killed = true;
+        try {
+          child.kill('SIGKILL');
+        } catch {
+          // Ignorar si el proceso ya finalizó
+        }
+        reject(
+          new AccessDatabaseTimeoutError(
+            'Tiempo de espera agotado al consultar la base de datos Access (posible bloqueo exclusivo o compactación en curso)'
+          )
+        );
+      }, timeoutMs);
 
       const stdoutChunks: Buffer[] = [];
       const stderrChunks: Buffer[] = [];
@@ -136,9 +162,15 @@ export class AccessDriver {
       child.stdout.on('data', (chunk: Buffer) => stdoutChunks.push(chunk));
       child.stderr.on('data', (chunk: Buffer) => stderrChunks.push(chunk));
 
-      child.on('error', (err) => reject(err));
+      child.on('error', (err) => {
+        clearTimeout(timer);
+        if (!killed) reject(err);
+      });
 
       child.on('close', (code) => {
+        clearTimeout(timer);
+        if (killed) return;
+
         if (stderrChunks.length > 0) {
           const stderrText = Buffer.concat(stderrChunks).toString('utf8').trim();
           let errMsg = stderrText;
@@ -191,6 +223,11 @@ export class AccessDriver {
       this.logger.debug(`Query executed in ${Date.now() - startTime}ms: ${sql.substring(0, 80)}...`);
       return parsed;
     } catch (error: unknown) {
+      if (error instanceof AccessDatabaseTimeoutError) {
+        this.logger.error(`Timeout agotado en consulta Access (30s): ${sql}`, error);
+        throw error;
+      }
+
       const err = error as { message?: string };
       const errorMessage = err?.message || 'Error desconocido al ejecutar consulta en Access';
 
@@ -233,6 +270,11 @@ export class AccessDriver {
       await this.runAdodb('execute', input);
       this.logger.debug(`Execute completed in ${Date.now() - startTime}ms: ${sql.substring(0, 80)}...`);
     } catch (error: unknown) {
+      if (error instanceof AccessDatabaseTimeoutError) {
+        this.logger.error(`Timeout agotado en comando Access (30s): ${sql}`, error);
+        throw error;
+      }
+
       const err = error as { message?: string };
       const errorMessage = err?.message || 'Error desconocido al ejecutar comando en Access';
 
@@ -279,6 +321,11 @@ export class AccessDriver {
         `Transacción atómica ejecutada (${validStatements.length} sentencias) en ${Date.now() - startTime}ms`
       );
     } catch (error: unknown) {
+      if (error instanceof AccessDatabaseTimeoutError) {
+        this.logger.error(`Timeout agotado en transacción Access (30s, ${validStatements.length} sentencias)`, error);
+        throw error;
+      }
+
       const err = error as { message?: string };
       const errorMessage = err?.message || 'Error desconocido al ejecutar transacción en Access';
 

@@ -21,4 +21,13 @@ export class EventBus extends EventEmitter {
   public getRecentEvents(): LogEvent[] {
     return [...this.recentEvents];
   }
+
+  public disconnectAllListeners(): void {
+    this.removeAllListeners();
+  }
+
+  public clear(): void {
+    this.removeAllListeners();
+    this.recentEvents = [];
+  }
 }

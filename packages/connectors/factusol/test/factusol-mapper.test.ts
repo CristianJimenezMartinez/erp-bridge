@@ -67,5 +67,36 @@ const backToFactusol = FactusolStockMapper.toFactusolStock(canonicalStock);
 assert.strictEqual(backToFactusol.ACTSTO, 100, 'ACTSTO must map to quantity');
 assert.strictEqual(backToFactusol.DISSTO, 85, 'DISSTO must map to availableQuantity');
 
+// Test tariff fallback & wholesale cost protection
+const rawArticleNoPrice: FactusolRawArticle = {
+  CODART: '000099',
+  DESART: 'ARTICULO SIN TARIFA',
+  PCOART: 10.00,
+  SUWART: '1',
+};
+
+// 1. Fallback to defaultPriceMap
+const canonicalFallback = mapFactusolArticleToCanonical(rawArticleNoPrice, {
+  priceMap: new Map(), // Sin precio en tarifa configurada
+  defaultPriceMap: new Map([['000099', 19.99]]), // Precio en tarifa 1 (PVP)
+  stockMap: new Map([['000099', 5]]),
+});
+assert.strictEqual(canonicalFallback.regularPrice, 19.99, 'Must fallback to defaultPriceMap');
+assert.strictEqual(canonicalFallback.costPrice, 10.00);
+assert.strictEqual(canonicalFallback.stockQuantity, 5);
+assert.strictEqual(canonicalFallback.status, 'published');
+
+// 2. Sin precio en ninguna tarifa: JAMÁS usar PCOART como regularPrice!
+const canonicalNoPrice = mapFactusolArticleToCanonical(rawArticleNoPrice, {
+  priceMap: new Map(),
+  defaultPriceMap: new Map(),
+  stockMap: new Map([['000099', 5]]),
+});
+assert.strictEqual(canonicalNoPrice.regularPrice, 0, 'Must NOT use PCOART as regularPrice');
+assert.strictEqual(canonicalNoPrice.costPrice, 10.00, 'costPrice remains wholesale cost');
+assert.strictEqual(canonicalNoPrice.stockQuantity, 0, 'stockQuantity must be 0 to prevent sale');
+assert.strictEqual(canonicalNoPrice.inStock, false, 'inStock must be false');
+assert.strictEqual(canonicalNoPrice.status, 'draft', 'status must be draft');
+
 console.log('✓ Factusol Mapper Tests Passed');
 

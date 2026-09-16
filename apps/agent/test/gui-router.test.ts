@@ -1,4 +1,5 @@
 import assert from 'assert';
+import http from 'http';
 import { LocalAgent } from '../src/agent';
 import { LocalGuiServer } from '../src/gui/gui-server';
 
@@ -83,6 +84,53 @@ async function testGuiServer() {
     assert.strictEqual(typeof autostartPostJson.success, 'boolean');
     assert.strictEqual(typeof autostartPostJson.enabled, 'boolean');
     console.log('  ✓ POST /api/local/autostart respondió 200 OK.');
+
+    // 9. Test Anti-CSRF: Rechazar Origin externo
+    console.log('9. Probando Anti-CSRF (Origin externo: https://sitio-malicioso.com)...');
+    const resEvilOrigin = await fetch(`${url}/api/local/status`, {
+      headers: { Origin: 'https://sitio-malicioso.com' },
+    });
+    assert.strictEqual(resEvilOrigin.status, 403, 'Petición con Origin malicioso debe responder 403 Forbidden');
+    const evilOriginJson = await resEvilOrigin.json() as any;
+    assert.strictEqual(evilOriginJson.error, 'Acceso denegado: Origen no autorizado');
+    console.log('  ✓ Origin externo rechazado con 403 Forbidden.');
+
+    // 10. Test Anti-CSRF: Rechazar Referer externo
+    console.log('10. Probando Anti-CSRF (Referer externo: https://sitio-malicioso.com/exploit)...');
+    const resEvilReferer = await fetch(`${url}/api/local/status`, {
+      headers: { Referer: 'https://sitio-malicioso.com/exploit' },
+    });
+    assert.strictEqual(resEvilReferer.status, 403, 'Petición con Referer malicioso debe responder 403 Forbidden');
+    const evilRefererJson = await resEvilReferer.json() as any;
+    assert.strictEqual(evilRefererJson.error, 'Acceso denegado: Origen no autorizado');
+    console.log('  ✓ Referer externo rechazado con 403 Forbidden.');
+
+    // 11. Test Host Header Validation: Rechazar Host externo
+    console.log('11. Probando Host Header Validation (Host: evil.com)...');
+    const evilHostStatus = await new Promise<number>((resolve, reject) => {
+      const httpReq = http.get(`http://127.0.0.1:${port}/api/local/status`, {
+        headers: { Host: 'evil.com' },
+      }, (res) => {
+        resolve(res.statusCode || 0);
+      });
+      httpReq.on('error', reject);
+    });
+    assert.strictEqual(evilHostStatus, 403, 'Petición con Host externo debe responder 403 Forbidden');
+    console.log('  ✓ Host externo rechazado con 403 Forbidden.');
+
+    // 12. Test OPTIONS preflight con CORS restrictivo loopback
+    console.log('12. Probando OPTIONS preflight con CORS restrictivo loopback...');
+    const resOptions = await fetch(`${url}/api/local/status`, {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'http://localhost:3000',
+        'Access-Control-Request-Method': 'POST',
+      },
+    });
+    assert.strictEqual(resOptions.status, 204, 'OPTIONS debe responder 204');
+    assert.strictEqual(resOptions.headers.get('access-control-allow-origin'), 'http://localhost:3000');
+    assert.strictEqual(resOptions.headers.get('access-control-allow-methods'), 'GET, POST, OPTIONS');
+    console.log('  ✓ Preflight OPTIONS validado con CORS loopback.');
 
   } finally {
     await server.stop();

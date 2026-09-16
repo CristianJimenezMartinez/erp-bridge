@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "ts-node test/canonical.test.ts && ts-node test/canonical-order.test.ts && ts-node test/canonical-stock.test.ts && ts-node test/canonical-invoice.test.ts && ts-node test/license.test.ts && ts-node test/update.test.ts"
+    "test": "ts-node test/canonical.test.ts && ts-node test/canonical-order.test.ts && ts-node test/canonical-stock.test.ts && ts-node test/canonical-invoice.test.ts && ts-node test/license.test.ts && ts-node test/update.test.ts && ts-node test/logger-sanitize.test.ts"
   },
   "dependencies": {
     "zod": "^3.22.4"

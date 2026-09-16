@@ -3,7 +3,7 @@ import { CanonicalStock, Logger } from '@erp-bridge/shared';
 import { AccessDriver } from '../access-driver';
 import { readStockBySkusQuery, readStockQuery } from '../queries';
 import { FactusolStockRaw, FactusolStockMapper } from '../mappers';
-import { FactusolConnectionConfig } from '../factusol.connector';
+import { FactusolConnectionConfig } from '../factusol.types';
 
 export class FactusolStockHandler {
   constructor(

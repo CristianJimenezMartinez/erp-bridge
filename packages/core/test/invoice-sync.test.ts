@@ -13,11 +13,13 @@ const sampleOrder: CanonicalOrder = {
   reference: 'REF-8899',
   date: new Date('2026-08-24'),
   status: 'processing',
+  hasEquivalenceSurcharge: false,
   customer: {
     id: 'cust_01',
     customerNumber: '10008',
     fiscalName: 'CLIENTE MOTOR SL',
     taxId: 'B12345678',
+    hasEquivalenceSurcharge: false,
     email: 'contacto@motor.es',
     phone: '912345678',
   },

@@ -1,5 +1,7 @@
 import { CanonicalAddress, CanonicalCustomer } from '@erp-bridge/shared';
-import { sanitizeSql, formatAccessDate, normalizeTaxId } from './order.queries';
+import { formatAccessDate, normalizeTaxId, sanitizeAndTruncate } from './order.queries';
+
+export { sanitizeAndTruncate };
 
 export function getNextCustomerIdQuery(): string {
   return `SELECT MAX(CODCLI) AS maxid FROM F_CLI`;
@@ -8,11 +10,11 @@ export function getNextCustomerIdQuery(): string {
 export function findCustomerByNifQuery(nif: string): string {
   const clean = normalizeTaxId(nif);
   const withEs = `ES${clean}`;
-  return `SELECT * FROM F_CLI WHERE NIFCLI = '${sanitizeSql(clean)}' OR NIFCLI = '${sanitizeSql(withEs)}'`;
+  return `SELECT * FROM F_CLI WHERE NIFCLI = '${sanitizeAndTruncate(clean, 18)}' OR NIFCLI = '${sanitizeAndTruncate(withEs, 18)}'`;
 }
 
 export function findCustomerByEmailQuery(email: string): string {
-  return `SELECT * FROM F_CLI WHERE EMACLI = '${sanitizeSql(email)}' OR OBSCLI LIKE '%${sanitizeSql(email)}%'`;
+  return `SELECT * FROM F_CLI WHERE EMACLI = '${sanitizeAndTruncate(email, 100)}' OR OBSCLI LIKE '%${sanitizeAndTruncate(email, 100)}%'`;
 }
 
 export function insertCustomerQuery(
@@ -21,21 +23,21 @@ export function insertCustomerQuery(
   configuredPaymentMethod = 'TRF'
 ): string {
   const addr: CanonicalAddress = customer.address || { country: 'ES' };
-  const nofcli = sanitizeSql(customer.fiscalName).substring(0, 100);
-  const noccli = sanitizeSql(customer.commercialName || customer.fiscalName).substring(0, 100);
-  const nifcli = sanitizeSql(normalizeTaxId(customer.taxId) || customer.taxId || '').substring(0, 18);
-  const domcli = sanitizeSql(addr.street || '').substring(0, 100);
-  const pobcli = sanitizeSql(addr.city || '').substring(0, 30);
-  const cpocli = sanitizeSql(addr.postalCode || '').substring(0, 10);
-  const procli = sanitizeSql(addr.state || '').substring(0, 40);
-  const telcli = sanitizeSql(customer.phone || addr.phone || '').substring(0, 50);
-  const email = sanitizeSql(customer.email || '').substring(0, 100);
+  const nofcli = sanitizeAndTruncate(customer.fiscalName, 100);
+  const noccli = sanitizeAndTruncate(customer.commercialName || customer.fiscalName, 100);
+  const nifcli = sanitizeAndTruncate(normalizeTaxId(customer.taxId) || customer.taxId || '', 18);
+  const domcli = sanitizeAndTruncate(addr.street || '', 100);
+  const pobcli = sanitizeAndTruncate(addr.city || '', 30);
+  const cpocli = sanitizeAndTruncate(addr.postalCode || '', 10);
+  const procli = sanitizeAndTruncate(addr.state || '', 40);
+  const telcli = sanitizeAndTruncate(customer.phone || addr.phone || '', 50);
+  const email = sanitizeAndTruncate(customer.email || '', 100);
   const tarcli = customer.priceList ?? 1;
   const falcli = formatAccessDate(new Date());
   const paicli = '724';
   const reqcli = customer.hasEquivalenceSurcharge ? 1 : 0;
   const ivacli = 0;
-  const fpacli = sanitizeSql(customer.paymentMethod || configuredPaymentMethod || 'TRF').substring(0, 3).toUpperCase();
+  const fpacli = sanitizeAndTruncate(customer.paymentMethod || configuredPaymentMethod || 'TRF', 3).toUpperCase();
   const estcli = 0;
 
   return `

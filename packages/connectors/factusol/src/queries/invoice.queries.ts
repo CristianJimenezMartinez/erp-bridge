@@ -1,3 +1,7 @@
+import { sanitizeAndTruncate } from './order.queries';
+
+export { sanitizeAndTruncate };
+
 export const GET_NEXT_INVOICE_ID_QUERY = `
   SELECT MAX(CODFAC) AS maxid FROM F_FAC WHERE TIPFAC = ?
 `;
@@ -73,15 +77,19 @@ export function insertInvoiceHeaderQuery(header: {
   net1fac: number;
   totfac: number;
 }): string {
-  const cdofacVal = header.cdofac ? `'${header.cdofac.replace(/'/g, "''")}'` : "''";
-  const cpofacVal = header.cpofac ? `'${header.cpofac.replace(/'/g, "''")}'` : "''";
-  const ccpfacVal = header.ccpfac ? `'${header.ccpfac.replace(/'/g, "''")}'` : "''";
-  const cprfacVal = header.cprfac ? `'${header.cprfac.replace(/'/g, "''")}'` : "''";
-  const cnifacVal = header.cnifac ? `'${header.cnifac.replace(/'/g, "''")}'` : "''";
-  const telfacVal = header.telfac ? `'${header.telfac.replace(/'/g, "''")}'` : "''";
-  const cemfacVal = header.cemfac ? `'${header.cemfac.replace(/'/g, "''")}'` : "''";
-  const cpafacVal = header.cpafac ? `'${header.cpafac.replace(/'/g, "''")}'` : "'ESPAÑA'";
-  const fopfacVal = header.fopfac ? `'${header.fopfac.replace(/'/g, "''")}'` : "'TAR'";
+  const tipfacVal = sanitizeAndTruncate(header.tipfac || '1', 1);
+  const reffacVal = sanitizeAndTruncate(header.reffac, 50);
+  const almfacVal = sanitizeAndTruncate(header.almfac || 'GEN', 3);
+  const cnofacVal = sanitizeAndTruncate(header.cnofac, 100);
+  const cdofacVal = header.cdofac ? `'${sanitizeAndTruncate(header.cdofac, 100)}'` : "''";
+  const cpofacVal = header.cpofac ? `'${sanitizeAndTruncate(header.cpofac, 10)}'` : "''";
+  const ccpfacVal = header.ccpfac ? `'${sanitizeAndTruncate(header.ccpfac, 30)}'` : "''";
+  const cprfacVal = header.cprfac ? `'${sanitizeAndTruncate(header.cprfac, 40)}'` : "''";
+  const cnifacVal = header.cnifac ? `'${sanitizeAndTruncate(header.cnifac, 18)}'` : "''";
+  const telfacVal = header.telfac ? `'${sanitizeAndTruncate(header.telfac, 50)}'` : "''";
+  const cemfacVal = header.cemfac ? `'${sanitizeAndTruncate(header.cemfac, 255)}'` : "''";
+  const cpafacVal = header.cpafac ? `'${sanitizeAndTruncate(header.cpafac, 50)}'` : "'ESPAÑA'";
+  const fopfacVal = header.fopfac ? `'${sanitizeAndTruncate(header.fopfac, 3).toUpperCase()}'` : "'TAR'";
   const bas1 = typeof header.bas1fac === 'number' ? header.bas1fac : Number((header.net1fac + header.ipor1fac).toFixed(2));
 
   return `
@@ -90,17 +98,17 @@ export function insertInvoiceHeaderQuery(header: {
       CNOFAC, CDOFAC, CPOFAC, CCPFAC, CPRFAC, CNIFAC, TELFAC, CEMFAC, CPAFAC, FOPFAC,
       PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC, BAS1FAC, IIVA1FAC, NET1FAC, TOTFAC
     ) VALUES (
-      '${header.tipfac}',
+      '${tipfacVal}',
       ${header.codfac},
-      '${header.reffac.replace(/'/g, "''")}',
+      '${reffacVal}',
       ${header.fecfac},
       ${header.horfac},
       ${header.usufac ?? 0},
       ${header.estfac},
-      '${header.almfac}',
+      '${almfacVal}',
       ${header.agefac ? header.agefac : 0},
       ${header.clifac},
-      '${header.cnofac.replace(/'/g, "''")}',
+      '${cnofacVal}',
       ${cdofacVal},
       ${cpofacVal},
       ${ccpfacVal},
