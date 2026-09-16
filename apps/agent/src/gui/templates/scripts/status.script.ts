@@ -8,7 +8,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         currentStatus = await res.json();
         renderStatus(currentStatus);
       } catch (err) {
-        console.warn('Servidor local:', err);
+        console.warn('Servidor local:', err); // quality-allow-console (browser template script)
       }
     }
 

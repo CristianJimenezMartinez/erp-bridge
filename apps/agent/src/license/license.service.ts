@@ -79,6 +79,7 @@ export class LicenseService {
       this.licenseStatus = 'VALID';
       this.activePlan = activation.plan;
       this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, Date.now());
+      await this.secureStore.saveLastSeenTimestamp(this.lastSeenTimestamp, hwid);
       this.logger.info(`✓ Licencia activada con éxito. Plan: ${activation.plan}, Expira: ${activation.expiresAt}`);
       this.eventBus?.addEvent('success', `✓ Licencia activada (${activation.plan})`);
     }
@@ -90,6 +91,12 @@ export class LicenseService {
     const hwid = await this.getHWID();
     const config = this.configManager.get();
     const token = await this.secureStore.loadLicenseToken(hwid);
+
+    // Cargar timestamp monotónico persistido en disco si aún no está inicializado
+    if (this.lastSeenTimestamp === 0) {
+      const persistedTs = await this.secureStore.loadLastSeenTimestamp(hwid);
+      this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, persistedTs);
+    }
 
     if (!token) {
       this.licenseStatus = 'UNLICENSED';
@@ -120,6 +127,7 @@ export class LicenseService {
     }
 
     this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, now);
+    await this.secureStore.saveLastSeenTimestamp(this.lastSeenTimestamp, hwid);
     const isLocalTokenValid = localPayload ? (now <= localPayload.expiresAt && (!localPayload.hwid || localPayload.hwid === hwid)) : false;
 
     // 2. Attempt online validation and token renewal

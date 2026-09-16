@@ -68,13 +68,23 @@ export function insertInvoiceHeaderQuery(header: {
   cemfac: string | null;
   cpafac: string | null;
   fopfac?: string | null;
+  tivfac?: number;
+  reqfac?: number;
   piva1fac: number;
   piva2fac: number;
   piva3fac: number;
   ipor1fac: number;
   bas1fac?: number;
+  bas2fac?: number;
+  bas3fac?: number;
+  bas4fac?: number;
   iiva1fac: number;
+  iiva2fac?: number;
+  iiva3fac?: number;
   net1fac: number;
+  net2fac?: number;
+  net3fac?: number;
+  net4fac?: number;
   totfac: number;
 }): string {
   const tipfacVal = sanitizeAndTruncate(header.tipfac || '1', 1);
@@ -82,8 +92,8 @@ export function insertInvoiceHeaderQuery(header: {
   const almfacVal = sanitizeAndTruncate(header.almfac || 'GEN', 3);
   const cnofacVal = sanitizeAndTruncate(header.cnofac, 100);
   const cdofacVal = header.cdofac ? `'${sanitizeAndTruncate(header.cdofac, 100)}'` : "''";
-  const cpofacVal = header.cpofac ? `'${sanitizeAndTruncate(header.cpofac, 10)}'` : "''";
-  const ccpfacVal = header.ccpfac ? `'${sanitizeAndTruncate(header.ccpfac, 30)}'` : "''";
+  const cpofacVal = header.cpofac ? `'${sanitizeAndTruncate(header.cpofac, 30)}'` : "''";
+  const ccpfacVal = header.ccpfac ? `'${sanitizeAndTruncate(header.ccpfac, 10)}'` : "''";
   const cprfacVal = header.cprfac ? `'${sanitizeAndTruncate(header.cprfac, 40)}'` : "''";
   const cnifacVal = header.cnifac ? `'${sanitizeAndTruncate(header.cnifac, 18)}'` : "''";
   const telfacVal = header.telfac ? `'${sanitizeAndTruncate(header.telfac, 50)}'` : "''";
@@ -91,12 +101,28 @@ export function insertInvoiceHeaderQuery(header: {
   const cpafacVal = header.cpafac ? `'${sanitizeAndTruncate(header.cpafac, 50)}'` : "'ESPAÑA'";
   const fopfacVal = header.fopfac ? `'${sanitizeAndTruncate(header.fopfac, 3).toUpperCase()}'` : "'TAR'";
   const bas1 = typeof header.bas1fac === 'number' ? header.bas1fac : Number((header.net1fac + header.ipor1fac).toFixed(2));
+  const bas2 = header.bas2fac ?? 0;
+  const bas3 = header.bas3fac ?? 0;
+  const bas4 = header.bas4fac ?? 0;
+  const net2 = header.net2fac ?? 0;
+  const net3 = header.net3fac ?? 0;
+  const net4 = header.net4fac ?? 0;
+  const iiva2 = header.iiva2fac ?? 0;
+  const iiva3 = header.iiva3fac ?? 0;
+  const tivfac = header.tivfac ?? 0;
+  const reqfac = header.reqfac ?? 0;
 
   return `
     INSERT INTO F_FAC (
       TIPFAC, CODFAC, REFFAC, FECFAC, HORFAC, USUFAC, ESTFAC, ALMFAC, AGEFAC, CLIFAC,
       CNOFAC, CDOFAC, CPOFAC, CCPFAC, CPRFAC, CNIFAC, TELFAC, CEMFAC, CPAFAC, FOPFAC,
-      PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC, BAS1FAC, IIVA1FAC, NET1FAC, TOTFAC
+      TIVFAC, REQFAC,
+      PIVA1FAC, PIVA2FAC, PIVA3FAC, IPOR1FAC,
+      NET1FAC, BAS1FAC, IIVA1FAC,
+      NET2FAC, BAS2FAC, IIVA2FAC,
+      NET3FAC, BAS3FAC, IIVA3FAC,
+      NET4FAC, BAS4FAC,
+      TOTFAC
     ) VALUES (
       '${tipfacVal}',
       ${header.codfac},
@@ -118,13 +144,23 @@ export function insertInvoiceHeaderQuery(header: {
       ${cemfacVal},
       ${cpafacVal},
       ${fopfacVal},
+      ${tivfac},
+      ${reqfac},
       ${header.piva1fac},
       ${header.piva2fac},
       ${header.piva3fac},
       ${header.ipor1fac},
+      ${header.net1fac},
       ${bas1},
       ${header.iiva1fac},
-      ${header.net1fac},
+      ${net2},
+      ${bas2},
+      ${iiva2},
+      ${net3},
+      ${bas3},
+      ${iiva3},
+      ${net4},
+      ${bas4},
       ${header.totfac}
     )
   `.trim();
@@ -132,9 +168,9 @@ export function insertInvoiceHeaderQuery(header: {
 
 export const INSERT_INVOICE_LINE_QUERY = `
   INSERT INTO F_LFA (
-    TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA
+    TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA, IVALFA
   ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?
   )
 `;
 

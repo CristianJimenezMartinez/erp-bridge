@@ -1,3 +1,5 @@
+import { sanitizeAndTruncate } from './order.queries';
+
 export interface FactusolRawArticle {
   CODART: string;
   DESART: string;
@@ -77,7 +79,7 @@ export function getAllArticlesQuery(limit?: number): string {
 }
 
 export function getArticleBySkuQuery(sku: string): string {
-  const safeCode = sku.replace(/'/g, "''");
+  const safeCode = sanitizeAndTruncate(sku, 13);
   return `
     SELECT 
       F_ART.CODART, F_ART.DESART, F_ART.DEWART, F_ART.EANART, F_ART.FAMART, F_ART.PCOART, F_ART.SUWART,
@@ -94,7 +96,7 @@ export function getAuxiliaryBarcodesQuery(skus: string[]): string {
   if (!skus || skus.length === 0) {
     return 'SELECT ARTEAN, EANEAN FROM F_EAN WHERE 1=0';
   }
-  const inList = skus.map((s) => `'${String(s).replace(/'/g, "''")}'`).join(', ');
+  const inList = skus.map((s) => `'${sanitizeAndTruncate(s, 13)}'`).join(', ');
   return `SELECT ARTEAN, EANEAN FROM F_EAN WHERE ARTEAN IN (${inList})`;
 }
 
@@ -114,7 +116,7 @@ export const FACTUSOL_QUERIES = {
   getStock: (skus?: string[]): string => {
     const whereClause =
       skus && skus.length > 0
-        ? `WHERE ARTSTO IN (${skus.map((s) => `'${String(s).replace(/'/g, "''")}'`).join(', ')})`
+        ? `WHERE ARTSTO IN (${skus.map((s) => `'${sanitizeAndTruncate(s, 13)}'`).join(', ')})`
         : '';
     return `
       SELECT ARTSTO, ALMSTO, ACTSTO, DISSTO
@@ -124,7 +126,7 @@ export const FACTUSOL_QUERIES = {
   },
 
   getPrices: (tarifaCode = '1', skus?: string[]): string => {
-    const safeTarifa = String(tarifaCode ?? '1').replace(/'/g, "''").trim() || '1';
+    const safeTarifa = sanitizeAndTruncate(tarifaCode ?? '1', 5) || '1';
     const isNumeric = /^\d+$/.test(safeTarifa);
     const tarifaCondition = isNumeric
       ? `(TARLTA = ${safeTarifa} OR CStr(TARLTA) = '${safeTarifa}')`
@@ -132,7 +134,7 @@ export const FACTUSOL_QUERIES = {
 
     const skuClause =
       skus && skus.length > 0
-        ? `AND ARTLTA IN (${skus.map((s) => `'${String(s).replace(/'/g, "''")}'`).join(', ')})`
+        ? `AND ARTLTA IN (${skus.map((s) => `'${sanitizeAndTruncate(s, 13)}'`).join(', ')})`
         : '';
 
     return `

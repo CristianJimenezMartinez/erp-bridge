@@ -100,8 +100,8 @@ export class FactusolInvoiceMapper {
         phone: header['TELFAC'] || header['telfac'] ? String(header['TELFAC'] || header['telfac']).trim() : undefined,
         billingAddress: {
           street: header['CDOFAC'] || header['cdofac'] ? String(header['CDOFAC'] || header['cdofac']).trim() : undefined,
-          postalCode: header['CPOFAC'] || header['cpofac'] ? String(header['CPOFAC'] || header['cpofac']).trim() : undefined,
-          city: header['CCPFAC'] || header['ccpfac'] ? String(header['CCPFAC'] || header['ccpfac']).trim() : undefined,
+          city: header['CPOFAC'] || header['cpofac'] ? String(header['CPOFAC'] || header['cpofac']).trim() : undefined,
+          postalCode: header['CCPFAC'] || header['ccpfac'] ? String(header['CCPFAC'] || header['ccpfac']).trim() : undefined,
           province: header['CPRFAC'] || header['cprfac'] ? String(header['CPRFAC'] || header['cprfac']).trim() : undefined,
           country: header['CPAFAC'] || header['cpafac'] ? String(header['CPAFAC'] || header['cpafac']).trim() : 'ES',
         },
@@ -155,13 +155,23 @@ export class FactusolInvoiceMapper {
     cemfac: string | null;
     cpafac: string | null;
     fopfac: string;
+    tivfac?: number;
+    reqfac?: number;
     piva1fac: number;
     piva2fac: number;
     piva3fac: number;
     ipor1fac: number;
     bas1fac: number;
+    bas2fac?: number;
+    bas3fac?: number;
+    bas4fac?: number;
     iiva1fac: number;
+    iiva2fac?: number;
+    iiva3fac?: number;
     net1fac: number;
+    net2fac?: number;
+    net3fac?: number;
+    net4fac?: number;
     totfac: number;
   } {
     const d = invoice.issueDate ? new Date(invoice.issueDate) : new Date();
@@ -183,6 +193,42 @@ export class FactusolInvoiceMapper {
     const rawPayment = (invoice as unknown as Record<string, unknown>).paymentMethod;
     const fopfac = typeof rawPayment === 'string' && rawPayment.trim() ? rawPayment.substring(0, 3).toUpperCase() : 'TAR';
 
+    let net1 = netAmount;
+    let bas1 = bas1fac;
+    let iiva1 = invoice.taxAmount || 0;
+    let net2 = 0;
+    let bas2 = 0;
+    let iiva2 = 0;
+    let net3 = 0;
+    let bas3 = 0;
+    let iiva3 = 0;
+    let net4 = 0;
+    let bas4 = 0;
+
+    if (invoice.taxBreakdown && invoice.taxBreakdown.length > 1) {
+      net1 = 0; bas1 = 0; iiva1 = 0;
+      for (const tb of invoice.taxBreakdown) {
+        if (tb.rate === 21) {
+          net1 += tb.baseAmount;
+          iiva1 += tb.taxAmount;
+        } else if (tb.rate === 10) {
+          net2 += tb.baseAmount;
+          iiva2 += tb.taxAmount;
+        } else if (tb.rate === 4) {
+          net3 += tb.baseAmount;
+          iiva3 += tb.taxAmount;
+        } else if (tb.rate === 0) {
+          net4 += tb.baseAmount;
+        }
+      }
+      bas1 = net1 > 0 ? Number((net1 + shippingCost).toFixed(2)) : 0;
+      bas2 = Number(net2.toFixed(2));
+      bas3 = Number(net3.toFixed(2));
+      bas4 = Number(net4.toFixed(2));
+    }
+
+    const hasReq = (invoice.customer as any).hasEquivalenceSurcharge ? 1 : 0;
+
     return {
       tipfac: series,
       codfac: invoiceNumber,
@@ -196,21 +242,31 @@ export class FactusolInvoiceMapper {
       clifac: isNaN(clientCode) ? 1 : clientCode,
       cnofac: (invoice.customer.name || 'CLIENTE CONTADO').substring(0, 50),
       cdofac: invoice.customer.billingAddress?.street ? invoice.customer.billingAddress.street.substring(0, 50) : null,
-      cpofac: invoice.customer.billingAddress?.postalCode ? invoice.customer.billingAddress.postalCode.substring(0, 5) : null,
-      ccpfac: invoice.customer.billingAddress?.city ? invoice.customer.billingAddress.city.substring(0, 30) : null,
-      cprfac: invoice.customer.billingAddress?.province ? invoice.customer.billingAddress.province.substring(0, 20) : null,
+      cpofac: invoice.customer.billingAddress?.city ? invoice.customer.billingAddress.city.substring(0, 30) : null,
+      ccpfac: invoice.customer.billingAddress?.postalCode ? invoice.customer.billingAddress.postalCode.substring(0, 10) : null,
+      cprfac: invoice.customer.billingAddress?.province ? invoice.customer.billingAddress.province.substring(0, 40) : null,
       cnifac: (invoice.customer.taxId || '').substring(0, 18),
       telfac: invoice.customer.phone ? invoice.customer.phone.substring(0, 15) : null,
       cemfac: invoice.customer.email ? invoice.customer.email.substring(0, 50) : null,
       cpafac: invoice.customer.billingAddress?.country ? invoice.customer.billingAddress.country.substring(0, 30) : 'ESPAÑA',
       fopfac,
+      tivfac: 0,
+      reqfac: hasReq,
       piva1fac: mainTaxRate,
       piva2fac: 10,
       piva3fac: 4,
       ipor1fac: shippingCost,
-      bas1fac,
-      iiva1fac: invoice.taxAmount || 0,
-      net1fac: netAmount,
+      bas1fac: bas1,
+      bas2fac: bas2,
+      bas3fac: bas3,
+      bas4fac: bas4,
+      iiva1fac: iiva1,
+      iiva2fac: iiva2,
+      iiva3fac: iiva3,
+      net1fac: net1,
+      net2fac: net2,
+      net3fac: net3,
+      net4fac: net4,
       totfac: invoice.totalAmount,
     };
   }
@@ -227,6 +283,7 @@ export class FactusolInvoiceMapper {
     canlfa: number;
     prelfa: number;
     totlfa: number;
+    ivalfa: number;
   }> {
     const series = (invoice.series || '1').substring(0, 1);
 
@@ -234,6 +291,11 @@ export class FactusolInvoiceMapper {
       const qty = ln.quantity || 1;
       const unitPrice = ln.unitPrice || 0;
       const lineTotal = ln.lineTotal || qty * unitPrice;
+      const taxRate = Number(ln.taxRate ?? 21);
+      let ivalfa = 0;
+      if (taxRate === 10) ivalfa = 1;
+      else if (taxRate === 4) ivalfa = 2;
+      else if (taxRate === 0) ivalfa = 3;
 
       return {
         tiplfa: series,
@@ -244,6 +306,7 @@ export class FactusolInvoiceMapper {
         canlfa: qty,
         prelfa: unitPrice,
         totlfa: lineTotal,
+        ivalfa,
       };
     });
   }

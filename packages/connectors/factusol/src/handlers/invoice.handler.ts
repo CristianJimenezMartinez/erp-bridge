@@ -95,7 +95,7 @@ export class FactusolInvoiceHandler {
 
           const lineSqls = lines.map((line) => `
             INSERT INTO F_LFA (
-              TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA
+              TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA, IVALFA
             ) VALUES (
               '${line.tiplfa}',
               ${line.codlfa},
@@ -104,7 +104,8 @@ export class FactusolInvoiceHandler {
               '${line.deslfa.replace(/'/g, "''")}',
               ${line.canlfa},
               ${line.prelfa},
-              ${line.totlfa}
+              ${line.totlfa},
+              ${line.ivalfa ?? 0}
             )
           `.trim());
 

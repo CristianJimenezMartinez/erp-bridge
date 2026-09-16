@@ -6,6 +6,8 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
+    "quality:check": "ts-node scripts/quality-gate.ts",
+    "audit:code": "ts-node scripts/quality-gate.ts",
     "test:benchmark": "ts-node test/e2e/autonomous-sync-benchmark.test.ts",
     "lint": "pnpm -r run lint",
     "start:api": "pnpm --filter @erp-bridge/api run start",

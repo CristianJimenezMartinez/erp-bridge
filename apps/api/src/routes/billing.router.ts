@@ -260,7 +260,7 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
 /**
  * 3. Crear sesión del Portal de Clientes de Stripe (Stripe Customer Portal)
  */
-billingRouter.post('/billing/create-portal-session', async (req: Request, res: Response, next: NextFunction) => {
+billingRouter.post('/billing/create-portal-session', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, customerId, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
 

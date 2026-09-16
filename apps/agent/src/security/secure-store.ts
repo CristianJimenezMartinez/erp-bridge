@@ -11,6 +11,7 @@ const TAG_LENGTH = 16; // 128 bits auth tag
 export class SecureStore {
   private readonly storageDir: string;
   private readonly licenseFilePath: string;
+  private readonly timestampFilePath: string;
 
   constructor(customDir?: string) {
     if (customDir) {
@@ -20,6 +21,7 @@ export class SecureStore {
       this.storageDir = path.join(appData, 'erp-bridge');
     }
     this.licenseFilePath = path.join(this.storageDir, 'license.enc');
+    this.timestampFilePath = path.join(this.storageDir, 'clock.enc');
   }
 
   public getStoragePath(): string {
@@ -96,6 +98,48 @@ export class SecureStore {
       try {
         fs.unlinkSync(this.licenseFilePath);
       } catch {}
+    }
+  }
+
+  /**
+   * Encrypts and persists monotonic last-seen timestamp to prevent clock rollbacks across reboots.
+   */
+  public async saveLastSeenTimestamp(ts: number, hwid: string): Promise<void> {
+    try {
+      if (!fs.existsSync(this.storageDir)) {
+        fs.mkdirSync(this.storageDir, { recursive: true });
+      }
+      const key = this.deriveKey(hwid);
+      const iv = crypto.randomBytes(IV_LENGTH);
+      const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+      const ciphertext = Buffer.concat([cipher.update(String(ts), 'utf8'), cipher.final()]);
+      const authTag = cipher.getAuthTag();
+      const payload = Buffer.concat([iv, authTag, ciphertext]);
+      fs.writeFileSync(this.timestampFilePath, payload);
+    } catch {}
+  }
+
+  /**
+   * Loads and decrypts the persisted last-seen timestamp.
+   */
+  public async loadLastSeenTimestamp(hwid: string): Promise<number> {
+    if (!fs.existsSync(this.timestampFilePath)) {
+      return 0;
+    }
+    try {
+      const payload = fs.readFileSync(this.timestampFilePath);
+      if (payload.length < IV_LENGTH + TAG_LENGTH) return 0;
+      const iv = payload.subarray(0, IV_LENGTH);
+      const authTag = payload.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
+      const ciphertext = payload.subarray(IV_LENGTH + TAG_LENGTH);
+      const key = this.deriveKey(hwid);
+      const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+      decipher.setAuthTag(authTag);
+      const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+      const val = parseInt(decrypted.toString('utf8'), 10);
+      return isNaN(val) ? 0 : val;
+    } catch {
+      return 0;
     }
   }
 }

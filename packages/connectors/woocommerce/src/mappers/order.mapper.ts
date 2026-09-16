@@ -110,6 +110,7 @@ export class WooCommerceOrderMapper {
 
     // Look for NIF/CIF in meta_data (standard fields: _billing_nif, _billing_cif, _billing_vat, NIF, DNI, CIF)
     let taxId: string | undefined;
+    let hasEquivalenceSurcharge = false;
     if (order.meta_data && Array.isArray(order.meta_data)) {
       const nifMeta = order.meta_data.find((m) =>
         ['nif', 'cif', 'dni', 'vat', '_billing_nif', '_billing_cif', '_billing_dni', '_billing_vat'].includes(
@@ -118,6 +119,15 @@ export class WooCommerceOrderMapper {
       );
       if (nifMeta && nifMeta.value) {
         taxId = String(nifMeta.value).trim();
+      }
+
+      const reMeta = order.meta_data.find((m) =>
+        ['_billing_recargo', '_billing_re', 'recargo_equivalencia', 'recargo'].includes(
+          m.key.toLowerCase()
+        )
+      );
+      if (reMeta && (reMeta.value === '1' || reMeta.value === 'yes' || String(reMeta.value).toLowerCase() === 'true' || String(reMeta.value).toLowerCase() === 'si')) {
+        hasEquivalenceSurcharge = true;
       }
     }
 
@@ -130,7 +140,7 @@ export class WooCommerceOrderMapper {
       email: billing.email || undefined,
       phone: billing.phone || undefined,
       address: this.toCanonicalAddress(billing),
-      hasEquivalenceSurcharge: false,
+      hasEquivalenceSurcharge,
       rawSourceData: { billing: order.billing, customer_id: order.customer_id },
     };
   }
@@ -139,8 +149,24 @@ export class WooCommerceOrderMapper {
     const qty = Number(raw.quantity) || 1;
     const total = Number(raw.total) || 0;
     const subtotal = Number(raw.subtotal) || total;
+    const totalTax = Number(raw.total_tax) || 0;
     const unitPrice = raw.price !== undefined ? Number(raw.price) : qty > 0 ? total / qty : 0;
     const sku = (raw.sku && raw.sku.trim()) ? raw.sku.trim() : `WC-${raw.product_id}`;
+
+    // Calcular tipo de IVA dinámico en vez de forzar 21%
+    let vatPercent = 21;
+    if (total > 0 && totalTax >= 0) {
+      const calculatedRate = Math.round((totalTax / total) * 100);
+      if (calculatedRate >= 18) vatPercent = 21;
+      else if (calculatedRate >= 8) vatPercent = 10;
+      else if (calculatedRate >= 2) vatPercent = 4;
+      else if (totalTax === 0) vatPercent = 0;
+      else vatPercent = calculatedRate;
+    } else if (totalTax === 0 && total > 0) {
+      vatPercent = 0;
+    }
+
+    const vatType = vatPercent === 21 ? 0 : (vatPercent === 10 ? 1 : (vatPercent === 4 ? 2 : 3));
 
     return {
       id: `wc_line_${raw.id}`,
@@ -150,8 +176,8 @@ export class WooCommerceOrderMapper {
       quantity: qty,
       unitPrice,
       discountPercent: subtotal > total && subtotal > 0 ? ((subtotal - total) / subtotal) * 100 : 0,
-      vatPercent: 21,
-      vatType: 0,
+      vatPercent,
+      vatType,
       subtotal,
       total,
       rawSourceData: raw as unknown as Record<string, unknown>,

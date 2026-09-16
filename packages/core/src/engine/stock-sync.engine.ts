@@ -188,7 +188,8 @@ export class StockSyncEngine {
           }
 
           try {
-            const res = await destConnector.updateStock(stock.sku, stock.quantity, targetId);
+            const effectiveQty = Math.max(0, stock.availableQuantity ?? stock.quantity ?? 0);
+            const res = await destConnector.updateStock(stock.sku, effectiveQty, targetId);
             if (res.success) {
               execution.successCount++;
               await this.eventBus.publish({
@@ -197,7 +198,7 @@ export class StockSyncEngine {
                 source: 'StockSyncEngine',
                 data: {
                   sku: stock.sku,
-                  quantity: stock.quantity,
+                  quantity: effectiveQty,
                   externalId: targetId,
                 },
               });

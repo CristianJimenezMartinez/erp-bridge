@@ -36,9 +36,10 @@ export class MiniRouter {
     const pathname = parsedUrl.pathname;
     const method = req.method || 'GET';
 
-    // 1. Host Validation: debe comenzar por 127.0.0.1 o localhost
+    // 1. Host Validation: debe ser estrictamente 127.0.0.1 o localhost (con o sin puerto)
     const host = req.headers.host || '';
-    if (!host.startsWith('127.0.0.1') && !host.startsWith('localhost')) {
+    const loopbackHostRegex = /^(127\.0\.0\.1|localhost)(:\d+)?$/;
+    if (!loopbackHostRegex.test(host)) {
       this.logger.warn(`Acceso denegado por cabecera Host no autorizada: "${host}"`);
       res.writeHead(403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Acceso denegado: Host no autorizado' }));
