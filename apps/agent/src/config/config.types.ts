@@ -1,6 +1,7 @@
 export interface AgentFactusolSettings {
   databasePath?: string;
   tariffCode?: string;
+  saleTariffCode?: string;
   orderSeries?: string;
   invoiceSeries?: string;
   warehouseCode?: string;

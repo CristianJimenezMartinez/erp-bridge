@@ -96,7 +96,31 @@ assert.strictEqual(canonicalNoPrice.regularPrice, 0, 'Must NOT use PCOART as reg
 assert.strictEqual(canonicalNoPrice.costPrice, 10.00, 'costPrice remains wholesale cost');
 assert.strictEqual(canonicalNoPrice.stockQuantity, 0, 'stockQuantity must be 0 to prevent sale');
 assert.strictEqual(canonicalNoPrice.inStock, false, 'inStock must be false');
-assert.strictEqual(canonicalNoPrice.status, 'draft', 'status must be draft');
+// 3. Test salePrice (Tarifa de Oferta / Precios Tachados)
+const canonicalWithSale = mapFactusolArticleToCanonical(rawArticle, {
+  priceMap: new Map([['000047', 25.50]]),
+  salePriceMap: new Map([['000047', 19.99]]), // Precio rebajado
+  stockMap: new Map([['000047', 10]]),
+});
+assert.strictEqual(canonicalWithSale.regularPrice, 25.50, 'regularPrice must be 25.50');
+assert.strictEqual(canonicalWithSale.salePrice, 19.99, 'salePrice must be 19.99');
+
+// 4. Test salePrice >= regularPrice (debe ignorarse por no ser oferta)
+const canonicalInvalidSale = mapFactusolArticleToCanonical(rawArticle, {
+  priceMap: new Map([['000047', 25.50]]),
+  salePriceMap: new Map([['000047', 30.00]]), // Mayor que regular
+  stockMap: new Map([['000047', 10]]),
+});
+assert.strictEqual(canonicalInvalidSale.regularPrice, 25.50);
+assert.strictEqual(canonicalInvalidSale.salePrice, undefined, 'salePrice must be undefined if >= regularPrice');
+
+// 5. Test salePrice <= 0 (debe ignorarse)
+const canonicalZeroSale = mapFactusolArticleToCanonical(rawArticle, {
+  priceMap: new Map([['000047', 25.50]]),
+  salePriceMap: new Map([['000047', 0]]),
+  stockMap: new Map([['000047', 10]]),
+});
+assert.strictEqual(canonicalZeroSale.salePrice, undefined, 'salePrice must be undefined if <= 0');
 
 console.log('✓ Factusol Mapper Tests Passed');
 

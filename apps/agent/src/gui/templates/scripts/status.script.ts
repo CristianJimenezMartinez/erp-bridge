@@ -50,6 +50,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         inputFactDb.value = fact.databasePath || fSettings.databasePath || '';
       }
       if (fSettings.tariffCode) document.getElementById('select-factusol-tariff').value = fSettings.tariffCode;
+      if (fSettings.saleTariffCode !== undefined && document.getElementById('select-factusol-sale-tariff')) {
+        document.getElementById('select-factusol-sale-tariff').value = fSettings.saleTariffCode || '';
+      }
       if (fSettings.orderSeries) document.getElementById('input-factusol-order-series').value = fSettings.orderSeries;
       if (fSettings.invoiceSeries) document.getElementById('input-factusol-inv-series').value = fSettings.invoiceSeries;
 

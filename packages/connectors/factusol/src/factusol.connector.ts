@@ -125,6 +125,7 @@ export class FactusolConnector implements Connector {
     this.config = {
       databasePath: activeDbPath,
       tariffCode: rawConfig.tariffCode || '1',
+      saleTariffCode: rawConfig.saleTariffCode,
       activeOnly: rawConfig.activeOnly !== false,
       provider: rawConfig.provider,
       orderSeries: rawConfig.orderSeries || ' ',

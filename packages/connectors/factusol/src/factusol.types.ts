@@ -1,6 +1,7 @@
 export interface FactusolConnectionConfig {
   databasePath: string;
   tariffCode?: string;
+  saleTariffCode?: string;
   activeOnly?: boolean;
   provider?: string;
   orderSeries?: string;

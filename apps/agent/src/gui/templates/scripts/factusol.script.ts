@@ -122,6 +122,7 @@ export const factusolScript = `
         factusol: {
           databasePath: document.getElementById('input-factusol-db').value.trim(),
           tariffCode: document.getElementById('select-factusol-tariff').value,
+          saleTariffCode: document.getElementById('select-factusol-sale-tariff') ? document.getElementById('select-factusol-sale-tariff').value : '',
           warehouseCode: document.getElementById('select-factusol-warehouse').value,
           orderSeries: document.getElementById('input-factusol-order-series').value.trim(),
           invoiceSeries: document.getElementById('input-factusol-inv-series').value.trim(),
@@ -180,7 +181,16 @@ export const factusolScript = `
         const data = await res.json();
         if (data.tariffs && data.tariffs.length > 0) {
           const sel = document.getElementById('select-factusol-tariff');
-          sel.innerHTML = data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+          if (sel) {
+            sel.innerHTML = data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+          }
+          const saleSel = document.getElementById('select-factusol-sale-tariff');
+          if (saleSel) {
+            const currentVal = saleSel.value;
+            saleSel.innerHTML = '<option value="">-- Ninguna (Sin precio tachado) --</option>' +
+              data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+            saleSel.value = currentVal;
+          }
         }
         if (data.warehouses && data.warehouses.length > 0) {
           const sel = document.getElementById('select-factusol-warehouse');

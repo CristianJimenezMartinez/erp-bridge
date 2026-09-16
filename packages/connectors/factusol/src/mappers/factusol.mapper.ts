@@ -18,6 +18,7 @@ export interface FactusolEnrichmentData {
   actualStockMap?: Map<string, number>;
   priceMap?: Map<string, number>;
   defaultPriceMap?: Map<string, number>;
+  salePriceMap?: Map<string, number>;
   familyMap?: Map<string, string>;
   barcodeMap?: Map<string, string[]>;
 }
@@ -62,6 +63,15 @@ export function mapFactusolArticleToCanonical(
     const defaultPrice = enrichment.defaultPriceMap.get(code);
     if (defaultPrice !== undefined && defaultPrice > 0) {
       regularPrice = defaultPrice;
+    }
+  }
+
+  // Precios tachados / ofertas: solo aplica si salePrice > 0 y es menor que regularPrice
+  let salePrice: number | undefined;
+  if (regularPrice > 0 && enrichment?.salePriceMap && enrichment.salePriceMap.has(code)) {
+    const rawSale = enrichment.salePriceMap.get(code);
+    if (rawSale !== undefined && rawSale > 0 && rawSale < regularPrice) {
+      salePrice = rawSale;
     }
   }
 
@@ -112,6 +122,7 @@ export function mapFactusolArticleToCanonical(
     description,
     shortDescription: name,
     regularPrice,
+    salePrice,
     costPrice,
     stockQuantity,
     manageStock: true,

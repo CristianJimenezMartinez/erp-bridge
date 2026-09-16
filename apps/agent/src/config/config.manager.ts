@@ -49,6 +49,7 @@ export class ConfigManager {
       factusol: {
         databasePath: customConfig?.factusolDbPath || customConfig?.factusol?.databasePath || diskConfig.factusolDbPath || diskFactusol.databasePath || '',
         tariffCode: customConfig?.factusol?.tariffCode || diskFactusol.tariffCode || '1',
+        saleTariffCode: customConfig?.factusol?.saleTariffCode ?? diskFactusol.saleTariffCode ?? '',
         orderSeries: customConfig?.factusol?.orderSeries || diskFactusol.orderSeries || '1',
         invoiceSeries: customConfig?.factusol?.invoiceSeries || diskFactusol.invoiceSeries || '1',
         warehouseCode: customConfig?.factusol?.warehouseCode || diskFactusol.warehouseCode || 'GEN',

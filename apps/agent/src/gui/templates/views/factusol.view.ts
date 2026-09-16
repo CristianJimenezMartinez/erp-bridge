@@ -38,11 +38,18 @@ export function renderFactusolTab(): string {
 
           <div class="form-grid">
             <div class="form-group">
-              <label class="form-label">Tarifa de Precios a Publicar:</label>
+              <label class="form-label">Tarifa de Precios a Publicar (Habitual):</label>
               <select id="select-factusol-tariff" class="form-control form-select">
                 <option value="1">1: Tarifa General</option>
                 <option value="2">2: Tarifa Web / Internet</option>
                 <option value="3">3: Tarifa Contado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tarifa de Oferta / Rebajas (Opcional):</label>
+              <select id="select-factusol-sale-tariff" class="form-control form-select">
+                <option value="">-- Ninguna (Sin precio tachado) --</option>
+                <option value="2">2: Tarifa Web / Oferta</option>
               </select>
             </div>
             <div class="form-group">

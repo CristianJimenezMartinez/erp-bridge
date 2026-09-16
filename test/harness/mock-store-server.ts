@@ -799,6 +799,7 @@ export class MockStoreServer {
           sku,
           name: p.name || p.description || 'Artículo Universal',
           price: String(p.price || p.priceWithVat || '0'),
+          sale_price: (p.salePrice && Number(p.salePrice) > 0) ? String(p.salePrice) : undefined,
           vat_rate: Number(p.vatRate || 21),
           unit_of_measure: p.unitOfMeasure || 'UNIDADES',
           stock_quantity: typeof p.stock === 'number' ? p.stock : 0,
@@ -819,7 +820,9 @@ export class MockStoreServer {
         codart: p.sku || String(p.id),
         desart: p.name,
         pcoart: Number(p.price || 0),
+        sale_price: p.sale_price ? Number(p.sale_price) : undefined,
         pvp: Number(p.price || 0) * 1.21,
+        sale_pvp: p.sale_price ? Number(p.sale_price) * 1.21 : undefined,
         stock: this.stockBySku.get(String(p.sku || p.id).toUpperCase()) ?? 0,
       }));
       const resp = { success: true, count: items.length, articles: items };

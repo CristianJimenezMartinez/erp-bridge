@@ -92,8 +92,10 @@ function ensureTablesExist($pdo) {
               `family_code` VARCHAR(10) DEFAULT NULL,
               `family_name` VARCHAR(100) DEFAULT NULL,
               `price` DECIMAL(12, 4) NOT NULL DEFAULT 0.0000,
+              `sale_price` DECIMAL(12, 4) DEFAULT NULL,
               `vat_rate` DECIMAL(5, 2) NOT NULL DEFAULT 21.00,
               `price_with_vat` DECIMAL(12, 4) NOT NULL DEFAULT 0.0000,
+              `sale_price_with_vat` DECIMAL(12, 4) DEFAULT NULL,
               `unit_of_measure` VARCHAR(20) DEFAULT 'UNIDADES',
               `weight` DECIMAL(10, 3) DEFAULT 0.000,
               `barcode` VARCHAR(50) DEFAULT NULL,
@@ -131,6 +133,10 @@ function ensureTablesExist($pdo) {
               INDEX `idx_created` (`created_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ");
+        try {
+            $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `sale_price` DECIMAL(12, 4) DEFAULT NULL");
+            $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `sale_price_with_vat` DECIMAL(12, 4) DEFAULT NULL");
+        } catch (Exception $colErr) {}
         return true;
     } catch (Exception $e) {
         return false;
@@ -230,7 +236,9 @@ if ($action === 'catalog' || $action === 'articles') {
             p.name AS desart,
             p.description AS dewart,
             p.price AS pcoart,
+            p.sale_price AS sale_price,
             p.price_with_vat AS pvp,
+            p.sale_price_with_vat AS sale_pvp,
             p.family_code AS famart,
             p.barcode AS eanart,
             p.unit_of_measure AS measure,
@@ -272,7 +280,9 @@ if ($action === 'family') {
             p.name AS desart,
             p.description AS dewart,
             p.price AS pcoart,
+            p.sale_price AS sale_price,
             p.price_with_vat AS pvp,
+            p.sale_price_with_vat AS sale_pvp,
             p.family_code AS famart,
             p.barcode AS eanart,
             p.unit_of_measure AS measure,
@@ -380,9 +390,9 @@ if ($action === 'push_catalog') {
 
     $stmt = $pdo->prepare("
         INSERT INTO `eb_products` 
-          (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `vat_rate`, `price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `active`)
+          (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `sale_price`, `vat_rate`, `price_with_vat`, `sale_price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `active`)
         VALUES 
-          (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :vat_rate, :price_with_vat, :unit_of_measure, :weight, :barcode, :active)
+          (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :sale_price, :vat_rate, :price_with_vat, :sale_price_with_vat, :unit_of_measure, :weight, :barcode, :active)
         ON DUPLICATE KEY UPDATE
           `sku` = VALUES(`sku`),
           `name` = VALUES(`name`),
@@ -392,8 +402,10 @@ if ($action === 'push_catalog') {
           `family_code` = VALUES(`family_code`),
           `family_name` = VALUES(`family_name`),
           `price` = VALUES(`price`),
+          `sale_price` = VALUES(`sale_price`),
           `vat_rate` = VALUES(`vat_rate`),
           `price_with_vat` = VALUES(`price_with_vat`),
+          `sale_price_with_vat` = VALUES(`sale_price_with_vat`),
           `unit_of_measure` = VALUES(`unit_of_measure`),
           `weight` = VALUES(`weight`),
           `barcode` = VALUES(`barcode`),
@@ -405,6 +417,12 @@ if ($action === 'push_catalog') {
     $count = 0;
     try {
         foreach ($products as $p) {
+            $vat = floatval($p['vatRate'] ?? 21.0);
+            $regPrice = floatval($p['price'] ?? 0);
+            $rawSale = isset($p['salePrice']) ? floatval($p['salePrice']) : null;
+            $salePrice = ($rawSale !== null && $rawSale > 0 && $rawSale < $regPrice) ? $rawSale : null;
+            $saleWithVat = $salePrice !== null ? round($salePrice * (1 + $vat / 100), 4) : null;
+
             $stmt->execute([
                 ':code' => substr($p['code'] ?? '', 0, 50),
                 ':sku' => substr($p['sku'] ?? $p['code'] ?? '', 0, 50),
@@ -414,9 +432,11 @@ if ($action === 'push_catalog') {
                 ':section_name' => substr($p['sectionName'] ?? '', 0, 100),
                 ':family_code' => substr($p['familyCode'] ?? '', 0, 10),
                 ':family_name' => substr($p['familyName'] ?? '', 0, 100),
-                ':price' => floatval($p['price'] ?? 0),
-                ':vat_rate' => floatval($p['vatRate'] ?? 21.0),
-                ':price_with_vat' => floatval($p['priceWithVat'] ?? 0),
+                ':price' => $regPrice,
+                ':sale_price' => $salePrice,
+                ':vat_rate' => $vat,
+                ':price_with_vat' => floatval($p['priceWithVat'] ?? ($regPrice * (1 + $vat / 100))),
+                ':sale_price_with_vat' => $saleWithVat,
                 ':unit_of_measure' => substr($p['unitOfMeasure'] ?? 'UNIDADES', 0, 20),
                 ':weight' => floatval($p['weight'] ?? 0),
                 ':barcode' => substr($p['barcode'] ?? '', 0, 50),

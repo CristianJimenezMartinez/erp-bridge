@@ -203,6 +203,7 @@ export class LocalSyncEngine {
                   orderSeries: series,
                   defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
                   tariffCode: config.factusol?.tariffCode || '1',
+                  saleTariffCode: config.factusol?.saleTariffCode,
                 },
               });
             }
@@ -438,6 +439,7 @@ export class LocalSyncEngine {
             orderSeries: config.factusol?.orderSeries || '1',
             defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
             tariffCode: config.factusol?.tariffCode || '1',
+            saleTariffCode: config.factusol?.saleTariffCode,
           },
         });
       }
@@ -520,6 +522,7 @@ export class LocalSyncEngine {
           sku: p.sku.trim(),
           type: 'simple',
           regular_price: p.regularPrice > 0 ? String(p.regularPrice) : '0',
+          sale_price: (p.salePrice && p.salePrice > 0) ? String(p.salePrice) : undefined,
           manage_stock: true,
           stock_quantity: Math.max(0, p.stockQuantity || 0),
           description: p.description || '',

@@ -67,6 +67,10 @@ export class FactusolProductHandler {
     const defaultPrices = tariffCode !== '1'
       ? await queryInBatches<FactusolRawPrice>((chunk) => FACTUSOL_QUERIES.getPrices('1', chunk))
       : prices;
+    const saleTariffCode = this.config.saleTariffCode?.trim();
+    const salePrices = (saleTariffCode && saleTariffCode !== tariffCode)
+      ? await queryInBatches<FactusolRawPrice>((chunk) => FACTUSOL_QUERIES.getPrices(saleTariffCode, chunk))
+      : [];
     const families = await this.driver.query<FactusolRawFamily>(FACTUSOL_QUERIES.getFamilies()).catch(() => [] as FactusolRawFamily[]);
     const auxiliaryBarcodes = await queryInBatches<FactusolRawBarcode>((chunk) =>
       FACTUSOL_QUERIES.getAuxiliaryBarcodes(chunk)
@@ -75,12 +79,13 @@ export class FactusolProductHandler {
     const stockMap = buildStockMap(stocks);
     const priceMap = buildPriceMap(prices);
     const defaultPriceMap = tariffCode !== '1' ? buildPriceMap(defaultPrices) : priceMap;
+    const salePriceMap = buildPriceMap(salePrices);
     const familyMap = buildFamilyMap(families);
     const barcodeMap = buildBarcodeMap(auxiliaryBarcodes);
 
     // 3. Map to CanonicalProduct
     const canonicalProducts: CanonicalProduct[] = rawArticles.map((raw) =>
-      mapFactusolArticleToCanonical(raw, { stockMap, priceMap, defaultPriceMap, familyMap, barcodeMap })
+      mapFactusolArticleToCanonical(raw, { stockMap, priceMap, defaultPriceMap, salePriceMap, familyMap, barcodeMap })
     );
 
     this.logger.info(`Lectura de productos de Factusol completada: ${canonicalProducts.length} productos procesados.`);
