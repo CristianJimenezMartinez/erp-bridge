@@ -21,37 +21,127 @@ export const factusolScript = `
       } catch (err) {}
     }
 
-    // Pruebas y Guardado Factusol
-    async function browseFactusol(isWizard) {
-      const btn = isWizard 
-        ? document.getElementById('wiz-btn-browse-fact') 
-        : document.getElementById('btn-browse-fact');
-      const originalHtml = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Abriendo...';
+    // Explorador de Archivos y Carpetas (100% Web Nativo, Cero PowerShell, Cero Antivirus)
+    let explorerIsWizard = false;
+    let explorerCurrentPath = '';
+    let explorerParentPath = null;
+
+    function browseFactusol(isWizard) {
+      explorerIsWizard = !!isWizard;
+      openExplorerModal();
+    }
+
+    function openExplorerModal() {
+      const modal = document.getElementById('modal-fs-explorer');
+      if (modal) {
+        modal.classList.add('open');
+        const targetInput = explorerIsWizard 
+          ? document.getElementById('wiz-input-fact-path') 
+          : document.getElementById('input-factusol-db');
+        const initPath = targetInput && targetInput.value.trim() ? targetInput.value.trim() : '';
+        explorerNavigateTo(initPath);
+      }
+    }
+
+    function closeExplorerModal() {
+      const modal = document.getElementById('modal-fs-explorer');
+      if (modal) modal.classList.remove('open');
+    }
+
+    async function explorerNavigateTo(dirPath) {
+      const fileList = document.getElementById('explorer-file-list');
+      if (fileList) {
+        fileList.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:30px;"><span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#60a5fa;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Explorando carpeta...</div>';
       }
 
       try {
-        const res = await fetch('/api/local/browse-factusol', { method: 'POST' });
+        const res = await fetch('/api/local/fs/browse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: dirPath || '' })
+        });
         const data = await res.json();
-        if (data.selectedPath) {
-          const targetInput = isWizard ? document.getElementById('wiz-input-fact-path') : document.getElementById('input-factusol-db');
-          targetInput.value = data.selectedPath;
-          handleFactusolInputBlur(isWizard ? 'wiz-input-fact-path' : 'input-factusol-db');
-          showToast('Base de datos seleccionada: ' + data.selectedPath, 'success');
-          if (!isWizard) {
-            await testFactusolConnection();
-          }
+        if (data.success) {
+          explorerCurrentPath = data.currentPath;
+          explorerParentPath = data.parentPath;
+          renderExplorerContent(data);
+        } else {
+          showToast(data.message || 'Error al acceder a la ruta', 'error');
         }
       } catch (err) {
-        showToast('Error al abrir selector de Windows', 'error');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = originalHtml;
-        }
+        showToast('No se pudo conectar con el explorador', 'error');
       }
+    }
+
+    function explorerGoUp() {
+      if (explorerParentPath) {
+        explorerNavigateTo(explorerParentPath);
+      } else {
+        showToast('Ya estás en la raíz del disco', 'info');
+      }
+    }
+
+    function renderExplorerContent(data) {
+      const pathInput = document.getElementById('explorer-current-path-input');
+      if (pathInput) pathInput.value = data.currentPath;
+
+      const upBtn = document.getElementById('btn-explorer-up');
+      if (upBtn) upBtn.disabled = !data.parentPath;
+
+      // Unidades y Atajos
+      const drivesList = document.getElementById('explorer-drives-list');
+      if (drivesList) {
+        const drivesHtml = (data.drives || []).map(function(d) {
+          const isSelected = data.currentPath && data.currentPath.toUpperCase().startsWith(d.path.toUpperCase());
+          return '<button onclick="explorerNavigateTo(\\'' + d.path.replace(/\\\\/g, '\\\\\\\\') + '\\')" class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:11px;' + (isSelected ? 'border-color:#6366f1;color:#a5b4fc;' : '') + '">' + d.label + '</button>';
+        }).join('');
+
+        const shortcutsHtml = (data.shortcuts || []).map(function(s) {
+          return '<button onclick="explorerNavigateTo(\\'' + s.path.replace(/\\\\/g, '\\\\\\\\') + '\\')" class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:11px;">' + s.label + '</button>';
+        }).join('');
+
+        drivesList.innerHTML = drivesHtml + shortcutsHtml;
+      }
+
+      // Archivos y Carpetas
+      const fileList = document.getElementById('explorer-file-list');
+      if (!fileList) return;
+
+      if (!data.items || data.items.length === 0) {
+        fileList.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:30px;">Esta carpeta no contiene subcarpetas ni bases de datos Factusol (.accdb).</div>';
+        return;
+      }
+
+      fileList.innerHTML = data.items.map(function(item) {
+        const safePath = item.fullPath.replace(/\\\\/g, '\\\\\\\\');
+        if (item.isDirectory) {
+          return '<div onclick="explorerNavigateTo(\\'' + safePath + '\\')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;background:#15151b;border:1px solid transparent;font-size:12px;transition:all 0.15s;" onmouseover="this.style.borderColor=\\'var(--card-border)\\';this.style.background=\\'#1e1e26\\'" onmouseout="this.style.borderColor=\\'transparent\\';this.style.background=\\'#15151b\\'">' +
+            '<span style="font-size:15px;">📁</span>' +
+            '<span style="font-weight:500;color:#e4e4e7;flex:1;">' + item.name + '</span>' +
+            '<span style="font-size:11px;color:var(--text-subtle);">Carpeta</span>' +
+          '</div>';
+        } else {
+          const sizeMb = item.sizeBytes ? (item.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.3);font-size:12px;margin:2px 0;">' +
+            '<div style="display:flex;align-items:center;gap:10px;">' +
+              '<span style="font-size:16px;">💾</span>' +
+              '<div>' +
+                '<strong style="color:#fff;">' + item.name + '</strong>' +
+                '<span style="color:var(--text-subtle);font-size:11px;margin-left:8px;">' + sizeMb + (item.mtime ? ' • ' + item.mtime : '') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<button onclick="explorerSelectFile(\\'' + safePath + '\\')" class="btn btn-primary btn-sm" style="padding:4px 10px;">' +
+              '<span>Seleccionar</span>' +
+            '</button>' +
+          '</div>';
+        }
+      }).join('');
+    }
+
+    async function explorerSelectFile(filePath) {
+      closeExplorerModal();
+      selectFactusolInstance(filePath, explorerIsWizard);
+      showToast('✓ Base de datos seleccionada con éxito', 'success');
     }
 
     async function detectFactusol(isWizard) {

@@ -77,26 +77,10 @@ export function openDesktopWindow(url: string): boolean {
 }
 
 /**
- * Abre el diálogo nativo de Windows (OpenFileDialog) para seleccionar un archivo.
+ * Diálogo de archivos defensivo: deshabilitado para evitar invocar PowerShell en segundo plano
+ * y disparar alertas heurísticas falsas positivas en Microsoft Windows Defender.
+ * La selección de archivos se gestiona nativamente a través del explorador integrado de la GUI.
  */
-export function openWindowsFileDialog(title: string, filter: string): string {
-  if (process.platform !== 'win32') {
-    return '';
-  }
-  try {
-    const escapedTitle = title.replace(/'/g, "''");
-    const escapedFilter = filter.replace(/'/g, "''");
-    const psCmd = `Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.OpenFileDialog; $dialog.Filter = '${escapedFilter}'; $dialog.Title = '${escapedTitle}'; if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $dialog.FileName }`;
-    const res = childProcess.spawnSync(
-      'powershell.exe',
-      ['-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-Sta', '-Command', psCmd],
-      {
-        encoding: 'utf8',
-        windowsHide: true,
-      }
-    );
-    return res.stdout ? res.stdout.trim() : '';
-  } catch {
-    return '';
-  }
+export function openWindowsFileDialog(_title: string, _filter: string): string {
+  return '';
 }

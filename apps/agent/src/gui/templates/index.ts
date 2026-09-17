@@ -10,6 +10,7 @@ import {
   renderLogsTab,
   renderLicenseTab,
   renderWizardModal,
+  renderExplorerModal,
   renderToast,
 } from './views';
 import { renderClientScript } from './scripts';
@@ -47,6 +48,7 @@ export function renderDashboardHtml(agentVersion: string = '0.2.0'): string {
     '  </div>',
     '',
     renderWizardModal(),
+    renderExplorerModal(),
     renderToast(),
     renderClientScript(agentVersion),
     '</body>',
