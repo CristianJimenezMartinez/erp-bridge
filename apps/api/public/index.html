@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -65,25 +65,25 @@
         "description": "Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP y plataformas eCommerce (WooCommerce, PrestaShop) con arquitectura Zero-Knowledge y Edge Processing.",
         "url": "https://bridge.cristianjm.com",
         "softwareVersion": "0.1.5",
-        "downloadUrl": "https://bridge.cristianjm.com/releases/v0.2.4/Bentian-Setup-v0.2.4.exe",
+        "downloadUrl": "https://bridge.cristianjm.com/releases/v0.2.5/Bentian-Setup-v0.2.5.exe",
         "offers": [
           {
             "@type": "Offer",
-            "name": "Plan Base Anual (3 Puestos)",
+            "name": "Plan Base Anual (1 Conexión ERP)",
             "price": "249.00",
             "priceCurrency": "EUR",
             "priceValidUntil": "2027-12-31",
             "availability": "https://schema.org/InStock",
-            "description": "Suscripción anual completa con hasta 3 puestos de trabajo locales incluidos."
+            "description": "Suscripción anual completa para 1 ERP Factusol y 1 Tienda Online."
           },
           {
             "@type": "Offer",
-            "name": "Plan Base Mensual (3 Puestos)",
+            "name": "Plan Base Mensual (1 Conexión ERP)",
             "price": "29.00",
             "priceCurrency": "EUR",
             "priceValidUntil": "2027-12-31",
             "availability": "https://schema.org/InStock",
-            "description": "Suscripción mensual flexible con hasta 3 puestos locales incluidos."
+            "description": "Suscripción mensual flexible para 1 ERP Factusol y 1 Tienda Online."
           }
         ],
         "featureList": [
@@ -182,10 +182,10 @@
           },
           {
             "@type": "Question",
-            "name": "¿Puedo instalarlo en varios puestos de trabajo?",
+            "name": "¿En cuántos ordenadores debo instalar el conector?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sí. El plan base incluye hasta 3 puestos locales bajo la misma licencia empresarial (por ejemplo, el ordenador de facturación, el de almacén y el de oficina)."
+              "text": "Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano."
             }
           },
           {
@@ -286,7 +286,7 @@
         <div class="flex items-center gap-3 mb-8">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#121215] border border-white/[0.1] text-xs font-mono text-zinc-300">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="hero-version-tag">Release Oficial v0.2.4 para Windows x64</span>
+            <span id="hero-version-tag">Release Oficial v0.2.5 para Windows x64</span>
           </div>
           <span class="text-xs font-mono text-zinc-500 hidden sm:inline">Arquitectura Store-and-Forward / Local-First</span>
         </div>
@@ -1114,7 +1114,7 @@
                 </li>
                 <li class="flex items-center gap-2.5">
                   <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
-                  <span><strong>Hasta 3 puestos locales</strong> de trabajo incluidos</span>
+                  <span><strong>1 Conexión ERP / Servidor</strong> (instalación en el equipo con Factusol)</span>
                 </li>
                 <li class="flex items-center gap-2.5">
                   <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
@@ -1158,7 +1158,7 @@
                 </li>
                 <li class="flex items-center gap-2.5">
                   <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
-                  <span>Hasta 3 puestos de trabajo incluidos</span>
+                  <span>1 Conexión ERP / Servidor Factusol</span>
                 </li>
                 <li class="flex items-center gap-2.5">
                   <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>
@@ -1259,11 +1259,11 @@
 
           <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
             <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
-              <span>¿Puedo instalarlo en varios puestos de trabajo?</span>
+              <span>¿En cuántos ordenadores debo instalar el conector?</span>
               <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
             </summary>
             <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
-              Sí. El plan base incluye hasta 3 puestos locales bajo la misma licencia empresarial (por ejemplo, el ordenador de facturación, el de almacén y el de oficina).
+              Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano.
             </p>
           </details>
 

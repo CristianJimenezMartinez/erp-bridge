@@ -34,14 +34,14 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     billingCycle: 'annual',
     mode: 'subscription',
     popular: true,
-    seats: 3,
+    seats: 1,
     storesIncluded: 1,
     description: 'Sincronización completa sin límites artificiales para 1 ERP y 1 Tienda Online.',
     features: [
       'Catálogo ilimitado de productos (sin límites de SKUs)',
-      'Sincronización de pedidos y clientes ilimitada',
+      'Sincronización de pedidos y clientes ilimitada en tiempo real',
       '1 ERP (Factusol / SimplyGest) ⇄ 1 Tienda Online (WooCommerce / PrestaShop)',
-      'Hasta 3 puestos locales de trabajo incluidos',
+      '1 Conexión ERP / Servidor (instalación única en el equipo con Factusol)',
       'Delta Sync por triada de hashes (descarte en local <100ms)',
       'Blindaje de imágenes por MD5 y Recargo de Equivalencia (R.E.)',
       'Centro de Control Local nativo y System Tray permanente',
@@ -55,13 +55,13 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     priceEur: 29,
     billingCycle: 'monthly',
     mode: 'subscription',
-    seats: 3,
+    seats: 1,
     storesIncluded: 1,
     description: 'Máxima flexibilidad mensual sin compromiso de permanencia.',
     features: [
       'Catálogo ilimitado de productos y pedidos',
       '1 ERP ⇄ 1 Tienda Online conectada',
-      'Hasta 3 puestos locales incluidos',
+      '1 Conexión ERP / Servidor (instalación en el equipo con Factusol)',
       'Delta Sync y blindaje de imágenes',
       'Prueba de 14 días gratis sin tarjeta',
       'Sin permanencia: cancelable en cualquier momento en 1 clic',
@@ -197,13 +197,13 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       params.append('metadata[organizationId]', orgId);
       params.append('metadata[planId]', matchedPlan.id);
       params.append('metadata[planName]', matchedPlan.name);
-      params.append('metadata[maxActivations]', String(matchedPlan.seats || 3));
+      params.append('metadata[maxActivations]', String(matchedPlan.seats || 1));
       params.append('metadata[storesIncluded]', String(matchedPlan.storesIncluded || 1));
 
       if (isSubscription) {
         params.append('subscription_data[metadata][organizationId]', orgId);
         params.append('subscription_data[metadata][planId]', matchedPlan.id);
-        params.append('subscription_data[metadata][maxActivations]', String(matchedPlan.seats || 3));
+        params.append('subscription_data[metadata][maxActivations]', String(matchedPlan.seats || 1));
       }
 
       // Línea de producto
@@ -392,10 +392,10 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com';
         const organizationId = session.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
-        const maxActivations = Number(session.metadata?.maxActivations) || 3;
-        const alias = session.metadata?.alias || 'Puesto Principal (Facturación)';
+        const maxActivations = Number(session.metadata?.maxActivations) || 1;
+        const alias = session.metadata?.alias || 'Servidor Factusol Principal';
 
-        logger.info(`Generando licencia tras pago de ${customerEmail} (Plan: ${planId}, Puestos: ${maxActivations})...`);
+        logger.info(`Generando licencia tras pago de ${customerEmail} (Plan: ${planId}, Servidores: ${maxActivations})...`);
 
         const license = await licenseService.createLicense({
           organizationId,

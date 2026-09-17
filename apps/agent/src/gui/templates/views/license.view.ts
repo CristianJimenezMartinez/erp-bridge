@@ -22,7 +22,7 @@ export function renderLicenseTab(): string {
           </div>
 
           <div class="form-group">
-            <label class="form-label">Clave de Puesto Activa:</label>
+            <label class="form-label">Clave de Activación del Conector:</label>
             <div class="input-with-button">
               <input type="text" id="input-lic-key" class="form-control" style="font-family: monospace;" placeholder="EB-XXXXX-XXXXX-XXXXX-XXXXX">
               <button onclick="activateLicenseKey()" id="btn-activate-lic" class="btn btn-primary" style="white-space: nowrap;">
@@ -47,12 +47,12 @@ export function renderLicenseTab(): string {
 
           <div style="margin-top: 24px; padding: 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <div style="font-size: 13px; font-weight: 600; color: #fff;">¿Necesitas más puestos o transferir esta clave a otro ordenador?</div>
-              <div style="font-size: 12px; color: var(--text-muted);">Accede al panel Cloud para gestionar tus puestos, desvincular equipos o gestionar pagos.</div>
+              <div style="font-size: 13px; font-weight: 600; color: #fff;">¿Necesitas transferir tu licencia a otro ordenador o gestionar tu suscripción?</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Accede al panel Cloud para consultar tus facturas de Stripe o liberar este equipo para mudarlo.</div>
             </div>
-            <a href="https://bridge.cristianjm.com/dashboard/" target="_blank" class="btn btn-secondary">
+            <button onclick="openCloudDashboard(event)" class="btn btn-secondary">
               Gestionar en Cloud ↗
-            </a>
+            </button>
           </div>
         </div>
       </section>`;

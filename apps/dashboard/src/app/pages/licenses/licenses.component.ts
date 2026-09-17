@@ -76,7 +76,7 @@ import { ApiService } from '../../services/api.service';
           </div>
           
           <div style="font-size: 0.75rem; color: #71717a; margin-top: 1rem;">
-            Puestos ocupados: 100%. Para conectar más servidores o tiendas, amplía tu plan.
+            1 Servidor ERP conectado. Sincronización en funcionamiento con tu tienda web.
           </div>
         </div>
 

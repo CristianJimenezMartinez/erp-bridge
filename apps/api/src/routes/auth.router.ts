@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { z } from 'zod';
+import { LicenseService } from '@erp-bridge/core';
 
 export interface AdminJwtPayload {
   sub: string;
@@ -274,4 +275,133 @@ authRouter.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res: Respons
   res.json({
     user: req.user,
   });
+});
+
+const authLicenseService = new LicenseService();
+
+// POST /api/v1/auth/license-session (Acceso 1-clic y login directo por clave)
+authRouter.post('/auth/license-session', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { licenseKey } = req.body as { licenseKey?: string };
+    if (!licenseKey || typeof licenseKey !== 'string') {
+      res.status(400).json({
+        error: {
+          code: 'MISSING_LICENSE_KEY',
+          message: 'Se requiere una clave de licencia válida',
+        },
+      });
+      return;
+    }
+
+    const trimmedKey = licenseKey.trim();
+    const license = await authLicenseService.getLicenseByKey(trimmedKey);
+    if (!license) {
+      res.status(401).json({
+        error: {
+          code: 'INVALID_LICENSE',
+          message: 'Clave de licencia no encontrada o formato no válido',
+        },
+      });
+      return;
+    }
+
+    if (license.status === 'revoked' || license.status === 'suspended') {
+      res.status(403).json({
+        error: {
+          code: 'LICENSE_INACTIVE',
+          message: `La licencia no está activa (Estado: ${license.status})`,
+        },
+      });
+      return;
+    }
+
+    const exp = Date.now() + 48 * 60 * 60 * 1000; // 48 horas de vigencia
+    const payload: AdminJwtPayload = {
+      sub: license.key,
+      role: 'OPERATOR',
+      organizationId: license.organizationId,
+      exp,
+    };
+
+    const token = AuthService.createToken(payload);
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        key: license.key,
+        role: 'OPERATOR',
+        organizationId: license.organizationId,
+        plan: license.plan,
+        alias: license.alias || 'Servidor Factusol',
+      },
+      expiresAt: new Date(exp).toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Error al verificar la clave de licencia',
+      },
+    });
+  }
+});
+
+// POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe)
+authRouter.post('/auth/email-session', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body as { email?: string };
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      res.status(400).json({
+        error: {
+          code: 'INVALID_EMAIL',
+          message: 'Introduce una dirección de correo electrónico válida',
+        },
+      });
+      return;
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const orgId = `org_${Buffer.from(cleanEmail).toString('hex').substring(0, 10)}`;
+    const licenses = await authLicenseService.listLicenses(orgId);
+
+    if (!licenses || licenses.length === 0) {
+      res.status(404).json({
+        error: {
+          code: 'NO_LICENSES_FOUND',
+          message: `No se encontraron licencias activas vinculadas a ${cleanEmail}. Comprueba el correo o usa tu clave de licencia.`,
+        },
+      });
+      return;
+    }
+
+    const exp = Date.now() + 48 * 60 * 60 * 1000;
+    const payload: AdminJwtPayload = {
+      sub: cleanEmail,
+      role: 'OPERATOR',
+      organizationId: orgId,
+      exp,
+    };
+
+    const token = AuthService.createToken(payload);
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        email: cleanEmail,
+        role: 'OPERATOR',
+        organizationId: orgId,
+      },
+      licenses,
+      expiresAt: new Date(exp).toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Error al buscar licencias por correo',
+      },
+    });
+  }
 });

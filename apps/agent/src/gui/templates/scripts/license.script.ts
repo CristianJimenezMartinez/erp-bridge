@@ -4,7 +4,7 @@ export const licenseScript = `
       const alertBox = document.getElementById('lic-activate-alert');
       const btn = document.getElementById('btn-activate-lic');
       if (!key) {
-        showToast('Introduce una clave de puesto', 'warn');
+        showToast('Introduce una clave de licencia válida', 'warn');
         return;
       }
       btn.disabled = true;
@@ -33,6 +33,17 @@ export const licenseScript = `
       } finally {
         btn.disabled = false;
       }
+    }
+
+    function openCloudDashboard(e) {
+      if (e) e.preventDefault();
+      const key = (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.licenseKey) || 
+                  (document.getElementById('input-lic-key') ? document.getElementById('input-lic-key').value.trim() : '');
+      let url = 'https://bridge.cristianjm.com/dashboard/';
+      if (key && key.startsWith('EB-')) {
+        url += '?key=' + encodeURIComponent(key);
+      }
+      window.open(url, '_blank');
     }
 
     async function submitConfigUpdates(updates, successMsg) {
