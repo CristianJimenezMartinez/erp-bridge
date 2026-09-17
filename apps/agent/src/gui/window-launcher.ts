@@ -87,8 +87,15 @@ export function openWindowsFileDialog(title: string, filter: string): string {
     const escapedTitle = title.replace(/'/g, "''");
     const escapedFilter = filter.replace(/'/g, "''");
     const psCmd = `Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.OpenFileDialog; $dialog.Filter = '${escapedFilter}'; $dialog.Title = '${escapedTitle}'; if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $dialog.FileName }`;
-    const res = childProcess.execSync(`powershell -NoProfile -Command "${psCmd}"`, { encoding: 'utf8' }).trim();
-    return res;
+    const res = childProcess.spawnSync(
+      'powershell.exe',
+      ['-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-Sta', '-Command', psCmd],
+      {
+        encoding: 'utf8',
+        windowsHide: true,
+      }
+    );
+    return res.stdout ? res.stdout.trim() : '';
   } catch {
     return '';
   }

@@ -1,3 +1,4 @@
+import path from 'path';
 import { Logger } from '@erp-bridge/shared';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
@@ -19,10 +20,20 @@ export class FactusolController {
     };
   }
 
-  public static detectFactusol(): RouteHandler {
+  public static detectFactusol(agent?: LocalAgent): RouteHandler {
     return (_req, res) => {
       logger.info('Escaneando discos en busca de Factusol...');
-      const instances = FactusolDetector.detectAll();
+      const additionalPaths: string[] = [];
+      const currentPath = agent?.configManager?.get()?.factusolDbPath;
+      if (currentPath) {
+        try {
+          const dir = path.dirname(currentPath);
+          additionalPaths.push(dir);
+          const parentDir = path.dirname(dir);
+          additionalPaths.push(parentDir);
+        } catch {}
+      }
+      const instances = FactusolDetector.detectAll(additionalPaths);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ instances }));
     };

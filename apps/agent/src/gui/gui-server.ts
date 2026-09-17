@@ -43,7 +43,7 @@ export class LocalGuiServer {
 
     // 3. Factusol
     router.post('/api/local/browse-factusol', FactusolController.browseFactusol());
-    router.post('/api/local/detect-factusol', FactusolController.detectFactusol());
+    router.post('/api/local/detect-factusol', FactusolController.detectFactusol(this.agent));
     router.post('/api/local/test-factusol', FactusolController.testFactusol(this.agent));
     router.get('/api/local/factusol/metadata', FactusolController.getMetadata(this.agent));
     router.get('/api/local/factusol/preview', FactusolController.getPreview(this.agent));

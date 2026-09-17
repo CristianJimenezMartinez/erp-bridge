@@ -23,6 +23,15 @@ export const factusolScript = `
 
     // Pruebas y Guardado Factusol
     async function browseFactusol(isWizard) {
+      const btn = isWizard 
+        ? document.getElementById('wiz-btn-browse-fact') 
+        : document.getElementById('btn-browse-fact');
+      const originalHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Abriendo...';
+      }
+
       try {
         const res = await fetch('/api/local/browse-factusol', { method: 'POST' });
         const data = await res.json();
@@ -30,39 +39,81 @@ export const factusolScript = `
           const targetInput = isWizard ? document.getElementById('wiz-input-fact-path') : document.getElementById('input-factusol-db');
           targetInput.value = data.selectedPath;
           handleFactusolInputBlur(isWizard ? 'wiz-input-fact-path' : 'input-factusol-db');
-          showToast('Base de datos seleccionada: ' + data.selectedPath);
+          showToast('Base de datos seleccionada: ' + data.selectedPath, 'success');
           if (!isWizard) {
             await testFactusolConnection();
           }
         }
       } catch (err) {
         showToast('Error al abrir selector de Windows', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
       }
     }
 
     async function detectFactusol(isWizard) {
+      const btn = isWizard 
+        ? document.getElementById('wiz-btn-detect-fact') 
+        : document.getElementById('btn-detect-fact');
+      const originalHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Buscando Factusol...';
+      }
+
+      const box = isWizard ? document.getElementById('wiz-fact-detected-box') : document.getElementById('factusol-detected-box');
+      const list = isWizard ? document.getElementById('wiz-fact-detected-list') : document.getElementById('factusol-detected-list');
+      const label = isWizard ? null : document.getElementById('factusol-detected-label');
+
       try {
         const res = await fetch('/api/local/detect-factusol', { method: 'POST' });
         const data = await res.json();
-        const box = isWizard ? document.getElementById('wiz-fact-detected-box') : document.getElementById('factusol-detected-box');
-        const list = isWizard ? document.getElementById('wiz-fact-detected-list') : document.getElementById('factusol-detected-list');
+
+        box.style.display = 'block';
 
         if (data.instances && data.instances.length > 0) {
-          box.style.display = 'block';
+          if (label) label.textContent = 'Bases de datos encontradas (' + data.instances.length + '):';
           list.innerHTML = data.instances.map(function(inst) {
             const safePath = inst.databasePath.replace(/\\\\/g, '\\\\\\\\');
-            const label = inst.companyCode ? ('Empresa ' + inst.companyCode) : 'Factusol';
-            return '<div onclick="selectFactusolInstance(\\'' + safePath + '\\', ' + isWizard + ')" style="background: #1e1e26; border: 1px solid var(--card-border); padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px;">' +
-              '<div><strong>' + label + '</strong> <span style="color: var(--text-subtle); margin-left: 8px; font-family: monospace;">' + inst.databasePath + '</span></div>' +
-              '<span class="tag tag-blue">Seleccionar</span>' +
+            const labelText = inst.companyCode ? ('Empresa ' + inst.companyCode + (inst.year ? ' (' + inst.year + ')' : '')) : 'Factusol';
+            const sizeMb = inst.fileSizeBytes ? ' • ' + (inst.fileSizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '';
+            return '<div onclick="selectFactusolInstance(\\'' + safePath + '\\', ' + isWizard + ')" style="background: #1e1e26; border: 1px solid var(--card-border); padding: 9px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor=\\'#6366f1\\'" onmouseout="this.style.borderColor=\\'var(--card-border)\\'">' +
+              '<div><strong>' + labelText + '</strong>' + sizeMb + '<div style="color: var(--text-subtle); font-family: monospace; font-size: 11px; margin-top: 2px;">' + inst.databasePath + '</div></div>' +
+              '<span class="tag tag-blue" style="margin-left: 8px;">Usar esta</span>' +
             '</div>';
           }).join('');
-          showToast('Se encontraron ' + data.instances.length + ' bases de datos Factusol');
+
+          // Si el campo de texto está vacío, pre-rellenar con la más reciente
+          const targetInput = isWizard ? document.getElementById('wiz-input-fact-path') : document.getElementById('input-factusol-db');
+          if (!targetInput.value.trim() && data.instances[0]) {
+            targetInput.value = data.instances[0].databasePath;
+            if (!isWizard) {
+              await testFactusolConnection();
+            }
+          }
+          showToast('✓ Se encontraron ' + data.instances.length + ' bases de datos Factusol', 'success');
         } else {
-          showToast('No se encontraron bases de datos en las rutas estándar', 'warn');
+          if (label) label.textContent = 'Resultado del escaneo:';
+          list.innerHTML = 
+            '<div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.3); padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #fde047; line-height: 1.5;">' +
+              '<strong>⚠️ No se detectó Factusol en las carpetas por defecto:</strong>' +
+              '<div style="color: var(--text-muted); margin-top: 4px;">' +
+                'Se buscaron archivos en las carpetas habituales (<code>C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\...</code>), pero no se detectaron instalaciones estándar.<br>' +
+                'Si tienes tu empresa en otra carpeta, disco de red o pendrive, pulsa en <strong>📁 Examinar mi PC</strong> para seleccionarla directamente.' +
+              '</div>' +
+            '</div>';
+          showToast('No se encontró Factusol en rutas habituales. Usa "Examinar mi PC".', 'warn');
         }
       } catch (err) {
         showToast('Error al escanear discos', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
       }
     }
 
@@ -153,12 +204,13 @@ export const factusolScript = `
       }
       tbody.innerHTML = articles.map(function(a) {
         const stockColor = a.stock > 0 ? '#34d399' : '#f87171';
+        const displayPrice = (a.salePrice !== undefined && a.salePrice > 0) ? a.salePrice : a.costPrice;
         return '<tr>' +
           '<td><span class="tag tag-blue">' + a.code + '</span></td>' +
           '<td style="font-weight: 500;">' + (a.description || 'Sin descripción') + '</td>' +
           '<td><span class="tag tag-amber">' + (a.family || 'GEN') + '</span></td>' +
           '<td style="text-align: right; font-weight: 700; color: ' + stockColor + '">' + a.stock + '</td>' +
-          '<td style="text-align: right; font-family: monospace;">' + Number(a.costPrice).toFixed(2) + ' €</td>' +
+          '<td style="text-align: right; font-family: monospace; font-weight: 600; color: #fff;">' + Number(displayPrice).toFixed(2) + ' €</td>' +
           '<td style="color: var(--text-subtle); font-family: monospace;">' + (a.ean || '---') + '</td>' +
         '</tr>';
       }).join('');

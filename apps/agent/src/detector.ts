@@ -13,10 +13,27 @@ export class FactusolDetector {
       dirs.push(
         `${drive}:\\Software DELSOL\\Factusol\\Datos\\FS`,
         `${drive}:\\Software DELSOL\\Factusol\\Datos`,
+        `${drive}:\\Software DELSOL\\FACTUSOL\\Datos\\FS`,
+        `${drive}:\\Software DELSOL\\FACTUSOL\\Datos`,
+        `${drive}:\\Program Files\\Software DELSOL\\Factusol\\Datos\\FS`,
+        `${drive}:\\Program Files (x86)\\Software DELSOL\\Factusol\\Datos\\FS`,
         `${drive}:\\Factusol\\Datos\\FS`,
-        `${drive}:\\Factusol\\Datos`
+        `${drive}:\\Factusol\\Datos`,
+        `${drive}:\\DELSOL\\Factusol\\Datos\\FS`,
+        `${drive}:\\DELSOL\\Factusol\\Datos`
       );
     }
+
+    try {
+      const userHome = process.env['USERPROFILE'] || process.env['HOME'];
+      if (userHome) {
+        dirs.push(
+          path.join(userHome, 'Documents', 'Factusol'),
+          path.join(userHome, 'Desktop', 'Factusol'),
+          path.join(userHome, 'Software DELSOL', 'Factusol', 'Datos', 'FS')
+        );
+      }
+    } catch {}
 
     dirs.push(process.cwd());
     return dirs;

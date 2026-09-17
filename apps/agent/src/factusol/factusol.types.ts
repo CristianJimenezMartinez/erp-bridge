@@ -9,6 +9,7 @@ export interface ArticlePreviewItem {
   description: string;
   family: string;
   costPrice: number;
+  salePrice?: number;
   stock: number;
   ean: string;
 }

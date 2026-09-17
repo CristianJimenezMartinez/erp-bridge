@@ -184,6 +184,13 @@ export class FactusolService {
       const artRows = await driver.query<{ CODART: string; DESART: string; FAMART: string; PCOART: number; EANART: string }>(query);
 
       let stockMap = new Map<string, number>();
+      let priceMap = new Map<string, number>();
+      const tariffCode = config.factusol?.tariffCode || '1';
+      const isNumericTariff = /^\d+$/.test(tariffCode);
+      const tariffCond = isNumericTariff
+        ? `(TARLTA = ${tariffCode} OR CStr(TARLTA) = '${tariffCode}')`
+        : `CStr(TARLTA) = '${tariffCode.replace(/'/g, "''")}'`;
+
       try {
         if (artRows.length > 0) {
           const codes = artRows.map((r) => `'${String(r.CODART || '').replace(/'/g, "''")}'`).join(',');
@@ -191,16 +198,28 @@ export class FactusolService {
           for (const s of sRows) {
             stockMap.set(String(s.ARTSTO || '').trim(), Number(s.ACTSTO) || 0);
           }
+
+          try {
+            const pRows = await driver.query<{ ARTLTA: string; PRELTA: number }>(
+              `SELECT ARTLTA, PRELTA FROM F_LTA WHERE ${tariffCond} AND ARTLTA IN (${codes})`
+            );
+            for (const p of pRows) {
+              priceMap.set(String(p.ARTLTA || '').trim(), Number(p.PRELTA) || 0);
+            }
+          } catch {}
         }
       } catch {}
 
       const articles: ArticlePreviewItem[] = artRows.map((r) => {
         const code = String(r.CODART || '').trim();
+        const pvp = priceMap.get(code);
+        const cost = Number(r.PCOART) || 0;
         return {
           code,
           description: String(r.DESART || '').trim(),
           family: String(r.FAMART || '').trim(),
-          costPrice: Number(r.PCOART) || 0,
+          costPrice: cost,
+          salePrice: pvp !== undefined && pvp > 0 ? pvp : cost,
           stock: stockMap.get(code) ?? 0,
           ean: String(r.EANART || '').trim(),
         };

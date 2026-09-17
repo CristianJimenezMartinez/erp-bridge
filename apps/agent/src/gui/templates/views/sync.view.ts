@@ -17,6 +17,14 @@ export function renderSyncTab(): string {
             </div>
           </label>
 
+          <label class="checkbox-row" style="margin-top: 10px;">
+            <input type="checkbox" id="check-autostart-enabled" onchange="toggleAutoStart(this.checked)">
+            <div>
+              <div class="checkbox-label">Iniciar con Windows (Auto-arranque del Agente)</div>
+              <div class="checkbox-desc">Arranca el agente automáticamente en segundo plano en la bandeja del sistema al encender el ordenador.</div>
+            </div>
+          </label>
+
           <div class="form-grid" style="margin-top: 14px;">
             <div class="form-group">
               <label class="form-label">Tiempo de estabilización (segundos):</label>

@@ -118,4 +118,33 @@ export const channelScript = `
       };
       await submitConfigUpdates(payload, 'Reglas de automatización guardadas.');
     }
+
+    async function loadAutoStart() {
+      try {
+        const res = await fetch('/api/local/autostart');
+        const data = await res.json();
+        const chk = document.getElementById('check-autostart-enabled');
+        if (chk && data && typeof data.enabled === 'boolean') {
+          chk.checked = data.enabled;
+        }
+      } catch (e) {}
+    }
+
+    async function toggleAutoStart(enabled) {
+      try {
+        const res = await fetch('/api/local/autostart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(enabled ? '✓ Auto-arranque con Windows activado' : 'Auto-arranque desactivado', 'info');
+        } else {
+          showToast('No se pudo cambiar el auto-arranque', 'warn');
+        }
+      } catch (e) {
+        showToast('Error al configurar auto-arranque', 'error');
+      }
+    }
 `;

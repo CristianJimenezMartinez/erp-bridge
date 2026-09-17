@@ -20,7 +20,7 @@ export function renderFactusolTab(): string {
           </div>
 
           <div id="factusol-detected-box" class="form-group" style="display: none;">
-            <label class="form-label">Empresas detectadas en Factusol:</label>
+            <label class="form-label" id="factusol-detected-label">Empresas detectadas en Factusol:</label>
             <div id="factusol-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
           </div>
 

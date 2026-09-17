@@ -41,11 +41,11 @@ export function renderWizardModal(): string {
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Selecciona la base de datos de tu empresa. El conector la detectará automáticamente.</p>
           
           <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-            <button onclick="detectFactusol(true)" class="btn btn-primary" style="flex: 1;">
+            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-primary" style="flex: 1;">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
               <span>🔍 Buscar mi Factusol Automáticamente</span>
             </button>
-            <button onclick="browseFactusol(true)" class="btn btn-secondary">
+            <button onclick="browseFactusol(true)" id="wiz-btn-browse-fact" class="btn btn-secondary">
               <span>📁 Examinar PC</span>
             </button>
           </div>
