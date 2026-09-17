@@ -42,22 +42,18 @@ export function openDesktopWindow(url: string): boolean {
   }
   try {
     const browserExe = findBrowserAppExecutable();
-    const windowArgs = [
-      `--app=${url}`,
-      '--window-size=1120,780',
-      '--app-id=BentianAgent',
-      '--disable-extensions',
-      '--no-default-browser-check',
-    ];
-
     if (browserExe) {
-      logger.info(`Lanzando ventana de escritorio nativa con: ${browserExe}`);
-      const child = childProcess.spawn(browserExe, windowArgs, {
-        detached: true,
-        stdio: 'ignore',
-      });
-      child.unref();
-      return true;
+      try {
+        logger.info(`Lanzando ventana de escritorio nativa con: ${browserExe}`);
+        const child = childProcess.spawn(browserExe, [`--app=${url}`, '--window-size=1120,780'], {
+          detached: true,
+          stdio: 'ignore',
+        });
+        child.unref();
+        return true;
+      } catch (spawnErr) {
+        logger.warn('Fallo al invocar browserExe, usando fallback del sistema:', { err: String(spawnErr) });
+      }
     }
 
     // Fallback si no se localiza ejecutable directo

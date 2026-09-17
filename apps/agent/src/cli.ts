@@ -390,10 +390,11 @@ async function main() {
         try {
           const checkReq = await fetch('http://127.0.0.1:39281/api/local/open-gui', {
             method: 'POST',
-            signal: AbortSignal.timeout(500),
+            signal: AbortSignal.timeout(1000),
           });
           if (checkReq.ok) {
-            console.log('✓ Ya existe una instancia de Bentian Agent en ejecución. Ventana abierta.');
+            console.log('✓ Ya existe una instancia de Bentian Agent en ejecución. Abriendo ventana...');
+            openDesktopWindow('http://127.0.0.1:39281');
             process.exit(0);
           }
         } catch {
