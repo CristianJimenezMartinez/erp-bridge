@@ -1,4 +1,4 @@
-﻿import * as fs from 'fs';
+import * as fs from 'fs';
 import * as path from 'path';
 
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
@@ -51,7 +51,34 @@ export function assembleLandingPage(): string {
     .replace('<!-- {{CONTENT}} -->', contentHtml)
     .replace('<!-- {{FOOTER}} -->', footerHtml);
 
-  // 5. Normalizar saltos de línea consistentes
+  // 5. Inyectar versión dinámica desde package.json
+  const apiPkgPath = path.resolve(__dirname, '../package.json');
+  let currentVersion = '0.2.4';
+  if (fs.existsSync(apiPkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(apiPkgPath, 'utf8'));
+      if (pkg.version) currentVersion = pkg.version;
+    } catch {}
+  }
+
+  assembled = assembled.replace(
+    /\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.exe/g,
+    `/releases/v${currentVersion}/Bentian-Setup-v${currentVersion}.exe`
+  );
+  assembled = assembled.replace(
+    /\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.zip/g,
+    `/releases/v${currentVersion}/Bentian-Setup-v${currentVersion}.zip`
+  );
+  assembled = assembled.replace(
+    /\/releases\/v[0-9.]+\/BentianAgent-v[0-9.]+-Portable\.zip/g,
+    `/releases/v${currentVersion}/BentianAgent-v${currentVersion}-Portable.zip`
+  );
+  assembled = assembled.replace(
+    /(<span id="hero-version-tag">)Release Oficial v[0-9.]+ para Windows x64(<\/span>)/g,
+    `$1Release Oficial v${currentVersion} para Windows x64$2`
+  );
+
+  // 6. Normalizar saltos de línea consistentes
   assembled = assembled.replace(/\r\n/g, '\n');
 
   return assembled;
