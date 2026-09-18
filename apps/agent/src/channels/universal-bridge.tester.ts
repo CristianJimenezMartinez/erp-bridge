@@ -88,36 +88,36 @@ export class UniversalBridgeTester {
         });
 
         const contentType = (epRes.headers.get('content-type') || '').toLowerCase();
-        const isHtml = contentType.includes('text/html');
+        const rawText = await epRes.text();
 
-        if (epRes.ok && !isHtml) {
-          try {
-            const json = (await epRes.json()) as any;
-            if (json && (json.status === 'ok' || json.success === true || json.service)) {
-              checks.endpointFound = true;
-              serverDetails.endpointUrl = ep;
-              serverDetails.version = json.version || '1.0.0';
-              const isDbOk =
-                json.databaseConnected ||
-                json.dbConfigured ||
-                (json.database && json.database.connected);
+        let json: any = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch {}
 
-              if (isDbOk) {
-                checks.databaseReady = true;
-                serverDetails.articlesInShop =
-                  json.articleCount || json.database?.articleCount || 0;
-                serverDetails.dbName =
-                  json.database?.database || json.databaseName || 'MariaDB';
-              } else {
-                serverDetails.dbError =
-                  json.database?.error ||
-                  json.error ||
-                  'Credenciales de base de datos incorrectas o EB_DB_NAME no configurado.';
-              }
-              break;
-            }
-          } catch {}
-        } else if (epRes.ok && isHtml) {
+        if (json && (json.status === 'ok' || json.success === true || json.service)) {
+          checks.endpointFound = true;
+          serverDetails.endpointUrl = ep;
+          serverDetails.version = json.version || '1.0.0';
+          const isDbOk =
+            json.databaseConnected ||
+            json.dbConfigured ||
+            (json.database && json.database.connected);
+
+          if (isDbOk) {
+            checks.databaseReady = true;
+            serverDetails.articlesInShop =
+              json.articleCount || json.database?.articleCount || 0;
+            serverDetails.dbName =
+              json.database?.database || json.databaseName || 'MariaDB';
+          } else {
+            serverDetails.dbError =
+              json.database?.error ||
+              json.error ||
+              'Credenciales de base de datos incorrectas o EB_DB_NAME no configurado.';
+          }
+          break;
+        } else if (epRes.ok && (contentType.includes('text/html') || rawText.includes('<!DOCTYPE html>') || rawText.includes('<html'))) {
           // Detectamos que el servidor responde 200 con HTML (SPA Angular/Vue o redirección Nginx)
           serverDetails.htmlFallbackDetected = true;
           serverDetails.candidateHtmlUrl = ep;
