@@ -259,7 +259,7 @@ interface ConnectorCard {
                   type="text" 
                   [(ngModel)]="factusolPath" 
                   class="modal-input font-mono"
-                  placeholder="G:/Otros ordenadores/Mi PC/Bentian/API/bentian/2252025.accdb"
+                  placeholder="C:/Software DELSOL/Factusol/Datos/FS/0012026.accdb"
                 />
                 <span style="display: block; font-size: 0.6875rem; color: #71717a; margin-top: 0.35rem;">
                   El Agente de Windows vigila este archivo de forma reactiva en tiempo real.
@@ -524,7 +524,7 @@ interface ConnectorCard {
 export class ConnectionsComponent implements OnInit {
   activeModalConnector: 'factusol' | 'woocommerce' | null = null;
   
-  factusolPath = 'G:\\Otros ordenadores\\Mi PC\\Bentian\\API\\bentian\\2252025.accdb';
+  factusolPath = '';
   factusolTariff = '1';
   factusolWarehouse = 'GEN';
 

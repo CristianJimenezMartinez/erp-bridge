@@ -34,20 +34,27 @@ export class ConfigManager {
     const diskWoo = diskConfig.woocommerce || {};
     const diskSync = diskConfig.syncRules || {};
 
+    const rawAgentName = customConfig?.agentName || diskConfig.agentName || '';
+    const resolvedAgentName = (rawAgentName && rawAgentName !== 'Telkkalas') ? rawAgentName : (os.hostname() || 'Windows Agent');
+
+    const rawDbPath = customConfig?.factusolDbPath || customConfig?.factusol?.databasePath || diskConfig.factusolDbPath || diskFactusol.databasePath || '';
+    // Sanitización defensiva: si el archivo configurado no existe en este disco, se descarta para evitar fugas de otros equipos y forzar autodetección
+    const sanitizedDbPath = (rawDbPath && fs.existsSync(rawDbPath)) ? rawDbPath : '';
+
     this.config = {
-      agentName: customConfig?.agentName || diskConfig.agentName || os.hostname() || 'Windows Agent',
+      agentName: resolvedAgentName,
       agentVersion: this.currentVersion,
       apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'https://bridge.cristianjm.com',
       organizationId: customConfig?.organizationId || diskConfig.organizationId || 'org_default',
       agentId: customConfig?.agentId || diskConfig.agentId,
       authToken: customConfig?.authToken || diskConfig.authToken,
-      factusolDbPath: customConfig?.factusolDbPath || diskConfig.factusolDbPath || diskFactusol.databasePath,
+      factusolDbPath: sanitizedDbPath,
       heartbeatIntervalMs: customConfig?.heartbeatIntervalMs || diskConfig.heartbeatIntervalMs || 30000,
       licenseKey: customConfig?.licenseKey || diskConfig.licenseKey,
       channelType: customConfig?.channelType || diskConfig.channelType || 'woocommerce',
       universalBridge: customConfig?.universalBridge || diskConfig.universalBridge,
       factusol: {
-        databasePath: customConfig?.factusolDbPath || customConfig?.factusol?.databasePath || diskConfig.factusolDbPath || diskFactusol.databasePath || '',
+        databasePath: sanitizedDbPath,
         tariffCode: customConfig?.factusol?.tariffCode || diskFactusol.tariffCode || '1',
         saleTariffCode: customConfig?.factusol?.saleTariffCode ?? diskFactusol.saleTariffCode ?? '',
         orderSeries: customConfig?.factusol?.orderSeries || diskFactusol.orderSeries || '1',

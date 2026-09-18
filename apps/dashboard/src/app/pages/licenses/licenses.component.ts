@@ -124,8 +124,8 @@ import { ApiService } from '../../services/api.service';
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
               </div>
               <div>
-                <div style="font-size: 0.875rem; font-weight: 600; color: #f4f4f5;">Telkkalas-PC (Servidor Principal)</div>
-                <div style="font-size: 0.6875rem; color: #71717a; font-family: monospace;">Windows 11 Pro 64-bit • BentianAgent v0.1.0</div>
+                <div style="font-size: 0.875rem; font-weight: 600; color: #f4f4f5;">Servidor Factusol Principal</div>
+                <div style="font-size: 0.6875rem; color: #71717a; font-family: monospace;">Windows 64-bit • BentianAgent Conectado</div>
               </div>
             </div>
 

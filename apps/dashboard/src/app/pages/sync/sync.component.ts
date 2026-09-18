@@ -35,7 +35,7 @@ import { ApiService } from '../../services/api.service';
               Factusol y WooCommerce están 100% sincronizados
             </div>
             <div style="font-size: 0.75rem; color: #a1a1aa; margin-top: 0.2rem;">
-              Última verificación del archivo <span style="color: #f4f4f5; font-family: monospace;">2252025.accdb</span>: hace 14 segundos. Cero colisiones de bloqueo.
+              Última verificación de la base de datos ERP: activa. Cero colisiones de bloqueo.
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@ import { ApiService } from '../../services/api.service';
         
         <div class="stat-tile">
           <div style="color: #71717a; font-size: 0.75rem; font-weight: 500;">CATÁLOGO DE PRODUCTOS</div>
-          <div style="font-size: 1.5rem; font-weight: 700; color: #f4f4f5; margin-top: 0.35rem; font-family: monospace;">7.978</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #f4f4f5; margin-top: 0.35rem; font-family: monospace;">Sincronizado</div>
           <div style="font-size: 0.6875rem; color: #34d399; margin-top: 0.25rem;">Tarifa 1 vinculada • Al día</div>
         </div>
 

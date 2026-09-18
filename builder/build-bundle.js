@@ -94,13 +94,27 @@ async function buildAgentBundle(options = {}) {
   fs.copyFileSync(adodbSource, adodbDest);
 
   const configDest = path.resolve(outDir, 'agent-config.json');
-  if (!fs.existsSync(configDest)) {
-    const defaultAgentConfig = {
-      apiBaseUrl: 'https://bridge.cristianjm.com',
-      organizationId: 'org_default'
-    };
-    fs.writeFileSync(configDest, JSON.stringify(defaultAgentConfig, null, 2), 'utf8');
-  }
+  // SIEMPRE forzar la regeneración de un agent-config.json limpio sin rutas hardcodeadas ni nombres de máquina
+  const defaultAgentConfig = {
+    agentName: '',
+    apiBaseUrl: 'https://bridge.cristianjm.com',
+    organizationId: 'org_default',
+    factusolDbPath: '',
+    factusol: {
+      databasePath: '',
+      tariffCode: '1',
+      orderSeries: 'A',
+      invoiceSeries: '1',
+      warehouseCode: 'GEN',
+      activeOnly: true
+    },
+    woocommerce: {
+      storeUrl: '',
+      consumerKey: '',
+      consumerSecret: ''
+    }
+  };
+  fs.writeFileSync(configDest, JSON.stringify(defaultAgentConfig, null, 2), 'utf8');
 
   const stats = fs.statSync(outBundle);
   const durationMs = Date.now() - startTime;

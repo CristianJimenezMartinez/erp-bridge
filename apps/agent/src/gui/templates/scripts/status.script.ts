@@ -33,7 +33,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (fact.configured && fact.connected) {
         cardFBadge.className = 'tag tag-green';
         cardFBadge.textContent = 'Conectado';
-        cardFMetric.textContent = (fact.articleCount !== undefined ? fact.articleCount.toLocaleString('es-ES') : '7.978') + ' arts.';
+        cardFMetric.textContent = (fact.articleCount !== undefined ? fact.articleCount.toLocaleString('es-ES') : '0') + ' arts.';
         cardFPath.textContent = fact.fileName || fact.databasePath;
         cardFWatcher.textContent = fact.watcherActive ? '● Vigilante activo' : '○ En pausa';
       } else if (fact.configured) {

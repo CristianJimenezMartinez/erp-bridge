@@ -43,10 +43,10 @@ import { ApiService } from '../../services/api.service';
             <span style="color: #34d399; font-family: monospace;">12ms</span>
           </div>
           <div style="font-size: 1.125rem; font-weight: 600; color: #f4f4f5; margin-top: 0.35rem; font-family: monospace;">
-            2252025.accdb
+            Base Conectada
           </div>
           <div style="font-size: 0.75rem; color: #a1a1aa; margin-top: 0.2rem;">
-            7.978 Artículos • Tarifa 1 (PVP)
+            Artículos ERP • Tarifa 1
           </div>
         </div>
 
@@ -56,10 +56,10 @@ import { ApiService } from '../../services/api.service';
             <span style="color: #34d399; font-weight: 600;">Online</span>
           </div>
           <div style="font-size: 1.125rem; font-weight: 600; color: #f4f4f5; margin-top: 0.35rem;">
-            Telkkalas-PC
+            Servidor Factusol
           </div>
           <div style="font-size: 0.75rem; color: #a1a1aa; margin-top: 0.2rem; font-family: monospace;">
-            BentianAgent v0.1.0 • Ed25519
+            BentianAgent • Ed25519
           </div>
         </div>
 
@@ -111,8 +111,8 @@ import { ApiService } from '../../services/api.service';
               FS
             </div>
             <div style="font-size: 0.8125rem; font-weight: 600; color: #f4f4f5;">Factusol (MS Access)</div>
-            <div style="font-size: 0.6875rem; color: #71717a; font-family: monospace; margin-top: 0.25rem;">2252025.accdb</div>
-            <div style="font-size: 0.6875rem; color: #34d399; margin-top: 0.35rem;">✓ 7.978 Artículos</div>
+            <div style="font-size: 0.6875rem; color: #71717a; font-family: monospace; margin-top: 0.25rem;">Base de Datos (.accdb)</div>
+            <div style="font-size: 0.6875rem; color: #34d399; margin-top: 0.35rem;">✓ Artículos ERP</div>
           </div>
 
           <!-- Arrow 1 -->

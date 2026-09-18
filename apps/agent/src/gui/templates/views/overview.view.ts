@@ -30,12 +30,12 @@ export function renderOverviewTab(): string {
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg>
                 Factusol ERP
               </span>
-              <span id="card-f-badge" class="tag tag-green">Conectado</span>
+              <span id="card-f-badge" class="tag tag-amber">Comprobando...</span>
             </div>
-            <div id="card-f-metric" class="card-metric">7.978 arts.</div>
-            <div id="card-f-path" class="card-desc">C:\\\\Factusol\\\\Datos\\\\...</div>
+            <div id="card-f-metric" class="card-metric">---</div>
+            <div id="card-f-path" class="card-desc">Sin configurar</div>
             <div class="card-footer">
-              <span id="card-f-watcher">● Vigilante activo</span>
+              <span id="card-f-watcher">○ Iniciando...</span>
               <button onclick="switchTab('factusol')" class="btn btn-secondary btn-sm">Ajustar</button>
             </div>
           </div>
@@ -47,10 +47,10 @@ export function renderOverviewTab(): string {
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
                 Canal Web
               </span>
-              <span id="card-wc-badge" class="tag tag-green">Enlace Activo</span>
+              <span id="card-wc-badge" class="tag tag-amber">Comprobando...</span>
             </div>
-            <div id="card-wc-metric" class="card-metric">Web Universal</div>
-            <div id="card-wc-url" class="card-desc">https://mitienda.com</div>
+            <div id="card-wc-metric" class="card-metric">---</div>
+            <div id="card-wc-url" class="card-desc">Sin configurar</div>
             <div class="card-footer">
               <span>Puerto 443 HTTPS</span>
               <button onclick="switchTab('channel')" class="btn btn-secondary btn-sm">Gestionar</button>

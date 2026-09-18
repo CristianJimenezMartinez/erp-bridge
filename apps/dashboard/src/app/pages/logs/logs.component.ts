@@ -152,7 +152,7 @@ export class LogsComponent implements OnInit {
       icon: '🛡️',
       title: 'Validación criptográfica del binario del Agente',
       details: 'BentianAgent.exe verificó su firma digital Ed25519 con la clave pública maestra de Bentian antes de iniciar su servicio de sincronización.',
-      userOrOrigin: 'Telkkalas-PC (Windows Service)',
+      userOrOrigin: 'Agente-Local (Windows Service)',
       timestamp: 'Hoy, 23:03:30',
       badgeColor: '#34d399'
     },

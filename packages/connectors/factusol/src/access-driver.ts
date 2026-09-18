@@ -31,13 +31,16 @@ export class AccessDriver {
     this.databasePath = path.resolve(config.databasePath);
     this.provider = config.provider || 'Microsoft.ACE.OLEDB.12.0';
 
-    // Resolve cscript path: on 64-bit Windows, SysWOW64 has the 32-bit cscript needed for 32-bit OLEDB drivers
+    const winDir = process.env['WINDIR'] || process.env['SystemRoot'] || 'C:\\Windows';
+    const sysWow64 = path.join(winDir, 'SysWOW64', 'cscript.exe');
+    const system32 = path.join(winDir, 'System32', 'cscript.exe');
+
     if (config.cscriptPath && fs.existsSync(config.cscriptPath)) {
       this.cscriptPath = config.cscriptPath;
-    } else if (fs.existsSync('C:\\Windows\\SysWOW64\\cscript.exe')) {
-      this.cscriptPath = 'C:\\Windows\\SysWOW64\\cscript.exe';
+    } else if (fs.existsSync(sysWow64)) {
+      this.cscriptPath = sysWow64;
     } else {
-      this.cscriptPath = 'C:\\Windows\\System32\\cscript.exe';
+      this.cscriptPath = system32;
     }
 
     const possibleAdodbPaths = [

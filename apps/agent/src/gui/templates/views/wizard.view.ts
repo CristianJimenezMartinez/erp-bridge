@@ -56,7 +56,7 @@ export function renderWizardModal(): string {
 
           <div class="form-group">
             <label class="form-label">Ruta seleccionada:</label>
-            <input type="text" id="wiz-input-fact-path" onblur="handleFactusolInputBlur('wiz-input-fact-path')" class="form-control" placeholder="C:\\\\Factusol\\\\Datos\\\\2252025.accdb">
+            <input type="text" id="wiz-input-fact-path" onblur="handleFactusolInputBlur('wiz-input-fact-path')" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
         </div>

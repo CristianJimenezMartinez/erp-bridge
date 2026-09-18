@@ -117,10 +117,10 @@ async function uploadReleases(options = {}) {
               });
             }
 
-            // Archivos públicos (index.html, robots.txt, sitemap.xml)
+            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard/index.html)
             const localPublicDir = path.resolve(__dirname, '../apps/api/public');
             if (fs.existsSync(localPublicDir)) {
-              const publicFiles = ['index.html', 'robots.txt', 'sitemap.xml'];
+              const publicFiles = ['index.html', 'robots.txt', 'sitemap.xml', 'dashboard/index.html'];
               for (const pf of publicFiles) {
                 const localPf = path.join(localPublicDir, pf);
                 if (fs.existsSync(localPf)) {
@@ -201,7 +201,8 @@ async function uploadReleases(options = {}) {
       port: 22,
       username: user,
       privateKey,
-      readyTimeout: 15000
+      readyTimeout: 60000,
+      keepaliveInterval: 10000
     });
   });
 }

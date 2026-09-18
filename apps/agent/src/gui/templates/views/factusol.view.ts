@@ -27,7 +27,7 @@ export function renderFactusolTab(): string {
           <div class="form-group">
             <label class="form-label">Ruta de la base de datos (o carpeta de Factusol):</label>
             <div class="input-with-button">
-              <input type="text" id="input-factusol-db" onblur="handleFactusolInputBlur()" class="form-control" placeholder="C:\\\\Factusol\\\\Datos\\\\FS.accdb o 2252025.accdb">
+              <input type="text" id="input-factusol-db" onblur="handleFactusolInputBlur()" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
               <button onclick="testFactusolConnection()" id="btn-test-fact" class="btn btn-secondary" style="white-space: nowrap;">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
                 <span>Probar Conexión</span>
@@ -81,7 +81,7 @@ export function renderFactusolTab(): string {
           <div class="table-toolbar">
             <div style="display: flex; align-items: center; gap: 10px;">
               <span style="font-size: 14px; font-weight: 600; color: #fff;">Vista Previa de Artículos Factusol</span>
-              <span id="article-count-tag" class="tag tag-green">7.978 arts.</span>
+              <span id="article-count-tag" class="tag tag-amber">0 arts.</span>
             </div>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="filter-articles-input" onkeyup="filterArticlesTable()" placeholder="Filtrar por código o nombre..." class="form-control" style="width: 220px; padding: 5px 10px; font-size: 11px;">

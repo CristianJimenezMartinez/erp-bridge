@@ -518,14 +518,14 @@
                 </tr>
               </thead>
               <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.04]">
-                <!-- Fila 1: Servidor ERP Real Telkkalas -->
+                <!-- Fila 1: Servidor ERP Principal -->
                 <tr class="hover:bg-white/[0.02] transition">
                   <td class="py-3.5 px-4 font-mono">
                     <div class="text-zinc-100 font-semibold flex items-center gap-1.5">
                       <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                      Telkkalas
+                      SRV-FACTUSOL-01
                     </div>
-                    <div class="text-[10px] text-zinc-500 truncate max-w-[140px]" title="HWID: e877ae98da1258c1...">e877ae98...d844</div>
+                    <div class="text-[10px] text-zinc-500 truncate max-w-[140px]" title="HWID: a1b2c3d4e5f67890...">a1b2c3d4...9f01</div>
                   </td>
                   <td class="py-3.5 px-4">
                     <div class="text-zinc-200 font-medium">contacto@empresa.com</div>
@@ -533,9 +533,9 @@
                   </td>
                   <td class="py-3.5 px-4 font-mono text-[11px]">
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Conectado (7,978 SKUs)
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Conectado
                     </span>
-                    <div class="text-[10px] text-zinc-500 mt-0.5">2252025.accdb (68.2 MB)</div>
+                    <div class="text-[10px] text-zinc-500 mt-0.5">Base Factusol (.accdb)</div>
                   </td>
                   <td class="py-3.5 px-4 font-mono text-[11px]">
                     <span class="px-2 py-0.5 rounded bg-indigo-950/40 border border-indigo-800/40 text-indigo-300">
@@ -592,8 +592,8 @@
           </div>
 
           <div class="space-y-2 text-zinc-300 max-h-[420px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:10.102</span> <span class="text-emerald-400 font-semibold">[SUCCESS]</span> Factusol OLEDB conectado: 2252025.accdb (7,978 artículos auditados)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:08.512</span> <span class="text-indigo-400 font-semibold">[SYNC]</span> Latido recibido de agente Telkkalas (HWID: e877ae98...) — HTTP 200 OK</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:10.102</span> <span class="text-emerald-400 font-semibold">[SUCCESS]</span> Factusol OLEDB conectado: Base Factusol (.accdb)</div>
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:45:08.512</span> <span class="text-indigo-400 font-semibold">[SYNC]</span> Latido recibido de agente local (HWID verificado) — HTTP 200 OK</div>
             <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:44:45.300</span> <span class="text-blue-400 font-semibold">[UPDATE]</span> Agente en versión oficial v0.1.2 (Firma criptográfica Ed25519 Válida)</div>
             <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:44:02.190</span> <span class="text-zinc-500 font-semibold">[LICENSE]</span> Clave EB-6WCKT-6S1ST-H816X validada para organización org_default</div>
             <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">11:43:18.420</span> <span class="text-emerald-400 font-semibold">[DELTA]</span> Sin colisiones de archivo (.ldb) en Factusol</div>
