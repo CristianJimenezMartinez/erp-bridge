@@ -7,7 +7,7 @@ export interface FactusolRawArticle {
   EANART?: string;
   FAMART?: string;
   PCOART?: number;
-  SUWART?: string;
+  SUWART?: string | number;
   IMGART?: string;
   UUMART?: string;
   PESART?: number;
@@ -50,7 +50,7 @@ export interface FactusolRawBarcode {
 
 export function getArticlesQuery(activeOnly = true, limit?: number): string {
   const topClause = limit ? `TOP ${limit}` : '';
-  const whereClause = activeOnly ? "WHERE (F_ART.SUWART = '1' OR F_ART.SUWART = 'S' OR F_ART.SUWART = 'True' OR F_ART.SUWART = '-1')" : '';
+  const whereClause = activeOnly ? "WHERE (F_ART.SUWART = 1 OR F_ART.SUWART = -1 OR F_ART.SUWART <> 0)" : '';
   return `
     SELECT ${topClause} 
       F_ART.CODART, F_ART.DESART, F_ART.DEWART, F_ART.EANART, F_ART.FAMART, F_ART.PCOART, F_ART.SUWART,

@@ -97,8 +97,17 @@ export function mapFactusolArticleToCanonical(
   }
 
   // Status check: si no existe precio público válido, no disponible para la venta web ('draft')
-  const suwartStr = String(raw.SUWART ?? '').trim();
-  const isWebActive = (suwartStr === '1' || suwartStr === 'S' || suwartStr === 'True' || suwartStr === '-1') && regularPrice > 0;
+  const suwartNum = Number(raw.SUWART);
+  const suwartStr = String(raw.SUWART ?? '').trim().toUpperCase();
+  const isWebActive =
+    (suwartNum === 1 ||
+      suwartNum === -1 ||
+      (Number.isFinite(suwartNum) && suwartNum !== 0) ||
+      suwartStr === '1' ||
+      suwartStr === 'S' ||
+      suwartStr === 'TRUE' ||
+      suwartStr === '-1') &&
+    regularPrice > 0;
   const status = isWebActive ? 'published' : 'draft';
 
   // Barcodes: merge principal EANART with F_EAN auxiliary barcodes
@@ -140,6 +149,7 @@ export function mapFactusolArticleToCanonical(
       taxRate: String(taxRate),
       tivart: String(raw.TIVART ?? 0),
       stoart: String(raw.STOART ?? ''),
+      imgart: imgStr,
       cp1: raw.CP1ART ? String(raw.CP1ART).trim() : '',
       cp2: raw.CP2ART ? String(raw.CP2ART).trim() : '',
       cp3: raw.CP3ART ? String(raw.CP3ART).trim() : '',

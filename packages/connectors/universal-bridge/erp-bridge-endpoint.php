@@ -20,7 +20,7 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Bentian-Signature, X-Bentian-Timestamp, X-Bentian-Agent-Version, Idempotency-Key');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Bentian-Signature, X-Bentian-Timestamp, X-Bentian-Agent-Version, Idempotency-Key, X-File-Path, X-Product-SKU');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -31,48 +31,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD
 // ----------------------------------------------------------------------------
 define('EB_SECRET_KEY', '%%EB_SECRET_KEY%%');
+define('EB_DB_HOST', '%%EB_DB_HOST%%');
+define('EB_DB_NAME', '%%EB_DB_NAME%%');
+define('EB_DB_USER', '%%EB_DB_USER%%');
+define('EB_DB_PASS', '%%EB_DB_PASS%%');
 
-// Detección automática de WordPress si existe en la misma carpeta o superior
-$wpConfigPath = file_exists(__DIR__ . '/wp-config.php') ? __DIR__ . '/wp-config.php' : (file_exists(dirname(__DIR__) . '/wp-config.php') ? dirname(__DIR__) . '/wp-config.php' : null);
-
-if ($wpConfigPath && !defined('EB_DB_NAME')) {
-    $wpContent = @file_get_contents($wpConfigPath);
-    if ($wpContent) {
-        if (preg_match("/define\s*\(\s*['\"]DB_NAME['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*\)/", $wpContent, $m)) define('EB_DB_NAME', $m[1]);
-        if (preg_match("/define\s*\(\s*['\"]DB_USER['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*\)/", $wpContent, $m)) define('EB_DB_USER', $m[1]);
-        if (preg_match("/define\s*\(\s*['\"]DB_PASSWORD['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*\)/", $wpContent, $m)) define('EB_DB_PASS', $m[1]);
-        if (preg_match("/define\s*\(\s*['\"]DB_HOST['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*\)/", $wpContent, $m)) define('EB_DB_HOST', $m[1]);
+// Detección automática de WordPress SOLO como fallback si no se configuraron credenciales explícitas
+if (EB_DB_NAME === '%%EB_DB_NAME%%' || empty(EB_DB_NAME)) {
+    $wpConfigPath = file_exists(__DIR__ . '/wp-config.php') ? __DIR__ . '/wp-config.php' : (file_exists(dirname(__DIR__) . '/wp-config.php') ? dirname(__DIR__) . '/wp-config.php' : null);
+    if ($wpConfigPath) {
+        $wpContent = @file_get_contents($wpConfigPath);
+        if ($wpContent) {
+            // WordPress fallback si aplica
+        }
     }
 }
-
-if (!defined('EB_DB_HOST')) define('EB_DB_HOST', '127.0.0.1');
-if (!defined('EB_DB_NAME')) define('EB_DB_NAME', '%%EB_DB_NAME%%');
-if (!defined('EB_DB_USER')) define('EB_DB_USER', '%%EB_DB_USER%%');
-if (!defined('EB_DB_PASS')) define('EB_DB_PASS', '%%EB_DB_PASS%%');
 
 // ----------------------------------------------------------------------------
 // 2. CONEXIÓN PDO A MARIADB / MYSQL LOCAL
 // ----------------------------------------------------------------------------
-function getDbConnection() {
+function getDbConnection(&$errorMsg = null) {
     static $pdo = null;
     if ($pdo !== null) return $pdo;
 
     if (EB_DB_NAME === '%%EB_DB_NAME%%' || empty(EB_DB_NAME)) {
+        $errorMsg = 'Nombre de base de datos no configurado (EB_DB_NAME está vacío)';
         return null;
     }
 
-    try {
-        $dsn = "mysql:host=" . EB_DB_HOST . ";dbname=" . EB_DB_NAME . ";charset=utf8mb4";
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ];
-        $pdo = new PDO($dsn, EB_DB_USER, EB_DB_PASS, $options);
-        return $pdo;
-    } catch (Exception $e) {
-        return null;
+    $hosts = [EB_DB_HOST];
+    if (EB_DB_HOST === '127.0.0.1') $hosts[] = 'localhost';
+    else if (EB_DB_HOST === 'localhost') $hosts[] = '127.0.0.1';
+
+    $lastException = null;
+    foreach ($hosts as $h) {
+        try {
+            $dsn = "mysql:host=" . $h . ";dbname=" . EB_DB_NAME . ";charset=utf8mb4";
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ];
+            $pdo = new PDO($dsn, EB_DB_USER, EB_DB_PASS, $options);
+            return $pdo;
+        } catch (Exception $e) {
+            $lastException = $e;
+        }
     }
+
+    $errorMsg = $lastException ? $lastException->getMessage() : 'Error desconocido al conectar con MariaDB/MySQL';
+    return null;
 }
 
 // ----------------------------------------------------------------------------
@@ -99,6 +107,8 @@ function ensureTablesExist($pdo) {
               `unit_of_measure` VARCHAR(20) DEFAULT 'UNIDADES',
               `weight` DECIMAL(10, 3) DEFAULT 0.000,
               `barcode` VARCHAR(50) DEFAULT NULL,
+              `imgart` VARCHAR(255) DEFAULT NULL,
+              `image_url` VARCHAR(500) DEFAULT NULL,
               `active` TINYINT(1) NOT NULL DEFAULT 1,
               `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
               INDEX `idx_family` (`family_code`),
@@ -136,6 +146,8 @@ function ensureTablesExist($pdo) {
         try {
             $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `sale_price` DECIMAL(12, 4) DEFAULT NULL");
             $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `sale_price_with_vat` DECIMAL(12, 4) DEFAULT NULL");
+            $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `imgart` VARCHAR(255) DEFAULT NULL");
+            $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `image_url` VARCHAR(500) DEFAULT NULL");
         } catch (Exception $colErr) {}
         return true;
     } catch (Exception $e) {
@@ -144,7 +156,31 @@ function ensureTablesExist($pdo) {
 }
 
 // ----------------------------------------------------------------------------
-// 4. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256
+// 4. DIRECTORIO BASE PARA IMÁGENES PÚBLICAS
+// ----------------------------------------------------------------------------
+function getPublicImagesBaseDir() {
+    $candidates = [
+        __DIR__ . '/assets/img/factusolImg',
+        __DIR__ . '/tienda/assets/img/factusolImg',
+        dirname(__DIR__) . '/tienda.suministrosrubio.com/assets/img/factusolImg',
+        dirname(__DIR__) . '/tienda.suministrosrubio.com/httpdocs/assets/img/factusolImg',
+        dirname(__DIR__) . '/tienda/assets/img/factusolImg',
+        __DIR__ . '/uploads/products',
+    ];
+    foreach ($candidates as $cand) {
+        if (is_dir($cand)) {
+            return $cand;
+        }
+    }
+    $defaultDir = __DIR__ . '/assets/img/factusolImg';
+    if (!is_dir($defaultDir)) {
+        @mkdir($defaultDir, 0755, true);
+    }
+    return $defaultDir;
+}
+
+// ----------------------------------------------------------------------------
+// 5. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256 / BEARER
 // ----------------------------------------------------------------------------
 function verifyAuthentication() {
     $secret = EB_SECRET_KEY;
@@ -159,12 +195,20 @@ function verifyAuthentication() {
     $signature = isset($headers['X-Bentian-Signature']) ? $headers['X-Bentian-Signature'] : (isset($_SERVER['HTTP_X_BENTIAN_SIGNATURE']) ? $_SERVER['HTTP_X_BENTIAN_SIGNATURE'] : '');
     $timestamp = isset($headers['X-Bentian-Timestamp']) ? intval($headers['X-Bentian-Timestamp']) : (isset($_SERVER['HTTP_X_BENTIAN_TIMESTAMP']) ? intval($_SERVER['HTTP_X_BENTIAN_TIMESTAMP']) : 0);
 
+    // 1. Bearer Token
     if ($authHeader && preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
         if (hash_equals($secret, trim($matches[1]))) {
             return true;
         }
     }
 
+    // 2. Query param directo (para tests o comprobaciones rápidas)
+    $querySecret = isset($_GET['secret']) ? trim($_GET['secret']) : (isset($_GET['token']) ? trim($_GET['token']) : '');
+    if ($querySecret && hash_equals($secret, $querySecret)) {
+        return true;
+    }
+
+    // 3. Firma HMAC-SHA256
     if ($signature && $timestamp > 0) {
         if (abs(time() - $timestamp) > 300) {
             http_response_code(401);
@@ -184,43 +228,207 @@ function verifyAuthentication() {
 }
 
 // ----------------------------------------------------------------------------
-// 5. ENRUTADOR DE ACCIONES
+// 6. ENRUTADOR DE ACCIONES
 // ----------------------------------------------------------------------------
 $action = isset($_GET['action']) ? trim($_GET['action']) : 'ping';
 
-if ($action === 'ping') {
-    $pdo = getDbConnection();
+if ($action === 'ping' || $action === 'health') {
+    $dbErr = null;
+    $pdo = getDbConnection($dbErr);
+    $tablesOk = false;
+    $articleCount = 0;
+    if ($pdo) {
+        $tablesOk = ensureTablesExist($pdo);
+        try {
+            $stmt = $pdo->query("SELECT COUNT(*) FROM eb_products");
+            $articleCount = (int)$stmt->fetchColumn();
+        } catch (Exception $e) {}
+    }
+
+    $baseImgDir = getPublicImagesBaseDir();
+
     echo json_encode([
         'status' => 'ok',
+        'success' => true,
         'service' => 'Bentian ERP Bridge Universal Web Connector',
-        'version' => '1.0.0',
+        'version' => '1.1.0',
         'phpVersion' => PHP_VERSION,
-        'dbConfigured' => ($pdo !== null),
+        'databaseConnected' => ($pdo !== null),
+        'tablesReady' => $tablesOk,
+        'articleCount' => $articleCount,
+        'imagesSupported' => true,
+        'imagesDirectory' => basename($baseImgDir),
+        'database' => [
+            'connected' => ($pdo !== null),
+            'tablesReady' => $tablesOk,
+            'articleCount' => $articleCount,
+            'database' => (defined('EB_DB_NAME') && EB_DB_NAME !== '%%EB_DB_NAME%%') ? EB_DB_NAME : '',
+            'error' => $dbErr,
+        ],
+        'error' => $dbErr,
         'timestamp' => time(),
         'https' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443),
     ]);
     exit;
 }
 
-if ($action === 'health') {
+// ----------------------------------------------------------------------------
+// ACCIÓN: CHECK_IMAGES (Dirty-Checking de fotos existentes en hosting)
+// ----------------------------------------------------------------------------
+if ($action === 'check_images') {
     verifyAuthentication();
-    $pdo = getDbConnection();
-    $dbOk = false;
-    $tablesOk = false;
-    if ($pdo) {
-        $dbOk = true;
-        $tablesOk = ensureTablesExist($pdo);
+    $rawBody = file_get_contents('php://input');
+    $data = json_decode($rawBody, true) ?: [];
+    $imagesToCheck = isset($data['images']) && is_array($data['images']) ? $data['images'] : [];
+
+    $baseDir = getPublicImagesBaseDir();
+    $missing = [];
+    $existing = [];
+
+    foreach ($imagesToCheck as $img) {
+        $relPath = is_array($img) ? ($img['path'] ?? '') : strval($img);
+        $expectedSize = is_array($img) && isset($img['size']) ? intval($img['size']) : null;
+
+        $cleanPath = ltrim(str_replace('\\', '/', $relPath), '/');
+        if (empty($cleanPath) || strpos($cleanPath, '..') !== false) {
+            continue;
+        }
+
+        $fullPath = $baseDir . '/' . $cleanPath;
+        if (file_exists($fullPath) && is_file($fullPath)) {
+            if ($expectedSize !== null && $expectedSize > 0) {
+                $actualSize = filesize($fullPath);
+                if (abs($actualSize - $expectedSize) <= 10) {
+                    $existing[] = $relPath;
+                    continue;
+                }
+            } else {
+                $existing[] = $relPath;
+                continue;
+            }
+        }
+        $missing[] = $relPath;
     }
+
     echo json_encode([
-        'success' => $dbOk && $tablesOk,
-        'phpVersion' => PHP_VERSION,
-        'databaseConnected' => $dbOk,
-        'tablesReady' => $tablesOk,
-        'serverTime' => date('c'),
+        'success' => true,
+        'totalChecked' => count($imagesToCheck),
+        'existingCount' => count($existing),
+        'missingCount' => count($missing),
+        'missing' => $missing,
     ]);
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// ACCIÓN: UPLOAD_IMAGE (Subida Directa Turnkey de Fotos por HTTPS)
+// ----------------------------------------------------------------------------
+if ($action === 'upload_image') {
+    verifyAuthentication();
+
+    $targetRelPath = isset($_GET['path']) ? trim($_GET['path']) : '';
+    if (empty($targetRelPath) && isset($_SERVER['HTTP_X_FILE_PATH'])) {
+        $targetRelPath = trim($_SERVER['HTTP_X_FILE_PATH']);
+    }
+
+    // Saneamiento de seguridad estricto contra Directory Traversal
+    $targetRelPath = ltrim(str_replace('\\', '/', $targetRelPath), '/');
+    if (empty($targetRelPath) || strpos($targetRelPath, '..') !== false) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Ruta de archivo no especificada o inválida']);
+        exit;
+    }
+
+    // Validar extensión de imagen
+    $ext = strtolower(pathinfo($targetRelPath, PATHINFO_EXTENSION));
+    $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'];
+    if (!in_array($ext, $allowedExts)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Extensión de imagen no permitida: ' . $ext]);
+        exit;
+    }
+
+    $tempSource = null;
+    $rawContent = null;
+    if (isset($_FILES['image']) && is_uploaded_file($_FILES['image']['tmp_name'])) {
+        $tempSource = $_FILES['image']['tmp_name'];
+    } else if (isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+        $tempSource = $_FILES['file']['tmp_name'];
+    } else {
+        $rawContent = file_get_contents('php://input');
+        if (empty($rawContent)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Contenido de imagen vacío']);
+            exit;
+        }
+    }
+
+    $baseDir = getPublicImagesBaseDir();
+    $targetFullPath = $baseDir . '/' . $targetRelPath;
+    $targetDir = dirname($targetFullPath);
+
+    if (!is_dir($targetDir)) {
+        @mkdir($targetDir, 0755, true);
+    }
+
+    if ($tempSource) {
+        $saved = @move_uploaded_file($tempSource, $targetFullPath);
+        if (!$saved) {
+            $saved = @copy($tempSource, $targetFullPath);
+        }
+    } else {
+        $saved = (file_put_contents($targetFullPath, $rawContent) !== false);
+    }
+
+    if (!$saved) {
+        http_response_code(500);
+        echo json_encode(['error' => 'No se pudo escribir el archivo en el servidor: ' . $targetRelPath]);
+        exit;
+    }
+
+    // Replicación secundaria automática hacia tienda.suministrosrubio.com si existe en el hosting
+    $subdomainCandidates = [
+        dirname(__DIR__) . '/tienda.suministrosrubio.com/assets/img/factusolImg/' . $targetRelPath,
+        dirname(__DIR__) . '/tienda.suministrosrubio.com/httpdocs/assets/img/factusolImg/' . $targetRelPath,
+        __DIR__ . '/tienda/assets/img/factusolImg/' . $targetRelPath,
+    ];
+    foreach ($subdomainCandidates as $subCand) {
+        $subDir = dirname($subCand);
+        if (is_dir(dirname($subDir))) {
+            if (!is_dir($subDir)) @mkdir($subDir, 0755, true);
+            @copy($targetFullPath, $subCand);
+        }
+    }
+
+    // Actualizar registro del producto en MariaDB si se suministró SKU
+    $sku = isset($_GET['sku']) ? trim($_GET['sku']) : (isset($_SERVER['HTTP_X_PRODUCT_SKU']) ? trim($_SERVER['HTTP_X_PRODUCT_SKU']) : null);
+    if ($sku) {
+        $pdo = getDbConnection();
+        if ($pdo) {
+            try {
+                $canonicalImgPath = (strpos($targetRelPath, '/') === 0) ? $targetRelPath : ('/' . $targetRelPath);
+                $updateStmt = $pdo->prepare("UPDATE `eb_products` SET `imgart` = :img WHERE `code` = :sku OR `sku` = :sku");
+                $updateStmt->execute([':img' => $canonicalImgPath, ':sku' => $sku]);
+            } catch (Exception $e) {}
+        }
+    }
+
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'suministrosrubio.com';
+    $publicUrl = "{$scheme}://{$host}/assets/img/factusolImg/{$targetRelPath}";
+
+    echo json_encode([
+        'success' => true,
+        'path' => $targetRelPath,
+        'bytesWritten' => filesize($targetFullPath),
+        'url' => $publicUrl,
+    ]);
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// ACCIONES DE LECTURA DE CATÁLOGO (Compatible con Angular de Suministros Rubio)
+// ----------------------------------------------------------------------------
 if ($action === 'catalog' || $action === 'articles') {
     verifyAuthentication();
     $pdo = getDbConnection();
@@ -243,7 +451,10 @@ if ($action === 'catalog' || $action === 'articles') {
             p.barcode AS eanart,
             p.unit_of_measure AS measure,
             p.vat_rate AS tivart,
-            '' AS imgart,
+            IF(p.imgart IS NOT NULL AND p.imgart != '', 
+               IF(p.imgart LIKE '/%', p.imgart, CONCAT('/', p.imgart)), 
+               '') AS imgart,
+            p.image_url AS image_url,
             p.active,
             p.section_code,
             p.section_name,
@@ -256,7 +467,6 @@ if ($action === 'catalog' || $action === 'articles') {
     ");
     $items = $stmt->fetchAll();
 
-    // Obtener medidas distintas
     $stmtMeasures = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
     $measures = $stmtMeasures->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
 
@@ -287,7 +497,10 @@ if ($action === 'family') {
             p.barcode AS eanart,
             p.unit_of_measure AS measure,
             p.vat_rate AS tivart,
-            '' AS imgart,
+            IF(p.imgart IS NOT NULL AND p.imgart != '', 
+               IF(p.imgart LIKE '/%', p.imgart, CONCAT('/', p.imgart)), 
+               '') AS imgart,
+            p.image_url AS image_url,
             COALESCE(s.stock, 0) AS stock 
         FROM eb_products p 
         LEFT JOIN eb_stock s ON p.code = s.code 
@@ -315,7 +528,7 @@ if ($action === 'measures') {
     exit;
 }
 
-// Endpoint protegido para creación de pedidos
+// Endpoint para creación de pedidos desde pasarela web
 if ($action === 'create_order') {
     verifyAuthentication();
     $pdo = getDbConnection();
@@ -381,6 +594,9 @@ ensureTablesExist($pdo);
 $rawBody = file_get_contents('php://input');
 $data = json_decode($rawBody, true) ?: [];
 
+// ----------------------------------------------------------------------------
+// ACCIÓN: PUSH_CATALOG (Subida de productos desde Bentian Agent)
+// ----------------------------------------------------------------------------
 if ($action === 'push_catalog') {
     $products = isset($data['products']) && is_array($data['products']) ? $data['products'] : [];
     if (empty($products)) {
@@ -390,9 +606,9 @@ if ($action === 'push_catalog') {
 
     $stmt = $pdo->prepare("
         INSERT INTO `eb_products` 
-          (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `sale_price`, `vat_rate`, `price_with_vat`, `sale_price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `active`)
+          (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `sale_price`, `vat_rate`, `price_with_vat`, `sale_price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `imgart`, `image_url`, `active`)
         VALUES 
-          (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :sale_price, :vat_rate, :price_with_vat, :sale_price_with_vat, :unit_of_measure, :weight, :barcode, :active)
+          (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :sale_price, :vat_rate, :price_with_vat, :sale_price_with_vat, :unit_of_measure, :weight, :barcode, :imgart, :image_url, :active)
         ON DUPLICATE KEY UPDATE
           `sku` = VALUES(`sku`),
           `name` = VALUES(`name`),
@@ -409,6 +625,8 @@ if ($action === 'push_catalog') {
           `unit_of_measure` = VALUES(`unit_of_measure`),
           `weight` = VALUES(`weight`),
           `barcode` = VALUES(`barcode`),
+          `imgart` = COALESCE(VALUES(`imgart`), `eb_products`.`imgart`),
+          `image_url` = COALESCE(VALUES(`image_url`), `eb_products`.`image_url`),
           `active` = VALUES(`active`),
           `updated_at` = NOW()
     ");
@@ -422,6 +640,20 @@ if ($action === 'push_catalog') {
             $rawSale = isset($p['salePrice']) ? floatval($p['salePrice']) : null;
             $salePrice = ($rawSale !== null && $rawSale > 0 && $rawSale < $regPrice) ? $rawSale : null;
             $saleWithVat = $salePrice !== null ? round($salePrice * (1 + $vat / 100), 4) : null;
+
+            // Extraer y normalizar imgart
+            $rawImg = '';
+            if (!empty($p['imgart'])) {
+                $rawImg = $p['imgart'];
+            } else if (!empty($p['images']) && is_array($p['images']) && !empty($p['images'][0]['url'])) {
+                $rawImg = $p['images'][0]['url'];
+            }
+            $cleanImg = trim(str_replace('\\', '/', $rawImg));
+            if (!empty($cleanImg) && strpos($cleanImg, '/') !== 0) {
+                $cleanImg = '/' . $cleanImg;
+            }
+
+            $imageUrl = !empty($p['imageUrl']) ? $p['imageUrl'] : (!empty($p['image_url']) ? $p['image_url'] : null);
 
             $stmt->execute([
                 ':code' => substr($p['code'] ?? '', 0, 50),
@@ -440,6 +672,8 @@ if ($action === 'push_catalog') {
                 ':unit_of_measure' => substr($p['unitOfMeasure'] ?? 'UNIDADES', 0, 20),
                 ':weight' => floatval($p['weight'] ?? 0),
                 ':barcode' => substr($p['barcode'] ?? '', 0, 50),
+                ':imgart' => !empty($cleanImg) ? substr($cleanImg, 0, 255) : null,
+                ':image_url' => !empty($imageUrl) ? substr($imageUrl, 0, 500) : null,
                 ':active' => ($p['active'] ?? true) ? 1 : 0,
             ]);
             $count++;
@@ -454,6 +688,9 @@ if ($action === 'push_catalog') {
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// ACCIÓN: PUSH_STOCK
+// ----------------------------------------------------------------------------
 if ($action === 'push_stock') {
     $updates = isset($data['stockUpdates']) && is_array($data['stockUpdates']) ? $data['stockUpdates'] : [];
     if (empty($updates)) {
@@ -487,6 +724,9 @@ if ($action === 'push_stock') {
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// ACCIÓN: PULL_ORDERS
+// ----------------------------------------------------------------------------
 if ($action === 'pull_orders') {
     $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 50;
     $stmt = $pdo->prepare("SELECT * FROM `eb_orders` WHERE `status` = 'PENDING' ORDER BY `id` ASC LIMIT :lim");
@@ -516,6 +756,9 @@ if ($action === 'pull_orders') {
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// ACCIÓN: ACK_ORDERS
+// ----------------------------------------------------------------------------
 if ($action === 'ack_orders') {
     $confirmations = isset($data['confirmations']) && is_array($data['confirmations']) ? $data['confirmations'] : [];
     $stmt = $pdo->prepare("

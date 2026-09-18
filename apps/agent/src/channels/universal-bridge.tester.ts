@@ -81,30 +81,46 @@ export class UniversalBridgeTester {
 
     for (const ep of endpointCandidates) {
       try {
-        const healthUrl = `${ep}?action=health${settings.secretKey ? `&secret=${encodeURIComponent(settings.secretKey)}` : ''}`;
-        const epRes = await fetch(healthUrl, {
+        const pingUrl = `${ep}?action=ping${settings.secretKey ? `&secret=${encodeURIComponent(settings.secretKey)}` : ''}`;
+        const epRes = await fetch(pingUrl, {
           method: 'GET',
           signal: AbortSignal.timeout(6000),
         });
 
-        if (epRes.ok) {
-          checks.endpointFound = true;
-          serverDetails.endpointUrl = ep;
+        const contentType = (epRes.headers.get('content-type') || '').toLowerCase();
+        const isHtml = contentType.includes('text/html');
 
+        if (epRes.ok && !isHtml) {
           try {
-            const json = await epRes.json() as any;
-            if (json && json.status === 'ok') {
-              serverDetails.version = json.version;
-              if (json.database && json.database.connected) {
+            const json = (await epRes.json()) as any;
+            if (json && (json.status === 'ok' || json.success === true || json.service)) {
+              checks.endpointFound = true;
+              serverDetails.endpointUrl = ep;
+              serverDetails.version = json.version || '1.0.0';
+              const isDbOk =
+                json.databaseConnected ||
+                json.dbConfigured ||
+                (json.database && json.database.connected);
+
+              if (isDbOk) {
                 checks.databaseReady = true;
-                serverDetails.articlesInShop = json.database.articleCount;
-                serverDetails.dbName = json.database.database;
-              } else if (json.database && !json.database.connected) {
-                serverDetails.dbError = json.database.error;
+                serverDetails.articlesInShop =
+                  json.articleCount || json.database?.articleCount || 0;
+                serverDetails.dbName =
+                  json.database?.database || json.databaseName || 'MariaDB';
+              } else {
+                serverDetails.dbError =
+                  json.database?.error ||
+                  json.error ||
+                  'Credenciales de base de datos incorrectas o EB_DB_NAME no configurado.';
               }
+              break;
             }
           } catch {}
-          break;
+        } else if (epRes.ok && isHtml) {
+          // Detectamos que el servidor responde 200 con HTML (SPA Angular/Vue o redirección Nginx)
+          serverDetails.htmlFallbackDetected = true;
+          serverDetails.candidateHtmlUrl = ep;
         } else if (epRes.status === 401 || epRes.status === 403) {
           checks.endpointFound = true;
           serverDetails.endpointUrl = ep;
@@ -118,7 +134,11 @@ export class UniversalBridgeTester {
     if (!checks.serverOnline) {
       msg = 'No pudimos conectar con la web. Revisa que el dominio esté bien escrito y accesible.';
     } else if (!checks.endpointFound) {
-      msg = 'Servidor web detectado, pero aún no se encuentra el archivo erp-bridge-endpoint.php. Súbelo a la carpeta pública de tu hosting.';
+      if (serverDetails.htmlFallbackDetected) {
+        msg = 'El servidor web responde pero devuelve una página HTML de Angular en lugar de ejecutar PHP. PHP no está activo en este subdominio o la regla de Nginx lo intercepta. Sube erp-bridge-endpoint.php a suministrosrubio.com (donde PHP está activo) o activa PHP en el subdominio.';
+      } else {
+        msg = 'Servidor web detectado, pero aún no se encuentra el archivo erp-bridge-endpoint.php. Súbelo a la carpeta pública de tu hosting.';
+      }
     } else if (!checks.databaseReady) {
       msg = `Conector detectado, pero la base de datos MariaDB no está configurada o fallaron las credenciales${serverDetails.dbError ? `: ${serverDetails.dbError}` : '.'}`;
     } else {

@@ -31,6 +31,7 @@ export class CompanionGenerator {
 
     const secret = options.secretKey || 'eb_sec_' + Math.random().toString(36).substring(2, 15);
     let customized = phpTemplate.replace(/%%EB_SECRET_KEY%%/g, secret);
+    customized = customized.replace(/%%EB_DB_HOST%%/g, 'localhost');
     if (options.dbName) customized = customized.replace(/%%EB_DB_NAME%%/g, options.dbName);
     if (options.dbUser) customized = customized.replace(/%%EB_DB_USER%%/g, options.dbUser);
     if (options.dbPass) customized = customized.replace(/%%EB_DB_PASS%%/g, options.dbPass);

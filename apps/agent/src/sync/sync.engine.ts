@@ -6,6 +6,7 @@ import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { FactusolService } from '../factusol/factusol.service';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
+import { ImageSyncService } from './image-sync.service';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -45,6 +46,28 @@ export class LocalSyncEngine {
     return '';
   }
 
+  public resolveBridgeEndpoint(storeUrl: string): string {
+    let clean = (storeUrl || '').trim();
+    if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+      clean = 'https://' + clean;
+    }
+    clean = clean.replace(/\/+$/, '');
+    if (!clean.endsWith('.php')) {
+      clean += '/erp-bridge-endpoint.php';
+    }
+    return clean;
+  }
+
+  public getBridgeHeaders(secretKey?: string): Record<string, string> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (secretKey) {
+      headers['Authorization'] = `Bearer ${secretKey.trim()}`;
+    }
+    return headers;
+  }
+
   public async triggerManualSync(): Promise<SyncManualResult> {
     const start = Date.now();
     this.eventBus.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
@@ -79,6 +102,19 @@ export class LocalSyncEngine {
       } catch (resolverErr) {
         this.logger.warn(`Aviso al verificar rollover fiscal de Factusol: ${String(resolverErr)}`);
       }
+    }
+
+    const isUniversalBridge =
+      config.channelType === 'universal_bridge' ||
+      (Boolean(config.universalBridge?.storeUrl) && !woo.storeUrl);
+
+    if (isUniversalBridge) {
+      if (!dbPath || !fs.existsSync(dbPath)) {
+        const msg = 'Base de datos de Factusol no configurada o inaccesible.';
+        this.eventBus.addEvent('error', `❌ ${msg}`);
+        return { success: false, message: msg };
+      }
+      return this.syncUniversalBridge(dbPath, config, start);
     }
 
     try {
@@ -354,7 +390,14 @@ export class LocalSyncEngine {
       const config = this.configManager.get();
       const dbPath = config.factusol?.databasePath || config.factusolDbPath;
       const woo = config.woocommerce;
-      if (!dbPath || !fs.existsSync(dbPath) || !woo?.storeUrl || !woo?.consumerKey || !woo?.consumerSecret) {
+      const isBridge =
+        config.channelType === 'universal_bridge' ||
+        (Boolean(config.universalBridge?.storeUrl) && !woo?.storeUrl);
+      const isWoo = Boolean(
+        woo?.storeUrl && woo?.consumerKey && woo?.consumerSecret
+      );
+
+      if (!dbPath || !fs.existsSync(dbPath) || (!isBridge && !isWoo)) {
         return;
       }
 
@@ -417,6 +460,14 @@ export class LocalSyncEngine {
       const msg = 'Base de datos de Factusol no configurada o inaccesible.';
       this.eventBus.addEvent('error', `❌ ${msg}`);
       return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+    }
+
+    const isUniversalBridge =
+      config.channelType === 'universal_bridge' ||
+      (Boolean(config.universalBridge?.storeUrl) && !woo.storeUrl);
+
+    if (isUniversalBridge) {
+      return this.uploadUniversalBridgeCatalog(dbPath, config, options);
     }
 
     if (!woo.storeUrl || !woo.consumerKey || !woo.consumerSecret) {
@@ -596,5 +647,408 @@ export class LocalSyncEngine {
         message: msg,
       };
     }
+  }
+
+  private async syncUniversalBridge(
+    dbPath: string,
+    config: any,
+    start: number
+  ): Promise<SyncManualResult> {
+    let itemsUpdated = 0;
+    let ordersImported = 0;
+
+    const bridgeSettings = config.universalBridge || {};
+    if (!bridgeSettings.storeUrl) {
+      const msg = 'URL del sitio web no configurada en Universal Bridge.';
+      this.eventBus.addEvent('warn', msg);
+      return { success: false, message: msg };
+    }
+
+    const endpointUrl = this.resolveBridgeEndpoint(bridgeSettings.storeUrl);
+    const secretKey = bridgeSettings.secretKey;
+    const headers = this.getBridgeHeaders(secretKey);
+    const driver = new AccessDriver({ databasePath: dbPath });
+
+    // 1. Sincronización de existencias de stock (Factusol -> Universal Bridge)
+    try {
+      this.eventBus.addEvent('info', 'Consultando existencias de stock en Factusol...');
+      const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
+      const stockRows = await driver
+        .query<{ ARTSTO: any; totalStock: any }>(
+          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
+        )
+        .catch((err) => {
+          this.logger.warn('Error al consultar stock en Factusol:', err);
+          return null;
+        });
+
+      if (stockRows && stockRows.length > 0) {
+        const stockUpdates = stockRows
+          .map((r) => ({
+            code: String(r.ARTSTO || '').trim(),
+            stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
+          }))
+          .filter((u) => u.code);
+
+        const STOCK_BATCH = 500;
+        for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
+          const chunk = stockUpdates.slice(i, i + STOCK_BATCH);
+          const res = await fetch(`${endpointUrl}?action=push_stock`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ stockUpdates: chunk }),
+            signal: AbortSignal.timeout(20000),
+          }).catch((err) => {
+            this.logger.warn(`Error al enviar lote de stock a Universal Bridge: ${String(err)}`);
+            return null;
+          });
+
+          if (res && res.ok) {
+            itemsUpdated += chunk.length;
+          }
+        }
+        this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+      }
+    } catch (stockErr) {
+      this.logger.warn(`Aviso en sincronización de stock con Universal Bridge: ${String(stockErr)}`);
+    }
+
+    // 2. Sincronización de pedidos (Universal Bridge -> Factusol)
+    try {
+      this.eventBus.addEvent('info', 'Comprobando pedidos nuevos en la tienda online...');
+      const pullRes = await fetch(`${endpointUrl}?action=pull_orders&limit=50`, {
+        method: 'GET',
+        headers,
+        signal: AbortSignal.timeout(15000),
+      }).catch((err) => {
+        this.logger.warn(`Aviso al consultar pedidos en Universal Bridge: ${String(err)}`);
+        return null;
+      });
+
+      if (pullRes && pullRes.ok) {
+        const pullJson = (await pullRes.json()) as { success?: boolean; orders?: any[] };
+        const pendingOrders = pullJson.orders || [];
+
+        if (pendingOrders.length > 0) {
+          this.eventBus.addEvent('info', `Encontrados ${pendingOrders.length} pedidos web pendientes. Importando a Factusol...`);
+          let factusolConnector = this.factusolService.getConnector();
+          if (!factusolConnector) {
+            factusolConnector = new FactusolConnector();
+            await factusolConnector.connect({
+              configuration: {
+                databasePath: dbPath,
+                orderSeries: config.factusol?.orderSeries || '1',
+                invoiceSeries: config.factusol?.invoiceSeries || '1',
+                defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+                tariffCode: config.factusol?.tariffCode || '1',
+                saleTariffCode: config.factusol?.saleTariffCode,
+              },
+            });
+          }
+
+          const confirmations: Array<{ webOrderId: number; factusolOrderNumber: number; factusolSeries: string }> = [];
+
+          for (const po of pendingOrders) {
+            try {
+              const rawLines = Array.isArray(po.lines) ? po.lines : [];
+              const mappedLines = rawLines.map((l: any, idx: number) => {
+                const qty = Number(l.quantity) || 1;
+                const price = Number(l.price || l.unitPrice) || 0;
+                const sub = Number((qty * price).toFixed(2));
+                return {
+                  id: String(l.id || l.sku || l.code || idx + 1),
+                  position: idx + 1,
+                  sku: String(l.sku || l.code || `ART_${idx + 1}`),
+                  name: l.name || l.description || 'Artículo',
+                  quantity: qty,
+                  unitPrice: price,
+                  vatPercent: Number(l.vatPercent) || 21,
+                  vatType: 0,
+                  subtotal: sub,
+                  total: sub,
+                };
+              });
+
+              const canonicalOrder: CanonicalOrder = {
+                id: String(po.id),
+                orderNumber: po.orderNumber,
+                series: config.factusol?.orderSeries || '1',
+                reference: po.orderNumber,
+                date: new Date(po.createdAt || Date.now()),
+                status: 'processing',
+                currency: 'EUR',
+                netAmount: po.subtotal || po.total || 0,
+                taxAmount: po.taxTotal || 0,
+                shippingAmount: po.shippingCost || 0,
+                discountAmount: 0,
+                totalAmount: po.total || 0,
+                warehouse: config.factusol?.warehouseCode || 'GEN',
+                hasEquivalenceSurcharge: false,
+                lines:
+                  mappedLines.length > 0
+                    ? mappedLines
+                    : [
+                        {
+                          id: '1',
+                          position: 1,
+                          sku: 'GENERICO',
+                          name: 'Artículo genérico',
+                          quantity: 1,
+                          unitPrice: po.total || 0,
+                          vatPercent: 21,
+                          vatType: 0,
+                          subtotal: po.total || 0,
+                          total: po.total || 0,
+                        },
+                      ],
+                customer: {
+                  id: po.customer?.email || po.customer?.taxId || 'web_customer',
+                  email: po.customer?.email || 'cliente@tienda.com',
+                  fiscalName: `${po.customer?.firstName || po.customer?.name || 'Cliente'} ${po.customer?.lastName || 'Web'}`.trim(),
+                  taxId: po.customer?.taxId || po.customer?.cif || po.customer?.nif || '',
+                  commercialName: po.customer?.company || '',
+                  phone: po.customer?.phone || '',
+                  hasEquivalenceSurcharge: false,
+                },
+                shippingAddress: {
+                  street: po.customer?.address || '',
+                  city: po.customer?.city || '',
+                  postalCode: po.customer?.postalCode || po.customer?.cp || '',
+                  state: po.customer?.province || po.customer?.state || '',
+                  country: po.customer?.country || 'ES',
+                },
+                notes: `Pedido Web ${po.orderNumber} - Pago: ${po.paymentMethod || 'Pasarela'}`,
+                rawSourceData: po,
+              };
+
+              const mutRes = await factusolConnector.createOrder(canonicalOrder);
+              if (mutRes.success) {
+                ordersImported++;
+                confirmations.push({
+                  webOrderId: po.id,
+                  factusolOrderNumber: Number(mutRes.orderId) || 0,
+                  factusolSeries: config.factusol?.orderSeries || '1',
+                });
+                this.eventBus.addEvent('success', `✓ Pedido ${po.orderNumber} registrado en Factusol (Nº ${mutRes.orderId}).`);
+              }
+            } catch (ordErr) {
+              this.logger.error(`Error al procesar pedido web ${po.orderNumber}:`, ordErr);
+            }
+          }
+
+          if (confirmations.length > 0) {
+            await fetch(`${endpointUrl}?action=ack_orders`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ confirmations }),
+              signal: AbortSignal.timeout(15000),
+            }).catch((err) => {
+              this.logger.warn(`Aviso al confirmar pedidos en Universal Bridge: ${String(err)}`);
+            });
+          }
+        }
+      }
+    } catch (orderErr) {
+      this.logger.warn(`Aviso en sincronización de pedidos con Universal Bridge: ${String(orderErr)}`);
+    }
+
+    const duration = ((Date.now() - start) / 1000).toFixed(1);
+    const summary = `Sincronización completada en ${duration}s: ${itemsUpdated} stock actualizado, ${ordersImported} pedidos importados.`;
+
+    this.historyManager.addSyncHistoryRecord({
+      type: 'manual',
+      mode: 'full',
+      status: 'success',
+      durationSeconds: parseFloat(duration),
+      itemsUpdated,
+      ordersImported,
+      message: summary,
+    });
+
+    this.eventBus.addEvent('success', `✓ ${summary}`);
+    return { success: true, message: summary };
+  }
+
+  private async uploadUniversalBridgeCatalog(
+    dbPath: string,
+    config: any,
+    options?: { limit?: number; onlyMissing?: boolean }
+  ): Promise<CatalogUploadResult> {
+    const start = Date.now();
+    const bridgeSettings = config.universalBridge || {};
+    if (!bridgeSettings.storeUrl) {
+      const msg = 'URL del sitio web no configurada en Universal Bridge.';
+      this.eventBus.addEvent('error', `❌ ${msg}`);
+      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+    }
+
+    const endpointUrl = this.resolveBridgeEndpoint(bridgeSettings.storeUrl);
+    const secretKey = bridgeSettings.secretKey;
+
+    // 1. Conectar a Factusol y leer artículos canónicos
+    let factusolConnector = this.factusolService.getConnector();
+    if (!factusolConnector) {
+      factusolConnector = new FactusolConnector();
+      await factusolConnector.connect({
+        configuration: {
+          databasePath: dbPath,
+          orderSeries: config.factusol?.orderSeries || '1',
+          defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+          tariffCode: config.factusol?.tariffCode || '1',
+          saleTariffCode: config.factusol?.saleTariffCode,
+        },
+      });
+    }
+
+    this.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
+    const factusolProducts = await factusolConnector.readProducts({
+      limit: options?.limit,
+      activeOnly: true,
+    });
+
+    if (!factusolProducts || factusolProducts.length === 0) {
+      const msg = 'No se encontraron artículos activos en Factusol para subir.';
+      this.eventBus.addEvent('warn', msg);
+      return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
+    }
+
+    this.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de Factusol.`);
+
+    // 2. Sincronización Directa y Automática de Fotos por HTTPS
+    try {
+      const imageSync = new ImageSyncService(
+        {
+          endpointUrl,
+          secretKey,
+          databasePath: dbPath,
+        },
+        this.eventBus
+      );
+      this.eventBus.addEvent('info', '📸 Comprobando y subiendo fotos de Factusol por HTTPS...');
+      await imageSync.syncImages(factusolProducts);
+    } catch (imgSyncErr) {
+      this.logger.warn(`Aviso durante la sincronización de imágenes: ${String(imgSyncErr)}`);
+      this.eventBus.addEvent('warn', `Aviso en subida de imágenes: ${String(imgSyncErr)}`);
+    }
+
+    // 3. Formatear y enviar productos a push_catalog
+    const bridgeProducts = factusolProducts.map((p) => {
+      const vatRate = p.taxRate ?? 21.0;
+      const price = p.regularPrice ?? 0;
+      const priceWithVat = Number((price * (1 + vatRate / 100)).toFixed(4));
+      const salePrice = p.salePrice && p.salePrice > 0 ? p.salePrice : undefined;
+      const salePriceWithVat = salePrice ? Number((salePrice * (1 + vatRate / 100)).toFixed(4)) : undefined;
+      const family = p.categories && p.categories.length > 0 ? p.categories[0] : undefined;
+
+      let imgart = p.attributes?.imgart || (p.images && p.images.length > 0 && p.images[0] ? p.images[0].url : '');
+      if (imgart) {
+        imgart = imgart.replace(/\\/g, '/');
+        const fIdx = imgart.toUpperCase().indexOf('FOTOS/');
+        if (fIdx !== -1) {
+          imgart = '/' + imgart.substring(fIdx);
+        } else if (!imgart.startsWith('/')) {
+          imgart = '/FOTOS/' + imgart.replace(/^\/+/, '');
+        }
+      }
+
+      return {
+        code: p.sku,
+        sku: p.sku,
+        name: p.name,
+        description: p.description || p.shortDescription || '',
+        familyCode: family?.id || '',
+        familyName: family?.name || '',
+        price,
+        salePrice,
+        vatRate,
+        priceWithVat,
+        salePriceWithVat,
+        unitOfMeasure: p.attributes?.unit || 'UNIDADES',
+        weight: p.weight,
+        barcode: p.barcode,
+        imgart: imgart || undefined,
+        active: p.status === 'published' && price > 0,
+      };
+    });
+
+    this.eventBus.addEvent('info', `Subiendo ${bridgeProducts.length} productos a la base de datos de la tienda online...`);
+
+    const PROD_BATCH = 200;
+    let uploadedCount = 0;
+    let failedCount = 0;
+
+    for (let i = 0; i < bridgeProducts.length; i += PROD_BATCH) {
+      const chunk = bridgeProducts.slice(i, i + PROD_BATCH);
+      const pushRes = await fetch(`${endpointUrl}?action=push_catalog`, {
+        method: 'POST',
+        headers: this.getBridgeHeaders(secretKey),
+        body: JSON.stringify({ products: chunk }),
+        signal: AbortSignal.timeout(30000),
+      }).catch((err) => {
+        this.logger.error('Error al enviar lote de catálogo a Universal Bridge', err);
+        return null;
+      });
+
+      if (pushRes && pushRes.ok) {
+        const resJson = (await pushRes.json()) as { success?: boolean; processed?: number };
+        uploadedCount += resJson.processed || chunk.length;
+      } else {
+        failedCount += chunk.length;
+      }
+    }
+
+    // 4. Enviar Existencias de Stock
+    try {
+      const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
+      const driver = new AccessDriver({ databasePath: dbPath });
+      const stockRows = await driver
+        .query<{ ARTSTO: any; totalStock: any }>(
+          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
+        )
+        .catch(() => null);
+
+      if (stockRows && stockRows.length > 0) {
+        const stockUpdates = stockRows
+          .map((r) => ({
+            code: String(r.ARTSTO || '').trim(),
+            stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
+          }))
+          .filter((u) => u.code);
+
+        const STOCK_BATCH = 500;
+        for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
+          const chunk = stockUpdates.slice(i, i + STOCK_BATCH);
+          await fetch(`${endpointUrl}?action=push_stock`, {
+            method: 'POST',
+            headers: this.getBridgeHeaders(secretKey),
+            body: JSON.stringify({ stockUpdates: chunk }),
+            signal: AbortSignal.timeout(20000),
+          }).catch(() => null);
+        }
+      }
+    } catch {}
+
+    const duration = ((Date.now() - start) / 1000).toFixed(1);
+    const summary = `Catálogo y fotos sincronizados con éxito en ${duration}s: ${uploadedCount} productos procesados en la web (${failedCount} incidencias).`;
+    this.eventBus.addEvent('success', `✓ ${summary}`);
+
+    this.historyManager.addSyncHistoryRecord({
+      type: 'manual',
+      mode: 'full',
+      status: failedCount === 0 ? 'success' : 'warning',
+      durationSeconds: parseFloat(duration),
+      itemsUpdated: uploadedCount,
+      ordersImported: 0,
+      message: summary,
+    });
+
+    return {
+      success: true,
+      totalArticles: factusolProducts.length,
+      uploadedCount,
+      skippedCount: 0,
+      failedCount,
+      message: summary,
+    };
   }
 }
