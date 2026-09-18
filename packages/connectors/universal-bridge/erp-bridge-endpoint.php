@@ -1,13 +1,13 @@
 <?php
 /**
  * ============================================================================
- * Bentian ERP Bridge — Conector Web Universal (HTTPS Bridge)
- * Archivo Único Autocontenido para Cualquier Web, Hosting o CMS
+ * Bentian ERP Bridge — Conector Web Universal (HTTPS Bridge v1.1.0)
+ * Suministros Rubio & Tienda Online
  * ============================================================================
  * Puerto: 443 (HTTPS Seguro)
  * Protocolo: HMAC-SHA256 / Bearer Token
- * Requisitos: PHP 7.4 o superior, PDO MySQL / MariaDB
- * Ubicación: Carpeta pública de tu web (public_html, httpdocs, www, etc.)
+ * Requisitos: PHP 7.4 o superior, PDO MariaDB / MySQL
+ * Ubicación en Plesk: httpdocs/erp-bridge-endpoint.php
  * ============================================================================
  */
 
@@ -28,24 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // ----------------------------------------------------------------------------
-// 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD
+// 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD (SUMINISTROS RUBIO)
 // ----------------------------------------------------------------------------
-define('EB_SECRET_KEY', '%%EB_SECRET_KEY%%');
-define('EB_DB_HOST', '%%EB_DB_HOST%%');
-define('EB_DB_NAME', '%%EB_DB_NAME%%');
-define('EB_DB_USER', '%%EB_DB_USER%%');
-define('EB_DB_PASS', '%%EB_DB_PASS%%');
-
-// Detección automática de WordPress SOLO como fallback si no se configuraron credenciales explícitas
-if (EB_DB_NAME === '%%EB_DB_NAME%%' || empty(EB_DB_NAME)) {
-    $wpConfigPath = file_exists(__DIR__ . '/wp-config.php') ? __DIR__ . '/wp-config.php' : (file_exists(dirname(__DIR__) . '/wp-config.php') ? dirname(__DIR__) . '/wp-config.php' : null);
-    if ($wpConfigPath) {
-        $wpContent = @file_get_contents($wpConfigPath);
-        if ($wpContent) {
-            // Fallback
-        }
-    }
-}
+define('EB_SECRET_KEY', 'rubio_secreto_2026');
+define('EB_DB_HOST', 'localhost');
+define('EB_DB_NAME', 'suministros_tienda');
+define('EB_DB_USER', 'tienda_user');
+define('EB_DB_PASS', 'fGC3IaLKvvGmhW47XF6X');
 
 // ----------------------------------------------------------------------------
 // 2. CONEXIÓN PDO A MARIADB / MYSQL LOCAL
@@ -54,7 +43,7 @@ function getDbConnection(&$errorMsg = null) {
     static $pdo = null;
     if ($pdo !== null) return $pdo;
 
-    if (EB_DB_NAME === '%%EB_DB_NAME%%' || empty(EB_DB_NAME)) {
+    if (empty(EB_DB_NAME)) {
         $errorMsg = 'Nombre de base de datos no configurado (EB_DB_NAME está vacío)';
         return null;
     }
@@ -84,7 +73,7 @@ function getDbConnection(&$errorMsg = null) {
 }
 
 // ----------------------------------------------------------------------------
-// 3. AUTO-INSTALACIÓN DE TABLAS CANÓNICAS (IDEMPOTENTE)
+// 3. AUTO-INSTALACIÓN DE TABLAS CANÓNICAS (IDEMPOTENTE - NUNCA BORRA DATOS)
 // ----------------------------------------------------------------------------
 function ensureTablesExist($pdo) {
     if (!$pdo) return false;
@@ -180,11 +169,11 @@ function getPublicImagesBaseDir() {
 }
 
 // ----------------------------------------------------------------------------
-// 5. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256 / BEARER (Solo para sync y admin)
+// 5. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256 / BEARER
 // ----------------------------------------------------------------------------
 function verifyAuthentication() {
     $secret = EB_SECRET_KEY;
-    if ($secret === '%%EB_SECRET_KEY%%' || empty($secret)) {
+    if (empty($secret)) {
         http_response_code(503);
         echo json_encode(['error' => 'Endpoint no configurado: Clave secreta no establecida (EB_SECRET_KEY)']);
         exit;
@@ -202,7 +191,7 @@ function verifyAuthentication() {
         }
     }
 
-    // 2. Query param directo (para depuración o llamadas del agente)
+    // 2. Query param directo (para tests o comprobaciones rápidas)
     $querySecret = isset($_GET['secret']) ? trim($_GET['secret']) : (isset($_GET['token']) ? trim($_GET['token']) : '');
     if ($querySecret && hash_equals($secret, $querySecret)) {
         return true;
@@ -228,56 +217,33 @@ function verifyAuthentication() {
 }
 
 // ----------------------------------------------------------------------------
-// 6. ENRUTADOR DE ACCIONES (Soporta query param ?action=..., PATH_INFO y REST)
+// 6. ENRUTADOR DE ACCIONES (Compatible con Query Params y PATH_INFO de Angular)
 // ----------------------------------------------------------------------------
-$action = isset($_GET['action']) ? trim($_GET['action']) : '';
-$subAction = '';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$pathInfo = $_SERVER['PATH_INFO'] ?? '';
+$uriPath = parse_url($requestUri, PHP_URL_PATH) ?? '';
 
-if (empty($action)) {
-    // 1. Extraer de PATH_INFO (ej: /erp-bridge-endpoint.php/articles o /erp-bridge-endpoint.php/rates)
-    $pathInfo = isset($_SERVER['PATH_INFO']) ? trim($_SERVER['PATH_INFO'], '/') : '';
-    if (!empty($pathInfo)) {
-        $parts = explode('/', $pathInfo);
-        $action = $parts[0];
-        if (isset($parts[1])) {
-            if ($parts[1] === 'search') {
-                $subAction = 'search';
-            } else if (!isset($_GET['id'])) {
-                $_GET['id'] = $parts[1];
-            }
-        }
-    }
+$route = '';
+if (!empty($_GET['action'])) {
+    $route = trim($_GET['action']);
+} else if (!empty($pathInfo)) {
+    $route = trim($pathInfo, '/');
+} else if (preg_match('#/erp-bridge-endpoint\.php(?:/([^?]+))?#i', $uriPath, $m)) {
+    $route = isset($m[1]) ? trim($m[1], '/') : '';
 }
 
-if (empty($action)) {
-    // 2. Extraer de REQUEST_URI (ej: /api/articles o /api/family/01)
-    $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-    if ($uriPath && strpos($uriPath, 'erp-bridge-endpoint.php') === false) {
-        $cleanUri = trim($uriPath, '/');
-        $parts = explode('/', $cleanUri);
-        $lastPart = end($parts);
-        $prevPart = count($parts) > 1 ? $parts[count($parts) - 2] : '';
-        if ($lastPart === 'search' && $prevPart === 'articles') {
-            $action = 'articles';
-            $subAction = 'search';
-        } else if ($prevPart === 'family' || $prevPart === 'families') {
-            $action = 'family';
-            $_GET['id'] = $lastPart;
-        } else if (!empty($lastPart) && in_array($lastPart, ['articles', 'catalog', 'family', 'families', 'rates', 'measures', 'sections', 'secction', 'order', 'create_order', 'ping', 'health'])) {
-            $action = $lastPart;
-        }
-    }
-}
+$routeParts = explode('/', $route);
+$mainAction = strtolower($routeParts[0] ?? '');
+$routeParam = $routeParts[1] ?? '';
 
-if (empty($action)) {
-    $action = 'ping';
+if (empty($mainAction)) {
+    $mainAction = ($_SERVER['REQUEST_METHOD'] === 'POST') ? 'create_order' : 'ping';
 }
 
 // ----------------------------------------------------------------------------
-// ACCIONES PÚBLICAS DE LA TIENDA WEB (No requieren token administrativo)
+// RUTA PÚBLICA: PING / HEALTH
 // ----------------------------------------------------------------------------
-
-if ($action === 'ping' || $action === 'health') {
+if ($mainAction === 'ping' || $mainAction === 'health') {
     $dbErr = null;
     $pdo = getDbConnection($dbErr);
     $tablesOk = false;
@@ -307,7 +273,7 @@ if ($action === 'ping' || $action === 'health') {
             'connected' => ($pdo !== null),
             'tablesReady' => $tablesOk,
             'articleCount' => $articleCount,
-            'database' => (defined('EB_DB_NAME') && EB_DB_NAME !== '%%EB_DB_NAME%%') ? EB_DB_NAME : '',
+            'database' => EB_DB_NAME,
             'error' => $dbErr,
         ],
         'error' => $dbErr,
@@ -317,39 +283,60 @@ if ($action === 'ping' || $action === 'health') {
     exit;
 }
 
-// 1. Tarifas requeridas por RatesService de Angular
-if ($action === 'rates') {
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: TARIFAS (Compatible con RatesService de Angular)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'rates') {
     echo json_encode([
-        ['codtar' => '1', 'destar' => 'GENERAL', 'martar' => '0', 'ivatar' => '0', 'diitar' => '0'],
-        ['codtar' => '2', 'destar' => 'INTERNET', 'martar' => '0', 'ivatar' => '0', 'diitar' => '0'],
+        [
+            'codtar' => 'INTERNET',
+            'destar' => 'INTERNET',
+            'martar' => '0',
+            'ivatar' => '21',
+            'diitar' => '0',
+        ]
     ]);
     exit;
 }
 
-// 2. Secciones requeridas por SectionService
-if ($action === 'secction' || $action === 'sections') {
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: SECCIONES (Compatible con SectionService de Angular)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'secction' || $mainAction === 'sections') {
     $pdo = getDbConnection();
     if (!$pdo) {
         echo json_encode([]);
         exit;
     }
     ensureTablesExist($pdo);
-    $stmt = $pdo->query("SELECT DISTINCT section_code AS codsec, section_name AS dessec FROM eb_products WHERE section_code IS NOT NULL AND section_code != '' ORDER BY section_name ASC");
-    echo json_encode($stmt->fetchAll() ?: []);
+    $stmt = $pdo->query("
+        SELECT DISTINCT 
+            section_code AS codsec, 
+            COALESCE(section_name, section_code) AS dessec 
+        FROM eb_products 
+        WHERE section_code IS NOT NULL AND section_code != '' 
+        ORDER BY section_code ASC
+    ");
+    $sections = $stmt->fetchAll();
+    echo json_encode($sections);
     exit;
 }
 
-// 3. Familias requeridas por FamilyService
-if ($action === 'family' || $action === 'families') {
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: FAMILIAS Y ARTÍCULOS POR FAMILIA (Compatible con FamilyService)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'family' || $mainAction === 'families') {
     $pdo = getDbConnection();
     if (!$pdo) {
-        http_response_code(503);
-        echo json_encode(['error' => 'Base de datos no disponible']);
+        echo json_encode([]);
         exit;
     }
     ensureTablesExist($pdo);
-    $famId = isset($_GET['id']) ? trim($_GET['id']) : (isset($_GET['famId']) ? trim($_GET['famId']) : '');
-    if ($famId) {
+
+    $famId = !empty($routeParam) ? trim($routeParam) : (isset($_GET['id']) ? trim($_GET['id']) : (isset($_GET['famId']) ? trim($_GET['famId']) : ''));
+
+    if (!empty($famId)) {
+        // Artículos de una familia específica
         $stmt = $pdo->prepare("
             SELECT 
                 p.code AS codart,
@@ -375,15 +362,26 @@ if ($action === 'family' || $action === 'families') {
         ");
         $stmt->execute([':famId' => $famId]);
         echo json_encode($stmt->fetchAll());
+        exit;
     } else {
-        $stmt = $pdo->query("SELECT DISTINCT family_code AS codfam, family_name AS desfam FROM eb_products WHERE family_code IS NOT NULL AND family_code != '' ORDER BY family_name ASC");
-        echo json_encode($stmt->fetchAll() ?: []);
+        // Listado de familias
+        $stmt = $pdo->query("
+            SELECT DISTINCT 
+                family_code AS codfam, 
+                COALESCE(family_name, family_code) AS desfam 
+            FROM eb_products 
+            WHERE family_code IS NOT NULL AND family_code != '' 
+            ORDER BY family_code ASC
+        ");
+        echo json_encode($stmt->fetchAll());
+        exit;
     }
-    exit;
 }
 
-// 4. Medidas requeridas por DataService
-if ($action === 'measures') {
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: CATÁLOGO COMPLETO Y MEDIDAS (Compatible con DataService)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'catalog' || $mainAction === 'articles') {
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -391,28 +389,14 @@ if ($action === 'measures') {
         exit;
     }
     ensureTablesExist($pdo);
-    $stmt = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
-    $measures = $stmt->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
-    echo json_encode(['measures' => $measures]);
-    exit;
-}
 
-// 5. Catálogo de Artículos y Búsqueda requerida por ArticulosComponent y DataService
-if ($action === 'catalog' || $action === 'articles') {
-    $pdo = getDbConnection();
-    if (!$pdo) {
-        http_response_code(503);
-        echo json_encode(['error' => 'Base de datos no disponible']);
-        exit;
-    }
-    ensureTablesExist($pdo);
-
-    $search = isset($_GET['query']) ? trim($_GET['query']) : (isset($_GET['search']) ? trim($_GET['search']) : '');
+    // Búsqueda opcional
+    $searchQuery = isset($_GET['query']) ? trim($_GET['query']) : '';
+    $where = "WHERE p.active = 1";
     $params = [];
-    $whereSql = "WHERE p.active = 1";
-    if (!empty($search)) {
-        $whereSql .= " AND (p.name LIKE :q OR p.description LIKE :q OR p.code LIKE :q OR p.barcode LIKE :q)";
-        $params[':q'] = "%{$search}%";
+    if (!empty($searchQuery)) {
+        $where .= " AND (p.name LIKE :q OR p.code LIKE :q OR p.barcode LIKE :q OR p.description LIKE :q)";
+        $params[':q'] = '%' . $searchQuery . '%';
     }
 
     $stmt = $pdo->prepare("
@@ -439,27 +423,52 @@ if ($action === 'catalog' || $action === 'articles') {
             COALESCE(s.stock, 0) AS stock 
         FROM eb_products p 
         LEFT JOIN eb_stock s ON p.code = s.code 
-        {$whereSql}
+        {$where}
         ORDER BY p.name ASC
     ");
     $stmt->execute($params);
     $items = $stmt->fetchAll();
 
-    // Si es modo búsqueda directa (/articles/search?query=...), devolver lista directa de artículos
-    if ($subAction === 'search' || (isset($_GET['query']) && $action === 'articles')) {
-        echo json_encode($items);
-        exit;
+    $stmtMeasures = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
+    $rawMeasures = $stmtMeasures->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
+    $measures = [];
+    foreach ($rawMeasures as $m) {
+        $measures[] = ['desume' => $m];
     }
 
-    $stmtMeasures = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
-    $measures = $stmtMeasures->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
-
-    echo json_encode(['success' => true, 'count' => count($items), 'articles' => $items, 'measures' => $measures]);
+    if (!empty($searchQuery)) {
+        // En búsqueda devuelve array directo de artículos
+        echo json_encode($items);
+    } else {
+        echo json_encode(['success' => true, 'count' => count($items), 'articles' => $items, 'measures' => $measures]);
+    }
     exit;
 }
 
-// 6. Creación de pedidos desde el carrito de compras (Público de la web)
-if ($action === 'create_order' || $action === 'order') {
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: MEDIDAS
+// ----------------------------------------------------------------------------
+if ($mainAction === 'measures') {
+    $pdo = getDbConnection();
+    if (!$pdo) {
+        echo json_encode(['measures' => [['desume' => 'UNIDADES']]]);
+        exit;
+    }
+    ensureTablesExist($pdo);
+    $stmt = $pdo->query("SELECT DISTINCT unit_of_measure FROM eb_products WHERE unit_of_measure IS NOT NULL AND unit_of_measure != ''");
+    $rawMeasures = $stmt->fetchAll(PDO::FETCH_COLUMN) ?: ['UNIDADES'];
+    $measures = [];
+    foreach ($rawMeasures as $m) {
+        $measures[] = ['desume' => $m];
+    }
+    echo json_encode(['measures' => $measures]);
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: CREACIÓN DE PEDIDOS (Checkout de la tienda)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'create_order' || $mainAction === 'order') {
     $pdo = getDbConnection();
     if (!$pdo) {
         http_response_code(503);
@@ -471,13 +480,13 @@ if ($action === 'create_order' || $action === 'order') {
     $rawBody = file_get_contents('php://input');
     $payload = json_decode($rawBody, true) ?: [];
 
-    $shipping = $payload['shippingData'] ?? $payload['customer'] ?? [];
+    $shipping = $payload['shippingData'] ?? [];
     $orderData = $payload['order'] ?? [];
-    $lines = $orderData['lines'] ?? $payload['lines'] ?? $payload['items'] ?? [];
+    $lines = $orderData['lines'] ?? $payload['lines'] ?? [];
     $total = floatval($orderData['total'] ?? $payload['total'] ?? 0);
     $subtotal = floatval($orderData['subtotal'] ?? $payload['subtotal'] ?? $total);
     $taxTotal = floatval($orderData['taxTotal'] ?? $payload['taxTotal'] ?? 0);
-    $shippingCost = floatval($payload['shippingCost'] ?? $payload['shippingTotal'] ?? 0);
+    $shippingCost = floatval($payload['shippingCost'] ?? 0);
     $orderNumber = 'WEB-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
 
     $stmt = $pdo->prepare("
@@ -491,9 +500,9 @@ if ($action === 'create_order' || $action === 'order') {
         ':orderNum' => $orderNumber,
         ':custData' => json_encode($shipping, JSON_UNESCAPED_UNICODE),
         ':linesData' => json_encode($lines, JSON_UNESCAPED_UNICODE),
-        ':payMethod' => substr($payload['paymentMethodType'] ?? $payload['paymentMethod'] ?? 'pasarela', 0, 50),
+        ':payMethod' => substr($payload['paymentMethodType'] ?? 'pasarela', 0, 50),
         ':payStatus' => 'COMPLETED',
-        ':payRef' => substr($payload['paymentMethodId'] ?? $payload['paymentReference'] ?? '', 0, 100),
+        ':payRef' => substr($payload['paymentMethodId'] ?? '', 0, 100),
         ':subtotal' => $subtotal,
         ':taxTotal' => $taxTotal,
         ':shipCost' => $shippingCost,
@@ -510,24 +519,17 @@ if ($action === 'create_order' || $action === 'order') {
     exit;
 }
 
-// ----------------------------------------------------------------------------
-// ACCIONES DE SINCRONIZACIÓN ADMINISTRATIVAS (Protegidas por Bearer / HMAC)
-// ----------------------------------------------------------------------------
+// ============================================================================
+// ACCIONES PROTEGIDAS DEL AGENTE LOCAL (Requieren Secret Key)
+// ============================================================================
 verifyAuthentication();
 
-$pdo = getDbConnection();
-if (!$pdo) {
-    http_response_code(500);
-    echo json_encode(['error' => 'No se pudo conectar a la base de datos MariaDB/MySQL local']);
-    exit;
-}
-ensureTablesExist($pdo);
-
-$rawBody = file_get_contents('php://input');
-$data = json_decode($rawBody, true) ?: [];
-
-// ACCIÓN: CHECK_IMAGES (Dirty-Checking de fotos existentes en hosting)
-if ($action === 'check_images') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: CHECK_IMAGES (Dirty-Checking de fotos existentes en hosting)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'check_images') {
+    $rawBody = file_get_contents('php://input');
+    $data = json_decode($rawBody, true) ?: [];
     $imagesToCheck = isset($data['images']) && is_array($data['images']) ? $data['images'] : [];
 
     $baseDir = getPublicImagesBaseDir();
@@ -569,13 +571,16 @@ if ($action === 'check_images') {
     exit;
 }
 
-// ACCIÓN: UPLOAD_IMAGE (Subida Directa Turnkey de Fotos por HTTPS)
-if ($action === 'upload_image') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: UPLOAD_IMAGE (Subida directa de fotos por HTTPS)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'upload_image') {
     $targetRelPath = isset($_GET['path']) ? trim($_GET['path']) : '';
     if (empty($targetRelPath) && isset($_SERVER['HTTP_X_FILE_PATH'])) {
         $targetRelPath = trim($_SERVER['HTTP_X_FILE_PATH']);
     }
 
+    // Saneamiento de seguridad contra Directory Traversal
     $targetRelPath = ltrim(str_replace('\\', '/', $targetRelPath), '/');
     if (empty($targetRelPath) || strpos($targetRelPath, '..') !== false) {
         http_response_code(400);
@@ -583,6 +588,7 @@ if ($action === 'upload_image') {
         exit;
     }
 
+    // Validar extensión de imagen
     $ext = strtolower(pathinfo($targetRelPath, PATHINFO_EXTENSION));
     $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'];
     if (!in_array($ext, $allowedExts)) {
@@ -643,13 +649,17 @@ if ($action === 'upload_image') {
         }
     }
 
+    // Actualizar registro del producto en MariaDB si se suministró SKU
     $sku = isset($_GET['sku']) ? trim($_GET['sku']) : (isset($_SERVER['HTTP_X_PRODUCT_SKU']) ? trim($_SERVER['HTTP_X_PRODUCT_SKU']) : null);
     if ($sku) {
-        try {
-            $canonicalImgPath = (strpos($targetRelPath, '/') === 0) ? $targetRelPath : ('/' . $targetRelPath);
-            $updateStmt = $pdo->prepare("UPDATE `eb_products` SET `imgart` = :img WHERE `code` = :sku OR `sku` = :sku");
-            $updateStmt->execute([':img' => $canonicalImgPath, ':sku' => $sku]);
-        } catch (Exception $e) {}
+        $pdo = getDbConnection();
+        if ($pdo) {
+            try {
+                $canonicalImgPath = (strpos($targetRelPath, '/') === 0) ? $targetRelPath : ('/' . $targetRelPath);
+                $updateStmt = $pdo->prepare("UPDATE `eb_products` SET `imgart` = :img WHERE `code` = :sku OR `sku` = :sku");
+                $updateStmt->execute([':img' => $canonicalImgPath, ':sku' => $sku]);
+            } catch (Exception $e) {}
+        }
     }
 
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -665,102 +675,127 @@ if ($action === 'upload_image') {
     exit;
 }
 
-// ACCIÓN: PUSH_CATALOG (Subida de productos desde Bentian Agent)
-if ($action === 'push_catalog') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: PUSH_CATALOG (Subida masiva de productos desde Bentian Agent)
+// ----------------------------------------------------------------------------
+$pdo = getDbConnection();
+if (!$pdo) {
+    http_response_code(500);
+    echo json_encode(['error' => 'No se pudo conectar a MariaDB']);
+    exit;
+}
+ensureTablesExist($pdo);
+
+$rawBody = file_get_contents('php://input');
+$data = json_decode($rawBody, true) ?: [];
+
+if ($mainAction === 'push_catalog') {
     $products = isset($data['products']) && is_array($data['products']) ? $data['products'] : [];
     if (empty($products)) {
-        echo json_encode(['success' => true, 'processed' => 0, 'message' => 'Lote vacío']);
+        echo json_encode(['success' => true, 'count' => 0, 'message' => 'No se enviaron productos']);
         exit;
     }
 
-    $stmt = $pdo->prepare("
-        INSERT INTO `eb_products` 
-          (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `sale_price`, `vat_rate`, `price_with_vat`, `sale_price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `imgart`, `image_url`, `active`)
-        VALUES 
-          (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :sale_price, :vat_rate, :price_with_vat, :sale_price_with_vat, :unit_of_measure, :weight, :barcode, :imgart, :image_url, :active)
-        ON DUPLICATE KEY UPDATE
-          `sku` = VALUES(`sku`),
-          `name` = VALUES(`name`),
-          `description` = VALUES(`description`),
-          `section_code` = VALUES(`section_code`),
-          `section_name` = VALUES(`section_name`),
-          `family_code` = VALUES(`family_code`),
-          `family_name` = VALUES(`family_name`),
-          `price` = VALUES(`price`),
-          `sale_price` = VALUES(`sale_price`),
-          `vat_rate` = VALUES(`vat_rate`),
-          `price_with_vat` = VALUES(`price_with_vat`),
-          `sale_price_with_vat` = VALUES(`sale_price_with_vat`),
-          `unit_of_measure` = VALUES(`unit_of_measure`),
-          `weight` = VALUES(`weight`),
-          `barcode` = VALUES(`barcode`),
-          `imgart` = COALESCE(VALUES(`imgart`), `eb_products`.`imgart`),
-          `image_url` = COALESCE(VALUES(`image_url`), `eb_products`.`image_url`),
-          `active` = VALUES(`active`),
-          `updated_at` = NOW()
-    ");
+    $sql = "INSERT INTO `eb_products` 
+      (`code`, `sku`, `name`, `description`, `section_code`, `section_name`, `family_code`, `family_name`, `price`, `sale_price`, `vat_rate`, `price_with_vat`, `sale_price_with_vat`, `unit_of_measure`, `weight`, `barcode`, `imgart`, `image_url`, `active`, `updated_at`)
+    VALUES 
+      (:code, :sku, :name, :description, :section_code, :section_name, :family_code, :family_name, :price, :sale_price, :vat_rate, :price_with_vat, :sale_price_with_vat, :unit_of_measure, :weight, :barcode, :imgart, :image_url, :active, NOW())
+    ON DUPLICATE KEY UPDATE
+      `sku` = VALUES(`sku`),
+      `name` = VALUES(`name`),
+      `description` = VALUES(`description`),
+      `section_code` = VALUES(`section_code`),
+      `section_name` = VALUES(`section_name`),
+      `family_code` = VALUES(`family_code`),
+      `family_name` = VALUES(`family_name`),
+      `price` = VALUES(`price`),
+      `sale_price` = VALUES(`sale_price`),
+      `vat_rate` = VALUES(`vat_rate`),
+      `price_with_vat` = VALUES(`price_with_vat`),
+      `sale_price_with_vat` = VALUES(`sale_price_with_vat`),
+      `unit_of_measure` = VALUES(`unit_of_measure`),
+      `weight` = VALUES(`weight`),
+      `barcode` = VALUES(`barcode`),
+      `imgart` = IF(VALUES(`imgart`) != '', VALUES(`imgart`), `imgart`),
+      `image_url` = IF(VALUES(`image_url`) != '', VALUES(`image_url`), `image_url`),
+      `active` = VALUES(`active`),
+      `updated_at` = NOW()";
+
+    $stmt = $pdo->prepare($sql);
+    $count = 0;
 
     $pdo->beginTransaction();
-    $count = 0;
     try {
         foreach ($products as $p) {
-            $vat = floatval($p['vatRate'] ?? 21.0);
-            $regPrice = floatval($p['price'] ?? 0);
+            $sku = substr($p['sku'] ?? $p['code'] ?? '', 0, 50);
+            $code = substr($p['code'] ?? $sku, 0, 50);
+            if (empty($code)) continue;
+
+            $regPrice = floatval($p['regularPrice'] ?? $p['price'] ?? 0);
             $rawSale = isset($p['salePrice']) ? floatval($p['salePrice']) : null;
+            $vat = floatval($p['taxRate'] ?? $p['vat_rate'] ?? 21.0);
+            $withVat = round($regPrice * (1 + $vat / 100), 4);
             $salePrice = ($rawSale !== null && $rawSale > 0 && $rawSale < $regPrice) ? $rawSale : null;
             $saleWithVat = $salePrice !== null ? round($salePrice * (1 + $vat / 100), 4) : null;
 
+            // Normalización canónica de imagen con prefijo /
             $rawImg = '';
             if (!empty($p['imgart'])) {
                 $rawImg = $p['imgart'];
-            } else if (!empty($p['images']) && is_array($p['images']) && !empty($p['images'][0]['url'])) {
-                $rawImg = $p['images'][0]['url'];
+            } else if (!empty($p['images']) && is_array($p['images']) && count($p['images']) > 0) {
+                $first = $p['images'][0];
+                $rawImg = is_array($first) ? ($first['src'] ?? '') : strval($first);
             }
-            $cleanImg = trim(str_replace('\\', '/', $rawImg));
-            if (!empty($cleanImg) && strpos($cleanImg, '/') !== 0) {
-                $cleanImg = '/' . $cleanImg;
+            $cleanImg = '';
+            if (!empty($rawImg)) {
+                $cleanImg = str_replace('\\', '/', $rawImg);
+                if (strpos($cleanImg, '/') !== 0 && !preg_match('#^https?://#i', $cleanImg)) {
+                    $cleanImg = '/' . $cleanImg;
+                }
             }
 
-            $imageUrl = !empty($p['imageUrl']) ? $p['imageUrl'] : (!empty($p['image_url']) ? $p['image_url'] : null);
+            $imgUrl = $p['imageUrl'] ?? $cleanImg;
 
             $stmt->execute([
-                ':code' => substr($p['code'] ?? '', 0, 50),
-                ':sku' => substr($p['sku'] ?? $p['code'] ?? '', 0, 50),
-                ':name' => substr($p['name'] ?? $p['description'] ?? 'Artículo sin nombre', 0, 255),
-                ':description' => $p['description'] ?? '',
-                ':section_code' => substr($p['sectionCode'] ?? '', 0, 10),
-                ':section_name' => substr($p['sectionName'] ?? '', 0, 100),
-                ':family_code' => substr($p['familyCode'] ?? '', 0, 10),
-                ':family_name' => substr($p['familyName'] ?? '', 0, 100),
+                ':code' => $code,
+                ':sku' => $sku,
+                ':name' => substr($p['name'] ?? '', 0, 255),
+                ':description' => $p['description'] ?? null,
+                ':section_code' => substr($p['section_code'] ?? $p['sectionCode'] ?? '', 0, 10) ?: null,
+                ':section_name' => substr($p['section_name'] ?? $p['sectionName'] ?? '', 0, 100) ?: null,
+                ':family_code' => substr($p['family_code'] ?? $p['familyCode'] ?? '', 0, 10) ?: null,
+                ':family_name' => substr($p['family_name'] ?? $p['familyName'] ?? '', 0, 100) ?: null,
                 ':price' => $regPrice,
                 ':sale_price' => $salePrice,
                 ':vat_rate' => $vat,
-                ':price_with_vat' => floatval($p['priceWithVat'] ?? ($regPrice * (1 + $vat / 100))),
+                ':price_with_vat' => $withVat,
                 ':sale_price_with_vat' => $saleWithVat,
                 ':unit_of_measure' => substr($p['unitOfMeasure'] ?? 'UNIDADES', 0, 20),
                 ':weight' => floatval($p['weight'] ?? 0),
-                ':barcode' => substr($p['barcode'] ?? '', 0, 50),
-                ':imgart' => !empty($cleanImg) ? substr($cleanImg, 0, 255) : null,
-                ':image_url' => !empty($imageUrl) ? substr($imageUrl, 0, 500) : null,
-                ':active' => ($p['active'] ?? true) ? 1 : 0,
+                ':barcode' => substr($p['barcode'] ?? '', 0, 50) ?: null,
+                ':imgart' => $cleanImg ?: null,
+                ':image_url' => $imgUrl ?: null,
+                ':active' => ($p['status'] ?? 'publish') === 'publish' ? 1 : 0,
             ]);
             $count++;
         }
         $pdo->commit();
-        echo json_encode(['success' => true, 'processed' => $count]);
+        echo json_encode(['success' => true, 'count' => $count, 'message' => "Se actualizaron {$count} productos"]);
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al insertar lote de productos: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al procesar lote de catálogo: ' . $e->getMessage()]);
     }
     exit;
 }
 
-// ACCIÓN: PUSH_STOCK
-if ($action === 'push_stock') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: PUSH_STOCK (Actualización rápida de existencias)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'push_stock') {
     $updates = isset($data['stockUpdates']) && is_array($data['stockUpdates']) ? $data['stockUpdates'] : [];
     if (empty($updates)) {
-        echo json_encode(['success' => true, 'updated' => 0]);
+        echo json_encode(['success' => true, 'count' => 0, 'message' => 'No se enviaron existencias']);
         exit;
     }
 
@@ -770,88 +805,89 @@ if ($action === 'push_stock') {
         ON DUPLICATE KEY UPDATE `stock` = VALUES(`stock`), `updated_at` = NOW()
     ");
 
-    $pdo->beginTransaction();
     $count = 0;
+    $pdo->beginTransaction();
     try {
         foreach ($updates as $u) {
+            $code = substr($u['code'] ?? $u['sku'] ?? '', 0, 50);
+            if (empty($code)) continue;
             $stmt->execute([
-                ':code' => substr($u['code'] ?? '', 0, 50),
+                ':code' => $code,
                 ':stock' => floatval($u['stock'] ?? 0),
             ]);
             $count++;
         }
         $pdo->commit();
-        echo json_encode(['success' => true, 'updated' => $count]);
+        echo json_encode(['success' => true, 'count' => $count]);
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al actualizar stock: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al actualizar existencias: ' . $e->getMessage()]);
     }
     exit;
 }
 
-// ACCIÓN: PULL_ORDERS
-if ($action === 'pull_orders') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: PULL_ORDERS (Descarga de pedidos hacia Factusol)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'pull_orders') {
     $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 50;
     $stmt = $pdo->prepare("SELECT * FROM `eb_orders` WHERE `status` = 'PENDING' ORDER BY `id` ASC LIMIT :lim");
     $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
     $stmt->execute();
-    $rawOrders = $stmt->fetchAll();
+    $rows = $stmt->fetchAll();
 
     $orders = [];
-    foreach ($rawOrders as $row) {
+    foreach ($rows as $r) {
         $orders[] = [
-            'id' => intval($row['id']),
-            'orderNumber' => $row['order_number'],
-            'status' => $row['status'],
-            'customer' => json_decode($row['customer_data'], true) ?: [],
-            'lines' => json_decode($row['order_lines'], true) ?: [],
-            'paymentMethod' => $row['payment_method'],
-            'paymentStatus' => $row['payment_status'],
-            'paymentReference' => $row['payment_reference'],
-            'subtotal' => floatval($row['subtotal']),
-            'taxTotal' => floatval($row['tax_total']),
-            'shippingCost' => floatval($row['shipping_cost']),
-            'total' => floatval($row['total']),
-            'createdAt' => $row['created_at'],
+            'id' => intval($r['id']),
+            'order_number' => $r['order_number'],
+            'status' => $r['status'],
+            'customer' => json_decode($r['customer_data'], true) ?: [],
+            'lines' => json_decode($r['order_lines'], true) ?: [],
+            'payment_method' => $r['payment_method'],
+            'total' => floatval($r['total']),
+            'created_at' => $r['created_at'],
         ];
     }
     echo json_encode(['success' => true, 'orders' => $orders]);
     exit;
 }
 
-// ACCIÓN: ACK_ORDERS
-if ($action === 'ack_orders') {
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: ACK_ORDERS (Confirmación de pedidos descargados)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'ack_orders') {
     $confirmations = isset($data['confirmations']) && is_array($data['confirmations']) ? $data['confirmations'] : [];
     $stmt = $pdo->prepare("
-        UPDATE `eb_orders`
-        SET `status` = 'SYNCED',
-            `factusol_order_number` = :fOrder,
-            `factusol_series` = :fSeries,
-            `synced_at` = NOW()
+        UPDATE `eb_orders` 
+        SET `status` = 'SYNCED', 
+            `factusol_order_number` = :factNum, 
+            `factusol_series` = :factSer, 
+            `synced_at` = NOW() 
         WHERE `id` = :id
     ");
 
-    $pdo->beginTransaction();
     $count = 0;
+    $pdo->beginTransaction();
     try {
         foreach ($confirmations as $c) {
             $stmt->execute([
-                ':id' => intval($c['webOrderId']),
-                ':fOrder' => intval($c['factusolOrderNumber'] ?? 0),
-                ':fSeries' => substr($c['factusolSeries'] ?? 'A', 0, 5),
+                ':id' => intval($c['orderId'] ?? 0),
+                ':factNum' => intval($c['factusolOrderNumber'] ?? 0) ?: null,
+                ':factSer' => substr($c['factusolSeries'] ?? 'A', 0, 5),
             ]);
             $count++;
         }
         $pdo->commit();
-        echo json_encode(['success' => true, 'acknowledged' => $count]);
+        echo json_encode(['success' => true, 'count' => $count]);
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al confirmar pedidos: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al confirmar pedidos']);
     }
     exit;
 }
 
 http_response_code(400);
-echo json_encode(['error' => 'Acción no válida: ' . htmlspecialchars($action)]);
+echo json_encode(['error' => 'Acción no válida: ' . htmlspecialchars($mainAction)]);
