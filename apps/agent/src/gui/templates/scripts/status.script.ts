@@ -1,12 +1,13 @@
 export function renderStatusScript(agentVersion: string = '0.2.0'): string {
   return `
     // Status Polling
-    async function fetchStatus() {
+    async function fetchStatus(forceFormSync) {
       try {
         const res = await fetch('/api/local/status');
         if (!res.ok) return;
         currentStatus = await res.json();
         renderStatus(currentStatus);
+        updateFormInputs(currentStatus, forceFormSync);
         if (typeof loadAutoStart === 'function') {
           loadAutoStart();
         }
@@ -24,7 +25,6 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       // Factusol
       const fact = data.factusol || {};
-      const fSettings = data.factusolSettings || {};
       const cardFBadge = document.getElementById('card-f-badge');
       const cardFMetric = document.getElementById('card-f-metric');
       const cardFPath = document.getElementById('card-f-path');
@@ -48,42 +48,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         cardFPath.textContent = 'Pulsa en Ajustar para seleccionar tu archivo';
       }
 
-      const inputFactDb = document.getElementById('input-factusol-db');
-      if (!inputFactDb.value && (fact.databasePath || fSettings.databasePath)) {
-        inputFactDb.value = fact.databasePath || fSettings.databasePath || '';
-      }
-      if (fSettings.tariffCode) document.getElementById('select-factusol-tariff').value = fSettings.tariffCode;
-      if (fSettings.saleTariffCode !== undefined && document.getElementById('select-factusol-sale-tariff')) {
-        document.getElementById('select-factusol-sale-tariff').value = fSettings.saleTariffCode || '';
-      }
-      if (fSettings.orderSeries) document.getElementById('input-factusol-order-series').value = fSettings.orderSeries;
-      if (fSettings.invoiceSeries) document.getElementById('input-factusol-inv-series').value = fSettings.invoiceSeries;
-
-      // Canal Web: solo inicializar la selección en la primera carga para respetar la elección del usuario
       const chType = data.channelType || 'universal_bridge';
-      if (!window.__channelTypeInitialized) {
-        selectChannelType(chType);
-        window.__channelTypeInitialized = true;
-      }
-
       const univ = data.universalBridgeSettings || {};
-      if (univ.storeUrl && !document.getElementById('input-universal-url').value) {
-        document.getElementById('input-universal-url').value = univ.storeUrl;
-      }
-      if (univ.secretKey && !document.getElementById('input-universal-key').value) {
-        document.getElementById('input-universal-key').value = univ.secretKey;
-      }
-
       const wc = data.woocommerceSettings || {};
-      if (wc.storeUrl && !document.getElementById('input-wc-url').value) {
-        document.getElementById('input-wc-url').value = wc.storeUrl;
-      }
-      if (wc.consumerKey && !document.getElementById('input-wc-key').value) {
-        document.getElementById('input-wc-key').value = wc.consumerKey;
-      }
-      if (wc.consumerSecret && !document.getElementById('input-wc-secret').value) {
-        document.getElementById('input-wc-secret').value = wc.consumerSecret;
-      }
 
       const cardWcMetric = document.getElementById('card-wc-metric');
       const cardWcUrl = document.getElementById('card-wc-url');
@@ -94,17 +61,6 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         cardWcMetric.textContent = 'WooCommerce';
         cardWcUrl.textContent = wc.storeUrl || 'Sin configurar';
       }
-
-      // Reglas de Sync
-      const rules = data.syncRules || {};
-      if (rules.enableFileWatcher !== undefined) document.getElementById('check-watcher-enabled').checked = rules.enableFileWatcher;
-      if (rules.debounceSeconds) document.getElementById('input-debounce-sec').value = rules.debounceSeconds;
-      if (rules.periodicIntervalMinutes) document.getElementById('select-periodic-min').value = rules.periodicIntervalMinutes;
-      if (rules.syncStock !== undefined) document.getElementById('check-sync-stock').checked = rules.syncStock;
-      if (rules.syncPrices !== undefined) document.getElementById('check-sync-prices').checked = rules.syncPrices;
-      if (rules.syncDescriptions !== undefined) document.getElementById('check-sync-desc').checked = rules.syncDescriptions;
-      if (rules.safetyStockBuffer !== undefined) document.getElementById('input-safety-stock').value = rules.safetyStockBuffer;
-      if (rules.onlyStockAboveZero !== undefined) document.getElementById('check-only-stock-pos').checked = rules.onlyStockAboveZero;
 
       // Licencia
       const lic = data.license || {};
@@ -130,9 +86,6 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       if (data.licenseKey) {
         licKey.textContent = data.licenseKey;
-        if (!document.getElementById('input-lic-key').value) {
-          document.getElementById('input-lic-key').value = data.licenseKey;
-        }
       }
       document.getElementById('lic-hwid-val').value = data.hwid || '';
 
@@ -145,5 +98,126 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         renderHistoryTable(data.syncHistory);
       }
     }
-`;
+
+    // Inicializar inputs del formulario de forma defensiva para que el sondeo cada 3s no sobreescriba cambios del usuario
+    function updateFormInputs(data, force) {
+      if (!data) return;
+      if (!window.__formInputsInitialized || force) {
+        const fact = data.factusol || {};
+        const fSettings = data.factusolSettings || {};
+
+        const inputFactDb = document.getElementById('input-factusol-db');
+        if (inputFactDb && (force || !inputFactDb.value || document.activeElement !== inputFactDb)) {
+          const dbVal = fact.databasePath || fSettings.databasePath || '';
+          if (dbVal || force) inputFactDb.value = dbVal;
+        }
+
+        const selTariff = document.getElementById('select-factusol-tariff');
+        if (selTariff && fSettings.tariffCode && (force || document.activeElement !== selTariff)) {
+          selTariff.value = fSettings.tariffCode;
+        }
+
+        const selSaleTariff = document.getElementById('select-factusol-sale-tariff');
+        if (selSaleTariff && fSettings.saleTariffCode !== undefined && (force || document.activeElement !== selSaleTariff)) {
+          selSaleTariff.value = fSettings.saleTariffCode || '';
+        }
+
+        const selWh = document.getElementById('select-factusol-warehouse');
+        if (selWh && fSettings.warehouseCode && (force || document.activeElement !== selWh)) {
+          selWh.value = fSettings.warehouseCode;
+        }
+
+        const inOrderSeries = document.getElementById('input-factusol-order-series');
+        if (inOrderSeries && fSettings.orderSeries && (force || !inOrderSeries.value || document.activeElement !== inOrderSeries)) {
+          inOrderSeries.value = fSettings.orderSeries;
+        }
+
+        const inInvSeries = document.getElementById('input-factusol-inv-series');
+        if (inInvSeries && fSettings.invoiceSeries && (force || !inInvSeries.value || document.activeElement !== inInvSeries)) {
+          inInvSeries.value = fSettings.invoiceSeries;
+        }
+
+        const chType = data.channelType || 'universal_bridge';
+        if (typeof selectChannelType === 'function') {
+          selectChannelType(chType);
+        }
+
+        const univ = data.universalBridgeSettings || {};
+        const inUnivUrl = document.getElementById('input-universal-url');
+        if (inUnivUrl && (force || !inUnivUrl.value || document.activeElement !== inUnivUrl)) {
+          if (univ.storeUrl || force) inUnivUrl.value = univ.storeUrl || '';
+        }
+
+        const inUnivKey = document.getElementById('input-universal-key');
+        if (inUnivKey && (force || !inUnivKey.value || document.activeElement !== inUnivKey)) {
+          if (univ.secretKey || force) inUnivKey.value = univ.secretKey || '';
+        }
+
+        const wc = data.woocommerceSettings || {};
+        const inWcUrl = document.getElementById('input-wc-url');
+        if (inWcUrl && (force || !inWcUrl.value || document.activeElement !== inWcUrl)) {
+          if (wc.storeUrl || force) inWcUrl.value = wc.storeUrl || '';
+        }
+
+        const inWcKey = document.getElementById('input-wc-key');
+        if (inWcKey && (force || !inWcKey.value || document.activeElement !== inWcKey)) {
+          if (wc.consumerKey || force) inWcKey.value = wc.consumerKey || '';
+        }
+
+        const inWcSec = document.getElementById('input-wc-secret');
+        if (inWcSec && (force || !inWcSec.value || document.activeElement !== inWcSec)) {
+          if (wc.consumerSecret || force) inWcSec.value = wc.consumerSecret || '';
+        }
+
+        // Reglas de Sync
+        const rules = data.syncRules || {};
+        const chkWatcher = document.getElementById('check-watcher-enabled');
+        if (chkWatcher && rules.enableFileWatcher !== undefined && (force || document.activeElement !== chkWatcher)) {
+          chkWatcher.checked = rules.enableFileWatcher;
+        }
+
+        const inDebounce = document.getElementById('input-debounce-sec');
+        if (inDebounce && rules.debounceSeconds && (force || document.activeElement !== inDebounce)) {
+          inDebounce.value = rules.debounceSeconds;
+        }
+
+        const selInterval = document.getElementById('select-periodic-min');
+        if (selInterval && rules.periodicIntervalMinutes && (force || document.activeElement !== selInterval)) {
+          selInterval.value = rules.periodicIntervalMinutes;
+        }
+
+        const chkStock = document.getElementById('check-sync-stock');
+        if (chkStock && rules.syncStock !== undefined && (force || document.activeElement !== chkStock)) {
+          chkStock.checked = rules.syncStock;
+        }
+
+        const chkPrices = document.getElementById('check-sync-prices');
+        if (chkPrices && rules.syncPrices !== undefined && (force || document.activeElement !== chkPrices)) {
+          chkPrices.checked = rules.syncPrices;
+        }
+
+        const chkDesc = document.getElementById('check-sync-desc');
+        if (chkDesc && rules.syncDescriptions !== undefined && (force || document.activeElement !== chkDesc)) {
+          chkDesc.checked = rules.syncDescriptions;
+        }
+
+        const inSafety = document.getElementById('input-safety-stock');
+        if (inSafety && rules.safetyStockBuffer !== undefined && (force || document.activeElement !== inSafety)) {
+          inSafety.value = rules.safetyStockBuffer;
+        }
+
+        const chkOnlyPos = document.getElementById('check-only-stock-pos');
+        if (chkOnlyPos && rules.onlyStockAboveZero !== undefined && (force || document.activeElement !== chkOnlyPos)) {
+          chkOnlyPos.checked = rules.onlyStockAboveZero;
+        }
+
+        const inLicKey = document.getElementById('input-lic-key');
+        if (inLicKey && data.licenseKey && (force || !inLicKey.value || document.activeElement !== inLicKey)) {
+          inLicKey.value = data.licenseKey;
+        }
+
+        window.__formInputsInitialized = true;
+      }
+    }
+  `;
 }

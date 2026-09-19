@@ -128,8 +128,9 @@ export class LocalAgent {
     const cfg = this.configManager.get();
     if (updates.factusol) {
       cfg.factusol = { ...(cfg.factusol || {}), ...updates.factusol };
-      if (updates.factusol.databasePath) {
+      if (updates.factusol.databasePath !== undefined) {
         cfg.factusolDbPath = updates.factusol.databasePath;
+        cfg.factusol.databasePath = updates.factusol.databasePath;
       }
     }
     if (updates.woocommerce) {
@@ -156,15 +157,27 @@ export class LocalAgent {
       }
     }
 
-    this.configManager.saveConfigToDisk();
-    this.syncEngine.startAutoSyncLoop(() => this.isRunning);
-
-    if (cfg.factusolDbPath && fs.existsSync(cfg.factusolDbPath)) {
-      await this.factusolService.reconnect(cfg.factusolDbPath).catch(() => null);
+    const saveRes = this.configManager.saveConfigToDisk();
+    if (!saveRes.success) {
+      this.addEvent('error', `✕ Fallo al guardar en disco: ${saveRes.error}`);
+      return {
+        success: false,
+        message: `Error al persistir la configuración en disco: ${saveRes.error}. Comprueba los permisos de acceso.`
+      };
     }
 
-    this.addEvent('success', `✓ Configuración local actualizada${licenseMsg}`);
-    return { success: true, message: `Configuración guardada con éxito${licenseMsg}` };
+    this.syncEngine.startAutoSyncLoop(() => this.isRunning);
+
+    if (cfg.factusolDbPath) {
+      if (fs.existsSync(cfg.factusolDbPath)) {
+        await this.factusolService.reconnect(cfg.factusolDbPath).catch(() => null);
+      } else {
+        this.logger.warn(`Ruta de Factusol guardada pero no accesible inmediatamente: ${cfg.factusolDbPath}`);
+      }
+    }
+
+    this.addEvent('success', `✓ Configuración guardada en disco (${path.basename(saveRes.filePath)})${licenseMsg}`);
+    return { success: true, message: `Configuración guardada correctamente en disco${licenseMsg}` };
   }
 
   // --- Métodos de Diagnósticos y Eventos ---

@@ -56,7 +56,7 @@ export const licenseScript = `
         const data = await res.json();
         if (data.success) {
           showToast(successMsg);
-          fetchStatus();
+          fetchStatus(true);
         } else {
           showToast('Error al guardar: ' + data.message, 'error');
         }
