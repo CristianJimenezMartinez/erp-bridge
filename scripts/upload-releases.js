@@ -156,7 +156,7 @@ async function uploadReleases(options = {}) {
             }
 
             // Copiar archivos clave a releases/latest/ en el servidor
-            console.log('>>> [4/4] Sincronizando punteros genéricos /releases/latest/...');
+            console.log('>>> [4/5] Sincronizando punteros genéricos /releases/latest/...');
             const setupExe = `Bentian-Setup-v${version}.exe`;
             const setupZip = `Bentian-Setup-v${version}.zip`;
             const portableZip = `BentianAgent-v${version}-Portable.zip`;
@@ -170,6 +170,33 @@ async function uploadReleases(options = {}) {
             `;
             await runSshCommand(conn, linkCmd);
             console.log('    ✓ Enlaces de descarga genéricos /releases/latest/ actualizados.');
+
+            // Registrar versión en PostgreSQL de producción en bentian-api-prod
+            console.log('>>> [5/5] Registrando versión en la base de datos de producción...');
+            const manifestPath = path.join(versionReleaseDir, 'manifest.json');
+            if (fs.existsSync(manifestPath)) {
+              const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+              const insertScript = `docker exec -w /app/apps/api bentian-api-prod node -e '
+                const { DatabaseService } = require("../../packages/core/dist/database/database.service");
+                const crypto = require("crypto");
+                const db = DatabaseService.getInstance();
+                db.initialize({ connectionString: process.env.DATABASE_URL });
+                db.query(\`
+                  INSERT INTO update_manifests (id, version, channel, platform, download_url, sha256, signature, file_size, release_notes, mandatory, min_version, published_at)
+                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                  ON CONFLICT (version) DO UPDATE
+                  SET channel = $3, platform = $4, download_url = $5, sha256 = $6, signature = $7, file_size = $8, release_notes = $9, mandatory = $10, min_version = $11, published_at = $12
+                \`, [crypto.randomUUID(), "${manifestData.version}", "${manifestData.channel}", "${manifestData.platform}", "${manifestData.downloadUrl}", "${manifestData.sha256}", "${manifestData.signature}", ${manifestData.fileSize || 'null'}, "${(manifestData.releaseNotes || '').replace(/"/g, '\\"')}", ${Boolean(manifestData.mandatory)}, ${manifestData.minVersion ? `"${manifestData.minVersion}"` : 'null'}, new Date("${manifestData.publishedAt || new Date().toISOString()}")])
+                .then(() => { console.log("OK_DB_REGISTERED"); process.exit(0); })
+                .catch(e => { console.error("DB_ERROR:", e.message); process.exit(1); });
+              '`;
+              try {
+                await runSshCommand(conn, insertScript);
+                console.log(`    ✓ Versión v${manifestData.version} registrada en la base de datos PostgreSQL.`);
+              } catch (dbErr) {
+                console.warn(`    ⚠️ Aviso al registrar en base de datos: ${dbErr.message}`);
+              }
+            }
 
             // Comprobar disponibilidad HTTP
             console.log('\n--- Verificando disponibilidad pública en vivo ---');

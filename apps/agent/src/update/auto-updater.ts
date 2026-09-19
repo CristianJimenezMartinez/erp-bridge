@@ -32,7 +32,25 @@ export class AutoUpdater {
   }
 
   /**
+   * Compara dos versiones SemVer. Retorna true si remoteVer es estrictamente mayor que localVer.
+   */
+  private isNewer(remoteVer: string, localVer: string): boolean {
+    const rBase = (remoteVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
+    const lBase = (localVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
+    const cleanR = rBase.map((x) => parseInt(x, 10) || 0);
+    const cleanL = lBase.map((x) => parseInt(x, 10) || 0);
+    for (let i = 0; i < 3; i++) {
+      const r = cleanR[i] ?? 0;
+      const l = cleanL[i] ?? 0;
+      if (r > l) return true;
+      if (r < l) return false;
+    }
+    return false;
+  }
+
+  /**
    * Queries the Core API to check if a new version is available for this Agent.
+   * Cuenta con fallback multi-nivel a releases/latest.json y CDN canónico oficial.
    */
   public async checkForUpdate(channel: 'stable' | 'beta' | 'critical' = 'stable'): Promise<UpdateCheckResponse> {
     const payload: UpdateCheckRequest = {
@@ -43,23 +61,79 @@ export class AutoUpdater {
       channel,
     };
 
+    let checkData: UpdateCheckResponse = { available: false };
+
     try {
-      const res = await fetch(`${this.config.apiBaseUrl}/api/v1/updates/check`, {
+      const res = await fetch(`${this.config.apiBaseUrl.replace(/\/$/, '')}/api/v1/updates/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(8000),
       });
 
-      if (!res.ok) {
-        return { available: false };
+      if (res.ok) {
+        const json = (await res.json()) as { data?: UpdateCheckResponse; available?: boolean };
+        checkData = (json.data || json) as UpdateCheckResponse;
       }
-
-      const json = (await res.json()) as { data: UpdateCheckResponse };
-      return json.data;
     } catch (err) {
-      this.logger.warn(`Error al consultar actualizaciones: ${String(err)}`);
-      return { available: false };
+      this.logger.debug(`API /updates/check no respondió: ${String(err)}. Consultando fallback CDN...`);
     }
+
+    // Fallback 1: releases/latest.json en apiBaseUrl
+    if (!checkData.available || !checkData.version) {
+      try {
+        const staticUrl = `${this.config.apiBaseUrl.replace(/\/$/, '')}/releases/latest.json`;
+        const staticRes = await fetch(staticUrl, { signal: AbortSignal.timeout(6000) });
+        if (staticRes.ok) {
+          const staticJson = (await staticRes.json()) as any;
+          const manifest = staticJson.stable || staticJson;
+          if (manifest && manifest.version && this.isNewer(manifest.version, this.config.currentVersion)) {
+            checkData = {
+              available: true,
+              version: manifest.version,
+              downloadUrl: manifest.downloadUrl,
+              sha256: manifest.sha256,
+              signature: manifest.signature,
+              fileSize: manifest.fileSize,
+              releaseNotes: manifest.releaseNotes,
+              mandatory: manifest.mandatory,
+              channel: manifest.channel || channel,
+            };
+          }
+        }
+      } catch (staticErr) {
+        this.logger.debug(`Fallback CDN apiBaseUrl no disponible: ${String(staticErr)}`);
+      }
+    }
+
+    // Fallback 2: CDN canónico oficial de Bentian (https://bridge.cristianjm.com)
+    if (!checkData.available || !checkData.version) {
+      const canonicalBase = 'https://bridge.cristianjm.com';
+      if (this.config.apiBaseUrl.replace(/\/$/, '') !== canonicalBase) {
+        try {
+          const canonRes = await fetch(`${canonicalBase}/releases/latest.json`, { signal: AbortSignal.timeout(6000) });
+          if (canonRes.ok) {
+            const canonJson = (await canonRes.json()) as any;
+            const manifest = canonJson.stable || canonJson;
+            if (manifest && manifest.version && this.isNewer(manifest.version, this.config.currentVersion)) {
+              checkData = {
+                available: true,
+                version: manifest.version,
+                downloadUrl: manifest.downloadUrl,
+                sha256: manifest.sha256,
+                signature: manifest.signature,
+                fileSize: manifest.fileSize,
+                releaseNotes: manifest.releaseNotes,
+                mandatory: manifest.mandatory,
+                channel: manifest.channel || channel,
+              };
+            }
+          }
+        } catch {}
+      }
+    }
+
+    return checkData;
   }
 
   /**

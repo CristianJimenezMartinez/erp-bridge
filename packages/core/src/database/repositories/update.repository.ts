@@ -1,4 +1,5 @@
-import { UpdateHistoryEntry, UpdateManifest } from '@erp-bridge/shared';
+import * as crypto from 'crypto';
+import { Logger, UpdateHistoryEntry, UpdateManifest } from '@erp-bridge/shared';
 import { DatabaseService } from '../database.service';
 
 export interface IUpdateRepository {
@@ -11,13 +12,15 @@ export interface IUpdateRepository {
 }
 
 export class PostgresUpdateRepository implements IUpdateRepository {
+  private static readonly logger = new Logger('PostgresUpdateRepository');
   private static readonly memoryManifests: Map<string, UpdateManifest> = new Map();
   private static readonly memoryHistory: UpdateHistoryEntry[] = [];
 
   constructor(private db: DatabaseService = DatabaseService.getInstance()) {}
 
   async publishManifest(manifest: UpdateManifest): Promise<UpdateManifest> {
-    const id = manifest.id || `manifest_${manifest.version}_${manifest.platform}`;
+    const isUuid = manifest.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(manifest.id);
+    const id = isUuid ? manifest.id! : crypto.randomUUID();
     const entry: UpdateManifest = { ...manifest, id, publishedAt: manifest.publishedAt || new Date() };
     PostgresUpdateRepository.memoryManifests.set(`${entry.version}_${entry.platform}`, entry);
 
@@ -26,7 +29,7 @@ export class PostgresUpdateRepository implements IUpdateRepository {
         `INSERT INTO update_manifests (id, version, channel, platform, download_url, sha256, signature, file_size, release_notes, mandatory, min_version, published_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
          ON CONFLICT (version) DO UPDATE
-         SET channel = $3, platform = $4, download_url = $5, sha256 = $6, signature = $7, file_size = $8, release_notes = $9, mandatory = $10, min_version = $11`,
+         SET channel = $3, platform = $4, download_url = $5, sha256 = $6, signature = $7, file_size = $8, release_notes = $9, mandatory = $10, min_version = $11, published_at = $12`,
         [
           entry.id,
           entry.version,
@@ -42,7 +45,9 @@ export class PostgresUpdateRepository implements IUpdateRepository {
           entry.publishedAt,
         ]
       );
-    } catch {}
+    } catch (err) {
+      PostgresUpdateRepository.logger.warn(`No se pudo persistir manifest en DB: ${String(err)}`);
+    }
 
     return entry;
   }

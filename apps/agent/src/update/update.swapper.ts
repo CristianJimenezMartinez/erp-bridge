@@ -11,11 +11,14 @@ export class UpdateSwapper {
    * Genera el script de PowerShell nativo para el swap atómico y monitorización de 10 segundos.
    */
   public static generatePowerShellScript(options: UpdateSwapOptions): string {
-    const targetExe = path.resolve(options.targetExePath).replace(/\\/g, '\\\\');
-    const newExe = path.resolve(options.newExePath).replace(/\\/g, '\\\\');
-    const backupExe = options.backupExePath
-      ? path.resolve(options.backupExePath).replace(/\\/g, '\\\\')
-      : `${targetExe}.bak`;
+    const rawTarget = path.resolve(options.targetExePath);
+    const rawNew = path.resolve(options.newExePath);
+    const rawBackup = options.backupExePath ? path.resolve(options.backupExePath) : `${rawTarget}.bak`;
+
+    const targetExe = rawTarget.replace(/'/g, "''");
+    const newExe = rawNew.replace(/'/g, "''");
+    const backupExe = rawBackup.replace(/'/g, "''");
+
     const timeoutSecs = options.timeoutSeconds ?? 10;
     const procNames = options.processNamesToKill ?? ['BentianAgent', 'BentianTray'];
     const procListStr = procNames.map((p) => `'${p}'`).join(', ');
@@ -28,11 +31,12 @@ export class UpdateSwapper {
 # Generado automáticamente por Bentian UpdateSwapper
 # ==============================================================================
 $ErrorActionPreference = 'Continue'
-$targetExe = "${targetExe}"
-$newExe = "${newExe}"
-$backupExe = "${backupExe}"
+$targetExe = '${targetExe}'
+$newExe = '${newExe}'
+$backupExe = '${backupExe}'
 $timeoutSecs = ${timeoutSecs}
-$logFile = Join-Path (Split-Path -Parent $targetExe) "bentian-update.log"
+$targetDir = Split-Path -Parent $targetExe
+$logFile = Join-Path $targetDir 'bentian-update.log'
 
 function Log-Msg($msg) {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -67,24 +71,23 @@ Move-Item -Path "$newExe" -Destination "$targetExe" -Force
 
 # 4. Copiar dependencias accesorias (adodb.js) si existen
 $newDir = Split-Path -Parent $newExe
-$targetDir = Split-Path -Parent $targetExe
 $adodbSource = Join-Path $newDir "adodb.js"
 $adodbTarget = Join-Path $targetDir "adodb.js"
 if (Test-Path "$adodbSource") {
     Copy-Item -Path "$adodbSource" -Destination "$adodbTarget" -Force -ErrorAction SilentlyContinue
 }
 
-# 5. Relanzar BentianAgent.exe
+# 5. Relanzar BentianAgent.exe con WorkingDirectory explícito
 Log-Msg "Relanzando $targetExe con argumentos: ${postArgs}..."
 $launchArgs = @(${postArgs})
-$proc = Start-Process -FilePath "$targetExe" -ArgumentList $launchArgs -PassThru -WindowStyle Hidden
+$proc = Start-Process -FilePath "$targetExe" -ArgumentList $launchArgs -WorkingDirectory "$targetDir" -PassThru -WindowStyle Hidden
 
 if (-not $proc) {
     Log-Msg "CRITICO: No se pudo lanzar el nuevo binario. Ejecutando rollback de emergencia..."
     Remove-Item -Path "$targetExe" -Force -ErrorAction SilentlyContinue
     if (Test-Path "$backupExe") {
         Move-Item -Path "$backupExe" -Destination "$targetExe" -Force
-        Start-Process -FilePath "$targetExe" -ArgumentList "start" -WindowStyle Hidden
+        Start-Process -FilePath "$targetExe" -ArgumentList "start" -WorkingDirectory "$targetDir" -WindowStyle Hidden
     }
     exit 1
 }

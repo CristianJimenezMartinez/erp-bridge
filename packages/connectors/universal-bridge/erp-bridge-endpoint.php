@@ -263,6 +263,7 @@ if ($mainAction === 'ping' || $mainAction === 'health') {
         'success' => true,
         'service' => 'Bentian ERP Bridge Universal Web Connector',
         'version' => '1.1.0',
+        'latestAgentVersion' => '0.2.6',
         'phpVersion' => PHP_VERSION,
         'databaseConnected' => ($pdo !== null),
         'tablesReady' => $tablesOk,
@@ -280,6 +281,45 @@ if ($mainAction === 'ping' || $mainAction === 'health') {
         'timestamp' => time(),
         'https' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443),
     ]);
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA: AUTO-UPDATE MANIFEST PROXY / FALLBACK
+// ----------------------------------------------------------------------------
+if ($mainAction === 'check_update' || $mainAction === 'update_manifest') {
+    $remoteManifestUrl = 'https://bridge.cristianjm.com/releases/latest.json';
+    $ctx = stream_context_create([
+        'http' => [
+            'timeout' => 5,
+            'user_agent' => 'Bentian-Universal-Bridge/1.1.0',
+        ],
+        'ssl' => [
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+        ]
+    ]);
+    $content = @file_get_contents($remoteManifestUrl, false, $ctx);
+    if ($content !== false && !empty($content)) {
+        echo $content;
+    } else {
+        echo json_encode([
+            'latestVersion' => '0.2.6',
+            'publishedAt' => '2026-09-18T16:57:52.351Z',
+            'stable' => [
+                'version' => '0.2.6',
+                'channel' => 'stable',
+                'platform' => 'win32_x64',
+                'downloadUrl' => 'https://bridge.cristianjm.com/releases/v0.2.6/BentianAgent.exe',
+                'sha256' => '46ddeaf2a78c7c0723dae00707197c96beaa988b390b34a22c4da58397c2c8d2',
+                'signature' => '4Dpouas2UntXny6lqfEVsQwSvG5rb/0t1l/PWQVZT13AVmhlnjdi82X4Wz65Az8vIO7xv/uoyIp8Bt9EpTA/BA==',
+                'fileSize' => 91718656,
+                'releaseNotes' => 'Lanzamiento oficial Bentian Agent v0.2.6 - Sincronización Factusol & WooCommerce',
+                'mandatory' => false,
+                'minVersion' => '0.1.0',
+            ]
+        ]);
+    }
     exit;
 }
 
@@ -482,10 +522,10 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
 
     $shipping = $payload['shippingData'] ?? [];
     $orderData = $payload['order'] ?? [];
-    $lines = $orderData['lines'] ?? $payload['lines'] ?? [];
-    $total = floatval($orderData['total'] ?? $payload['total'] ?? 0);
-    $subtotal = floatval($orderData['subtotal'] ?? $payload['subtotal'] ?? $total);
-    $taxTotal = floatval($orderData['taxTotal'] ?? $payload['taxTotal'] ?? 0);
+    $lines = $orderData['lines'] ?? $orderData['lineas'] ?? $payload['lines'] ?? $payload['lineas'] ?? [];
+    $total = floatval($orderData['total'] ?? $orderData['cabecera']['totpcl'] ?? $payload['total'] ?? 0);
+    $subtotal = floatval($orderData['subtotal'] ?? $orderData['cabecera']['net1pcl'] ?? $payload['subtotal'] ?? $total);
+    $taxTotal = floatval($orderData['taxTotal'] ?? $orderData['cabecera']['iiva1pcl'] ?? $payload['taxTotal'] ?? 0);
     $shippingCost = floatval($payload['shippingCost'] ?? 0);
     $orderNumber = 'WEB-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
 
@@ -500,9 +540,9 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
         ':orderNum' => $orderNumber,
         ':custData' => json_encode($shipping, JSON_UNESCAPED_UNICODE),
         ':linesData' => json_encode($lines, JSON_UNESCAPED_UNICODE),
-        ':payMethod' => substr($payload['paymentMethodType'] ?? 'pasarela', 0, 50),
-        ':payStatus' => 'COMPLETED',
-        ':payRef' => substr($payload['paymentMethodId'] ?? '', 0, 100),
+        ':payMethod' => substr($payload['paymentMethod'] ?? $payload['paymentMethodType'] ?? 'paypal', 0, 50),
+        ':payStatus' => substr($payload['paymentStatus'] ?? 'COMPLETED', 0, 50),
+        ':payRef' => substr($payload['paymentReference'] ?? $payload['paymentMethodId'] ?? '', 0, 100),
         ':subtotal' => $subtotal,
         ':taxTotal' => $taxTotal,
         ':shipCost' => $shippingCost,

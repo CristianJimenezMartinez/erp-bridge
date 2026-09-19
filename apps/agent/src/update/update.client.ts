@@ -210,7 +210,34 @@ export class UpdateClient {
             }
           }
         } catch (staticErr) {
-          this.logger.debug(`Fallback CDN no disponible: ${staticErr instanceof Error ? staticErr.message : String(staticErr)}`);
+          this.logger.debug(`Fallback CDN apiBaseUrl no disponible: ${staticErr instanceof Error ? staticErr.message : String(staticErr)}`);
+        }
+      }
+
+      // Fallback canónico oficial: Si el host local o de tienda no tiene latest.json, consultar el CDN central de Bentian
+      if (!checkData.available || !checkData.version) {
+        const canonicalBase = 'https://bridge.cristianjm.com';
+        if (this.options.apiBaseUrl.replace(/\/$/, '') !== canonicalBase) {
+          try {
+            const canonRes = await fetch(`${canonicalBase}/releases/latest.json`, { signal: AbortSignal.timeout(6000) });
+            if (canonRes.ok) {
+              const canonJson = (await canonRes.json()) as any;
+              const manifest = canonJson.stable || canonJson;
+              if (manifest && manifest.version && this.isNewer(manifest.version, this.options.currentVersion)) {
+                checkData = {
+                  available: true,
+                  version: manifest.version,
+                  downloadUrl: manifest.downloadUrl,
+                  sha256: manifest.sha256,
+                  signature: manifest.signature,
+                  fileSize: manifest.fileSize,
+                  releaseNotes: manifest.releaseNotes,
+                  mandatory: manifest.mandatory,
+                  channel: manifest.channel || chosenChannel,
+                };
+              }
+            }
+          } catch {}
         }
       }
 
@@ -388,7 +415,7 @@ export class UpdateClient {
         sha256: verification.calculatedSha256,
       });
 
-      if (this.options.autoApply) {
+      if (this.options.autoApply && !this.isApplying) {
         void this.applyUpdate(update);
       }
 
