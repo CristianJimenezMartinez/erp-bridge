@@ -210,6 +210,34 @@ export class AutoUpdater {
     this.logger.info(`Aplicando actualización atómica sobre: ${targetExe}`);
 
     if (process.platform === 'win32') {
+      const isCompiledExe =
+        !targetBinaryPath &&
+        targetExe.toLowerCase().endsWith('.exe') &&
+        !targetExe.toLowerCase().includes('node.exe') &&
+        process.env.NODE_ENV !== 'test' &&
+        launchNew;
+
+      if (isCompiledExe) {
+        this.logger.info('🚀 Ejecutable compilado en Windows detectado. Lanzando proceso atómico de actualización con UpdateSwapper (con soporte UAC si es necesario)...');
+        try {
+          const { UpdateSwapper } = require('./update.swapper');
+          const result = UpdateSwapper.launchAtomicUpdateProcess({
+            targetExePath: targetExe,
+            newExePath: newBinaryPath,
+            timeoutSeconds: 10,
+            processNamesToKill: ['BentianAgent', 'BentianTray'],
+            postUpdateArgs: ['start', '--post-update'],
+          });
+          this.logger.info(`✓ Proceso atómico iniciado: ${result.batPath}. Cerrando proceso actual para reemplazo.`);
+          setTimeout(() => {
+            process.exit(0);
+          }, 800);
+          return;
+        } catch (swapErr) {
+          this.logger.warn(`Aviso con UpdateSwapper: ${String(swapErr)}. Intentando método directo como fallback.`);
+        }
+      }
+
       const oldExePath = `${targetExe}.old`;
 
       // 1. Si existe un .old residual previo, eliminarlo
@@ -244,31 +272,6 @@ export class AutoUpdater {
         try {
           fs.copyFileSync(newAdodb, targetAdodb);
         } catch {}
-      }
-
-      // 5. Lanzar nuevo proceso desacoplado si estamos corriendo como ejecutable
-      const isCompiledExe =
-        !targetBinaryPath &&
-        targetExe.toLowerCase().endsWith('.exe') &&
-        !targetExe.toLowerCase().includes('node.exe') &&
-        process.env.NODE_ENV !== 'test' &&
-        launchNew;
-
-      if (isCompiledExe) {
-        this.logger.info('🚀 Lanzando nueva versión desacoplada (detached)...');
-        try {
-          const child = childProcess.spawn(targetExe, ['start', '--post-update'], {
-            detached: true,
-            stdio: 'ignore',
-            cwd: targetDir,
-          });
-          child.unref();
-
-          this.logger.info('👋 Proceso anterior finalizado exitosamente para liberar recursos.');
-          process.exit(0);
-        } catch (spawnErr) {
-          this.logger.warn(`No se pudo relanzar binario: ${String(spawnErr)}`);
-        }
       }
     } else {
       fs.copyFileSync(newBinaryPath, targetExe);
