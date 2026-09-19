@@ -416,8 +416,7 @@ async function main() {
             signal: AbortSignal.timeout(1000),
           });
           if (checkReq.ok) {
-            console.log('✓ Ya existe una instancia de Bentian Agent en ejecución. Abriendo ventana...');
-            openDesktopWindow('http://127.0.0.1:39281');
+            console.log('✓ Ya existe una instancia de Bentian Agent en ejecución. Enfocando ventana...');
             process.exit(0);
           }
         } catch {

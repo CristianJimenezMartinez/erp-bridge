@@ -43,6 +43,7 @@ export class LocalGuiServer {
 
     // 3. Factusol
     router.post('/api/local/browse-factusol', FactusolController.browseFactusol());
+    router.any(['GET', 'POST'], '/api/local/open-file-dialog', FactusolController.openNativeFileDialog());
     router.any(['GET', 'POST'], '/api/local/fs/browse', FactusolController.browseDirectory(this.agent));
     router.post('/api/local/detect-factusol', FactusolController.detectFactusol(this.agent));
     router.post('/api/local/test-factusol', FactusolController.testFactusol(this.agent));

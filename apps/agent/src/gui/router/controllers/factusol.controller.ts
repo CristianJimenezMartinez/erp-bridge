@@ -4,6 +4,7 @@ import { Logger } from '@erp-bridge/shared';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
 import { FactusolDetector } from '../../../detector';
+import { openWindowsFileDialog } from '../../window-launcher';
 
 const logger = new Logger('FactusolController');
 
@@ -27,9 +28,9 @@ export class FactusolController {
           }
         }
 
-        // Obtener unidades disponibles en Windows
+        // Obtener todas las unidades disponibles en Windows (A-Z para incluir NAS y red)
         const drives: Array<{ label: string; path: string }> = [];
-        const driveLetters = ['C', 'D', 'E', 'F', 'G', 'H', 'Z', 'Y', 'X'];
+        const driveLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
         for (const dl of driveLetters) {
           const rootPath = `${dl}:\\`;
           try {
@@ -125,6 +126,26 @@ export class FactusolController {
     return (_req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, useExplorerModal: true }));
+    };
+  }
+
+  public static openNativeFileDialog(): RouteHandler {
+    return (_req, res) => {
+      try {
+        const filePath = openWindowsFileDialog(
+          'Seleccionar Base de Datos Factusol (Local o NAS / Red)',
+          'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb'
+        );
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        if (filePath) {
+          res.end(JSON.stringify({ success: true, filePath }));
+        } else {
+          res.end(JSON.stringify({ success: false, cancelled: true }));
+        }
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: String(err) }));
+      }
     };
   }
 

@@ -7,7 +7,13 @@ export function renderExplorerModal(): string {
           <svg width="20" height="20" fill="none" stroke="#60a5fa" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
           <span style="font-weight: 700; font-size: 15px; color: #fff;">Explorador de Base de Datos Factusol</span>
         </div>
-        <button onclick="closeExplorerModal()" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">✕</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button onclick="openNativeWindowsDialog()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); font-weight: 600; padding: 5px 12px; font-size: 12px; border: 1px solid #3b82f6;" title="Abre el explorador de Windows estándar para buscar en la Red o NAS">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+            <span>📂 Ventana de Windows (Red / NAS)</span>
+          </button>
+          <button onclick="closeExplorerModal()" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">✕</button>
+        </div>
       </div>
 
       <div class="modal-body" style="padding: 16px;">

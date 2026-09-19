@@ -46,7 +46,10 @@ export function renderWizardModal(): string {
               <span>🔍 Buscar mi Factusol Automáticamente</span>
             </button>
             <button onclick="browseFactusol(true)" id="wiz-btn-browse-fact" class="btn btn-secondary">
-              <span>📁 Examinar PC</span>
+              <span>📁 Examinar Carpetas</span>
+            </button>
+            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none;" title="Abre el explorador de Windows estándar para buscar en la Red o NAS">
+              <span>🌐 Red / NAS</span>
             </button>
           </div>
 

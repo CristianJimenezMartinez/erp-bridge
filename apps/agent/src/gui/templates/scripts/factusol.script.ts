@@ -26,6 +26,37 @@ export const factusolScript = `
     let explorerCurrentPath = '';
     let explorerParentPath = null;
 
+    async function openNativeWindowsDialog(isWizard) {
+      if (typeof isWizard !== 'undefined') {
+        explorerIsWizard = !!isWizard;
+      }
+      showToast('Abriendo ventana clásica de Windows...', 'info');
+      try {
+        const res = await fetch('/api/local/open-file-dialog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success && data.filePath) {
+          const targetInput = explorerIsWizard 
+            ? document.getElementById('wiz-input-fact-path') 
+            : document.getElementById('input-factusol-db');
+          if (targetInput) {
+            targetInput.value = data.filePath;
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            targetInput.dispatchEvent(new Event('change', { bubbles: true }));
+            handleFactusolInputBlur(targetInput.id);
+          }
+          closeExplorerModal();
+          showToast('Base de datos seleccionada: ' + data.filePath, 'success');
+        } else if (!data.cancelled) {
+          showToast(data.message || 'No se seleccionó ningún archivo', 'info');
+        }
+      } catch (err) {
+        showToast('Error al invocar la ventana de Windows', 'error');
+      }
+    }
+
     function browseFactusol(isWizard) {
       explorerIsWizard = !!isWizard;
       openExplorerModal();

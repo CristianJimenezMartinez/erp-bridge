@@ -31,6 +31,8 @@ export function findBrowserAppExecutable(): string | null {
   return null;
 }
 
+let lastOpenedAt = 0;
+
 /**
  * Lanza la interfaz de Bentian Agent en una ventana nativa de escritorio
  * sin barra de direcciones ni pestañas (modo cromeless app).
@@ -40,6 +42,14 @@ export function openDesktopWindow(url: string): boolean {
     logger.info(`Modo headless/test activo: apertura de ventana simulada para ${url}`);
     return true;
   }
+
+  const now = Date.now();
+  if (now - lastOpenedAt < 2500) {
+    logger.info(`Apertura de ventana ignorada: anti-duplicados activo (${now - lastOpenedAt}ms desde la anterior).`);
+    return true;
+  }
+  lastOpenedAt = now;
+
   try {
     const browserExe = findBrowserAppExecutable();
     if (browserExe) {
@@ -73,10 +83,54 @@ export function openDesktopWindow(url: string): boolean {
 }
 
 /**
- * Diálogo de archivos defensivo: deshabilitado para evitar invocar PowerShell en segundo plano
- * y disparar alertas heurísticas falsas positivas en Microsoft Windows Defender.
- * La selección de archivos se gestiona nativamente a través del explorador integrado de la GUI.
+ * Abre el selector nativo de archivos de Windows (OpenFileDialog).
+ * Permite examinar la Red, unidades asignadas y rutas UNC hacia el NAS (ej: \\NAS\...).
  */
-export function openWindowsFileDialog(_title: string, _filter: string): string {
+export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factusol (Local o NAS)', filter = 'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb'): string {
+  if (process.platform !== 'win32') {
+    return '';
+  }
+
+  // 1. Intentar mediante BentianTray.exe --open-file-dialog
+  try {
+    const execDir = path.dirname(process.execPath);
+    const trayCandidates = [
+      path.join(execDir, 'BentianTray.exe'),
+      path.join(__dirname, 'tray', 'BentianTray.exe'),
+      path.join(__dirname, 'BentianTray.exe'),
+      path.resolve(process.cwd(), 'builder', 'dist', 'BentianTray.exe'),
+    ];
+
+    for (const trayExe of trayCandidates) {
+      if (fs.existsSync(trayExe)) {
+        const output = childProcess.execFileSync(trayExe, ['--open-file-dialog'], {
+          encoding: 'utf8',
+          timeout: 120000,
+          windowsHide: false,
+        });
+        if (output && output.trim()) {
+          return output.trim();
+        }
+      }
+    }
+  } catch (trayErr) {
+    logger.debug('Aviso al invocar BentianTray dialog:', { err: String(trayErr) });
+  }
+
+  // 2. Fallback mediante PowerShell nativo en modo STA
+  try {
+    const psScript = `Add-Type -AssemblyName System.Windows.Forms; $d = New-Object System.Windows.Forms.OpenFileDialog; $d.Title = '${title.replace(/'/g, "''")}'; $d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*'; $d.RestoreDirectory = $true; if ($d.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) }`;
+    const output = childProcess.execSync(`powershell.exe -NoProfile -STA -Command "${psScript}"`, {
+      encoding: 'utf8',
+      timeout: 120000,
+      windowsHide: false,
+    });
+    if (output && output.trim()) {
+      return output.trim();
+    }
+  } catch (psErr) {
+    logger.warn('Fallo al invocar OpenFileDialog de PowerShell:', { err: String(psErr) });
+  }
+
   return '';
 }

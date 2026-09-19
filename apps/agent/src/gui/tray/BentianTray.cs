@@ -33,6 +33,24 @@ namespace Bentian.Tray
         [STAThread]
         static void Main(string[] args)
         {
+            if (args.Length > 0 && args[0] == "--open-file-dialog")
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                using (var dialog = new OpenFileDialog())
+                {
+                    dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
+                    dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
+                    dialog.CheckFileExists = true;
+                    dialog.RestoreDirectory = true;
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        Console.WriteLine(dialog.FileName);
+                    }
+                }
+                return;
+            }
+
             // Registrar AppUserModelID oficial para Windows 10/11 Action Center & Notificaciones
             try
             {
@@ -113,15 +131,8 @@ namespace Bentian.Tray
             trayIcon.ContextMenuStrip = contextMenu;
             trayIcon.Visible = true;
 
-            // Click handlers: Left-click or Double-click opens Control Center
+            // Click handlers: Double-click opens Control Center
             trayIcon.DoubleClick += (s, e) => OpenControlCenter();
-            trayIcon.MouseClick += (s, e) =>
-            {
-                if (e.Button == MouseButtons.Left)
-                {
-                    OpenControlCenter();
-                }
-            };
 
             // Watchdog timer: monitors parent PID so we don't leave orphaned tray icons
             if (parentPid > 0)
@@ -167,8 +178,13 @@ namespace Bentian.Tray
             Application.Run();
         }
 
+        private static DateTime lastOpened = DateTime.MinValue;
+
         private static void OpenControlCenter()
         {
+            if ((DateTime.Now - lastOpened).TotalSeconds < 2.5) return;
+            lastOpened = DateTime.Now;
+
             try
             {
                 string url = "http://127.0.0.1:" + port + "/api/local/open-window";
