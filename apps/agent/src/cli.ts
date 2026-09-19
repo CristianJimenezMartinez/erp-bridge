@@ -379,6 +379,29 @@ async function main() {
       break;
     }
 
+    case 'sync':
+    case 'sync-catalog': {
+      const agent = new LocalAgent();
+      console.log('🚀 Iniciando sincronización de catálogo de Factusol hacia la tienda web...');
+      try {
+        const res = await agent.uploadCatalog();
+        if (res.success) {
+          console.log(`\n🎉 ¡Sincronización completada con éxito!`);
+          console.log(`   Total leídos: ${res.totalArticles}`);
+          console.log(`   Subidos/Actualizados: ${res.uploadedCount}`);
+          console.log(`   Mensaje: ${res.message}\n`);
+          process.exit(0);
+        } else {
+          console.error(`\n❌ Error en la sincronización: ${res.message}\n`);
+          process.exit(1);
+        }
+      } catch (err: unknown) {
+        console.error(`\n❌ Fallo crítico durante la sincronización:`, err instanceof Error ? err.message : String(err));
+        process.exit(1);
+      }
+      break;
+    }
+
     case 'gui':
     case 'start':
     default: {
