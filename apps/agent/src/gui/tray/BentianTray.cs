@@ -12,8 +12,8 @@ using System.Windows.Forms;
 [assembly: System.Reflection.AssemblyCompany("Bentian")]
 [assembly: System.Reflection.AssemblyProduct("Bentian ERP Bridge")]
 [assembly: System.Reflection.AssemblyCopyright("(c) 2026 Cristian Jiménez Martínez")]
-[assembly: System.Reflection.AssemblyVersion("0.2.6.0")]
-[assembly: System.Reflection.AssemblyFileVersion("0.2.6.0")]
+[assembly: System.Reflection.AssemblyVersion("0.2.7.0")]
+[assembly: System.Reflection.AssemblyFileVersion("0.2.7.0")]
 
 namespace Bentian.Tray
 {
