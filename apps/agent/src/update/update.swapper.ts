@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import * as childProcess from 'child_process';
 import { Logger } from '@erp-bridge/shared';
 import { UpdateSwapOptions } from './update.types';
@@ -19,6 +20,9 @@ export class UpdateSwapper {
     const newExe = rawNew.replace(/'/g, "''");
     const backupExe = rawBackup.replace(/'/g, "''");
 
+    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
+    const rawScriptDir = scriptDir.replace(/'/g, "''");
+
     const timeoutSecs = options.timeoutSeconds ?? 10;
     const procNames = options.processNamesToKill ?? ['BentianAgent', 'BentianTray'];
     const procListStr = procNames.map((p) => `'${p}'`).join(', ');
@@ -36,7 +40,9 @@ $newExe = '${newExe}'
 $backupExe = '${backupExe}'
 $timeoutSecs = ${timeoutSecs}
 $targetDir = Split-Path -Parent $targetExe
-$logFile = Join-Path $targetDir 'bentian-update.log'
+$logDir = '${rawScriptDir}'
+if (-not (Test-Path "$logDir")) { New-Item -ItemType Directory -Path "$logDir" -Force -ErrorAction SilentlyContinue | Out-Null }
+$logFile = Join-Path $logDir 'bentian-update.log'
 
 function Log-Msg($msg) {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -131,9 +137,9 @@ exit 0
     const targetExe = path.resolve(options.targetExePath);
     const newExe = path.resolve(options.newExePath);
     const backupExe = options.backupExePath ? path.resolve(options.backupExePath) : `${targetExe}.bak`;
-    const targetDir = path.dirname(targetExe);
-    const logFile = path.join(targetDir, 'bentian-update.log');
-    const resolvedPs1 = ps1Path || path.join(path.dirname(targetExe), 'bentian-apply-update.ps1');
+    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
+    const logFile = path.join(scriptDir, 'bentian-update.log');
+    const resolvedPs1 = ps1Path || path.join(scriptDir, 'bentian-apply-update.ps1');
 
     return `@echo off
 rem ==============================================================================
@@ -199,7 +205,7 @@ exit /b 0
     batPath: string;
     ps1Path: string;
   } {
-    const scriptDir = options.scriptDir || path.dirname(path.resolve(options.targetExePath));
+    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
     if (!fs.existsSync(scriptDir)) {
       fs.mkdirSync(scriptDir, { recursive: true });
     }
@@ -227,6 +233,39 @@ exit /b 0
     this.logger.info(`Lanzando proceso desacoplado de actualización atómica: ${batPath}`);
 
     if (process.platform === 'win32') {
+      const targetDir = path.dirname(path.resolve(options.targetExePath));
+      let needsElevation = false;
+
+      // Comprobar si tenemos permisos de escritura en la carpeta del ejecutable (ej: C:\Program Files)
+      try {
+        const testFile = path.join(targetDir, `.bentian_perm_test_${Date.now()}.tmp`);
+        fs.writeFileSync(testFile, 'test');
+        fs.unlinkSync(testFile);
+      } catch {
+        needsElevation = true;
+      }
+
+      if (needsElevation) {
+        this.logger.info(`Ruta de destino protegida (${targetDir}). Elevando proceso de actualización mediante UAC de Windows...`);
+        const child = childProcess.spawn(
+          'powershell.exe',
+          [
+            '-NoProfile',
+            '-ExecutionPolicy',
+            'Bypass',
+            '-Command',
+            `Start-Process -FilePath "cmd.exe" -ArgumentList '/c', '${batPath.replace(/'/g, "''")}' -Verb RunAs -WindowStyle Hidden`,
+          ],
+          {
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: true,
+          }
+        );
+        child.unref();
+        return { launched: true, batPath };
+      }
+
       const child = childProcess.spawn('cmd.exe', ['/c', batPath], {
         detached: true,
         stdio: 'ignore',
