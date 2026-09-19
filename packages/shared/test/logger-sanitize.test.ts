@@ -19,9 +19,9 @@ function runTests() {
   assert(!cleanBearer.includes('eyJhbGciOiJIUzI1NiJ9'), 'El JWT no debe aparecer');
   assert(cleanBearer.includes('Bearer ***REDACTED***'), 'Debe indicar Bearer ***REDACTED***');
 
-  const stripeMsg = 'Checkout con sk_live_51Abcdefghijklmnop123456789 y webhook whsec_9876543210fedcba';
+  const stripeMsg = 'Checkout con sk_test_fake1234567890abcdef y webhook whsec_9876543210fedcba';
   const cleanStripe = sanitizeMessage(stripeMsg);
-  assert(!cleanStripe.includes('sk_live_51Abcdefghijklmnop123456789'));
+  assert(!cleanStripe.includes('sk_test_fake1234567890abcdef'));
   assert(!cleanStripe.includes('whsec_9876543210fedcba'));
   console.log('  ✓ Tokens Bearer, JWT y Stripe enmascarados correctamente.');
 
