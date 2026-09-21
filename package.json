@@ -5,7 +5,7 @@
   "description": "Universal connectivity layer for business software",
   "scripts": {
     "build": "pnpm -r run build",
-    "test": "pnpm -r run test",
+    "test": "pnpm -r --workspace-concurrency=1 run test",
     "quality:check": "ts-node scripts/quality-gate.ts",
     "audit:code": "ts-node scripts/quality-gate.ts",
     "test:benchmark": "ts-node test/e2e/autonomous-sync-benchmark.test.ts",
