@@ -77,7 +77,7 @@ export const factusolScript = `
           showToast(data.message, 'info');
         }
       } catch (err) {
-        console.warn('Selector de archivos de Windows cancelado o cerrado:', err);
+        console.warn('Selector de archivos de Windows cancelado o cerrado:', err); // quality-allow-console (browser template script)
       } finally {
         isOpeningNativeDialog = false;
         if (btnNative) btnNative.disabled = false;

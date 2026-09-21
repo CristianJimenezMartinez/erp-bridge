@@ -1,0 +1,157 @@
+{
+  "$schema": "./schemas/architecture-manifest.schema.json",
+  "project": "Bentian ERP Bridge",
+  "version": "0.2.9",
+  "updatedAt": "2026-09-21",
+  "modules": [
+    {
+      "id": "connectors.factusol",
+      "name": "Conector Factusol ERP (OLEDB Driver, SQL Queries & Relational Engine)",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Driver OLEDB cscript.exe (32/64 bits, ACE/Jet), transacciones atómicas F_PCL/F_LPC/F_STO, consultas SQL saneadas, rollover de año fiscal y cuadre aritmético al céntimo.",
+      "paths": [
+        "packages/connectors/factusol/src"
+      ],
+      "integrityTreeHash": "4345171b982d65ed3876762dac09d00eb359fabf130537129fae88dd83bd6df9",
+      "publicContract": "packages/connectors/factusol/src/index.ts",
+      "testSuites": [
+        "packages/connectors/factusol/test/connector.test.ts",
+        "packages/connectors/factusol/test/queries.test.ts",
+        "packages/connectors/factusol/test/adodb-driver.test.ts",
+        "packages/connectors/factusol/test/integration/factusol-e2e.test.ts"
+      ]
+    },
+    {
+      "id": "core.licensing",
+      "name": "Motor de Licencias y HWID Criptográfico",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Generación de claves EB-XXXXX, tokens criptográficos HMAC-SHA256, período de gracia offline de 7 días y vinculación de hardware por HWID.",
+      "paths": [
+        "packages/core/src/license"
+      ],
+      "integrityTreeHash": "43075e95e158fbf73715b8827a179bbdd0ffb250459ba83bc773bd0f57776ba9",
+      "publicContract": "packages/core/src/license/index.ts",
+      "testSuites": [
+        "packages/core/test/license-key.test.ts",
+        "packages/core/test/license-token.test.ts",
+        "packages/core/test/license-service.test.ts"
+      ]
+    },
+    {
+      "id": "core.update.signer",
+      "name": "Firmas Asimétricas Ed25519 para Actualizaciones",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Firma asimétrica y verificación criptográfica de binarios ejecutables con curvas elípticas Ed25519 y SHA-256.",
+      "paths": [
+        "packages/core/src/update/update-signer.ts"
+      ],
+      "integrityTreeHash": "570926baf054c943d42b96a7b0821c996e08cd2104cd743ca301f0cee1a8745a",
+      "publicContract": "packages/core/src/update/update-signer.ts",
+      "testSuites": [
+        "packages/core/test/update-service.test.ts"
+      ]
+    },
+    {
+      "id": "agent.update.swapper",
+      "name": "Intercambiador Atómico de Actualizaciones en Windows (UpdateSwapper)",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Reemplazo atómico desacoplado en %TEMP%, elevación UAC para Program Files, terminación limpia de procesos bloqueantes y rollback en 10s ante crash.",
+      "paths": [
+        "apps/agent/src/update/update.swapper.ts"
+      ],
+      "integrityTreeHash": "5284ef9d7bc952f0efbaa7fe6fed55523d7d1242459814d1966d9b7e92dfe705",
+      "publicContract": "apps/agent/src/update/update.swapper.ts",
+      "testSuites": [
+        "apps/agent/test/update-system.test.ts"
+      ]
+    },
+    {
+      "id": "agent.config.persistence",
+      "name": "Persistencia de Configuración en AppData & Anti-Wiping NAS",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Persistencia canónica inmutable en %APPDATA%, escritura atómica mediante ficheros temporales y preservación blindada de rutas UNC y unidades de red.",
+      "paths": [
+        "apps/agent/src/config/config.manager.ts"
+      ],
+      "integrityTreeHash": "d66055603d8bd05760f7b2e26ba5ebb82f1fe75d92ba09645347552539766bfb",
+      "publicContract": "apps/agent/src/config/config.manager.ts",
+      "testSuites": [
+        "apps/agent/test/config-persistence.test.ts",
+        "apps/agent/test/nas-dialog-e2e.test.ts"
+      ]
+    },
+    {
+      "id": "agent.gui",
+      "name": "Servidor GUI Local, MiniRouter, Vistas y System Tray",
+      "status": "STABLE",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "MiniRouter loopback 127.0.0.1 con Anti-CSRF, validación Host, plantillas HTML/JS sin dependencias externas y System Tray nativo STA en C#.",
+      "paths": [
+        "apps/agent/src/gui",
+        "apps/agent/src/window-launcher.ts"
+      ],
+      "publicContract": "apps/agent/src/gui/gui-server.ts",
+      "testSuites": [
+        "apps/agent/test/gui-router.test.ts",
+        "apps/agent/test/autostart.test.ts"
+      ]
+    },
+    {
+      "id": "connectors.woocommerce",
+      "name": "Conector WooCommerce REST API (v3)",
+      "status": "STABLE",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Mapeo canónico bidireccional de productos, stock, precios, pedidos y variaciones padre-hijo (tallas/colores) contra WooCommerce REST API.",
+      "paths": [
+        "packages/connectors/woocommerce/src"
+      ],
+      "publicContract": "packages/connectors/woocommerce/src/index.ts",
+      "testSuites": [
+        "packages/connectors/woocommerce/test/woocommerce-connector.test.ts",
+        "packages/connectors/woocommerce/test/variation-handler.test.ts"
+      ]
+    },
+    {
+      "id": "connectors.prestashop",
+      "name": "Conector PrestaShop Webservice XML",
+      "status": "STABLE",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Cliente XML para PrestaShop Webservice con soporte de combinaciones, stock y pedidos.",
+      "paths": [
+        "packages/connectors/prestashop/src"
+      ],
+      "publicContract": "packages/connectors/prestashop/src/index.ts",
+      "testSuites": [
+        "packages/connectors/prestashop/test/prestashop-connector.test.ts"
+      ]
+    },
+    {
+      "id": "cloud.api",
+      "name": "API Cloud Central de Bentian (Releases, Licencias, Deadman Switch)",
+      "status": "STABLE",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Servidor central Express/PostgreSQL para distribución de releases, verificación de firmas Ed25519, validación de licencias y monitorización de flota.",
+      "paths": [
+        "apps/api/src"
+      ],
+      "publicContract": "apps/api/src/server.ts",
+      "testSuites": [
+        "apps/api/test/agent-monitor.test.ts"
+      ]
+    }
+  ]
+}

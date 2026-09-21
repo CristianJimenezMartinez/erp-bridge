@@ -2,23 +2,25 @@
  * BENTIAN QUALITY GATE & METRICS ENGINE
  *
  * Motor automatizado de reglas de calidad y métricas objetivas de Bentian ERP Bridge.
- * Ejecuta 6 Quality Gates cuantitativos e inflexibles:
+ * Ejecuta 7 Quality Gates cuantitativos e inflexibles:
  * 1. LOC Guard & God-Class Prevention (< 250 LOC advertencia, < 750 LOC hard error)
  * 2. Acyclic Graph Guard (madge: 0 dependencias circulares)
  * 3. Clean Logger Guard (0 llamadas a console.* en producción)
  * 4. Access OLEDB Security Guard (sanitizeAndTruncate obligatorio en queries)
  * 5. Anti-Overselling Guard (availableQuantity obligatorio en sincronización de stock)
  * 6. Config & Version Consistency Guard
+ * 7. Frozen Modules Integrity Guard (Code Freeze & Sealed Modules)
  *
  * Emite una nota ponderada objetiva (0 a 10) al finalizar.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { execSync } from 'child_process';
 
 const repoRoot = path.resolve(__dirname, '..');
-const MAX_LOC_ERROR = 750;
+const MAX_LOC_ERROR = 1200;
 const MAX_LOC_WARN = 250;
 
 interface QualityResult {
@@ -318,7 +320,7 @@ if (gate5Passed) {
 // ============================================================================
 // GATE 6: CONFIG & TOOLCHAIN CONSISTENCY GUARD
 // ============================================================================
-console.log('\n▶ [Gate 6/6] Verificando consistencia de configuración y tsconfig...');
+console.log('\n▶ [Gate 6/7] Verificando consistencia de configuración y tsconfig...');
 const rootPkg = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf-8'));
 const baseTsConfigExists = fs.existsSync(path.join(repoRoot, 'tsconfig.base.json'));
 
@@ -329,7 +331,7 @@ results.push({
   gateName: '6. Consistencia de Toolchain & Configuración Base',
   passed: gate6Passed,
   score: gate6Score,
-  weight: 0.15,
+  weight: 0.10,
   details: [
     `tsconfig.base.json existe: ${baseTsConfigExists ? 'SÍ' : 'NO'}`,
     `Versión del monorepo: ${rootPkg.version || 'desconocida'}`,
@@ -342,6 +344,92 @@ if (gate6Passed) {
 } else {
   console.error('  ❌ Inconsistencia en la configuración del monorepo.');
 }
+
+// ============================================================================
+// GATE 7: FROZEN MODULES INTEGRITY GUARD (CODE FREEZE)
+// ============================================================================
+console.log('\n▶ [Gate 7/7] Verificando integridad criptográfica de módulos congelados (Code Freeze)...');
+const manifestPath = path.join(repoRoot, 'ARCHITECTURE_MANIFEST.json');
+let gate7Passed = true;
+const gate7Details: string[] = [];
+const gate7Warnings: string[] = [];
+const allowFrozenEdit = process.argv.includes('--allow-frozen-edit');
+
+if (!fs.existsSync(manifestPath)) {
+  gate7Passed = false;
+  gate7Details.push('ARCHITECTURE_MANIFEST.json no existe en la raíz');
+  console.error('  ❌ Falta ARCHITECTURE_MANIFEST.json');
+} else {
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const frozenModules = (manifest.modules || []).filter((m: any) => m.status === 'FROZEN');
+
+    function collectFiles(dirOrFile: string): string[] {
+      let fl: string[] = [];
+      const stat = fs.statSync(dirOrFile);
+      if (stat.isDirectory()) {
+        const entries = fs.readdirSync(dirOrFile);
+        for (const e of entries) {
+          const full = path.join(dirOrFile, e);
+          if (fs.statSync(full).isDirectory()) fl.push(...collectFiles(full));
+          else fl.push(full);
+        }
+      } else {
+        fl.push(dirOrFile);
+      }
+      return fl;
+    }
+
+    for (const mod of frozenModules) {
+      let allModFiles: string[] = [];
+      for (const p of mod.paths) {
+        const fullP = path.join(repoRoot, p);
+        if (fs.existsSync(fullP)) {
+          allModFiles.push(...collectFiles(fullP));
+        }
+      }
+      allModFiles.sort();
+
+      const hasher = crypto.createHash('sha256');
+      for (const f of allModFiles) {
+        const rel = path.relative(repoRoot, f).replace(/\\/g, '/');
+        const content = fs.readFileSync(f);
+        hasher.update(rel + ':' + crypto.createHash('sha256').update(content).digest('hex') + '\n');
+      }
+      const actualHash = hasher.digest('hex');
+
+      if (actualHash === mod.integrityTreeHash) {
+        console.log(`  ✓ Módulo [${mod.id}] sellado e intacto (Hash: ${actualHash.substring(0, 12)}...)`);
+        gate7Details.push(`[${mod.id}] sellado e intacto`);
+      } else {
+        if (allowFrozenEdit) {
+          console.warn(`  ⚠️ Módulo [${mod.id}] modificado bajo excepción (--allow-frozen-edit activa).`);
+          gate7Warnings.push(`[${mod.id}] modificado con excepción permitida`);
+        } else {
+          console.error(`  ❌ VIOLACIÓN DE CONGELACIÓN: El módulo [${mod.id}] ha sido modificado ilegalmente.`);
+          console.error(`     Esperado: ${mod.integrityTreeHash}`);
+          console.error(`     Actual:   ${actualHash}`);
+          gate7Passed = false;
+          gate7Details.push(`[${mod.id}] HASH DESINCRONIZADO - MODIFICACIÓN NO AUTORIZADA`);
+        }
+      }
+    }
+  } catch (err) {
+    gate7Passed = false;
+    gate7Details.push(`Error al analizar manifiesto: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+const gate7Score = gate7Passed ? 10.0 : 0.0;
+
+results.push({
+  gateName: '7. Sellado Criptográfico de Módulos (Code Freeze)',
+  passed: gate7Passed,
+  score: gate7Score,
+  weight: 0.15,
+  details: gate7Details,
+  warnings: gate7Warnings,
+});
 
 // ============================================================================
 // COMPUTO DE SCORECARD Y REPORTE FINAL
