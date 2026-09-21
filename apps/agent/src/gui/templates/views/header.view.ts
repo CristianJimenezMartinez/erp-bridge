@@ -9,6 +9,10 @@ export function renderHeader(): string {
           <span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block;box-shadow:0 0 6px #10b981;"></span>
           <span>Motor Autónomo Activo</span>
         </div>
+        <button id="btn-update-restart" onclick="triggerRestartUpdate()" class="btn" style="display:none;align-items:center;gap:6px;font-weight:600;background:linear-gradient(135deg, #f59e0b, #d97706);color:#fff;border:none;box-shadow:0 0 12px rgba(245,158,11,0.45);cursor:pointer;padding:6px 14px;border-radius:6px;font-size:12px;transition:all 0.2s ease;">
+          <svg id="update-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span id="btn-update-text">Reiniciar para Actualizar</span>
+        </button>
         <button onclick="triggerManualSync()" id="btn-sync-header" class="btn btn-primary">
           <svg id="sync-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Sincronizar Ahora</span>

@@ -1,6 +1,23 @@
 export function renderOverviewTab(): string {
   return `      <!-- ================= TAB 1: ESTADO GENERAL (VISTA ZEN) ================= -->
       <section id="tab-overview" class="tab-pane active">
+        <!-- Banner de Actualización Disponible -->
+        <div id="overview-update-banner" style="display:none;margin-bottom:1.5rem;padding:1.1rem 1.4rem;background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(217,119,6,0.08));border:1px solid rgba(245,158,11,0.35);border-radius:12px;align-items:center;justify-content:space-between;gap:1rem;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.18);display:flex;align-items:center;justify-content:center;color:#f59e0b;flex-shrink:0;">
+              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:14px;color:#f59e0b;" id="update-banner-title">Nueva versión disponible</div>
+              <div style="font-size:12px;color:var(--text-secondary,#94a3b8);margin-top:2px;" id="update-banner-desc">Hay una actualización lista para instalarse.</div>
+            </div>
+          </div>
+          <button onclick="triggerRestartUpdate()" id="btn-update-banner-action" class="btn" style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#fff;border:none;box-shadow:0 0 12px rgba(245,158,11,0.35);font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span id="btn-update-banner-text">Reiniciar para Actualizar</span>
+          </button>
+        </div>
+
         <!-- Semáforo Zen Central -->
         <div class="zen-hero">
           <div>

@@ -2,6 +2,7 @@ import { AgentSystemInfo } from '@erp-bridge/shared';
 import { AgentLicenseStatus } from '../license/license.types';
 import { AgentFactusolSettings, AgentWooCommerceSettings, AgentUniversalBridgeSettings, AgentSyncRules } from '../config/config.types';
 import { SyncHistoryRecord } from '../history/history.types';
+import { UpdateClientState } from '../update/update.types';
 
 export interface LogEvent {
   timestamp: string;
@@ -35,4 +36,5 @@ export interface AgentStatusDetails {
   syncHistory?: SyncHistoryRecord[];
   system: AgentSystemInfo;
   recentEvents: LogEvent[];
+  update?: UpdateClientState;
 }

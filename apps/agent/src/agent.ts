@@ -276,6 +276,7 @@ export class LocalAgent {
       syncHistory: this.historyManager.getSyncHistory(),
       system: SystemInfoService.getSystemInfo(),
       recentEvents: this.eventBus.getRecentEvents(),
+      update: this.getUpdateStatus(),
     };
   }
 

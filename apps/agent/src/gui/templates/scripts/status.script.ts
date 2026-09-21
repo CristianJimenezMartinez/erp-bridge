@@ -97,6 +97,47 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (data.syncHistory) {
         renderHistoryTable(data.syncHistory);
       }
+
+      // Estado de actualización (Botón de cabecera y Banner Zen estilo Google/Antigravity)
+      const upd = data.update;
+      const btnHeader = document.getElementById('btn-update-restart');
+      const btnHeaderText = document.getElementById('btn-update-text');
+      const bannerOverview = document.getElementById('overview-update-banner');
+      const bannerTitle = document.getElementById('update-banner-title');
+      const bannerDesc = document.getElementById('update-banner-desc');
+      const bannerBtnText = document.getElementById('btn-update-banner-text');
+
+      if (upd && (upd.status === 'ready' || upd.status === 'available' || upd.status === 'downloading' || upd.pendingUpdate)) {
+        const targetVer = upd.pendingUpdate ? ('v' + upd.pendingUpdate.version) : '';
+        let btnLabel = 'Actualizar ' + targetVer;
+        let bannerText = 'Hay una nueva versión disponible para instalar.';
+
+        if (upd.status === 'ready') {
+          btnLabel = 'Reiniciar para actualizar ' + targetVer;
+          bannerText = 'La actualización ' + targetVer + ' está lista. Haz clic para reiniciar y aplicar.';
+        } else if (upd.status === 'downloading') {
+          const pct = upd.downloadProgress ? (upd.downloadProgress.percentage || 0) : 0;
+          btnLabel = 'Descargando ' + targetVer + ' (' + pct + '%)...';
+          bannerText = 'Descargando nueva versión en segundo plano (' + pct + '%)...';
+        } else if (upd.status === 'applying') {
+          btnLabel = 'Aplicando actualización...';
+          bannerText = 'Instalando actualización y reiniciando el servicio...';
+        }
+
+        if (btnHeader) {
+          btnHeader.style.display = 'inline-flex';
+          if (btnHeaderText) btnHeaderText.textContent = btnLabel;
+        }
+        if (bannerOverview) {
+          bannerOverview.style.display = 'flex';
+          if (bannerTitle) bannerTitle.textContent = 'Actualización ' + targetVer + ' disponible';
+          if (bannerDesc) bannerDesc.textContent = bannerText;
+          if (bannerBtnText) bannerBtnText.textContent = btnLabel;
+        }
+      } else {
+        if (btnHeader) btnHeader.style.display = 'none';
+        if (bannerOverview) bannerOverview.style.display = 'none';
+      }
     }
 
     // Inicializar inputs del formulario de forma defensiva para que el sondeo cada 3s no sobreescriba cambios del usuario
@@ -217,6 +258,89 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         window.__formInputsInitialized = true;
+      }
+    }
+
+    let isUpdatingInProgress = false;
+
+    async function triggerRestartUpdate() {
+      if (isUpdatingInProgress) return;
+      if (!confirm('¿Deseas aplicar la actualización y reiniciar Bentian Agent ahora?')) {
+        return;
+      }
+      isUpdatingInProgress = true;
+      const btnHeader = document.getElementById('btn-update-restart');
+      const btnHeaderText = document.getElementById('btn-update-text');
+      const bannerBtn = document.getElementById('btn-update-banner-action');
+      const bannerBtnText = document.getElementById('btn-update-banner-text');
+
+      if (btnHeader) btnHeader.disabled = true;
+      if (bannerBtn) bannerBtn.disabled = true;
+      if (btnHeaderText) btnHeaderText.textContent = 'Actualizando y reiniciando...';
+      if (bannerBtnText) bannerBtnText.textContent = 'Actualizando y reiniciando...';
+
+      showToast('Iniciando proceso de actualización y reinicio...', 'info');
+
+      try {
+        const res = await fetch('/api/local/apply-update', { method: 'POST' });
+        const result = await res.json();
+        if (!res.ok || (result && result.success === false)) {
+          showToast((result && result.message) || 'No se pudo iniciar la actualización', 'error');
+          isUpdatingInProgress = false;
+          if (btnHeader) btnHeader.disabled = false;
+          if (bannerBtn) bannerBtn.disabled = false;
+          return;
+        }
+
+        showToast('Actualización en curso. El agente se reiniciará en breves momentos...', 'success');
+
+        // Polling para reconexión y recarga automática
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          attempts++;
+          try {
+            const check = await fetch('/api/local/status');
+            if (check.ok) {
+              clearInterval(interval);
+              showToast('¡Bentian Agent actualizado y reiniciado con éxito!', 'success');
+              setTimeout(() => {
+                window.location.reload();
+              }, 1200);
+            }
+          } catch (e) {
+            if (attempts > 60) {
+              clearInterval(interval);
+              showToast('El agente está tardando en responder. Por favor, recarga la página.', 'warning');
+            }
+          }
+        }, 1500);
+
+      } catch (err) {
+        showToast('Error de conexión con el agente: ' + err.message, 'error');
+        isUpdatingInProgress = false;
+        if (btnHeader) btnHeader.disabled = false;
+        if (bannerBtn) bannerBtn.disabled = false;
+      }
+    }
+
+    async function manualCheckUpdate() {
+      const btn = document.getElementById('btn-check-updates');
+      if (btn) btn.disabled = true;
+      showToast('Comprobando actualizaciones en el servidor central...', 'info');
+      try {
+        const res = await fetch('/api/local/check-update', { method: 'POST' });
+        const data = await res.json();
+        if (data && (data.available || (data.checkResult && data.checkResult.available))) {
+          const ver = data.version || (data.checkResult && data.checkResult.version) || '';
+          showToast('¡Nueva versión ' + (ver ? 'v' + ver : '') + ' detectada! Iniciando descarga...', 'success');
+          await fetchStatus(true);
+        } else {
+          showToast('Bentian Agent ya está actualizado a la última versión disponible.', 'info');
+        }
+      } catch (err) {
+        showToast('Error al comprobar actualizaciones: ' + err.message, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
       }
     }
   `;
