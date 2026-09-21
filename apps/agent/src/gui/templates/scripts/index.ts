@@ -19,9 +19,10 @@ export function renderClientScript(agentVersion: string = '0.2.0'): string {
     syncScript,
     logsScript,
     wizardScript,
-    '    // Inicializar',
+    '    // Inicializar sondeo con protección de timer único',
+    '    if (window.__statusPollInterval) clearInterval(window.__statusPollInterval);',
     '    fetchStatus();',
-    '    setInterval(fetchStatus, 3000);',
+    '    window.__statusPollInterval = setInterval(fetchStatus, 3000);',
     '  </script>',
   ].join('\n');
 }

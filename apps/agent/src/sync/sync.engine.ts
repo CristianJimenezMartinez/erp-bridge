@@ -51,6 +51,8 @@ export class LocalSyncEngine {
     if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
       clean = 'https://' + clean;
     }
+    // Blindaje de red: forzar www. en suministrosrubio.com para evitar redirecciones 301 que vacíen peticiones POST
+    clean = clean.replace(/^(https?:\/\/)(?:www\.)?suministrosrubio\.com(\/|$)/i, '$1www.suministrosrubio.com$2');
     clean = clean.replace(/\/+$/, '');
     if (!clean.endsWith('.php')) {
       clean += '/erp-bridge-endpoint.php';
@@ -69,7 +71,20 @@ export class LocalSyncEngine {
   }
 
   public async triggerManualSync(): Promise<SyncManualResult> {
+    if (this.isSyncing) {
+      this.logger.warn('Intento de sincronización ignorado: ya existe un ciclo en ejecución.');
+      return { success: false, message: 'Ya hay un proceso de sincronización en ejecución.' };
+    }
+    this.isSyncing = true;
     const start = Date.now();
+    try {
+      return await this.executeManualSync(start);
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
+  private async executeManualSync(start: number): Promise<SyncManualResult> {
     this.eventBus.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
     let itemsUpdated = 0;
     let ordersImported = 0;
@@ -402,12 +417,9 @@ export class LocalSyncEngine {
       }
 
       try {
-        this.isSyncing = true;
         await this.triggerManualSync();
       } catch (err) {
         this.logger.warn(`Aviso en sincronización periódica: ${String(err)}`);
-      } finally {
-        this.isSyncing = false;
       }
     };
 

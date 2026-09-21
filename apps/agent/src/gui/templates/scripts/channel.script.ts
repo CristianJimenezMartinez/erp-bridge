@@ -119,14 +119,16 @@ export const channelScript = `
       await submitConfigUpdates(payload, 'Reglas de automatización guardadas.');
     }
 
-    async function loadAutoStart() {
+    async function loadAutoStart(force) {
+      if (window.__autoStartLoaded && !force) return;
       try {
         const res = await fetch('/api/local/autostart');
         const data = await res.json();
         const chk = document.getElementById('check-autostart-enabled');
-        if (chk && data && typeof data.enabled === 'boolean') {
+        if (chk && data && typeof data.enabled === 'boolean' && (force || document.activeElement !== chk)) {
           chk.checked = data.enabled;
         }
+        window.__autoStartLoaded = true;
       } catch (e) {}
     }
 

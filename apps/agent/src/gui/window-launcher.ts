@@ -153,6 +153,7 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
       '$d.CheckFileExists = $true;',
       '$d.RestoreDirectory = $true;',
       'if ($d.ShowDialog($f) -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) };',
+      '$d.Dispose();',
       '$f.Dispose();'
     ].join(' ');
 

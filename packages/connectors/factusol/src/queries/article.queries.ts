@@ -129,8 +129,8 @@ export const FACTUSOL_QUERIES = {
     const safeTarifa = sanitizeAndTruncate(tarifaCode ?? '1', 5) || '1';
     const isNumeric = /^\d+$/.test(safeTarifa);
     const tarifaCondition = isNumeric
-      ? `(TARLTA = ${safeTarifa} OR CStr(TARLTA) = '${safeTarifa}')`
-      : `CStr(TARLTA) = '${safeTarifa}'`;
+      ? `(TARLTA = ${safeTarifa} OR CStr('' & TARLTA) = '${safeTarifa}')`
+      : `CStr('' & TARLTA) = '${safeTarifa}'`;
 
     const skuClause =
       skus && skus.length > 0

@@ -124,38 +124,23 @@ export class ConfigManager {
     const exeConfigPath = path.join(exeDir, 'agent-config.json');
     const cwdConfigPath = path.join(process.cwd(), 'agent-config.json');
 
-    const isProgramFiles = /Program Files/i.test(exeDir) || /Windows/i.test(exeDir);
     const isPortable = fs.existsSync(path.join(exeDir, '.portable'));
 
     if (isPortable) {
       return { primaryPath: exeConfigPath, secondaryPath: userConfigPath };
     }
 
-    if (!isProgramFiles && ConfigManager.isDirWritable(exeDir)) {
-      if (fs.existsSync(userConfigPath)) {
-        return { primaryPath: userConfigPath, secondaryPath: exeConfigPath };
-      }
-      return { primaryPath: exeConfigPath, secondaryPath: userConfigPath };
-    }
+    // Instalación estándar en Windows / Producción:
+    // La ubicación primaria SIEMPRE debe ser AppData (100% escribible sin permisos de administrador).
+    // Las rutas de exe o cwd solo se utilizan como secundaria para migración inicial si existían previamente.
+    const secondaryCandidate = fs.existsSync(exeConfigPath) && exeConfigPath !== userConfigPath
+      ? exeConfigPath
+      : (fs.existsSync(cwdConfigPath) && cwdConfigPath !== userConfigPath ? cwdConfigPath : undefined);
 
-    // Instalación normal en Windows (C:\Program Files\Bentian Agent):
-    // La ubicación primaria SIEMPRE debe ser AppData (100% escribible sin permisos de administrador)
     return {
       primaryPath: userConfigPath,
-      secondaryPath: fs.existsSync(exeConfigPath) ? exeConfigPath : (fs.existsSync(cwdConfigPath) ? cwdConfigPath : undefined)
+      secondaryPath: secondaryCandidate
     };
-  }
-
-  private static isDirWritable(dir: string): boolean {
-    try {
-      if (!fs.existsSync(dir)) return false;
-      const testFile = path.join(dir, `.bentian-test-${Date.now()}.tmp`);
-      fs.writeFileSync(testFile, 'test', 'utf8');
-      fs.unlinkSync(testFile);
-      return true;
-    } catch {
-      return false;
-    }
   }
 
   public get(): AgentConfigFile {
@@ -258,34 +243,48 @@ export class ConfigManager {
   }
 
   public saveConfigToDisk(): { success: boolean; filePath: string; error?: string } {
+    let tempFile: string | null = null;
     try {
       const dir = path.dirname(this.configFilePath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
 
-      const tempFile = `${this.configFilePath}.tmp.${Date.now()}`;
+      tempFile = `${this.configFilePath}.tmp.${Date.now()}`;
       const content = JSON.stringify(this.config, null, 2);
       fs.writeFileSync(tempFile, content, 'utf8');
 
-      if (fs.existsSync(this.configFilePath)) {
+      // Reemplazo atómico seguro en Windows con reintentos para bloqueos transitorios
+      let replaced = false;
+      for (let attempt = 0; attempt < 3; attempt++) {
         try {
-          fs.unlinkSync(this.configFilePath);
-        } catch {}
+          if (fs.existsSync(this.configFilePath)) {
+            try {
+              fs.unlinkSync(this.configFilePath);
+            } catch {}
+          }
+          fs.renameSync(tempFile, this.configFilePath);
+          replaced = true;
+          break;
+        } catch {
+          const delay = (attempt + 1) * 30;
+          const end = Date.now() + delay;
+          while (Date.now() < end) {}
+        }
       }
-      fs.renameSync(tempFile, this.configFilePath);
+
+      // Si renameSync falló tras reintentos por bloqueo persistente de Windows, copiar contenido
+      if (!replaced) {
+        fs.copyFileSync(tempFile, this.configFilePath);
+        try { fs.unlinkSync(tempFile); } catch {}
+      }
 
       this.logger.info(`✓ Configuración guardada en disco: ${this.configFilePath}`);
-
-      // Intentar espejo en la ubicación secundaria si es escribible
-      if (this.secondaryConfigFilePath && this.secondaryConfigFilePath !== this.configFilePath) {
-        try {
-          fs.writeFileSync(this.secondaryConfigFilePath, content, 'utf8');
-        } catch {}
-      }
-
       return { success: true, filePath: this.configFilePath };
     } catch (err) {
+      if (tempFile && fs.existsSync(tempFile)) {
+        try { fs.unlinkSync(tempFile); } catch {}
+      }
       const msg = `Error al persistir configuración en ${this.configFilePath}: ${String(err)}`;
       this.logger.error(msg);
       return { success: false, filePath: this.configFilePath, error: String(err) };

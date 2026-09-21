@@ -18,6 +18,8 @@ export class UniversalBridgeTester {
     if (!parsedUrl.startsWith('http://') && !parsedUrl.startsWith('https://')) {
       parsedUrl = 'https://' + parsedUrl;
     }
+    // Blindaje de red: forzar www. en suministrosrubio.com para evitar redirecciones 301
+    parsedUrl = parsedUrl.replace(/^(https?:\/\/)(?:www\.)?suministrosrubio\.com(\/|$)/i, '$1www.suministrosrubio.com$2');
     const cleanBaseUrl = parsedUrl.replace(/\/+$/, '');
 
     const checks = {

@@ -24,10 +24,10 @@ const filteredStockQuery = FACTUSOL_QUERIES.getStock(['A001', 'B002']);
 assert(filteredStockQuery.includes("WHERE ARTSTO IN ('A001', 'B002')"), 'Filtered getStock must include WHERE ARTSTO IN');
 
 const numericPriceQuery = FACTUSOL_QUERIES.getPrices('1');
-assert(numericPriceQuery.includes("(TARLTA = 1 OR CStr(TARLTA) = '1')"), 'Numeric tariff must include dual format');
+assert(numericPriceQuery.includes("(TARLTA = 1 OR CStr('' & TARLTA) = '1')"), 'Numeric tariff must include dual format');
 
 const alphaPriceQuery = FACTUSOL_QUERIES.getPrices('WEB', ['A001', 'B002']);
-assert(alphaPriceQuery.includes("CStr(TARLTA) = 'WEB'"), 'Alphanumeric tariff must use CStr');
+assert(alphaPriceQuery.includes("CStr('' & TARLTA) = 'WEB'"), 'Alphanumeric tariff must use CStr with null protection');
 assert(alphaPriceQuery.includes("AND ARTLTA IN ('A001', 'B002')"), 'Tariff query must include SKU filter');
 
 // 2. Test Stock Mapper

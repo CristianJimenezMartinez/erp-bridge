@@ -26,10 +26,17 @@ export const factusolScript = `
     let explorerCurrentPath = '';
     let explorerParentPath = null;
 
+    let isOpeningNativeDialog = false;
     async function openNativeWindowsDialog(isWizard) {
+      if (isOpeningNativeDialog) return;
+      isOpeningNativeDialog = true;
       if (typeof isWizard !== 'undefined') {
         explorerIsWizard = !!isWizard;
       }
+      const btnNative = document.getElementById('btn-browse-native');
+      const btnWizNative = document.getElementById('wiz-btn-browse-native');
+      if (btnNative) btnNative.disabled = true;
+      if (btnWizNative) btnWizNative.disabled = true;
       showToast('Abriendo selector de archivos de Windows...', 'info');
       try {
         const res = await fetch('/api/local/open-file-dialog', {
@@ -71,6 +78,10 @@ export const factusolScript = `
         }
       } catch (err) {
         console.warn('Selector de archivos de Windows cancelado o cerrado:', err);
+      } finally {
+        isOpeningNativeDialog = false;
+        if (btnNative) btnNative.disabled = false;
+        if (btnWizNative) btnWizNative.disabled = false;
       }
     }
 
@@ -391,7 +402,9 @@ export const factusolScript = `
         if (data.tariffs && data.tariffs.length > 0) {
           const sel = document.getElementById('select-factusol-tariff');
           if (sel) {
+            const currentTariff = sel.value;
             sel.innerHTML = data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+            if (currentTariff) sel.value = currentTariff;
           }
           const saleSel = document.getElementById('select-factusol-sale-tariff');
           if (saleSel) {
@@ -403,7 +416,11 @@ export const factusolScript = `
         }
         if (data.warehouses && data.warehouses.length > 0) {
           const sel = document.getElementById('select-factusol-warehouse');
-          sel.innerHTML = data.warehouses.map(function(w) { return '<option value="' + w.code + '">' + w.name + '</option>'; }).join('');
+          if (sel) {
+            const currentWh = sel.value;
+            sel.innerHTML = data.warehouses.map(function(w) { return '<option value="' + w.code + '">' + w.name + '</option>'; }).join('');
+            if (currentWh) sel.value = currentWh;
+          }
         }
       } catch (e) {}
     }

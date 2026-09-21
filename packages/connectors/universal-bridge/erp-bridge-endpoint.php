@@ -729,7 +729,7 @@ ensureTablesExist($pdo);
 $rawBody = file_get_contents('php://input');
 $data = json_decode($rawBody, true) ?: [];
 
-if ($mainAction === 'push_catalog') {
+if ($mainAction === 'push_catalog' || $mainAction === 'sync_catalog') {
     $products = isset($data['products']) && is_array($data['products']) ? $data['products'] : [];
     if (empty($products)) {
         echo json_encode(['success' => true, 'count' => 0, 'message' => 'No se enviaron productos']);
@@ -870,7 +870,7 @@ if ($mainAction === 'push_stock') {
 // ----------------------------------------------------------------------------
 // ACCIÓN PROTEGIDA: PULL_ORDERS (Descarga de pedidos hacia Factusol)
 // ----------------------------------------------------------------------------
-if ($mainAction === 'pull_orders') {
+if ($mainAction === 'pull_orders' || $mainAction === 'get_orders') {
     $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 50;
     $stmt = $pdo->prepare("SELECT * FROM `eb_orders` WHERE `status` = 'PENDING' ORDER BY `id` ASC LIMIT :lim");
     $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);

@@ -9,7 +9,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         renderStatus(currentStatus);
         updateFormInputs(currentStatus, forceFormSync);
         if (typeof loadAutoStart === 'function') {
-          loadAutoStart();
+          loadAutoStart(forceFormSync);
         }
       } catch (err) {
         console.warn('Servidor local:', err); // quality-allow-console (browser template script)
