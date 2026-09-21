@@ -22,33 +22,6 @@ export class SystemController {
     };
   }
 
-  public static saveConfig(agent: LocalAgent): RouteHandler {
-    return async (_req, res, ctx) => {
-      const body = ctx.body;
-      let success = true;
-      let message = 'Configuración actualizada con éxito.';
-
-      if (body.factusolDbPath) {
-        const rec = await agent.reconnectFactusol(body.factusolDbPath);
-        if (!rec.success) {
-          success = false;
-          message = rec.message;
-        }
-      }
-
-      if (body.licenseKey) {
-        const licRes = await agent.activateLicense(body.licenseKey);
-        if (!licRes.success) {
-          success = false;
-          message = `Error en licencia: ${licRes.error}`;
-        }
-      }
-
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success, message }));
-    };
-  }
-
   public static openWindow(getUrl: () => string): RouteHandler {
     return (_req, res) => {
       logger.info('Solicitud de apertura de ventana recibida desde System Tray o CLI.');

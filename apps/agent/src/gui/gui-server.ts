@@ -42,9 +42,7 @@ export class LocalGuiServer {
     router.get('/api/local/export-diagnostic', StatusController.exportDiagnostic(this.agent));
 
     // 3. Factusol
-    router.post('/api/local/browse-factusol', FactusolController.browseFactusol());
     router.any(['GET', 'POST'], '/api/local/open-file-dialog', FactusolController.openNativeFileDialog());
-    router.any(['GET', 'POST'], '/api/local/fs/browse', FactusolController.browseDirectory(this.agent));
     router.post('/api/local/detect-factusol', FactusolController.detectFactusol(this.agent));
     router.post('/api/local/test-factusol', FactusolController.testFactusol(this.agent));
     router.get('/api/local/factusol/metadata', FactusolController.getMetadata(this.agent));
@@ -68,7 +66,6 @@ export class LocalGuiServer {
     router.get('/api/local/autostart', SystemController.getAutoStart(this.agent));
     router.post('/api/local/autostart', SystemController.setAutoStart(this.agent));
     router.post('/api/local/save-full-config', SystemController.saveFullConfig(this.agent));
-    router.post('/api/local/save-config', SystemController.saveConfig(this.agent));
     router.any(['GET', 'POST'], '/api/local/check-update', SystemController.checkUpdate(this.agent));
     router.post('/api/local/apply-update', SystemController.applyUpdate(this.agent));
     router.any(['GET', 'POST'], '/api/local/open-window', SystemController.openWindow(() => this.getUrl()));

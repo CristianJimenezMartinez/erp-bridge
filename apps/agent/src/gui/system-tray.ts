@@ -40,7 +40,9 @@ export class SystemTrayManager {
 
       if (fs.existsSync(sourcePath)) {
         const targetExe = path.join(path.dirname(sourcePath), 'BentianTray.exe');
-        const iconPath = path.resolve(process.cwd(), 'apps', 'dashboard', 'src-tauri', 'icons', 'icon.ico');
+        const iconCandidate1 = path.resolve(__dirname, 'assets', 'icon.ico');
+        const iconCandidate2 = path.resolve(process.cwd(), 'apps', 'agent', 'src', 'gui', 'assets', 'icon.ico');
+        const iconPath = fs.existsSync(iconCandidate1) ? iconCandidate1 : iconCandidate2;
         const iconFlag = fs.existsSync(iconPath) ? `/win32icon:"${iconPath}"` : '';
 
         try {

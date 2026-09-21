@@ -2,7 +2,7 @@ let Client;
 try {
   Client = require('ssh2').Client;
 } catch {
-  Client = require('C:/Users/Cayse/.gemini/antigravity/brain/6758f875-863d-413c-ab60-e8933d2aff32/scratch/node_modules/ssh2').Client;
+  // ssh2 se verificará al ejecutar si no está presente
 }
 
 const fs = require('fs');

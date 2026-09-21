@@ -1,4 +1,9 @@
-const { Client } = require('C:/Users/Cayse/.gemini/antigravity/brain/6758f875-863d-413c-ab60-e8933d2aff32/scratch/node_modules/ssh2');
+let Client;
+try {
+  Client = require('ssh2').Client;
+} catch {
+  // ssh2 no instalado
+}
 
 const os = require('os');
 const fs = require('fs');

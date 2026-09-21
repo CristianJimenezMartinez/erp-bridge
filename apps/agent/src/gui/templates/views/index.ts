@@ -8,5 +8,4 @@ export { renderHistoryTab } from './history.view';
 export { renderLogsTab } from './logs.view';
 export { renderLicenseTab } from './license.view';
 export { renderWizardModal } from './wizard.view';
-export { renderExplorerModal } from './explorer.view';
 export { renderToast } from './toast.view';
