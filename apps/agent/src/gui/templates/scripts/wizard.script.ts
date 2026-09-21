@@ -134,6 +134,12 @@ export const wizardScript = `
       }
     }
 
+    async function wizTestFactusolConnection() {
+      if (typeof testFactusolConnection === 'function') {
+        await testFactusolConnection('wiz-input-fact-path', 'wiz-fact-alert');
+      }
+    }
+
     async function finishWizardAndStart() {
       // Guardar todo
       const payload = {

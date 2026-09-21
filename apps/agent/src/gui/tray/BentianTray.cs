@@ -35,17 +35,30 @@ namespace Bentian.Tray
         {
             if (args.Length > 0 && args[0] == "--open-file-dialog")
             {
+                try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                using (var dialog = new OpenFileDialog())
+                using (var owner = new Form())
                 {
-                    dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
-                    dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
-                    dialog.CheckFileExists = true;
-                    dialog.RestoreDirectory = true;
-                    if (dialog.ShowDialog() == DialogResult.OK)
+                    owner.TopMost = true;
+                    owner.StartPosition = FormStartPosition.Manual;
+                    owner.Location = new Point(-32000, -32000);
+                    owner.Size = new Size(1, 1);
+                    owner.ShowInTaskbar = false;
+                    owner.Show();
+                    owner.BringToFront();
+                    owner.Activate();
+
+                    using (var dialog = new OpenFileDialog())
                     {
-                        Console.WriteLine(dialog.FileName);
+                        dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
+                        dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
+                        dialog.CheckFileExists = true;
+                        dialog.RestoreDirectory = true;
+                        if (dialog.ShowDialog(owner) == DialogResult.OK)
+                        {
+                            Console.WriteLine(dialog.FileName);
+                        }
                     }
                 }
                 return;

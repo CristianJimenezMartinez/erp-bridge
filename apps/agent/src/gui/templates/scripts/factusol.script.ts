@@ -30,7 +30,7 @@ export const factusolScript = `
       if (typeof isWizard !== 'undefined') {
         explorerIsWizard = !!isWizard;
       }
-      showToast('Abriendo ventana clásica de Windows...', 'info');
+      showToast('Abriendo selector de archivos de Windows...', 'info');
       try {
         const res = await fetch('/api/local/open-file-dialog', {
           method: 'POST',
@@ -47,19 +47,35 @@ export const factusolScript = `
             targetInput.dispatchEvent(new Event('change', { bubbles: true }));
             handleFactusolInputBlur(targetInput.id);
           }
+          // Sincronizar el otro input si está en el DOM
+          const otherInput = explorerIsWizard
+            ? document.getElementById('input-factusol-db')
+            : document.getElementById('wiz-input-fact-path');
+          if (otherInput) {
+            otherInput.value = data.filePath;
+          }
+
           closeExplorerModal();
           showToast('Base de datos seleccionada: ' + data.filePath, 'success');
-        } else if (!data.cancelled) {
-          showToast(data.message || 'No se seleccionó ningún archivo', 'info');
+
+          // Disparar comprobación de conexión inmediata
+          if (explorerIsWizard) {
+            await testFactusolConnection('wiz-input-fact-path', 'wiz-fact-alert');
+          } else {
+            await testFactusolConnection('input-factusol-db', 'fact-test-alert');
+          }
+        } else if (data.cancelled) {
+          // Si el usuario cancela o cierra con la cruz, no hacer nada ni mostrar error
+        } else if (data.message) {
+          showToast(data.message, 'info');
         }
       } catch (err) {
-        showToast('Error al invocar la ventana de Windows', 'error');
+        console.warn('Selector de archivos de Windows cancelado o cerrado:', err);
       }
     }
 
     function browseFactusol(isWizard) {
-      explorerIsWizard = !!isWizard;
-      openExplorerModal();
+      openNativeWindowsDialog(isWizard);
     }
 
     function openExplorerModal() {
@@ -211,8 +227,12 @@ export const factusolScript = `
           const targetInput = isWizard ? document.getElementById('wiz-input-fact-path') : document.getElementById('input-factusol-db');
           if (!targetInput.value.trim() && data.instances[0]) {
             targetInput.value = data.instances[0].databasePath;
-            if (!isWizard) {
-              await testFactusolConnection();
+            const otherInput = isWizard ? document.getElementById('input-factusol-db') : document.getElementById('wiz-input-fact-path');
+            if (otherInput) otherInput.value = data.instances[0].databasePath;
+            if (isWizard) {
+              await testFactusolConnection('wiz-input-fact-path', 'wiz-fact-alert');
+            } else {
+              await testFactusolConnection('input-factusol-db', 'fact-test-alert');
             }
           }
           showToast('✓ Se encontraron ' + data.instances.length + ' bases de datos Factusol', 'success');
@@ -223,10 +243,10 @@ export const factusolScript = `
               '<strong>⚠️ No se detectó Factusol en las carpetas por defecto:</strong>' +
               '<div style="color: var(--text-muted); margin-top: 4px;">' +
                 'Se buscaron archivos en las carpetas habituales (<code>C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\...</code>), pero no se detectaron instalaciones estándar.<br>' +
-                'Si tienes tu empresa en otra carpeta, disco de red o pendrive, pulsa en <strong>📁 Examinar mi PC</strong> para seleccionarla directamente.' +
+                'Si tienes tu empresa en otra carpeta, disco de red o pendrive, pulsa en <strong>📁 Examinar en Windows</strong> para seleccionarla directamente.' +
               '</div>' +
             '</div>';
-          showToast('No se encontró Factusol en rutas habituales. Usa "Examinar mi PC".', 'warn');
+          showToast('No se encontró Factusol en rutas habituales. Usa "Examinar en Windows".', 'warn');
         }
       } catch (err) {
         showToast('Error al escanear discos', 'error');
@@ -240,28 +260,38 @@ export const factusolScript = `
 
     function selectFactusolInstance(dbPath, isWizard) {
       const targetInput = isWizard ? document.getElementById('wiz-input-fact-path') : document.getElementById('input-factusol-db');
-      targetInput.value = dbPath;
+      if (targetInput) targetInput.value = dbPath;
+      const otherInput = isWizard ? document.getElementById('input-factusol-db') : document.getElementById('wiz-input-fact-path');
+      if (otherInput) otherInput.value = dbPath;
+
       if (isWizard) {
-        document.getElementById('wiz-fact-detected-box').style.display = 'none';
-        const alertBox = document.getElementById('wiz-fact-alert');
-        alertBox.style.display = 'block';
-        alertBox.style.color = '#34d399';
-        alertBox.textContent = '✓ Base de datos seleccionada';
+        const box = document.getElementById('wiz-fact-detected-box');
+        if (box) box.style.display = 'none';
+        testFactusolConnection('wiz-input-fact-path', 'wiz-fact-alert');
       } else {
-        document.getElementById('factusol-detected-box').style.display = 'none';
-        testFactusolConnection();
+        const box = document.getElementById('factusol-detected-box');
+        if (box) box.style.display = 'none';
+        testFactusolConnection('input-factusol-db', 'fact-test-alert');
       }
     }
 
-    async function testFactusolConnection() {
-      const dbPath = document.getElementById('input-factusol-db').value.trim();
-      const alertBox = document.getElementById('fact-test-alert');
-      const btn = document.getElementById('btn-test-fact');
+    async function testFactusolConnection(inputId, alertId) {
+      inputId = inputId || 'input-factusol-db';
+      alertId = alertId || 'fact-test-alert';
+      const inputEl = document.getElementById(inputId);
+      const dbPath = inputEl ? inputEl.value.trim() : '';
+      const alertBox = document.getElementById(alertId);
+      const btn = inputId === 'input-factusol-db' ? document.getElementById('btn-test-fact') : null;
       if (!dbPath) {
         showToast('Selecciona la ruta de tu Factusol', 'warn');
         return;
       }
-      btn.disabled = true;
+      if (btn) btn.disabled = true;
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.color = 'var(--text-muted)';
+        alertBox.textContent = 'Comprobando conexión con Factusol...';
+      }
       try {
         const res = await fetch('/api/local/test-factusol', {
           method: 'POST',
@@ -269,23 +299,29 @@ export const factusolScript = `
           body: JSON.stringify({ databasePath: dbPath })
         });
         const data = await res.json();
-        alertBox.style.display = 'block';
-        if (data.success) {
-          alertBox.style.color = '#34d399';
-          alertBox.textContent = '✓ ' + data.message;
-          showToast('Conexión con Factusol exitosa');
-          loadArticlePreview();
-        } else {
-          alertBox.style.color = '#f87171';
-          alertBox.textContent = '✕ ' + data.message;
-          showToast('Error conectando con Factusol', 'error');
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          if (data.success) {
+            alertBox.style.color = '#34d399';
+            alertBox.textContent = '✓ ' + data.message;
+            showToast('Conexión con Factusol exitosa');
+            if (typeof loadArticlePreview === 'function') {
+              loadArticlePreview();
+            }
+          } else {
+            alertBox.style.color = '#f87171';
+            alertBox.textContent = '✕ ' + data.message;
+            showToast('Error conectando con Factusol', 'error');
+          }
         }
       } catch (err) {
-        alertBox.style.display = 'block';
-        alertBox.style.color = '#f87171';
-        alertBox.textContent = 'Error al comunicar con Factusol';
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.style.color = '#f87171';
+          alertBox.textContent = 'Error al comunicar con Factusol';
+        }
       } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
       }
     }
 

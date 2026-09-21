@@ -41,15 +41,13 @@ export function renderWizardModal(): string {
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Selecciona la base de datos de tu empresa. El conector la detectará automáticamente.</p>
           
           <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-primary" style="flex: 1;">
+            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-secondary" style="flex: 1;">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <span>🔍 Buscar mi Factusol Automáticamente</span>
+              <span>🔍 Auto-detectar Factusol</span>
             </button>
-            <button onclick="browseFactusol(true)" id="wiz-btn-browse-fact" class="btn btn-secondary">
-              <span>📁 Examinar Carpetas</span>
-            </button>
-            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none;" title="Abre el explorador de Windows estándar para buscar en la Red o NAS">
-              <span>🌐 Red / NAS</span>
+            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+              <span>📁 Examinar en Windows (Local / Red / NAS)</span>
             </button>
           </div>
 
@@ -59,7 +57,7 @@ export function renderWizardModal(): string {
 
           <div class="form-group">
             <label class="form-label">Ruta seleccionada:</label>
-            <input type="text" id="wiz-input-fact-path" onblur="handleFactusolInputBlur('wiz-input-fact-path')" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
+            <input type="text" id="wiz-input-fact-path" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
         </div>

@@ -87,6 +87,18 @@ export function openDesktopWindow(url: string): boolean {
  * Permite examinar la Red, unidades asignadas y rutas UNC hacia el NAS (ej: \\NAS\...).
  */
 export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factusol (Local o NAS)', filter = 'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb'): string {
+  // Soporte de mock para pruebas automatizadas y CI/CD
+  if (process.env['BENTIAN_MOCK_FILE_DIALOG'] !== undefined) {
+    const mockVal = process.env['BENTIAN_MOCK_FILE_DIALOG'];
+    logger.info(`[MOCK/TEST] openWindowsFileDialog simulado: ${mockVal || '(CANCEL)'}`);
+    return mockVal === 'CANCEL' ? '' : mockVal;
+  }
+
+  if (process.env['HEADLESS'] === 'true') {
+    logger.info('[HEADLESS] openWindowsFileDialog ignorado en entorno sin cabeza.');
+    return '';
+  }
+
   if (process.platform !== 'win32') {
     return '';
   }
@@ -99,28 +111,52 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
       path.join(__dirname, 'tray', 'BentianTray.exe'),
       path.join(__dirname, 'BentianTray.exe'),
       path.resolve(process.cwd(), 'builder', 'dist', 'BentianTray.exe'),
+      path.resolve(process.cwd(), 'apps', 'agent', 'src', 'gui', 'tray', 'BentianTray.exe'),
+      path.resolve(process.cwd(), 'apps', 'agent', 'dist', 'gui', 'tray', 'BentianTray.exe'),
     ];
 
     for (const trayExe of trayCandidates) {
       if (fs.existsSync(trayExe)) {
+        logger.info(`Abriendo selector nativo de Windows mediante: ${trayExe}`);
         const output = childProcess.execFileSync(trayExe, ['--open-file-dialog'], {
           encoding: 'utf8',
           timeout: 120000,
           windowsHide: false,
         });
-        if (output && output.trim()) {
-          return output.trim();
-        }
+        // Si el ejecutable se ejecutó sin errores, el diálogo fue mostrado al usuario.
+        // Si seleccionó archivo devolvemos la ruta; si canceló, retornamos cadena vacía
+        // inmediatamente sin caer en el fallback de PowerShell para no abrir una segunda ventana.
+        return output ? output.trim() : '';
       }
     }
   } catch (trayErr) {
-    logger.debug('Aviso al invocar BentianTray dialog:', { err: String(trayErr) });
+    logger.warn('Aviso al invocar BentianTray dialog, usando fallback de PowerShell:', { err: String(trayErr) });
   }
 
-  // 2. Fallback mediante PowerShell nativo en modo STA
+  // 2. Fallback mediante PowerShell nativo en modo STA con ventana TopMost y UTF-8
   try {
-    const psScript = `Add-Type -AssemblyName System.Windows.Forms; $d = New-Object System.Windows.Forms.OpenFileDialog; $d.Title = '${title.replace(/'/g, "''")}'; $d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*'; $d.RestoreDirectory = $true; if ($d.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) }`;
-    const output = childProcess.execSync(`powershell.exe -NoProfile -STA -Command "${psScript}"`, {
+    logger.info('Invocando selector nativo mediante fallback PowerShell (TopMost = true, UTF-8)...');
+    const psScript = [
+      '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8;',
+      'Add-Type -AssemblyName System.Windows.Forms;',
+      '$f = New-Object System.Windows.Forms.Form;',
+      '$f.TopMost = $true;',
+      '$f.StartPosition = "Manual";',
+      '$f.Location = New-Object System.Drawing.Point(-32000, -32000);',
+      '$f.Size = New-Object System.Drawing.Size(1, 1);',
+      '$f.ShowInTaskbar = $false;',
+      '$f.Show();',
+      '$f.BringToFront();',
+      '$d = New-Object System.Windows.Forms.OpenFileDialog;',
+      `$d.Title = '${title.replace(/'/g, "''")}';`,
+      `$d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*';`,
+      '$d.CheckFileExists = $true;',
+      '$d.RestoreDirectory = $true;',
+      'if ($d.ShowDialog($f) -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) };',
+      '$f.Dispose();'
+    ].join(' ');
+
+    const output = childProcess.execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-STA', '-Command', psScript], {
       encoding: 'utf8',
       timeout: 120000,
       windowsHide: false,
@@ -129,7 +165,7 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
       return output.trim();
     }
   } catch (psErr) {
-    logger.warn('Fallo al invocar OpenFileDialog de PowerShell:', { err: String(psErr) });
+    logger.warn('Fallo o timeout al invocar OpenFileDialog de PowerShell:', { err: String(psErr) });
   }
 
   return '';

@@ -12,13 +12,9 @@ export function renderFactusolTab(): string {
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <span>Auto-detectar Factusol</span>
               </button>
-              <button onclick="browseFactusol()" id="btn-browse-fact" class="btn btn-secondary btn-sm">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
-                <span>Examinar Carpetas</span>
-              </button>
-              <button onclick="openNativeWindowsDialog()" id="btn-browse-native" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows donde aparece la Red y el NAS">
+              <button onclick="openNativeWindowsDialog()" id="btn-browse-native" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows donde aparece el equipo, la Red y el NAS">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
-                <span>🌐 Buscar en Red / NAS</span>
+                <span>📁 Examinar en Windows (Local / Red / NAS)</span>
               </button>
             </div>
           </div>
