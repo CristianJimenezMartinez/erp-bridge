@@ -125,11 +125,11 @@
     },
     {
       "id": "connectors.prestashop",
-      "name": "Conector PrestaShop Webservice XML",
-      "status": "STABLE",
+      "name": "Conector PrestaShop Webservice XML (Extensión Experimental)",
+      "status": "EXPERIMENTAL",
       "certifiedAt": "2026-09-21",
       "certifiedCommit": "d82c20a",
-      "description": "Cliente XML para PrestaShop Webservice con soporte de combinaciones, stock y pedidos.",
+      "description": "Extensión experimental: Cliente XML para PrestaShop Webservice con soporte de combinaciones, stock y pedidos para futuras tiendas de clientes.",
       "paths": [
         "packages/connectors/prestashop/src"
       ],
@@ -139,14 +139,45 @@
       ]
     },
     {
+      "id": "connectors.simplygest",
+      "name": "Conector SimplyGest ERP (Extensión Experimental)",
+      "status": "EXPERIMENTAL",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Extensión experimental para integración de artículos, familias y existencias de SimplyGest.",
+      "paths": [
+        "packages/connectors/simplygest/src"
+      ],
+      "publicContract": "packages/connectors/simplygest/src/index.ts",
+      "testSuites": [
+        "packages/connectors/simplygest/test/simplygest-connector.test.ts"
+      ]
+    },
+    {
+      "id": "core.engine.cloud",
+      "name": "Motores de Sincronización Cloud/Linux en Core (Futuros ERPs Cloud)",
+      "status": "EXPERIMENTAL",
+      "certifiedAt": "2026-09-21",
+      "certifiedCommit": "d82c20a",
+      "description": "Motores de sincronización abstractos en Core preservados para futuros ERPs sobre Linux o APIs cloud-to-cloud (Odoo, Holded, SAP). En on-premise Windows/Factusol opera LocalSyncEngine.",
+      "paths": [
+        "packages/core/src/engine"
+      ],
+      "publicContract": "packages/core/src/engine/index.ts",
+      "testSuites": [
+        "packages/core/test/invoice-sync.test.ts"
+      ]
+    },
+    {
       "id": "cloud.api",
-      "name": "API Cloud Central de Bentian (Releases, Licencias, Deadman Switch)",
+      "name": "API Cloud Central de Bentian & Dashboard de Producción",
       "status": "STABLE",
       "certifiedAt": "2026-09-21",
       "certifiedCommit": "d82c20a",
-      "description": "Servidor central Express/PostgreSQL para distribución de releases, verificación de firmas Ed25519, validación de licencias y monitorización de flota.",
+      "description": "Servidor central Express/PostgreSQL y Dashboard oficial (apps/api/public/dashboard) para distribución de releases, verificación de firmas Ed25519, validación de licencias y monitorización de flota.",
       "paths": [
-        "apps/api/src"
+        "apps/api/src",
+        "apps/api/public/dashboard"
       ],
       "publicContract": "apps/api/src/server.ts",
       "testSuites": [

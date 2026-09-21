@@ -50,7 +50,29 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 
 ---
 
-## 3. Protocolo para Extender Módulos Congelados
+## 3. Módulos Estables de Producción y Dashboard Canónico
+
+* **`cloud.api` + Dashboard Oficial (`apps/api/src` + `apps/api/public/dashboard`):**  
+  Panel web maestro en producción (HTML5 + Tailwind + Vanilla JS) para monitorización en vivo de flota de agentes, resolución de mudanzas de PC (`unbind`), administración de licencias y pasarela de facturación Stripe.
+* **`agent.gui` (`apps/agent/src/gui`):**  
+  Servidor web local (puerto 39281) con interfaz responsive y bandeja nativa C# (`BentianTray.exe`).
+* **`connectors.woocommerce` (`packages/connectors/woocommerce`):**  
+  Conector REST API certificado contra WooCommerce v3.
+
+---
+
+## 4. Estrategia de Motores de Sincronización y Extensiones
+
+* **Dualidad de Motores de Sincronización:**
+  1. **`LocalSyncEngine` (`apps/agent/src/sync/sync.engine.ts`):** Motor de producción exclusivo para puestos de clientes en Windows. Interactúa directamente con el driver OLEDB 32 bits de Factusol (`F_ART`, `F_STO`, `F_PCL`), observador reactivo de archivos (`AccdbFileWatcher`) y el conector universal web.
+  2. **Motores de Sincronización en Core (`packages/core/src/engine`):** Preservados como la infraestructura base desacoplada para futuros ERPs sobre Linux o APIs cloud-to-cloud (Odoo, Holded, SAP).
+* **Conectores como Extensiones Experimentales:**
+  - **`connectors.prestashop` (`packages/connectors/prestashop`):** Conector Webservice XML preservado para clientes futuros con tiendas PrestaShop.
+  - **`connectors.simplygest` (`packages/connectors/simplygest`):** Conector para SimplyGest preservado para clientes futuros.
+
+---
+
+## 5. Protocolo para Extender Módulos Congelados
 
 Cuando se requiera una nueva funcionalidad que interactúe con un módulo congelado:
 
