@@ -235,10 +235,16 @@ async function runPaymentTests() {
     assert.strictEqual(cobRows[0].TIPCOB, 0, 'TIPCOB debe ser 0');
     console.log(`✓ Apunte de cobro F_COB verificado (CODCOB=${mullco}, IMPCOB=${cobRows[0].IMPCOB})`);
 
+    // Pausa breve para liberar cerrojo de disco antes de la siguiente transacción
+    await new Promise(r => setTimeout(r, 500));
+
     // Test updating invoice status to 'cancelled' to verify payment cleanup (integrity)
     console.log('Actualizando estado a "cancelled" para verificar integridad...');
     const updateRes = await connector.updateInvoiceStatus(String(codfac), 'cancelled');
     assert.strictEqual(updateRes.success, true);
+
+    // Pausa breve para confirmar escritura en disco antes de la lectura
+    await new Promise(r => setTimeout(r, 500));
 
     const lcoAfterCancel = await realDriver.query<any>(selectPaymentsByInvoiceQuery('1', codfac));
     assert.strictEqual(lcoAfterCancel.length, 0, 'F_LCO debe quedar limpio tras cancelación');
