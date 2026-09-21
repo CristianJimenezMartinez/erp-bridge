@@ -4,16 +4,16 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://bridge.cristianjm.com/</loc>
-    <lastmod>2026-09-14T10:00:00+02:00</lastmod>
+    <lastmod>2026-09-21T14:00:00+02:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/" />
     <image:image>
-      <image:loc>https://bridge.cristianjm.com/assets/icon.svg</image:loc>
-      <image:title>Bentian ERP Bridge — Sincronización Factusol y WooCommerce</image:title>
-      <image:caption>Infraestructura de integración continua y sincronización autónoma entre Factusol ERP y WooCommerce</image:caption>
+      <image:loc>https://bridge.cristianjm.com/assets/og-preview.png</image:loc>
+      <image:title>Conector Factusol WooCommerce &amp; PrestaShop — Bentian ERP Bridge</image:title>
+      <image:caption>Conector y sincronizador bidireccional en tiempo real entre Factusol ERP y plataformas eCommerce</image:caption>
     </image:image>
   </url>
 </urlset>

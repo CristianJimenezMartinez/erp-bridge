@@ -1,11 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { OrganizationService } from '@erp-bridge/core';
 import { CreateOrganizationDtoSchema } from '@erp-bridge/shared';
+import { requireAuth } from './auth.router';
 
 export const organizationsRouter = Router();
 const orgService = new OrganizationService();
 
-organizationsRouter.get('/organizations', async (_req: Request, res: Response, next: NextFunction) => {
+organizationsRouter.get('/organizations', requireAuth, async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const list = await orgService.list();
     res.json({ data: list });

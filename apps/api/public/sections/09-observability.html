@@ -12,28 +12,39 @@
           </p>
         </div>
 
-        <!-- Terminal de Logs de Demostración -->
-        <div class="mt-10 rounded-2xl bg-[#09090b] border border-white/[0.08] p-6 font-mono text-xs overflow-hidden shadow-2xl">
-          <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-500">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="ml-2 text-zinc-400">Stream de Auditoría en Tiempo Real</span>
+        <!-- Bloque Conceptual de Trazabilidad y Auditoría -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-indigo-950/40 border border-indigo-800/30 flex items-center justify-center text-indigo-400 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
             </div>
-            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
-            </span>
+            <h3 class="text-base font-semibold text-white">Trazabilidad Registro a Registro</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Cada pedido ingresado en Factusol y cada actualización de stock en WooCommerce queda registrada con código de respuesta, serie contable y referencia cruzada.
+            </p>
           </div>
 
-          <div class="pt-4 space-y-2 text-zinc-300" id="log-stream-container">
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.102</span> <span class="text-indigo-400 font-semibold">[Watcher]</span> Cambio detectado en F_STO.accdb (hash MD5 alterado)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.240</span> <span class="text-blue-400 font-semibold">[Delta]</span> 1 registro modificado: FS-28492 (Stock: 42 -> 41)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.512</span> <span class="text-emerald-400 font-semibold">[WooCommerce]</span> PUT /products/28492 — HTTP 200 OK (272ms)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:15.001</span> <span class="text-zinc-500 font-semibold">[Heartbeat]</span> Latido periódico a bridge.cristianjm.com (OK 200)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:22.845</span> <span class="text-indigo-400 font-semibold">[OrderSync]</span> Nuevo pedido web #1849 recibido desde WooCommerce</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:23.110</span> <span class="text-emerald-400 font-semibold">[Factusol]</span> Pedido importado en F_PCL con Serie WEB (Ref: 1849)</div>
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/30 flex items-center justify-center text-emerald-400 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white">Prevención de Duplicados</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Idempotencia garantizada por diseño. Incluso si la red se corta en mitad de una sincronización, el motor evita pedidos duplicados o descuadres de stock.
+            </p>
           </div>
+
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-zinc-800/80 border border-white/[0.1] flex items-center justify-center text-zinc-300 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white">Diagnóstico en Segundo Plano</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              El agente comprueba el estado de conexión del motor, los drivers de lectura y la latencia del canal de venta para alertar de incidencias antes de que afecten a tu negocio.
+            </p>
+          </div>
+
         </div>
       </div>
     </section>

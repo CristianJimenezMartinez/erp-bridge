@@ -34,59 +34,60 @@
 
             <!-- Botonera de descargas directas del agente -->
             <div class="mt-10 flex flex-wrap items-center gap-4">
-              <a id="btn-agent-exe" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition">
+              <a id="btn-agent-exe" href="/releases/v0.2.9/Bentian-Setup-v0.2.9.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
                 <span>Descargar Instalador Oficial (.exe)</span>
               </a>
 
-              <a id="btn-agent-zip" href="/releases/v0.1.5/Bentian-Setup-v0.1.5.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
+              <a id="btn-agent-zip" href="/releases/v0.2.9/Bentian-Setup-v0.2.9.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
                 Paquete .zip
               </a>
             </div>
           </div>
 
-          <!-- Representación de la Ficha Técnica del Binario -->
-          <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-6 font-mono text-xs">
-            <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-400">
+          <!-- Tarjeta de Requisitos y Verificación de Software -->
+          <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-6 font-sans text-xs">
+            <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-400 font-mono">
               <span class="text-white font-semibold flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                BentianAgent.exe
+                Bentian Agent para Windows
               </span>
-              <span class="text-zinc-500" id="agent-file-size">~24 MB</span>
+              <span class="text-indigo-400 font-semibold" id="agent-file-size">Instalador Oficial x64</span>
             </div>
 
-            <div class="py-4 space-y-3 text-zinc-400">
-              <div class="flex justify-between">
-                <span>Arquitectura:</span>
-                <span class="text-zinc-200">win32_x64 (Native Node SEA)</span>
+            <div class="py-4 space-y-3 text-zinc-300">
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Sistema Operativo:</span>
+                <span class="text-zinc-100 font-medium">Windows 10, 11 o Windows Server (64-bit)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Subsistema Windows:</span>
-                <span class="text-zinc-200">IMAGE_SUBSYSTEM_WINDOWS_GUI</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Versiones Factusol:</span>
+                <span class="text-emerald-400 font-medium">Ediciones 2024, 2025 y 2026</span>
               </div>
-              <div class="flex justify-between">
-                <span>Compatibilidad:</span>
-                <span class="text-zinc-200">Windows 10, 11, Windows Server</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Modo de Funcionamiento:</span>
+                <span class="text-zinc-100 font-medium">Servicio en segundo plano (Bandeja del sistema)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Factusol soportado:</span>
-                <span class="text-zinc-200">Versiones 2024, 2025 y 2026</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Seguridad de Red:</span>
+                <span class="text-indigo-300 font-medium">Conexión saliente cifrada (Sin abrir puertos)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Driver de lectura:</span>
-                <span class="text-indigo-400">Microsoft.ACE.OLEDB.12.0/16.0</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Almacenamiento seguro:</span>
-                <span class="text-emerald-400">Windows DPAPI (AES-256)</span>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-zinc-400">Actualizaciones:</span>
+                <span class="text-emerald-400 font-medium">Automáticas y firmadas con Ed25519</span>
               </div>
             </div>
 
-            <!-- Hash SHA-256 en vivo -->
-            <div class="pt-4 border-t border-white/[0.06] text-[11px]">
-              <div class="text-zinc-500">Hash SHA-256 Verificado:</div>
-              <div class="text-zinc-300 break-all mt-1" id="agent-sha256">
-                adfb0e8722e5096c03a36e8e4f2c9fc26e35803cf3b127c7f2079933776a8ecc
+            <!-- Pasos rápidos -->
+            <div class="pt-4 border-t border-white/[0.06] text-xs text-zinc-400 space-y-2">
+              <div class="font-semibold text-zinc-200">Puesta en marcha en 2 minutos:</div>
+              <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded bg-indigo-950 text-indigo-400 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                <span>Descarga y ejecuta el instalador oficial en el equipo donde corre Factusol.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded bg-indigo-950 text-indigo-400 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                <span>Introduce tu clave de licencia o inicia la prueba gratuita desde el panel de la bandeja.</span>
               </div>
             </div>
           </div>

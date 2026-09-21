@@ -3,15 +3,48 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { LicenseService } from '@erp-bridge/core';
 
+export type UserRole = 'SUPERADMIN' | 'RESELLER' | 'TENANT_CLIENT' | 'ADMIN' | 'OPERATOR';
+
 export interface AdminJwtPayload {
   sub: string;
-  role: 'ADMIN' | 'OPERATOR';
+  role: UserRole;
   organizationId: string;
+  resellerId?: string;
   exp: number;
 }
 
 export interface AuthenticatedRequest extends Request {
   user?: AdminJwtPayload;
+}
+
+export function requireRole(allowedRoles: UserRole[]) {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Autenticación requerida' },
+      });
+      return;
+    }
+
+    const currentRole = req.user.role;
+    const effectiveRole: UserRole =
+      currentRole === 'ADMIN' ? 'SUPERADMIN' : (currentRole === 'OPERATOR' ? 'TENANT_CLIENT' : currentRole);
+
+    const normalizedAllowed: UserRole[] = allowedRoles.map((r) =>
+      r === 'ADMIN' ? 'SUPERADMIN' : (r === 'OPERATOR' ? 'TENANT_CLIENT' : r)
+    );
+
+    if (normalizedAllowed.includes(effectiveRole)) {
+      next();
+    } else {
+      res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Permisos insuficientes para realizar esta acción',
+        },
+      });
+    }
+  };
 }
 
 const LoginSchema = z.object({
@@ -251,7 +284,7 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
 
   const payload: AdminJwtPayload = {
     sub: email,
-    role: 'ADMIN',
+    role: 'SUPERADMIN',
     organizationId: 'org_default',
     exp,
   };
@@ -263,8 +296,61 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
     token,
     user: {
       email,
-      role: 'ADMIN',
+      role: 'SUPERADMIN',
       organizationId: 'org_default',
+    },
+    expiresAt: new Date(exp).toISOString(),
+  });
+});
+
+// POST /api/v1/auth/partner-login (Acceso para Empresas Instaladoras / Partners / Resellers)
+authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
+  const { partnerCode, partnerEmail } = req.body as { partnerCode?: string; partnerEmail?: string };
+  if (!partnerCode || typeof partnerCode !== 'string') {
+    res.status(400).json({
+      error: {
+        code: 'MISSING_PARTNER_CODE',
+        message: 'Introduce tu código de Partner o Empresa Instaladora autorizado',
+      },
+    });
+    return;
+  }
+
+  const cleanCode = partnerCode.trim().toUpperCase();
+  // Validar formato partner: código tipo PT-XXXX o reseller asignado
+  if (!cleanCode.startsWith('PT-') && !cleanCode.startsWith('PARTNER-')) {
+    res.status(401).json({
+      error: {
+        code: 'INVALID_PARTNER_CODE',
+        message: 'Código de Partner no reconocido. Los códigos de partner comienzan por PT-',
+      },
+    });
+    return;
+  }
+
+  const resellerId = `reseller_${crypto.createHash('md5').update(cleanCode).digest('hex').substring(0, 10)}`;
+  const email = partnerEmail ? partnerEmail.trim().toLowerCase() : `${cleanCode.toLowerCase()}@partner.bentian.es`;
+
+  const exp = Date.now() + 24 * 60 * 60 * 1000;
+  const payload: AdminJwtPayload = {
+    sub: email,
+    role: 'RESELLER',
+    organizationId: resellerId,
+    resellerId: cleanCode,
+    exp,
+  };
+
+  const token = AuthService.createToken(payload);
+
+  res.json({
+    success: true,
+    token,
+    user: {
+      email,
+      partnerCode: cleanCode,
+      role: 'RESELLER',
+      resellerId: cleanCode,
+      organizationId: resellerId,
     },
     expiresAt: new Date(exp).toISOString(),
   });
@@ -318,7 +404,7 @@ authRouter.post('/auth/license-session', async (req: Request, res: Response): Pr
     const exp = Date.now() + 48 * 60 * 60 * 1000; // 48 horas de vigencia
     const payload: AdminJwtPayload = {
       sub: license.key,
-      role: 'OPERATOR',
+      role: 'TENANT_CLIENT',
       organizationId: license.organizationId,
       exp,
     };
@@ -330,7 +416,7 @@ authRouter.post('/auth/license-session', async (req: Request, res: Response): Pr
       token,
       user: {
         key: license.key,
-        role: 'OPERATOR',
+        role: 'TENANT_CLIENT',
         organizationId: license.organizationId,
         plan: license.plan,
         alias: license.alias || 'Servidor Factusol',
@@ -378,7 +464,7 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
     const exp = Date.now() + 48 * 60 * 60 * 1000;
     const payload: AdminJwtPayload = {
       sub: cleanEmail,
-      role: 'OPERATOR',
+      role: 'TENANT_CLIENT',
       organizationId: orgId,
       exp,
     };
@@ -390,7 +476,7 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
       token,
       user: {
         email: cleanEmail,
-        role: 'OPERATOR',
+        role: 'TENANT_CLIENT',
         organizationId: orgId,
       },
       licenses,

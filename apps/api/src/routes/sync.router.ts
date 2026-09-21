@@ -1,10 +1,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { SyncScheduler, SyncService } from '@erp-bridge/core';
 import { CreateSyncJobDtoSchema, RunSyncJobDtoSchema } from '@erp-bridge/shared';
+import { requireAuth } from './auth.router';
 
 export const syncRouter = Router();
 const syncService = new SyncService();
 const scheduler = SyncScheduler.getInstance();
+
+syncRouter.use('/sync-jobs', requireAuth);
+syncRouter.use('/sync-executions', requireAuth);
 
 function getOrgId(req: Request): string {
   return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || 'org_default';

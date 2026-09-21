@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bentian ERP Bridge — Infraestructura de Integración Empresarial B2B</title>
-  <meta name="description" content="Infraestructura de integración continua y sincronización autónoma entre ERP local (Factusol) y plataformas eCommerce (WooCommerce). Arquitectura Local-First con Store-and-Forward y cero exposición de bases de datos.">
-  <meta name="keywords" content="integración erp, sincronización factusol woocommerce, conector factusol, local first erp, store and forward, automatización stock factusol, recargo equivalencia woocommerce">
+  <title>Conector Factusol WooCommerce &amp; PrestaShop — Bentian ERP Bridge</title>
+  <meta name="description" content="Conector y sincronizador bidireccional en tiempo real entre Factusol ERP y tiendas online (WooCommerce, PrestaShop). Control autónomo de catálogo, stock, tarifas, pedidos y facturas sin exponer tu base de datos a internet.">
+  <meta name="keywords" content="conector factusol woocommerce, sincronizar factusol woocommerce, conector factusol prestashop, integracion factusol, sincronizacion stock factusol, pedidos factusol woocommerce, recargo equivalencia woocommerce">
   <meta name="author" content="Bentian">
   <link rel="canonical" href="https://bridge.cristianjm.com/">
 
@@ -32,21 +32,27 @@
   <link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/">
   <link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/">
 
-  <!-- Open Graph / Redes Sociales -->
+  <!-- Open Graph / Redes Sociales (Imágenes Ráster PNG de Alta Resolución) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bridge.cristianjm.com/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Bentian ERP Bridge — Integración Empresarial Factusol & WooCommerce">
+  <meta property="og:title" content="Conector Factusol WooCommerce &amp; PrestaShop — Bentian ERP Bridge">
   <meta property="og:description" content="Sincronización autónoma en tiempo real entre Factusol ERP y tu tienda online. Arquitectura Local-First, Zero-Knowledge y sin abrir puertos en tu router.">
   <meta property="og:locale" content="es_ES">
-  <meta property="og:image" content="https://bridge.cristianjm.com/assets/icon.svg">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:image:secure_url" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bentian ERP Bridge — Conector Factusol WooCommerce">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://bridge.cristianjm.com/">
-  <meta name="twitter:title" content="Bentian ERP Bridge — Sincronización Factusol & WooCommerce">
-  <meta name="twitter:description" content="Tus sistemas empresariales trabajando juntos. Conecta Factusol con WooCommerce de forma local y segura.">
-  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/icon.svg">
+  <meta name="twitter:title" content="Conector Factusol WooCommerce &amp; PrestaShop — Bentian ERP Bridge">
+  <meta name="twitter:description" content="Tus sistemas empresariales trabajando juntos. Conecta Factusol con WooCommerce de forma local, en tiempo real y segura.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:image:alt" content="Bentian ERP Bridge — Conector Factusol WooCommerce">
 
   <!-- ========================================================================= -->
   <!-- GEO IA & RICH SNIPPETS: ESTRUCTURAS JSON-LD SCHEMA.ORG PARA MOTORES IA     -->
@@ -64,13 +70,13 @@
         "applicationSubCategory": "ERP Integration Software",
         "description": "Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP y plataformas eCommerce (WooCommerce, PrestaShop) con arquitectura Zero-Knowledge y Edge Processing.",
         "url": "https://bridge.cristianjm.com",
-        "softwareVersion": "0.1.5",
+        "softwareVersion": "0.2.9",
         "downloadUrl": "https://bridge.cristianjm.com/releases/v0.2.9/Bentian-Setup-v0.2.9.exe",
         "offers": [
           {
             "@type": "Offer",
             "name": "Plan Base Anual (1 Conexión ERP)",
-            "price": "249.00",
+            "price": "199.00",
             "priceCurrency": "EUR",
             "priceValidUntil": "2027-12-31",
             "availability": "https://schema.org/InStock",
@@ -109,7 +115,7 @@
         "name": "Bentian",
         "legalName": "Bentian ERP Bridge",
         "url": "https://bridge.cristianjm.com",
-        "logo": "https://bridge.cristianjm.com/assets/icon.svg",
+        "logo": "https://bridge.cristianjm.com/assets/icon.png",
         "founder": {
           "@type": "Person",
           "name": "Cristian Jiménez Martínez",
@@ -291,15 +297,15 @@
           <span class="text-xs font-mono text-zinc-500 hidden sm:inline">Arquitectura Store-and-Forward / Local-First</span>
         </div>
 
-        <!-- Headline de Alto Impacto -->
+        <!-- Headline de Alto Impacto & SEO -->
         <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.08] max-w-4xl">
-          Tus sistemas empresariales.<br/>
-          <span class="text-zinc-400 font-normal">Por fin trabajando juntos.</span>
+          Conector Factusol WooCommerce.<br/>
+          <span class="text-zinc-400 font-normal">Sincronización en tiempo real.</span>
         </h1>
 
         <!-- Subheadline Honesto -->
         <p class="mt-6 text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
-          Conecta tu ERP físico con tu comercio electrónico sin sustituir el software que tu empresa lleva años utilizando. Catálogo, stock, tarifas y pedidos sincronizados de forma autónoma sin exponer jamás tu base de datos a internet.
+          Conecta tu ERP Factusol con tu comercio electrónico WooCommerce o PrestaShop sin sustituir tu software de gestión. Catálogo, stock, tarifas, pedidos y facturación sincronizados de forma autónoma sin exponer jamás tu base de datos a internet.
         </p>
 
         <!-- CTAs Primarios -->
@@ -311,7 +317,7 @@
               <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/>
             </svg>
             <span>Descargar Agente Windows (.exe)</span>
-            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-black/25 text-zinc-200">24 MB</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-black/25 text-zinc-200">Oficial x64</span>
           </a>
 
           <a href="#como-funciona" class="px-5 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 hover:text-white border border-white/[0.08] font-medium text-sm transition flex items-center gap-2">
@@ -330,12 +336,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div class="leading-relaxed">
-            <strong class="text-zinc-200 font-semibold">Aviso de instalación en Windows:</strong> Al ser una versión reciente, Windows Defender SmartScreen puede mostrar una pantalla azul informativa. Para continuar, haz clic en <span class="text-indigo-300 font-semibold">"Más información"</span> y luego en <span class="text-indigo-300 font-semibold">"Ejecutar de todas formas"</span>.
+            <strong class="text-zinc-200 font-semibold">Aviso de instalación en Windows:</strong> Al ser una versión de software reciente, Windows Defender SmartScreen puede mostrar una pantalla azul informativa. Para continuar, haz clic en <span class="text-indigo-300 font-semibold">"Más información"</span> y luego en <span class="text-indigo-300 font-semibold">"Ejecutar de todas formas"</span>.
           </div>
         </div>
 
         <!-- ========================================================================= -->
-        <!-- MASTERPIECE: VISUALIZACIÓN DINÁMICA DEL FLUJO DE SISTEMAS                -->
+        <!-- VISUALIZACIÓN CONCEPTUAL DE INTEGRACIÓN DE SISTEMAS                       -->
         <!-- ========================================================================= -->
         <div class="mt-16 rounded-2xl bg-[#121215] border border-white/[0.08] p-6 lg:p-8 relative overflow-hidden" id="arquitectura">
           <!-- Fondo sutil con cuadrícula técnica -->
@@ -344,15 +350,15 @@
           <!-- Cabecera de la Visualización -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06] relative z-10">
             <div>
-              <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-950/40 border border-indigo-800/40 px-2 py-0.5 rounded">Topología de Flujo Activo</span>
-              <h2 class="text-base font-semibold text-white mt-1">Conexión de Sistemas en Tiempo Real</h2>
+              <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-950/40 border border-indigo-800/40 px-2 py-0.5 rounded">Arquitectura Canónica</span>
+              <h2 class="text-base font-semibold text-white mt-1">Integración Bidireccional de Sistemas</h2>
             </div>
             <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
-              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Motor Activo</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Autónomo</span>
               <span class="text-zinc-600">|</span>
-              <span class="text-zinc-400">Canal: <strong class="text-zinc-200">Stable x64</strong></span>
+              <span class="text-zinc-400">Canal: <strong class="text-zinc-200">Windows x64</strong></span>
               <span class="text-zinc-600">|</span>
-              <span class="text-zinc-400">Latencia: <strong class="text-emerald-400 font-mono">38ms</strong></span>
+              <span class="text-zinc-400">Tolerancia: <strong class="text-emerald-400 font-mono">Store-and-Forward</strong></span>
             </div>
           </div>
 
@@ -365,25 +371,25 @@
                 <div class="flex items-center justify-between mb-3">
                   <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Sistema Origen (ERP)</span>
                   <span class="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> LOCAL
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ON-PREMISE
                   </span>
                 </div>
-                <div class="text-xl font-bold text-white tracking-tight">Factusol</div>
-                <div class="text-xs text-zinc-400 mt-1">Base de datos local Access (<code class="text-zinc-300 font-mono">.accdb</code>)</div>
+                <div class="text-xl font-bold text-white tracking-tight">Factusol ERP</div>
+                <div class="text-xs text-zinc-400 mt-1">Base de datos local o red LAN (<code class="text-zinc-300 font-mono">.accdb</code>)</div>
               </div>
 
               <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
                 <div class="flex justify-between text-zinc-400">
-                  <span>Catálogo auditado:</span>
-                  <span class="text-white font-semibold">7,978 Artículos</span>
+                  <span>Acceso de datos:</span>
+                  <span class="text-indigo-300 font-semibold">OLEDB Sin Bloqueos</span>
                 </div>
                 <div class="flex justify-between text-zinc-400">
-                  <span>Modo acceso:</span>
-                  <span class="text-indigo-300">OLEDB Driver Nativo</span>
+                  <span>Detección delta:</span>
+                  <span class="text-emerald-400">Hash de cambios inteligente</span>
                 </div>
                 <div class="flex justify-between text-zinc-400">
-                  <span>Bloqueo concurrente:</span>
-                  <span class="text-emerald-400">0% (Lectura Limpia)</span>
+                  <span>Versiones soportadas:</span>
+                  <span class="text-zinc-200">2024, 2025 y 2026</span>
                 </div>
               </div>
             </div>
@@ -398,32 +404,31 @@
                 <div class="flex items-center justify-between mb-3">
                   <span class="text-xs font-mono text-indigo-300 uppercase tracking-wider" data-product-name>Bentian Sync Engine</span>
                   <span class="inline-flex items-center gap-1 text-[11px] font-mono text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/40">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping"></span> ACTIVO
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> CANÓNICO
                   </span>
                 </div>
-                <div class="text-xl font-bold text-white tracking-tight">Normalización Canónica</div>
-                <div class="text-xs text-zinc-400 mt-1">Transformación de datos & Store-and-Forward</div>
+                <div class="text-xl font-bold text-white tracking-tight">Normalización Fiscal</div>
+                <div class="text-xs text-zinc-400 mt-1">Gestión de IVA, Recargo de Eq. y series de pedidos</div>
               </div>
 
-              <!-- Paquete de datos en vuelo (animación visual sutil) -->
               <div class="my-4 py-2.5 px-3 rounded-lg bg-[#09090b] border border-white/[0.06] font-mono text-[11px]">
                 <div class="text-zinc-400 flex items-center justify-between">
-                  <span>Evento: <strong class="text-zinc-200">StockDeltaUpdate</strong></span>
-                  <span class="text-indigo-400 text-[10px]" id="live-packet-ts">14:32:08</span>
+                  <span>Pipeline: <strong class="text-zinc-200">Bidireccional Seguro</strong></span>
+                  <span class="text-indigo-400 text-[10px]">TLS 1.3</span>
                 </div>
-                <div class="text-zinc-500 mt-1 truncate">
-                  SKU: <span class="text-zinc-300" id="live-packet-sku">FS-28492</span> | Stock: <span class="text-emerald-400 font-bold" id="live-packet-stock">42</span> | R.E.: <span class="text-zinc-300">5.2%</span>
+                <div class="text-zinc-400 mt-1">
+                  Artículos • Tarifas • Stock • Pedidos Web
                 </div>
               </div>
 
               <div class="pt-3 border-t border-white/[0.06] space-y-2 font-mono text-xs">
                 <div class="flex justify-between text-zinc-400">
-                  <span>Esquema:</span>
-                  <span class="text-zinc-200">CanonicalModel v1</span>
+                  <span>Persistencia:</span>
+                  <span class="text-emerald-400">Cola Offline Segura</span>
                 </div>
                 <div class="flex justify-between text-zinc-400">
-                  <span>Cola offline:</span>
-                  <span class="text-emerald-400">Tolerancia 30 Días</span>
+                  <span>Arquitectura:</span>
+                  <span class="text-zinc-200">Zero-Knowledge Local-First</span>
                 </div>
               </div>
             </div>
@@ -432,27 +437,27 @@
             <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
               <div>
                 <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Sistema Destino (Tienda)</span>
+                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Canal Online (Tienda)</span>
                   <span class="inline-flex items-center gap-1 text-[11px] font-mono text-blue-400 bg-blue-950/40 px-2 py-0.5 rounded border border-blue-800/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> CLOUD
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> E-COMMERCE
                   </span>
                 </div>
-                <div class="text-xl font-bold text-white tracking-tight">WooCommerce</div>
-                <div class="text-xs text-zinc-400 mt-1">Canal de venta web online (<code class="text-zinc-300 font-mono">REST API v3</code>)</div>
+                <div class="text-xl font-bold text-white tracking-tight">WooCommerce &amp; PrestaShop</div>
+                <div class="text-xs text-zinc-400 mt-1">Plataformas de venta online (<code class="text-zinc-300 font-mono">REST API v3</code>)</div>
               </div>
 
               <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
                 <div class="flex justify-between text-zinc-400">
-                  <span>Pedidos gestionados:</span>
-                  <span class="text-white font-semibold">428 Pedidos</span>
+                  <span>Sincronización:</span>
+                  <span class="text-emerald-400 font-semibold">Stock &amp; Precios al Instante</span>
+                </div>
+                <div class="flex justify-between text-zinc-400">
+                  <span>Recepción pedidos:</span>
+                  <span class="text-blue-300">Descarga e Ingesta Atómica</span>
                 </div>
                 <div class="flex justify-between text-zinc-400">
                   <span>Protocolo:</span>
-                  <span class="text-blue-300">HTTPS / HMAC SHA256</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Sincronización:</span>
-                  <span class="text-emerald-400">Bidireccional (24/7)</span>
+                  <span class="text-zinc-200">HTTPS Cifrado End-to-End</span>
                 </div>
               </div>
             </div>
@@ -464,10 +469,10 @@
             <div class="flex items-center gap-2">
               <!-- Shield Check SVG -->
               <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Verificación de Integridad: <strong class="text-zinc-200">Firma Ed25519 Válida</strong></span>
+              <span>Garantía de Seguridad: <strong class="text-zinc-200">Cero Exposición de Red</strong> (No requiere abrir puertos en el router)</span>
             </div>
-            <div class="truncate text-zinc-500 max-w-md">
-              SHA-256: <span class="text-zinc-400" id="hero-hash-preview">7c80650833087e3f3d4ea9b95f3dd7b5d5cdf9ce576c4dd1d7abf5ab4e578ede</span>
+            <div class="text-zinc-500">
+              Certificado Ed25519 • Conexiones Salientes Cifradas
             </div>
           </div>
         </div>
@@ -744,11 +749,11 @@
               <span class="text-[10px] text-zinc-500">OLEDB ACCDB</span>
             </div>
             <pre class="text-zinc-300 leading-relaxed overflow-x-auto"><code>{
-  <span class="text-zinc-500">"CODART"</span>: <span class="text-indigo-400">"FS-28492"</span>,
-  <span class="text-zinc-500">"DESART"</span>: <span class="text-zinc-200">"Válvula Esfera Latón 1/2 Pulgada"</span>,
+  <span class="text-zinc-500">"CODART"</span>: <span class="text-indigo-400">"ART-1004"</span>,
+  <span class="text-zinc-500">"DESART"</span>: <span class="text-zinc-200">"Artículo Demo Profesional"</span>,
   <span class="text-zinc-500">"ACTSTO"</span>: <span class="text-emerald-400 font-bold" id="demo-factusol-stock">42.000</span>,
-  <span class="text-zinc-500">"PCOART"</span>: <span class="text-zinc-400">12.45</span>,
-  <span class="text-zinc-500">"PVIART"</span>: <span class="text-zinc-200">19.90</span>,
+  <span class="text-zinc-500">"PCOART"</span>: <span class="text-zinc-400">15.00</span>,
+  <span class="text-zinc-500">"PVIART"</span>: <span class="text-zinc-200">25.00</span>,
   <span class="text-zinc-500">"TVIART"</span>: <span class="text-zinc-400">1</span>, <span class="text-zinc-500">// IVA General 21%</span>
   <span class="text-zinc-500">"REQART"</span>: <span class="text-amber-400">true</span> <span class="text-zinc-500">// R.E. 5.2%</span>
 }</code></pre>
@@ -758,14 +763,14 @@
           <div class="rounded-xl bg-[#121215] border border-white/[0.08] p-5">
             <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-400 mb-3">
               <span class="font-semibold text-zinc-200">WooCommerce — Payload REST API v3</span>
-              <span class="text-[10px] text-emerald-400" id="demo-sync-status">● Sincronizado (420ms)</span>
+              <span class="text-[10px] text-emerald-400" id="demo-sync-status">● Sincronizado (320ms)</span>
             </div>
             <pre class="text-zinc-300 leading-relaxed overflow-x-auto"><code>{
-  <span class="text-zinc-500">"sku"</span>: <span class="text-indigo-400">"FS-28492"</span>,
-  <span class="text-zinc-500">"name"</span>: <span class="text-zinc-200">"Válvula Esfera Latón 1/2 Pulgada"</span>,
+  <span class="text-zinc-500">"sku"</span>: <span class="text-indigo-400">"ART-1004"</span>,
+  <span class="text-zinc-500">"name"</span>: <span class="text-zinc-200">"Artículo Demo Profesional"</span>,
   <span class="text-zinc-500">"stock_quantity"</span>: <span class="text-emerald-400 font-bold" id="demo-wc-stock">42</span>,
   <span class="text-zinc-500">"manage_stock"</span>: <span class="text-zinc-400">true</span>,
-  <span class="text-zinc-500">"regular_price"</span>: <span class="text-zinc-200">"19.90"</span>,
+  <span class="text-zinc-200">"regular_price"</span>: <span class="text-zinc-200">"25.00"</span>,
   <span class="text-zinc-500">"tax_status"</span>: <span class="text-zinc-400">"taxable"</span>,
   <span class="text-zinc-500">"meta_data"</span>: [{ <span class="text-zinc-500">"key"</span>: <span class="text-zinc-400">"_recargo_equiv"</span>, <span class="text-zinc-500">"value"</span>: <span class="text-amber-400">"yes"</span> }]
 }</code></pre>
@@ -814,7 +819,7 @@
 
             <!-- Botonera de descargas directas del agente -->
             <div class="mt-10 flex flex-wrap items-center gap-4">
-              <a id="btn-agent-exe" href="/releases/v0.2.9/Bentian-Setup-v0.2.9.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition">
+              <a id="btn-agent-exe" href="/releases/v0.2.9/Bentian-Setup-v0.2.9.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
                 <span>Descargar Instalador Oficial (.exe)</span>
               </a>
@@ -825,48 +830,49 @@
             </div>
           </div>
 
-          <!-- Representación de la Ficha Técnica del Binario -->
-          <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-6 font-mono text-xs">
-            <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-400">
+          <!-- Tarjeta de Requisitos y Verificación de Software -->
+          <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-6 font-sans text-xs">
+            <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-400 font-mono">
               <span class="text-white font-semibold flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                BentianAgent.exe
+                Bentian Agent para Windows
               </span>
-              <span class="text-zinc-500" id="agent-file-size">~24 MB</span>
+              <span class="text-indigo-400 font-semibold" id="agent-file-size">Instalador Oficial x64</span>
             </div>
 
-            <div class="py-4 space-y-3 text-zinc-400">
-              <div class="flex justify-between">
-                <span>Arquitectura:</span>
-                <span class="text-zinc-200">win32_x64 (Native Node SEA)</span>
+            <div class="py-4 space-y-3 text-zinc-300">
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Sistema Operativo:</span>
+                <span class="text-zinc-100 font-medium">Windows 10, 11 o Windows Server (64-bit)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Subsistema Windows:</span>
-                <span class="text-zinc-200">IMAGE_SUBSYSTEM_WINDOWS_GUI</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Versiones Factusol:</span>
+                <span class="text-emerald-400 font-medium">Ediciones 2024, 2025 y 2026</span>
               </div>
-              <div class="flex justify-between">
-                <span>Compatibilidad:</span>
-                <span class="text-zinc-200">Windows 10, 11, Windows Server</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Modo de Funcionamiento:</span>
+                <span class="text-zinc-100 font-medium">Servicio en segundo plano (Bandeja del sistema)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Factusol soportado:</span>
-                <span class="text-zinc-200">Versiones 2024, 2025 y 2026</span>
+              <div class="flex justify-between items-center py-1 border-b border-white/[0.04]">
+                <span class="text-zinc-400">Seguridad de Red:</span>
+                <span class="text-indigo-300 font-medium">Conexión saliente cifrada (Sin abrir puertos)</span>
               </div>
-              <div class="flex justify-between">
-                <span>Driver de lectura:</span>
-                <span class="text-indigo-400">Microsoft.ACE.OLEDB.12.0/16.0</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Almacenamiento seguro:</span>
-                <span class="text-emerald-400">Windows DPAPI (AES-256)</span>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-zinc-400">Actualizaciones:</span>
+                <span class="text-emerald-400 font-medium">Automáticas y firmadas con Ed25519</span>
               </div>
             </div>
 
-            <!-- Hash SHA-256 en vivo -->
-            <div class="pt-4 border-t border-white/[0.06] text-[11px]">
-              <div class="text-zinc-500">Hash SHA-256 Verificado:</div>
-              <div class="text-zinc-300 break-all mt-1" id="agent-sha256">
-                adfb0e8722e5096c03a36e8e4f2c9fc26e35803cf3b127c7f2079933776a8ecc
+            <!-- Pasos rápidos -->
+            <div class="pt-4 border-t border-white/[0.06] text-xs text-zinc-400 space-y-2">
+              <div class="font-semibold text-zinc-200">Puesta en marcha en 2 minutos:</div>
+              <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded bg-indigo-950 text-indigo-400 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                <span>Descarga y ejecuta el instalador oficial en el equipo donde corre Factusol.</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded bg-indigo-950 text-indigo-400 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                <span>Introduce tu clave de licencia o inicia la prueba gratuita desde el panel de la bandeja.</span>
               </div>
             </div>
           </div>
@@ -892,28 +898,39 @@
           </p>
         </div>
 
-        <!-- Terminal de Logs de Demostración -->
-        <div class="mt-10 rounded-2xl bg-[#09090b] border border-white/[0.08] p-6 font-mono text-xs overflow-hidden shadow-2xl">
-          <div class="flex items-center justify-between pb-4 border-b border-white/[0.06] text-zinc-500">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="w-3 h-3 rounded-full bg-zinc-800"></span>
-              <span class="ml-2 text-zinc-400">Stream de Auditoría en Tiempo Real</span>
+        <!-- Bloque Conceptual de Trazabilidad y Auditoría -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-indigo-950/40 border border-indigo-800/30 flex items-center justify-center text-indigo-400 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
             </div>
-            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
-            </span>
+            <h3 class="text-base font-semibold text-white">Trazabilidad Registro a Registro</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Cada pedido ingresado en Factusol y cada actualización de stock en WooCommerce queda registrada con código de respuesta, serie contable y referencia cruzada.
+            </p>
           </div>
 
-          <div class="pt-4 space-y-2 text-zinc-300" id="log-stream-container">
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.102</span> <span class="text-indigo-400 font-semibold">[Watcher]</span> Cambio detectado en F_STO.accdb (hash MD5 alterado)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.240</span> <span class="text-blue-400 font-semibold">[Delta]</span> 1 registro modificado: FS-28492 (Stock: 42 -> 41)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:08.512</span> <span class="text-emerald-400 font-semibold">[WooCommerce]</span> PUT /products/28492 — HTTP 200 OK (272ms)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:15.001</span> <span class="text-zinc-500 font-semibold">[Heartbeat]</span> Latido periódico a bridge.cristianjm.com (OK 200)</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:22.845</span> <span class="text-indigo-400 font-semibold">[OrderSync]</span> Nuevo pedido web #1849 recibido desde WooCommerce</div>
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">14:32:23.110</span> <span class="text-emerald-400 font-semibold">[Factusol]</span> Pedido importado en F_PCL con Serie WEB (Ref: 1849)</div>
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/30 flex items-center justify-center text-emerald-400 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white">Prevención de Duplicados</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Idempotencia garantizada por diseño. Incluso si la red se corta en mitad de una sincronización, el motor evita pedidos duplicados o descuadres de stock.
+            </p>
           </div>
+
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-lg bg-zinc-800/80 border border-white/[0.1] flex items-center justify-center text-zinc-300 mb-4">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-white">Diagnóstico en Segundo Plano</h3>
+            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+              El agente comprueba el estado de conexión del motor, los drivers de lectura y la latencia del canal de venta para alertar de incidencias antes de que afecten a tu negocio.
+            </p>
+          </div>
+
         </div>
       </div>
     </section>
@@ -1300,8 +1317,6 @@
         </div>
       </div>
     </section>
-
-  </main>
 
   </main>
 
