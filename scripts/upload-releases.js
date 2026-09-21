@@ -81,7 +81,7 @@ async function uploadReleases(options = {}) {
     conn.on('ready', async () => {
       try {
         console.log('>>> [1/4] Creando directorios remotos en el servidor...');
-        await runSshCommand(conn, `mkdir -p "${remoteVersionDir}" "${remoteLatestDir}" "${remotePublicDir}"`);
+        await runSshCommand(conn, `mkdir -p "${remoteVersionDir}" "${remoteLatestDir}" "${remotePublicDir}" "${remotePublicDir}/assets" "${remotePublicDir}/dashboard"`);
         console.log('    ✓ Directorios remotos verificados.');
 
         console.log('>>> [2/4] Abriendo canal SFTP seguro...');
@@ -117,10 +117,20 @@ async function uploadReleases(options = {}) {
               });
             }
 
-            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard/index.html)
+            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard/index.html, assets)
             const localPublicDir = path.resolve(__dirname, '../apps/api/public');
             if (fs.existsSync(localPublicDir)) {
-              const publicFiles = ['index.html', 'robots.txt', 'sitemap.xml', 'dashboard/index.html'];
+              const publicFiles = [
+                'index.html',
+                'robots.txt',
+                'sitemap.xml',
+                'dashboard/index.html',
+                'assets/og-preview.png',
+                'assets/icon-256.png',
+                'assets/icon.png',
+                'assets/icon.svg',
+                'assets/icon.ico'
+              ];
               for (const pf of publicFiles) {
                 const localPf = path.join(localPublicDir, pf);
                 if (fs.existsSync(localPf)) {

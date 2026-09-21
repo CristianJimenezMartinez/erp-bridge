@@ -10,7 +10,6 @@ const VERSIONED_FILES = [
   path.resolve(rootDir, 'builder/package.json'),
   path.resolve(rootDir, 'apps/agent/package.json'),
   path.resolve(rootDir, 'apps/api/package.json'),
-  path.resolve(rootDir, 'apps/dashboard/package.json'),
   path.resolve(rootDir, 'packages/shared/package.json'),
   path.resolve(rootDir, 'packages/sdk/package.json'),
   path.resolve(rootDir, 'packages/core/package.json'),

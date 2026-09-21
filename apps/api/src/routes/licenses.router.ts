@@ -178,7 +178,7 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
       data: {
         ...license,
         activations,
-        installerUrl: '/releases/v0.2.9/Bentian-Setup-v0.2.9.exe',
+        installerUrl: '/releases/v0.3.0/Bentian-Setup-v0.3.0.exe',
       },
     });
   } catch (error) {
