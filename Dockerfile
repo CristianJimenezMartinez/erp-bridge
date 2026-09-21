@@ -7,8 +7,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Enable corepack for pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable corepack for pnpm (LTS v9)
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Copy workspace configuration and dependencies
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* tsconfig.base.json* tsconfig.json* ./
@@ -18,7 +18,7 @@ COPY dashboard.html* ./
 RUN mkdir -p releases
 
 # Install dependencies and build TypeScript packages
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 RUN pnpm --filter @erp-bridge/shared build || true
 RUN pnpm --filter @erp-bridge/sdk build || true
 RUN pnpm --filter @erp-bridge/connector-factusol build || true
