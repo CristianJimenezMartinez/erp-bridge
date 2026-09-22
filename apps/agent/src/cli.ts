@@ -406,10 +406,12 @@ async function main() {
     case 'start':
     default: {
       const isHeadless = args.includes('--headless') || process.env['HEADLESS'] === 'true';
-      const isMinimized = args.includes('--minimized') || process.argv.includes('--minimized');
+      const isPostUpdate = args.includes('--post-update') || process.argv.includes('--post-update');
+      const isSilent = args.includes('--silent') || process.argv.includes('--silent');
+      const isMinimized = args.includes('--minimized') || process.argv.includes('--minimized') || isPostUpdate || isSilent;
 
-      // Si no es headless, comprobar si ya existe una instancia en ejecución en el puerto por defecto (39281)
-      if (!isHeadless) {
+      // Si no es headless y no es minimizado/post-update, enfocar instancia si ya existe
+      if (!isHeadless && !isMinimized) {
         try {
           const checkReq = await fetch('http://127.0.0.1:39281/api/local/open-gui', {
             method: 'POST',
@@ -421,6 +423,20 @@ async function main() {
           }
         } catch {
           // No hay instancia previa en ejecución, continuar con el arranque normal
+        }
+      } else if (!isHeadless && isMinimized) {
+        // En arranque minimizado o post-actualización, si ya hay una instancia activa, no abrir nada y salir limpiamente
+        try {
+          const checkReq = await fetch('http://127.0.0.1:39281/health', {
+            method: 'GET',
+            signal: AbortSignal.timeout(1000),
+          });
+          if (checkReq.ok) {
+            console.log('✓ Instancia de Bentian Agent ya activa en segundo plano.');
+            process.exit(0);
+          }
+        } catch {
+          // No hay instancia previa, continuar arranque
         }
       }
 

@@ -226,7 +226,7 @@ export class AutoUpdater {
             newExePath: newBinaryPath,
             timeoutSeconds: 10,
             processNamesToKill: ['BentianAgent', 'BentianTray'],
-            postUpdateArgs: ['start', '--post-update'],
+            postUpdateArgs: ['start', '--post-update', '--minimized'],
           });
           this.logger.info(`✓ Proceso atómico iniciado: ${result.batPath}. Cerrando proceso actual para reemplazo.`);
           setTimeout(() => {
