@@ -1,4 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
 import { AgentService, UpdateService, DatabaseService } from '@erp-bridge/core';
 import { AgentHeartbeatPayloadSchema, AgentPairingRequestSchema } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
@@ -6,6 +8,21 @@ import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
 export const agentsRouter = Router();
 const agentService = new AgentService();
 const updateService = new UpdateService();
+
+function getLatestReleasedVersion(): string {
+  try {
+    const latestJsonPath = path.resolve(__dirname, '../../../../releases/latest.json');
+    if (fs.existsSync(latestJsonPath)) {
+      const parsed = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
+      if (parsed.latestVersion) return parsed.latestVersion;
+    }
+  } catch {}
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
+    if (pkg.version) return pkg.version;
+  } catch {}
+  return '0.3.1';
+}
 
 function getOrgId(req: Request): string {
   const authReq = req as AuthenticatedRequest;
@@ -67,13 +84,14 @@ agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: 
       const result = await db.query(query, params).catch(() => ({ rows: [] }));
       const now = Date.now();
       const OFFLINE_THRESHOLD_MS = 90_000;
+      const LATEST_VERSION = getLatestReleasedVersion();
 
       const unified = result.rows.map((row: any) => {
         const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
         const diff = now - lastSeen;
         const isOnline = diff < OFFLINE_THRESHOLD_MS;
-        const installedVersion = (row.version || '0.3.0').replace(/^v/, '');
-        const isLatest = installedVersion === '0.3.0';
+        const installedVersion = (row.version || LATEST_VERSION).replace(/^v/, '');
+        const isLatest = installedVersion === LATEST_VERSION;
 
         return {
           id: row.id,
@@ -88,7 +106,7 @@ agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: 
           seatType: row.seat_type || 'BASE',
           version: `v${installedVersion}`,
           installedVersion,
-          latestVersion: '0.3.0',
+          latestVersion: LATEST_VERSION,
           isUpToDate: isLatest,
           status: isOnline ? 'ACTIVE' : 'OFFLINE',
           isOnline,
@@ -330,13 +348,13 @@ agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN'
       const result = await db.query(query, params).catch(() => ({ rows: [] }));
       const now = Date.now();
       const OFFLINE_THRESHOLD_MS = 90_000;
-      const LATEST_VERSION = '0.3.0';
+      const LATEST_VERSION = getLatestReleasedVersion();
 
       const machines = result.rows.map((row: any) => {
         const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
         const diff = now - lastSeen;
         const isOnline = diff < OFFLINE_THRESHOLD_MS;
-        const installedVersion = (row.version || '0.3.0').replace(/^v/, '');
+        const installedVersion = (row.version || LATEST_VERSION).replace(/^v/, '');
         const isUpToDate = installedVersion === LATEST_VERSION;
 
         return {
