@@ -135,7 +135,7 @@ export class LicenseService {
       const requestPayload: LicenseValidationRequest = {
         licenseToken: token,
         hwid,
-        agentVersion: '0.1.0',
+        agentVersion: this.configManager.getVersion(),
       };
 
       const response = await fetch(`${config.apiBaseUrl}/api/v1/licenses/validate`, {

@@ -91,6 +91,7 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', billingRouter);
   app.use('/api/v1', authRouter);
   app.use('/api/v1', monitoringRouter);
+  app.use(monitoringRouter);
 
   // Servir descargas de releases y actualizaciones del agente
   const releasesDir = path.resolve(__dirname, '../../../releases');

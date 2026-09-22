@@ -4,6 +4,7 @@ import { Agent } from '@erp-bridge/shared';
 import { PostgresAgentRepository, EventBus } from '@erp-bridge/core';
 import { AgentMonitorService } from '../src/services/agent-monitor.service';
 import { bootstrapApp } from '../src/server';
+import { AuthService } from '../src/routes/auth.router';
 
 console.log('--- Running Deadman Switch & Agent Monitor Tests ---');
 
@@ -155,8 +156,17 @@ async function runTests() {
     const port = (server.address() as { port: number }).port;
     const baseUrl = `http://127.0.0.1:${port}`;
 
+    const authToken = AuthService.createToken({
+      sub: 'test-admin',
+      role: 'SUPERADMIN',
+      organizationId: testOrgId,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    });
+
     try {
-      const res = await fetch(`${baseUrl}/api/v1/monitoring/agents/health?organizationId=${testOrgId}&thresholdHours=24`);
+      const res = await fetch(`${baseUrl}/api/v1/monitoring/agents/health?organizationId=${testOrgId}&thresholdHours=24`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       assert.strictEqual(res.status, 200);
 
       const json = (await res.json()) as { data: any };
@@ -169,7 +179,9 @@ async function runTests() {
       assert.strictEqual(json.data.alerts.length, 2);
 
       // Probar también ruta directa /monitoring/agents/health
-      const directRes = await fetch(`${baseUrl}/monitoring/agents/health?organizationId=${testOrgId}&thresholdHours=24`);
+      const directRes = await fetch(`${baseUrl}/monitoring/agents/health?organizationId=${testOrgId}&thresholdHours=24`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       assert.strictEqual(directRes.status, 200);
 
       console.log('  ✓ Endpoint HTTP GET /api/v1/monitoring/agents/health validado al 100%');

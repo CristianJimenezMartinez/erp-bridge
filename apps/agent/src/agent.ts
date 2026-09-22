@@ -454,6 +454,14 @@ export class LocalAgent {
     }
 
     this.syncEngine.startAutoSyncLoop(() => this.isRunning);
+
+    // Filosofía "Install & Plug": disparo inicial tras arranque a los 3s
+    setTimeout(() => {
+      if (this.isRunning && !this.syncEngine.isBusy()) {
+        void this.syncEngine.triggerManualSync().catch(() => null);
+      }
+    }, 3000);
+
     this.startHeartbeat();
     this.licenseService.startValidationLoop();
     this.updateClient.startPeriodicCheck();
@@ -463,31 +471,40 @@ export class LocalAgent {
     const sendBeat = async () => {
       if (!this.isRunning) return;
       const cfg = this.configManager.get();
+      const hwid = await this.licenseService.getHWID().catch(() => 'unknown_hwid');
+      const effectiveAgentId = cfg.agentId || `ag_${hwid.substring(0, 16)}`;
 
       try {
-        let factusolHealth;
+        let factusolHealth: any;
         const connector = this.factusolService.getConnector();
         if (connector) {
           const check = await connector.healthCheck();
+          const count = await this.factusolService.getArticleCount(cfg.factusolDbPath).catch(() => undefined);
           factusolHealth = {
             status: check.status,
             latencyMs: check.latencyMs,
             databasePath: cfg.factusolDbPath,
             message: check.message,
+            articleCount: count,
           };
         }
 
-        const heartbeat: AgentHeartbeatPayload = {
-          agentId: cfg.agentId || 'agent_local_standalone',
+        const heartbeat: AgentHeartbeatPayload & Record<string, any> = {
+          agentId: effectiveAgentId,
+          hwid,
           version: this.configManager.getVersion(),
           status: 'ONLINE',
           systemInfo: SystemInfoService.getSystemInfo(),
           factusolHealth,
           fileWatcherActive: this.fileWatcherService.isActive(),
+          channelInfo: {
+            channelType: cfg.channelType || (cfg.universalBridge?.storeUrl ? 'universal_bridge' : 'woocommerce'),
+            storeUrl: cfg.universalBridge?.storeUrl || cfg.woocommerce?.storeUrl || '',
+          },
         };
 
-        if (cfg.agentId && cfg.apiBaseUrl) {
-          const res = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/${cfg.agentId}/heartbeat`, {
+        if (cfg.apiBaseUrl) {
+          const res = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/${effectiveAgentId}/heartbeat`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

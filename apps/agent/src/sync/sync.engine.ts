@@ -12,6 +12,7 @@ export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
   private autoSyncTimer: NodeJS.Timeout | null = null;
   private isSyncing = false;
+  private hasAutoUploadedCatalog = false;
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -187,6 +188,16 @@ export class LocalSyncEngine {
                   page++;
                 }
               }
+            }
+
+            // Si la tienda WooCommerce está vacía (0 productos), activar Install & Plug
+            if (allWcProducts.length === 0 && !this.hasAutoUploadedCatalog) {
+              this.hasAutoUploadedCatalog = true;
+              this.logger.info('🚀 Tienda WooCommerce vacía detectada (0 productos). Activando "Install & Plug": subiendo catálogo inicial de Factusol automáticamente...');
+              this.eventBus.addEvent('info', '🚀 Tienda WooCommerce vacía. Activando "Install & Plug": subiendo catálogo de Factusol automáticamente...');
+              void this.uploadCatalog().catch((catErr) => {
+                this.logger.warn(`Aviso en subida inicial automática de catálogo a WooCommerce: ${String(catErr)}`);
+              });
             }
 
             // Dirty-checking: enviar a WooCommerce batch únicamente los artículos gestionados en Factusol cuyo stock haya variado
@@ -680,6 +691,35 @@ export class LocalSyncEngine {
     const secretKey = bridgeSettings.secretKey;
     const headers = this.getBridgeHeaders(secretKey);
     const driver = new AccessDriver({ databasePath: dbPath });
+
+    // 0. Filosofía "Install & Plug": Comprobación autónoma de catálogo inicial en la web
+    if (!this.hasAutoUploadedCatalog) {
+      try {
+        const pingRes = await fetch(`${endpointUrl}?action=ping`, {
+          method: 'GET',
+          headers,
+          signal: AbortSignal.timeout(10000),
+        }).catch(() => null);
+
+        if (pingRes && pingRes.ok) {
+          const pingJson = (await pingRes.json().catch(() => null)) as { articleCount?: number } | null;
+          if (pingJson && typeof pingJson.articleCount === 'number') {
+            if (pingJson.articleCount === 0) {
+              this.hasAutoUploadedCatalog = true;
+              this.logger.info('🚀 Tienda web vacía detectada (0 artículos). Activando "Install & Plug": subiendo catálogo y fotos desde Factusol automáticamente...');
+              this.eventBus.addEvent('info', '🚀 Tienda web vacía (0 artículos). Activando "Install & Plug": subiendo catálogo y fotos desde Factusol automáticamente...');
+              void this.uploadUniversalBridgeCatalog(dbPath, config).catch((catErr) => {
+                this.logger.warn(`Aviso en subida autónoma inicial de catálogo: ${String(catErr)}`);
+              });
+            } else {
+              this.hasAutoUploadedCatalog = true;
+            }
+          }
+        }
+      } catch (pingErr) {
+        this.logger.warn(`Aviso al comprobar estado inicial de la tienda web: ${String(pingErr)}`);
+      }
+    }
 
     // 1. Sincronización de existencias de stock (Factusol -> Universal Bridge)
     try {

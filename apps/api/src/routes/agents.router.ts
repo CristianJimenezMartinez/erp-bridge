@@ -15,12 +15,98 @@ function getOrgId(req: Request): string {
   return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
 }
 
-// 1. List agents (Protected)
+// 1. List agents (Protected - Consulta unificada de máquinas activas por licencia y agentes)
 agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    // Superadmin puede listar todos si no se especifica org
-    if ((req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN') && !req.query['organizationId']) {
+    const db = DatabaseService.getInstance();
+    const isSuperadmin = req.user?.role === 'SUPERADMIN';
+    const isAdmin = req.user?.role === 'ADMIN';
+
+    if (db.isAvailable()) {
+      let query = `
+        SELECT 
+          COALESCE(a.id, la.agent_id, 'ag_' || SUBSTRING(la.hwid, 1, 16)) as id,
+          COALESCE(a.name, la.machine_info->>'hostname', 'Servidor Factusol') as name,
+          COALESCE(a.organization_id, l.organization_id, 'org_default') as organization_id,
+          o.name as organization_name,
+          COALESCE(l.tax_id, o.tax_id, '') as tax_id,
+          l.key as license_key,
+          l.alias as license_alias,
+          l.plan as plan,
+          l.seat_type,
+          COALESCE(a.version, '0.3.0') as version,
+          COALESCE(a.platform, la.machine_info->>'platform', 'win32') as platform,
+          COALESCE(a.last_seen_at, la.last_validated_at) as last_seen_at,
+          la.last_validated_at,
+          la.activated_at,
+          la.hwid,
+          la.machine_info,
+          a.ip_address
+        FROM license_activations la
+        JOIN licenses l ON la.license_id = l.id
+        LEFT JOIN organizations o ON l.organization_id = o.id
+        LEFT JOIN agents a ON (la.agent_id = a.id OR la.hwid = a.id)
+        WHERE la.deactivated_at IS NULL
+      `;
+      const params: any[] = [];
+
+      if (!isSuperadmin && !isAdmin) {
+        query += ` AND l.organization_id = $1`;
+        params.push(req.user?.organizationId || orgId);
+      } else if (isAdmin && !isSuperadmin) {
+        query += ` AND (l.organization_id = $1 OR o.reseller_id = $1)`;
+        params.push(orgId);
+      } else if (req.query['organizationId']) {
+        query += ` AND l.organization_id = $1`;
+        params.push(req.query['organizationId']);
+      }
+
+      query += ` ORDER BY COALESCE(a.last_seen_at, la.last_validated_at) DESC`;
+
+      const result = await db.query(query, params).catch(() => ({ rows: [] }));
+      const now = Date.now();
+      const OFFLINE_THRESHOLD_MS = 90_000;
+
+      const unified = result.rows.map((row: any) => {
+        const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
+        const diff = now - lastSeen;
+        const isOnline = diff < OFFLINE_THRESHOLD_MS;
+        const installedVersion = (row.version || '0.3.0').replace(/^v/, '');
+        const isLatest = installedVersion === '0.3.0';
+
+        return {
+          id: row.id,
+          name: row.name,
+          organizationId: row.organization_id,
+          organization_id: row.organization_id,
+          organizationName: row.organization_name || row.license_alias || 'Cliente Bentian',
+          taxId: row.tax_id,
+          licenseKey: row.license_key,
+          licenseAlias: row.license_alias,
+          plan: row.plan || 'professional',
+          seatType: row.seat_type || 'BASE',
+          version: `v${installedVersion}`,
+          installedVersion,
+          latestVersion: '0.3.0',
+          isUpToDate: isLatest,
+          status: isOnline ? 'ACTIVE' : 'OFFLINE',
+          isOnline,
+          platform: row.platform,
+          lastSeenAt: row.last_seen_at,
+          last_seen_at: row.last_seen_at,
+          last_heartbeat: row.last_seen_at,
+          lastValidatedAt: row.last_validated_at,
+          hwid: row.hwid,
+          machineInfo: row.machine_info,
+          ipAddress: row.ip_address,
+        };
+      });
+
+      return res.json({ data: unified });
+    }
+
+    if ((isSuperadmin || isAdmin) && !req.query['organizationId']) {
       const all = await agentService.listAllAgents();
       return res.json({ data: all });
     }
@@ -120,6 +206,51 @@ agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, n
     });
     const result = await agentService.recordHeartbeat(validated);
 
+    // Persistencia y enlace en PostgreSQL si la base está disponible
+    const db = DatabaseService.getInstance();
+    if (db.isAvailable()) {
+      const hwid = (req.body.hwid as string) || '';
+      let orgId = 'org_default';
+      if (hwid) {
+        const lic = await db.query(
+          `SELECT l.organization_id FROM license_activations la JOIN licenses l ON la.license_id = l.id WHERE la.hwid = $1 LIMIT 1`,
+          [hwid]
+        ).catch(() => ({ rows: [] }));
+        if (lic.rows[0]?.organization_id) {
+          orgId = lic.rows[0].organization_id;
+        }
+      }
+
+      const agentName = req.body.systemInfo?.hostname || req.body.name || 'Servidor Factusol';
+      const version = validated.version || (req.body.version as string) || '0.3.0';
+      const platform = req.body.systemInfo?.platform || req.body.platform || 'win32';
+      const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || null;
+
+      await db.query(
+        `INSERT INTO agents (id, organization_id, name, status, version, last_seen_at, ip_address, platform, updated_at)
+         VALUES ($1, $2, $3, 'ONLINE', $4, CURRENT_TIMESTAMP, $5, $6, CURRENT_TIMESTAMP)
+         ON CONFLICT (id) DO UPDATE
+         SET organization_id = EXCLUDED.organization_id,
+             name = EXCLUDED.name,
+             status = 'ONLINE',
+             version = EXCLUDED.version,
+             last_seen_at = CURRENT_TIMESTAMP,
+             ip_address = COALESCE(EXCLUDED.ip_address, agents.ip_address),
+             platform = EXCLUDED.platform,
+             updated_at = CURRENT_TIMESTAMP`,
+        [validated.agentId, orgId, agentName, version, ip, platform]
+      ).catch(() => null);
+
+      if (hwid) {
+        await db.query(
+          `UPDATE license_activations
+           SET agent_id = $1, last_validated_at = CURRENT_TIMESTAMP
+           WHERE hwid = $2`,
+          [validated.agentId, hwid]
+        ).catch(() => null);
+      }
+    }
+
     // Detección inmediata piggybacked: notifica al agente en < 30 segundos
     const agentVersion = validated.version || (req.body.version as string) || '0.1.0';
     let updateAvailable = false;
@@ -153,5 +284,109 @@ agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, n
     });
   } catch (error) {
     next(error);
+  }
+});
+
+// 2.2 Telemetría Enriquecida de Flota y Control de Versiones para Superadmin & Partners
+agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const orgId = getOrgId(req);
+    const db = DatabaseService.getInstance();
+    const isSuperadmin = req.user?.role === 'SUPERADMIN';
+
+    if (db.isAvailable()) {
+      let query = `
+        SELECT 
+          COALESCE(a.id, la.agent_id, 'ag_' || SUBSTRING(la.hwid, 1, 16)) as id,
+          COALESCE(a.name, la.machine_info->>'hostname', 'Servidor Factusol') as hostname,
+          COALESCE(a.organization_id, l.organization_id, 'org_default') as organization_id,
+          o.name as company_name,
+          COALESCE(l.tax_id, o.tax_id, '') as tax_id,
+          l.key as license_key,
+          l.alias as license_alias,
+          l.plan as plan,
+          l.seat_type,
+          COALESCE(a.version, '0.3.0') as version,
+          COALESCE(a.platform, la.machine_info->>'platform', 'win32') as platform,
+          COALESCE(a.last_seen_at, la.last_validated_at) as last_seen_at,
+          la.last_validated_at,
+          la.activated_at,
+          la.hwid,
+          la.machine_info,
+          a.ip_address
+        FROM license_activations la
+        JOIN licenses l ON la.license_id = l.id
+        LEFT JOIN organizations o ON l.organization_id = o.id
+        LEFT JOIN agents a ON (la.agent_id = a.id OR la.hwid = a.id)
+        WHERE la.deactivated_at IS NULL
+      `;
+      const params: any[] = [];
+      if (!isSuperadmin) {
+        query += ` AND (l.organization_id = $1 OR o.reseller_id = $1)`;
+        params.push(orgId);
+      }
+      query += ` ORDER BY COALESCE(a.last_seen_at, la.last_validated_at) DESC`;
+
+      const result = await db.query(query, params).catch(() => ({ rows: [] }));
+      const now = Date.now();
+      const OFFLINE_THRESHOLD_MS = 90_000;
+      const LATEST_VERSION = '0.3.0';
+
+      const machines = result.rows.map((row: any) => {
+        const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
+        const diff = now - lastSeen;
+        const isOnline = diff < OFFLINE_THRESHOLD_MS;
+        const installedVersion = (row.version || '0.3.0').replace(/^v/, '');
+        const isUpToDate = installedVersion === LATEST_VERSION;
+
+        return {
+          id: row.id,
+          hostname: row.hostname,
+          organizationId: row.organization_id,
+          companyName: row.company_name || row.license_alias || 'Cliente Bentian',
+          taxId: row.tax_id,
+          licenseKey: row.license_key,
+          licenseAlias: row.license_alias,
+          plan: row.plan || 'professional',
+          seatType: row.seat_type || 'BASE',
+          installedVersion: `v${installedVersion}`,
+          latestVersion: `v${LATEST_VERSION}`,
+          isUpToDate,
+          status: isOnline ? 'ONLINE' : 'OFFLINE',
+          isOnline,
+          platform: row.platform,
+          lastSeenAt: row.last_seen_at,
+          lastValidatedAt: row.last_validated_at,
+          hwid: row.hwid,
+          machineInfo: row.machine_info,
+          ipAddress: row.ip_address,
+        };
+      });
+
+      const totalMachines = machines.length;
+      const onlineMachines = machines.filter(m => m.isOnline).length;
+      const upToDateMachines = machines.filter(m => m.isUpToDate).length;
+
+      return res.json({
+        data: {
+          summary: {
+            totalMachines,
+            onlineMachines,
+            upToDateMachines,
+            latestVersion: `v${LATEST_VERSION}`,
+          },
+          machines,
+        },
+      });
+    }
+
+    return res.json({
+      data: {
+        summary: { totalMachines: 0, onlineMachines: 0, upToDateMachines: 0, latestVersion: 'v0.3.0' },
+        machines: [],
+      },
+    });
+  } catch (error) {
+    return next(error);
   }
 });
