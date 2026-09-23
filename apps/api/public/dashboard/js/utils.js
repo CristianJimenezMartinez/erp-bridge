@@ -115,10 +115,20 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+function copiarClaveBienvenida() {
+  const el = document.getElementById('welcome-license-key');
+  const key = el ? el.innerText.trim() : '';
+  if (key) {
+    navigator.clipboard.writeText(key);
+    showToast(`✓ Clave ${key} copiada al portapapeles`, 'success');
+  }
+}
+
 // Exposición en el ámbito global para atributos onclick HTML
 window.escapeHtml = escapeHtml;
 window.showToast = showToast;
 window.copyKey = copyKey;
+window.copiarClaveBienvenida = copiarClaveBienvenida;
 window.closeModal = closeModal;
 window.openInstructionsModal = openInstructionsModal;
 window.openStripePortal = openStripePortal;

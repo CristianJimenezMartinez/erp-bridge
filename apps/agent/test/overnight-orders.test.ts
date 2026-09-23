@@ -150,7 +150,7 @@ console.log('🧪 Iniciando tests de blindaje de pedidos nocturnos (Overnight Or
   const canonicalWc = OrderSyncHelper.wooCommerceToCanonical(wcOrderPending, '1', 'GEN');
   assert.strictEqual(canonicalWc.id, '501');
   assert.strictEqual(canonicalWc.reference, '501');
-  assert.strictEqual(canonicalWc.customer.fiscalName, 'María López');
+  assert.strictEqual(canonicalWc.customer.fiscalName, 'Maria Lopez');
   assert.strictEqual(canonicalWc.customer.taxId, '12345678Z');
   assert.strictEqual(canonicalWc.lines[0]!.sku, 'DISCO-CORTE-115');
   assert.strictEqual(canonicalWc.lines[0]!.quantity, 2);

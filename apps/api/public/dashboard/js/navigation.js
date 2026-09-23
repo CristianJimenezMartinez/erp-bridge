@@ -157,6 +157,56 @@ function switchDashboardTab(tabName) {
 // Inicialización automática
 window.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
+  const checkoutStatus = urlParams.get('checkout');
+  const sessionId = urlParams.get('session_id');
+
+  // Flujo Post-Pago de Stripe: canjear session_id por licencia y auto-login
+  if (checkoutStatus === 'success' && sessionId) {
+    if (typeof window.showToast === 'function') {
+      window.showToast('Verificando tu compra con Stripe y activando tu licencia...', 'info');
+    }
+    try {
+      const res = await fetch(`/api/v1/billing/session-license?session_id=${encodeURIComponent(sessionId)}`);
+      const data = await res.json();
+      if (res.ok && data.success && data.token) {
+        if (typeof window.setSession === 'function') {
+          window.setSession(data.token, 'TENANT_CLIENT', data.organizationId || 'org_default', data.email || 'Cliente');
+        }
+
+        // Limpiar URL para que no quede expuesta la sesión en el historial
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        if (typeof window.showDashboard === 'function') {
+          window.showDashboard();
+        }
+
+        // Configurar y abrir modal de entrega de licencia
+        const keyEl = document.getElementById('welcome-license-key');
+        if (keyEl && data.licenseKey) {
+          keyEl.innerText = data.licenseKey;
+        }
+
+        const modal = document.getElementById('modal-welcome-checkout');
+        if (modal) {
+          modal.classList.remove('hidden');
+        }
+
+        if (typeof window.showToast === 'function') {
+          window.showToast('✓ ¡Suscripción y licencia activadas con éxito!', 'success');
+        }
+        return;
+      } else {
+        if (typeof window.showToast === 'function') {
+          window.showToast(data.error?.message || 'No se pudo validar la sesión de pago de Stripe', 'error');
+        }
+      }
+    } catch (err) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('Error de conexión al validar la sesión de pago con Stripe', 'error');
+      }
+    }
+  }
+
   const urlKey = urlParams.get('key') || urlParams.get('licenseKey');
   if (urlKey) {
     if (typeof window.handleAutoLoginWithKey === 'function') {

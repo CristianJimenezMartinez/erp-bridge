@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { LicenseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthService } from './auth.router';
 
 export const billingRouter = Router();
 const licenseService = new LicenseService();
@@ -242,10 +242,11 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
 
     // Modo Mock / Desarrollo local
     logger.warn('STRIPE_SECRET_KEY no configurada. Retornando Checkout Session simulada.');
+    const mockSessionId = `cs_test_mock_${Date.now()}`;
     return res.json({
       success: true,
-      sessionId: `cs_test_mock_${Date.now()}`,
-      url: `${successUrl}&demo_mode=true&plan=${matchedPlan.id}&price=${finalPriceEur}`,
+      sessionId: mockSessionId,
+      url: `${successUrl}&session_id=${mockSessionId}&demo_mode=true&plan=${matchedPlan.id}&price=${finalPriceEur}`,
       plan: matchedPlan.id,
       amountEur: finalPriceEur,
       demo: true,
@@ -395,16 +396,22 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         const maxActivations = Number(session.metadata?.maxActivations) || 1;
         const alias = session.metadata?.alias || 'Servidor Factusol Principal';
 
-        logger.info(`Generando licencia tras pago de ${customerEmail} (Plan: ${planId}, Servidores: ${maxActivations})...`);
+        logger.info(`Generando o reutilizando licencia tras pago de ${customerEmail} (Plan: ${planId}, Servidores: ${maxActivations})...`);
 
-        const license = await licenseService.createLicense({
-          organizationId,
-          plan: 'professional', // Mapeo de compatibilidad con schema DB existente
-          maxActivations,
-          alias,
-        });
+        const existingLicenses = await licenseService.listLicenses(organizationId);
+        let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
 
-        logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${alias}]`);
+        if (!license) {
+          license = await licenseService.createLicense({
+            organizationId,
+            plan: 'professional', // Mapeo de compatibilidad con schema DB existente
+            maxActivations,
+            alias,
+          });
+          logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${alias}]`);
+        } else {
+          logger.info(`✓ Licencia ${license.key} ya existente para ${customerEmail}. Reutilizando sin duplicar.`);
+        }
 
         return res.json({
           received: true,
@@ -460,6 +467,142 @@ billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: Request
     const list = await licenseService.listLicenses(orgId);
     return res.json({ data: list });
   } catch (error) {
+    next(error);
+    return;
+  }
+});
+
+/**
+ * 6. Canje y Activación Post-Checkout de Stripe (Onboarding y Auto-Login)
+ * Permite al frontend del Dashboard recibir la sesión completada de Stripe,
+ * auto-iniciar sesión y entregar en pantalla de inmediato la clave de licencia y el instalador.
+ */
+billingRouter.get('/billing/session-license', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sessionId = (req.query['session_id'] as string || '').trim();
+    if (!sessionId) {
+      return res.status(400).json({
+        error: { code: 'MISSING_SESSION_ID', message: 'Identificador de sesión de pago Stripe requerido' }
+      });
+    }
+
+    // Modo Mock / Testing Local (ej: cs_test_mock_...)
+    if (sessionId.startsWith('cs_test_mock_') || (!STRIPE_SECRET_KEY && sessionId.startsWith('cs_'))) {
+      const demoEmail = 'cliente-demo@bentian.es';
+      const orgId = `org_${Buffer.from(demoEmail).toString('hex').substring(0, 10)}`;
+      let licenses = await licenseService.listLicenses(orgId);
+      let license = licenses.length > 0 ? licenses[0]! : null;
+
+      if (!license) {
+        license = await licenseService.createLicense({
+          organizationId: orgId,
+          plan: 'professional',
+          maxActivations: 1,
+          alias: 'Servidor Factusol Principal (Demo)',
+        });
+      }
+
+      const exp = Date.now() + 48 * 60 * 60 * 1000;
+      const token = AuthService.createToken({
+        sub: license.key,
+        role: 'TENANT_CLIENT',
+        organizationId: orgId,
+        exp,
+      });
+
+      return res.json({
+        success: true,
+        licenseKey: license.key,
+        token,
+        email: demoEmail,
+        plan: license.plan,
+        organizationId: orgId,
+        alias: license.alias,
+        expiresAt: new Date(exp).toISOString(),
+      });
+    }
+
+    if (!STRIPE_SECRET_KEY || (!STRIPE_SECRET_KEY.startsWith('sk_live_') && !STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
+      return res.status(503).json({
+        error: { code: 'STRIPE_NOT_CONFIGURED', message: 'Servicio de facturación Stripe no configurado en producción' }
+      });
+    }
+
+    // Consultar sesión oficial en Stripe API
+    logger.info(`Consultando sesión de Stripe Checkout: ${sessionId}`);
+    const stripeRes = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      },
+    });
+
+    const sessionData = (await stripeRes.json()) as any;
+    if (!stripeRes.ok || !sessionData) {
+      logger.warn(`Sesión Stripe no encontrada o error devuelto: ${sessionData?.error?.message}`);
+      return res.status(404).json({
+        error: { code: 'SESSION_NOT_FOUND', message: 'Sesión de pago no encontrada en Stripe' }
+      });
+    }
+
+    // Verificar que el pago fue completado
+    const isPaid = sessionData.payment_status === 'paid' || sessionData.status === 'complete';
+    if (!isPaid) {
+      return res.status(400).json({
+        error: {
+          code: 'PAYMENT_NOT_COMPLETED',
+          message: `El pago aún no ha sido confirmado por la entidad bancaria (Estado: ${sessionData.payment_status || sessionData.status})`
+        }
+      });
+    }
+
+    const customerEmail = (
+      sessionData.customer_details?.email ||
+      sessionData.customer_email ||
+      'cliente@bentian.es'
+    ).toLowerCase().trim();
+
+    const organizationId = sessionData.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
+    const planId = sessionData.metadata?.planId || 'base_annual';
+    const maxActivations = Number(sessionData.metadata?.maxActivations) || 1;
+    const alias = sessionData.metadata?.alias || 'Servidor Factusol Principal';
+
+    // Idempotencia: Verificar si ya existe una licencia para esta organización
+    const existingLicenses = await licenseService.listLicenses(organizationId);
+    let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
+
+    if (!license) {
+      logger.info(`Creando licencia on-demand tras validación de sesión ${sessionId} para ${customerEmail}`);
+      license = await licenseService.createLicense({
+        organizationId,
+        plan: 'professional',
+        maxActivations,
+        alias,
+      });
+    }
+
+    const exp = Date.now() + 48 * 60 * 60 * 1000;
+    const token = AuthService.createToken({
+      sub: license.key,
+      role: 'TENANT_CLIENT',
+      organizationId,
+      exp,
+    });
+
+    logger.info(`✓ Onboarding post-checkout completado para ${customerEmail}. Clave: ${license.key}`);
+
+    return res.json({
+      success: true,
+      licenseKey: license.key,
+      token,
+      email: customerEmail,
+      plan: planId,
+      organizationId,
+      alias: license.alias,
+      expiresAt: new Date(exp).toISOString(),
+    });
+  } catch (error) {
+    logger.error('Error procesando onboarding post-checkout de Stripe:', error);
     next(error);
     return;
   }
