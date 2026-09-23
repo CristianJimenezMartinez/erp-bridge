@@ -145,6 +145,17 @@ async function handleEmailLogin(e) {
   const email = input ? input.value.trim() : '';
   if (!email) return;
 
+  // Detección proactiva si es Superadministrador
+  if (email.toLowerCase().startsWith('admin@') || email.toLowerCase().includes('cristianjm.com') || email.toLowerCase().includes('bentian.es')) {
+    switchLoginMode('admin');
+    const adminEmailInput = document.getElementById('login-email');
+    if (adminEmailInput) adminEmailInput.value = email;
+    const adminPassInput = document.getElementById('login-password');
+    if (adminPassInput) adminPassInput.focus();
+    showToast('Identificado como Administrador. Introduce tu contraseña de control.', 'info');
+    return;
+  }
+
   try {
     const res = await fetch('/api/v1/auth/email-session', {
       method: 'POST',
@@ -157,7 +168,16 @@ async function handleEmailLogin(e) {
       showDashboard();
       showToast('✓ Acceso concedido', 'success');
     } else {
-      showLoginError(data.error?.message || 'No se encontraron licencias para este correo');
+      if (data.error?.code === 'ADMIN_ACCOUNT') {
+        switchLoginMode('admin');
+        const adminEmailInput = document.getElementById('login-email');
+        if (adminEmailInput) adminEmailInput.value = email;
+        const adminPassInput = document.getElementById('login-password');
+        if (adminPassInput) adminPassInput.focus();
+        showToast(data.error.message, 'info');
+      } else {
+        showLoginError(data.error?.message || 'No se encontraron licencias para este correo');
+      }
     }
   } catch (err) {
     showLoginError('Error de conexión con la API central');

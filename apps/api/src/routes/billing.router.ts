@@ -419,7 +419,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           customerEmail,
           licenseKey: license.key,
           planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
-          alias: license.alias,
+          alias: license.alias || undefined,
         }).catch((err) => {
           logger.warn(`Aviso: Error no bloqueante al enviar email de bienvenida a ${customerEmail}: ${err.message}`);
         });
@@ -596,7 +596,7 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
         customerEmail,
         licenseKey: license.key,
         planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
-        alias: license.alias,
+        alias: license.alias || undefined,
       }).catch((err) => {
         logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
       });

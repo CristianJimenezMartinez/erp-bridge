@@ -164,9 +164,15 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
     let license = null;
     if (sub && sub.startsWith('EB-')) {
       license = await licenseService.getLicenseByKey(sub);
-    } else if (orgId) {
+    } else if (orgId && req.user?.role !== 'SUPERADMIN' && req.user?.role !== 'ADMIN') {
       const list = await licenseService.listLicenses(orgId);
       license = list[0] || null;
+    }
+
+    // Si es SUPERADMIN inspeccionando la vista cliente, previsualizar la primera licencia disponible
+    if (!license && (req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN')) {
+      const all = await licenseService.listLicenses(orgId);
+      license = all.find(l => l.status === 'active') || all[0] || null;
     }
 
     if (!license) {

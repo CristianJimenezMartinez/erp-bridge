@@ -400,7 +400,7 @@ agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN'
 
     return res.json({
       data: {
-        summary: { totalMachines: 0, onlineMachines: 0, upToDateMachines: 0, latestVersion: 'v0.3.0' },
+        summary: { totalMachines: 0, onlineMachines: 0, upToDateMachines: 0, latestVersion: 'v0.3.1' },
         machines: [],
       },
     });

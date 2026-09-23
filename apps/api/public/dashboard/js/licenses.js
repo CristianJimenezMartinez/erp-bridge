@@ -183,9 +183,38 @@ async function loadClientPortal() {
       const lic = window.currentClientData;
       const keyEl = document.getElementById('client-license-key');
       if (keyEl) keyEl.innerText = lic.key || '—';
+
+      const statusBadge = document.getElementById('client-status-badge');
+      if (statusBadge) {
+        if (lic.status === 'active') {
+          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+          statusBadge.innerText = 'ACTIVA';
+        } else if (lic.status === 'trial') {
+          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20';
+          statusBadge.innerText = 'EVALUACIÓN';
+        } else {
+          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20';
+          statusBadge.innerText = (lic.status || 'INACTIVA').toUpperCase();
+        }
+      }
+
       const seatTypeEl = document.getElementById('client-seat-type');
       if (seatTypeEl) {
         seatTypeEl.innerText = lic.seatType === 'ADDITIONAL_SEAT' ? 'Puesto Adicional (99 €/año)' : 'Licencia Base (1 ERP ⇄ 1 Tienda Web)';
+      }
+
+      const subStatus = document.getElementById('client-subscription-status');
+      if (subStatus) {
+        if (lic.billingStatus === 'ACTIVE' || lic.status === 'active') {
+          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Suscripción al día';
+          subStatus.className = 'text-emerald-400 flex items-center gap-1';
+        } else if (lic.billingStatus === 'PAST_DUE') {
+          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Pago pendiente';
+          subStatus.className = 'text-red-400 flex items-center gap-1';
+        } else {
+          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Modo Directo';
+          subStatus.className = 'text-zinc-400 flex items-center gap-1';
+        }
       }
 
       const act = lic.activations && lic.activations.length > 0 ? lic.activations[0] : null;
@@ -211,6 +240,41 @@ async function loadClientPortal() {
         }
         if (unbindBtn) unbindBtn.classList.add('hidden');
       }
+    } else {
+      // Manejo de estado vacío si la cuenta no tiene licencia
+      window.currentClientData = null;
+      const keyEl = document.getElementById('client-license-key');
+      if (keyEl) keyEl.innerText = 'Sin licencia asignada';
+
+      const statusBadge = document.getElementById('client-status-badge');
+      if (statusBadge) {
+        statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-500/10 text-zinc-400 border border-zinc-500/20';
+        statusBadge.innerText = 'SIN LICENCIA';
+      }
+
+      const seatTypeEl = document.getElementById('client-seat-type');
+      if (seatTypeEl) seatTypeEl.innerText = 'No hay ninguna licencia activa asociada a esta sesión';
+
+      const subStatus = document.getElementById('client-subscription-status');
+      if (subStatus) {
+        subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span> Sin suscripción activa';
+        subStatus.className = 'text-zinc-500 flex items-center gap-1';
+      }
+
+      const hostnameEl = document.getElementById('client-device-hostname');
+      if (hostnameEl) hostnameEl.innerText = 'Sin ordenador vinculado';
+
+      const hwidEl = document.getElementById('client-device-hwid');
+      if (hwidEl) hwidEl.innerText = 'HWID: —';
+
+      const badgeEl = document.getElementById('client-device-status-badge');
+      if (badgeEl) {
+        badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-500 border border-zinc-500/20';
+        badgeEl.innerText = 'Inactivo';
+      }
+
+      const unbindBtn = document.getElementById('btn-client-unbind');
+      if (unbindBtn) unbindBtn.classList.add('hidden');
     }
   } catch (e) {
     console.warn('Error cargando portal de cliente:', e);
@@ -220,9 +284,11 @@ async function loadClientPortal() {
 function copyClientKey() {
   const keyEl = document.getElementById('client-license-key');
   const key = keyEl ? keyEl.innerText : '';
-  if (key && key !== 'Cargando...') {
+  if (key && !key.includes('Cargando') && !key.includes('Sin licencia') && key !== '—') {
     navigator.clipboard.writeText(key);
-    showToast('Clave copiada al portapapeles', 'success');
+    showToast('✓ Clave copiada al portapapeles', 'success');
+  } else {
+    showToast('No hay ninguna clave activa para copiar', 'warning');
   }
 }
 

@@ -26,6 +26,7 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('fleet')" id="nav-tab-fleet" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Salud Equipos</button>
         <button onclick="switchDashboardTab('audit')" id="nav-tab-audit" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Auditoría</button>
         <button onclick="switchDashboardTab('organizations')" id="nav-tab-organizations" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Organizaciones</button>
+        <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Vista Cliente</button>
       `;
     }
 
@@ -37,6 +38,7 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('fleet')" id="mob-nav-tab-fleet" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Salud</button>
         <button onclick="switchDashboardTab('audit')" id="mob-nav-tab-audit" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Auditoría</button>
         <button onclick="switchDashboardTab('organizations')" id="mob-nav-tab-organizations" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Orgs</button>
+        <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Cliente</button>
       `;
     }
 
@@ -151,10 +153,20 @@ function switchDashboardTab(tabName) {
     if (typeof window.loadAuditLogs === 'function') window.loadAuditLogs();
   } else if (tabName === 'organizations') {
     if (typeof window.loadOrganizations === 'function') window.loadOrganizations();
+  } else if (tabName === 'client-portal') {
+    if (typeof window.loadClientPortal === 'function') window.loadClientPortal();
+    const banner = document.getElementById('client-preview-superadmin-banner');
+    if (banner) {
+      if (window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN') {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
   }
 }
 
-// Inicialización automática
+// Inicialización automática con Verificación Real de Identidad y Rol
 window.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const checkoutStatus = urlParams.get('checkout');
@@ -217,7 +229,42 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
   if (token) {
-    if (typeof window.showDashboard === 'function') window.showDashboard();
+    try {
+      // Validar con la API Central el rol real y vigencia de la sesión
+      const meRes = await fetch('/api/v1/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (meRes.ok) {
+        const meData = await meRes.json();
+        const user = meData.user;
+        if (user && user.role) {
+          const verifiedRole = (user.role === 'ADMIN' || user.role === 'SUPERADMIN') ? 'SUPERADMIN' : user.role;
+          window.currentAuthToken = token;
+          window.currentUserRole = verifiedRole;
+          window.currentOrgId = user.organizationId || 'org_default';
+          localStorage.setItem('bentian_cloud_role', verifiedRole);
+          localStorage.setItem('bentian_cloud_org', window.currentOrgId);
+          if (user.sub) {
+            localStorage.setItem('bentian_cloud_email', user.sub);
+          }
+          if (typeof window.showDashboard === 'function') {
+            window.showDashboard();
+          }
+          return;
+        }
+      } else {
+        // Token expirado o revocado: limpiar sesión
+        localStorage.removeItem('bentian_cloud_token');
+        localStorage.removeItem('bentian_cloud_role');
+        window.currentAuthToken = '';
+        if (typeof window.showLogin === 'function') window.showLogin();
+        return;
+      }
+    } catch {
+      // Fallback offline si no hay red inmediata
+      if (typeof window.showDashboard === 'function') window.showDashboard();
+      return;
+    }
   } else {
     if (typeof window.showLogin === 'function') window.showLogin();
   }

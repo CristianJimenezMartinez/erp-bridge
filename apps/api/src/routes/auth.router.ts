@@ -448,6 +448,17 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
     }
 
     const cleanEmail = email.toLowerCase().trim();
+    const adminEmail = process.env['ADMIN_EMAIL'];
+    if (adminEmail && cleanEmail === adminEmail.toLowerCase()) {
+      res.status(400).json({
+        error: {
+          code: 'ADMIN_ACCOUNT',
+          message: 'Esta dirección corresponde al Superadministrador. Inicia sesión en la pestaña Superadmin con tu contraseña.',
+        },
+      });
+      return;
+    }
+
     const orgId = `org_${Buffer.from(cleanEmail).toString('hex').substring(0, 10)}`;
     const licenses = await authLicenseService.listLicenses(orgId);
 

@@ -32,7 +32,7 @@ async function loadFleetHealthData() {
       }
 
       const versionKpi = document.getElementById('health-kpi-version');
-      if (versionKpi) versionKpi.innerText = 'v0.3.0';
+      if (versionKpi) versionKpi.innerText = 'v0.3.1';
 
       tbody.innerHTML = agents.map(a => {
         const isOnline = a.status === 'ACTIVE' || a.isOnline === true;
@@ -42,8 +42,8 @@ async function loadFleetHealthData() {
 
         const isLatest = a.isUpToDate !== false;
         const versionBadge = isLatest
-          ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${escapeHtml(a.version || 'v0.3.0')} <span class="text-[9px] text-emerald-500 uppercase">Al día</span></span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${escapeHtml(a.version || 'v0.2.9')} <span class="text-[9px] text-amber-300 uppercase">v${escapeHtml(a.latestVersion || '0.3.0')} disp.</span></span>`;
+          ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${escapeHtml(a.version || 'v0.3.1')} <span class="text-[9px] text-emerald-500 uppercase">Al día</span></span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${escapeHtml(a.version || 'v0.3.0')} <span class="text-[9px] text-amber-300 uppercase">v${escapeHtml(a.latestVersion || '0.3.1')} disp.</span></span>`;
 
         const shortHwid = a.hwid ? a.hwid.substring(0, 12) + '...' : '';
 
