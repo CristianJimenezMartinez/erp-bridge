@@ -49,8 +49,8 @@ console.log('🧪 Iniciando tests de blindaje de pedidos nocturnos (Overnight Or
   assert.strictEqual(canonical.series, '1', 'La serie debe ser "1"');
   assert.strictEqual(canonical.warehouse, 'GEN', 'El almacén debe ser "GEN"');
 
-  // Cliente
-  assert.strictEqual(canonical.customer.fiscalName, 'Carlos Gómez Martínez', 'El nombre fiscal debe ser el fullName');
+  // Cliente (Sanitizado para compatibilidad total con Factusol OLEDB)
+  assert.strictEqual(canonical.customer.fiscalName, 'Carlos Gomez Martinez', 'El nombre fiscal debe ser el fullName sanitizado');
   assert.strictEqual(canonical.shippingAddress?.state, 'Madrid', 'province debe mapearse a state (CPRPCL)');
   assert.strictEqual(canonical.shippingAddress?.street, 'Calle Mayor 15, 2º B', 'Dirección de envío correcta');
 

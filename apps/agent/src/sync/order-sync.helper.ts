@@ -11,6 +11,24 @@ import {
  */
 export class OrderSyncHelper {
   /**
+   * Sanitiza cadenas de texto para inserción en Factusol OLEDB/Access:
+   * Normaliza diacríticos (á->a, é->e, í->i, ó->o, ú->u, etc.) protegiendo ñ/Ñ,
+   * y eliminando caracteres invisibles de control o saltos de línea que corrompen el driver ADODB.
+   */
+  public static sanitizeFactusolText(val: unknown): string {
+    if (val === null || val === undefined) return '';
+    return String(val)
+      .replace(/[áàäâÁÀÄÂ]/g, (c) => (c === c.toUpperCase() ? 'A' : 'a'))
+      .replace(/[éèëêÉÈËÊ]/g, (c) => (c === c.toUpperCase() ? 'E' : 'e'))
+      .replace(/[íìïîÍÌÏÎ]/g, (c) => (c === c.toUpperCase() ? 'I' : 'i'))
+      .replace(/[óòöôÓÒÖÔ]/g, (c) => (c === c.toUpperCase() ? 'O' : 'o'))
+      .replace(/[úùüûÚÙÜÛ]/g, (c) => (c === c.toUpperCase() ? 'U' : 'u'))
+      .replace(/[\r\n\t]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /**
    * Extrae el NIF/CIF/DNI de un pedido WooCommerce inspeccionando metadatos y campos de facturación.
    */
   public static extractTaxIdFromWcOrder(wcOrder: any): string {
@@ -68,20 +86,21 @@ export class OrderSyncHelper {
     const rawLines = Array.isArray(po.lines) ? po.lines : Array.isArray(po.lineas) ? po.lineas : [];
 
     // 1. Cliente y Direcciones
-    const fullName = (
+    const rawFullName = (
       String(rawCustomer.fullName || rawCustomer.name || '').trim() ||
       `${rawCustomer.firstName || ''} ${rawCustomer.lastName || ''}`.trim() ||
       'CLIENTE CONTADO WEB'
     );
+    const fullName = OrderSyncHelper.sanitizeFactusolText(rawFullName);
 
     const nameParts = fullName.split(/\s+/);
-    const firstName = rawCustomer.firstName || nameParts[0] || 'Cliente';
-    const lastName = rawCustomer.lastName || nameParts.slice(1).join(' ') || (fullName === 'CLIENTE CONTADO WEB' ? 'Web' : '');
+    const firstName = OrderSyncHelper.sanitizeFactusolText(rawCustomer.firstName) || nameParts[0] || 'Cliente';
+    const lastName = OrderSyncHelper.sanitizeFactusolText(rawCustomer.lastName) || nameParts.slice(1).join(' ') || (fullName === 'CLIENTE CONTADO WEB' ? 'Web' : '');
 
-    const street = String(rawCustomer.address || rawCustomer.street || rawCustomer.cdopcl || '').trim();
-    const city = String(rawCustomer.city || rawCustomer.cpopcl || '').trim();
+    const street = OrderSyncHelper.sanitizeFactusolText(rawCustomer.address || rawCustomer.street || rawCustomer.cdopcl || '');
+    const city = OrderSyncHelper.sanitizeFactusolText(rawCustomer.city || rawCustomer.cpopcl || '');
     const postalCode = String(rawCustomer.postalCode || rawCustomer.postal_code || rawCustomer.cp || rawCustomer.ccppcl || '').trim();
-    const state = String(rawCustomer.province || rawCustomer.state || rawCustomer.cprpcl || '').trim();
+    const state = OrderSyncHelper.sanitizeFactusolText(rawCustomer.province || rawCustomer.state || rawCustomer.cprpcl || '');
     const country = String(rawCustomer.country || rawCustomer.cpapcl || 'ES').trim();
     const phone = String(rawCustomer.phone || rawCustomer.telpcl || '').trim();
     const email = String(rawCustomer.email || rawCustomer.cempcl || 'cliente@tienda.com').trim();
@@ -90,7 +109,7 @@ export class OrderSyncHelper {
     const addressObj: CanonicalAddress = {
       firstName,
       lastName,
-      company: rawCustomer.company || '',
+      company: OrderSyncHelper.sanitizeFactusolText(rawCustomer.company || ''),
       street,
       city,
       state,
@@ -103,7 +122,7 @@ export class OrderSyncHelper {
     // 2. Líneas de Pedido
     const lines: CanonicalOrderLine[] = rawLines.map((l: any, idx: number) => {
       const rawSku = String(l.artlpc || l.sku || l.code || l.id || `ART_${idx + 1}`).trim();
-      const rawName = String(l.deslpc || l.name || l.description || 'Artículo').trim();
+      const rawName = OrderSyncHelper.sanitizeFactusolText(l.deslpc || l.name || l.description || 'Artículo');
       const quantity = Math.max(0.01, Number(l.canlpc ?? l.quantity ?? l.qty ?? 1));
       const unitPrice = Number(l.prelpc ?? l.unitPrice ?? l.price ?? 0);
       const discountPercent = Math.max(0, Math.min(100, Number(l.dt1lpc ?? l.discountPercent ?? l.discount ?? 0)));
@@ -239,7 +258,14 @@ export class OrderSyncHelper {
     const billing = wcOrder.billing || {};
     const shipping = wcOrder.shipping || {};
 
-    const fiscalName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'Cliente Web';
+    const rawFiscalName = `${billing.first_name || ''} ${billing.last_name || ''}`.trim() || 'Cliente Web';
+    const fiscalName = OrderSyncHelper.sanitizeFactusolText(rawFiscalName);
+
+    const firstName = OrderSyncHelper.sanitizeFactusolText(billing.first_name || '');
+    const lastName = OrderSyncHelper.sanitizeFactusolText(billing.last_name || '');
+    const street = OrderSyncHelper.sanitizeFactusolText(billing.address_1 || '');
+    const city = OrderSyncHelper.sanitizeFactusolText(billing.city || '');
+    const state = OrderSyncHelper.sanitizeFactusolText(billing.state || '');
 
     const customer: CanonicalCustomer = {
       id: String(wcOrder.customer_id || '0'),
@@ -249,11 +275,11 @@ export class OrderSyncHelper {
       phone: billing.phone || '',
       hasEquivalenceSurcharge: false,
       address: {
-        firstName: billing.first_name,
-        lastName: billing.last_name,
-        street: billing.address_1,
-        city: billing.city,
-        state: billing.state,
+        firstName,
+        lastName,
+        street,
+        city,
+        state,
         postalCode: billing.postcode,
         country: billing.country || 'ES',
         phone: billing.phone,
@@ -262,11 +288,11 @@ export class OrderSyncHelper {
     };
 
     const shippingAddress: CanonicalAddress = {
-      firstName: shipping.first_name || billing.first_name,
-      lastName: shipping.last_name || billing.last_name,
-      street: shipping.address_1 || billing.address_1,
-      city: shipping.city || billing.city,
-      state: shipping.state || billing.state,
+      firstName: OrderSyncHelper.sanitizeFactusolText(shipping.first_name || billing.first_name || ''),
+      lastName: OrderSyncHelper.sanitizeFactusolText(shipping.last_name || billing.last_name || ''),
+      street: OrderSyncHelper.sanitizeFactusolText(shipping.address_1 || billing.address_1 || ''),
+      city: OrderSyncHelper.sanitizeFactusolText(shipping.city || billing.city || ''),
+      state: OrderSyncHelper.sanitizeFactusolText(shipping.state || billing.state || ''),
       postalCode: shipping.postcode || billing.postcode,
       country: shipping.country || billing.country || 'ES',
       phone: billing.phone,
@@ -274,11 +300,11 @@ export class OrderSyncHelper {
     };
 
     const billingAddress: CanonicalAddress = {
-      firstName: billing.first_name,
-      lastName: billing.last_name,
-      street: billing.address_1,
-      city: billing.city,
-      state: billing.state,
+      firstName,
+      lastName,
+      street,
+      city,
+      state,
       postalCode: billing.postcode,
       country: billing.country || 'ES',
       phone: billing.phone,
@@ -287,7 +313,7 @@ export class OrderSyncHelper {
 
     const lines: CanonicalOrderLine[] = (wcOrder.line_items || []).map((li: any, idx: number) => {
       const rawSku = String(li.sku || `ART_${idx + 1}`).trim();
-      const rawName = String(li.name || 'Artículo').trim();
+      const rawName = OrderSyncHelper.sanitizeFactusolText(li.name || 'Artículo');
       const quantity = Math.max(0.01, Number(li.quantity || 1));
       const subtotal = Number(li.total || (quantity * Number(li.price || 0)));
       const unitPrice = quantity > 0 ? Number((subtotal / quantity).toFixed(4)) : Number(li.price || 0);

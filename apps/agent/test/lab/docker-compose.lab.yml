@@ -1,0 +1,41 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: bentian-lab-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: suministros_tienda
+      MYSQL_USER: tienda_user
+      MYSQL_PASSWORD: fGC3IaLKvvGmhW47XF6X
+    ports:
+      - "3309:3306"
+    networks:
+      - bentian-lab-net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 2s
+      timeout: 5s
+      retries: 25
+
+  php-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    container_name: bentian-lab-php
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      EB_SECRET_KEY: rubio_secreto_2026
+      EB_DB_HOST: mariadb
+      EB_DB_NAME: suministros_tienda
+      EB_DB_USER: tienda_user
+      EB_DB_PASS: fGC3IaLKvvGmhW47XF6X
+    ports:
+      - "8999:80"
+    networks:
+      - bentian-lab-net
+
+networks:
+  bentian-lab-net:
+    driver: bridge
