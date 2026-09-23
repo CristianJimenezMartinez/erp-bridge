@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { CanonicalOrder, Logger } from '@erp-bridge/shared';
+import { Logger } from '@erp-bridge/shared';
 import { AccessDriver, FactusolConnector, FactusolYearResolver } from '@erp-bridge/connector-factusol';
 import { ConfigManager } from '../config/config.manager';
 import { HistoryManager } from '../history/history.manager';
@@ -7,6 +7,7 @@ import { EventBus } from '../diagnostics/event-bus';
 import { FactusolService } from '../factusol/factusol.service';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
+import { OrderSyncHelper } from './order-sync.helper';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -26,25 +27,7 @@ export class LocalSyncEngine {
   }
 
   public extractTaxIdFromWcOrder(wcOrder: any): string {
-    const metaList = Array.isArray(wcOrder.meta_data) ? wcOrder.meta_data : [];
-    const nifMeta = metaList.find(
-      (m: any) =>
-        m.key === '_billing_nif' ||
-        m.key === 'billing_nif' ||
-        m.key === '_billing_cif' ||
-        m.key === 'billing_cif' ||
-        m.key === '_billing_dni' ||
-        m.key === 'billing_dni' ||
-        m.key === 'nif' ||
-        m.key === 'cif' ||
-        m.key === 'vat_number'
-    );
-    if (nifMeta && nifMeta.value) {
-      return String(nifMeta.value).trim();
-    }
-    if (wcOrder.billing?.nif) return String(wcOrder.billing.nif).trim();
-    if (wcOrder.billing?.tax_id) return String(wcOrder.billing.tax_id).trim();
-    return '';
+    return OrderSyncHelper.extractTaxIdFromWcOrder(wcOrder);
   }
 
   public resolveBridgeEndpoint(storeUrl: string): string {
@@ -247,106 +230,61 @@ export class LocalSyncEngine {
 
         // 2. SINCRONIZACIÓN DE PEDIDOS (WooCommerce -> Factusol)
         try {
-          const resOrders: any = await fetch(`${cleanUrl}/wp-json/wc/v3/orders?status=processing`, {
-            headers: { Authorization: authHeader },
-            signal: AbortSignal.timeout(10000),
-          });
+          const series = config.factusol?.orderSeries || '1';
+          const warehouse = config.factusol?.warehouseCode || 'GEN';
 
-          if (resOrders.ok) {
-            const wcOrders = (await resOrders.json()) as any[];
-            const series = config.factusol?.orderSeries || '1';
+          let factusolConnector = this.factusolService.getConnector();
+          if (!factusolConnector) {
+            factusolConnector = new FactusolConnector();
+            await factusolConnector.connect({
+              configuration: {
+                databasePath: dbPath,
+                orderSeries: series,
+                defaultWarehouse: warehouse,
+                tariffCode: config.factusol?.tariffCode || '1',
+                saleTariffCode: config.factusol?.saleTariffCode,
+              },
+            });
+          }
 
-            let factusolConnector = this.factusolService.getConnector();
-            if (!factusolConnector) {
-              factusolConnector = new FactusolConnector();
-              await factusolConnector.connect({
-                configuration: {
-                  databasePath: dbPath,
-                  orderSeries: series,
-                  defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-                  tariffCode: config.factusol?.tariffCode || '1',
-                  saleTariffCode: config.factusol?.saleTariffCode,
-                },
-              });
+          let wcOrderPage = 1;
+          const MAX_WC_PAGES = 10;
+          let hasMoreWc = true;
+
+          while (hasMoreWc && wcOrderPage <= MAX_WC_PAGES) {
+            const resOrders: any = await fetch(
+              `${cleanUrl}/wp-json/wc/v3/orders?status=processing&per_page=100&page=${wcOrderPage}&orderby=date&order=desc`,
+              {
+                headers: { Authorization: authHeader },
+                signal: AbortSignal.timeout(15000),
+              }
+            ).catch((err) => {
+              this.logger.warn(`Error al consultar pedidos en WooCommerce (página ${wcOrderPage}): ${String(err)}`);
+              return null;
+            });
+
+            if (!resOrders || !resOrders.ok) {
+              break;
             }
 
+            const wcOrders = (await resOrders.json().catch(() => [])) as any[];
+            if (!Array.isArray(wcOrders) || wcOrders.length === 0) {
+              hasMoreWc = false;
+              break;
+            }
+
+            let newOrdersInBatch = 0;
             for (const wcOrder of wcOrders) {
-              const externalRef = String(wcOrder.id);
-              const extractedNif = this.extractTaxIdFromWcOrder(wcOrder);
+              if (OrderSyncHelper.isWcOrderAlreadyProcessed(wcOrder)) {
+                continue;
+              }
+              newOrdersInBatch++;
 
-              const canonicalOrder: CanonicalOrder = {
-                id: externalRef,
-                orderNumber: externalRef,
-                series,
-                reference: externalRef,
-                date: new Date(wcOrder.date_created || Date.now()),
-                status: 'processing',
-                hasEquivalenceSurcharge: false,
-                discountAmount: 0,
-                warehouse: 'GEN',
-                paymentMethod: wcOrder.payment_method || 'TAR',
-                paymentMethodTitle: wcOrder.payment_method_title,
-                currency: wcOrder.currency || 'EUR',
-                customer: {
-                  id: String(wcOrder.customer_id || '0'),
-                  fiscalName: `${wcOrder.billing?.first_name || ''} ${wcOrder.billing?.last_name || ''}`.trim() || 'Cliente Web',
-                  taxId: extractedNif,
-                  email: wcOrder.billing?.email || '',
-                  phone: wcOrder.billing?.phone || '',
-                  hasEquivalenceSurcharge: false,
-                  address: {
-                    street: wcOrder.billing?.address_1,
-                    city: wcOrder.billing?.city,
-                    state: wcOrder.billing?.state,
-                    postalCode: wcOrder.billing?.postcode,
-                    country: wcOrder.billing?.country || 'ES',
-                    phone: wcOrder.billing?.phone,
-                    email: wcOrder.billing?.email,
-                  },
-                },
-                shippingAddress: {
-                  firstName: wcOrder.shipping?.first_name,
-                  lastName: wcOrder.shipping?.last_name,
-                  street: wcOrder.shipping?.address_1,
-                  city: wcOrder.shipping?.city,
-                  state: wcOrder.shipping?.state,
-                  postalCode: wcOrder.shipping?.postcode,
-                  country: wcOrder.shipping?.country || 'ES',
-                  phone: wcOrder.billing?.phone,
-                  email: wcOrder.billing?.email,
-                },
-                billingAddress: {
-                  firstName: wcOrder.billing?.first_name,
-                  lastName: wcOrder.billing?.last_name,
-                  street: wcOrder.billing?.address_1,
-                  city: wcOrder.billing?.city,
-                  state: wcOrder.billing?.state,
-                  postalCode: wcOrder.billing?.postcode,
-                  country: wcOrder.billing?.country || 'ES',
-                  phone: wcOrder.billing?.phone,
-                  email: wcOrder.billing?.email,
-                },
-                netAmount: Math.max(0, Number(wcOrder.total || 0) - Number(wcOrder.total_tax || 0)),
-                taxAmount: Number(wcOrder.total_tax || 0),
-                shippingAmount: Number(wcOrder.shipping_total || 0),
-                totalAmount: Number(wcOrder.total || 0),
-                notes: wcOrder.customer_note || '',
-                lines: (wcOrder.line_items || []).map((li: any, idx: number) => ({
-                  id: String(li.id),
-                  position: idx + 1,
-                  sku: li.sku || 'GENERICO',
-                  name: li.name || 'Artículo',
-                  quantity: Number(li.quantity || 1),
-                  unitPrice: Number(li.price || 0),
-                  total: Number(li.total || 0),
-                  vatRate: 21,
-                })),
-              };
-
-              // Delegar en FactusolConnector.createOrder() para idempotencia, deduplicación, F_DCL y reintentos
+              const canonicalOrder = OrderSyncHelper.wooCommerceToCanonical(wcOrder, series, warehouse);
               const orderRes = await factusolConnector.createOrder(canonicalOrder);
 
               if (orderRes.success) {
+                const assignedNum = String(orderRes.externalId || orderRes.orderNumber || wcOrder.id);
                 // Marcar en WooCommerce con metadato de importación Factusol
                 await fetch(`${cleanUrl}/wp-json/wc/v3/orders/${wcOrder.id}`, {
                   method: 'PUT',
@@ -355,19 +293,26 @@ export class LocalSyncEngine {
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    meta_data: [{ key: '_bentian_factusol_pcl', value: String(orderRes.externalId) }],
+                    meta_data: [{ key: '_bentian_factusol_pcl', value: assignedNum }],
                   }),
                 }).catch(() => null);
 
                 ordersImported++;
-                this.eventBus.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${orderRes.externalId})`);
+                this.eventBus.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${assignedNum})`);
               } else {
                 this.logger.warn(`No se pudo importar pedido #${wcOrder.id} a Factusol: ${orderRes.error}`);
               }
             }
+
+            // Parada temprana: si en orden desc todos los 100 pedidos ya estaban sincronizados, detener
+            if (newOrdersInBatch === 0 || wcOrders.length < 100) {
+              hasMoreWc = false;
+            } else {
+              wcOrderPage++;
+            }
           }
         } catch (orderErr) {
-          this.logger.warn(`Aviso en importación de pedidos: ${String(orderErr)}`);
+          this.logger.warn(`Aviso en importación de pedidos de WooCommerce: ${String(orderErr)}`);
         }
       } else {
         // Modo Standalone sin WooCommerce configurado
@@ -768,136 +713,100 @@ export class LocalSyncEngine {
     // 2. Sincronización de pedidos (Universal Bridge -> Factusol)
     try {
       this.eventBus.addEvent('info', 'Comprobando pedidos nuevos en la tienda online...');
-      const pullRes = await fetch(`${endpointUrl}?action=pull_orders&limit=50`, {
-        method: 'GET',
-        headers,
-        signal: AbortSignal.timeout(15000),
-      }).catch((err) => {
-        this.logger.warn(`Aviso al consultar pedidos en Universal Bridge: ${String(err)}`);
-        return null;
-      });
+      const series = config.factusol?.orderSeries || '1';
+      const warehouse = config.factusol?.warehouseCode || 'GEN';
 
-      if (pullRes && pullRes.ok) {
-        const pullJson = (await pullRes.json()) as { success?: boolean; orders?: any[] };
-        const pendingOrders = pullJson.orders || [];
+      let factusolConnector = this.factusolService.getConnector();
+      if (!factusolConnector) {
+        factusolConnector = new FactusolConnector();
+        await factusolConnector.connect({
+          configuration: {
+            databasePath: dbPath,
+            orderSeries: series,
+            invoiceSeries: config.factusol?.invoiceSeries || '1',
+            defaultWarehouse: warehouse,
+            tariffCode: config.factusol?.tariffCode || '1',
+            saleTariffCode: config.factusol?.saleTariffCode,
+          },
+        });
+      }
 
-        if (pendingOrders.length > 0) {
-          this.eventBus.addEvent('info', `Encontrados ${pendingOrders.length} pedidos web pendientes. Importando a Factusol...`);
-          let factusolConnector = this.factusolService.getConnector();
-          if (!factusolConnector) {
-            factusolConnector = new FactusolConnector();
-            await factusolConnector.connect({
-              configuration: {
-                databasePath: dbPath,
-                orderSeries: config.factusol?.orderSeries || '1',
-                invoiceSeries: config.factusol?.invoiceSeries || '1',
-                defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-                tariffCode: config.factusol?.tariffCode || '1',
-                saleTariffCode: config.factusol?.saleTariffCode,
-              },
-            });
-          }
+      const MAX_PULL_BATCHES = 10;
+      const seenOrderIds = new Set<number>();
+      let batchCount = 0;
+      let hasMoreBatches = true;
 
-          const confirmations: Array<{ webOrderId: number; factusolOrderNumber: number; factusolSeries: string }> = [];
+      while (hasMoreBatches && batchCount < MAX_PULL_BATCHES) {
+        batchCount++;
+        const pullRes = await fetch(`${endpointUrl}?action=pull_orders&limit=100`, {
+          method: 'GET',
+          headers,
+          signal: AbortSignal.timeout(15000),
+        }).catch((err) => {
+          this.logger.warn(`Aviso al consultar pedidos en Universal Bridge: ${String(err)}`);
+          return null;
+        });
 
-          for (const po of pendingOrders) {
-            try {
-              const rawLines = Array.isArray(po.lines) ? po.lines : [];
-              const mappedLines = rawLines.map((l: any, idx: number) => {
-                const qty = Number(l.quantity) || 1;
-                const price = Number(l.price || l.unitPrice) || 0;
-                const sub = Number((qty * price).toFixed(2));
-                return {
-                  id: String(l.id || l.sku || l.code || idx + 1),
-                  position: idx + 1,
-                  sku: String(l.sku || l.code || `ART_${idx + 1}`),
-                  name: l.name || l.description || 'Artículo',
-                  quantity: qty,
-                  unitPrice: price,
-                  vatPercent: Number(l.vatPercent) || 21,
-                  vatType: 0,
-                  subtotal: sub,
-                  total: sub,
-                };
+        if (!pullRes || !pullRes.ok) {
+          break;
+        }
+
+        const pullJson = (await pullRes.json().catch(() => null)) as { success?: boolean; orders?: any[] } | null;
+        const rawBatch = pullJson?.orders || [];
+        const pendingOrders = rawBatch.filter((po) => po && po.id && !seenOrderIds.has(Number(po.id)));
+
+        if (pendingOrders.length === 0) {
+          hasMoreBatches = false;
+          break;
+        }
+
+        const confirmations: Array<{
+          id: number;
+          orderId: number;
+          webOrderId: number;
+          factusolOrderNumber: number;
+          factusolSeries: string;
+        }> = [];
+
+        for (const po of pendingOrders) {
+          const numId = Number(po.id);
+          seenOrderIds.add(numId);
+          try {
+            const canonicalOrder = OrderSyncHelper.universalBridgeToCanonical(po, series, warehouse);
+            const mutRes = await factusolConnector.createOrder(canonicalOrder);
+
+            if (mutRes.success) {
+              ordersImported++;
+              const factNum = Number(mutRes.externalId || mutRes.orderNumber) || 0;
+              confirmations.push({
+                id: numId,
+                orderId: numId,
+                webOrderId: numId,
+                factusolOrderNumber: factNum,
+                factusolSeries: series,
               });
-
-              const canonicalOrder: CanonicalOrder = {
-                id: String(po.id),
-                orderNumber: po.orderNumber,
-                series: config.factusol?.orderSeries || '1',
-                reference: po.orderNumber,
-                date: new Date(po.createdAt || Date.now()),
-                status: 'processing',
-                currency: 'EUR',
-                netAmount: po.subtotal || po.total || 0,
-                taxAmount: po.taxTotal || 0,
-                shippingAmount: po.shippingCost || 0,
-                discountAmount: 0,
-                totalAmount: po.total || 0,
-                warehouse: config.factusol?.warehouseCode || 'GEN',
-                hasEquivalenceSurcharge: false,
-                lines:
-                  mappedLines.length > 0
-                    ? mappedLines
-                    : [
-                        {
-                          id: '1',
-                          position: 1,
-                          sku: 'GENERICO',
-                          name: 'Artículo genérico',
-                          quantity: 1,
-                          unitPrice: po.total || 0,
-                          vatPercent: 21,
-                          vatType: 0,
-                          subtotal: po.total || 0,
-                          total: po.total || 0,
-                        },
-                      ],
-                customer: {
-                  id: po.customer?.email || po.customer?.taxId || 'web_customer',
-                  email: po.customer?.email || 'cliente@tienda.com',
-                  fiscalName: `${po.customer?.firstName || po.customer?.name || 'Cliente'} ${po.customer?.lastName || 'Web'}`.trim(),
-                  taxId: po.customer?.taxId || po.customer?.cif || po.customer?.nif || '',
-                  commercialName: po.customer?.company || '',
-                  phone: po.customer?.phone || '',
-                  hasEquivalenceSurcharge: false,
-                },
-                shippingAddress: {
-                  street: po.customer?.address || '',
-                  city: po.customer?.city || '',
-                  postalCode: po.customer?.postalCode || po.customer?.cp || '',
-                  state: po.customer?.province || po.customer?.state || '',
-                  country: po.customer?.country || 'ES',
-                },
-                notes: `Pedido Web ${po.orderNumber} - Pago: ${po.paymentMethod || 'Pasarela'}`,
-                rawSourceData: po,
-              };
-
-              const mutRes = await factusolConnector.createOrder(canonicalOrder);
-              if (mutRes.success) {
-                ordersImported++;
-                confirmations.push({
-                  webOrderId: po.id,
-                  factusolOrderNumber: Number(mutRes.orderId) || 0,
-                  factusolSeries: config.factusol?.orderSeries || '1',
-                });
-                this.eventBus.addEvent('success', `✓ Pedido ${po.orderNumber} registrado en Factusol (Nº ${mutRes.orderId}).`);
-              }
-            } catch (ordErr) {
-              this.logger.error(`Error al procesar pedido web ${po.orderNumber}:`, ordErr);
+              this.eventBus.addEvent('success', `✓ Pedido ${canonicalOrder.reference} registrado en Factusol (Nº ${factNum || mutRes.externalId}).`);
+            } else {
+              this.logger.warn(`No se pudo registrar pedido web #${numId} (${po.order_number}) en Factusol: ${mutRes.error}`);
             }
+          } catch (ordErr) {
+            this.logger.error(`Error al procesar pedido web #${numId}:`, ordErr);
           }
+        }
 
-          if (confirmations.length > 0) {
-            await fetch(`${endpointUrl}?action=ack_orders`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ confirmations }),
-              signal: AbortSignal.timeout(15000),
-            }).catch((err) => {
-              this.logger.warn(`Aviso al confirmar pedidos en Universal Bridge: ${String(err)}`);
-            });
-          }
+        if (confirmations.length > 0) {
+          await fetch(`${endpointUrl}?action=ack_orders`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ confirmations }),
+            signal: AbortSignal.timeout(15000),
+          }).catch((err) => {
+            this.logger.warn(`Aviso al confirmar pedidos en Universal Bridge: ${String(err)}`);
+          });
+        }
+
+        if (rawBatch.length < 100 || confirmations.length === 0) {
+          hasMoreBatches = false;
         }
       }
     } catch (orderErr) {

@@ -882,12 +882,20 @@ if ($mainAction === 'pull_orders' || $mainAction === 'get_orders') {
         $orders[] = [
             'id' => intval($r['id']),
             'order_number' => $r['order_number'],
+            'orderNumber' => $r['order_number'],
             'status' => $r['status'],
             'customer' => json_decode($r['customer_data'], true) ?: [],
             'lines' => json_decode($r['order_lines'], true) ?: [],
             'payment_method' => $r['payment_method'],
+            'paymentMethod' => $r['payment_method'],
+            'payment_status' => $r['payment_status'] ?? 'COMPLETED',
+            'payment_reference' => $r['payment_reference'] ?? '',
+            'subtotal' => floatval($r['subtotal'] ?? $r['total']),
+            'tax_total' => floatval($r['tax_total'] ?? 0),
+            'shipping_cost' => floatval($r['shipping_cost'] ?? 0),
             'total' => floatval($r['total']),
             'created_at' => $r['created_at'],
+            'createdAt' => $r['created_at'],
         ];
     }
     echo json_encode(['success' => true, 'orders' => $orders]);
@@ -913,9 +921,9 @@ if ($mainAction === 'ack_orders') {
     try {
         foreach ($confirmations as $c) {
             $stmt->execute([
-                ':id' => intval($c['orderId'] ?? 0),
-                ':factNum' => intval($c['factusolOrderNumber'] ?? 0) ?: null,
-                ':factSer' => substr($c['factusolSeries'] ?? 'A', 0, 5),
+                ':id' => intval($c['orderId'] ?? $c['webOrderId'] ?? $c['id'] ?? 0),
+                ':factNum' => intval($c['factusolOrderNumber'] ?? $c['orderNumber'] ?? 0) ?: null,
+                ':factSer' => substr($c['factusolSeries'] ?? '1', 0, 5),
             ]);
             $count++;
         }
