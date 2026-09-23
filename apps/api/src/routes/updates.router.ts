@@ -1,5 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { UpdateService } from '@erp-bridge/core';
+import * as fs from 'fs';
+import * as path from 'path';
+import { UpdateService, compareSemver } from '@erp-bridge/core';
 import {
   UpdateCheckRequestSchema,
   UpdateConfirmRequestSchema,
@@ -14,7 +16,41 @@ const updateService = new UpdateService();
 updatesRouter.post('/updates/check', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = UpdateCheckRequestSchema.parse(req.body);
-    const result = await updateService.checkForUpdates(validated);
+    let result = await updateService.checkForUpdates(validated);
+
+    // Fallback de alta resiliencia: Si la base de datos no tiene una versión superior, comprobar releases/latest.json en disco
+    if (!result.available) {
+      try {
+        const candidatePaths = [
+          path.resolve(__dirname, '../../../../releases/latest.json'),
+          path.resolve(__dirname, '../../../releases/latest.json'),
+          path.resolve(process.cwd(), 'releases/latest.json'),
+          '/app/releases/latest.json',
+        ];
+        for (const p of candidatePaths) {
+          if (fs.existsSync(p)) {
+            const latestData = JSON.parse(fs.readFileSync(p, 'utf8'));
+            const manifest = latestData.stable || latestData;
+            if (manifest && manifest.version && compareSemver(manifest.version, validated.currentVersion) > 0) {
+              result = {
+                available: true,
+                version: manifest.version,
+                downloadUrl: manifest.downloadUrl,
+                sha256: manifest.sha256,
+                signature: manifest.signature,
+                fileSize: manifest.fileSize,
+                releaseNotes: manifest.releaseNotes,
+                mandatory: manifest.mandatory,
+                minVersion: manifest.minVersion,
+                channel: manifest.channel || 'stable',
+              };
+              break;
+            }
+          }
+        }
+      } catch {}
+    }
+
     res.json({ data: result });
   } catch (error) {
     next(error);
