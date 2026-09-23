@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { LicenseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService } from './auth.router';
+import { MailerService } from '../services/mailer.service';
 
 export const billingRouter = Router();
 const licenseService = new LicenseService();
@@ -413,6 +414,16 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           logger.info(`✓ Licencia ${license.key} ya existente para ${customerEmail}. Reutilizando sin duplicar.`);
         }
 
+        // Despacho de email transaccional de bienvenida y entrega de clave (a coste cero)
+        MailerService.sendLicenseWelcomeEmail({
+          customerEmail,
+          licenseKey: license.key,
+          planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
+          alias: license.alias,
+        }).catch((err) => {
+          logger.warn(`Aviso: Error no bloqueante al enviar email de bienvenida a ${customerEmail}: ${err.message}`);
+        });
+
         return res.json({
           received: true,
           licenseKey: license.key,
@@ -578,6 +589,16 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
         plan: 'professional',
         maxActivations,
         alias,
+      });
+
+      // Despachar email de bienvenida si la licencia fue generada en este momento
+      MailerService.sendLicenseWelcomeEmail({
+        customerEmail,
+        licenseKey: license.key,
+        planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
+        alias: license.alias,
+      }).catch((err) => {
+        logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
       });
     }
 
