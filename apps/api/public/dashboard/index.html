@@ -251,6 +251,11 @@
           <span>Instalador (.exe)</span>
         </a>
 
+        <a href="/docs/windows-antivirus-smartscreen-guide.md" target="_blank" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-[11px] font-medium border border-amber-500/30 transition" title="Guía de ayuda contra bloqueos de SmartScreen y antivirus">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span>Ayuda SmartScreen / Antivirus</span>
+        </a>
+
         <div class="h-4 w-[1px] bg-white/[0.08]"></div>
 
         <!-- DROPDOWN PERFIL & CERRAR SESIÓN -->
@@ -283,6 +288,11 @@
             <a href="/releases/v0.3.1/Bentian-Setup-v0.3.1.exe" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition">
               <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               <span>Descargar Agente Windows (.exe)</span>
+            </a>
+
+            <a href="/docs/windows-antivirus-smartscreen-guide.md" target="_blank" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 rounded-lg transition">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span>Guía SmartScreen & Antivirus</span>
             </a>
 
             <button onclick="openStripePortal(); toggleUserDropdown(event)" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-zinc-300 hover:text-white hover:bg-white/[0.05] rounded-lg transition text-left cursor-pointer">
@@ -622,6 +632,28 @@
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- AVISO DE SOPORTE SMARTSCREEN Y EXCLUSIONES ANTIVIRUS -->
+        <div class="bg-[#121215] border border-amber-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-semibold text-zinc-100 flex items-center gap-2">
+                <span>¿Windows SmartScreen o tu antivirus bloquea el instalador?</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">Soporte Windows</span>
+              </h4>
+              <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+                Al tratarse de una versión reciente, pulsa <strong class="text-white">"Más información"</strong> y luego <strong class="text-white">"Ejecutar de todas formas"</strong>. Recuerda excluir <code class="text-zinc-200 bg-white/[0.05] px-1 py-0.5 rounded font-mono">%APPDATA%\Bentian Agent\</code> y el archivo <code class="text-zinc-200 bg-white/[0.05] px-1 py-0.5 rounded font-mono">.accdb</code> de Factusol en tu antivirus.
+              </p>
+            </div>
+          </div>
+          <a href="/docs/windows-antivirus-smartscreen-guide.md" target="_blank" class="px-3.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30 transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+            <span>Ver Guía Técnica & Exclusiones</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
         </div>
 
       </div>
@@ -1210,6 +1242,17 @@
         >
           Ir a mi Panel
         </button>
+      </div>
+
+      <!-- Aviso de SmartScreen y Antivirus en Modal de Bienvenida -->
+      <div class="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left text-[11px] text-amber-200/90 flex items-start gap-2.5">
+        <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div>
+          <span>¿Pantalla azul de SmartScreen? Pulsa <strong class="text-white font-semibold">"Más información"</strong> y luego <strong class="text-white font-semibold">"Ejecutar de todas formas"</strong>.</span>
+          <div class="mt-1">
+            <a href="/docs/windows-antivirus-smartscreen-guide.md" target="_blank" class="text-amber-400 hover:text-amber-300 underline font-medium">Ver guía técnica paso a paso & exclusiones de antivirus &rarr;</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -97,6 +97,10 @@ export async function bootstrapApp(): Promise<Express> {
   const releasesDir = path.resolve(__dirname, '../../../releases');
   app.use('/releases', express.static(releasesDir));
 
+  // Servir documentación técnica oficial y guías de soporte
+  const docsDir = path.resolve(__dirname, '../../../docs');
+  app.use('/docs', express.static(docsDir));
+
   // Servir landing page de descargas y dashboard web
   const publicDir = path.resolve(__dirname, '../public');
   app.use(express.static(publicDir));
