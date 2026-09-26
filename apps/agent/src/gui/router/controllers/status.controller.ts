@@ -28,4 +28,16 @@ export class StatusController {
       res.end(diagnosticText);
     };
   }
+
+  public static getPreflight(agent: LocalAgent): RouteHandler {
+    return async (req, res) => {
+      const url = new URL(req.url || '/', 'http://127.0.0.1');
+      const force = url.searchParams.get('force') === 'true';
+      const report = await agent.getPreflightHealth(force);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(report));
+    };
+  }
 }
+
+

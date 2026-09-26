@@ -2,3 +2,6 @@ export * from './diagnostics.types';
 export * from './event-bus';
 export * from './system-info';
 export * from './diagnostic-exporter';
+export * from './preflight-health.types';
+export * from './preflight-probes';
+export * from './preflight-health.service';

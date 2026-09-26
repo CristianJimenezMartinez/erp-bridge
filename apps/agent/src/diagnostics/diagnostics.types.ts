@@ -4,6 +4,8 @@ import { AgentFactusolSettings, AgentWooCommerceSettings, AgentUniversalBridgeSe
 import { SyncHistoryRecord } from '../history/history.types';
 import { UpdateClientState } from '../update/update.types';
 
+import { PreflightHealthReport } from './preflight-health.types';
+
 export interface LogEvent {
   timestamp: string;
   level: 'info' | 'warn' | 'error' | 'success';
@@ -37,4 +39,5 @@ export interface AgentStatusDetails {
   system: AgentSystemInfo;
   recentEvents: LogEvent[];
   update?: UpdateClientState;
+  preflight?: PreflightHealthReport;
 }

@@ -2,6 +2,7 @@ import fs from 'fs';
 import { AgentConfigFile } from '../config/config.types';
 import { SyncHistoryRecord } from '../history/history.types';
 import { LogEvent } from './diagnostics.types';
+import { PreflightHealthReport } from './preflight-health.types';
 import { SystemInfoService } from './system-info';
 
 export interface DiagnosticData {
@@ -14,11 +15,12 @@ export interface DiagnosticData {
   watcherActive: boolean;
   syncHistory: SyncHistoryRecord[];
   recentEvents: LogEvent[];
+  preflight?: PreflightHealthReport;
 }
 
 export class DiagnosticExporter {
   public static generate(data: DiagnosticData): string {
-    const { config, configFilePath, currentVersion, currentHwid, licenseStatus, activePlan, watcherActive, syncHistory, recentEvents } = data;
+    const { config, configFilePath, currentVersion, currentHwid, licenseStatus, activePlan, watcherActive, syncHistory, recentEvents, preflight } = data;
     const sys = SystemInfoService.getSystemInfo();
     const fact = config.factusol || {};
     const woo = config.woocommerce || {};
@@ -42,6 +44,14 @@ export class DiagnosticExporter {
       `Núcleos CPU:        ${sys.cpuCores}`,
       `Ruta Ejecutable:    ${process.execPath}`,
       `Archivo Config:     ${configFilePath}`,
+      '',
+      '[1.1] ESTADO DE SALUD PRE-FLIGHT (EDR & SISTEMA)',
+      '------------------------------------------------------------------------------',
+      `Estado Global Pre-Flight: ${preflight ? preflight.overallStatus : 'No evaluado'}`,
+      `Motor Scripting (cscript):${preflight ? ` [${preflight.checks.cscript.status}] ${preflight.checks.cscript.message}` : '---'}`,
+      `Driver OLEDB Access:      ${preflight ? ` [${preflight.checks.oledbProvider.status}] ${preflight.checks.oledbProvider.message}` : '---'}`,
+      `Sincronización Reloj NTP: ${preflight ? ` [${preflight.checks.clockDrift.status}] ${preflight.checks.clockDrift.message}` : '---'}`,
+      `Almacenamiento y Red:     ${preflight ? ` [${preflight.checks.networkStorage.status}] ${preflight.checks.networkStorage.message}` : '---'}`,
       '',
       '[2] LICENCIAMIENTO BENTIAN',
       '------------------------------------------------------------------------------',

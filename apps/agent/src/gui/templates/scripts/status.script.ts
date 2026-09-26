@@ -138,6 +138,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         if (btnHeader) btnHeader.style.display = 'none';
         if (bannerOverview) bannerOverview.style.display = 'none';
       }
+
+      // Pre-Flight Health EDR Semáforos
+      if (data.preflight) {
+        renderPreflight(data.preflight);
+      }
     }
 
     // Inicializar inputs del formulario de forma defensiva para que el sondeo cada 3s no sobreescriba cambios del usuario
@@ -320,6 +325,78 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         isUpdatingInProgress = false;
         if (btnHeader) btnHeader.disabled = false;
         if (bannerBtn) bannerBtn.disabled = false;
+      }
+    }
+
+    function renderPreflight(pf) {
+      if (!pf || !pf.checks) return;
+
+      function updateItem(id, check) {
+        const badge = document.getElementById('pf-' + id + '-badge');
+        const desc = document.getElementById('pf-' + id + '-desc');
+        const dot = document.getElementById('pf-' + id + '-dot');
+        if (!badge || !desc || !check) return;
+
+        desc.textContent = check.message || '';
+        if (check.status === 'OK') {
+          badge.className = 'tag tag-green';
+          badge.textContent = 'Correcto';
+          if (dot) dot.style.background = '#10b981';
+        } else if (check.status === 'WARN') {
+          badge.className = 'tag tag-amber';
+          badge.textContent = 'Atención';
+          if (dot) dot.style.background = '#f59e0b';
+        } else {
+          badge.className = 'tag tag-rose';
+          badge.textContent = 'Fallo';
+          if (dot) dot.style.background = '#ef4444';
+        }
+      }
+
+      updateItem('cscript', pf.checks.cscript);
+      updateItem('oledb', pf.checks.oledbProvider);
+      updateItem('clock', pf.checks.clockDrift);
+      updateItem('net', pf.checks.networkStorage);
+
+      const alertBox = document.getElementById('pf-alert-box');
+      const alertMsg = document.getElementById('pf-alert-message');
+      if (alertBox && alertMsg) {
+        const issues = Object.values(pf.checks).filter(function(c) {
+          return c && (c.status === 'FAIL' || c.status === 'WARN') && c.recommendation;
+        });
+        if (issues.length > 0) {
+          alertBox.style.display = 'block';
+          alertMsg.innerHTML = issues.map(function(i) {
+            return '<strong>' + i.name + ':</strong> ' + i.recommendation;
+          }).join('<br style="margin-bottom:6px;"/>');
+        } else {
+          alertBox.style.display = 'none';
+        }
+      }
+    }
+
+    async function refreshPreflight() {
+      const btn = document.getElementById('btn-refresh-preflight');
+      if (btn) {
+        btn.disabled = true;
+        const textSpan = btn.querySelector('span');
+        if (textSpan) textSpan.textContent = 'Analizando...';
+      }
+      try {
+        const res = await fetch('/api/local/preflight?force=true');
+        if (res.ok) {
+          const pf = await res.json();
+          renderPreflight(pf);
+          showToast('✓ Diagnóstico Pre-Flight actualizado', 'success');
+        }
+      } catch (err) {
+        showToast('Error al ejecutar diagnóstico preflight: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          const textSpan = btn.querySelector('span');
+          if (textSpan) textSpan.textContent = 'Reanalizar';
+        }
       }
     }
 

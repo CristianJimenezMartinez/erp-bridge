@@ -318,13 +318,15 @@ export class LocalSyncEngine {
 
         // 3. SINCRONIZACIÓN INVERSA DE PEDIDOS CANCELADOS/REEMBOLSADOS (WooCommerce -> Factusol)
         try {
+          const cancelSeries = config.factusol?.orderSeries || '1';
+          const cancelWarehouse = config.factusol?.warehouseCode || 'GEN';
           this.eventBus.addEvent('info', 'Comprobando pedidos cancelados/reembolsados en WooCommerce...');
           const cancelRes = await CancellationSyncHelper.syncWooCommerceCancellations({
             storeUrl: cleanUrl,
             authHeader,
             driver,
-            orderSeries: series,
-            defaultWarehouse: warehouse,
+            orderSeries: cancelSeries,
+            defaultWarehouse: cancelWarehouse,
             eventBus: this.eventBus,
           });
           if (cancelRes.ordersCancelled > 0) {

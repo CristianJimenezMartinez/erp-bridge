@@ -29,7 +29,7 @@ import {
   ConfigManager,
 } from './config';
 import { SyncHistoryRecord, HistoryManager } from './history';
-import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails } from './diagnostics';
+import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport } from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
@@ -66,6 +66,7 @@ export class LocalAgent {
   public readonly autoUpdater: AutoUpdater;
   public readonly updateClient: UpdateClient;
   public readonly autoStartService: AutoStartService;
+  public readonly preflightHealthService: PreflightHealthService;
 
   private isRunning = false;
   private isUpdating = false;
@@ -83,6 +84,10 @@ export class LocalAgent {
     this.autoStartService = new AutoStartService();
 
     const cfg = this.configManager.get();
+    this.preflightHealthService = new PreflightHealthService({
+      apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
+      factusolDbPath: cfg.factusol?.databasePath || cfg.factusolDbPath,
+    });
     const updateOptions: UpdateOptions = {
       apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
       agentId: cfg.agentId || 'agent_local_standalone',
@@ -218,7 +223,16 @@ export class LocalAgent {
       watcherActive: this.fileWatcherService.isActive(),
       syncHistory: this.historyManager.getSyncHistory(),
       recentEvents: this.eventBus.getRecentEvents(),
+      preflight: (this.preflightHealthService as any).cachedReport || undefined,
     });
+  }
+
+  public async getPreflightHealth(force = false): Promise<PreflightHealthReport> {
+    const cfg = this.configManager.get();
+    const dbPath = cfg.factusol?.databasePath || cfg.factusolDbPath;
+    (this.preflightHealthService as any).options.apiBaseUrl = cfg.apiBaseUrl || 'https://bridge.cristianjm.com';
+    (this.preflightHealthService as any).options.factusolDbPath = dbPath;
+    return this.preflightHealthService.runDiagnostics(force);
   }
 
   public async getStatusDetails(): Promise<AgentStatusDetails> {
@@ -226,6 +240,13 @@ export class LocalAgent {
     const license = await this.licenseService.validateLicense();
     const cfg = this.configManager.get();
     const dbPath = cfg.factusol?.databasePath || cfg.factusolDbPath;
+
+    let preflight: PreflightHealthReport | undefined;
+    try {
+      preflight = await this.getPreflightHealth();
+    } catch {
+      // Ignorar excepciones para proteger telemetría del dashboard
+    }
 
     let articleCount: number | undefined;
     let fileSizeBytes: number | undefined;
@@ -277,6 +298,7 @@ export class LocalAgent {
       system: SystemInfoService.getSystemInfo(),
       recentEvents: this.eventBus.getRecentEvents(),
       update: this.getUpdateStatus(),
+      preflight,
     };
   }
 
