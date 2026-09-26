@@ -20,7 +20,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 CloseApplications=yes
 CloseApplicationsFilter=BentianAgent.exe,BentianTray.exe
-PrivilegesRequired=lowest
+PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir={#OutputDir}
 OutputBaseFilename=Bentian-Setup-v{#AppVersion}
@@ -64,5 +64,23 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Set
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Bentian.ERPBridge.Agent"; ValueType: dword; ValueName: "Enabled"; ValueData: 1; Flags: uninsdeletekey
 
 [Run]
+; 1. Reglas en el Firewall de Windows (Entrada y Salida para agente y tray)
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Agent"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes profile=any"; Flags: runhidden waituntilterminated
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Agent Salida"" dir=out action=allow program=""{app}\{#MyAppExeName}"" enable=yes profile=any"; Flags: runhidden waituntilterminated
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Tray"" dir=in action=allow program=""{app}\BentianTray.exe"" enable=yes profile=any"; Flags: runhidden waituntilterminated
+
+; 2. Exclusiones automáticas en Windows Defender Antivirus
+Filename: "powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try { Add-MpPreference -ExclusionPath '{app}' -ExclusionPath '$env:APPDATA\Bentian Agent' -ExclusionProcess '{#MyAppExeName}','BentianTray.exe','cscript.exe' -ExclusionExtension '.accdb','.laccdb' -ErrorAction SilentlyContinue } catch {}"""; Flags: runhidden waituntilterminated
+
+; 3. Lanzar aplicación post-instalación
 Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden
+
+[UninstallRun]
+; Limpieza limpia de reglas de Firewall
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Agent"""; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Agent Salida"""; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Tray"""; Flags: runhidden
+
+; Limpieza de exclusiones en Windows Defender
+Filename: "powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try { Remove-MpPreference -ExclusionPath '{app}' -ErrorAction SilentlyContinue } catch {}"""; Flags: runhidden
 
