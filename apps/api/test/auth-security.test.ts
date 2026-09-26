@@ -176,6 +176,60 @@ async function runTests() {
     assert.strictEqual(resRevokeForbidden.status, 403, 'TENANT_CLIENT no debe poder revocar licencias (403 Forbidden)');
     console.log('  ✓ RBAC verificado: TENANT_CLIENT no puede emitir ni revocar licencias.');
 
+    // 9. Flujo Passwordless OTP en /auth/email-session
+    console.log('9. Probando flujo Passwordless OTP en /auth/email-session...');
+    const testEmail = 'cliente-otp@empresa.es';
+    // Crear una licencia previa para que el email tenga licencias
+    const superToken = AuthService.createToken({
+      sub: 'admin@bentian.es',
+      role: 'SUPERADMIN',
+      organizationId: 'org_default',
+      exp: Date.now() + 3600000,
+    });
+    const resCreateLic = await fetch(`${baseUrl}/api/v1/licenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${superToken}`,
+      },
+      body: JSON.stringify({
+        organizationId: 'org_' + crypto.createHash('sha256').update(testEmail).digest('hex').substring(0, 16),
+        plan: 'starter',
+      }),
+    });
+    assert(resCreateLic.status === 201 || resCreateLic.status === 200, 'Debe crear licencia para el test');
+
+    // Paso 9.1: Solicitar OTP
+    const resReqOtp = await fetch(`${baseUrl}/api/v1/auth/email-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: testEmail }),
+    });
+    assert.strictEqual(resReqOtp.status, 200, 'Petición inicial debe responder 200 requireOtp');
+    const otpJson = (await resReqOtp.json()) as any;
+    assert.strictEqual(otpJson.requireOtp, true, 'Debe solicitar OTP');
+    assert(otpJson.debugOtp, 'En modo dev/test debe incluir debugOtp');
+
+    // Paso 9.2: Enviar OTP erróneo
+    const resWrongOtp = await fetch(`${baseUrl}/api/v1/auth/email-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: testEmail, otp: '000000' }),
+    });
+    assert.strictEqual(resWrongOtp.status, 401, 'OTP incorrecto debe responder 401');
+
+    // Paso 9.3: Enviar OTP correcto
+    const resValidOtp = await fetch(`${baseUrl}/api/v1/auth/email-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: testEmail, otp: otpJson.debugOtp }),
+    });
+    assert.strictEqual(resValidOtp.status, 200, 'OTP correcto debe responder 200 y entregar token');
+    const validOtpJson = (await resValidOtp.json()) as any;
+    assert(validOtpJson.token, 'Debe retornar JWT');
+    assert.strictEqual(validOtpJson.user?.role, 'TENANT_CLIENT');
+    console.log('  ✓ Flujo Passwordless OTP validado con éxito (solicitud, rechazo erróneo y canje correcto).');
+
     console.log('✓ ALL API AUTH & SECURITY TESTS PASSED!');
   } finally {
     server.close();

@@ -106,6 +106,16 @@ async function run() {
       }),
     });
     assert.strictEqual(deactRes.status, 200);
+    const deactJson = (await deactRes.json()) as any;
+    assert.strictEqual(deactJson.data?.success, true, 'Debe indicar éxito en desactivación');
+
+    // 5.1 Comprobar que en base de datos la máquina ya no consta como activa
+    const postDeactRes = await fetch(`${baseUrl}/api/v1/licenses/${licenseKey}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    assert.strictEqual(postDeactRes.status, 200);
+    const postDeactJson = (await postDeactRes.json()) as { data: { activations: any[] } };
+    assert.strictEqual(postDeactJson.data.activations.length, 0, 'La lista de activaciones activas debe ser 0 tras desactivar');
 
     console.log('✓ License API E2E Tests Passed');
   } finally {
