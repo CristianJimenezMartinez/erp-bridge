@@ -70,10 +70,10 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""B
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Tray"" dir=in action=allow program=""{app}\BentianTray.exe"" enable=yes profile=any"; Flags: runhidden waituntilterminated
 
 ; 2. Exclusiones automáticas en Windows Defender Antivirus
-Filename: "powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try { Add-MpPreference -ExclusionPath '{app}' -ExclusionPath '$env:APPDATA\Bentian Agent' -ExclusionProcess '{#MyAppExeName}','BentianTray.exe','cscript.exe' -ExclusionExtension '.accdb','.laccdb' -ErrorAction SilentlyContinue } catch {}"""; Flags: runhidden waituntilterminated
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try {{ Add-MpPreference -ExclusionPath @('{app}', ""$env:APPDATA\Bentian Agent"") -ExclusionProcess @('{#MyAppExeName}','BentianTray.exe','cscript.exe') -ExclusionExtension @('.accdb','.laccdb') -ErrorAction SilentlyContinue }} catch {{}}"""; Flags: runhidden waituntilterminated
 
-; 3. Lanzar aplicación post-instalación
-Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden
+; 3. Lanzar aplicación post-instalación como usuario estándar original (no admin elevado)
+Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden runasoriginaluser
 
 [UninstallRun]
 ; Limpieza limpia de reglas de Firewall
@@ -81,6 +81,11 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Agent Salida"""; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Tray"""; Flags: runhidden
 
-; Limpieza de exclusiones en Windows Defender
-Filename: "powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try { Remove-MpPreference -ExclusionPath '{app}' -ErrorAction SilentlyContinue } catch {}"""; Flags: runhidden
+; Limpieza completa de exclusiones en Windows Defender
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try {{ Remove-MpPreference -ExclusionPath @('{app}', ""$env:APPDATA\Bentian Agent"") -ExclusionProcess @('{#MyAppExeName}','BentianTray.exe','cscript.exe') -ExclusionExtension @('.accdb','.laccdb') -ErrorAction SilentlyContinue }} catch {{}}"""; Flags: runhidden
+
+[UninstallDelete]
+Type: files; Name: "{app}\*.bak"
+Type: files; Name: "{app}\*.log"
+Type: files; Name: "{app}\*.tmp"
 

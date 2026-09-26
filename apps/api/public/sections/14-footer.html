@@ -16,13 +16,27 @@
         </div>
       </div>
 
-      <!-- Enlaces Técnicos y de Estado -->
-      <div class="flex items-center gap-6 font-mono text-[11px]">
-        <a href="/health" class="hover:text-emerald-400 transition flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> API Health
-        </a>
-        <a href="/releases/latest.json" class="hover:text-zinc-300 transition">Manifest Releases</a>
-        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard Clientes</a>
+      <!-- Enlaces Técnicos, de Estado y Regulatorios -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 font-mono text-[11px]">
+        <!-- Enlaces Legales Oficiales (LSSI / RGPD) -->
+        <div class="flex items-center gap-3 text-zinc-500 font-sans">
+          <a href="javascript:void(0)" onclick="abrirModalLegal('aviso')" class="hover:text-zinc-300 transition">Aviso Legal</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="hover:text-zinc-300 transition">Privacidad (RGPD)</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="hover:text-zinc-300 transition">Términos</a>
+          <span>•</span>
+          <a href="javascript:void(0)" onclick="abrirModalLegal('cookies')" class="hover:text-zinc-300 transition">Cookies</a>
+        </div>
+        <div class="hidden sm:block w-px h-3 bg-white/[0.1]"></div>
+        <!-- Enlaces Técnicos -->
+        <div class="flex items-center gap-4">
+          <a href="/health" class="hover:text-emerald-400 transition flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> API Health
+          </a>
+          <a href="/releases/latest.json" class="hover:text-zinc-300 transition">Manifest</a>
+          <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+        </div>
       </div>
 
     </div>

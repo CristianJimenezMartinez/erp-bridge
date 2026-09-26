@@ -192,12 +192,50 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
   }
 });
 
-// 1. List all licenses for organization (with activations)
+// 1. List all licenses for organization (with activations and partner/reseller support)
 licensesRouter.get('/licenses', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    // Si es superadmin y no se filtra por org, puede ver todas
-    if ((req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN') && !req.query['organizationId']) {
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    const isReseller = req.user?.role === 'RESELLER';
+    const resellerCode = req.user?.resellerId || req.user?.sub;
+
+    const db = DatabaseService.getInstance();
+    if (db.isAvailable()) {
+      let query = `
+        SELECT l.*, o.name as organization_name, o.tax_id as org_tax_id, o.reseller_id
+        FROM licenses l
+        LEFT JOIN organizations o ON l.organization_id = o.id
+      `;
+      const params: any[] = [];
+
+      if (isReseller) {
+        query += ` WHERE (o.reseller_id = $1 OR l.organization_id = $2)`;
+        params.push(resellerCode, req.user?.organizationId || orgId);
+      } else if (!isSuperadmin) {
+        query += ` WHERE l.organization_id = $1`;
+        params.push(req.user?.organizationId || orgId);
+      } else if (req.query['organizationId']) {
+        query += ` WHERE l.organization_id = $1`;
+        params.push(req.query['organizationId']);
+      }
+
+      query += ` ORDER BY l.created_at DESC`;
+      const result = await db.query(query, params).catch(() => ({ rows: [] }));
+
+      const licensesWithActivations = await Promise.all(
+        result.rows.map(async (lic: any) => {
+          const activations = await licenseService.listActivations(lic.id).catch(() => []);
+          return {
+            ...lic,
+            activations,
+          };
+        })
+      );
+      return res.json({ data: licensesWithActivations });
+    }
+
+    if (isSuperadmin && !req.query['organizationId']) {
       const list = await licenseService.listLicenses(orgId);
       return res.json({ data: list });
     }
@@ -220,7 +258,7 @@ licensesRouter.get('/licenses/fleet-overview', requireAuth, async (req: Request,
 });
 
 // 2. Create a new license (con Blindaje Fiscal Anti-Arbitraje de Puesto Adicional 99€)
-licensesRouter.post('/licenses', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN', 'RESELLER']), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
     const seatType = (req.body.seatType as string) || 'BASE';
@@ -412,7 +450,7 @@ licensesRouter.post('/licenses/deactivate', async (req: Request, res: Response, 
 });
 
 // 7. Revoke license (admin)
-licensesRouter.post('/licenses/:id/revoke', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/:id/revoke', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const reason = (req.body.reason as string) || 'Revocada por el administrador';
     const revoked = await licenseService.revokeLicense(req.params['id']!, reason);

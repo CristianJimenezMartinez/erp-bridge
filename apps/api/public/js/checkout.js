@@ -75,6 +75,15 @@ async function procesarCheckoutModal(e) {
     return;
   }
 
+  const consentCb = document.getElementById('checkout-legal-consent');
+  if (consentCb && !consentCb.checked) {
+    if (errEl) {
+      errEl.textContent = 'Debes aceptar los Términos del Servicio y la Política de Privacidad para continuar.';
+      errEl.classList.remove('hidden');
+    }
+    return;
+  }
+
   if (errEl) errEl.classList.add('hidden');
   if (btn) btn.disabled = true;
   if (btnText) btnText.textContent = 'Conectando con pasarela segura...';

@@ -2,8 +2,9 @@ import assert from 'assert';
 import http from 'http';
 import crypto from 'crypto';
 import express from 'express';
-import { authRouter, clearLoginAttempts, MAX_LOGIN_ATTEMPTS } from '../src/routes/auth.router';
+import { authRouter, AuthService, clearLoginAttempts, MAX_LOGIN_ATTEMPTS } from '../src/routes/auth.router';
 import { billingRouter } from '../src/routes/billing.router';
+import { licensesRouter } from '../src/routes/licenses.router';
 
 console.log('--- Running API Auth & Security Hardening Tests ---');
 
@@ -11,11 +12,13 @@ async function runTests() {
   process.env['ADMIN_EMAIL'] = 'admin@bentian.es';
   process.env['ADMIN_PASSWORD'] = 'SuperSecurePass123!';
   process.env['ADMIN_JWT_SECRET'] = 'test-jwt-secret-key-12345';
+  process.env['PARTNER_SECRET'] = 'PartnerSecret2026!';
 
   const app = express();
   app.use(express.json());
   app.use('/api/v1', authRouter);
   app.use('/api/v1', billingRouter);
+  app.use('/api/v1', licensesRouter);
 
   const server = http.createServer(app);
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
@@ -120,6 +123,58 @@ async function runTests() {
     const validJson = (await resValidSig.json()) as any;
     assert.strictEqual(validJson.received, true);
     console.log('  ✓ Webhook con firma criptográfica válida aceptado con éxito (200 OK).');
+
+    // 7. Acceso de Partner protegido contra bypass sin secreto
+    console.log('7. Probando autenticación de Partner con y sin partnerSecret...');
+    const resPartnerFail = await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ partnerCode: 'PT-INFORMATICA', partnerSecret: 'WrongSecret' }),
+    });
+    assert.strictEqual(resPartnerFail.status, 401, 'Partner con secret erróneo debe responder 401');
+    const partnerFailJson = (await resPartnerFail.json()) as any;
+    assert.strictEqual(partnerFailJson.error?.code, 'INVALID_PARTNER_SECRET');
+
+    const resPartnerOk = await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ partnerCode: 'PT-INFORMATICA', partnerSecret: 'PartnerSecret2026!' }),
+    });
+    assert.strictEqual(resPartnerOk.status, 200, 'Partner con secret correcto debe responder 200');
+    const partnerOkJson = (await resPartnerOk.json()) as any;
+    assert.strictEqual(partnerOkJson.user?.role, 'RESELLER');
+    assert(partnerOkJson.token, 'Debe emitir token JWT de RESELLER');
+    console.log('  ✓ Partner login validado con secreto estricto y timingSafeEqual.');
+
+    // 8. Control de Acceso Basado en Roles (RBAC) en /licenses
+    console.log('8. Probando RBAC: creación y revocación de licencias protegidas contra TENANT_CLIENT...');
+    const clientToken = AuthService.createToken({
+      sub: 'cliente@prueba.es',
+      role: 'TENANT_CLIENT',
+      organizationId: 'org_cliente',
+      exp: Date.now() + 3600000,
+    });
+
+    const resCreateForbidden = await fetch(`${baseUrl}/api/v1/licenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${clientToken}`,
+      },
+      body: JSON.stringify({ seatType: 'BASE' }),
+    });
+    assert.strictEqual(resCreateForbidden.status, 403, 'TENANT_CLIENT no debe poder crear licencias (403 Forbidden)');
+
+    const resRevokeForbidden = await fetch(`${baseUrl}/api/v1/licenses/lic_test/revoke`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${clientToken}`,
+      },
+      body: JSON.stringify({ reason: 'Ataque de prueba' }),
+    });
+    assert.strictEqual(resRevokeForbidden.status, 403, 'TENANT_CLIENT no debe poder revocar licencias (403 Forbidden)');
+    console.log('  ✓ RBAC verificado: TENANT_CLIENT no puede emitir ni revocar licencias.');
 
     console.log('✓ ALL API AUTH & SECURITY TESTS PASSED!');
   } finally {

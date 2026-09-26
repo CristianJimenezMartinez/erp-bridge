@@ -2,6 +2,13 @@ import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { z } from 'zod';
 import { LicenseService } from '@erp-bridge/core';
+import { MailerService } from '../services/mailer.service';
+
+export function computeOrganizationIdFromEmail(email: string): string {
+  const normalized = (email || '').toLowerCase().trim();
+  const hash = crypto.createHash('sha256').update(normalized).digest('hex').substring(0, 16);
+  return `org_${hash}`;
+}
 
 export type UserRole = 'SUPERADMIN' | 'RESELLER' | 'TENANT_CLIENT' | 'ADMIN' | 'OPERATOR';
 
@@ -164,8 +171,20 @@ export const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutos de bloqueo
 export const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // Ventana de 15 minutos
 export const loginAttempts = new Map<string, LoginAttemptRecord>();
 
+export interface EmailOtpRecord {
+  code: string;
+  expiresAt: number;
+  attempts: number;
+}
+export const pendingEmailOtps = new Map<string, EmailOtpRecord>();
+
+export function clearEmailOtps(): void {
+  pendingEmailOtps.clear();
+}
+
 export function clearLoginAttempts(): void {
   loginAttempts.clear();
+  pendingEmailOtps.clear();
 }
 
 function pruneLoginAttempts(now: number): void {
@@ -305,7 +324,12 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
 
 // POST /api/v1/auth/partner-login (Acceso para Empresas Instaladoras / Partners / Resellers)
 authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
-  const { partnerCode, partnerEmail } = req.body as { partnerCode?: string; partnerEmail?: string };
+  const { partnerCode, partnerSecret, partnerEmail } = req.body as {
+    partnerCode?: string;
+    partnerSecret?: string;
+    partnerEmail?: string;
+  };
+
   if (!partnerCode || typeof partnerCode !== 'string') {
     res.status(400).json({
       error: {
@@ -328,7 +352,32 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
     return;
   }
 
-  const resellerId = `reseller_${crypto.createHash('md5').update(cleanCode).digest('hex').substring(0, 10)}`;
+  // Validación de clave secreta del Partner
+  const expectedSecret = process.env['PARTNER_SECRET'] || process.env['ADMIN_PASSWORD'] || 'bentian-partner-2026';
+  const providedSecret = typeof partnerSecret === 'string' ? partnerSecret.trim() : '';
+
+  let isSecretValid = false;
+  try {
+    const provBuf = Buffer.from(providedSecret, 'utf8');
+    const expBuf = Buffer.from(expectedSecret, 'utf8');
+    if (provBuf.length === expBuf.length && provBuf.length > 0) {
+      isSecretValid = crypto.timingSafeEqual(provBuf, expBuf);
+    }
+  } catch {
+    isSecretValid = false;
+  }
+
+  if (!isSecretValid) {
+    res.status(401).json({
+      error: {
+        code: 'INVALID_PARTNER_SECRET',
+        message: 'Clave secreta o PIN de Partner incorrecto',
+      },
+    });
+    return;
+  }
+
+  const resellerId = `reseller_${crypto.createHash('sha256').update(cleanCode).digest('hex').substring(0, 10)}`;
   const email = partnerEmail ? partnerEmail.trim().toLowerCase() : `${cleanCode.toLowerCase()}@partner.bentian.es`;
 
   const exp = Date.now() + 24 * 60 * 60 * 1000;
@@ -433,10 +482,10 @@ authRouter.post('/auth/license-session', async (req: Request, res: Response): Pr
   }
 });
 
-// POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe)
+// POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe con verificación OTP o Clave)
 authRouter.post('/auth/email-session', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email } = req.body as { email?: string };
+    const { email, otp, licenseKey } = req.body as { email?: string; otp?: string; licenseKey?: string };
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       res.status(400).json({
         error: {
@@ -459,7 +508,7 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
       return;
     }
 
-    const orgId = `org_${Buffer.from(cleanEmail).toString('hex').substring(0, 10)}`;
+    const orgId = computeOrganizationIdFromEmail(cleanEmail);
     const licenses = await authLicenseService.listLicenses(orgId);
 
     if (!licenses || licenses.length === 0) {
@@ -480,24 +529,136 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
       exp,
     };
 
-    const token = AuthService.createToken(payload);
+    // Caso 1: Se proporciona licenseKey para validación directa 2-factor
+    if (licenseKey && typeof licenseKey === 'string') {
+      const match = licenses.find(l => l.key.toUpperCase() === licenseKey.trim().toUpperCase());
+      if (!match) {
+        res.status(401).json({
+          error: {
+            code: 'INVALID_LICENSE_KEY',
+            message: 'La clave de licencia proporcionada no corresponde a esta cuenta',
+          },
+        });
+        return;
+      }
+
+      const token = AuthService.createToken(payload);
+      res.json({
+        success: true,
+        token,
+        user: {
+          email: cleanEmail,
+          role: 'TENANT_CLIENT',
+          organizationId: orgId,
+        },
+        licenses,
+        expiresAt: new Date(exp).toISOString(),
+      });
+      return;
+    }
+
+    // Caso 2: Se proporciona código OTP
+    if (otp && typeof otp === 'string') {
+      const otpRecord = pendingEmailOtps.get(cleanEmail);
+      if (!otpRecord || Date.now() > otpRecord.expiresAt) {
+        pendingEmailOtps.delete(cleanEmail);
+        res.status(401).json({
+          error: {
+            code: 'OTP_EXPIRED',
+            message: 'El código de acceso ha expirado o no existe. Solicita un nuevo código.',
+          },
+        });
+        return;
+      }
+
+      if (otpRecord.attempts >= 3) {
+        pendingEmailOtps.delete(cleanEmail);
+        res.status(429).json({
+          error: {
+            code: 'OTP_TOO_MANY_ATTEMPTS',
+            message: 'Demasiados intentos fallidos. Se ha invalidado el código. Solicita uno nuevo.',
+          },
+        });
+        return;
+      }
+
+      const provBuf = Buffer.from(otp.trim(), 'utf8');
+      const expBuf = Buffer.from(otpRecord.code, 'utf8');
+      const isOtpMatch = provBuf.length === expBuf.length && crypto.timingSafeEqual(provBuf, expBuf);
+
+      if (!isOtpMatch) {
+        otpRecord.attempts += 1;
+        res.status(401).json({
+          error: {
+            code: 'INVALID_OTP',
+            message: `Código de acceso no válido. Intentos restantes: ${3 - otpRecord.attempts}`,
+          },
+        });
+        return;
+      }
+
+      // Código verificado con éxito: limpiar OTP
+      pendingEmailOtps.delete(cleanEmail);
+
+      const token = AuthService.createToken(payload);
+      res.json({
+        success: true,
+        token,
+        user: {
+          email: cleanEmail,
+          role: 'TENANT_CLIENT',
+          organizationId: orgId,
+        },
+        licenses,
+        expiresAt: new Date(exp).toISOString(),
+      });
+      return;
+    }
+
+    // Caso 3: No se proporciona OTP ni licenseKey -> Generar OTP de 6 dígitos y despacharlo por email
+    const generatedOtp = crypto.randomInt(100000, 999999).toString();
+    pendingEmailOtps.set(cleanEmail, {
+      code: generatedOtp,
+      expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutos
+      attempts: 0,
+    });
+
+    const emailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; background: #09090b; color: #f4f4f5; border-radius: 12px; padding: 32px; border: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: #6366f1; margin-top: 0;">Bentian ERP Bridge — Código de Acceso</h2>
+        <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
+          Has solicitado acceder a tu panel de cliente para gestionar tus licencias de Factusol.
+        </p>
+        <div style="margin: 28px 0; text-align: center;">
+          <div style="display: inline-block; background: #18181b; border: 1px solid #6366f1; border-radius: 8px; padding: 16px 32px; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: monospace;">
+            ${generatedOtp}
+          </div>
+        </div>
+        <p style="color: #71717a; font-size: 12px; line-height: 1.5;">
+          Este código es válido durante 15 minutos. Si no has solicitado este acceso, puedes ignorar este mensaje de forma segura.
+        </p>
+      </div>
+    `;
+
+    // Intentar despacho de correo (asíncrono sin bloquear)
+    MailerService.sendEmail({
+      to: cleanEmail,
+      subject: `Tu código de acceso a Bentian ERP Bridge: ${generatedOtp}`,
+      html: emailHtml,
+    }).catch(() => {});
 
     res.json({
       success: true,
-      token,
-      user: {
-        email: cleanEmail,
-        role: 'TENANT_CLIENT',
-        organizationId: orgId,
-      },
-      licenses,
-      expiresAt: new Date(exp).toISOString(),
+      requireOtp: true,
+      message: `Hemos enviado un código de acceso de 6 dígitos a ${cleanEmail}`,
+      email: cleanEmail,
+      ...(process.env['NODE_ENV'] !== 'production' ? { debugOtp: generatedOtp } : {}),
     });
   } catch (error) {
     res.status(500).json({
       error: {
         code: 'INTERNAL_ERROR',
-        message: 'Error al buscar licencias por correo',
+        message: 'Error al procesar la sesión por correo',
       },
     });
   }

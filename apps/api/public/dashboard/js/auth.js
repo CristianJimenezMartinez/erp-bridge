@@ -142,7 +142,11 @@ async function handleLicenseKeyLogin(e) {
 async function handleEmailLogin(e) {
   e.preventDefault();
   const input = document.getElementById('login-billing-email');
+  const otpInput = document.getElementById('login-billing-otp');
+  const otpContainer = document.getElementById('email-otp-container');
+  const btnText = document.getElementById('btn-login-email-text');
   const email = input ? input.value.trim() : '';
+  const otp = (otpInput && !otpContainer.classList.contains('hidden')) ? otpInput.value.trim() : '';
   if (!email) return;
 
   // Detección proactiva si es Superadministrador
@@ -157,16 +161,27 @@ async function handleEmailLogin(e) {
   }
 
   try {
+    const payload = otp ? { email, otp } : { email };
     const res = await fetch('/api/v1/auth/email-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (res.ok && data.token) {
       setSession(data.token, data.user?.role || 'TENANT_CLIENT', data.user?.organizationId || 'org_default', email);
       showDashboard();
       showToast('✓ Acceso concedido', 'success');
+    } else if (res.ok && data.requireOtp) {
+      if (otpContainer) otpContainer.classList.remove('hidden');
+      if (btnText) btnText.innerText = 'Verificar Código y Acceder';
+      if (otpInput) {
+        otpInput.focus();
+        if (data.debugOtp && !otpInput.value) {
+          otpInput.value = data.debugOtp; // Facilitar modo demo/test local
+        }
+      }
+      showToast(data.message || 'Código enviado a tu correo', 'info');
     } else {
       if (data.error?.code === 'ADMIN_ACCOUNT') {
         switchLoginMode('admin');
@@ -176,7 +191,7 @@ async function handleEmailLogin(e) {
         if (adminPassInput) adminPassInput.focus();
         showToast(data.error.message, 'info');
       } else {
-        showLoginError(data.error?.message || 'No se encontraron licencias para este correo');
+        showLoginError(data.error?.message || 'Error al iniciar sesión con este correo');
       }
     }
   } catch (err) {
@@ -187,16 +202,21 @@ async function handleEmailLogin(e) {
 async function handlePartnerLogin(e) {
   e.preventDefault();
   const partnerCodeEl = document.getElementById('login-partner-code');
+  const partnerSecretEl = document.getElementById('login-partner-secret');
   const partnerEmailEl = document.getElementById('login-partner-email');
   const partnerCode = partnerCodeEl ? partnerCodeEl.value.trim() : '';
+  const partnerSecret = partnerSecretEl ? partnerSecretEl.value.trim() : '';
   const partnerEmail = partnerEmailEl ? partnerEmailEl.value.trim() : '';
-  if (!partnerCode) return;
+  if (!partnerCode || !partnerSecret) {
+    showLoginError('Introduce el código de Partner y su clave secreta');
+    return;
+  }
 
   try {
     const res = await fetch('/api/v1/auth/partner-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ partnerCode, partnerEmail })
+      body: JSON.stringify({ partnerCode, partnerSecret, partnerEmail })
     });
     const data = await res.json();
     if (res.ok && data.token) {
@@ -205,7 +225,7 @@ async function handlePartnerLogin(e) {
       showDashboard();
       showToast(`✓ Bienvenido, Partner ${partnerCode}`, 'success');
     } else {
-      showLoginError(data.error?.message || 'Código de partner no reconocido');
+      showLoginError(data.error?.message || 'Código o clave de partner no reconocido');
     }
   } catch (err) {
     showLoginError('Error de conexión con la API central');

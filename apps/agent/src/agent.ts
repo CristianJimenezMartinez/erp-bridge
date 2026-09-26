@@ -72,6 +72,8 @@ export class LocalAgent {
   private isUpdating = false;
   private heartbeatTimer: NodeJS.Timeout | null = null;
   private guiServer: AgentGuiServer | null = null;
+  private cachedLicenseVal: { data: LicenseValidationStatus; timestamp: number } | null = null;
+  private cachedFactusolHealth: { connected: boolean; statusMessage: string; articleCount?: number; timestamp: number } | null = null;
 
   constructor(customConfig?: Partial<AgentConfigFile>, customStoreDir?: string) {
     this.configManager = new ConfigManager(customConfig);
@@ -237,7 +239,16 @@ export class LocalAgent {
 
   public async getStatusDetails(): Promise<AgentStatusDetails> {
     const hwid = await this.licenseService.getHWID();
-    const license = await this.licenseService.validateLicense();
+    const now = Date.now();
+
+    let license: LicenseValidationStatus;
+    if (this.cachedLicenseVal && now - this.cachedLicenseVal.timestamp < 60_000) {
+      license = this.cachedLicenseVal.data;
+    } else {
+      license = await this.licenseService.validateLicense();
+      this.cachedLicenseVal = { data: license, timestamp: now };
+    }
+
     const cfg = this.configManager.get();
     const dbPath = cfg.factusol?.databasePath || cfg.factusolDbPath;
 
@@ -257,14 +268,22 @@ export class LocalAgent {
       try {
         const stats = fs.statSync(dbPath);
         fileSizeBytes = stats.size;
-        const connector = this.factusolService.getConnector();
-        if (connector) {
-          const health = await connector.healthCheck();
-          connected = health.status === 'HEALTHY';
-          statusMessage = health.message || '';
-          if (connected) {
-            articleCount = await this.factusolService.getArticleCount(dbPath);
+
+        if (this.cachedFactusolHealth && now - this.cachedFactusolHealth.timestamp < 30_000) {
+          connected = this.cachedFactusolHealth.connected;
+          statusMessage = this.cachedFactusolHealth.statusMessage;
+          articleCount = this.cachedFactusolHealth.articleCount;
+        } else {
+          const connector = this.factusolService.getConnector();
+          if (connector) {
+            const health = await connector.healthCheck();
+            connected = health.status === 'HEALTHY';
+            statusMessage = health.message || '';
+            if (connected) {
+              articleCount = await this.factusolService.getArticleCount(dbPath);
+            }
           }
+          this.cachedFactusolHealth = { connected, statusMessage, articleCount, timestamp: now };
         }
       } catch (err) {
         statusMessage = err instanceof Error ? err.message : String(err);

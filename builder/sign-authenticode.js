@@ -49,14 +49,23 @@ function signBinary(filePath) {
   if (signtool && fs.existsSync(azureDlib) && fs.existsSync(azureMetadata)) {
     console.log(`    🔐 [CodeSign] Firmando con Azure Trusted Signing: ${path.basename(filePath)}...`);
     const timestampUrl = process.env.TIMESTAMP_URL || 'http://timestamp.acs.microsoft.com';
-    const cmd = `"${signtool}" sign /v /fd SHA256 /tr "${timestampUrl}" /td SHA256 /dlib "${azureDlib}" /dmdf "${azureMetadata}" "${filePath}"`;
+    const args = [
+      'sign',
+      '/v',
+      '/fd', 'SHA256',
+      '/tr', timestampUrl,
+      '/td', 'SHA256',
+      '/dlib', azureDlib,
+      '/dmdf', azureMetadata,
+      filePath
+    ];
 
-    try {
-      childProcess.execSync(cmd, { stdio: 'inherit' });
+    const res = childProcess.spawnSync(signtool, args, { stdio: 'inherit' });
+    if (res.status === 0) {
       console.log(`    ✓ [CodeSign] Firma Azure Trusted Signing exitosa: ${path.basename(filePath)}`);
       return true;
-    } catch (err) {
-      console.error(`    ❌ [CodeSign] Error al firmar con Azure Trusted Signing:`, err.message);
+    } else {
+      console.error(`    ❌ [CodeSign] Error al firmar con Azure Trusted Signing (código ${res.status}).`);
       return false;
     }
   }
@@ -70,25 +79,31 @@ function signBinary(filePath) {
   if (signtool && (pfxPath || certThumbprint || process.env.USE_CERT_STORE === 'true')) {
     console.log(`    🔐 [CodeSign] Firmando con certificado Authenticode (Certum/Store): ${path.basename(filePath)}...`);
     const timestampUrl = process.env.TIMESTAMP_URL || 'http://timestamp.digicert.com';
-    let cmd = `"${signtool}" sign /v /fd SHA256 /tr "${timestampUrl}" /td SHA256`;
+    const args = [
+      'sign',
+      '/v',
+      '/fd', 'SHA256',
+      '/tr', timestampUrl,
+      '/td', 'SHA256'
+    ];
 
     if (pfxPath && fs.existsSync(pfxPath)) {
-      cmd += ` /f "${pfxPath}"`;
-      if (pfxPassword) cmd += ` /p "${pfxPassword}"`;
+      args.push('/f', pfxPath);
+      if (pfxPassword) args.push('/p', pfxPassword);
     } else if (certThumbprint) {
-      cmd += ` /sha1 "${certThumbprint}"`;
+      args.push('/sha1', certThumbprint);
     } else {
-      cmd += ` /n "${certSubject}" /a`;
+      args.push('/n', certSubject, '/a');
     }
 
-    cmd += ` "${filePath}"`;
+    args.push(filePath);
 
-    try {
-      childProcess.execSync(cmd, { stdio: 'inherit' });
+    const res = childProcess.spawnSync(signtool, args, { stdio: 'inherit' });
+    if (res.status === 0) {
       console.log(`    ✓ [CodeSign] Firma Authenticode exitosa: ${path.basename(filePath)}`);
       return true;
-    } catch (err) {
-      console.error(`    ❌ [CodeSign] Error al firmar con certificado local:`, err.message);
+    } else {
+      console.error(`    ❌ [CodeSign] Error al firmar con certificado local (código ${res.status}).`);
       return false;
     }
   }

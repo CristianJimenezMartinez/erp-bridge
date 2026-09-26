@@ -413,12 +413,26 @@ export class LocalSyncEngine {
   }
 
   public async uploadCatalog(options?: { limit?: number; onlyMissing?: boolean }): Promise<CatalogUploadResult> {
-    const start = Date.now();
-    this.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
+    if (this.isSyncing) {
+      const busyMsg = 'Subida de catálogo omitida: el motor de sincronización ya está ejecutando otra tarea activa.';
+      this.logger.warn(busyMsg);
+      return {
+        success: false,
+        totalArticles: 0,
+        uploadedCount: 0,
+        skippedCount: 0,
+        failedCount: 0,
+        message: busyMsg,
+      };
+    }
+    this.isSyncing = true;
+    try {
+      const start = Date.now();
+      this.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
 
-    const config = this.configManager.get();
-    let dbPath = config.factusol?.databasePath || config.factusolDbPath;
-    const woo = config.woocommerce || {};
+      const config = this.configManager.get();
+      let dbPath = config.factusol?.databasePath || config.factusolDbPath;
+      const woo = config.woocommerce || {};
 
     if (dbPath) {
       try {
@@ -465,9 +479,8 @@ export class LocalSyncEngine {
       return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
     }
 
-    try {
-      const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
-      const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
+    const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
+    const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
 
       // 1. Conectar a Factusol y leer artículos canónicos
       let factusolConnector = this.factusolService.getConnector();
@@ -635,6 +648,8 @@ export class LocalSyncEngine {
         failedCount: 0,
         message: msg,
       };
+    } finally {
+      this.isSyncing = false;
     }
   }
 

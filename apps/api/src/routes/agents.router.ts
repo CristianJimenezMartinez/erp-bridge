@@ -39,6 +39,7 @@ agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: 
     const db = DatabaseService.getInstance();
     const isSuperadmin = req.user?.role === 'SUPERADMIN';
     const isAdmin = req.user?.role === 'ADMIN';
+    const isReseller = req.user?.role === 'RESELLER';
 
     if (db.isAvailable()) {
       let query = `
@@ -68,7 +69,11 @@ agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: 
       `;
       const params: any[] = [];
 
-      if (!isSuperadmin && !isAdmin) {
+      if (isReseller) {
+        const resellerCode = req.user?.resellerId || req.user?.sub;
+        query += ` AND (o.reseller_id = $1 OR l.organization_id = $2)`;
+        params.push(resellerCode, req.user?.organizationId || orgId);
+      } else if (!isSuperadmin && !isAdmin) {
         query += ` AND l.organization_id = $1`;
         params.push(req.user?.organizationId || orgId);
       } else if (isAdmin && !isSuperadmin) {

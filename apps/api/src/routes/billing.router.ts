@@ -12,6 +12,12 @@ const logger = new Logger('BillingRouter');
 const STRIPE_SECRET_KEY = process.env['STRIPE_SECRET_KEY'] || '';
 const DEFAULT_DASHBOARD_URL = process.env['DASHBOARD_URL'] || 'https://bridge.cristianjm.com/dashboard/';
 
+export function computeOrganizationIdFromEmail(email: string): string {
+  const normalized = (email || '').toLowerCase().trim();
+  const hash = crypto.createHash('sha256').update(normalized).digest('hex').substring(0, 16);
+  return `org_${hash}`;
+}
+
 export interface PlanDefinition {
   id: string;
   name: string;
@@ -177,7 +183,7 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       matchedPlan = CATALOG_PLANS[0]!;
     }
 
-    const orgId = customOrgId || `org_${Buffer.from(email).toString('hex').substring(0, 10)}`;
+    const orgId = customOrgId || computeOrganizationIdFromEmail(email);
     const isSubscription = matchedPlan.mode === 'subscription';
     const interval = matchedPlan.billingCycle === 'monthly' ? 'month' : 'year';
 
@@ -268,9 +274,26 @@ billingRouter.post('/billing/create-portal-session', requireAuth, async (req: Re
 
     logger.info(`Solicitud de Portal de Clientes de Stripe para ${customerId || email || 'desconocido'}`);
 
-    if (STRIPE_SECRET_KEY && customerId && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
+    let effectiveCustomerId = customerId;
+    if (!effectiveCustomerId && email && STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
+      try {
+        const custRes = await fetch(`https://api.stripe.com/v1/customers?email=${encodeURIComponent(email)}&limit=1`, {
+          headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+        });
+        if (custRes.ok) {
+          const custData = (await custRes.json()) as any;
+          if (custData.data && custData.data.length > 0) {
+            effectiveCustomerId = custData.data[0].id;
+          }
+        }
+      } catch (err) {
+        logger.warn(`No se pudo buscar cliente por email en Stripe: ${String(err)}`);
+      }
+    }
+
+    if (STRIPE_SECRET_KEY && effectiveCustomerId && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
       const params = new URLSearchParams();
-      params.append('customer', customerId);
+      params.append('customer', effectiveCustomerId);
       params.append('return_url', returnUrl);
 
       const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
@@ -392,7 +415,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
       case 'invoice.payment_succeeded': {
         const session = event.data?.object || {};
         const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com';
-        const organizationId = session.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
+        const organizationId = session.metadata?.organizationId || computeOrganizationIdFromEmail(customerEmail);
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
         const maxActivations = Number(session.metadata?.maxActivations) || 1;
         const alias = session.metadata?.alias || 'Servidor Factusol Principal';
@@ -474,7 +497,7 @@ billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: Request
     if (!email) {
       return res.status(400).json({ error: { message: 'Parámetro email requerido' } });
     }
-    const orgId = `org_${Buffer.from(email).toString('hex').substring(0, 10)}`;
+    const orgId = computeOrganizationIdFromEmail(email);
     const list = await licenseService.listLicenses(orgId);
     return res.json({ data: list });
   } catch (error) {
@@ -497,10 +520,10 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
       });
     }
 
-    // Modo Mock / Testing Local (ej: cs_test_mock_...)
-    if (sessionId.startsWith('cs_test_mock_') || (!STRIPE_SECRET_KEY && sessionId.startsWith('cs_'))) {
+    // Modo Mock / Testing Local (ej: cs_test_mock_...) — Desactivado en Producción
+    if (process.env.NODE_ENV !== 'production' && (sessionId.startsWith('cs_test_mock_') || (!STRIPE_SECRET_KEY && sessionId.startsWith('cs_')))) {
       const demoEmail = 'cliente-demo@bentian.es';
-      const orgId = `org_${Buffer.from(demoEmail).toString('hex').substring(0, 10)}`;
+      const orgId = computeOrganizationIdFromEmail(demoEmail);
       let licenses = await licenseService.listLicenses(orgId);
       let license = licenses.length > 0 ? licenses[0]! : null;
 
@@ -573,7 +596,7 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
       'cliente@bentian.es'
     ).toLowerCase().trim();
 
-    const organizationId = sessionData.metadata?.organizationId || `org_${Buffer.from(customerEmail).toString('hex').substring(0, 10)}`;
+    const organizationId = sessionData.metadata?.organizationId || computeOrganizationIdFromEmail(customerEmail);
     const planId = sessionData.metadata?.planId || 'base_annual';
     const maxActivations = Number(sessionData.metadata?.maxActivations) || 1;
     const alias = sessionData.metadata?.alias || 'Servidor Factusol Principal';

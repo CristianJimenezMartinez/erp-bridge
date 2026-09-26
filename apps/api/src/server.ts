@@ -37,6 +37,13 @@ export async function bootstrapApp(): Promise<Express> {
   const app = express();
 
   // Middleware
+  app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+  });
   app.use(cors({ origin: '*' }));
   app.use(express.json({
     limit: '10mb',
@@ -93,13 +100,19 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', monitoringRouter);
   app.use(monitoringRouter);
 
-  // Servir descargas de releases y actualizaciones del agente
+  // Servir descargas de releases oficiales (protegiendo claves o archivos privados)
   const releasesDir = path.resolve(__dirname, '../../../releases');
-  app.use('/releases', express.static(releasesDir));
-
-  // Servir documentación técnica oficial y guías de soporte
-  const docsDir = path.resolve(__dirname, '../../../docs');
-  app.use('/docs', express.static(docsDir));
+  app.use('/releases', (req, res, next): void => {
+    const lowerUrl = req.url.toLowerCase();
+    if (lowerUrl.includes('.pem') || lowerUrl.includes('.key') || lowerUrl.includes('legal') || lowerUrl.includes('.git') || lowerUrl.includes('..')) {
+      res.status(403).json({ error: { message: 'Acceso no autorizado' } });
+      return;
+    }
+    next();
+  }, express.static(releasesDir, {
+    dotfiles: 'ignore',
+    index: false,
+  }));
 
   // Servir landing page de descargas y dashboard web
   const publicDir = path.resolve(__dirname, '../public');

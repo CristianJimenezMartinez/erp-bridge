@@ -73,7 +73,7 @@ export class CancellationSyncHelper {
 
     // 1. Consultar cabecera del pedido (F_PCL) para verificar estado actual y almacén asignado
     const headerRows = await driver
-      .query<{ ALMPCL: string; ESTPCL: number }>(
+      .query<{ ALMPCL: string; ESTPCL: number; TIPPCL?: string }>(
         `SELECT ALMPCL, ESTPCL FROM F_PCL WHERE CODPCL = ${code} AND TIPPCL = '${safeSeries}'`
       )
       .catch((err) => {
@@ -81,14 +81,38 @@ export class CancellationSyncHelper {
         return [];
       });
 
-    const currentEst = headerRows[0]?.ESTPCL !== undefined ? Number(headerRows[0].ESTPCL) : null;
-    const warehouse = (headerRows[0]?.ALMPCL && headerRows[0].ALMPCL.trim()) || safeDefaultWarehouse;
+    let matchedSeries = safeSeries;
+    let header = headerRows[0];
+
+    if (!header) {
+      // Intentar buscar el pedido en cualquier serie si difiere de la serie por defecto
+      const anySeriesRows = await driver
+        .query<{ ALMPCL: string; ESTPCL: number; TIPPCL: string }>(
+          `SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = ${code}`
+        )
+        .catch(() => []);
+      if (anySeriesRows && anySeriesRows.length > 0) {
+        header = anySeriesRows[0];
+        matchedSeries = String(anySeriesRows[0]?.TIPPCL || safeSeries).trim().substring(0, 1) || safeSeries;
+      }
+    }
+
+    // Guardarraíl anti-inflación: si el pedido no existe en F_PCL, no reponer inventario a ciegas
+    if (!header) {
+      CancellationSyncHelper.logger.warn(
+        `[Anti-Inflation Guardrail] Pedido #${code} no existe en F_PCL. Se omite reposición de stock para evitar creación de existencias fantasma.`
+      );
+      return { alreadyCancelled: true, linesRestocked: 0 };
+    }
+
+    const currentEst = header.ESTPCL !== undefined ? Number(header.ESTPCL) : null;
+    const warehouse = (header.ALMPCL && header.ALMPCL.trim()) || safeDefaultWarehouse;
     const safeWarehouse = CancellationSyncHelper.sanitizeSql(warehouse).substring(0, 3) || 'GEN';
 
     // Guardarraíl anti-doble reposición: si el pedido ya está en estado anulado (ESTPCL = 3), no reponer dos veces
     if (currentEst === 3) {
       CancellationSyncHelper.logger.info(
-        `Pedido Factusol #${code} (Serie ${safeSeries}) ya se encontraba en estado anulado (ESTPCL = 3). Se omite reposición redundante de stock.`
+        `Pedido Factusol #${code} (Serie ${matchedSeries}) ya se encontraba en estado anulado (ESTPCL = 3). Se omite reposición redundante de stock.`
       );
       return { alreadyCancelled: true, linesRestocked: 0 };
     }
@@ -96,7 +120,7 @@ export class CancellationSyncHelper {
     // 2. Consultar líneas del pedido en Factusol (F_LPC)
     const dbLines = await driver
       .query<{ ARTLPC: string; CANLPC: number }>(
-        `SELECT ARTLPC, CANLPC FROM F_LPC WHERE CODLPC = ${code} AND TIPLPC = '${safeSeries}'`
+        `SELECT ARTLPC, CANLPC FROM F_LPC WHERE CODLPC = ${code} AND TIPLPC = '${matchedSeries}'`
       )
       .catch(() => []);
 
@@ -126,7 +150,7 @@ export class CancellationSyncHelper {
 
     // Marcar pedido en F_PCL como anulado/cancelado (ESTPCL = 3)
     sqlStatements.push(
-      `UPDATE F_PCL SET ESTPCL = 3 WHERE CODPCL = ${code} AND TIPPCL = '${safeSeries}'`
+      `UPDATE F_PCL SET ESTPCL = 3 WHERE CODPCL = ${code} AND TIPPCL = '${matchedSeries}'`
     );
 
     // Reponer stock disponible (DISSTO) de cada artículo en F_STO

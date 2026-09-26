@@ -309,6 +309,25 @@
         <!-- Mensaje de error -->
         <div id="checkout-error-msg" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300"></div>
 
+        <!-- Consentimiento Legal Obligatorio (LSSI-CE & RGPD) -->
+        <div class="pt-1">
+          <label class="flex items-start gap-2.5 text-[11px] text-zinc-400 cursor-pointer select-none">
+            <input 
+              type="checkbox" 
+              id="checkout-legal-consent" 
+              required 
+              class="mt-0.5 rounded bg-[#09090b] border border-white/[0.2] text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer shrink-0"
+            />
+            <span class="leading-relaxed">
+              He leído y acepto los 
+              <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="text-indigo-400 underline hover:text-indigo-300">Términos de Contratación</a> 
+              y la 
+              <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="text-indigo-400 underline hover:text-indigo-300">Política de Privacidad</a> 
+              (RGPD / LSSI-CE).
+            </span>
+          </label>
+        </div>
+
         <!-- Botón de Envío -->
         <button 
           type="submit" 
@@ -331,6 +350,157 @@
       </form>
     </div>
   </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL LEGAL UNIFICADO (LSSI-CE, RGPD, TÉRMINOS Y COOKIES)                  -->
+  <!-- ========================================================================= -->
+  <div id="modal-legal" onclick="if(event.target === this) cerrarModalLegal()" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="relative w-full max-w-2xl bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
+      <!-- Encabezado con pestañas -->
+      <div class="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#18181b]/50 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Información Legal y Regulatoria</h3>
+            <p class="text-[11px] text-zinc-400">Bentian ERP Bridge — Cumplimiento UE</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalLegal()" class="text-zinc-400 hover:text-white transition p-1.5 rounded-lg hover:bg-white/[0.05]">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Barra de pestañas -->
+      <div class="flex border-b border-white/[0.08] px-6 bg-[#0e0e11] text-xs font-medium overflow-x-auto gap-2 shrink-0">
+        <button onclick="cambiarPestanaLegal('aviso')" id="tab-legal-aviso" class="py-3 px-3 border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap transition-colors">Aviso Legal</button>
+        <button onclick="cambiarPestanaLegal('privacidad')" id="tab-legal-privacidad" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Privacidad (RGPD)</button>
+        <button onclick="cambiarPestanaLegal('terminos')" id="tab-legal-terminos" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Términos del Servicio</button>
+        <button onclick="cambiarPestanaLegal('cookies')" id="tab-legal-cookies" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Cookies</button>
+      </div>
+
+      <!-- Contenedor scrolleable de textos legales -->
+      <div class="p-6 overflow-y-auto text-xs text-zinc-300 space-y-4 leading-relaxed custom-scrollbar">
+        <!-- 1. Aviso Legal -->
+        <div id="content-legal-aviso" class="space-y-3">
+          <h4 class="text-sm font-semibold text-white">1. Datos Identificativos del Titular (LSSI-CE art. 10)</h4>
+          <p>
+            En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de que el titular y responsable de esta plataforma es:
+          </p>
+          <ul class="list-disc pl-5 space-y-1 text-zinc-400 font-mono text-[11px]">
+            <li>Denominación comercial: Bentian ERP Bridge</li>
+            <li>Titular: Cristian Jiménez Martínez</li>
+            <li>Dominio web: bridge.cristianjm.com / bentian.es</li>
+            <li>Correo electrónico de contacto: soporte@cristianjm.com</li>
+            <li>Actividad: Servicios de software de integración y sincronización de datos empresariales.</li>
+          </ul>
+          <h4 class="text-sm font-semibold text-white pt-2">2. Propiedad Intelectual e Industrial</h4>
+          <p>
+            Todos los contenidos, diseños, código fuente, algoritmos, manuales y elementos gráficos de Bentian ERP Bridge están protegidos por los derechos de propiedad intelectual e industrial aplicables en España y la Unión Europea. Queda prohibida la reproducción, descompilación, ingeniería inversa o distribución no autorizada de los binarios ejecutables sin la preceptiva licencia de uso.
+          </p>
+        </div>
+
+        <!-- 2. Privacidad (RGPD) -->
+        <div id="content-legal-privacidad" class="hidden space-y-3">
+          <h4 class="text-sm font-semibold text-white">Política de Privacidad y Protección de Datos (RGPD)</h4>
+          <p>
+            Conforme al Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), te informamos del tratamiento de tus datos personales:
+          </p>
+          <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
+            <li><strong class="text-zinc-200">Responsable del Tratamiento:</strong> Bentian (Cristian Jiménez Martínez).</li>
+            <li><strong class="text-zinc-200">Finalidad:</strong> Gestión y activación de licencias de software, cobro y facturación de suscripciones, soporte técnico e incidencias.</li>
+            <li><strong class="text-zinc-200">Principio Zero-Knowledge:</strong> El agente local de Bentian procesa las bases de datos de Factusol en local en tu propio equipo. La API central de Bentian NUNCA almacena ni inspecciona tus clientes, facturas, tarifas ni secretos comerciales.</li>
+            <li><strong class="text-zinc-200">Legitimación:</strong> Ejecución de la relación contractual de suscripción y consentimiento del usuario.</li>
+            <li><strong class="text-zinc-200">Destinatarios:</strong> Plataforma de cobro seguro Stripe Inc. (proveedor certificado PCI-DSS) y servicios de envío de notificaciones por email. En ningún caso se ceden datos personales a terceras empresas con fines comerciales.</li>
+            <li><strong class="text-zinc-200">Tus Derechos:</strong> Puedes ejercer tus derechos de acceso, rectificación, supresión, limitación y portabilidad enviando un correo a <span class="text-indigo-400">soporte@cristianjm.com</span>.</li>
+          </ul>
+        </div>
+
+        <!-- 3. Términos del Servicio -->
+        <div id="content-legal-terminos" class="hidden space-y-3">
+          <h4 class="text-sm font-semibold text-white">Condiciones Generales de Contratación y Licenciamiento</h4>
+          <p>
+            El acceso, descarga y uso de Bentian ERP Bridge se rige por las siguientes condiciones:
+          </p>
+          <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
+            <li><strong class="text-zinc-200">Objeto:</strong> Concesión de una licencia de uso de software, no exclusiva, intransferible y sujeta a suscripción activa, para conectar un sistema Factusol con tiendas electrónicas.</li>
+            <li><strong class="text-zinc-200">Modelo de Puestos:</strong> La Licencia Base autoriza la sincronización de 1 empresa ERP en 1 equipo servidor. Puestos adicionales requieren la vinculación al mismo CIF empresarial mediante el complemento correspondiente.</li>
+            <li><strong class="text-zinc-200">Periodo de Prueba y Garantía:</strong> Se ofrece un periodo de prueba inicial de 14 días sin coste para comprobar la compatibilidad técnica antes de formalizar la contratación definitiva.</li>
+            <li><strong class="text-zinc-200">Facturación y Cancelación:</strong> Las suscripciones se renuevan automáticamente según el ciclo seleccionado (anual o mensual). El usuario puede cancelar su suscripción en cualquier momento desde el portal de facturación de Stripe sin penalización.</li>
+            <li><strong class="text-zinc-200">Soporte y Actualizaciones:</strong> Mientras la suscripción permanezca activa, el usuario tiene derecho a todas las actualizaciones del software y al soporte técnico estándar por correo electrónico.</li>
+          </ul>
+        </div>
+
+        <!-- 4. Cookies -->
+        <div id="content-legal-cookies" class="hidden space-y-3">
+          <h4 class="text-sm font-semibold text-white">Política de Cookies Técnicas</h4>
+          <p>
+            Bentian ERP Bridge respeta al máximo la privacidad de sus usuarios.
+          </p>
+          <p class="text-zinc-400 text-[11px]">
+            Este sitio web <strong class="text-zinc-200">NO utiliza cookies de publicidad comportamental, ni rastreadores de marketing de terceros</strong>.
+          </p>
+          <p class="text-zinc-400 text-[11px]">
+            Únicamente se emplean cookies técnicas estrictamente necesarias y almacenamiento local (<code class="text-indigo-400">localStorage</code>) con las siguientes finalidades esenciales:
+          </p>
+          <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11px]">
+            <li>Mantener segura la sesión autenticada en el panel de control.</li>
+            <li>Garantizar la protección contra fraudes y ataques CSRF en la pasarela de pagos segura de Stripe.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Pie del modal -->
+      <div class="border-t border-white/[0.08] px-6 py-3.5 bg-[#18181b]/40 flex justify-end shrink-0">
+        <button onclick="cerrarModalLegal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium transition">
+          Entendido y Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirModalLegal(tab) {
+      const modal = document.getElementById('modal-legal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        cambiarPestanaLegal(tab || 'aviso');
+      }
+    }
+
+    function cerrarModalLegal() {
+      const modal = document.getElementById('modal-legal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function cambiarPestanaLegal(tab) {
+      const tabs = ['aviso', 'privacidad', 'terminos', 'cookies'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tab-legal-' + t);
+        const content = document.getElementById('content-legal-' + t);
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'py-3 px-3 border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap transition-colors font-semibold';
+          } else {
+            btn.className = 'py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors';
+          }
+        }
+        if (content) {
+          if (t === tab) content.classList.remove('hidden');
+          else content.classList.add('hidden');
+        }
+      });
+    }
+
+    window.abrirModalLegal = abrirModalLegal;
+    window.cerrarModalLegal = cerrarModalLegal;
+    window.cambiarPestanaLegal = cambiarPestanaLegal;
+  </script>
 
   <!-- Scripts Funcionales Modulares: Stripe Checkout, Releases y Simulador -->
   <script src="/js/checkout.js"></script>
