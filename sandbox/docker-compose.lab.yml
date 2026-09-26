@@ -1,0 +1,43 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: bentian-lab-mariadb
+    restart: unless-stopped
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_lab_123
+      MYSQL_DATABASE: suministros_tienda
+      MYSQL_USER: tienda_user
+      MYSQL_PASSWORD: test_password_123
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_lab_123"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+    networks:
+      - bentian-lab-net
+
+  universal-bridge:
+    image: lab-php-bridge:latest
+    container_name: bentian-lab-php
+    restart: unless-stopped
+    ports:
+      - "8095:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      EB_DB_HOST: mariadb
+      EB_DB_NAME: suministros_tienda
+      EB_DB_USER: tienda_user
+      EB_DB_PASS: test_password_123
+      EB_SECRET_KEY: rubio_secreto_2026
+    volumes:
+      - ../packages/connectors/universal-bridge/erp-bridge-endpoint.php:/var/www/html/erp-bridge-endpoint.php:ro
+    networks:
+      - bentian-lab-net
+
+networks:
+  bentian-lab-net:
+    driver: bridge

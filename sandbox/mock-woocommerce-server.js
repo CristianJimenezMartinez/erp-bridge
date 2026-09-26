@@ -49,8 +49,8 @@ let products = [
 
 let orders = [
   {
-    id: 501,
-    number: '501',
+    id: 601,
+    number: '601',
     status: 'processing',
     currency: 'EUR',
     date_created: new Date().toISOString(),
@@ -127,9 +127,10 @@ function parseJsonBody(req) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
-  const method = req.method;
+  try {
+    const parsedUrl = url.parse(req.url, true);
+    const pathname = parsedUrl.pathname;
+    const method = req.method;
 
   // CORS headers para permitir llamadas de cualquier origen local
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -214,6 +215,23 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 4b. Single Order Details (Order Get by ID)
+  if (pathname.startsWith('/wp-json/wc/v3/orders/') && method === 'GET') {
+    const idStr = pathname.split('/').pop();
+    const orderId = Number(idStr);
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      logActivity('Consultar Pedido Individual', `Pedido #${orderId} encontrado`);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(order));
+      return;
+    } else {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ code: 'woocommerce_rest_order_invalid_id', message: 'Pedido no encontrado' }));
+      return;
+    }
+  }
+
   // 5. Update Order Status (Mark as completed / add metadata)
   if (pathname.startsWith('/wp-json/wc/v3/orders/') && (method === 'PUT' || method === 'POST')) {
     const idStr = pathname.split('/').pop();
@@ -224,7 +242,8 @@ const server = http.createServer(async (req, res) => {
     if (order) {
       if (body.status) order.status = body.status;
       if (body.meta_data) {
-        order.meta_data = [...(order.meta_data || []), ...body.meta_data];
+        const incomingMeta = Array.isArray(body.meta_data) ? body.meta_data : [body.meta_data];
+        order.meta_data = [...(order.meta_data || []), ...incomingMeta];
       }
       logActivity('Pedido Actualizado', `Pedido #${orderId} nuevo estado: '${order.status}'`);
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -519,7 +538,17 @@ const server = http.createServer(async (req, res) => {
 
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ error: 'Endpoint no encontrado en WooCommerce Sandbox' }));
+  } catch (err) {
+    console.error('[WOO MOCK ERROR]', err);
+    try {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: err.message }));
+    } catch (_) {}
+  }
 });
+
+process.on('uncaughtException', (err) => console.error('[UNCAUGHT EXCEPTION]', err));
+process.on('unhandledRejection', (err) => console.error('[UNHANDLED REJECTION]', err));
 
 server.listen(PORT, () => {
   console.log(`\n======================================================`);
@@ -528,3 +557,4 @@ server.listen(PORT, () => {
   console.log(`   PANEL VISUAL:  http://127.0.0.1:${PORT}/`);
   console.log(`======================================================\n`);
 });
+
