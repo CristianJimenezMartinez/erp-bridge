@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const childProcess = require('child_process');
 const { buildAgentBundle } = require('./build-bundle');
 const { buildExecutable } = require('./build-exe');
+const { signBinary } = require('./sign-authenticode');
 const { getCurrentVersion, calculateNextVersion, applyVersionToAll, checkVersionSync } = require('./version');
 
 function calculateSha256(filePath) {
@@ -148,6 +149,13 @@ async function runMasterBuild() {
   console.log('>>> [2/6] Generando Ejecutable Nativo BentianAgent.exe...');
   const exeResult = await buildExecutable({ distDir, forceRebuild: true });
 
+  // Firma Authenticode de ejecutables base antes de empaquetar
+  console.log('    [CodeSign] Verificando firma digital Authenticode de binarios...');
+  signBinary(exeResult.exePath);
+  if (exeResult.trayPath && fs.existsSync(exeResult.trayPath)) {
+    signBinary(exeResult.trayPath);
+  }
+
   // 3. Inno Setup Installer
   console.log('>>> [3/6] Compilando Instalador de Windows (Inno Setup)...');
   const isccPath = findInnoCompiler();
@@ -166,6 +174,9 @@ async function runMasterBuild() {
     if (fs.existsSync(installerPath)) {
       const instStats = fs.statSync(installerPath);
       console.log(`    ✓ Instalador generado: ${installerPath} (${(instStats.size / (1024 * 1024)).toFixed(2)} MB)`);
+      // Firma Authenticode del instalador final
+      console.log('    [CodeSign] Firmando paquete instalador con Authenticode...');
+      signBinary(installerPath);
     } else {
       console.warn('    ⚠️ No se encontró el instalador generado en la ruta esperada.');
     }

@@ -1,0 +1,6 @@
+{
+  "Endpoint": "https://weu.codesigning.azure.net",
+  "CodeSigningAccountName": "BentianTrustedSigning",
+  "CertificateProfileName": "BentianPublicTrustProfile",
+  "CorrelationId": "bentian-build-cli"
+}
