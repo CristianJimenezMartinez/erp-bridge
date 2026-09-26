@@ -30,10 +30,15 @@ En el panel de control de Cloudflare (sección **Security** -> **WAF** -> **Cust
 ### 2.1 Regla WAF 1: Exclusión de la API REST de WooCommerce
 Esta regla evita que las peticiones del Agente Bentian a `/wp-json/wc/v3/*` sean bloqueadas por el firewall administrado o la verificación de navegador.
 
-#### Expresión Wirefilter (Cloudflare Expression Language):
+#### Expresión Wirefilter Oficial (Cloudflare Ruleset Engine):
 ```wirefilter
-(http.request.uri.path starts_with "/wp-json/wc/v3" and (http.user_agent contains "Bentian" or http.request.headers["x-bentian-key"][0] ne "" or http.request.headers["authorization"][0] contains "Basic"))
+(starts_with(http.request.uri.path, "/wp-json/wc/v3") and (http.user_agent contains "Bentian" or any(http.request.headers["x-bentian-key"][*] != "") or any(http.request.headers["authorization"][*] contains "Basic")))
 ```
+
+> [!NOTE] **Directrices de Sintaxis Cloudflare Ruleset Engine:**  
+> 1. En Wirefilter moderno, `starts_with(field, string)` es una **función**, NO un operador infijo (escribir `field starts_with "..."` genera un error sintáctico de validación en Cloudflare).
+> 2. Las cabeceras HTTP son un mapa de arrays con nombres siempre en **minúsculas** (`x-bentian-key`, `authorization`).
+> 3. El operador `any(http.request.headers["..."][*] != "")` es la sintaxis canónica segura para verificar existencia sin errores de desbordamiento de índice (`[0]`).
 
 #### Parámetros de la Regla en Cloudflare:
 | Campo | Valor Configurado |
@@ -48,9 +53,9 @@ Esta regla evita que las peticiones del Agente Bentian a `/wp-json/wc/v3/*` sean
 ### 2.2 Regla WAF 2: Exclusión de Bentian Universal Bridge (`/erp-bridge-endpoint.php`)
 Para tiendas que emplean el conector nativo PHP rápido de Suministros Rubio:
 
-#### Expresión Wirefilter:
+#### Expresión Wirefilter Oficial:
 ```wirefilter
-(http.request.uri.path eq "/erp-bridge-endpoint.php" and (http.request.headers["x-bridge-token"][0] ne "" or http.user_agent contains "Bentian"))
+(http.request.uri.path == "/erp-bridge-endpoint.php" and (any(http.request.headers["x-bridge-token"][*] != "") or http.user_agent contains "Bentian"))
 ```
 
 #### Parámetros de la Regla:
@@ -69,7 +74,7 @@ Las peticiones de inventario, stock y descarga de pedidos **NUNCA** deben ser ca
 En **Caching** -> **Cache Rules** -> **Create rule**:
 * **Expression:**
   ```wirefilter
-  (http.request.uri.path starts_with "/wp-json/wc/v3" or http.request.uri.path eq "/erp-bridge-endpoint.php")
+  (starts_with(http.request.uri.path, "/wp-json/wc/v3") or http.request.uri.path == "/erp-bridge-endpoint.php")
   ```
 * **Cache Eligibility:** **Bypass cache**
 
@@ -109,34 +114,45 @@ output_buffering = 4096
 
 ---
 
-### 3.2 Directivas Apache (`.htaccess` o Directivas Adicionales de Apache en Plesk)
-En la raíz de la web (`/var/www/vhosts/suministrosrubio.com/httpdocs/.htaccess`) o en Plesk **Configuración de Apache y Nginx**:
+### 3.2 Directivas Apache (Diferenciación Crítica `.htaccess` vs Plesk VirtualHost)
+
+> [!CAUTION] **Regla de Oro Apache:**  
+> Las directivas `<Location>` y `<LocationMatch>` están **TERMINANTEMENTE PROHIBIDAS** dentro de archivos `.htaccess`. Colocar `<LocationMatch>` en un fichero `.htaccess` provocará un **Error 500 (Internal Server Error)** fatal en todo el sitio web de WordPress.
+> 
+> A continuación se detallan las dos alternativas de implementación según el nivel de acceso disponible:
+
+#### Opción A: Configuración en `.htaccess` (En la raíz de WordPress `/httpdocs/.htaccess`)
+Para administradores que solo tienen acceso FTP o al Gestor de Archivos de WordPress:
 
 ```apache
 # ====================================================================
-# BENTIAN ERP BRIDGE - MODSECURITY & REWRITE OVERRIDES
+# BENTIAN ERP BRIDGE - MODSECURITY OVERRIDES (COMPATIBLE .HTACCESS)
 # ====================================================================
 
-# 1. Desactivar ModSecurity selectivamente para endpoints de sincronización
 <IfModule mod_security2.c>
-  # Para el conector PHP ligero
+  # 1. Desactivación selectiva de ModSecurity para el conector nativo ligero
   <Files "erp-bridge-endpoint.php">
     SecRuleEngine Off
   </Files>
 
-  # Para la API REST oficial de WooCommerce
-  <LocationMatch "^/wp-json/wc/v3">
-    # Reglas OWASP CRS habituales que provocan falsos positivos con JSON estructurado
-    SecRuleRemoveById 949110 980130 920420 921151 941100 942100
-  </LocationMatch>
+  # 2. Desactivación de reglas OWASP CRS en WooCommerce REST API
+  # Se utiliza ctl:ruleRemoveById a nivel de petición URI sin usar LocationMatch
+  SecRule REQUEST_URI "@beginsWith /wp-json/wc/v3" \
+    "id:1000001,phase:1,pass,nolog,\
+ctl:ruleRemoveById=949110,\
+ctl:ruleRemoveById=980130,\
+ctl:ruleRemoveById=920420,\
+ctl:ruleRemoveById=921151,\
+ctl:ruleRemoveById=941100,\
+ctl:ruleRemoveById=942100"
 </IfModule>
 
-# 2. Desactivar compresión GZIP/Brotli intermedia en el endpoint si rompe streaming
+# 3. Desactivar compresión GZIP/Brotli intermedia en el endpoint si rompe streaming
 <IfModule mod_deflate.c>
   SetEnvIfNoCase Request_URI "^/erp-bridge-endpoint\.php$" no-gzip dont-vary
 </IfModule>
 
-# 3. Asegurar cabeceras de autorización HTTP en FastCGI / PHP-FPM
+# 4. Asegurar cabeceras de autorización HTTP en FastCGI / PHP-FPM
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{HTTP:Authorization} ^(.*)
@@ -144,16 +160,43 @@ En la raíz de la web (`/var/www/vhosts/suministrosrubio.com/httpdocs/.htaccess`
 </IfModule>
 ```
 
+#### Opción B: Directivas en Plesk Panel (Configuración de Apache y Nginx -> "Directivas adicionales de Apache")
+Si tienes acceso de administrador a Plesk (contexto `<VirtualHost>`), puedes aplicar:
+
+```apache
+# ====================================================================
+# BENTIAN ERP BRIDGE - DIRECTIVAS ADICIONALES APACHE (VIRTUALHOST CONTEXT)
+# ====================================================================
+
+<IfModule mod_security2.c>
+  # Para el conector PHP ligero
+  <Files "erp-bridge-endpoint.php">
+    SecRuleEngine Off
+  </Files>
+
+  # Para la API REST oficial de WooCommerce (Válido exclusivamente en VirtualHost)
+  <LocationMatch "^/wp-json/wc/v3">
+    SecRuleRemoveById 949110 980130 920420 921151 941100 942100
+  </LocationMatch>
+</IfModule>
+```
+
 ---
 
 ### 3.3 Directivas Nginx (Plesk -> Configuración de Apache y Nginx)
-Si Plesk ejecuta Nginx como proxy inverso por delante de Apache (configuración estándar) o en modo dedicado:
 
-En **Directivas adicionales de Nginx**:
+> [!WARNING] **Riesgo Crítico de Enrutamiento en Nginx (`try_files`):**  
+> Las rutas de la API REST de WooCommerce (`/wp-json/wc/v3/*`) son rutas dinámicas y virtuales procesadas internamente por `index.php`.  
+> Utilizar una directiva `try_files $uri =404;` sobre `/wp-json/wc/v3` busca archivos físicos inexistentes en el disco y **devuelve un error 404 Not Found a cada llamada del Agente Bentian**.
+
+Aplica la configuración adecuada según el modo de operación de tu servidor Plesk:
+
+#### Modo A: Plesk Estándar (Nginx como Proxy Inverso delante de Apache con PHP-FPM)
+*Este es el modo predeterminado y recomendado en Plesk.* Nginx delega el procesamiento dinámico a Apache vía `proxy_pass`. En **Directivas adicionales de Nginx**, solo es necesario desacoplar los límites y el búfer del proxy:
 
 ```nginx
 # ====================================================================
-# BENTIAN ERP BRIDGE - DIRECTIVAS NGINX DE TIMEOUT Y BUFFERING
+# BENTIAN ERP BRIDGE - NGINX REVERSE PROXY (MODO ESTÁNDAR PLESK)
 # ====================================================================
 
 # 1. Ampliar tamaño de carga para evitar error 413 (Payload Too Large)
@@ -164,26 +207,46 @@ proxy_connect_timeout 300s;
 proxy_send_timeout 300s;
 proxy_read_timeout 300s;
 
-fastcgi_connect_timeout 300s;
-fastcgi_send_timeout 300s;
-fastcgi_read_timeout 300s;
+# 3. Desactivar buffering del proxy para streaming en tiempo real de sincronización
+proxy_buffering off;
+proxy_buffer_size 128k;
+proxy_buffers 4 256k;
+proxy_busy_buffers_size 256k;
+```
 
-# 3. Desactivar buffering para streaming de respuestas de sincronización continua
-location ~ ^/(erp-bridge-endpoint\.php|wp-json/wc/v3) {
+#### Modo B: Plesk Modo Nginx Dedicado (Sin Apache, PHP-FPM directo)
+Si el dominio tiene desmarcado el servidor Apache y procesa las peticiones directamente con Nginx y PHP-FPM:
+
+```nginx
+# ====================================================================
+# BENTIAN ERP BRIDGE - NGINX DEDICADO FASTCGI (SIN APACHE)
+# ====================================================================
+
+client_max_body_size 64M;
+
+# 1. Endpoint nativo ligero de Universal Bridge (archivo físico real)
+location = /erp-bridge-endpoint.php {
     try_files $uri =404;
-    
-    # Parámetros FastCGI para streaming directo
+    fastcgi_pass "unix:///var/www/vhosts/system/suministrosrubio.com/php/php-fpm.sock";
     fastcgi_buffering off;
-    fastcgi_buffer_size 128k;
-    fastcgi_buffers 4 256k;
-    fastcgi_busy_buffers_size 256k;
-    
-    # Pasar parámetros originales a PHP-FPM
+    fastcgi_connect_timeout 300s;
+    fastcgi_send_timeout 300s;
+    fastcgi_read_timeout 300s;
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    fastcgi_pass "unix:///var/www/vhosts/system/suministrosrubio.com/php/php-fpm.sock";
 }
-```
+
+# 2. Rutas dinámicas de WooCommerce REST API (desvío al enrutador WordPress)
+location ~ ^/wp-json/wc/v3 {
+    try_files $uri $uri/ /index.php?$args;
+    fastcgi_pass "unix:///var/www/vhosts/system/suministrosrubio.com/php/php-fpm.sock";
+    fastcgi_buffering off;
+    fastcgi_connect_timeout 300s;
+    fastcgi_send_timeout 300s;
+    fastcgi_read_timeout 300s;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+}
 
 ---
 
