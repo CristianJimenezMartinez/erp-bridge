@@ -7,7 +7,7 @@ import {
   UpdateConfirmRequestSchema,
   UpdateManifestSchema,
 } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, requireRole } from './auth.router';
 
 export const updatesRouter = Router();
 const updateService = new UpdateService();
@@ -69,7 +69,7 @@ updatesRouter.post('/updates/confirm', async (req: Request, res: Response, next:
 });
 
 // 3. Admin publishes a new update manifest (Protected)
-updatesRouter.post('/updates/publish', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+updatesRouter.post('/updates/publish', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = UpdateManifestSchema.parse(req.body);
     const result = await updateService.publishManifest(validated);
@@ -80,7 +80,7 @@ updatesRouter.post('/updates/publish', requireAuth, async (req: Request, res: Re
 });
 
 // 4. List update history (Protected)
-updatesRouter.get('/updates/history', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+updatesRouter.get('/updates/history', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const agentId = req.query['agentId'] as string | undefined;
     const history = await updateService.listUpdateHistory(agentId);
@@ -91,7 +91,7 @@ updatesRouter.get('/updates/history', requireAuth, async (req: Request, res: Res
 });
 
 // 5. List update manifests (Protected)
-updatesRouter.get('/updates/manifests', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+updatesRouter.get('/updates/manifests', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const channel = req.query['channel'] as string | undefined;
     const manifests = await updateService.listManifests(channel);

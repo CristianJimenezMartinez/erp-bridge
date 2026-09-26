@@ -5,7 +5,7 @@ import {
   TestConnectionDtoSchema,
   UpdateConnectionDtoSchema,
 } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 
 export const connectionsRouter = Router();
 const connectionService = new ConnectionService();
@@ -15,7 +15,11 @@ connectionsRouter.use('/connections', requireAuth);
 
 // Helper to extract organizationId header or fallback
 function getOrgId(req: Request): string {
-  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || 'org_default';
+  const authReq = req as AuthenticatedRequest;
+  if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
+    return authReq.user.organizationId;
+  }
+  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
 }
 
 connectionsRouter.get('/connections', async (req: Request, res: Response, next: NextFunction) => {

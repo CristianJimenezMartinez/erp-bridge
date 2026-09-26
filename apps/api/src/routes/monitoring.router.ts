@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AgentMonitorService } from '../services/agent-monitor.service';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 
 export const monitoringRouter = Router();
 const agentMonitorService = new AgentMonitorService();
@@ -14,14 +14,19 @@ const agentMonitorService = new AgentMonitorService();
  */
 monitoringRouter.get('/monitoring/agents/health', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const authReq = req as AuthenticatedRequest;
     const thresholdHours = req.query['thresholdHours']
       ? Math.max(1, Number(req.query['thresholdHours']) || 24)
       : 24;
 
-    const organizationId =
+    let organizationId =
       (req.headers['x-organization-id'] as string) ||
       (req.query['organizationId'] as string) ||
       undefined;
+
+    if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
+      organizationId = authReq.user.organizationId;
+    }
 
     const report = await agentMonitorService.getFleetHealth(organizationId, thresholdHours);
     res.json({ data: report });

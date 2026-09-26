@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { SyncScheduler, SyncService } from '@erp-bridge/core';
 import { CreateSyncJobDtoSchema, RunSyncJobDtoSchema } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 
 export const syncRouter = Router();
 const syncService = new SyncService();
@@ -11,7 +11,11 @@ syncRouter.use('/sync-jobs', requireAuth);
 syncRouter.use('/sync-executions', requireAuth);
 
 function getOrgId(req: Request): string {
-  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || 'org_default';
+  const authReq = req as AuthenticatedRequest;
+  if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
+    return authReq.user.organizationId;
+  }
+  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
 }
 
 syncRouter.get('/sync-jobs', async (req: Request, res: Response, next: NextFunction) => {

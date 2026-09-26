@@ -1,11 +1,18 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { FlowService } from '@erp-bridge/core';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 
 export const flowsRouter = Router();
 const flowService = new FlowService();
 
+flowsRouter.use('/flows', requireAuth);
+
 function getOrgId(req: Request): string {
-  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || 'org_default';
+  const authReq = req as AuthenticatedRequest;
+  if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
+    return authReq.user.organizationId;
+  }
+  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
 }
 
 flowsRouter.get('/flows', async (req: Request, res: Response, next: NextFunction) => {
