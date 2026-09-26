@@ -241,9 +241,22 @@ const server = http.createServer(async (req, res) => {
 
     if (order) {
       if (body.status) order.status = body.status;
-      if (body.meta_data) {
-        const incomingMeta = Array.isArray(body.meta_data) ? body.meta_data : [body.meta_data];
-        order.meta_data = [...(order.meta_data || []), ...incomingMeta];
+      if (body.meta_data !== undefined) {
+        if (Array.isArray(body.meta_data) && body.meta_data.length === 0) {
+          order.meta_data = [];
+        } else {
+          const incomingMeta = Array.isArray(body.meta_data) ? body.meta_data : [body.meta_data];
+          const currentMeta = order.meta_data || [];
+          for (const item of incomingMeta) {
+            const existingIdx = currentMeta.findIndex(m => m.key === item.key);
+            if (existingIdx >= 0) {
+              currentMeta[existingIdx] = item;
+            } else {
+              currentMeta.push(item);
+            }
+          }
+          order.meta_data = currentMeta;
+        }
       }
       logActivity('Pedido Actualizado', `Pedido #${orderId} nuevo estado: '${order.status}'`);
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -331,6 +344,64 @@ const server = http.createServer(async (req, res) => {
     logActivity('Reset Stock', 'Todo el stock del catálogo reseteado a 0');
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, message: 'Stock reseteado' }));
+    return;
+  }
+
+  // 7b. Sandbox Action: Reset Orders
+  if (pathname === '/api/sandbox/reset-orders' && method === 'POST') {
+    orders = [
+      {
+        id: 601,
+        number: '601',
+        status: 'processing',
+        currency: 'EUR',
+        date_created: new Date().toISOString(),
+        total: '26.92',
+        total_tax: '4.67',
+        shipping_total: '0.00',
+        payment_method: 'redsys',
+        payment_method_title: 'Tarjeta de Crédito (Redsys)',
+        customer_note: 'Por favor dejar en el portal si no estoy.',
+        billing: {
+          first_name: 'Cristian',
+          last_name: 'Jimenez',
+          company: 'Bentian Solutions',
+          address_1: 'Calle Gran Vía 28',
+          city: 'Madrid',
+          state: 'Madrid',
+          postcode: '28013',
+          country: 'ES',
+          email: 'cristian@bentian.es',
+          phone: '612345678'
+        },
+        shipping: {
+          first_name: 'Cristian',
+          last_name: 'Jimenez',
+          company: 'Bentian Solutions',
+          address_1: 'Calle Gran Vía 28',
+          city: 'Madrid',
+          state: 'Madrid',
+          postcode: '28013',
+          country: 'ES'
+        },
+        line_items: [
+          {
+            id: 1,
+            name: 'DERIVACION DOBLE 67º PVC SAN.',
+            product_id: 101,
+            sku: '001455',
+            quantity: 2,
+            subtotal: '22.25',
+            total: '22.25',
+            total_tax: '4.67',
+            price: 13.46
+          }
+        ]
+      }
+    ];
+    logActivity('Reset Orders', 'Pedidos de WooCommerce reseteados a estado inicial');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Pedidos reseteados' }));
     return;
   }
 

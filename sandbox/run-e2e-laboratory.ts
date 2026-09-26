@@ -4,6 +4,7 @@ import { resetSandboxDatabase } from './reset-factusol-sandbox';
 import { AccessDriver } from '../packages/connectors/factusol/src/access-driver';
 import { FactusolConnector } from '../packages/connectors/factusol/src/factusol.connector';
 import { OrderSyncHelper } from '../apps/agent/src/sync/order-sync.helper';
+import { CancellationSyncHelper } from '../apps/agent/src/sync/cancellation-sync.helper';
 
 interface TestOrderDefinition {
   name: string;
@@ -62,6 +63,15 @@ async function runE2ELaboratory(): Promise<void> {
     logSuccess('Tabla eb_orders vaciada y reseteada.');
   } catch (err: any) {
     throw new Error(`Fallo al resetear eb_orders en MariaDB: ${err.message}`);
+  }
+
+  // 2b. Resetear pedidos en Mock WooCommerce
+  logSubstep('Reseteando pedidos en Mock WooCommerce...');
+  try {
+    await fetch(`${WOOCOMMERCE_BASE_URL}/api/sandbox/reset-orders`, { method: 'POST' });
+    logSuccess('Pedidos de Mock WooCommerce reseteados a estado inicial.');
+  } catch (err: any) {
+    logSubstep(`Aviso al resetear mock WooCommerce: ${err.message}`);
   }
 
   // 3. Inspeccionar estado inicial en Factusol ACCDB
@@ -563,6 +573,224 @@ async function runE2ELaboratory(): Promise<void> {
   logSuccess('✓ WooCommerce OrderSyncHelper reconoce pedido procesado y lo descarta en siguientes ciclos.');
 
   // --------------------------------------------------------------------------
+  // FASE 6: SINCRONIZACIÓN INVERSA Y REPOSICIÓN DE STOCK POR CANCELACIÓN/REEMBOLSO
+  // --------------------------------------------------------------------------
+  logStep(6, 'Sincronización Inversa y Reposición de Stock por Cancelación/Reembolso');
+
+  // 1. Simular cancelación de Pedido 2 en Universal Bridge (MariaDB / PHP)
+  const order2Web = createdWebOrders[1];
+  if (!order2Web) {
+    throw new Error('No se encontró el Pedido 2 en createdWebOrders');
+  }
+  logSubstep(`Simulando cancelación de Pedido 2 Web (ID=${order2Web.id}, Ref=${order2Web.orderNumber})...`);
+  const cancelBridgeReq = await fetch(`${BRIDGE_BASE_URL}?action=cancel_order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      orderId: order2Web.id,
+      orderNumber: order2Web.orderNumber,
+      reason: 'Cancelación de prueba en Laboratorio E2E',
+    }),
+  });
+
+  if (!cancelBridgeReq.ok) {
+    throw new Error(`HTTP Error ${cancelBridgeReq.status} al cancelar pedido en Universal Bridge: ${await cancelBridgeReq.text()}`);
+  }
+
+  const cancelBridgeJson = (await cancelBridgeReq.json()) as any;
+  if (!cancelBridgeJson.success || cancelBridgeJson.status !== 'CANCELLED') {
+    throw new Error(`Fallo en respuesta cancel_order: ${JSON.stringify(cancelBridgeJson)}`);
+  }
+  logSuccess(`✓ Pedido 2 marcado como CANCELLED en Universal Bridge MariaDB.`);
+
+  // 2. Ejecutar syncUniversalBridgeCancellations
+  logSubstep('Ejecutando CancellationSyncHelper.syncUniversalBridgeCancellations()...');
+  const bridgeCancelSyncResult = await CancellationSyncHelper.syncUniversalBridgeCancellations({
+    endpointUrl: BRIDGE_BASE_URL,
+    headers: { Authorization: `Bearer ${BRIDGE_SECRET}` },
+    driver: accessDriver,
+    orderSeries: '1',
+    defaultWarehouse: 'GEN',
+  });
+
+  logSubstep(
+    `Resultado syncUniversalBridgeCancellations: cancelados=${bridgeCancelSyncResult.ordersCancelled}, repuestos=${bridgeCancelSyncResult.itemsRestocked}, errores=${bridgeCancelSyncResult.errors.length}`
+  );
+  if (bridgeCancelSyncResult.errors.length > 0) {
+    throw new Error(`Errores en syncUniversalBridgeCancellations: ${bridgeCancelSyncResult.errors.join('; ')}`);
+  }
+  if (bridgeCancelSyncResult.ordersCancelled !== 1) {
+    throw new Error(`Se esperaba 1 pedido cancelado procesado, pero se procesaron ${bridgeCancelSyncResult.ordersCancelled}`);
+  }
+  logSuccess('✓ Sincronización inversa de Universal Bridge completada.');
+
+  // 3. Comprobar en Factusol ACCDB: F_PCL ESTPCL = 3 y F_STO DISSTO repuesto de -6 a -2
+  logSubstep('Comprobando F_PCL para pedido cancelado Factusol #14...');
+  const order14CancelCheck = await accessDriver.query<{ ESTPCL: number }>(
+    `SELECT ESTPCL FROM F_PCL WHERE CODPCL = 14 AND TIPPCL = '1'`
+  );
+  if (order14CancelCheck.length === 0) {
+    throw new Error('No se encontró el pedido Factusol #14 en F_PCL');
+  }
+  const estPcl14 = Number(order14CancelCheck[0]?.ESTPCL);
+  logSubstep(`Estado ESTPCL de pedido Factusol #14: ${estPcl14}`);
+  if (estPcl14 !== 3) {
+    throw new Error(`ESTPCL de pedido Factusol #14 no es 3 (Anulado): actual ${estPcl14}`);
+  }
+  logSuccess('✓ Factusol F_PCL verificado: Pedido #14 marcado con ESTPCL = 3 (Anulado).');
+
+  logSubstep('Comprobando F_STO para SKU [001455] (debe reponer 4 uds: de -6 a -2)...');
+  const s001455After1stCancel = await accessDriver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '001455' AND ALMSTO = 'GEN'`
+  );
+  const stockAfter1stCancel = Number(s001455After1stCancel[0]?.DISSTO || 0);
+  logSubstep(`Stock SKU [001455] en almacén GEN: actual=${stockAfter1stCancel}, esperado=-2`);
+  if (stockAfter1stCancel !== -2) {
+    throw new Error(`Stock de 001455 incorrecto tras cancelación de Pedido 2: esperado -2, actual ${stockAfter1stCancel}`);
+  }
+  logSuccess('✓ Factusol F_STO verificado: Stock de 001455 repuesto exactamente en 4 unidades (-6 -> -2).');
+
+  // 4. Comprobar en MariaDB que eb_orders tiene factusol_unstocked = 1 y status = 'CANCELLED'
+  logSubstep('Comprobando estado de eb_orders en MariaDB...');
+  const mariaDbOrder2 = execSync(
+    `docker exec -i bentian-lab-mariadb mariadb -u tienda_user -ptest_password_123 suministros_tienda -e "SELECT id, status, factusol_unstocked FROM eb_orders WHERE id = ${order2Web.id};"`,
+    { encoding: 'utf8' }
+  );
+  logSubstep(`Registro en MariaDB:\n${mariaDbOrder2.trim()}`);
+  if (!mariaDbOrder2.includes('CANCELLED') || !mariaDbOrder2.includes('1')) {
+    throw new Error(`eb_orders en MariaDB no refleja status=CANCELLED y factusol_unstocked=1:\n${mariaDbOrder2}`);
+  }
+  logSuccess('✓ MariaDB eb_orders verificado: status="CANCELLED" y factusol_unstocked=1.');
+
+  // 5. Segunda pasada y comprobación del guardarraíl anti-doble reposición
+  logSubstep('Ejecutando segunda pasada para verificar guardarraíl anti-doble reposición...');
+  const secondBridgeCancelSync = await CancellationSyncHelper.syncUniversalBridgeCancellations({
+    endpointUrl: BRIDGE_BASE_URL,
+    headers: { Authorization: `Bearer ${BRIDGE_SECRET}` },
+    driver: accessDriver,
+    orderSeries: '1',
+    defaultWarehouse: 'GEN',
+  });
+  if (secondBridgeCancelSync.ordersCancelled !== 0) {
+    throw new Error(`Segunda pasada procesó ${secondBridgeCancelSync.ordersCancelled} pedidos cuando debía ser 0.`);
+  }
+
+  // Prueba directa en FactusolConnector/AccessDriver
+  logSubstep('Sometiendo a prueba directa restoreFactusolOrderStock sobre pedido ya anulado (ESTPCL = 3)...');
+  const directGuardrail = await CancellationSyncHelper.restoreFactusolOrderStock(
+    accessDriver,
+    14,
+    '1',
+    'GEN'
+  );
+  if (!directGuardrail.alreadyCancelled || directGuardrail.linesRestocked !== 0) {
+    throw new Error(`Guardarraíl interno falló: ${JSON.stringify(directGuardrail)}`);
+  }
+
+  const s001455GuardrailCheck = await accessDriver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '001455' AND ALMSTO = 'GEN'`
+  );
+  const stockAfterGuardrail = Number(s001455GuardrailCheck[0]?.DISSTO || 0);
+  if (stockAfterGuardrail !== -2) {
+    throw new Error(`¡VIOLACIÓN DE GUARDARRAÍL! El stock de 001455 cambió en la segunda pasada: esperado -2, actual ${stockAfterGuardrail}`);
+  }
+  logSuccess('✓ Guardarraíl anti-doble reposición verificado: El stock permanece exactamente en -2.');
+
+  // 6. Simular cancelación del pedido de WooCommerce (#601)
+  logSubstep('Simulando cancelación de pedido WooCommerce #601...');
+  const wcCancelReq = await fetch(`${WOOCOMMERCE_BASE_URL}/wp-json/wc/v3/orders/601`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'cancelled' }),
+  });
+  if (!wcCancelReq.ok) {
+    throw new Error(`Fallo al cancelar pedido #601 en WooCommerce Mock: ${await wcCancelReq.text()}`);
+  }
+  const wcCancelled = (await wcCancelReq.json()) as any;
+  if (wcCancelled.status !== 'cancelled') {
+    throw new Error(`Estado inesperado en WooCommerce #601: ${wcCancelled.status}`);
+  }
+  logSuccess('✓ Pedido WooCommerce #601 marcado con status="cancelled".');
+
+  // 7. Ejecutar syncWooCommerceCancellations
+  logSubstep('Ejecutando CancellationSyncHelper.syncWooCommerceCancellations()...');
+  const wcCancelSyncResult = await CancellationSyncHelper.syncWooCommerceCancellations({
+    storeUrl: WOOCOMMERCE_BASE_URL,
+    authHeader: 'Basic dGVzdDp0ZXN0',
+    driver: accessDriver,
+    orderSeries: '1',
+    defaultWarehouse: 'GEN',
+  });
+
+  logSubstep(
+    `Resultado syncWooCommerceCancellations: cancelados=${wcCancelSyncResult.ordersCancelled}, repuestos=${wcCancelSyncResult.itemsRestocked}, errores=${wcCancelSyncResult.errors.length}`
+  );
+  if (wcCancelSyncResult.errors.length > 0) {
+    throw new Error(`Errores en syncWooCommerceCancellations: ${wcCancelSyncResult.errors.join('; ')}`);
+  }
+  if (wcCancelSyncResult.ordersCancelled !== 1) {
+    throw new Error(`Se esperaba 1 pedido cancelado de WooCommerce procesado, pero se procesaron ${wcCancelSyncResult.ordersCancelled}`);
+  }
+  logSuccess('✓ Sincronización inversa de WooCommerce completada.');
+
+  // 8. Comprobar en Factusol: Pedido 16 tiene ESTPCL = 3 y F_STO SKU 001455 repuso 2 uds (de -2 a 0)
+  logSubstep('Comprobando F_PCL para pedido Factusol #16 (WooCommerce)...');
+  const order16CancelCheck = await accessDriver.query<{ ESTPCL: number }>(
+    `SELECT ESTPCL FROM F_PCL WHERE CODPCL = 16 AND TIPPCL = '1'`
+  );
+  if (order16CancelCheck.length === 0) {
+    throw new Error('No se encontró el pedido Factusol #16 en F_PCL');
+  }
+  const estPcl16 = Number(order16CancelCheck[0]?.ESTPCL);
+  if (estPcl16 !== 3) {
+    throw new Error(`ESTPCL de pedido Factusol #16 no es 3 (Anulado): actual ${estPcl16}`);
+  }
+  logSuccess('✓ Factusol F_PCL verificado: Pedido #16 marcado con ESTPCL = 3 (Anulado).');
+
+  logSubstep('Comprobando F_STO para SKU [001455] tras cancelación WooCommerce (de -2 a 0)...');
+  const s001455AfterWcCancel = await accessDriver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '001455' AND ALMSTO = 'GEN'`
+  );
+  const stockAfterWcCancel = Number(s001455AfterWcCancel[0]?.DISSTO || 0);
+  logSubstep(`Stock final SKU [001455] en almacén GEN: actual=${stockAfterWcCancel}, esperado=0`);
+  if (stockAfterWcCancel !== 0) {
+    throw new Error(`Stock de 001455 incorrecto tras cancelación WooCommerce: esperado 0, actual ${stockAfterWcCancel}`);
+  }
+  logSuccess('✓ Factusol F_STO verificado: Stock de 001455 repuesto en 2 unidades (-2 -> 0, inventario original restablecido).');
+
+  // 9. Comprobar metadato _bentian_factusol_cancelled: "1" en WooCommerce Mock
+  logSubstep('Verificando estampa de metadato _bentian_factusol_cancelled: "1" en WooCommerce...');
+  const wcRecheckReq = await fetch(`${WOOCOMMERCE_BASE_URL}/wp-json/wc/v3/orders/601`);
+  const wcRecheckData = (await wcRecheckReq.json()) as any;
+  const cancelledMeta = Array.isArray(wcRecheckData.meta_data) && wcRecheckData.meta_data.find(
+    (m: any) => m.key === '_bentian_factusol_cancelled'
+  );
+  if (!cancelledMeta || String(cancelledMeta.value) !== '1') {
+    throw new Error(`No se encontró el metadato _bentian_factusol_cancelled="1" en WooCommerce: ${JSON.stringify(wcRecheckData.meta_data)}`);
+  }
+  logSuccess('✓ WooCommerce verificado: Metadato _bentian_factusol_cancelled="1" presente en el pedido.');
+
+  // 10. Segunda pasada WooCommerce (Guardarraíl anti-doble reposición)
+  logSubstep('Verificando segunda pasada en WooCommerce (Guardarraíl Anti-Doble Reposición)...');
+  const secondWcCancelSync = await CancellationSyncHelper.syncWooCommerceCancellations({
+    storeUrl: WOOCOMMERCE_BASE_URL,
+    authHeader: 'Basic dGVzdDp0ZXN0',
+    driver: accessDriver,
+    orderSeries: '1',
+    defaultWarehouse: 'GEN',
+  });
+  if (secondWcCancelSync.ordersCancelled !== 0) {
+    throw new Error(`Segunda pasada de WooCommerce canceló ${secondWcCancelSync.ordersCancelled} pedidos cuando debía ser 0.`);
+  }
+  const s001455FinalCheck = await accessDriver.query<{ DISSTO: number }>(
+    `SELECT DISSTO FROM F_STO WHERE ARTSTO = '001455' AND ALMSTO = 'GEN'`
+  );
+  if (Number(s001455FinalCheck[0]?.DISSTO || 0) !== 0) {
+    throw new Error('El stock de 001455 cambió en la segunda pasada de WooCommerce.');
+  }
+  logSuccess('✓ Guardarraíl WooCommerce verificado: Cero reposiciones adicionales, stock inmutable en 0.');
+
+  // --------------------------------------------------------------------------
   // RESUMEN Y CONCLUSIÓN FINAL
   // --------------------------------------------------------------------------
   const durationSec = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -571,10 +799,12 @@ async function runE2ELaboratory(): Promise<void> {
   console.log(`======================================================================`);
   console.log(`  • Pedidos web MariaDB inyectados:    3`);
   console.log(`  • Pedidos importados a Factusol:      4 (3 Web + 1 WooCommerce)`);
+  console.log(`  • Pedidos cancelados y repuestos:    2 (Pedido 14 / Web-2 + Pedido 16 / Woo-601)`);
   console.log(`  • Clientes dados de alta en F_CLI:   1 (B2B con CIF)`);
   console.log(`  • Líneas de pedido insertadas:       4`);
-  console.log(`  • Aserciones de stock en F_STO:      100% correctas`);
+  console.log(`  • Aserciones de stock en F_STO:      100% correctas (decremento y reposición exacta)`);
   console.log(`  • Test de Idempotencia y Reintentos: 0 duplicados, 0 fugas de stock`);
+  console.log(`  • Guardarraíl Anti-Doble Reposición: 100% blindado contra sobre-reposiciones`);
   console.log(`======================================================================\n`);
 }
 
