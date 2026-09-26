@@ -68,6 +68,40 @@ export class OrderSyncHelper {
   }
 
   /**
+   * Comprueba si un pedido de WooCommerce ha sido cancelado o reembolsado y requiere
+   * reposición de existencias en Factusol (tiene _bentian_factusol_pcl y no tiene _bentian_factusol_cancelled).
+   */
+  public static isWcOrderCancelledNeedingRestock(wcOrder: any): {
+    needsRestock: boolean;
+    factusolOrderNumber?: number;
+  } {
+    if (!wcOrder || !Array.isArray(wcOrder.meta_data)) {
+      return { needsRestock: false };
+    }
+    const status = String(wcOrder.status || '').toLowerCase().trim();
+    if (status !== 'cancelled' && status !== 'refunded') {
+      return { needsRestock: false };
+    }
+    const isAlreadyCancelled = wcOrder.meta_data.some(
+      (m: any) =>
+        m.key === '_bentian_factusol_cancelled' &&
+        (String(m.value) === '1' || String(m.value).toLowerCase() === 'true')
+    );
+    if (isAlreadyCancelled) {
+      return { needsRestock: false };
+    }
+    const factMeta = wcOrder.meta_data.find((m: any) => m.key === '_bentian_factusol_pcl');
+    if (!factMeta || factMeta.value === undefined || factMeta.value === null || String(factMeta.value).trim() === '') {
+      return { needsRestock: false };
+    }
+    const factNum = parseInt(String(factMeta.value).trim(), 10);
+    if (isNaN(factNum) || factNum <= 0) {
+      return { needsRestock: false };
+    }
+    return { needsRestock: true, factusolOrderNumber: factNum };
+  }
+
+  /**
    * Transforma un pedido de Universal Bridge (MariaDB / PHP `erp-bridge-endpoint.php`)
    * a `CanonicalOrder` para inserción directa en Factusol.
    *

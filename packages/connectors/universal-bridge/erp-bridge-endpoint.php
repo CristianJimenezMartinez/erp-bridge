@@ -126,9 +126,12 @@ function ensureTablesExist($pdo) {
               `total` DECIMAL(12, 2) NOT NULL,
               `factusol_order_number` INT DEFAULT NULL,
               `factusol_series` VARCHAR(5) DEFAULT NULL,
+              `factusol_unstocked` TINYINT(1) NOT NULL DEFAULT 0,
+              `unstocked_at` TIMESTAMP NULL DEFAULT NULL,
               `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               `synced_at` TIMESTAMP NULL DEFAULT NULL,
               INDEX `idx_status` (`status`),
+              INDEX `idx_unstocked` (`status`, `factusol_unstocked`),
               INDEX `idx_created` (`created_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ");
@@ -138,6 +141,23 @@ function ensureTablesExist($pdo) {
             $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `imgart` VARCHAR(255) DEFAULT NULL");
             $pdo->exec("ALTER TABLE `eb_products` ADD COLUMN IF NOT EXISTS `image_url` VARCHAR(500) DEFAULT NULL");
         } catch (Exception $colErr) {}
+        try {
+            $pdo->exec("ALTER TABLE `eb_orders` ADD COLUMN IF NOT EXISTS `factusol_unstocked` TINYINT(1) NOT NULL DEFAULT 0");
+            $pdo->exec("ALTER TABLE `eb_orders` ADD COLUMN IF NOT EXISTS `unstocked_at` TIMESTAMP NULL DEFAULT NULL");
+        } catch (Exception $orderColErr) {
+            try {
+                $cols = $pdo->query("SHOW COLUMNS FROM `eb_orders` LIKE 'factusol_unstocked'")->fetchAll();
+                if (empty($cols)) {
+                    $pdo->exec("ALTER TABLE `eb_orders` ADD COLUMN `factusol_unstocked` TINYINT(1) NOT NULL DEFAULT 0");
+                }
+            } catch (Exception $e1) {}
+            try {
+                $cols = $pdo->query("SHOW COLUMNS FROM `eb_orders` LIKE 'unstocked_at'")->fetchAll();
+                if (empty($cols)) {
+                    $pdo->exec("ALTER TABLE `eb_orders` ADD COLUMN `unstocked_at` TIMESTAMP NULL DEFAULT NULL");
+                }
+            } catch (Exception $e2) {}
+        }
         return true;
     } catch (Exception $e) {
         return false;
@@ -559,6 +579,95 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// RUTA PÚBLICA / WEBHOOK: CANCELACIÓN DE PEDIDOS (Frontend / Pasarelas de Pago)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'cancel_order' || $mainAction === 'order_cancel' || $mainAction === 'cancel' || $mainAction === 'payment_webhook' || $mainAction === 'webhook') {
+    $pdo = getDbConnection();
+    if (!$pdo) {
+        http_response_code(503);
+        echo json_encode(['error' => 'Base de datos no disponible']);
+        exit;
+    }
+    ensureTablesExist($pdo);
+
+    $rawBody = file_get_contents('php://input');
+    $payload = json_decode($rawBody, true) ?: [];
+
+    // Si es un webhook de Stripe/PayPal/Redsys, verificar si corresponde a reembolso o cancelación
+    $isWebhook = ($mainAction === 'webhook' || $mainAction === 'payment_webhook');
+    if ($isWebhook) {
+        $eventType = strtolower($payload['type'] ?? $payload['event_type'] ?? $payload['event'] ?? '');
+        $eventStatus = strtolower($payload['status'] ?? '');
+        $isCancellationEvent = (
+            strpos($eventType, 'refund') !== false ||
+            strpos($eventType, 'cancel') !== false ||
+            strpos($eventType, 'denied') !== false ||
+            in_array($eventStatus, ['cancelled', 'canceled', 'refunded', 'denied', 'failed'])
+        );
+        if (!$isCancellationEvent && empty($_GET['order_number']) && empty($payload['orderNumber'])) {
+            echo json_encode(['status' => 'ignored', 'message' => 'Evento de webhook no relacionado con cancelación o reembolso']);
+            exit;
+        }
+    }
+
+    $orderNum = trim(strval($payload['orderNumber'] ?? $payload['order_number'] ?? $payload['data']['object']['metadata']['order_number'] ?? $_GET['order_number'] ?? $_GET['orderNumber'] ?? ''));
+    $orderId = intval($payload['orderId'] ?? $payload['order_id'] ?? $payload['id'] ?? $_GET['id'] ?? $_GET['orderId'] ?? 0);
+    $payRef = trim(strval($payload['paymentReference'] ?? $payload['payment_reference'] ?? $payload['data']['object']['id'] ?? $_GET['payment_reference'] ?? ''));
+    $reason = trim(strval($payload['reason'] ?? $payload['cancel_reason'] ?? 'Cancelado por cliente o pasarela de pago'));
+
+    if (empty($orderNum) && $orderId <= 0 && empty($payRef)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Identificador de pedido no proporcionado (orderNumber, orderId o paymentReference)']);
+        exit;
+    }
+
+    $where = [];
+    $params = [];
+    if (!empty($orderNum)) {
+        $where[] = "`order_number` = :orderNum";
+        $params[':orderNum'] = $orderNum;
+    }
+    if ($orderId > 0) {
+        $where[] = "`id` = :orderId";
+        $params[':orderId'] = $orderId;
+    }
+    if (!empty($payRef)) {
+        $where[] = "`payment_reference` = :payRef";
+        $params[':payRef'] = $payRef;
+    }
+
+    $whereClause = implode(' OR ', $where);
+    $stmt = $pdo->prepare("SELECT id, order_number, status, factusol_order_number, factusol_unstocked FROM `eb_orders` WHERE {$whereClause} LIMIT 1");
+    $stmt->execute($params);
+    $existing = $stmt->fetch();
+
+    if (!$existing) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Pedido no encontrado para cancelar']);
+        exit;
+    }
+
+    $updateStmt = $pdo->prepare("
+        UPDATE `eb_orders` 
+        SET `status` = 'CANCELLED',
+            `payment_status` = 'CANCELLED'
+        WHERE `id` = :id
+    ");
+    $updateStmt->execute([':id' => $existing['id']]);
+
+    echo json_encode([
+        'success' => true,
+        'orderId' => intval($existing['id']),
+        'orderNumber' => $existing['order_number'],
+        'status' => 'CANCELLED',
+        'hadFactusolOrder' => !empty($existing['factusol_order_number']),
+        'factusolUnstocked' => intval($existing['factusol_unstocked'] ?? 0),
+        'message' => 'Pedido cancelado correctamente en la tienda online',
+    ]);
+    exit;
+}
+
 // ============================================================================
 // ACCIONES PROTEGIDAS DEL AGENTE LOCAL (Requieren Secret Key)
 // ============================================================================
@@ -933,6 +1042,89 @@ if ($mainAction === 'ack_orders') {
         $pdo->rollBack();
         http_response_code(500);
         echo json_encode(['error' => 'Fallo al confirmar pedidos']);
+    }
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: PULL_CANCELLED_ORDERS (Descarga de pedidos cancelados para Factusol)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'pull_cancelled_orders' || $mainAction === 'get_cancelled_orders') {
+    $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 50;
+    $stmt = $pdo->prepare("
+        SELECT * FROM `eb_orders` 
+        WHERE `status` = 'CANCELLED' 
+          AND `factusol_order_number` IS NOT NULL 
+          AND (`factusol_unstocked` = 0 OR `factusol_unstocked` IS NULL)
+        ORDER BY `id` ASC 
+        LIMIT :lim
+    ");
+    $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+
+    $orders = [];
+    foreach ($rows as $r) {
+        $orders[] = [
+            'id' => intval($r['id']),
+            'order_number' => $r['order_number'],
+            'orderNumber' => $r['order_number'],
+            'status' => $r['status'],
+            'customer' => json_decode($r['customer_data'], true) ?: [],
+            'lines' => json_decode($r['order_lines'], true) ?: [],
+            'payment_method' => $r['payment_method'],
+            'paymentMethod' => $r['payment_method'],
+            'payment_status' => $r['payment_status'] ?? 'CANCELLED',
+            'payment_reference' => $r['payment_reference'] ?? '',
+            'subtotal' => floatval($r['subtotal'] ?? $r['total']),
+            'tax_total' => floatval($r['tax_total'] ?? 0),
+            'shipping_cost' => floatval($r['shipping_cost'] ?? 0),
+            'total' => floatval($r['total']),
+            'factusol_order_number' => intval($r['factusol_order_number']),
+            'factusolOrderNumber' => intval($r['factusol_order_number']),
+            'factusol_series' => $r['factusol_series'] ?? '1',
+            'factusolSeries' => $r['factusol_series'] ?? '1',
+            'created_at' => $r['created_at'],
+            'createdAt' => $r['created_at'],
+        ];
+    }
+    echo json_encode(['success' => true, 'orders' => $orders]);
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: ACK_CANCELLED_ORDERS (Confirmación de reposición de stock en Factusol)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'ack_cancelled_orders') {
+    $confirmations = isset($data['confirmations']) && is_array($data['confirmations']) 
+        ? $data['confirmations'] 
+        : (isset($data['orderIds']) && is_array($data['orderIds']) ? $data['orderIds'] : []);
+
+    $stmt = $pdo->prepare("
+        UPDATE `eb_orders` 
+        SET `factusol_unstocked` = 1, 
+            `unstocked_at` = NOW() 
+        WHERE `id` = :id
+    ");
+
+    $count = 0;
+    $pdo->beginTransaction();
+    try {
+        foreach ($confirmations as $c) {
+            $orderId = is_array($c) 
+                ? intval($c['orderId'] ?? $c['webOrderId'] ?? $c['id'] ?? 0)
+                : intval($c);
+            if ($orderId > 0) {
+                $stmt->execute([':id' => $orderId]);
+                $count++;
+            }
+        }
+        $pdo->commit();
+        echo json_encode(['success' => true, 'count' => $count]);
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(['error' => 'Fallo al confirmar reposición de pedidos cancelados: ' . $e->getMessage()]);
     }
     exit;
 }

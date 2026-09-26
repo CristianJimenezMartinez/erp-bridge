@@ -8,6 +8,7 @@ import { FactusolService } from '../factusol/factusol.service';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
 import { OrderSyncHelper } from './order-sync.helper';
+import { CancellationSyncHelper } from './cancellation-sync.helper';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -313,6 +314,24 @@ export class LocalSyncEngine {
           }
         } catch (orderErr) {
           this.logger.warn(`Aviso en importación de pedidos de WooCommerce: ${String(orderErr)}`);
+        }
+
+        // 3. SINCRONIZACIÓN INVERSA DE PEDIDOS CANCELADOS/REEMBOLSADOS (WooCommerce -> Factusol)
+        try {
+          this.eventBus.addEvent('info', 'Comprobando pedidos cancelados/reembolsados en WooCommerce...');
+          const cancelRes = await CancellationSyncHelper.syncWooCommerceCancellations({
+            storeUrl: cleanUrl,
+            authHeader,
+            driver,
+            orderSeries: series,
+            defaultWarehouse: warehouse,
+            eventBus: this.eventBus,
+          });
+          if (cancelRes.ordersCancelled > 0) {
+            this.eventBus.addEvent('success', `✓ Stock repuesto en Factusol para ${cancelRes.ordersCancelled} pedidos cancelados/reembolsados de WooCommerce.`);
+          }
+        } catch (cancelErr) {
+          this.logger.warn(`Aviso en sincronización inversa de cancelaciones de WooCommerce: ${String(cancelErr)}`);
         }
       } else {
         // Modo Standalone sin WooCommerce configurado
@@ -813,8 +832,26 @@ export class LocalSyncEngine {
       this.logger.warn(`Aviso en sincronización de pedidos con Universal Bridge: ${String(orderErr)}`);
     }
 
+    // 3. Sincronización inversa de pedidos cancelados (Universal Bridge -> Factusol)
+    let ordersCancelled = 0;
+    try {
+      this.eventBus.addEvent('info', 'Comprobando pedidos cancelados en la tienda online...');
+      const cancelRes = await CancellationSyncHelper.syncUniversalBridgeCancellations({
+        endpointUrl,
+        headers,
+        driver,
+        orderSeries: config.factusol?.orderSeries || '1',
+        defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+        eventBus: this.eventBus,
+      });
+      ordersCancelled = cancelRes.ordersCancelled;
+    } catch (cancelErr) {
+      this.logger.warn(`Aviso en sincronización inversa de cancelaciones con Universal Bridge: ${String(cancelErr)}`);
+    }
+
     const duration = ((Date.now() - start) / 1000).toFixed(1);
-    const summary = `Sincronización completada en ${duration}s: ${itemsUpdated} stock actualizado, ${ordersImported} pedidos importados.`;
+    const cancelMsg = ordersCancelled > 0 ? `, ${ordersCancelled} pedidos cancelados/repuestos` : '';
+    const summary = `Sincronización completada en ${duration}s: ${itemsUpdated} stock actualizado, ${ordersImported} pedidos importados${cancelMsg}.`;
 
     this.historyManager.addSyncHistoryRecord({
       type: 'manual',
