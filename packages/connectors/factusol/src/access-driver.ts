@@ -133,6 +133,25 @@ export class AccessDriver {
     throw new Error('Ninguna combinación de proveedor OLEDB / arquitectura de Windows fue capaz de abrir la base de datos.');
   }
 
+  private decodeStreamBuffer(buf: Buffer): string {
+    if (!buf || buf.length === 0) return '';
+    // Detect UTF-16LE: check for UTF-16LE BOM (0xFF, 0xFE) or null high-byte in first ASCII character
+    if (buf.length >= 2 && ((buf[0] === 0xff && buf[1] === 0xfe) || buf[1] === 0x00)) {
+      const text = buf.toString('utf16le');
+      return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+    }
+    // Fallback: UTF-8 without replacement char, else Latin1
+    try {
+      const text = buf.toString('utf8');
+      if (!text.includes('\ufffd')) {
+        return text;
+      }
+    } catch {
+      // Fallback to latin1 below
+    }
+    return buf.toString('latin1');
+  }
+
   private runAdodbWith(
     cscript: string,
     action: 'query' | 'execute' | 'transaction',
@@ -140,7 +159,7 @@ export class AccessDriver {
     timeoutMs = 30000
   ): Promise<string> {
     return new Promise((resolve, reject) => {
-      const child = childProcess.spawn(cscript, ['//Nologo', this.adodbJsPath, action], {
+      const child = childProcess.spawn(cscript, ['//Nologo', '//U', this.adodbJsPath, action], {
         windowsHide: true,
       });
 
@@ -175,7 +194,7 @@ export class AccessDriver {
         if (killed) return;
 
         if (stderrChunks.length > 0) {
-          const stderrText = Buffer.concat(stderrChunks).toString('utf8').trim();
+          const stderrText = this.decodeStreamBuffer(Buffer.concat(stderrChunks)).trim();
           let errMsg = stderrText;
           try {
             const parsedErr = JSON.parse(stderrText);
@@ -187,22 +206,16 @@ export class AccessDriver {
         }
 
         if (code !== 0) {
-          const stdoutText = Buffer.concat(stdoutChunks).toString('utf8').trim();
+          const stdoutText = this.decodeStreamBuffer(Buffer.concat(stdoutChunks)).trim();
           return reject(new Error(stdoutText || `cscript process exited with code ${code}`));
         }
 
         const outBuf = Buffer.concat(stdoutChunks);
-        let text = outBuf.toString('utf8');
-        try {
-          JSON.parse(text);
-          return resolve(text);
-        } catch {
-          text = outBuf.toString('latin1');
-          return resolve(text);
-        }
+        const text = this.decodeStreamBuffer(outBuf);
+        return resolve(text);
       });
 
-      child.stdin.end(input, 'utf8');
+      child.stdin.end(Buffer.from(input, 'utf16le'));
     });
   }
 

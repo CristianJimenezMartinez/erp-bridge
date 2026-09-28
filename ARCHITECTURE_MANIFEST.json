@@ -14,7 +14,7 @@
       "paths": [
         "packages/connectors/factusol/src"
       ],
-      "integrityTreeHash": "4345171b982d65ed3876762dac09d00eb359fabf130537129fae88dd83bd6df9",
+      "integrityTreeHash": "4468021a030e60cd7aa826eb40132656ecf8e6ee133056a7692f8f0863f680a6",
       "publicContract": "packages/connectors/factusol/src/index.ts",
       "testSuites": [
         "packages/connectors/factusol/test/connector.test.ts",
