@@ -9,12 +9,17 @@ const logger = new Logger('FactusolController');
 
 export class FactusolController {
 
-  public static openNativeFileDialog(): RouteHandler {
-    return (_req, res) => {
+  public static openNativeFileDialog(agent?: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
       try {
-        const filePath = openWindowsFileDialog(
+        let initialPath = (ctx?.body && ctx.body.currentPath) || ctx?.parsedUrl?.searchParams?.get('currentPath') || undefined;
+        if (!initialPath && agent) {
+          initialPath = agent.configManager?.get()?.factusolDbPath;
+        }
+        const filePath = await openWindowsFileDialog(
           'Seleccionar Base de Datos Factusol (Local o NAS / Red)',
-          'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb'
+          'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb',
+          initialPath
         );
         res.writeHead(200, { 'Content-Type': 'application/json' });
         if (filePath) {

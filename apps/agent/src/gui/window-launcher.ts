@@ -86,7 +86,11 @@ export function openDesktopWindow(url: string): boolean {
  * Abre el selector nativo de archivos de Windows (OpenFileDialog).
  * Permite examinar la Red, unidades asignadas y rutas UNC hacia el NAS (ej: \\NAS\...).
  */
-export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factusol (Local o NAS)', filter = 'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb'): string {
+export async function openWindowsFileDialog(
+  title = 'Seleccionar Base de Datos Factusol (Local o NAS)',
+  filter = 'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb',
+  initialPath?: string
+): Promise<string> {
   // Soporte de mock para pruebas automatizadas y CI/CD
   if (process.env['BENTIAN_MOCK_FILE_DIALOG'] !== undefined) {
     const mockVal = process.env['BENTIAN_MOCK_FILE_DIALOG'];
@@ -103,7 +107,7 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
     return '';
   }
 
-  // 1. Intentar mediante BentianTray.exe --open-file-dialog
+  // 1. Intentar mediante BentianTray.exe --open-file-dialog [initialPath]
   try {
     const execDir = path.dirname(process.execPath);
     const trayCandidates = [
@@ -115,18 +119,43 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
       path.resolve(process.cwd(), 'apps', 'agent', 'dist', 'gui', 'tray', 'BentianTray.exe'),
     ];
 
+    let foundTrayExe: string | null = null;
     for (const trayExe of trayCandidates) {
       if (fs.existsSync(trayExe)) {
-        logger.info(`Abriendo selector nativo de Windows mediante: ${trayExe}`);
-        const output = childProcess.execFileSync(trayExe, ['--open-file-dialog'], {
-          encoding: 'utf8',
-          timeout: 120000,
-          windowsHide: false,
-        });
-        // Si el ejecutable se ejecutó sin errores, el diálogo fue mostrado al usuario.
-        // Si seleccionó archivo devolvemos la ruta; si canceló, retornamos cadena vacía
-        // inmediatamente sin caer en el fallback de PowerShell para no abrir una segunda ventana.
-        return output ? output.trim() : '';
+        foundTrayExe = trayExe;
+        break;
+      }
+    }
+
+    if (foundTrayExe) {
+      logger.info(`Abriendo selector nativo de Windows mediante: ${foundTrayExe}`);
+      const args = ['--open-file-dialog'];
+      if (initialPath) {
+        args.push(initialPath);
+      }
+
+      const output = await new Promise<string | null>((resolve) => {
+        childProcess.execFile(
+          foundTrayExe!,
+          args,
+          {
+            encoding: 'utf8',
+            timeout: 120000,
+            windowsHide: false,
+          },
+          (err, stdout) => {
+            if (err) {
+              logger.warn('Aviso al invocar BentianTray dialog, usando fallback de PowerShell:', { err: String(err) });
+              resolve(null);
+            } else {
+              resolve(stdout ? stdout.trim() : '');
+            }
+          }
+        );
+      });
+
+      if (output !== null) {
+        return output;
       }
     }
   } catch (trayErr) {
@@ -136,32 +165,75 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
   // 2. Fallback mediante PowerShell nativo en modo STA con ventana TopMost y UTF-8
   try {
     logger.info('Invocando selector nativo mediante fallback PowerShell (TopMost = true, UTF-8)...');
+
+    let initialDirPs = '';
+    if (initialPath) {
+      const sanitizedInitial = initialPath.replace(/'/g, "''");
+      initialDirPs = `$initPath = '${sanitizedInitial}'; if (Test-Path $initPath -PathType Leaf) { $d.InitialDirectory = [System.IO.Path]::GetDirectoryName($initPath); $d.FileName = [System.IO.Path]::GetFileName($initPath); } elseif (Test-Path $initPath -PathType Container) { $d.InitialDirectory = $initPath; };`;
+    } else {
+      initialDirPs = `foreach ($p in @('C:\\Software DELSOL\\Factusol\\Datos\\FS', 'C:\\Factusol\\Datos\\FS')) { if (Test-Path $p) { $d.InitialDirectory = $p; break; } };`;
+    }
+
     const psScript = [
       '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8;',
       'Add-Type -AssemblyName System.Windows.Forms;',
+      'Add-Type @"',
+      'using System;',
+      'using System.Runtime.InteropServices;',
+      'public class WinFocus {',
+      '    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);',
+      '    [DllImport("user32.dll")] public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);',
+      '    public static void Force(IntPtr h) {',
+      '        try {',
+      '            keybd_event(0x12, 0, 0, 0);',
+      '            keybd_event(0x12, 0, 2, 0);',
+      '            SetForegroundWindow(h);',
+      '        } catch {}',
+      '    }',
+      '}',
+      '"@;',
       '$f = New-Object System.Windows.Forms.Form;',
+      '$f.Text = "Bentian ERP Bridge — Seleccionar Archivo";',
       '$f.TopMost = $true;',
       '$f.StartPosition = "CenterScreen";',
       '$f.Size = New-Object System.Drawing.Size(1, 1);',
-      '$f.Opacity = 0;',
-      '$f.ShowInTaskbar = $false;',
+      '$f.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedToolWindow;',
+      '$f.ShowInTaskbar = $true;',
       '$f.Show();',
       '$f.BringToFront();',
+      '[WinFocus]::Force($f.Handle);',
       '$d = New-Object System.Windows.Forms.OpenFileDialog;',
       `$d.Title = '${title.replace(/'/g, "''")}';`,
       `$d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*';`,
       '$d.CheckFileExists = $true;',
       '$d.RestoreDirectory = $true;',
+      '$d.AutoUpgradeEnabled = $true;',
+      initialDirPs,
       'if ($d.ShowDialog($f) -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) };',
       '$d.Dispose();',
-      '$f.Dispose();'
+      '$f.Dispose();',
     ].join(' ');
 
-    const output = childProcess.execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-STA', '-Command', psScript], {
-      encoding: 'utf8',
-      timeout: 120000,
-      windowsHide: true,
+    const output = await new Promise<string>((resolve) => {
+      childProcess.execFile(
+        'powershell.exe',
+        ['-NoProfile', '-STA', '-Command', psScript],
+        {
+          encoding: 'utf8',
+          timeout: 120000,
+          windowsHide: true,
+        },
+        (err, stdout) => {
+          if (err) {
+            logger.warn('Fallo o timeout al invocar OpenFileDialog de PowerShell:', { err: String(err) });
+            resolve('');
+          } else {
+            resolve(stdout ? stdout.trim() : '');
+          }
+        }
+      );
     });
+
     if (output && output.trim()) {
       return output.trim();
     }

@@ -84,7 +84,7 @@ async function runAuditSuite() {
       process.env.BENTIAN_MOCK_FILE_DIALOG = scenario.path;
 
       // 1. Probar openWindowsFileDialog directamente
-      const directResult = openWindowsFileDialog();
+      const directResult = await openWindowsFileDialog();
       if (scenario.expectedSuccess) {
         assert.strictEqual(
           directResult,

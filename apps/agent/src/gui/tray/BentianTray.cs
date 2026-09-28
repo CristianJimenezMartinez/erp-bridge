@@ -22,6 +22,32 @@ namespace Bentian.Tray
         [DllImport("shell32.dll", SetLastError = true)]
         private static extern int SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string AppID);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
+
+        private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_SHOWWINDOW = 0x0040;
+
+        private static void ForceForeground(IntPtr hWnd)
+        {
+            try
+            {
+                SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                keybd_event(0x12, 0, 0, 0); // ALT key down
+                keybd_event(0x12, 0, 2, 0); // ALT key up
+                SetForegroundWindow(hWnd);
+            }
+            catch { }
+        }
+
         private static NotifyIcon trayIcon;
         private static ContextMenuStrip contextMenu;
         private static int port = 39281;
@@ -38,16 +64,56 @@ namespace Bentian.Tray
                 try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
+                string initialDir = null;
+                string initialFileName = null;
+                if (args.Length > 1 && !string.IsNullOrEmpty(args[1]))
+                {
+                    try
+                    {
+                        string candidate = args[1].Trim('"', '\'');
+                        if (File.Exists(candidate))
+                        {
+                            initialDir = Path.GetDirectoryName(candidate);
+                            initialFileName = Path.GetFileName(candidate);
+                        }
+                        else if (Directory.Exists(candidate))
+                        {
+                            initialDir = candidate;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (string.IsNullOrEmpty(initialDir))
+                {
+                    string[] defaultDirs = new string[] {
+                        @"C:\Software DELSOL\Factusol\Datos\FS",
+                        @"C:\Factusol\Datos\FS",
+                        @"D:\Software DELSOL\Factusol\Datos\FS"
+                    };
+                    foreach (var d in defaultDirs)
+                    {
+                        if (Directory.Exists(d))
+                        {
+                            initialDir = d;
+                            break;
+                        }
+                    }
+                }
+
                 using (var owner = new Form())
                 {
-                    owner.TopMost = true;
+                    owner.Text = "Bentian ERP Bridge — Seleccionar Base de Datos Factusol";
                     owner.StartPosition = FormStartPosition.CenterScreen;
                     owner.Size = new Size(1, 1);
-                    owner.Opacity = 0;
-                    owner.ShowInTaskbar = false;
+                    owner.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+                    owner.ShowInTaskbar = true;
+                    owner.TopMost = true;
                     owner.Show();
                     owner.BringToFront();
                     owner.Activate();
+                    ForceForeground(owner.Handle);
 
                     using (var dialog = new OpenFileDialog())
                     {
@@ -55,6 +121,17 @@ namespace Bentian.Tray
                         dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
                         dialog.CheckFileExists = true;
                         dialog.RestoreDirectory = true;
+                        dialog.AutoUpgradeEnabled = true;
+
+                        if (!string.IsNullOrEmpty(initialDir))
+                        {
+                            dialog.InitialDirectory = initialDir;
+                        }
+                        if (!string.IsNullOrEmpty(initialFileName))
+                        {
+                            dialog.FileName = initialFileName;
+                        }
+
                         if (dialog.ShowDialog(owner) == DialogResult.OK)
                         {
                             Console.WriteLine(dialog.FileName);

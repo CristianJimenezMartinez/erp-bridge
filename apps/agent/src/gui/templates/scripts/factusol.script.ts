@@ -29,19 +29,34 @@ export const factusolScript = `
       const targetIsWizard = !!isWizard;
       const btnNative = document.getElementById('btn-browse-native');
       const btnWizNative = document.getElementById('wiz-btn-browse-native');
-      if (btnNative) btnNative.disabled = true;
-      if (btnWizNative) btnWizNative.disabled = true;
+      const originalNativeHtml = btnNative ? btnNative.innerHTML : '';
+      const originalWizHtml = btnWizNative ? btnWizNative.innerHTML : '';
+
+      const spinnerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Abriendo...';
+
+      if (btnNative) {
+        btnNative.disabled = true;
+        btnNative.innerHTML = spinnerHTML;
+      }
+      if (btnWizNative) {
+        btnWizNative.disabled = true;
+        btnWizNative.innerHTML = spinnerHTML;
+      }
       showToast('Abriendo selector de archivos de Windows...', 'info');
+
       try {
+        const targetInput = targetIsWizard 
+          ? document.getElementById('wiz-input-fact-path') 
+          : document.getElementById('input-factusol-db');
+        const currentPath = targetInput ? targetInput.value.trim() : '';
+
         const res = await fetch('/api/local/open-file-dialog', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPath })
         });
         const data = await res.json();
         if (data.success && data.filePath) {
-          const targetInput = targetIsWizard 
-            ? document.getElementById('wiz-input-fact-path') 
-            : document.getElementById('input-factusol-db');
           if (targetInput) {
             targetInput.value = data.filePath;
             targetInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -73,8 +88,14 @@ export const factusolScript = `
         console.warn('Selector de archivos de Windows cancelado o cerrado:', err); // quality-allow-console (browser template script)
       } finally {
         isOpeningNativeDialog = false;
-        if (btnNative) btnNative.disabled = false;
-        if (btnWizNative) btnWizNative.disabled = false;
+        if (btnNative) {
+          btnNative.disabled = false;
+          btnNative.innerHTML = originalNativeHtml;
+        }
+        if (btnWizNative) {
+          btnWizNative.disabled = false;
+          btnWizNative.innerHTML = originalWizHtml;
+        }
       }
     }
 
