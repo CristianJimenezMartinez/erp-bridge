@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@erp-bridge/connector-factusol": "workspace:*",
+    "@erp-bridge/connector-prestashop": "workspace:*",
     "@erp-bridge/connector-simplygest": "workspace:*",
     "@erp-bridge/connector-woocommerce": "workspace:*",
     "@erp-bridge/core": "workspace:*",

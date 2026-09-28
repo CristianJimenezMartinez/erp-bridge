@@ -96,7 +96,7 @@ export class PrestaShopOrderMapper {
     return {
       id,
       orderNumber,
-      series: 'PS',
+      series: '',
       reference: `PS-${raw.id}`,
       date,
       status,
