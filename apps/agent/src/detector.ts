@@ -39,11 +39,50 @@ export class FactusolDetector {
     return dirs;
   }
 
+  private static isTemplateOrSystemFile(fileName: string): boolean {
+    const base = path.basename(fileName, path.extname(fileName)).toUpperCase();
+    const ignored = [
+      'FACTUSOL',
+      'FACTUSOLWEB',
+      'GENERAL',
+      'GENERALBASE',
+      'GENERALCOPIA',
+      'MODELOS',
+      'GESTORSOL',
+    ];
+    if (ignored.includes(base)) return true;
+    if (base.startsWith('C1') || base.endsWith('.BAK')) return true;
+    return false;
+  }
+
   public static detectAll(additionalPaths: string[] = []): FactusolDetectedInstance[] {
-    const detected: FactusolDetectedInstance[] = [];
+    const detectedMap = new Map<string, FactusolDetectedInstance>();
     const searchDirs = [...new Set([...additionalPaths, ...this.getStandardDirectories()])];
 
     this.logger.info('Escaneando directorios en busca de bases de datos Factusol (.accdb / .mdb)...');
+
+    const addInstance = (fullPath: string, fileName: string) => {
+      const normKey = path.resolve(fullPath).toLowerCase();
+      if (detectedMap.has(normKey)) return;
+      if (this.isTemplateOrSystemFile(fileName)) return;
+
+      try {
+        const stats = fs.statSync(fullPath);
+        if (stats.size < 100 * 1024) return;
+
+        const { companyCode, year } = this.parseFileName(fileName);
+        detectedMap.set(normKey, {
+          databasePath: fullPath,
+          companyCode,
+          year,
+          fileSizeBytes: stats.size,
+          lastModified: stats.mtime,
+          isValid: true,
+        });
+
+        this.logger.info(`✓ Factusol detectado: ${fullPath} (Empresa: ${companyCode || 'N/A'}, Ejercicio: ${year || 'N/A'})`);
+      } catch {}
+    };
 
     for (const dir of searchDirs) {
       if (!fs.existsSync(dir)) continue;
@@ -55,27 +94,9 @@ export class FactusolDetector {
           if (entry.isFile()) {
             const ext = path.extname(entry.name).toLowerCase();
             if (ext === '.accdb' || ext === '.mdb') {
-              const fullPath = path.join(dir, entry.name);
-              const stats = fs.statSync(fullPath);
-
-              // Ignorar archivos de bloqueo temporales (.laccdb / archivos < 100 KB)
-              if (stats.size < 100 * 1024) continue;
-
-              const { companyCode, year } = this.parseFileName(entry.name);
-
-              detected.push({
-                databasePath: fullPath,
-                companyCode,
-                year,
-                fileSizeBytes: stats.size,
-                lastModified: stats.mtime,
-                isValid: true,
-              });
-
-              this.logger.info(`✓ Factusol detectado: ${fullPath} (Empresa: ${companyCode || 'N/A'}, Ejercicio: ${year || 'N/A'})`);
+              addInstance(path.join(dir, entry.name), entry.name);
             }
           } else if (entry.isDirectory() && entry.name.toUpperCase() === 'FS') {
-            // Escanear subcarpeta FS común en Factusol
             const subFsDir = path.join(dir, entry.name);
             try {
               const fsEntries = fs.readdirSync(subFsDir, { withFileTypes: true });
@@ -83,20 +104,7 @@ export class FactusolDetector {
                 if (subEntry.isFile()) {
                   const ext = path.extname(subEntry.name).toLowerCase();
                   if (ext === '.accdb' || ext === '.mdb') {
-                    const fullPath = path.join(subFsDir, subEntry.name);
-                    const stats = fs.statSync(fullPath);
-                    if (stats.size < 100 * 1024) continue;
-
-                    const { companyCode, year } = this.parseFileName(subEntry.name);
-                    detected.push({
-                      databasePath: fullPath,
-                      companyCode,
-                      year,
-                      fileSizeBytes: stats.size,
-                      lastModified: stats.mtime,
-                      isValid: true,
-                    });
-                    this.logger.info(`✓ Factusol detectado en /FS: ${fullPath} (Empresa: ${companyCode || 'N/A'}, Ejercicio: ${year || 'N/A'})`);
+                    addInstance(path.join(subFsDir, subEntry.name), subEntry.name);
                   }
                 }
               }
@@ -108,7 +116,9 @@ export class FactusolDetector {
       }
     }
 
-    // Ordenar por año descendente (2025 > 2024) para priorizar el ejercicio fiscal más reciente
+    const detected = Array.from(detectedMap.values());
+
+    // Ordenar por año descendente (2026 > 2021) para priorizar el ejercicio fiscal más reciente
     detected.sort((a, b) => {
       const yearA = parseInt(a.year || '0', 10);
       const yearB = parseInt(b.year || '0', 10);

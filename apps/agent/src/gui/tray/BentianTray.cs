@@ -41,9 +41,9 @@ namespace Bentian.Tray
                 using (var owner = new Form())
                 {
                     owner.TopMost = true;
-                    owner.StartPosition = FormStartPosition.Manual;
-                    owner.Location = new Point(-32000, -32000);
+                    owner.StartPosition = FormStartPosition.CenterScreen;
                     owner.Size = new Size(1, 1);
+                    owner.Opacity = 0;
                     owner.ShowInTaskbar = false;
                     owner.Show();
                     owner.BringToFront();
