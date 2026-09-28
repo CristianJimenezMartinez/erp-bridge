@@ -157,10 +157,10 @@ export function openWindowsFileDialog(title = 'Seleccionar Base de Datos Factuso
       '$f.Dispose();'
     ].join(' ');
 
-    const output = childProcess.execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-STA', '-Command', psScript], {
+    const output = childProcess.execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-STA', '-Command', psScript], {
       encoding: 'utf8',
       timeout: 120000,
-      windowsHide: false,
+      windowsHide: true,
     });
     if (output && output.trim()) {
       return output.trim();
