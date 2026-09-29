@@ -96,7 +96,7 @@ export class LiveHealthService {
       overallStatus = 'OFFLINE';
     } else if (factusolProbe.lockFile.isOrphan || !channelProbe.reachable || !centralApiProbe.reachable) {
       overallStatus = 'DEGRADED';
-    } else if (processInfo.memoryRssMb > 350) {
+    } else if (processInfo.memoryRssMb > 500) {
       overallStatus = 'DEGRADED';
     }
 

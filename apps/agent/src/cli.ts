@@ -167,7 +167,7 @@ async function main() {
       let dbPath = args[1];
       if (!dbPath) {
         console.log('Abriendo selector de archivos de Windows...');
-        dbPath = openWindowsFileDialog(
+        dbPath = await openWindowsFileDialog(
           'Seleccione el archivo de base de datos Factusol (FS.accdb o F_XXX.accdb)',
           'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*'
         );
