@@ -156,23 +156,29 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
   }
 });
 
-// 0.3 Cliente Final: Vista de su propia licencia, vencimiento y descarga
+// 0.3 Cliente Final: Vista de su propia licencia, vencimiento y descarga (con soporte multi-licencia)
 licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const sub = req.user?.sub;
     const orgId = req.user?.organizationId || 'org_default';
+    const requestedKey = (req.query['key'] as string)?.trim();
+
+    let all: any[] = [];
+    if (orgId) {
+      all = await licenseService.listLicenses(orgId);
+    }
 
     let license = null;
-    if (sub && sub.startsWith('EB-')) {
+    if (requestedKey) {
+      license = all.find(l => l.key === requestedKey) || await licenseService.getLicenseByKey(requestedKey);
+    } else if (sub && sub.startsWith('EB-')) {
       license = await licenseService.getLicenseByKey(sub);
     } else if (orgId && req.user?.role !== 'SUPERADMIN' && req.user?.role !== 'ADMIN') {
-      const list = await licenseService.listLicenses(orgId);
-      license = list[0] || null;
+      license = all[0] || null;
     }
 
     // Si es SUPERADMIN inspeccionando la vista cliente, previsualizar la primera licencia disponible
     if (!license && (req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN')) {
-      const all = await licenseService.listLicenses(orgId);
       license = all.find(l => l.status === 'active') || all[0] || null;
     }
 
@@ -186,6 +192,16 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
         ...license,
         activations,
         installerUrl: getLatestInstallerUrl(),
+        totalLicenses: all.length,
+        allLicenses: all.map(l => ({
+          id: l.id,
+          key: l.key,
+          alias: l.alias || 'Servidor Factusol',
+          status: l.status,
+          plan: l.plan,
+          seatType: l.seatType,
+          expiresAt: l.expiresAt,
+        })),
       },
     });
   } catch (error) {

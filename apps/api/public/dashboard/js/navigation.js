@@ -76,22 +76,24 @@ function setupRoleNavigation(role) {
       window.loadPartnerClients();
     }
   } else {
-    // TENANT_CLIENT (Cliente Final)
+    // TENANT_CLIENT (Cliente Final / Cartera de Licencias)
     if (roleBadge) {
-      roleBadge.innerText = 'CLIENTE FINAL';
+      roleBadge.innerText = 'CLIENTE MULTI-ERP';
       roleBadge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
     }
-    if (orgLabel) orgLabel.innerText = 'Conexión 1 ERP Factusol ⇄ Web';
-    if (ddRole) ddRole.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Cliente con Licencia Activa';
+    if (orgLabel) orgLabel.innerText = 'Panel de Gestión y Licencias Factusol';
+    if (ddRole) ddRole.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Licencias Factusol Activas';
 
     if (nav) {
       nav.innerHTML = `
-        <span class="px-3 py-1 text-xs font-semibold text-zinc-200">Panel de Conexión ERP Factusol</span>
+        <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-3 py-1 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] shadow-sm font-medium">Mi Conexión ERP</button>
+        <button onclick="switchDashboardTab('licenses')" id="nav-tab-licenses" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Todas Mis Licencias</button>
       `;
     }
     if (mobNav) {
       mobNav.innerHTML = `
-        <span class="px-3 py-1 text-xs font-semibold text-zinc-200">Panel de Conexión ERP Factusol</span>
+        <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-3 py-1.5 rounded-md transition text-white bg-[#18181b] font-medium whitespace-nowrap">Conexión</button>
+        <button onclick="switchDashboardTab('licenses')" id="mob-nav-tab-licenses" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Licencias</button>
       `;
     }
 

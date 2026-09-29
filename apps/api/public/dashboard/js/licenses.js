@@ -170,17 +170,37 @@ async function loadFleetOverview() {
   }
 }
 
-async function loadClientPortal() {
+async function loadClientPortal(requestedKey) {
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  const url = requestedKey ? `/api/v1/client/my-license?key=${encodeURIComponent(requestedKey)}` : '/api/v1/client/my-license';
 
   try {
-    const res = await fetch('/api/v1/client/my-license', {
+    const res = await fetch(url, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) {
       const json = await res.json();
       window.currentClientData = json.data;
       const lic = window.currentClientData;
+
+      // Actualizar selector multi-licencia si la cuenta tiene varias licencias
+      const multiBanner = document.getElementById('client-multi-license-banner');
+      const multiBadge = document.getElementById('client-multi-count-badge');
+      const multiSelect = document.getElementById('client-license-select');
+
+      if (lic.totalLicenses && lic.totalLicenses > 1) {
+        if (multiBanner) multiBanner.classList.remove('hidden');
+        if (multiBadge) multiBadge.innerText = `${lic.totalLicenses} Licencias Contratadas`;
+        if (multiSelect && lic.allLicenses) {
+          multiSelect.innerHTML = lic.allLicenses.map(l => {
+            const isSelected = l.key === lic.key ? 'selected' : '';
+            return `<option value="${escapeHtml(l.key)}" ${isSelected}>${escapeHtml(l.alias || 'Servidor Factusol')} — ${escapeHtml(l.key)}</option>`;
+          }).join('');
+        }
+      } else {
+        if (multiBanner) multiBanner.classList.add('hidden');
+      }
+
       const keyEl = document.getElementById('client-license-key');
       if (keyEl) keyEl.innerText = lic.key || '—';
 

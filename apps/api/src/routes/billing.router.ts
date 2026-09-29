@@ -428,26 +428,52 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
         const maxActivations = Number(session.metadata?.maxActivations) || 1;
         const alias = session.metadata?.alias || 'Servidor Factusol Principal';
+        const sessionId = (session.id || '') as string;
+        const customerId = (session.customer || '') as string;
 
-        logger.info(`Generando o reutilizando licencia tras pago de ${customerEmail} (Plan: ${planId}, Servidores: ${maxActivations})...`);
+        logger.info(`Generando o reutilizando licencia tras pago de ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId || 'n/a'})...`);
 
-        const existingLicenses = await licenseService.listLicenses(organizationId);
-        let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
+        const db = DatabaseService.getInstance();
+        let license: any = null;
+
+        // Idempotencia precisa: verificar si esta sesión de Stripe ya emitió una clave previamente
+        if (sessionId && db.isAvailable()) {
+          const sessionRow = await db.query(
+            `SELECT * FROM licenses WHERE stripe_session_id = $1`,
+            [sessionId]
+          ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
+
+          if (sessionRow) {
+            license = sessionRow;
+            logger.info(`✓ Licencia ${license.key} ya existente para la sesión Stripe ${sessionId}. Reutilizando.`);
+          }
+        }
 
         if (!license) {
           if (planId.startsWith('addon_')) {
             logger.warn(`Alerta de seguridad: Intento de generar licencia base mediante add-on huérfano (${planId}) para ${customerEmail}. Operación bloqueada.`);
             return res.status(400).json({ error: { message: 'No se permite generar una licencia base a partir de un add-on huérfano.' } });
           }
+
+          const existingCount = (await licenseService.listLicenses(organizationId)).length;
+          const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
+            ? alias
+            : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
+
           license = await licenseService.createLicense({
             organizationId,
             plan: 'professional', // Mapeo de compatibilidad con schema DB existente
             maxActivations,
-            alias,
+            alias: dynamicAlias,
           });
-          logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${alias}]`);
-        } else {
-          logger.info(`✓ Licencia ${license.key} ya existente para ${customerEmail}. Reutilizando sin duplicar.`);
+
+          if (db.isAvailable() && sessionId) {
+            await db.query(
+              `UPDATE licenses SET stripe_session_id = $1, stripe_customer_id = $2, billing_status = 'ACTIVE' WHERE id = $3`,
+              [sessionId, customerId || null, license.id]
+            ).catch(() => {});
+          }
+          logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${dynamicAlias}, Sesión: ${sessionId}]`);
         }
 
         // Vincular al Partner si la compra vino referida por código PT-XXXX
@@ -631,9 +657,20 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
     const maxActivations = Number(sessionData.metadata?.maxActivations) || 1;
     const alias = sessionData.metadata?.alias || 'Servidor Factusol Principal';
 
-    // Idempotencia: Verificar si ya existe una licencia para esta organización
-    const existingLicenses = await licenseService.listLicenses(organizationId);
-    let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
+    // Idempotencia: Verificar si ya existe una licencia para esta sesión específica de Stripe
+    const db = DatabaseService.getInstance();
+    let license: any = null;
+
+    if (sessionId && db.isAvailable()) {
+      const sessionRow = await db.query(
+        `SELECT * FROM licenses WHERE stripe_session_id = $1`,
+        [sessionId]
+      ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
+
+      if (sessionRow) {
+        license = sessionRow;
+      }
+    }
 
     if (!license) {
       if (planId.startsWith('addon_')) {
@@ -642,13 +679,26 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
           error: { code: 'ORPHAN_ADDON_NOT_ALLOWED', message: 'Un add-on requiere disponer previamente de una Licencia Base activa.' }
         });
       }
+
+      const existingCount = (await licenseService.listLicenses(organizationId)).length;
+      const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
+        ? alias
+        : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
+
       logger.info(`Creando licencia on-demand tras validación de sesión ${sessionId} para ${customerEmail}`);
       license = await licenseService.createLicense({
         organizationId,
         plan: 'professional',
         maxActivations,
-        alias,
+        alias: dynamicAlias,
       });
+
+      if (db.isAvailable() && sessionId) {
+        await db.query(
+          `UPDATE licenses SET stripe_session_id = $1, billing_status = 'ACTIVE' WHERE id = $2`,
+          [sessionId, license.id]
+        ).catch(() => {});
+      }
 
       // Despachar email de bienvenida si la licencia fue generada en este momento
       MailerService.sendLicenseWelcomeEmail({
