@@ -44,40 +44,59 @@ export function openDesktopWindow(url: string): boolean {
   }
 
   const now = Date.now();
-  if (now - lastOpenedAt < 2500) {
+  if (now - lastOpenedAt < 1000) {
     logger.info(`Apertura de ventana ignorada: anti-duplicados activo (${now - lastOpenedAt}ms desde la anterior).`);
     return true;
   }
   lastOpenedAt = now;
 
   try {
-    const browserExe = findBrowserAppExecutable();
-    if (browserExe) {
-      try {
-        logger.info(`Lanzando ventana de escritorio nativa con: ${browserExe}`);
-        const child = childProcess.spawn(browserExe, [`--app=${url}`, '--window-size=1120,780'], {
-          detached: true,
-          stdio: 'ignore',
-        });
-        child.unref();
-        return true;
-      } catch (spawnErr) {
-        logger.warn('Fallo al invocar browserExe, usando fallback del sistema:', { err: String(spawnErr) });
-      }
-    }
-
-    // Fallback si no se localiza ejecutable directo
-    logger.info('Usando launcher del sistema para abrir la interfaz en el navegador...');
     if (process.platform === 'win32') {
-      childProcess.exec(`start "" "${url}"`);
+      const browserExe = findBrowserAppExecutable();
+      let launchedApp = false;
+
+      if (browserExe) {
+        try {
+          const profileDir = path.join(process.env['LOCALAPPDATA'] || 'C:\\Temp', 'Bentian Agent', 'gui-profile');
+          if (!fs.existsSync(profileDir)) {
+            fs.mkdirSync(profileDir, { recursive: true });
+          }
+          logger.info(`Lanzando ventana de escritorio nativa con: ${browserExe}`);
+          const child = childProcess.spawn(
+            browserExe,
+            [`--app=${url}`, `--user-data-dir=${profileDir}`, '--new-window', '--window-size=1120,780'],
+            {
+              detached: true,
+              stdio: 'ignore',
+            }
+          );
+          child.unref();
+          launchedApp = true;
+        } catch (spawnErr) {
+          logger.warn('Fallo al invocar browserExe como app:', { err: String(spawnErr) });
+        }
+      }
+
+      if (!launchedApp) {
+        logger.info('Usando launcher del sistema para abrir la interfaz en el navegador predeterminado...');
+        childProcess.exec(`start "" "${url}"`);
+      }
+      return true;
     } else if (process.platform === 'darwin') {
       childProcess.exec(`open "${url}"`);
+      return true;
     } else {
       childProcess.exec(`xdg-open "${url}"`);
+      return true;
     }
-    return true;
   } catch (err) {
     logger.warn('No se pudo lanzar automáticamente la ventana gráfica:', { err: String(err) });
+    try {
+      if (process.platform === 'win32') {
+        childProcess.exec(`start "" "${url}"`);
+        return true;
+      }
+    } catch {}
     return false;
   }
 }
