@@ -99,6 +99,27 @@ function updateLandingHtml(rootDir, version, hashes) {
   console.log('  🌐 Landing page (apps/api/public/index.html) actualizada con la nueva versión y sumas SHA-256.');
 }
 
+function updateDashboardHtml(rootDir, version) {
+  const dashPath = path.resolve(rootDir, 'apps/api/public/dashboard/index.html');
+  if (fs.existsSync(dashPath)) {
+    let content = fs.readFileSync(dashPath, 'utf8');
+    content = content.replace(
+      /<span>Descargar Instalador \(v[0-9.]+\)<\/span>/g,
+      `<span>Descargar Instalador (v${version})</span>`
+    );
+    content = content.replace(
+      /(<div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version">)v[0-9.]+(<\/div>)/g,
+      `$1v${version}$2`
+    );
+    content = content.replace(
+      /(<span class="font-mono">)v[0-9.]+ Cloud(<\/span>)/g,
+      `$1v${version} Cloud$2`
+    );
+    fs.writeFileSync(dashPath, content, 'utf8');
+    console.log(`  📊 Dashboard (apps/api/public/dashboard/index.html) sincronizado con versión v${version}.`);
+  }
+}
+
 async function runMasterBuild() {
   const startTime = Date.now();
   const args = process.argv.slice(2);
@@ -337,6 +358,7 @@ async function runMasterBuild() {
 
   // Actualizar Landing Page index.html
   updateLandingHtml(rootDir, version, { installerHash, exeHash });
+  updateDashboardHtml(rootDir, version);
 
   // Publicar automáticamente en Core API si está disponible en local
   const apiPublishUrl = process.env.CORE_API_URL || 'http://localhost:3000';

@@ -21,7 +21,7 @@ function getLatestReleasedVersion(): string {
     const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
     if (pkg.version) return pkg.version;
   } catch {}
-  return '0.3.1';
+  return '0.3.2';
 }
 
 function getOrgId(req: Request): string {
@@ -316,6 +316,7 @@ agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN'
     const orgId = getOrgId(req);
     const db = DatabaseService.getInstance();
     const isSuperadmin = req.user?.role === 'SUPERADMIN';
+    const LATEST_VERSION = getLatestReleasedVersion();
 
     if (db.isAvailable()) {
       let query = `
@@ -353,7 +354,6 @@ agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN'
       const result = await db.query(query, params).catch(() => ({ rows: [] }));
       const now = Date.now();
       const OFFLINE_THRESHOLD_MS = 90_000;
-      const LATEST_VERSION = getLatestReleasedVersion();
 
       const machines = result.rows.map((row: any) => {
         const lastSeen = row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0;
@@ -405,7 +405,7 @@ agentsRouter.get('/admin/fleet/overview', requireAuth, requireRole(['SUPERADMIN'
 
     return res.json({
       data: {
-        summary: { totalMachines: 0, onlineMachines: 0, upToDateMachines: 0, latestVersion: 'v0.3.1' },
+        summary: { totalMachines: 0, onlineMachines: 0, upToDateMachines: 0, latestVersion: `v${LATEST_VERSION}` },
         machines: [],
       },
     });

@@ -133,7 +133,7 @@ export class MailerService {
    * Envía el correo de bienvenida y entrega inmediata de licencia tras completarse el pago en Stripe.
    */
   public static async sendLicenseWelcomeEmail(data: LicenseWelcomeEmailData): Promise<boolean> {
-    const downloadUrl = data.downloadUrl || 'https://bridge.cristianjm.com/releases/v0.3.1/Bentian-Setup-v0.3.1.exe';
+    const downloadUrl = data.downloadUrl || 'https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe';
     const dashboardUrl = data.dashboardUrl || `https://bridge.cristianjm.com/dashboard/?key=${encodeURIComponent(data.licenseKey)}`;
     const planLabel = data.planName || 'Plan Base Todo Incluido (Factusol ⇄ Web)';
 
@@ -154,7 +154,7 @@ export class MailerService {
       `Servidor Asignado: ${data.alias || 'Servidor Factusol Principal'}`,
       '',
       'PASOS PARA CONECTAR TU FACTUSOL EN 60 SEGUNDOS:',
-      `1. Descarga el instalador del Agente Bentian (v0.3.1):`,
+      `1. Descarga el instalador del Agente Bentian (v0.3.2):`,
       `   ${downloadUrl}`,
       '2. Ejecuta el instalador en el equipo con acceso a la base de datos de Factusol.',
       `3. Pega tu clave de activación (${data.licenseKey}) cuando te la solicite.`,
@@ -231,7 +231,7 @@ export class MailerService {
                 <tr>
                   <td align="center">
                     <a href="${downloadUrl}" style="display: block; width: 100%; box-sizing: border-box; background-color: #4f46e5; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 700; padding: 14px 24px; border-radius: 10px; text-align: center; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);">
-                      Descargar Bentian Agent para Windows (v0.3.1) &rarr;
+                      Descargar Bentian Agent para Windows (v0.3.2) &rarr;
                     </a>
                   </td>
                 </tr>

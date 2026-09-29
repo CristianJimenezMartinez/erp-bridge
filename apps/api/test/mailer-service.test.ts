@@ -11,7 +11,7 @@ async function testMailerService() {
     licenseKey: 'EB-TEST1-TEST2-TEST3-TEST4',
     planName: 'Plan Base Todo Incluido (Anual)',
     alias: 'Servidor Factusol Central',
-    downloadUrl: 'https://bridge.cristianjm.com/releases/v0.3.1/Bentian-Setup-v0.3.1.exe',
+    downloadUrl: 'https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe',
     dashboardUrl: 'https://bridge.cristianjm.com/dashboard/?key=EB-TEST1-TEST2-TEST3-TEST4',
   });
 
