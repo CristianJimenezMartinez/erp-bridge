@@ -97,14 +97,28 @@ export class CatalogUploadHelper {
 
       ctx.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
       const tReadCatalogStart = performance.now();
-      const factusolProducts = await factusolConnector.readProducts({
+      const activeOnlyConfig = config.factusol?.activeOnly;
+      let factusolProducts = await factusolConnector.readProducts({
         limit: options?.limit,
-        activeOnly: true,
+        activeOnly: activeOnlyConfig !== false,
       });
+
+      // Fallback inteligente: si con activeOnly no hay artículos pero en Factusol sí existen
+      if ((!factusolProducts || factusolProducts.length === 0) && activeOnlyConfig !== false) {
+        const allProducts = await factusolConnector.readProducts({
+          limit: options?.limit,
+          activeOnly: false,
+        });
+        if (allProducts && allProducts.length > 0) {
+          ctx.logger.info(`ℹ No se detectaron artículos con casilla web (SUWART) activa, pero sí ${allProducts.length} en Factusol. Sincronizando catálogo...`);
+          ctx.eventBus.addEvent('info', `ℹ Incluyendo ${allProducts.length} artículos del catálogo de Factusol...`);
+          factusolProducts = allProducts;
+        }
+      }
       const readCatalogMs = Math.round(performance.now() - tReadCatalogStart);
 
       if (!factusolProducts || factusolProducts.length === 0) {
-        const msg = 'No se encontraron artículos activos en Factusol para subir.';
+        const msg = 'No se encontraron artículos en Factusol para subir.';
         ctx.eventBus.addEvent('warn', msg);
         return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
       }
@@ -328,14 +342,28 @@ export class CatalogUploadHelper {
 
       ctx.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
       const tReadCatalogStart = performance.now();
-      const factusolProducts = await factusolConnector.readProducts({
+      const activeOnlyConfig = config.factusol?.activeOnly;
+      let factusolProducts = await factusolConnector.readProducts({
         limit: options?.limit,
-        activeOnly: true,
+        activeOnly: activeOnlyConfig !== false,
       });
+
+      // Fallback inteligente: si con activeOnly no hay artículos pero en Factusol sí existen
+      if ((!factusolProducts || factusolProducts.length === 0) && activeOnlyConfig !== false) {
+        const allProducts = await factusolConnector.readProducts({
+          limit: options?.limit,
+          activeOnly: false,
+        });
+        if (allProducts && allProducts.length > 0) {
+          ctx.logger.info(`ℹ No se detectaron artículos con casilla web (SUWART) activa, pero sí ${allProducts.length} en Factusol. Sincronizando catálogo...`);
+          ctx.eventBus.addEvent('info', `ℹ Incluyendo ${allProducts.length} artículos del catálogo de Factusol...`);
+          factusolProducts = allProducts;
+        }
+      }
       const readCatalogMs = Math.round(performance.now() - tReadCatalogStart);
 
       if (!factusolProducts || factusolProducts.length === 0) {
-        const msg = 'No se encontraron artículos activos en Factusol para subir.';
+        const msg = 'No se encontraron artículos en Factusol para subir.';
         ctx.eventBus.addEvent('warn', msg);
         return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
       }
