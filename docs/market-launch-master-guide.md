@@ -112,14 +112,14 @@ El agente central despacha automáticamente el email de bienvenida con la clave 
 1. **Alta gratuita en Resend (`resend.com`)**:
    - Permite enviar **3.000 correos al mes GRATIS de por vida**.
    - Generar API Key y guardarla en el `.env` del servidor: `RESEND_API_KEY=re_...`.
-2. **Publicar Registros DNS en el registrador de dominio (`bentian.es` o `cristianjm.com`)**:
+2. **Publicar Registros DNS en el registrador de dominio (`cristianjm.com`)**:
    - **SPF (TXT):**  
      `v=spf1 include:resend.com ~all`  
      *(O combinar con el hosting de Plesk si envías desde ambos: `v=spf1 include:resend.com include:_spf.hosting... ~all`).*
    - **DKIM (CNAME):**  
      Crear los registros CNAME indicados por Resend para firmar criptográficamente los correos con 2048 bits.
    - **DMARC (TXT):**  
-     `_dmarc.bentian.es` -> `v=DMARC1; p=none; rua=mailto:dmarc@bentian.es; adkim=r; aspf=r;`  
+     `_dmarc.cristianjm.com` -> `v=DMARC1; p=none; rua=mailto:dmarc@cristianjm.com; adkim=r; aspf=r;`  
      *(Iniciar con política `p=none` durante los primeros 30 días para no perder correos legítimos mientras se asienta la reputación).*
 
 ---
@@ -165,10 +165,8 @@ El pipeline de empaquetado en `builder/build.js` ya cuenta con el módulo `build
 ## BLOQUE 7: OPERATIVA DE SOPORTE TÉCNICO Y POSTVENTA
 
 1. **Canal Oficial de Asistencia**:
-   - Email visible: `soporte@cristianjm.com` o `soporte@bentian.es`.
-   - Para clientes que contraten la **Puesta en Marcha Asistida (99€)**:
-     * Disponer de AnyDesk o TeamViewer para conectarse remotamente durante 45 minutos.
-     * Seguir la lista de comprobación: verificar que Factusol responde, configurar tarifas e IVA, y hacer un pedido de prueba.
+   - Email visible: `soporte@cristianjm.com`.
+   - Soporte técnico oficial incluido por correo electrónico y documentación técnica paso a paso.
 2. **Documentación de Autoayuda lista para clientes**:
    - `docs/windows-antivirus-smartscreen-guide.md` (cómo permitir la aplicación si algún antivirus de terceros es muy agresivo).
    - `docs/cloudflare-plesk-waf-bypass.md` (por si la tienda web del cliente tiene un firewall de hosting que bloquee la sincronización).

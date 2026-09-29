@@ -5,7 +5,7 @@
 > **Área:** Infraestructura DNS, Seguridad de Comunicaciones & Anti-SPAM  
 > **Versión:** 1.0.0 — Revisión de Hardening Criptográfico  
 > **Fecha:** Septiembre 2026  
-> **Dominios Oficiales:** `bentian.es` | `suministrosrubio.com` | `cristianjm.com`
+> **Dominios Oficiales:** `cristianjm.com` | `suministrosrubio.com` | `cristianjm.com`
 
 ---
 
@@ -30,11 +30,11 @@ SPF valida que el servidor emisor (la dirección IP que abre el socket TCP contr
 > * **Mecanismos que NO consumen lookups:** `ip4`, `ip6`, `all`.
 > * **Regla de oro:** Consolidar IPs estáticas mediante bloques CIDR `ip4:` y minimizar directivas `include:` redundantes.
 
-### 2.2 Registro SPF Exacto y Auditoría de Lookups para `bentian.es`
-El dominio `bentian.es` emite correos transaccionales desde el clúster central de Bentian ERP Bridge, el servidor de correo propio en Plesk, y pasarelas transaccionales autorizadas (Resend como proveedor primario de alta reputación y Brevo/Sendinblue como fallback):
+### 2.2 Registro SPF Exacto y Auditoría de Lookups para `cristianjm.com`
+El dominio `cristianjm.com` emite correos transaccionales desde el clúster central de Bentian ERP Bridge, el servidor de correo propio en Plesk, y pasarelas transaccionales autorizadas (Resend como proveedor primario de alta reputación y Brevo/Sendinblue como fallback):
 
 ```dns
-bentian.es. IN TXT "v=spf1 ip4:82.223.109.124 include:resend.com include:spf.sendinblue.com include:_spf.google.com ~all"
+cristianjm.com. IN TXT "v=spf1 ip4:82.223.109.124 include:resend.com include:spf.sendinblue.com include:_spf.google.com ~all"
 ```
 
 #### Auditoría y Desglose de Consultas DNS (Consumo: 4/10 Lookups):
@@ -42,7 +42,7 @@ bentian.es. IN TXT "v=spf1 ip4:82.223.109.124 include:resend.com include:spf.sen
 | :--- | :--- | :---: | :--- |
 | `v=spf1` | Prefijo | 0 | Identificador de protocolo Sender Policy Framework versión 1. |
 | `ip4:82.223.109.124` | IP Estática | 0 | IP estática del servidor central Plesk/Linux (`bridge.cristianjm.com`). Envíos directos vía Postfix / SMTP TLS nativo. |
-| `include:resend.com` | Inclusión | 2 | Autoriza el dominio de Resend. Resend anida internamente `_spf.google.com` (1 + 1 = 2 lookups). *Nota de arquitectura:* En configuraciones avanzadas con subdominio dedicado (ej. `mail.bentian.es`), Resend utiliza `include:amazonses.com` o CNAME directo a Amazon SES, aislando el tráfico transaccional. |
+| `include:resend.com` | Inclusión | 2 | Autoriza el dominio de Resend. Resend anida internamente `_spf.google.com` (1 + 1 = 2 lookups). *Nota de arquitectura:* En configuraciones avanzadas con subdominio dedicado (ej. `mail.cristianjm.com`), Resend utiliza `include:amazonses.com` o CNAME directo a Amazon SES, aislando el tráfico transaccional. |
 | `include:spf.sendinblue.com`| Inclusión | 1 | Autoriza la pasarela secundaria Brevo/Sendinblue ante conmutación por contingencia (0 sub-includes, solo rangos `ip4:`). |
 | `include:_spf.google.com` | Inclusión | 1 | Autoriza envíos de Google Workspace corporativo (soporte humano y facturación). |
 | `~all` *(SoftFail)* | Calificador | 0 | Durante la fase de auditoría y verificación. Tras validar alineación en reportes DMARC, se puede conmutar a `-all` *(HardFail)*. |
@@ -83,26 +83,26 @@ DKIM introduce una firma digital asimétrica en la cabecera del correo (`DKIM-Si
 * Longitud mínima de clave: **2048 bits**. Las claves RSA de 1024 bits son consideradas inseguras y rechazadas por Google desde 2024.
 * La clave privada reside en el servidor emisor; la clave pública se publica en un subdominio DNS bajo la convención `<selector>._domainkey.<dominio>`.
 
-### 3.2 Registros DKIM para `bentian.es`
+### 3.2 Registros DKIM para `cristianjm.com`
 
 #### A. Selector de Resend (Proveedor Primario de Licencias y Transaccional)
 Resend utiliza claves CNAME o TXT con selectores delegados.
 
 ```dns
-resend._domainkey.bentian.es. IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyvU4bY6mX9yq5N2ZgK8...[CLAVE_PUBLICA_2048_BITS_RESEND]...IDAQAB"
+resend._domainkey.cristianjm.com. IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyvU4bY6mX9yq5N2ZgK8...[CLAVE_PUBLICA_2048_BITS_RESEND]...IDAQAB"
 ```
 
 *Si Resend proporciona CNAMEs automáticos para rotación de claves:*
 ```dns
-s1._domainkey.bentian.es. IN CNAME s1._domainkey.resend.com.
-s2._domainkey.bentian.es. IN CNAME s2._domainkey.resend.com.
+s1._domainkey.cristianjm.com. IN CNAME s1._domainkey.resend.com.
+s2._domainkey.cristianjm.com. IN CNAME s2._domainkey.resend.com.
 ```
 
 #### B. Selector de Plesk / Servidor Central (`default._domainkey`)
 Para correos despachados vía SMTP nativo desde el microservicio (`apps/api/src/services/mailer.service.ts`):
 
 ```dns
-default._domainkey.bentian.es. IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA193f47d8...[CLAVE_PUBLICA_PLESK]...IDAQAB"
+default._domainkey.cristianjm.com. IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA193f47d8...[CLAVE_PUBLICA_PLESK]...IDAQAB"
 ```
 
 ### 3.3 Registros DKIM para `suministrosrubio.com`
@@ -127,7 +127,7 @@ Desde febrero de 2024, Google y Yahoo imponen de forma estricta la presencia de 
 #### Justificación Técnica y Riesgo en Producción de un `p=reject` Prematuro:
 1. **Cumplimiento Normativo Inmediato:** Las especificaciones de Google y Yahoo establecen que **una política `p=none` cumple al 100% el requisito obligatorio de DMARC**. No penaliza la entregabilidad ni degrada la reputación del dominio.
 2. **Peligro de Falsos Rechazos en Pasarelas Críticas (Stripe y Resend):** Si se publica `p=reject` con alineación estricta (`adkim=s; aspf=s`) el Día 1 sin un periodo previo de auditoría:
-   - Los correos emitidos por **Stripe** (recibos de facturación despachados desde la infraestructura delegada de Amazon SES) o notificaciones transaccionales de **Resend** cuyo `Return-Path` técnico resida en un subdominio (ej: `bounces.bentian.es` o `mail.bentian.es`) **fallarán la alineación estricta**.
+   - Los correos emitidos por **Stripe** (recibos de facturación despachados desde la infraestructura delegada de Amazon SES) o notificaciones transaccionales de **Resend** cuyo `Return-Path` técnico resida en un subdominio (ej: `bounces.cristianjm.com` o `mail.cristianjm.com`) **fallarán la alineación estricta**.
    - Los correos legítimos reenviados automáticamente por clientes hacia cuentas de Gmail o Microsoft 365 romperán la validación SPF si la firma DKIM no estuviera perfectamente sellada.
    - Con `p=reject`, Google Workspace, Gmail y Outlook **destruirán el correo en la sesión SMTP con un error 550 5.7.1**. El comprador de una licencia de Bentian ERP Bridge nunca recibirá su clave de activación (`EB-XXXXX...`), generando disputas bancarias, frustración y daño reputacional irreparable.
 3. **Función de `p=none`:** La política `p=none` actúa como un radar pasivo. Permite que todos los correos legítimos se entreguen normalmente en la bandeja de entrada mientras los servidores de Google, Microsoft y Yahoo recopilan y envían diariamente informes agregados XML (`rua`) con la telemetría exacta de cada IP que envía correo en nombre del dominio.
@@ -154,24 +154,24 @@ Rechazo total en socket SMTP (550) de cualquier falsificación o intento de phis
 
 #### Fase 1: Lanzamiento Comercial & Monitoreo (Configuración de Salida al Mercado)
 * **Objetivo:** Garantizar que ningún correo de compra de Stripe ni de soporte sea rechazado, recopilando informes RUA para auditar la alineación real.
-* **Alineación Relajada (`adkim=r; aspf=r`):** Estándar oficial de RFC 7489. Permite que subdominios operativos (`bounces.bentian.es`, `mail.bentian.es`) alineen con el dominio organizativo del remitente visible (`bentian.es`).
+* **Alineación Relajada (`adkim=r; aspf=r`):** Estándar oficial de RFC 7489. Permite que subdominios operativos (`bounces.cristianjm.com`, `mail.cristianjm.com`) alineen con el dominio organizativo del remitente visible (`cristianjm.com`).
 
 ```dns
-_dmarc.bentian.es. IN TXT "v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:dmarc-reports@bentian.es; pct=100; ri=86400"
+_dmarc.cristianjm.com. IN TXT "v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:dmarc-reports@cristianjm.com; pct=100; ri=86400"
 _dmarc.suministrosrubio.com. IN TXT "v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:dmarc-reports@suministrosrubio.com; pct=100; ri=86400"
 ```
 
 #### Fase 2: Cuarentena Progresiva (Ramping up Quarantine)
 Tras analizar durante 2 a 4 semanas los informes XML (con herramientas como Cloudflare DMARC Management, Postmark DMARC o dmarcian) y certificar que el 100% del tráfico legítimo aprueba SPF y DKIM:
 ```dns
-_dmarc.bentian.es. IN TXT "v=DMARC1; p=quarantine; sp=quarantine; adkim=r; aspf=r; rua=mailto:dmarc-reports@bentian.es; pct=25; ri=86400"
+_dmarc.cristianjm.com. IN TXT "v=DMARC1; p=quarantine; sp=quarantine; adkim=r; aspf=r; rua=mailto:dmarc-reports@cristianjm.com; pct=25; ri=86400"
 ```
 *(Se incrementa progresivamente `pct=25` -> `pct=50` -> `pct=100`)*.
 
 #### Fase 3: Blindaje Coercitivo Definitivo (Enforcement)
 Una vez estabilizada la cuarentena al 100% sin incidencias:
 ```dns
-_dmarc.bentian.es. IN TXT "v=DMARC1; p=reject; sp=reject; adkim=r; aspf=r; rua=mailto:dmarc-reports@bentian.es; ruf=mailto:dmarc-forensics@bentian.es; pct=100; rf=afrf; ri=86400"
+_dmarc.cristianjm.com. IN TXT "v=DMARC1; p=reject; sp=reject; adkim=r; aspf=r; rua=mailto:dmarc-reports@cristianjm.com; ruf=mailto:dmarc-forensics@cristianjm.com; pct=100; rf=afrf; ri=86400"
 ```
 
 ---
@@ -196,8 +196,8 @@ v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:...; pct=100; ri=86400
 | `v=DMARC1` | `DMARC1` | `DMARC1` | Versión obligatoria. Si no está en primer lugar, el registro es inválido. |
 | `p` | **`none`** | **`reject`** | En Fase 1, solo audita y reporta. En Fase 3, rechaza en socket SMTP (`550 5.7.1`). |
 | `sp` | **`none`** | **`reject`** | Política de subdominios. Permite subdominios transaccionales en Fase 1 y los blinda en Fase 3. |
-| `adkim` | **`r`** *(relaxed)* | **`r`** *(relaxed)* | Alineación DKIM relajada: permite que `d=mail.bentian.es` o `d=resend.com` alineen con `bentian.es`. *(Solo pasar a `s` si no hay subdominios)*. |
-| `aspf` | **`r`** *(relaxed)* | **`r`** *(relaxed)* | Alineación SPF relajada: permite que `Return-Path: bounces@mail.bentian.es` alinee con `From: @bentian.es`. |
+| `adkim` | **`r`** *(relaxed)* | **`r`** *(relaxed)* | Alineación DKIM relajada: permite que `d=mail.cristianjm.com` o `d=resend.com` alineen con `cristianjm.com`. *(Solo pasar a `s` si no hay subdominios)*. |
+| `aspf` | **`r`** *(relaxed)* | **`r`** *(relaxed)* | Alineación SPF relajada: permite que `Return-Path: bounces@mail.cristianjm.com` alinee con `From: @cristianjm.com`. |
 | `rua` | `mailto:...` | `mailto:...` | URI de entrega para reportes agregados XML diarios comprimidos (`.xml.gz`). |
 | `ruf` | *(Opcional)* | `mailto:...` | URI de reportes forenses en tiempo real emitidos cuando ocurre un fallo. |
 | `pct` | `100` | `100` | Porcentaje de mensajes sujetos a la política. |
@@ -213,20 +213,20 @@ A continuación se detallan las medidas obligatorias implementadas en Bentian ER
 
 ### 5.1 Alineación Completa de Identificadores (SPF + DKIM Alignment)
 Para que DMARC declare un estado `PASS`, se requiere alineación entre el remitente visible y el técnico:
-* **Cabecera `From` visible:** `Bentian ERP Bridge <soporte@bentian.es>`
-* **Cabecera `Return-Path` (Envelope From):** `bounces@bentian.es` (o subdominio delegado con CNAME alineado, ej. `mail.bentian.es`).
-* **Firma DKIM `d=`:** `bentian.es`.
+* **Cabecera `From` visible:** `Bentian ERP Bridge <soporte@cristianjm.com>`
+* **Cabecera `Return-Path` (Envelope From):** `bounces@cristianjm.com` (o subdominio delegado con CNAME alineado, ej. `mail.cristianjm.com`).
+* **Firma DKIM `d=`:** `cristianjm.com`.
 * **Resultado:** Con alineación relajada (`adkim=r; aspf=r`), cualquier subdominio transaccional de Amazon SES / Resend / Stripe aprueba inmediatamente la validación DMARC.
 
 ### 5.2 Cabeceras Obligatorias para Gmail y Yahoo (RFC 8058 One-Click POST & SLA 48h)
 Desde febrero de 2024, Google y Yahoo exigen de forma obligatoria la presencia de la cabecera `List-Unsubscribe` acompañada de `List-Unsubscribe-Post` para permitir la baja en un solo clic directamente desde la interfaz del lector de correo:
 
 ```http
-List-Unsubscribe: <https://bridge.cristianjm.com/api/v1/billing/unsubscribe?token=d9f823a7c4>, <mailto:bajas@bentian.es?subject=unsubscribe-d9f823a7c4>
+List-Unsubscribe: <https://bridge.cristianjm.com/api/v1/billing/unsubscribe?token=d9f823a7c4>, <mailto:bajas@cristianjm.com?subject=unsubscribe-d9f823a7c4>
 List-Unsubscribe-Post: List-Unsubscribe=One-Click
 Auto-Submitted: auto-generated
 X-Auto-Response-Suppress: All
-Message-ID: <20260926.112439.98234@bentian.es>
+Message-ID: <20260926.112439.98234@cristianjm.com>
 Date: Sat, 26 Sep 2026 11:24:39 +0200
 MIME-Version: 1.0
 Content-Type: multipart/alternative; boundary="----=_Part_Bentian_98234"
@@ -257,19 +257,19 @@ Los correos que solo envían HTML sin alternativa en texto plano reciben penaliz
 * Todos los enlaces deben apuntar exclusivamente al dominio certificado HTTPS oficial:
   `https://bridge.cristianjm.com/dashboard/?key=...`
   o `https://www.suministrosrubio.com/...`
-* El texto ancla del enlace debe coincidir con el destino real (nunca poner en el texto `bentian.es` y enlazar a un dominio externo de tracking, lo cual activa de inmediato la heurística antifraude de Microsoft Outlook).
+* El texto ancla del enlace debe coincidir con el destino real (nunca poner en el texto `cristianjm.com` y enlazar a un dominio externo de tracking, lo cual activa de inmediato la heurística antifraude de Microsoft Outlook).
 
 ### 5.5 Configuración del Dominio de Envío de Stripe
 Para que los recibos y notificaciones automáticas de Stripe salgan firmados con el dominio corporativo:
 1. Acceder al **Dashboard de Stripe** -> **Configuración** -> **Correos electrónicos y marca**.
-2. En **Dominio remitente personalizado**, añadir `bentian.es` (o subdominio `mail.bentian.es`).
+2. En **Dominio remitente personalizado**, añadir `cristianjm.com` (o subdominio `mail.cristianjm.com`).
 3. Añadir a la zona DNS los 3 registros CNAME proporcionados por Stripe para delegar la firma DKIM de Stripe a Amazon SES.
-4. De este modo, los recibos emitidos tras compras en `https://bridge.cristianjm.com` saldrán con `From: facturacion@bentian.es` firmado y alineado al 100%.
+4. De este modo, los recibos emitidos tras compras en `https://bridge.cristianjm.com` saldrán con `From: facturacion@cristianjm.com` firmado y alineado al 100%.
 
 ### 5.6 Reverse DNS (PTR Record) en el Servidor Plesk
 Todo servidor SMTP saliente debe contar con resolución DNS inversa (PTR) que coincida exactamente con el FQDN del banner SMTP:
 * **IP Pública:** `82.223.109.124`
-* **Registro PTR:** `82.223.109.124.in-addr.arpa` -> `bridge.cristianjm.com` (o `mail.bentian.es`).
+* **Registro PTR:** `82.223.109.124.in-addr.arpa` -> `bridge.cristianjm.com` (o `mail.cristianjm.com`).
 * **Banner SMTP:** `HELO / EHLO bridge.cristianjm.com`.
 * Si el banner EHLO no coincide con la resolución reversa de la IP, Microsoft Outlook descarta el correo con el error `550 5.7.1 Service unavailable; Client host [x.x.x.x] blocked using Spamhaus`.
 
@@ -277,15 +277,15 @@ Todo servidor SMTP saliente debe contar con resolución DNS inversa (PTR) que co
 
 ## 6. Tabla Resumen de Registros DNS para Plesk / Cloudflare
 
-### Zona DNS: `bentian.es`
+### Zona DNS: `cristianjm.com`
 | Tipo | Nombre / Host | Contenido / Valor | Fase / Estado | TTL |
 | :--- | :--- | :--- | :--- | :--- |
 | **TXT** | `@` | `"v=spf1 ip4:82.223.109.124 include:resend.com include:spf.sendinblue.com include:_spf.google.com ~all"` | **Producción** (4/10 lookups) | 3600 |
-| **TXT** | `_dmarc` | `"v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:dmarc-reports@bentian.es; pct=100; ri=86400"` | **Fase 1: Lanzamiento** *(Recomendado Día 1)* | 3600 |
-| **TXT** | `_dmarc` | `"v=DMARC1; p=reject; sp=reject; adkim=r; aspf=r; rua=mailto:dmarc-reports@bentian.es; ruf=mailto:dmarc-forensics@bentian.es; pct=100; rf=afrf; ri=86400"` | **Fase 3: Blindaje Total** *(Tras 30 días auditoría)* | 3600 |
+| **TXT** | `_dmarc` | `"v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:dmarc-reports@cristianjm.com; pct=100; ri=86400"` | **Fase 1: Lanzamiento** *(Recomendado Día 1)* | 3600 |
+| **TXT** | `_dmarc` | `"v=DMARC1; p=reject; sp=reject; adkim=r; aspf=r; rua=mailto:dmarc-reports@cristianjm.com; ruf=mailto:dmarc-forensics@cristianjm.com; pct=100; rf=afrf; ri=86400"` | **Fase 3: Blindaje Total** *(Tras 30 días auditoría)* | 3600 |
 | **TXT** | `default._domainkey` | `"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCg...IDAQAB"` | **Producción** (RSA 2048-bit Plesk) | 3600 |
 | **TXT** | `resend._domainkey` | *(Valor proporcionado por la consola de Resend)* | **Producción** (Transaccional API) | 3600 |
-| **MX** | `@` | `mail.bentian.es` (Prioridad: 10) | **Producción** | 3600 |
+| **MX** | `@` | `mail.cristianjm.com` (Prioridad: 10) | **Producción** | 3600 |
 | **A** | `mail` | `82.223.109.124` | **Producción** | 3600 |
 
 ### Zona DNS: `suministrosrubio.com`
@@ -307,18 +307,18 @@ Para validar el cumplimiento de esta especificación en cualquier momento:
 1. **Test de Puntuación Integral (Mail-Tester):**  
    Enviar un correo de prueba desde `apps/api` o la tienda a la dirección temporal generada en `https://www.mail-tester.com/`. La puntuación debe ser **10/10** (sin penalizaciones de DKIM, SPF, SpamAssassin ni listas negras).
 2. **Google Postmaster Tools:**  
-   Verificar la propiedad de `bentian.es` y `suministrosrubio.com` en `https://postmaster.google.com/`. Monitorear semanalmente:
+   Verificar la propiedad de `cristianjm.com` y `suministrosrubio.com` en `https://postmaster.google.com/`. Monitorear semanalmente:
    - *Domain Reputation:* Debe mantenerse en nivel **High**.
    - *Spam Rate:* Debe situarse estrictamente por debajo del **0.10%** (límite crítico: 0.30%).
    - *Authentication:* 100% de éxito en SPF, DKIM y DMARC.
 3. **Comprobación vía Terminal DNS (Dig / PowerShell):**
    ```powershell
    # Verificar SPF
-   Resolve-DnsName -Name "bentian.es" -Type TXT | Select-Object -ExpandProperty Strings
+   Resolve-DnsName -Name "cristianjm.com" -Type TXT | Select-Object -ExpandProperty Strings
 
    # Verificar DMARC
-   Resolve-DnsName -Name "_dmarc.bentian.es" -Type TXT | Select-Object -ExpandProperty Strings
+   Resolve-DnsName -Name "_dmarc.cristianjm.com" -Type TXT | Select-Object -ExpandProperty Strings
 
    # Verificar DKIM
-   Resolve-DnsName -Name "default._domainkey.bentian.es" -Type TXT | Select-Object -ExpandProperty Strings
+   Resolve-DnsName -Name "default._domainkey.cristianjm.com" -Type TXT | Select-Object -ExpandProperty Strings
    ```
