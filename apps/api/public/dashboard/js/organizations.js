@@ -6,7 +6,7 @@
 async function loadOrganizations() {
   const tbody = document.getElementById('orgs-tbody');
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">Cargando organizaciones...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">Cargando organizaciones...</td></tr>`;
   }
 
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
@@ -20,14 +20,21 @@ async function loadOrganizations() {
       const orgs = json.data || [];
       if (!tbody) return;
       if (orgs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-zinc-500 text-xs">No hay organizaciones registradas.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-500 text-xs">No hay organizaciones registradas.</td></tr>`;
         return;
       }
       tbody.innerHTML = orgs.map(o => {
+        const activeLic = o.active_licenses !== undefined ? o.active_licenses : '—';
+        const totalLic = o.total_licenses !== undefined ? o.total_licenses : '—';
+        const licDisplay = o.active_licenses !== undefined
+          ? `<span class="text-emerald-400 font-semibold">${activeLic}</span> <span class="text-zinc-500 font-mono text-[11px]">/ ${totalLic} tot.</span>`
+          : '<span class="text-zinc-500 font-mono text-xs">—</span>';
+
         return `
           <tr class="hover:bg-white/[0.02] transition">
             <td class="py-3.5 px-4 font-semibold text-white">${escapeHtml(o.legal_name || o.name || 'Organización')}</td>
             <td class="py-3.5 px-4 font-mono text-indigo-300">${escapeHtml(o.tax_id || '—')}</td>
+            <td class="py-3.5 px-4 font-mono">${licDisplay}</td>
             <td class="py-3.5 px-4 font-mono text-zinc-400">${escapeHtml(o.reseller_id || 'Directo')}</td>
             <td class="py-3.5 px-4 text-zinc-300">${escapeHtml(o.plan || 'Standard')}</td>
             <td class="py-3.5 px-4 text-right">
@@ -39,7 +46,7 @@ async function loadOrganizations() {
     }
   } catch (e) {
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-400 font-mono text-xs">Error al cargar organizaciones.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400 font-mono text-xs">Error al cargar organizaciones.</td></tr>`;
     }
   }
 }
