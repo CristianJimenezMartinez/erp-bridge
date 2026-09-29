@@ -33,7 +33,7 @@ async function testSessionLicenseOnboarding() {
     assert.strictEqual(json2.success, true);
     assert.ok(json2.licenseKey.startsWith('EB-'), 'La clave debe comenzar con EB-');
     assert.ok(json2.token, 'Debe retornar un token JWT');
-    assert.strictEqual(json2.email, 'cliente-demo@bentian.es');
+    assert.strictEqual(json2.email, 'cliente-demo@cristianjm.com');
 
     // 3. Verificar que el JWT emitido es válido y tiene rol TENANT_CLIENT
     const verification = AuthService.verifyToken(json2.token);

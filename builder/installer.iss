@@ -2,8 +2,8 @@
 #ifndef AppVersion
   #define AppVersion "0.1.0"
 #endif
-#define MyAppPublisher "Bentian"
-#define MyAppURL "https://bentian.es"
+#define MyAppPublisher "Bentian ERP Bridge"
+#define MyAppURL "https://bridge.cristianjm.com"
 #define MyAppExeName "BentianAgent.exe"
 
 [Setup]

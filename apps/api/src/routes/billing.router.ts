@@ -508,7 +508,7 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
 
     // Modo Mock / Testing Local (ej: cs_test_mock_...) — Desactivado en Producción
     if (process.env.NODE_ENV !== 'production' && (sessionId.startsWith('cs_test_mock_') || (!STRIPE_SECRET_KEY && sessionId.startsWith('cs_')))) {
-      const demoEmail = 'cliente-demo@bentian.es';
+      const demoEmail = 'cliente-demo@cristianjm.com';
       const orgId = computeOrganizationIdFromEmail(demoEmail);
       let licenses = await licenseService.listLicenses(orgId);
       let license = licenses.length > 0 ? licenses[0]! : null;
@@ -579,7 +579,7 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
     const customerEmail = (
       sessionData.customer_details?.email ||
       sessionData.customer_email ||
-      'cliente@bentian.es'
+      'cliente@cristianjm.com'
     ).toLowerCase().trim();
 
     const organizationId = sessionData.metadata?.organizationId || computeOrganizationIdFromEmail(customerEmail);

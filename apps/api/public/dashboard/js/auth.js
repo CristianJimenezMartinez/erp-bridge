@@ -150,7 +150,7 @@ async function handleEmailLogin(e) {
   if (!email) return;
 
   // Detección proactiva si es Superadministrador
-  if (email.toLowerCase().startsWith('admin@') || email.toLowerCase().includes('cristianjm.com') || email.toLowerCase().includes('bentian.es')) {
+  if (email.toLowerCase().startsWith('admin@') || email.toLowerCase().includes('cristianjm.com')) {
     switchLoginMode('admin');
     const adminEmailInput = document.getElementById('login-email');
     if (adminEmailInput) adminEmailInput.value = email;

@@ -378,7 +378,7 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
   }
 
   const resellerId = `reseller_${crypto.createHash('sha256').update(cleanCode).digest('hex').substring(0, 10)}`;
-  const email = partnerEmail ? partnerEmail.trim().toLowerCase() : `${cleanCode.toLowerCase()}@partner.bentian.es`;
+  const email = partnerEmail ? partnerEmail.trim().toLowerCase() : `${cleanCode.toLowerCase()}@partner.cristianjm.com`;
 
   const exp = Date.now() + 24 * 60 * 60 * 1000;
   const payload: AdminJwtPayload = {

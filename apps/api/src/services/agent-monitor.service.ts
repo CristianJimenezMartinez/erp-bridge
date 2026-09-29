@@ -326,7 +326,7 @@ export class AgentMonitorService {
 `.trim();
 
     return {
-      to: `alerts@bentian.es`,
+      to: process.env.ALERTS_EMAIL || `soporte@cristianjm.com`,
       from: `no-reply@bridge.cristianjm.com`,
       subject,
       text,

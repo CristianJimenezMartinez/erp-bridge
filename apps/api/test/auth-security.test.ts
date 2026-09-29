@@ -9,7 +9,7 @@ import { licensesRouter } from '../src/routes/licenses.router';
 console.log('--- Running API Auth & Security Hardening Tests ---');
 
 async function runTests() {
-  process.env['ADMIN_EMAIL'] = 'admin@bentian.es';
+  process.env['ADMIN_EMAIL'] = 'admin@cristianjm.com';
   process.env['ADMIN_PASSWORD'] = 'SuperSecurePass123!';
   process.env['ADMIN_JWT_SECRET'] = 'test-jwt-secret-key-12345';
   process.env['PARTNER_SECRET'] = 'PartnerSecret2026!';
@@ -33,7 +33,7 @@ async function runTests() {
     const resLogin = await fetch(`${baseUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@bentian.es', password: 'SuperSecurePass123!' }),
+      body: JSON.stringify({ email: 'admin@cristianjm.com', password: 'SuperSecurePass123!' }),
     });
     assert.strictEqual(resLogin.status, 200, 'Login válido debe responder 200 OK');
     const loginData = (await resLogin.json()) as any;
@@ -46,7 +46,7 @@ async function runTests() {
     const resFail = await fetch(`${baseUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@bentian.es', password: 'WrongPassword!' }),
+      body: JSON.stringify({ email: 'admin@cristianjm.com', password: 'WrongPassword!' }),
     });
     assert.strictEqual(resFail.status, 401, 'Credenciales incorrectas deben responder 401');
     console.log('  ✓ Contraseña errónea rechazada con 401.');
@@ -59,7 +59,7 @@ async function runTests() {
       const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'admin@bentian.es', password: `wrong_${i}` }),
+        body: JSON.stringify({ email: 'admin@cristianjm.com', password: `wrong_${i}` }),
       });
       assert.strictEqual(res.status, 401, `Intento ${i} debe retornar 401`);
     }
@@ -68,7 +68,7 @@ async function runTests() {
     const resBlocked = await fetch(`${baseUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@bentian.es', password: 'SuperSecurePass123!' }),
+      body: JSON.stringify({ email: 'admin@cristianjm.com', password: 'SuperSecurePass123!' }),
     });
     assert.strictEqual(resBlocked.status, 429, 'Petición tras exceder límite debe responder 429');
     const blockedJson = (await resBlocked.json()) as any;
@@ -181,7 +181,7 @@ async function runTests() {
     const testEmail = 'cliente-otp@empresa.es';
     // Crear una licencia previa para que el email tenga licencias
     const superToken = AuthService.createToken({
-      sub: 'admin@bentian.es',
+      sub: 'admin@cristianjm.com',
       role: 'SUPERADMIN',
       organizationId: 'org_default',
       exp: Date.now() + 3600000,

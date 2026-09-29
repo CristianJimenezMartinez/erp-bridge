@@ -42,6 +42,46 @@ function verifyHttpEndpoint(url) {
   });
 }
 
+function waitForHealthy(url, timeoutMs = 20000) {
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const check = () => {
+      https.get(url, (res) => {
+        if (res.statusCode === 200) {
+          resolve(true);
+        } else if (Date.now() - start < timeoutMs) {
+          setTimeout(check, 1000);
+        } else {
+          resolve(false);
+        }
+      }).on('error', () => {
+        if (Date.now() - start < timeoutMs) {
+          setTimeout(check, 1000);
+        } else {
+          resolve(false);
+        }
+      });
+    };
+    check();
+  });
+}
+
+function collectFilesRecursively(dir, baseDir = dir) {
+  let results = [];
+  if (!fs.existsSync(dir)) return results;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results = results.concat(collectFilesRecursively(fullPath, baseDir));
+    } else if (entry.isFile()) {
+      const relPath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+      results.push({ fullPath, relPath });
+    }
+  }
+  return results;
+}
+
 async function uploadReleases(options = {}) {
   const localReleasesDir = path.resolve(__dirname, '../releases');
   const latestJsonPath = path.join(localReleasesDir, 'latest.json');
@@ -70,21 +110,84 @@ async function uploadReleases(options = {}) {
   const remoteVersionDir = `${remoteReleasesDir}/v${version}`;
   const remoteLatestDir = `${remoteReleasesDir}/latest`;
   const remotePublicDir = '/opt/bentian/erp-bridge/apps/api/public';
+  const remoteDistDir = '/opt/bentian/erp-bridge/apps/api/dist';
 
   console.log('\n================================================================');
   console.log(`   SUBIENDO RELEASE v${version} A HETZNER CX23 (bridge.cristianjm.com) `);
   console.log('================================================================\n');
+
+  // Construir cola de subida
+  const filesInVersionDir = fs.readdirSync(versionReleaseDir);
+  const uploadQueue = [];
+
+  // 1. Archivos de la carpeta versionada
+  for (const file of filesInVersionDir) {
+    const localFile = path.join(versionReleaseDir, file);
+    if (fs.statSync(localFile).isFile()) {
+      uploadQueue.push({
+        local: localFile,
+        remote: `${remoteVersionDir}/${file}`,
+        name: `v${version}/${file}`
+      });
+    }
+  }
+
+  // 2. latest.json
+  if (fs.existsSync(latestJsonPath)) {
+    uploadQueue.push({
+      local: latestJsonPath,
+      remote: `${remoteReleasesDir}/latest.json`,
+      name: 'latest.json'
+    });
+  }
+
+  // 3. Archivos públicos completos (recursivo: index.html, dashboard, docs, js, css, assets, etc.)
+  const localPublicDir = path.resolve(__dirname, '../apps/api/public');
+  if (fs.existsSync(localPublicDir)) {
+    const allPublicFiles = collectFilesRecursively(localPublicDir);
+    for (const pf of allPublicFiles) {
+      uploadQueue.push({
+        local: pf.fullPath,
+        remote: `${remotePublicDir}/${pf.relPath}`,
+        name: `public/${pf.relPath}`
+      });
+    }
+  }
+
+  // 4. Archivos compilados de la API (dist/)
+  const localDistDir = path.resolve(__dirname, '../apps/api/dist');
+  if (fs.existsSync(localDistDir)) {
+    const allDistFiles = collectFilesRecursively(localDistDir);
+    for (const df of allDistFiles) {
+      uploadQueue.push({
+        local: df.fullPath,
+        remote: `${remoteDistDir}/${df.relPath}`,
+        name: `dist/${df.relPath}`
+      });
+    }
+  }
 
   return new Promise((resolve, reject) => {
     const conn = new Client();
 
     conn.on('ready', async () => {
       try {
-        console.log('>>> [1/4] Creando directorios remotos en el servidor...');
-        await runSshCommand(conn, `mkdir -p "${remoteVersionDir}" "${remoteLatestDir}" "${remotePublicDir}" "${remotePublicDir}/assets" "${remotePublicDir}/dashboard" "${remotePublicDir}/dashboard/js" "${remotePublicDir}/css" "${remotePublicDir}/js"`);
+        console.log('>>> [1/6] Creando directorios remotos en el servidor...');
+        const dirsToCreate = new Set([
+          remoteVersionDir,
+          remoteLatestDir,
+          remotePublicDir,
+          remoteDistDir
+        ]);
+        for (const item of uploadQueue) {
+          const dir = path.dirname(item.remote).replace(/\\/g, '/');
+          dirsToCreate.add(dir);
+        }
+        const mkdirCmd = `mkdir -p ${Array.from(dirsToCreate).map(d => `"${d}"`).join(' ')}`;
+        await runSshCommand(conn, mkdirCmd);
         console.log('    ✓ Directorios remotos verificados.');
 
-        console.log('>>> [2/4] Abriendo canal SFTP seguro...');
+        console.log('>>> [2/6] Abriendo canal SFTP seguro...');
         conn.sftp(async (err, sftp) => {
           if (err) {
             conn.end();
@@ -92,95 +195,38 @@ async function uploadReleases(options = {}) {
           }
 
           try {
-            // Lista de archivos a subir
-            const filesInVersionDir = fs.readdirSync(versionReleaseDir);
-            const uploadQueue = [];
-
-            // Archivos de la carpeta versionada
-            for (const file of filesInVersionDir) {
-              const localFile = path.join(versionReleaseDir, file);
-              if (fs.statSync(localFile).isFile()) {
-                uploadQueue.push({
-                  local: localFile,
-                  remote: `${remoteVersionDir}/${file}`,
-                  name: `v${version}/${file}`
-                });
-              }
-            }
-
-            // latest.json
-            if (fs.existsSync(latestJsonPath)) {
-              uploadQueue.push({
-                local: latestJsonPath,
-                remote: `${remoteReleasesDir}/latest.json`,
-                name: 'latest.json'
-              });
-            }
-
-            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard, assets, css, js)
-            const localPublicDir = path.resolve(__dirname, '../apps/api/public');
-            if (fs.existsSync(localPublicDir)) {
-              const publicFiles = [
-                'index.html',
-                'robots.txt',
-                'sitemap.xml',
-                'favicon.ico',
-                'dashboard/index.html',
-                'dashboard/favicon.ico',
-                'dashboard/js/utils.js',
-                'dashboard/js/auth.js',
-                'dashboard/js/licenses.js',
-                'dashboard/js/fleet.js',
-                'dashboard/js/organizations.js',
-                'dashboard/js/audit-errors.js',
-                'dashboard/js/navigation.js',
-                'assets/og-preview.png',
-                'assets/icon-256.png',
-                'assets/icon.png',
-                'assets/icon.svg',
-                'assets/icon.ico',
-                'css/styles.css',
-                'js/tailwind.config.js',
-                'js/checkout.js',
-                'js/releases.js',
-                'js/simulator.js'
-              ];
-              for (const pf of publicFiles) {
-                const localPf = path.join(localPublicDir, pf);
-                if (fs.existsSync(localPf)) {
-                  uploadQueue.push({
-                    local: localPf,
-                    remote: `${remotePublicDir}/${pf}`,
-                    name: `public/${pf}`
-                  });
-                }
-              }
-            }
-
-            console.log(`>>> [3/4] Transfiriendo ${uploadQueue.length} archivos a producción...`);
+            console.log(`>>> [3/6] Transfiriendo ${uploadQueue.length} archivos a producción...`);
 
             for (const item of uploadQueue) {
-              const sizeMb = (fs.statSync(item.local).size / (1024 * 1024)).toFixed(2);
-              console.log(`  ↑ Subiendo ${item.name} (${sizeMb} MB)...`);
+              const sizeBytes = fs.statSync(item.local).size;
+              const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(2);
+              const isLarge = sizeBytes > 1024 * 1024;
+              
+              if (isLarge) {
+                console.log(`  ↑ Subiendo ${item.name} (${sizeMb} MB)...`);
+              }
 
               await new Promise((resPut, rejPut) => {
                 sftp.fastPut(item.local, item.remote, {
                   step: (total, nb, totalSize) => {
-                    const pct = Math.round((total / totalSize) * 100);
-                    process.stdout.write(`\r     Progreso: ${pct}% (${(total / 1024 / 1024).toFixed(1)} / ${(totalSize / 1024 / 1024).toFixed(1)} MB)`);
+                    if (isLarge) {
+                      const pct = Math.round((total / totalSize) * 100);
+                      process.stdout.write(`\r     Progreso: ${pct}% (${(total / 1024 / 1024).toFixed(1)} / ${(totalSize / 1024 / 1024).toFixed(1)} MB)`);
+                    }
                   }
                 }, (putErr) => {
                   if (putErr) rejPut(putErr);
                   else {
-                    console.log(`\n    ✓ ${item.name} subido con éxito.`);
+                    if (isLarge) process.stdout.write('\n');
                     resPut();
                   }
                 });
               });
             }
+            console.log(`    ✓ ${uploadQueue.length} archivos transferidos con éxito.`);
 
             // Copiar archivos clave a releases/latest/ en el servidor
-            console.log('>>> [4/5] Sincronizando punteros genéricos /releases/latest/...');
+            console.log('>>> [4/6] Sincronizando punteros genéricos /releases/latest/...');
             const setupExe = `Bentian-Setup-v${version}.exe`;
             const setupZip = `Bentian-Setup-v${version}.zip`;
             const portableZip = `BentianAgent-v${version}-Portable.zip`;
@@ -196,7 +242,7 @@ async function uploadReleases(options = {}) {
             console.log('    ✓ Enlaces de descarga genéricos /releases/latest/ actualizados.');
 
             // Registrar versión en PostgreSQL de producción en bentian-api-prod
-            console.log('>>> [5/5] Registrando versión en la base de datos de producción...');
+            console.log('>>> [5/6] Registrando versión en la base de datos de producción...');
             const manifestPath = path.join(versionReleaseDir, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
               const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
@@ -222,10 +268,31 @@ async function uploadReleases(options = {}) {
               }
             }
 
+            // Actualizar contenedor Docker y reiniciar
+            console.log('>>> [6/6] Sincronizando backend compilado y reiniciando contenedor Docker...');
+            const updateContainerCmd = `
+              docker cp "${remoteDistDir}/." bentian-api-prod:/app/apps/api/dist/ &&
+              docker restart bentian-api-prod
+            `;
+            await runSshCommand(conn, updateContainerCmd);
+            console.log('    ✓ Contenedor bentian-api-prod actualizado y reiniciado.');
+
             // Comprobar disponibilidad HTTP
             console.log('\n--- Verificando disponibilidad pública en vivo ---');
+            const isHealthOk = await waitForHealthy('https://bridge.cristianjm.com/health');
+            console.log(`  GET https://bridge.cristianjm.com/health: ${isHealthOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
+
             const isLatestOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/releases/latest.json');
             console.log(`  GET https://bridge.cristianjm.com/releases/latest.json: ${isLatestOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
+
+            const isDocHtmlOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html');
+            console.log(`  GET https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html: ${isDocHtmlOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
+
+            const isDocMdOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.md');
+            console.log(`  GET https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.md: ${isDocMdOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
+
+            const isSyncJsOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/js/version-sync.js');
+            console.log(`  GET https://bridge.cristianjm.com/js/version-sync.js: ${isSyncJsOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
 
             const isZipOk = await verifyHttpEndpoint(`https://bridge.cristianjm.com/releases/v${version}/${setupZip}`);
             console.log(`  GET https://bridge.cristianjm.com/releases/v${version}/${setupZip}: ${isZipOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);

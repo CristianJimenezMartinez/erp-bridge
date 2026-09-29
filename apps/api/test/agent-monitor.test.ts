@@ -97,7 +97,7 @@ async function runTests() {
 
     // Verify structured Mailer / SendGrid / Postmark payload
     assert(alertDead1.emailPayload, 'Debe incluir payload de email estructurado');
-    assert.strictEqual(alertDead1.emailPayload.to, 'alerts@bentian.es');
+    assert.strictEqual(alertDead1.emailPayload.to, 'soporte@cristianjm.com');
     assert(alertDead1.emailPayload.subject.includes(deadmanAgent1.name));
     assert(alertDead1.emailPayload.html.includes(deadmanAgent1.id));
     assert(alertDead1.emailPayload.text.includes('DEADMAN SWITCH'));
