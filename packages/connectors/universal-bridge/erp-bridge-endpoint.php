@@ -2,7 +2,6 @@
 /**
  * ============================================================================
  * Bentian ERP Bridge — Conector Web Universal (HTTPS Bridge v1.1.0)
- * Suministros Rubio & Tienda Online
  * ============================================================================
  * Puerto: 443 (HTTPS Seguro)
  * Protocolo: HMAC-SHA256 / Bearer Token
@@ -28,13 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // ----------------------------------------------------------------------------
-// 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD (SUMINISTROS RUBIO)
+// 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD
 // ----------------------------------------------------------------------------
-define('EB_SECRET_KEY', getenv('EB_SECRET_KEY') ?: 'rubio_secreto_2026');
-define('EB_DB_HOST', getenv('EB_DB_HOST') ?: 'localhost');
-define('EB_DB_NAME', getenv('EB_DB_NAME') ?: 'suministros_tienda');
-define('EB_DB_USER', getenv('EB_DB_USER') ?: 'tienda_user');
-define('EB_DB_PASS', getenv('EB_DB_PASS') ?: 'fGC3IaLKvvGmhW47XF6X');
+define('EB_SECRET_KEY', getenv('EB_SECRET_KEY') ?: '%%EB_SECRET_KEY%%');
+define('EB_DB_HOST', getenv('EB_DB_HOST') ?: '%%EB_DB_HOST%%');
+define('EB_DB_NAME', getenv('EB_DB_NAME') ?: '%%EB_DB_NAME%%');
+define('EB_DB_USER', getenv('EB_DB_USER') ?: '%%EB_DB_USER%%');
+define('EB_DB_PASS', getenv('EB_DB_PASS') ?: '%%EB_DB_PASS%%');
 
 // ----------------------------------------------------------------------------
 // 2. CONEXIÓN PDO A MARIADB / MYSQL LOCAL
@@ -171,8 +170,6 @@ function getPublicImagesBaseDir() {
     $candidates = [
         __DIR__ . '/assets/img/factusolImg',
         __DIR__ . '/tienda/assets/img/factusolImg',
-        dirname(__DIR__) . '/tienda.suministrosrubio.com/assets/img/factusolImg',
-        dirname(__DIR__) . '/tienda.suministrosrubio.com/httpdocs/assets/img/factusolImg',
         dirname(__DIR__) . '/tienda/assets/img/factusolImg',
         __DIR__ . '/uploads/products',
     ];
@@ -784,10 +781,8 @@ if ($mainAction === 'upload_image') {
         exit;
     }
 
-    // Replicación secundaria automática hacia tienda.suministrosrubio.com si existe en el hosting
+    // Replicación secundaria automática si existe subdirectorio de tienda
     $subdomainCandidates = [
-        dirname(__DIR__) . '/tienda.suministrosrubio.com/assets/img/factusolImg/' . $targetRelPath,
-        dirname(__DIR__) . '/tienda.suministrosrubio.com/httpdocs/assets/img/factusolImg/' . $targetRelPath,
         __DIR__ . '/tienda/assets/img/factusolImg/' . $targetRelPath,
     ];
     foreach ($subdomainCandidates as $subCand) {
@@ -812,7 +807,7 @@ if ($mainAction === 'upload_image') {
     }
 
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'suministrosrubio.com';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $publicUrl = "{$scheme}://{$host}/assets/img/factusolImg/{$targetRelPath}";
 
     echo json_encode([

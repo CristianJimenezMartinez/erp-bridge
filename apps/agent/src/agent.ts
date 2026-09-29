@@ -82,7 +82,13 @@ export class LocalAgent {
     this.licenseService = new LicenseService(this.configManager, this.eventBus, customStoreDir);
     this.factusolService = new FactusolService(this.configManager, this.eventBus);
     this.fileWatcherService = new FileWatcherService();
-    this.syncEngine = new LocalSyncEngine(this.configManager, this.factusolService, this.historyManager, this.eventBus);
+    this.syncEngine = new LocalSyncEngine(
+      this.configManager,
+      this.factusolService,
+      this.historyManager,
+      this.eventBus,
+      () => this.licenseService.getLicenseStatus()
+    );
     this.autoStartService = new AutoStartService();
 
     const cfg = this.configManager.get();

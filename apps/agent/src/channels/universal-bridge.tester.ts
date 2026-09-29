@@ -137,7 +137,7 @@ export class UniversalBridgeTester {
       msg = 'No pudimos conectar con la web. Revisa que el dominio esté bien escrito y accesible.';
     } else if (!checks.endpointFound) {
       if (serverDetails.htmlFallbackDetected) {
-        msg = 'El servidor web responde pero devuelve una página HTML de Angular en lugar de ejecutar PHP. PHP no está activo en este subdominio o la regla de Nginx lo intercepta. Sube erp-bridge-endpoint.php a suministrosrubio.com (donde PHP está activo) o activa PHP en el subdominio.';
+        msg = 'El servidor web responde pero devuelve una página HTML en lugar de ejecutar PHP. PHP no está activo en este subdominio o la regla del servidor lo intercepta. Sube erp-bridge-endpoint.php a la raíz de tu dominio (donde PHP esté activo) o habilita la ejecución de PHP.';
       } else {
         msg = 'Servidor web detectado, pero aún no se encuentra el archivo erp-bridge-endpoint.php. Súbelo a la carpeta pública de tu hosting.';
       }

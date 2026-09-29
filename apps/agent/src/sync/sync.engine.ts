@@ -22,7 +22,8 @@ export class LocalSyncEngine {
     private readonly configManager: ConfigManager,
     private readonly factusolService: FactusolService,
     private readonly historyManager: HistoryManager,
-    private readonly eventBus: EventBus
+    private readonly eventBus: EventBus,
+    private readonly licenseCheckFn?: () => { status: string; plan?: string }
   ) {}
 
   public isBusy(): boolean {
@@ -62,6 +63,18 @@ export class LocalSyncEngine {
       this.logger.warn('Intento de sincronización ignorado: ya existe un ciclo en ejecución.');
       return { success: false, message: 'Ya hay un proceso de sincronización en ejecución.' };
     }
+
+    // Guarda estricta de seguridad y licencias: bloquear sincronización si no está validada
+    if (this.licenseCheckFn) {
+      const lic = this.licenseCheckFn();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        const msg = `Sincronización bloqueada: Requiere una licencia activa (${lic.status}). Active su clave en el Centro de Control para sincronizar con la tienda web.`;
+        this.logger.warn(msg);
+        this.eventBus.addEvent('warn', `⚠️ ${msg}`);
+        return { success: false, message: msg };
+      }
+    }
+
     this.isSyncing = true;
     const start = Date.now();
     try {
@@ -495,6 +508,15 @@ export class LocalSyncEngine {
 
     const checkAndSync = async () => {
       if (!isRunningGetter() || this.isSyncing) return;
+
+      // Guarda de licencia: no sincronizar automáticamente en segundo plano si la licencia no es válida
+      if (this.licenseCheckFn) {
+        const lic = this.licenseCheckFn();
+        if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+          return;
+        }
+      }
+
       const config = this.configManager.get();
       const dbPath = config.factusol?.databasePath || config.factusolDbPath;
       const woo = config.woocommerce;
@@ -529,6 +551,23 @@ export class LocalSyncEngine {
   }
 
   public async uploadCatalog(options?: { limit?: number; onlyMissing?: boolean }): Promise<CatalogUploadResult> {
+    if (this.licenseCheckFn) {
+      const lic = this.licenseCheckFn();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        const msg = `Subida de catálogo bloqueada: Requiere una licencia activa (${lic.status}). Active su clave en el Centro de Control.`;
+        this.logger.warn(msg);
+        this.eventBus.addEvent('warn', `⚠️ ${msg}`);
+        return {
+          success: false,
+          totalArticles: 0,
+          uploadedCount: 0,
+          skippedCount: 0,
+          failedCount: 0,
+          message: msg,
+        };
+      }
+    }
+
     if (this.isSyncing) {
       const busyMsg = 'Subida de catálogo omitida: el motor de sincronización ya está ejecutando otra tarea activa.';
       this.logger.warn(busyMsg);
