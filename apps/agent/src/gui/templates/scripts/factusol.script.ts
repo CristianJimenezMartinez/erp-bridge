@@ -245,8 +245,7 @@ export const factusolScript = `
           tariffCode: document.getElementById('select-factusol-tariff').value,
           saleTariffCode: document.getElementById('select-factusol-sale-tariff') ? document.getElementById('select-factusol-sale-tariff').value : '',
           warehouseCode: document.getElementById('select-factusol-warehouse').value,
-          orderSeries: document.getElementById('input-factusol-order-series').value.trim(),
-          invoiceSeries: document.getElementById('input-factusol-inv-series').value.trim(),
+          orderSeries: ((document.getElementById('input-factusol-order-series') ? document.getElementById('input-factusol-order-series').value.trim() : '') || 'W').toUpperCase().substring(0, 1),
         }
       };
       await submitConfigUpdates(payload, 'Ajustes de Factusol guardados con éxito.');

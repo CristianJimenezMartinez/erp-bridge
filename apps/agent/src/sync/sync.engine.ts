@@ -732,7 +732,7 @@ export class LocalSyncEngine {
     // 2. Sincronización de pedidos (Universal Bridge -> Factusol)
     try {
       this.eventBus.addEvent('info', 'Comprobando pedidos nuevos en la tienda online...');
-      const series = config.factusol?.orderSeries || '1';
+      const series = config.factusol?.orderSeries || 'W';
       const warehouse = config.factusol?.warehouseCode || 'GEN';
 
       let factusolConnector = this.factusolService.getConnector();

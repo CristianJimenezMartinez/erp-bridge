@@ -38,7 +38,7 @@ export class FactusolService {
       await this.factusol.connect({
         configuration: {
           databasePath: dbPath,
-          orderSeries: config.factusol?.orderSeries || '1',
+          orderSeries: config.factusol?.orderSeries || 'W',
           defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
           tariffCode: config.factusol?.tariffCode || '1',
         },

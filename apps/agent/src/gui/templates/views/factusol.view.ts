@@ -60,11 +60,8 @@ export function renderFactusolTab(): string {
             </div>
             <div class="form-group">
               <label class="form-label">Serie para Pedidos Web:</label>
-              <input type="text" id="input-factusol-order-series" class="form-control" value="A" maxlength="3" placeholder="A">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Serie para Facturas Directas:</label>
-              <input type="text" id="input-factusol-inv-series" class="form-control" value="1" maxlength="3" placeholder="1">
+              <input type="text" id="input-factusol-order-series" class="form-control" value="W" maxlength="1" placeholder="W" style="text-transform: uppercase;">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Por defecto 'W' (Web) o '1'. Los pedidos online se registrarán en esta serie dentro de Factusol.</div>
             </div>
           </div>
 

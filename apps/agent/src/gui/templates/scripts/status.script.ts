@@ -190,13 +190,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         const inOrderSeries = document.getElementById('input-factusol-order-series');
-        if (inOrderSeries && fSettings.orderSeries && (force || !inOrderSeries.value || document.activeElement !== inOrderSeries)) {
-          inOrderSeries.value = fSettings.orderSeries;
-        }
-
-        const inInvSeries = document.getElementById('input-factusol-inv-series');
-        if (inInvSeries && fSettings.invoiceSeries && (force || !inInvSeries.value || document.activeElement !== inInvSeries)) {
-          inInvSeries.value = fSettings.invoiceSeries;
+        if (inOrderSeries && (force || !inOrderSeries.value || document.activeElement !== inOrderSeries)) {
+          inOrderSeries.value = fSettings.orderSeries || 'W';
         }
 
         const chType = data.channelType || 'universal_bridge';
