@@ -22,7 +22,7 @@ export function renderClientScript(agentVersion: string = '0.2.0'): string {
     '    // Inicializar sondeo con protección de timer único',
     '    if (window.__statusPollInterval) clearInterval(window.__statusPollInterval);',
     '    fetchStatus();',
-    '    window.__statusPollInterval = setInterval(fetchStatus, 3000);',
+    '    window.__statusPollInterval = setInterval(fetchStatus, 5000);',
     '  </script>',
   ].join('\n');
 }

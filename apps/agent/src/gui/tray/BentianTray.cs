@@ -104,15 +104,15 @@ namespace Bentian.Tray
 
                 using (var owner = new Form())
                 {
-                    owner.Text = "Bentian ERP Bridge — Seleccionar Base de Datos Factusol";
-                    owner.StartPosition = FormStartPosition.CenterScreen;
-                    owner.Size = new Size(1, 1);
-                    owner.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-                    owner.ShowInTaskbar = true;
+                    owner.Text = "Bentian ERP Bridge";
+                    owner.StartPosition = FormStartPosition.Manual;
+                    owner.Location = new Point(-32000, -32000);
+                    owner.Size = new Size(0, 0);
+                    owner.FormBorderStyle = FormBorderStyle.None;
+                    owner.ShowInTaskbar = false;
+                    owner.Opacity = 0;
                     owner.TopMost = true;
                     owner.Show();
-                    owner.BringToFront();
-                    owner.Activate();
                     ForceForeground(owner.Handle);
 
                     using (var dialog = new OpenFileDialog())

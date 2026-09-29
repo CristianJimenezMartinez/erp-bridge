@@ -12,7 +12,7 @@ const logger = new Logger('PreflightHealth');
 export class PreflightHealthService {
   private cachedReport: PreflightHealthReport | null = null;
   private lastRunTimestamp = 0;
-  private readonly cacheTtlMs = 15000; // Cache 15 segundos para no sobrecargar el sistema en polling
+  private readonly cacheTtlMs = 300000; // Cache 5 minutos para eliminar consumo de CPU y disco durante el sondeo
 
   constructor(private readonly options: PreflightServiceOptions = {}) {}
 

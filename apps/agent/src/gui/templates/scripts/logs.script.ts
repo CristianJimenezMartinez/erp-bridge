@@ -22,8 +22,11 @@ export const logsScript = `
         }).join('');
       }
 
-      if (overviewList) overviewList.innerHTML = buildHtml(events.slice(0, 15));
-      if (fullPanel) fullPanel.innerHTML = buildHtml(filtered);
+      const overviewHtml = buildHtml(events.slice(0, 15));
+      const fullHtml = buildHtml(filtered);
+
+      if (overviewList && overviewList.innerHTML !== overviewHtml) overviewList.innerHTML = overviewHtml;
+      if (fullPanel && fullPanel.innerHTML !== fullHtml) fullPanel.innerHTML = fullHtml;
     }
 
     function setLogLevelFilter(filter) {

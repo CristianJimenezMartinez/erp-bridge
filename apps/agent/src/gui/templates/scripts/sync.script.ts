@@ -37,10 +37,11 @@ export const syncScript = `
       const tbody = document.getElementById('history-table-body');
       if (!tbody) return;
       if (!records || records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">Sin ejecuciones registradas todavía.</td></tr>';
+        const emptyHtml = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">Sin ejecuciones registradas todavía.</td></tr>';
+        if (tbody.innerHTML !== emptyHtml) tbody.innerHTML = emptyHtml;
         return;
       }
-      tbody.innerHTML = records.map(function(r) {
+      const newHtml = records.map(function(r) {
         const statusClass = r.status === 'success' ? 'tag-green' : (r.status === 'warning' ? 'tag-amber' : 'tag-rose');
         return '<tr>' +
           '<td style="font-family: monospace;">' + r.timestamp + '</td>' +
@@ -53,6 +54,7 @@ export const syncScript = `
           '<td style="color: var(--text-muted);">' + r.message + '</td>' +
         '</tr>';
       }).join('');
+      if (tbody.innerHTML !== newHtml) tbody.innerHTML = newHtml;
     }
 
     function downloadDiagnostics() {

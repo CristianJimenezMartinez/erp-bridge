@@ -24,7 +24,7 @@ export const dashboardStyles = `
     /* Layout */
     .sidebar { width: 256px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; flex-shrink: 0; user-select: none; }
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-    .header { height: 62px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: rgba(13, 13, 17, 0.65); backdrop-filter: blur(12px); z-index: 10; }
+    .header { height: 62px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--sidebar-bg); z-index: 10; }
     .content-area { flex: 1; overflow-y: auto; padding: 24px; }
     .content-area::-webkit-scrollbar { width: 6px; }
     .content-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
@@ -46,7 +46,7 @@ export const dashboardStyles = `
     .status-online { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
     .status-warn { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
     .status-offline { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
-    .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite ease-in-out; }
+    .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite ease-in-out; will-change: transform, opacity; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.85); } }
 
     /* Header */
@@ -137,7 +137,7 @@ export const dashboardStyles = `
     .checklist-step.fail .checklist-circle { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444; }
 
     /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 2000; }
     .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease-out; }
     .modal-card { width: 92%; max-width: 680px; background: #131317; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
     .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; background: #17171d; }

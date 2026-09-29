@@ -1,11 +1,19 @@
 export function renderStatusScript(agentVersion: string = '0.2.0'): string {
   return `
     // Status Polling
+    let _lastStatusPayload = '';
+
     async function fetchStatus(forceFormSync) {
+      if (document.hidden && !forceFormSync) return;
       try {
         const res = await fetch('/api/local/status');
         if (!res.ok) return;
-        currentStatus = await res.json();
+        const text = await res.text();
+        if (!forceFormSync && text === _lastStatusPayload) {
+          return;
+        }
+        _lastStatusPayload = text;
+        currentStatus = JSON.parse(text);
         renderStatus(currentStatus);
         updateFormInputs(currentStatus, forceFormSync);
         if (typeof loadAutoStart === 'function') {
@@ -15,6 +23,12 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         console.warn('Servidor local:', err); // quality-allow-console (browser template script)
       }
     }
+
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        fetchStatus(false);
+      }
+    });
 
     function renderStatus(data) {
       if (!data) return;
