@@ -4,7 +4,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://bridge.cristianjm.com/</loc>
-    <lastmod>2026-09-21T14:00:00+02:00</lastmod>
+    <lastmod>2026-09-29T13:40:00+02:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/" />
@@ -15,5 +15,11 @@
       <image:title>Conector Factusol WooCommerce &amp; PrestaShop — Bentian ERP Bridge</image:title>
       <image:caption>Conector y sincronizador bidireccional en tiempo real entre Factusol ERP y plataformas eCommerce</image:caption>
     </image:image>
+  </url>
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html</loc>
+    <lastmod>2026-09-29T13:40:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

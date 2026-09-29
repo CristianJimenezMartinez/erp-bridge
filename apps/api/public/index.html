@@ -309,8 +309,8 @@
         </p>
 
         <!-- CTAs Primarios -->
-        <div class="mt-10 flex flex-wrap items-center gap-4" id="descargas">
-          <a id="btn-hero-download" data-download-installer href="/releases/latest/Bentian-Setup.exe" 
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a id="btn-hero-download" data-download-installer href="/releases/latest/Bentian-Setup.exe" download="Bentian-Setup.exe"
              class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm flex items-center gap-2.5 transition shadow-lg shadow-indigo-600/20">
             <!-- Icono Windows SVG fino -->
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -325,7 +325,7 @@
             <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
-          <a id="btn-hero-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" class="text-xs text-zinc-500 hover:text-zinc-300 font-mono underline underline-offset-4 ml-2 transition">
+          <a id="btn-hero-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" download="Bentian-Setup.zip" class="text-xs text-zinc-500 hover:text-zinc-300 font-mono underline underline-offset-4 ml-2 transition">
             Descargar versión .zip
           </a>
         </div>
@@ -538,7 +538,7 @@
 
   <!-- 4. SECCIÓN LA SOLUCIÓN: CAPA DE INFRAESTRUCTURA CANÓNICA                  -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="arquitectura">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">La Solución</span>
@@ -589,7 +589,7 @@
 
   <!-- 5. SECCIÓN ESPECIAL: NO CAMBIES TU ERP (KEEP WHAT WORKS)                 -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06] bg-[#0c0c0f]" id="no-cambies-erp">
+    <section class="py-20 px-6 border-b border-white/[0.06] bg-[#0c0c0f] scroll-mt-24" id="no-cambies-erp">
       <div class="max-w-6xl mx-auto">
         <div class="rounded-3xl bg-[#121215] border border-white/[0.09] p-8 lg:p-12 relative overflow-hidden">
           
@@ -659,7 +659,7 @@
 
   <!-- 6. SECCIÓN CÓMO FUNCIONA (CONNECT, SYNC, RECONCILE)                       -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="como-funciona">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="como-funciona">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Cómo Funciona</span>
@@ -785,7 +785,8 @@
 
   <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="agente-local">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="agente-local">
+      <div id="descargas" class="scroll-mt-24"></div>
       <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
@@ -819,16 +820,16 @@
 
             <!-- Botonera de descargas directas del agente -->
             <div class="mt-10 flex flex-wrap items-center gap-4">
-              <a id="btn-agent-exe" data-download-installer href="/releases/latest/Bentian-Setup.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
+              <a id="btn-agent-exe" data-download-installer href="/releases/latest/Bentian-Setup.exe" download="Bentian-Setup.exe" class="px-5 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
                 <span>Descargar Instalador Oficial (.exe)</span>
               </a>
 
-              <a id="btn-agent-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
+              <a id="btn-agent-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" download="Bentian-Setup.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
                 Paquete .zip
               </a>
 
-              <a id="btn-agent-portable" data-download-portable href="/releases/latest/BentianAgent-Portable.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
+              <a id="btn-agent-portable" data-download-portable href="/releases/latest/BentianAgent-Portable.zip" download="BentianAgent-Portable.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 border border-white/[0.08] font-mono text-xs transition">
                 Portable .zip
               </a>
             </div>
@@ -907,7 +908,7 @@
 
   <!-- 9. SECCIÓN OBSERVABILIDAD Y REGISTRO DE AUDITORÍA                         -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="observabilidad">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="observabilidad">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Observabilidad</span>
@@ -961,7 +962,7 @@
 
   <!-- 10. SECCIÓN CONECTORES (DISPONIBLES HOY VS EXPANSIÓN)                    -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="conectores">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="conectores">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Ecosistema</span>
@@ -1056,7 +1057,7 @@
 
   <!-- 11. SECCIÓN SEGURIDAD Y CRIPTOGRAFÍA                                      -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="seguridad">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="seguridad">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Seguridad Zero-Trust</span>
@@ -1109,7 +1110,7 @@
 
   <!-- 12. TARIFAS TRANSPARENTES (PRICING MODULAR)                               -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="precios">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="precios">
       <div class="max-w-6xl mx-auto">
         <div class="text-center max-w-2xl mx-auto mb-12">
           <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Tarifas Transparentes</span>
@@ -1241,7 +1242,7 @@
 
   <!-- 13. PREGUNTAS FRECUENTES (FAQ PARA OBJECIONES REALES)                     -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06]" id="faq">
+    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="faq">
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-12">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Preguntas Frecuentes</span>
@@ -1657,6 +1658,39 @@
   <script src="/js/version-sync.js"></script>
   <script src="/js/releases.js"></script>
   <script src="/js/simulator.js"></script>
+
+  <!-- Control de desplazamiento suave y compensación precisa de píxeles para el header sticky -->
+  <script>
+    (function initSmoothScrollCompensation() {
+      document.addEventListener('click', function(e) {
+        var anchor = e.target.closest('a[href^="#"]');
+        if (!anchor) return;
+        var href = anchor.getAttribute('href');
+        if (!href || href === '#' || href.length < 2) return;
+
+        var targetId = href.substring(1);
+        var targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+
+        e.preventDefault();
+        var headerHeight = 64; // Altura fija de header sticky h-16
+        var paddingOffset = 20; // Espaciado visual de respiro superior
+        var elementPosition = targetEl.getBoundingClientRect().top;
+        var offsetPosition = elementPosition + window.pageYOffset - (headerHeight + paddingOffset);
+
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+
+        if (window.history && window.history.pushState) {
+          window.history.pushState(null, null, href);
+        } else {
+          window.location.hash = href;
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
