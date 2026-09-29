@@ -29,6 +29,7 @@ import { updatesRouter } from './routes/updates.router';
 import { billingRouter } from './routes/billing.router';
 import { authRouter } from './routes/auth.router';
 import { monitoringRouter } from './routes/monitoring.router';
+import { getLatestReleasedVersion } from './utils/version.util';
 
 dotenv.config();
 
@@ -104,6 +105,37 @@ export async function bootstrapApp(): Promise<Express> {
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)
   const releasesDir = path.resolve(__dirname, '../../../releases');
+  // Resilient resolver para descargas canónicas /releases/latest/:filename
+  app.get('/releases/latest/:filename', (req, res) => {
+    const filename = req.params.filename;
+    // 1. Si existe en releases/latest/:filename en disco, servir directamente
+    const physicalPath = path.join(releasesDir, 'latest', filename);
+    if (fs.existsSync(physicalPath)) {
+      return res.sendFile(physicalPath);
+    }
+
+    // 2. Si no existe la carpeta latest física (ej: dev local), resolver desde la versión canónica
+    const version = getLatestReleasedVersion();
+    const versionDir = path.join(releasesDir, `v${version}`);
+
+    let targetFile = path.join(versionDir, filename);
+    if (!fs.existsSync(targetFile)) {
+      if (filename === 'Bentian-Setup.exe') {
+        targetFile = path.join(versionDir, `Bentian-Setup-v${version}.exe`);
+      } else if (filename === 'Bentian-Setup.zip') {
+        targetFile = path.join(versionDir, `Bentian-Setup-v${version}.zip`);
+      } else if (filename === 'BentianAgent-Portable.zip') {
+        targetFile = path.join(versionDir, `BentianAgent-v${version}-Portable.zip`);
+      }
+    }
+
+    if (fs.existsSync(targetFile)) {
+      return res.sendFile(targetFile);
+    }
+
+    return res.status(404).json({ error: { message: `Archivo ${filename} no encontrado para la versión v${version}` } });
+  });
+
   app.use('/releases', (req, res, next): void => {
     const lowerUrl = req.url.toLowerCase();
     if (lowerUrl.includes('.pem') || lowerUrl.includes('.key') || lowerUrl.includes('legal') || lowerUrl.includes('.git') || lowerUrl.includes('..')) {
@@ -116,8 +148,21 @@ export async function bootstrapApp(): Promise<Express> {
     index: false,
   }));
 
-  // Servir landing page de descargas y dashboard web
+  // Servir documentación técnica oficial y guías de soporte
   const publicDir = path.resolve(__dirname, '../public');
+  const docsDir = path.join(publicDir, 'docs');
+  app.use('/docs', express.static(docsDir, {
+    dotfiles: 'ignore',
+    index: ['windows-antivirus-smartscreen-guide.html', 'index.html'],
+    extensions: ['html', 'md'],
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.md')) {
+        res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      }
+    }
+  }));
+
+  // Servir landing page de descargas y dashboard web
   app.use(express.static(publicDir));
   app.get('/', (_req, res) => {
     const indexPath = path.join(publicDir, 'index.html');

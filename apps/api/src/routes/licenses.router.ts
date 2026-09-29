@@ -7,6 +7,7 @@ import {
   LicenseValidationRequestSchema,
 } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
+import { getLatestInstallerUrl } from '../utils/version.util';
 
 export const licensesRouter = Router();
 const licenseService = new LicenseService();
@@ -184,7 +185,7 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
       data: {
         ...license,
         activations,
-        installerUrl: '/releases/latest/Bentian-Setup.exe',
+        installerUrl: getLatestInstallerUrl(),
       },
     });
   } catch (error) {

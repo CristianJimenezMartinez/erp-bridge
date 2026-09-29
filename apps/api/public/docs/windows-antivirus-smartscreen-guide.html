@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Resolución: Windows SmartScreen y Antivirus — Bentian ERP Bridge</title>
+  <meta name="description" content="Guía técnica oficial de resolución de alertas de Windows Defender SmartScreen y configuración de exclusiones en antivirus (Defender, Kaspersky, Bitdefender, Avast, AVG, CrowdStrike) para Bentian ERP Bridge.">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+
+  <style>
+    /* Estilos adicionales para scrollbars y selectores */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0e0e11; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    code { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-full flex flex-col bg-[#09090b] text-[#f4f4f5] font-sans antialiased selection:bg-indigo-500/30">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-[#09090b]/80 border-b border-white/[0.08]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo y Título -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 p-[1px] shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/30 transition">
+            <div class="w-full h-full bg-[#0d0d12] rounded-[11px] flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-400 group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <span class="text-sm font-bold text-white tracking-tight flex items-center gap-1.5">
+              Bentian <span class="text-indigo-400 font-mono text-xs">DOCS</span>
+            </span>
+            <span class="text-[10px] text-zinc-400 block -mt-0.5">Soporte y Despliegue Técnico</span>
+          </div>
+        </a>
+        <span class="hidden sm:inline-block h-4 w-[1px] bg-white/[0.1] mx-1"></span>
+        <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
+          <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          SmartScreen &amp; Antivirus
+        </span>
+      </div>
+
+      <!-- Acciones de Navegación -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="/docs/windows-antivirus-smartscreen-guide.md" class="px-2.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 hover:text-white text-xs font-mono transition flex items-center gap-1.5" title="Ver archivo Markdown sin procesar">
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span class="hidden md:inline">Ver</span> .md
+        </a>
+        <a href="/dashboard" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 hover:text-indigo-200 text-xs font-medium transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Ir al Dashboard</span>
+        </a>
+        <a href="/" class="hidden sm:inline-flex px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-300 hover:text-white text-xs font-medium transition items-center gap-1.5">
+          <span>Web Principal</span>
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+
+    <!-- HERO DE LA GUÍA -->
+    <div class="mb-10 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[#18181f] to-[#121215] border border-white/[0.08] shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10">
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-medium bg-amber-500/10 text-amber-300 border border-amber-500/30">
+            Documento Técnico v1.0.0
+          </span>
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono text-zinc-400 bg-white/[0.04] border border-white/[0.06]">
+            Windows 10, 11 &amp; Windows Server
+          </span>
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+            Ed25519 &amp; SHA-256 Verificado
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+          Guía de Resolución de Windows Defender SmartScreen y Exclusiones de Antivirus
+        </h1>
+        <p class="mt-3 text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
+          Instrucciones técnicas paso a paso para desbloquear el instalador oficial de <strong class="text-white">Bentian ERP Bridge</strong>, entender el mecanismo de reputación de Microsoft y configurar las exclusiones críticas para garantizar la lectura concurrente OLEDB de Factusol sin interrupciones.
+        </p>
+
+        <!-- Afecta a -->
+        <div class="mt-4 pt-4 border-t border-white/[0.06] flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-zinc-400 font-mono">
+          <span class="text-zinc-500">Componentes afectados:</span>
+          <span class="text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">BentianAgent.exe</span>
+          <span class="text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">BentianTray.exe</span>
+          <span class="text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">Bentian-Setup-v*.exe</span>
+          <span class="text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">cscript.exe (adodb.js)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÍNDICE RÁPIDO -->
+    <div class="mb-10 p-5 rounded-xl bg-[#121215] border border-white/[0.08]">
+      <h2 class="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        Índice de la Guía
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+        <a href="#seccion-1" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">1.</span> ¿Por qué aparece SmartScreen?
+        </a>
+        <a href="#seccion-2" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">2.</span> Superar la Pantalla Azul (Métodos)
+        </a>
+        <a href="#seccion-3" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">3.</span> Lista de Exclusiones Requeridas
+        </a>
+        <a href="#seccion-4" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">4.</span> Guías por Antivirus (Defender, Kaspersky, etc.)
+        </a>
+        <a href="#seccion-4-5" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">4.5</span> Avast &amp; AVG Antivirus
+        </a>
+        <a href="#seccion-5" class="p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] text-zinc-300 hover:text-white transition flex items-center gap-2">
+          <span class="text-indigo-400 font-mono font-semibold">5.</span> Verificación de Estado y Logs
+        </a>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 1: ¿POR QUÉ APARECE SMARTSCREEN? -->
+    <section id="seccion-1" class="mb-12 scroll-mt-24">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/[0.08] mb-6">
+        <span class="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">1</span>
+        <h2 class="text-xl font-bold text-white tracking-tight">¿Por Qué Aparece la Pantalla Azul de SmartScreen?</h2>
+      </div>
+
+      <div class="space-y-4 text-zinc-300 text-sm leading-relaxed">
+        <p>
+          Al descargar e iniciar por primera vez el instalador oficial (<code class="text-amber-300 bg-white/[0.05] px-1.5 py-0.5 rounded">Bentian-Setup-v*.exe</code>) o el agente en equipos con Windows 10, Windows 11 o Windows Server, el sistema operativo puede mostrar una ventana de alerta azul con el mensaje:
+        </p>
+
+        <!-- Cita SmartScreen -->
+        <div class="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs sm:text-sm font-sans flex items-start gap-3">
+          <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <strong class="font-semibold text-white block text-sm">"Windows protegió su PC"</strong>
+            <span class="text-blue-300/90 italic">Microsoft Defender SmartScreen evitó el inicio de una aplicación no reconocida. Si ejecuta esta aplicación, su PC podría estar en riesgo.</span>
+          </div>
+        </div>
+
+        <h3 class="text-base font-semibold text-white pt-2">El Mecanismo de Reputación de Microsoft SmartScreen</h3>
+        <p>
+          Microsoft Defender SmartScreen <strong class="text-white">no analiza el código binario buscando virus en esta etapa</strong>: evalúa la <em>reputación histórica acumulada</em> de la firma digital del ejecutable.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-[#141418] border border-white/[0.06]">
+            <h4 class="text-xs font-bold text-indigo-300 font-mono uppercase tracking-wider mb-2">1. Reputación vs Nuevas Versiones</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Cada vez que se compila y publica una nueva versión del software (ej. <code class="text-zinc-200">v0.3.1</code>), Microsoft la clasifica inicialmente como "de baja reputación" hasta que cientos de miles de equipos en el mundo la descargan sin incidentes. Este aviso es completamente habitual en software profesional B2B.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-[#141418] border border-white/[0.06]">
+            <h4 class="text-xs font-bold text-emerald-300 font-mono uppercase tracking-wider mb-2">2. Seguridad Criptográfica Nativa</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Bentian ERP Bridge incorpora un sistema criptográfico de verificación asimétrica interna con curvas elípticas <strong class="text-white">Ed25519</strong> y firmas <strong class="text-white">SHA-256</strong> auditadas. No contiene adware, telemetría invasiva ni bibliotecas de terceros opacas. El instalador es 100% limpio y seguro.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: CÓMO SUPERAR SMARTSCREEN -->
+    <section id="seccion-2" class="mb-12 scroll-mt-24">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/[0.08] mb-6">
+        <span class="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">2</span>
+        <h2 class="text-xl font-bold text-white tracking-tight">Instrucciones Paso a Paso para Superar SmartScreen</h2>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- MÉTODO A: 2 CLICS (RECOMENDADO) -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-indigo-500/30 relative">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Método A</span>
+              <span>Salto Directo desde la Ventana Azul (Recomendado — 2 clics)</span>
+            </h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">Más Rápido</span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-zinc-300 mb-4">
+            Cuando aparezca la ventana azul de Microsoft Defender SmartScreen, no pulses "No ejecutar":
+          </p>
+
+          <!-- Mockup visual de la ventana SmartScreen -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0078d4] text-white font-sans text-xs shadow-xl mb-4 max-w-xl mx-auto border border-blue-400/40">
+            <div class="flex items-center justify-between pb-3 border-b border-white/20">
+              <span class="font-semibold text-sm">Windows protegió su PC</span>
+              <span class="text-white/80 cursor-pointer">✕</span>
+            </div>
+            <p class="mt-3 text-xs leading-relaxed text-blue-50">
+              Microsoft Defender SmartScreen evitó el inicio de una aplicación no reconocida. Si ejecuta esta aplicación, su PC podría estar en riesgo.
+            </p>
+            <div class="mt-4 p-2.5 rounded bg-blue-900/40 border border-white/30 flex items-center justify-between">
+              <div>
+                <span class="underline font-semibold cursor-pointer text-white">Más información</span>
+                <span class="text-[11px] text-amber-200 font-mono ml-2">← [PASO 1: PULSAR AQUÍ]</span>
+              </div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-white/20 text-xs">
+              <div class="text-[11px] text-blue-100 font-mono mb-2">
+                <div>Aplicación: <strong>Bentian-Setup-v*.exe</strong></div>
+                <div>Editor: <strong>Cristian Jiménez Martínez / Bentian ERP Bridge</strong></div>
+              </div>
+              <div class="flex items-center justify-end gap-2 mt-3">
+                <div class="px-4 py-1.5 rounded bg-white text-[#0078d4] font-bold text-xs shadow hover:bg-zinc-100 transition cursor-pointer flex items-center gap-1">
+                  <span>Ejecutar de todas formas</span>
+                  <span class="text-[10px] text-indigo-700 font-mono">← [PASO 2]</span>
+                </div>
+                <div class="px-4 py-1.5 rounded bg-blue-800/80 text-white text-xs border border-white/20 cursor-pointer">
+                  No ejecutar
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ol class="list-decimal list-inside text-xs sm:text-sm text-zinc-300 space-y-1.5 ml-1">
+            <li>Haz clic sobre el texto subrayado <strong class="text-white">"Más información"</strong> (<em>"More info"</em> en inglés).</li>
+            <li>Se mostrará el nombre del archivo y el botón <strong class="text-white">"Ejecutar de todas formas"</strong> (<em>"Run anyway"</em>).</li>
+            <li>Haz clic en <strong class="text-emerald-400">"Ejecutar de todas formas"</strong>. El instalador arrancará inmediatamente.</li>
+          </ol>
+        </div>
+
+        <!-- MÉTODO B: PROPIEDADES EN WINDOWS 11 / SMART APP CONTROL -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <h3 class="text-sm sm:text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-white/[0.08] text-zinc-300 border border-white/[0.1]">Método B</span>
+            <span>Desbloqueo en Propiedades del Archivo (Windows 11 y Smart App Control)</span>
+          </h3>
+          <p class="text-xs sm:text-sm text-zinc-300 mb-3 leading-relaxed">
+            En Windows 11 (22H2/23H2/24H2), la función <em>Smart App Control (SAC)</em> puede bloquear directamente archivos descargados de la web por la marca NTFS <code>Zone.Identifier</code>:
+          </p>
+
+          <ol class="list-decimal list-inside text-xs sm:text-sm text-zinc-300 space-y-2 ml-1">
+            <li>Abre el Explorador de Archivos y localiza el instalador descargado en tu carpeta de <code class="text-zinc-200">Descargas</code>.</li>
+            <li>Haz clic derecho sobre el archivo y selecciona <strong class="text-white">Propiedades</strong> (o selecciónalo y presiona <kbd class="px-1.5 py-0.5 bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-zinc-200">Alt + Enter</kbd>).</li>
+            <li>En la pestaña <strong class="text-white">General</strong>, dirígete a la parte inferior (sección <em>Seguridad</em>).</li>
+            <li>Marca la casilla <strong class="text-amber-300">"Desbloquear"</strong> (<em>Unblock</em>).</li>
+            <li>Pulsa <strong class="text-white">Aplicar</strong> y luego <strong class="text-white">Aceptar</strong>.</li>
+            <li>Haz doble clic en el instalador: se iniciará sin ningún tipo de advertencia.</li>
+          </ol>
+        </div>
+
+        <!-- MÉTODO C: POWERSHELL DESBLOQUEO RÁPIDO -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-white/[0.08] text-zinc-300 border border-white/[0.1]">Método C</span>
+              <span>Desbloqueo Automatizado vía PowerShell (Administradores de TI)</span>
+            </h3>
+            <button onclick="copyToClipboard('ps-unblock-cmd', this)" class="px-2.5 py-1 rounded bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-[11px] font-mono text-zinc-300 hover:text-white transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-300 mb-3">
+            Para terminales o despliegues sin interacción gráfica, ejecuta este comando en PowerShell:
+          </p>
+
+          <pre class="p-3.5 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-indigo-300 overflow-x-auto"><code id="ps-unblock-cmd"># Eliminar el bloqueo de zona web del instalador de Bentian
+Unblock-File -Path "$env:USERPROFILE\Downloads\Bentian-Setup-*.exe"
+Start-Process -FilePath "$env:USERPROFILE\Downloads\Bentian-Setup-*.exe"</code></pre>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: LISTA OBLIGATORIA DE EXCLUSIONES -->
+    <section id="seccion-3" class="mb-12 scroll-mt-24">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/[0.08] mb-6">
+        <span class="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">3</span>
+        <h2 class="text-xl font-bold text-white tracking-tight">Lista Obligatoria de Exclusiones en Antivirus</h2>
+      </div>
+
+      <div class="space-y-4 text-zinc-300 text-sm leading-relaxed">
+        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 flex items-start gap-3">
+          <svg class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <div>
+            <strong class="font-semibold text-amber-300 block">¿Por qué son críticas estas exclusiones para Factusol?</strong>
+            Bentian ERP Bridge interactúa directamente con el motor Microsoft Access Database Engine (ACE/Jet OLEDB) a través de <code class="text-white">cscript.exe</code>. Si el antivirus escanea el archivo <code class="text-white">.accdb</code> o el cerrojo <code class="text-white">.laccdb</code> en cada escritura, generará el error crítico <code class="text-amber-300">3045: Could not use ''; file already in use</code> o bloqueará la facturación física.
+          </div>
+        </div>
+
+        <!-- Tabla de exclusiones -->
+        <div class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#121215]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-white/[0.04] text-zinc-400 font-mono uppercase tracking-wider border-b border-white/[0.08]">
+              <tr>
+                <th class="p-3.5">Elemento a Excluir</th>
+                <th class="p-3.5">Ruta Exacta / Nombre</th>
+                <th class="p-3.5">Tipo de Exclusión</th>
+                <th class="p-3.5">Propósito Operativo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/[0.06] text-zinc-300">
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Configuración del Agente</td>
+                <td class="p-3.5 font-mono text-indigo-300">%APPDATA%\Bentian Agent\</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Carpeta</span></td>
+                <td class="p-3.5 text-zinc-400">Persistencia local de configuración y sincronizaciones.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Logs de Diagnóstico</td>
+                <td class="p-3.5 font-mono text-indigo-300">%APPDATA%\Bentian Agent\logs\</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Carpeta</span></td>
+                <td class="p-3.5 text-zinc-400">Escritura continua de eventos del conector.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Directorio Principal</td>
+                <td class="p-3.5 font-mono text-indigo-300">C:\Program Files\Bentian Agent\</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Carpeta</span></td>
+                <td class="p-3.5 text-zinc-400">Binarios de la aplicación y ejecutables del servicio.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Proceso Daemon</td>
+                <td class="p-3.5 font-mono text-indigo-300">BentianAgent.exe</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Proceso</span></td>
+                <td class="p-3.5 text-zinc-400">Motor en segundo plano del agente de sincronización.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Bandeja del Sistema</td>
+                <td class="p-3.5 font-mono text-indigo-300">BentianTray.exe</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Proceso</span></td>
+                <td class="p-3.5 text-zinc-400">Icono nativo de Windows y diálogo STA de Factusol.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Subproceso OLEDB</td>
+                <td class="p-3.5 font-mono text-amber-300">cscript.exe</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Proceso</span></td>
+                <td class="p-3.5 text-zinc-400">Invoca <code class="text-zinc-200">adodb.js</code> para conectar con Factusol.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Auto-actualizador</td>
+                <td class="p-3.5 font-mono text-indigo-300">%TEMP%\bentian-updates\</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">Carpeta</span></td>
+                <td class="p-3.5 text-zinc-400">Directorio de intercambio atómico de nuevas releases.</td>
+              </tr>
+              <tr class="hover:bg-white/[0.02]">
+                <td class="p-3.5 font-semibold text-white">Archivos de Factusol</td>
+                <td class="p-3.5 font-mono text-amber-300">*.accdb y *.laccdb</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">Extensiones</span></td>
+                <td class="p-3.5 text-zinc-400">Evita bloqueos de concurrencia y cerrojos en red/NAS.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: GUÍAS POR ANTIVIRUS -->
+    <section id="seccion-4" class="mb-12 scroll-mt-24">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/[0.08] mb-6">
+        <span class="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">4</span>
+        <h2 class="text-xl font-bold text-white tracking-tight">Instrucciones Específicas por Suite Antivirus</h2>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- 4.1 MICROSOFT DEFENDER -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+              <span>4.1 Microsoft Defender Antivirus (Seguridad de Windows)</span>
+            </h3>
+            <button onclick="copyToClipboard('ps-defender-script', this)" class="px-2.5 py-1 rounded bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-[11px] font-mono text-zinc-300 hover:text-white transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span>Copiar Script PowerShell</span>
+            </button>
+          </div>
+
+          <p class="text-xs sm:text-sm text-zinc-300 mb-3">
+            Abre una consola de <strong class="text-white">PowerShell como Administrador</strong> y ejecuta:
+          </p>
+
+          <pre class="p-3.5 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-indigo-300 overflow-x-auto"><code id="ps-defender-script"># 1. Excluir directorios del Agente y registros
+Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent"
+Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent\logs"
+Add-MpPreference -ExclusionPath "C:\Program Files\Bentian Agent"
+Add-MpPreference -ExclusionPath "$env:TEMP\bentian-updates"
+
+# 2. Excluir procesos ejecutables del agente y motor OLEDB
+Add-MpPreference -ExclusionProcess "BentianAgent.exe"
+Add-MpPreference -ExclusionProcess "BentianTray.exe"
+Add-MpPreference -ExclusionProcess "cscript.exe"
+
+# 3. Excluir extensiones de base de datos Factusol
+Add-MpPreference -ExclusionExtension ".accdb"
+Add-MpPreference -ExclusionExtension ".laccdb"
+
+Write-Host "✓ Exclusiones aplicadas con éxito en Windows Defender." -ForegroundColor Green</code></pre>
+
+          <div class="mt-4 pt-4 border-t border-white/[0.06] text-xs text-zinc-400">
+            <strong class="text-zinc-200">Vía Interfaz Gráfica:</strong> Seguridad de Windows → Protección contra virus y amenazas → Administrar la configuración → Exclusiones → Agregar o quitar exclusiones → Agregar Carpeta, Proceso y Tipo de archivo.
+          </div>
+        </div>
+
+        <!-- 4.2 KASPERSKY -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <h3 class="text-sm sm:text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+            <span>4.2 Kaspersky (Endpoint Security / Small Office / Plus)</span>
+          </h3>
+
+          <ol class="list-decimal list-inside text-xs sm:text-sm text-zinc-300 space-y-2 ml-1">
+            <li>Abre Kaspersky y pulsa en el icono de <strong class="text-white">Configuración (engranaje)</strong>.</li>
+            <li>Entra en <strong class="text-white">Configuración de seguridad</strong> → <strong class="text-white">Exclusiones y aplicaciones de confianza</strong>.</li>
+            <li>En <strong class="text-white">Exclusiones</strong>, pulsa <em>Agregar</em> y añade:
+              <ul class="list-disc list-inside ml-5 my-1 font-mono text-xs text-indigo-300">
+                <li>C:\Program Files\Bentian Agent\*</li>
+                <li>%APPDATA%\Bentian Agent\*</li>
+                <li>*.accdb y *.laccdb</li>
+              </ul>
+            </li>
+            <li>En <strong class="text-white">Aplicaciones de confianza</strong>, añade <code class="text-zinc-200 font-mono">BentianAgent.exe</code>, <code class="text-zinc-200 font-mono">BentianTray.exe</code> y <code class="text-zinc-200 font-mono">cscript.exe</code>.</li>
+            <li>Marca: <em>"No supervisar la actividad de la aplicación"</em> y <em>"No heredar restricciones del proceso principal"</em>.</li>
+            <li>Pulsa <strong class="text-white">Guardar</strong>.</li>
+          </ol>
+        </div>
+
+        <!-- 4.3 BITDEFENDER -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <h3 class="text-sm sm:text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-400"></span>
+            <span>4.3 Bitdefender (GravityZone Cloud / Total Security)</span>
+          </h3>
+
+          <ol class="list-decimal list-inside text-xs sm:text-sm text-zinc-300 space-y-2 ml-1">
+            <li>Abre Bitdefender y dirígete al módulo <strong class="text-white">Protección</strong> → <strong class="text-white">Antivirus</strong> → <strong class="text-white">Ajustes / Exclusiones</strong>.</li>
+            <li>Pulsa <strong class="text-white">Añadir exclusión</strong>: selecciona carpeta y añade <code class="text-zinc-200 font-mono">C:\Program Files\Bentian Agent</code> y <code class="text-zinc-200 font-mono">%APPDATA%\Bentian Agent</code> (marcar <em>"En acceso y Bajo demanda"</em>).</li>
+            <li>Añade las extensiones <code class="text-zinc-200 font-mono">.accdb</code> y <code class="text-zinc-200 font-mono">.laccdb</code>.</li>
+            <li>En <strong class="text-white">Defensa contra amenazas avanzadas (ATD)</strong>: añade a la lista de excepciones <code class="text-zinc-200 font-mono">BentianAgent.exe</code>, <code class="text-zinc-200 font-mono">BentianTray.exe</code> y <code class="text-zinc-200 font-mono">cscript.exe</code>.</li>
+          </ol>
+        </div>
+
+        <!-- 4.4 AVAST & AVG -->
+        <div id="seccion-4-5" class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08] scroll-mt-24">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-orange-400"></span>
+              <span>4.4 Avast Antivirus &amp; AVG AntiVirus (Motor Gen Digital)</span>
+            </h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-orange-500/10 text-orange-400 border border-orange-500/20">Muy Común en PYMEs</span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-zinc-300 mb-3 leading-relaxed">
+            Avast y AVG comparten el mismo motor de escudos en tiempo real (<em>File Shield</em> y <em>Behavior Shield</em>). Si no se configuran excepciones, el análisis heurístico bloqueará el subproceso OLEDB o aislará el instalador en el Baúl de Virus:
+          </p>
+
+          <ol class="list-decimal list-inside text-xs sm:text-sm text-zinc-300 space-y-2 ml-1">
+            <li>Abre la interfaz principal de <strong class="text-white">Avast</strong> o <strong class="text-white">AVG</strong>.</li>
+            <li>Haz clic en <strong class="text-white">Menú</strong> (esquina superior derecha, icono de tres líneas o engranaje) → <strong class="text-white">Opciones</strong> (o <strong class="text-white">Configuración</strong>).</li>
+            <li>En la pestaña <strong class="text-white">General</strong>, selecciona la subsección <strong class="text-white">Excepciones</strong>.</li>
+            <li>Haz clic en el botón <strong class="text-emerald-400">Añadir excepción</strong> y agrega una por una las siguientes rutas:
+              <ul class="list-disc list-inside ml-5 my-1.5 font-mono text-xs text-indigo-300 space-y-1">
+                <li>C:\Program Files\Bentian Agent\*</li>
+                <li>%APPDATA%\Bentian Agent\*</li>
+                <li>%TEMP%\bentian-updates\*</li>
+                <li>La carpeta de datos de Factusol (ej. <span class="text-zinc-400">C:\Factusol\Datos\*</span> o <span class="text-zinc-400">\\SERVIDOR\Datos\*</span>)</li>
+              </ul>
+            </li>
+            <li>En el menú lateral, dirígete a <strong class="text-white">Protección</strong> → <strong class="text-white">Escudo contra ransomware</strong> (<em>Ransomware Shield</em>):
+              <div class="text-zinc-400 text-xs ml-5 mt-1">
+                Entra en <em>Aplicaciones bloqueadas y permitidas</em>. Si <code class="text-zinc-200 font-mono">BentianAgent.exe</code> o <code class="text-zinc-200 font-mono">cscript.exe</code> aparecen en "Bloqueadas", haz clic en los tres puntos y pulsa <strong class="text-white">Permitir</strong>.
+              </div>
+            </li>
+            <li>Reinicia el agente desde el icono del System Tray.</li>
+          </ol>
+        </div>
+
+        <!-- 4.5 CROWDSTRIKE FALCON -->
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+          <h3 class="text-sm sm:text-base font-bold text-white mb-3 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-violet-400"></span>
+            <span>4.5 CrowdStrike Falcon EDR (Entornos Corporativos)</span>
+          </h3>
+
+          <p class="text-xs sm:text-sm text-zinc-300 mb-3 leading-relaxed">
+            El sensor de Falcon puede categorizar la invocación de <code class="text-amber-300">cscript.exe adodb.js</code> como una técnica de <em>Living off the Land (LotL)</em>. Para silenciar la alerta en la consola de Falcon:
+          </p>
+
+          <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono space-y-1 text-zinc-300">
+            <div><strong class="text-indigo-400">Regla Custom IOA Exclusion:</strong></div>
+            <div>Parent Image Filename: <span class="text-emerald-300">.*\\BentianAgent\.exe</span></div>
+            <div>Image Filename: <span class="text-emerald-300">.*\\cscript\.exe</span></div>
+            <div>Command Line: <span class="text-emerald-300">.*adodb\.js.*</span></div>
+            <div>Action: <span class="text-emerald-400 font-bold">Allow / No Alert</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: VERIFICACIÓN -->
+    <section id="seccion-5" class="mb-12 scroll-mt-24">
+      <div class="flex items-center gap-2 pb-3 border-b border-white/[0.08] mb-6">
+        <span class="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">5</span>
+        <h2 class="text-xl font-bold text-white tracking-tight">Verificación de Funcionamiento tras Aplicar Exclusiones</h2>
+      </div>
+
+      <div class="space-y-4 text-zinc-300 text-sm leading-relaxed">
+        <ol class="list-decimal list-inside space-y-2 ml-1">
+          <li>Comprueba que el icono de <strong class="text-white">Bentian ERP Bridge</strong> aparece en la bandeja del sistema (junto al reloj de Windows).</li>
+          <li>Haz clic derecho sobre el icono y selecciona <strong class="text-white">Abrir Panel de Control</strong>.</li>
+          <li>Verifica que el estado de conexión con Factusol se muestra en color verde (<strong class="text-emerald-400">En Línea / Conectado</strong>).</li>
+          <li>El archivo de registro en <code class="text-indigo-300 font-mono">%APPDATA%\Bentian Agent\logs\agent.log</code> debe confirmar la conexión OLEDB limpia:</li>
+        </ol>
+
+        <pre class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-emerald-400 overflow-x-auto"><code>[INFO] [FactusolService] Conexión OLEDB con base de datos establecida correctamente.
+[INFO] [FileWatcher] Monitor de cambios en *.accdb activo.</code></pre>
+      </div>
+    </section>
+
+    <!-- BANNER DE CONTACTO Y SOPORTE -->
+    <div class="p-6 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-[#14141c] to-[#121215] border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>¿Necesitas asistencia técnica para tu empresa?</span>
+        </h3>
+        <p class="text-xs text-zinc-300 mt-1">
+          Si experimentas incidencias o requieres soporte para despliegues por GPO en Directorio Activo, contacta con nuestro equipo.
+        </p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="mailto:soporte@bentian.es" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>soporte@bentian.es</span>
+        </a>
+        <a href="/dashboard" class="px-3.5 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-300 hover:text-white text-xs font-medium transition">
+          Panel Web
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-zinc-300">Bentian ERP Bridge</span>
+        <span>— Documentación Técnica Oficial</span>
+      </div>
+      <div>
+        <span>© 2026 Bentian. Todos los derechos reservados.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT PARA COPIAR AL PORTAPAPELES -->
+  <script>
+    function copyToClipboard(elementId, btnElement) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.innerText || el.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btnElement.innerHTML;
+        btnElement.innerHTML = `
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span class="text-emerald-400">¡Copiado!</span>
+        `;
+        setTimeout(() => {
+          btnElement.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>

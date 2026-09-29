@@ -31,8 +31,10 @@ async function loadFleetHealthData() {
         return;
       }
 
-      const versionKpi = document.getElementById('health-kpi-version');
-      if (versionKpi) versionKpi.innerText = data.summary?.latestVersion || 'v0.3.2';
+      const latestVerString = json.summary?.latestVersion || (window.BentianVersion ? window.BentianVersion.getVersion() : null);
+      if (versionKpi && latestVerString) {
+        versionKpi.innerText = latestVerString.startsWith('v') ? latestVerString : ('v' + latestVerString);
+      }
 
       tbody.innerHTML = agents.map(a => {
         const isOnline = a.status === 'ACTIVE' || a.isOnline === true;
@@ -40,10 +42,15 @@ async function loadFleetHealthData() {
           ? new Date(a.last_heartbeat || a.last_seen_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           : '—';
 
+        const rawAgentVer = a.version || a.installedVersion || (window.BentianVersion ? window.BentianVersion.getVersion() : '—');
+        const displayAgentVer = rawAgentVer.startsWith('v') ? rawAgentVer : ('v' + rawAgentVer);
+        const rawTargetVer = a.latestVersion || latestVerString || (window.BentianVersion ? window.BentianVersion.getVersion() : '');
+        const displayTargetVer = rawTargetVer ? (rawTargetVer.startsWith('v') ? rawTargetVer : ('v' + rawTargetVer)) : '';
+
         const isLatest = a.isUpToDate !== false;
         const versionBadge = isLatest
-          ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${escapeHtml(a.version || 'v0.3.2')} <span class="text-[9px] text-emerald-500 uppercase">Al día</span></span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${escapeHtml(a.version || 'v0.3.1')} <span class="text-[9px] text-amber-300 uppercase">v${escapeHtml(a.latestVersion || '0.3.2')} disp.</span></span>`;
+          ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>${escapeHtml(displayAgentVer)} <span class="text-[9px] text-emerald-500 uppercase">Al día</span></span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${escapeHtml(displayAgentVer)} <span class="text-[9px] text-amber-300 uppercase">${escapeHtml(displayTargetVer)} disp.</span></span>`;
 
         const shortHwid = a.hwid ? a.hwid.substring(0, 12) + '...' : '';
 

@@ -1,6 +1,4 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
 import { AgentService, UpdateService, DatabaseService } from '@erp-bridge/core';
 import { AgentHeartbeatPayloadSchema, AgentPairingRequestSchema } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
@@ -9,20 +7,9 @@ export const agentsRouter = Router();
 const agentService = new AgentService();
 const updateService = new UpdateService();
 
-function getLatestReleasedVersion(): string {
-  try {
-    const latestJsonPath = path.resolve(__dirname, '../../../../releases/latest.json');
-    if (fs.existsSync(latestJsonPath)) {
-      const parsed = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
-      if (parsed.latestVersion) return parsed.latestVersion;
-    }
-  } catch {}
-  try {
-    const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
-    if (pkg.version) return pkg.version;
-  } catch {}
-  return '0.3.2';
-}
+import { getLatestReleasedVersion } from '../utils/version.util';
+
+export { getLatestReleasedVersion };
 
 function getOrgId(req: Request): string {
   const authReq = req as AuthenticatedRequest;
@@ -126,7 +113,15 @@ agentsRouter.get('/agents', requireAuth, async (req: AuthenticatedRequest, res: 
         };
       });
 
-      return res.json({ data: unified });
+      return res.json({
+        data: unified,
+        summary: {
+          totalMachines: unified.length,
+          onlineMachines: unified.filter(m => m.isOnline).length,
+          upToDateMachines: unified.filter(m => m.isUpToDate).length,
+          latestVersion: `v${LATEST_VERSION}`,
+        },
+      });
     }
 
     if ((isSuperadmin || isAdmin) && !req.query['organizationId']) {
