@@ -26,7 +26,7 @@ async function loadAdminOverview() {
       if (trialsEl) trialsEl.innerText = d.trials || 0;
       if (unpaidEl) unpaidEl.innerText = d.unpaidOrCanceled || 0;
       if (seatsEl) {
-        seatsEl.innerText = `${d.baseSeats || 0} Puestos Base (199€) · ${d.additionalSeats || 0} Puestos Adic. (99€)`;
+        seatsEl.innerText = `${d.baseSeats || 0} Licencias Base · ${d.additionalSeats || 0} Licencias 2ª Tienda`;
       }
     }
   } catch (e) {

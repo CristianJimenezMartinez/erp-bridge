@@ -70,8 +70,8 @@ function renderLicenses(list) {
     const shortHwid = act?.hwid ? `${act.hwid.substring(0, 16)}...` : '—';
     const fullHwid = act?.hwid || '';
     const seatBadge = lic.seatType === 'ADDITIONAL_SEAT' 
-      ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">Puesto Adic. (99€)</span>'
-      : '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Base (199€)</span>';
+      ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">2ª Tienda (-20%)</span>'
+      : '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Licencia Base</span>';
 
     return `
       <tr class="hover:bg-white/[0.02] transition-colors">

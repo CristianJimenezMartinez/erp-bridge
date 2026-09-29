@@ -91,6 +91,7 @@ export async function bootstrapApp(): Promise<Express> {
 
   // 3. Mount Routes
   app.use(healthRouter);
+  app.use('/api/v1', healthRouter);
   app.use('/api/v1', organizationsRouter);
   app.use('/api/v1', connectorsRouter);
   app.use('/api/v1', connectionsRouter);
