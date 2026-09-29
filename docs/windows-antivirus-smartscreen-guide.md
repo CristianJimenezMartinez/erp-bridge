@@ -299,4 +299,4 @@ Una vez configuradas las exclusiones:
    [INFO] [FactusolService] Conexión OLEDB con base de datos establecida correctamente.
    [INFO] [FileWatcher] Monitor de cambios en *.accdb activo.
    ```
-5. Si experimentas cualquier mensaje de bloqueo o necesitas asistencia técnica para desplegar exclusiones en Active Directory vía GPO, contacta directamente con el equipo de soporte técnico en `soporte@bentian.es`.
+5. Si experimentas cualquier mensaje de bloqueo o necesitas asistencia técnica para desplegar exclusiones en Active Directory vía GPO, contacta directamente con el equipo de soporte técnico en `soporte@cristianjm.com`.

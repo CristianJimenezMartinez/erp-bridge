@@ -79,7 +79,7 @@ flowchart LR
 ```
 
 ### Paso 1: Solicitud de Registro
-- Rellena el formulario de alta en el portal oficial: [https://bridge.cristianjm.com/partners](https://bridge.cristianjm.com/partners) o contacta por correo a `partners@bentian.es` indicando:
+- Rellena el formulario de alta en el portal oficial: [https://bridge.cristianjm.com/partners](https://bridge.cristianjm.com/partners) o contacta por correo a `soporte@cristianjm.com` indicando:
   * Razón Social o Nombre del Autónomo y CIF/NIF.
   * Sitio web o perfil profesional.
   * Número aproximado de clientes que utilizan Factusol o plataformas eCommerce (WooCommerce/PrestaShop).
@@ -135,7 +135,7 @@ Garantizamos un procedimiento de pago riguroso, claro y puntual:
 * **Gestión Fiscal Española:**
   - El software emite mensualmente un borrador detallado con el desglose de clientes, importes brutos y comisión devengada.
   - El partner emite su factura por *Servicios de Intermediación Comercial* (con su correspondiente 21% de IVA y retención de IRPF si es autónomo individual, o IVA para Sociedades Limitadas).
-  - Una vez recibida la factura por correo a `facturacion@bentian.es`, el abono se ejecuta en 24-48 horas laborables.
+  - Una vez recibida la factura por correo a `soporte@cristianjm.com`, el abono se ejecuta en 24-48 horas laborables.
 
 ### Métricas en Tiempo Real en tu Panel de Control
 Desde el Dashboard de Partner (`/partner/clients`), tienes total visibilidad de:
@@ -153,7 +153,7 @@ Uno de los mayores temores de los informáticos y distribuidores al prescribir s
 1. **Vinculación Irrevocable:** Una vez que un CIF/NIF de cliente se registra bajo tu código `PT-XXXX`, ese cliente queda blindado en base de datos (`organizations.reseller_id = 'PT-XXXX'`). Ningún otro distribuidor ni venta directa puede desvincularlo.
 2. **Comisión Vitalicia en Renovaciones Directas:** Aunque el cliente decida renovar su suscripción por su cuenta directamente en la web de Bentian sin avisarte, el sistema detecta su cuenta y **te liquida tu 25% íntegro**.
 3. **Respeto Absoluto al Canal:** Bentian es un proveedor de tecnología. **Jamás prestamos servicios de mantenimiento informático, redes ni diseño web.** Si un cliente tuyo solicita ayuda para configurar su red o modificar su tienda, lo derivamos de vuelta a ti como su partner de referencia.
-4. **Soporte Técnico de Nivel 2 Prioritario:** Como partner oficial, dispones de una línea directa de asistencia técnica por WhatsApp y correo (`partners@bentian.es`) para apoyarte en cualquier incidencia técnica compleja durante la instalación en casa del cliente.
+4. **Soporte Técnico de Nivel 2 Prioritario:** Como partner oficial, dispones de una línea directa de asistencia técnica por WhatsApp y correo (`soporte@cristianjm.com`) para apoyarte en cualquier incidencia técnica compleja durante la instalación en casa del cliente.
 
 ---
 
@@ -171,13 +171,13 @@ Para mantener la máxima transparencia, cumplir estrictamente con el RGPD y prot
 
 | Paso | Acción | Tiempo estimado |
 | :---: | :--- | :---: |
-| **1** | Envía un email a `partners@bentian.es` solicitando tu código `PT-XXXX`. | 2 minutos |
+| **1** | Envía un email a `soporte@cristianjm.com` solicitando tu código `PT-XXXX`. | 2 minutos |
 | **2** | Recibe tu código de partner y acceso al Dashboard de Partner. | < 24 horas |
 | **3** | Descarga el instalador y el dossier comercial para tus clientes. | Inmediato |
 | **4** | Conecta el primer cliente y genera tu primer ingreso recurrente vitalicio. | 5 minutos por instalación |
 
 **¿Tienes dudas técnicas o comerciales?**  
 Contacta directamente con el Responsable de Canal de Distribución:  
-📧 Email: `partners@bentian.es` | `soporte@cristianjm.com`  
+📧 Email: `soporte@cristianjm.com`  
 🌐 Portal Web: [https://bridge.cristianjm.com](https://bridge.cristianjm.com)  
-Oficinas Centrales: Bentian Solutions S.L. - España
+Bentian ERP Bridge — Cristian Jiménez Martínez — España

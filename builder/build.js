@@ -52,36 +52,25 @@ function createZipArchive(files, outputZip) {
 }
 
 function updateLandingHtml(rootDir, version, hashes) {
+  // 1. Invocar compilador modular de landing page para Single Source of Truth
+  try {
+    const buildLandingScript = path.resolve(rootDir, 'apps/api/scripts/build-landing.ts');
+    if (fs.existsSync(buildLandingScript)) {
+      childProcess.execSync('npx ts-node apps/api/scripts/build-landing.ts', {
+        cwd: rootDir,
+        stdio: 'inherit'
+      });
+    }
+  } catch (e) {
+    console.warn('  ⚠️ Aviso compilando landing:', e.message);
+  }
+
   const htmlPath = path.resolve(rootDir, 'apps/api/public/index.html');
   if (!fs.existsSync(htmlPath)) return;
 
   let content = fs.readFileSync(htmlPath, 'utf8');
 
-  // Actualizar versión en el badge
-  content = content.replace(
-    /(<span id="version-badge">)Versión Oficial v[0-9.]+ para Windows x64(<\/span>)/g,
-    `$1Versión Oficial v${version} para Windows x64$2`
-  );
-
-  // Actualizar enlaces de descarga
-  content = content.replace(
-    /href="\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.exe"/g,
-    `href="/releases/v${version}/Bentian-Setup-v${version}.exe"`
-  );
-  content = content.replace(
-    /href="\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.zip"/g,
-    `href="/releases/v${version}/Bentian-Setup-v${version}.zip"`
-  );
-  content = content.replace(
-    /href="\/releases\/v[0-9.]+\/BentianAgent-v[0-9.]+-Portable\.zip"/g,
-    `href="/releases/v${version}/BentianAgent-v${version}-Portable.zip"`
-  );
-
-  // Actualizar etiquetas y hashes
-  content = content.replace(
-    /(<span class="text-cyan-400" id="hash-installer-label">)Bentian-Setup-v[0-9.]+\.exe:(<\/span>)/g,
-    `$1Bentian-Setup-v${version}.exe:$2`
-  );
+  // Actualizar sumas criptográficas SHA-256 si están disponibles
   if (hashes.installerHash) {
     content = content.replace(
       /(<span id="hash-installer">)[a-f0-9]+(<\/span>)/g,
@@ -103,18 +92,31 @@ function updateDashboardHtml(rootDir, version) {
   const dashPath = path.resolve(rootDir, 'apps/api/public/dashboard/index.html');
   if (fs.existsSync(dashPath)) {
     let content = fs.readFileSync(dashPath, 'utf8');
+
+    // Actualizar elementos con data-app-version y formatos
+    content = content.replace(
+      /(<[^>]*data-app-version[^>]*data-version-format="([^"]+)"[^>]*>)(.*?)(<\/[^>]+>)/g,
+      (match, open, fmt, inner, close) => `${open}${fmt.replace('{version}', 'v' + version).replace('{rawVersion}', version)}${close}`
+    );
+
+    content = content.replace(
+      /(<[^>]*data-app-version[^>]*>)(?:v)?[0-9.]+(<\/[^>]+>)/g,
+      `$1v${version}$2`
+    );
+
     content = content.replace(
       /<span>Descargar Instalador \(v[0-9.]+\)<\/span>/g,
       `<span>Descargar Instalador (v${version})</span>`
     );
     content = content.replace(
-      /(<div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version">)v[0-9.]+(<\/div>)/g,
+      /(<div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version"[^>]*>)(?:v)?[0-9.]+(<\/div>)/g,
       `$1v${version}$2`
     );
     content = content.replace(
-      /(<span class="font-mono">)v[0-9.]+ Cloud(<\/span>)/g,
+      /(<span class="font-mono"[^>]*>)v[0-9.]+ Cloud(<\/span>)/g,
       `$1v${version} Cloud$2`
     );
+
     fs.writeFileSync(dashPath, content, 'utf8');
     console.log(`  📊 Dashboard (apps/api/public/dashboard/index.html) sincronizado con versión v${version}.`);
   }
@@ -355,6 +357,29 @@ async function runMasterBuild() {
     }, null, 2),
     'utf8'
   );
+
+  // Sincronizar directorio local releases/latest/ para desarrollo y descargas canónicas
+  const latestLocalDir = path.resolve(releasesDir, 'latest');
+  if (!fs.existsSync(latestLocalDir)) {
+    fs.mkdirSync(latestLocalDir, { recursive: true });
+  }
+  if (installerPath && fs.existsSync(installerPath)) {
+    fs.copyFileSync(installerPath, path.resolve(latestLocalDir, 'Bentian-Setup.exe'));
+  }
+  if (installerZipPath && fs.existsSync(installerZipPath)) {
+    fs.copyFileSync(installerZipPath, path.resolve(latestLocalDir, 'Bentian-Setup.zip'));
+  }
+  if (portableZipPath && fs.existsSync(portableZipPath)) {
+    fs.copyFileSync(portableZipPath, path.resolve(latestLocalDir, 'BentianAgent-Portable.zip'));
+  }
+  if (fs.existsSync(targetExe)) {
+    fs.copyFileSync(targetExe, path.resolve(latestLocalDir, 'BentianAgent.exe'));
+  }
+  fs.copyFileSync(
+    path.resolve(versionReleaseDir, 'manifest.json'),
+    path.resolve(latestLocalDir, 'manifest.json')
+  );
+  console.log('  ✓ Directorio local releases/latest/ sincronizado con éxito.');
 
   // Actualizar Landing Page index.html
   updateLandingHtml(rootDir, version, { installerHash, exeHash });

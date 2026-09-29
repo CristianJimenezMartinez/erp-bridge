@@ -201,7 +201,7 @@ async function main() {
       let apiUrl = args[1];
       if (!apiUrl) {
         apiUrl = await promptUserForInput(
-          '🌐 Ingrese la URL del servidor API (ej. https://api.bentian.es):',
+          '🌐 Ingrese la URL del servidor API (ej. https://bridge.cristianjm.com):',
           'Configurar Servidor API - Bentian Agent'
         );
       }

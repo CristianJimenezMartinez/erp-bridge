@@ -4,7 +4,7 @@
 > **Resumen Ejecutivo para Dirección General, Gerencia y Dirección de Operaciones**  
 > **Producto:** Bentian ERP Bridge — Conector Empresarial de Datos en Tiempo Real  
 > **Página Web Oficial:** [https://bridge.cristianjm.com](https://bridge.cristianjm.com)  
-> **Contacto Comercial Directo:** `ventas@bentian.es` | `soporte@cristianjm.com`
+> **Contacto Comercial Directo:** `soporte@cristianjm.com`
 
 ---
 
@@ -120,8 +120,8 @@ La transición no requiere detener la actividad de la empresa ni cambiar la form
 Conecte su Factusol hoy mismo y comience a operar en tiempo real:
 
 - **Portal Web y Demostración:** [https://bridge.cristianjm.com](https://bridge.cristianjm.com)
-- **Departamento de Ventas y Asesoramiento:** `ventas@bentian.es`
+- **Departamento de Ventas y Asesoramiento:** `soporte@cristianjm.com`
 - **Atención al Cliente y Soporte Técnico:** `soporte@cristianjm.com`
 - **Canal de Partners y Distribuidores:** Si trabaja con una empresa de informática o agencia web, consúltele por su código oficial de partner (`PT-XXXX`) para acceder a condiciones preferentes.
 
-**Bentian Solutions S.L. — Infraestructura de Integración Empresarial Local-First**
+**Bentian ERP Bridge — Cristian Jiménez Martínez — Infraestructura de Integración Empresarial Local-First**

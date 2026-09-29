@@ -179,4 +179,4 @@ Los datos de tus artículos, clientes y ventas siempre residen en tu propio Fact
 ---
 
 > **¿Tienes alguna duda sobre tu suscripción o necesitas una cotización personalizada?**  
-> Escríbenos a `facturacion@bentian.es` o visita el portal oficial en [https://bridge.cristianjm.com](https://bridge.cristianjm.com).
+> Escríbenos a `soporte@cristianjm.com` o visita el portal oficial en [https://bridge.cristianjm.com](https://bridge.cristianjm.com).

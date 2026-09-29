@@ -21,6 +21,37 @@ const CONTENT_SECTIONS = [
   '13-faq.html',
 ];
 
+export function getCanonicalVersion(): string {
+  // 1. releases/latest.json
+  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
+  if (fs.existsSync(latestJsonPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
+      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
+    } catch {}
+  }
+
+  // 2. Monorepo root package.json
+  const rootPkgPath = path.resolve(__dirname, '../../../package.json');
+  if (fs.existsSync(rootPkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8'));
+      if (pkg.version) return String(pkg.version).replace(/^v/, '').trim();
+    } catch {}
+  }
+
+  // 3. API package.json
+  const apiPkgPath = path.resolve(__dirname, '../package.json');
+  if (fs.existsSync(apiPkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(apiPkgPath, 'utf8'));
+      if (pkg.version) return String(pkg.version).replace(/^v/, '').trim();
+    } catch {}
+  }
+
+  return '0.3.2';
+}
+
 export function assembleLandingPage(): string {
   if (!fs.existsSync(LAYOUT_FILE)) {
     throw new Error(`Layout template not found at ${LAYOUT_FILE}`);
@@ -51,31 +82,47 @@ export function assembleLandingPage(): string {
     .replace('<!-- {{CONTENT}} -->', contentHtml)
     .replace('<!-- {{FOOTER}} -->', footerHtml);
 
-  // 5. Inyectar versión dinámica desde package.json
-  const apiPkgPath = path.resolve(__dirname, '../package.json');
-  let currentVersion = '0.2.4';
-  if (fs.existsSync(apiPkgPath)) {
-    try {
-      const pkg = JSON.parse(fs.readFileSync(apiPkgPath, 'utf8'));
-      if (pkg.version) currentVersion = pkg.version;
-    } catch {}
-  }
+  // 5. Inyectar versión canónica centralizada
+  const currentVersion = getCanonicalVersion();
 
+  // Inyectar en Schema.org LD+JSON
   assembled = assembled.replace(
-    /\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.exe/g,
-    `/releases/v${currentVersion}/Bentian-Setup-v${currentVersion}.exe`
+    /"softwareVersion":\s*"[^"]+"/g,
+    `"softwareVersion": "${currentVersion}"`
   );
   assembled = assembled.replace(
-    /\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.zip/g,
-    `/releases/v${currentVersion}/Bentian-Setup-v${currentVersion}.zip`
+    /"downloadUrl":\s*"[^"]+"/g,
+    `"downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe"`
+  );
+
+  // Inyectar en badges y elementos de versión
+  assembled = assembled.replace(
+    /<span id="hero-version-tag">Release Oficial (?:<span data-app-version>)?v[0-9.]+(?:<\/span>)? para Windows x64<\/span>/g,
+    `<span id="hero-version-tag">Release Oficial <span data-app-version>v${currentVersion}</span> para Windows x64</span>`
   );
   assembled = assembled.replace(
-    /\/releases\/v[0-9.]+\/BentianAgent-v[0-9.]+-Portable\.zip/g,
-    `/releases/v${currentVersion}/BentianAgent-v${currentVersion}-Portable.zip`
+    /<span id="hero-version-tag">Release Oficial v[0-9.]+ para Windows x64<\/span>/g,
+    `<span id="hero-version-tag">Release Oficial <span data-app-version>v${currentVersion}</span> para Windows x64</span>`
+  );
+
+  // Asegurar elementos data-app-version
+  assembled = assembled.replace(
+    /(<[^>]*data-app-version[^>]*>)(?:v)?[0-9.]+(<\/[^>]+>)/g,
+    `$1v${currentVersion}$2`
+  );
+
+  // Normalizar enlaces de descarga a rutas canónicas /releases/latest/
+  assembled = assembled.replace(
+    /href="\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.exe"/g,
+    'href="/releases/latest/Bentian-Setup.exe"'
   );
   assembled = assembled.replace(
-    /(<span id="hero-version-tag">)Release Oficial v[0-9.]+ para Windows x64(<\/span>)/g,
-    `$1Release Oficial v${currentVersion} para Windows x64$2`
+    /href="\/releases\/v[0-9.]+\/Bentian-Setup-v[0-9.]+\.zip"/g,
+    'href="/releases/latest/Bentian-Setup.zip"'
+  );
+  assembled = assembled.replace(
+    /href="\/releases\/v[0-9.]+\/BentianAgent-v[0-9.]+-Portable\.zip"/g,
+    'href="/releases/latest/BentianAgent-Portable.zip"'
   );
 
   // 6. Normalizar saltos de línea consistentes
@@ -102,11 +149,16 @@ export function buildLanding(): void {
     'href="/css/styles.css"',
     'src="/js/tailwind.config.js"',
     'src="/js/checkout.js"',
+    'src="/js/version-sync.js"',
     'src="/js/releases.js"',
     'src="/js/simulator.js"',
     'id="btn-hero-download"',
     'id="btn-agent-exe"',
     'id="btn-simulate-sync"',
+    'data-app-version',
+    'data-download-installer',
+    'data-download-zip',
+    'data-download-portable',
     'data-brand-name',
     'data-product-name'
   ];
