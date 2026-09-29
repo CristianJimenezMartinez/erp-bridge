@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
-import { LicenseService } from '@erp-bridge/core';
+import { LicenseService, DatabaseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService } from './auth.router';
 import { MailerService } from '../services/mailer.service';
@@ -54,6 +54,24 @@ export const CATALOG_PLANS: PlanDefinition[] = [
       'Centro de Control Local nativo y System Tray permanente',
       'Prueba de 14 días gratis sin tarjeta',
       'Actualizaciones continuas y soporte técnico por email',
+    ],
+  },
+  {
+    id: 'partner_reseller_annual',
+    name: 'Licencia Cliente Final (Tarifa Distribuidor Partner -25%)',
+    priceEur: 186.75,
+    billingCycle: 'annual',
+    mode: 'subscription',
+    popular: false,
+    seats: 1,
+    storesIncluded: 1,
+    description: 'Tarifa mayorista para agencias y partners B2B acreditados. Margen directo del 25% retenido en origen.',
+    features: [
+      'Licencia Base Completa para 1 cliente final',
+      'Descuento del 25% directo de distribuidor ya aplicado (186,75 € vs 249,00 €)',
+      'Asignación automática a la cartera del partner',
+      'Sincronización ilimitada Factusol ⇄ WooCommerce / PrestaShop',
+      'Soporte técnico prioritario de segundo nivel para el partner',
     ],
   },
   {
@@ -180,6 +198,7 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       const params = new URLSearchParams();
       params.append('mode', matchedPlan.mode);
       params.append('customer_email', email);
+      params.append('allow_promotion_codes', 'true');
       params.append('success_url', successUrl.includes('{CHECKOUT_SESSION_ID}') ? successUrl : `${successUrl}&session_id={CHECKOUT_SESSION_ID}`);
       params.append('cancel_url', cancelUrl);
       params.append('metadata[organizationId]', orgId);
@@ -189,10 +208,18 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       params.append('metadata[maxActivations]', String(safeActivations));
       params.append('metadata[storesIncluded]', String(matchedPlan.storesIncluded || 1));
 
+      const partnerCode = (req.body.partnerCode || req.body.ref || req.query['ref'] || '') as string;
+      if (partnerCode) {
+        params.append('metadata[resellerId]', String(partnerCode).trim().toUpperCase());
+      }
+
       if (isSubscription) {
         params.append('subscription_data[metadata][organizationId]', orgId);
         params.append('subscription_data[metadata][planId]', matchedPlan.id);
         params.append('subscription_data[metadata][maxActivations]', String(safeActivations));
+        if (partnerCode) {
+          params.append('subscription_data[metadata][resellerId]', String(partnerCode).trim().toUpperCase());
+        }
       }
 
       // Línea de producto
@@ -421,6 +448,23 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${alias}]`);
         } else {
           logger.info(`✓ Licencia ${license.key} ya existente para ${customerEmail}. Reutilizando sin duplicar.`);
+        }
+
+        // Vincular al Partner si la compra vino referida por código PT-XXXX
+        const resellerId = session.metadata?.resellerId || null;
+        if (resellerId) {
+          try {
+            const db = DatabaseService.getInstance();
+            if (db.isAvailable()) {
+              await db.query(
+                `UPDATE organizations SET reseller_id = $1 WHERE id = $2`,
+                [resellerId, organizationId]
+              );
+              logger.info(`✓ Organización ${organizationId} vinculada al Partner ${resellerId}`);
+            }
+          } catch (dbErr) {
+            logger.warn('Aviso al vincular reseller_id en base de datos:', { err: String(dbErr) });
+          }
         }
 
         // Despacho de email transaccional de bienvenida y entrega de clave (a coste cero)
