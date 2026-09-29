@@ -119,29 +119,35 @@ namespace Bentian.Tray
                     }
                 }
 
-                IntPtr fg = GetForegroundWindow();
-                IWin32Window owner = (fg != IntPtr.Zero) ? new WindowWrapper(fg) : null;
-
-                using (var dialog = new OpenFileDialog())
+                using (var owner = new Form())
                 {
-                    dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
-                    dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
-                    dialog.CheckFileExists = true;
-                    dialog.RestoreDirectory = true;
-                    dialog.AutoUpgradeEnabled = true;
+                    owner.ShowInTaskbar = false;
+                    owner.WindowState = FormWindowState.Minimized;
+                    owner.TopMost = true;
+                    IntPtr h = owner.Handle; // Fuerza la creación del handle Win32 nativo sin invocar .Show()
+                    ForceForeground(h);
 
-                    if (!string.IsNullOrEmpty(initialDir))
+                    using (var dialog = new OpenFileDialog())
                     {
-                        dialog.InitialDirectory = initialDir;
-                    }
-                    if (!string.IsNullOrEmpty(initialFileName))
-                    {
-                        dialog.FileName = initialFileName;
-                    }
+                        dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
+                        dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
+                        dialog.CheckFileExists = true;
+                        dialog.RestoreDirectory = true;
+                        dialog.AutoUpgradeEnabled = true;
 
-                    if (dialog.ShowDialog(owner) == DialogResult.OK)
-                    {
-                        Console.WriteLine(dialog.FileName);
+                        if (!string.IsNullOrEmpty(initialDir))
+                        {
+                            dialog.InitialDirectory = initialDir;
+                        }
+                        if (!string.IsNullOrEmpty(initialFileName))
+                        {
+                            dialog.FileName = initialFileName;
+                        }
+
+                        if (dialog.ShowDialog(owner) == DialogResult.OK)
+                        {
+                            Console.WriteLine(dialog.FileName);
+                        }
                     }
                 }
                 return;
