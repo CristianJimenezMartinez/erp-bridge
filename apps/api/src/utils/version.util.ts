@@ -50,7 +50,7 @@ export function getLatestReleasedVersion(): string {
   }
 
   // 3. Fallback de contingencia (última versión conocida)
-  return '0.3.2';
+  return '0.3.3';
 }
 
 export function getLatestInstallerUrl(): string {

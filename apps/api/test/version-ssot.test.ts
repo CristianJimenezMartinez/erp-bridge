@@ -16,7 +16,7 @@ async function testVersionSSoT() {
   console.log('  -> Test 1: Verificar función centralizada getLatestReleasedVersion()...');
   const ver = getLatestReleasedVersion();
   assert.ok(ver, 'La versión retornada no debe ser vacía');
-  assert.strictEqual(ver, '0.3.2', 'La versión canónica actual debe ser 0.3.2');
+  assert.strictEqual(ver, '0.3.3', 'La versión canónica actual debe ser 0.3.3');
   console.log(`  ✓ Versión detectada correctamente: v${ver}`);
 
   // 2. Verificar URLs canónicas
@@ -44,6 +44,7 @@ async function testVersionSSoT() {
   assert.ok(dashHtml.includes('data-download-installer'), 'Dashboard debe incluir data-download-installer');
   assert.ok(dashHtml.includes('/js/version-sync.js'), 'Dashboard debe cargar version-sync.js');
   assert.ok(!dashHtml.includes('Bentian-Setup-v0.3.2.exe'), 'Dashboard no debe contener nombres hardcodeados con versión en enlaces');
+  assert.ok(!dashHtml.includes('Bentian-Setup-v0.3.3.exe'), 'Dashboard no debe contener nombres hardcodeados con versión en enlaces');
   console.log('  ✓ Dashboard verificado con cero hardcoding de versiones.');
 
   // 5. Verificar script de sincronización cliente version-sync.js

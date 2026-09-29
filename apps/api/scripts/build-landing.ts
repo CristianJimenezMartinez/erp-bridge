@@ -49,7 +49,7 @@ export function getCanonicalVersion(): string {
     } catch {}
   }
 
-  return '0.3.2';
+  return '0.3.3';
 }
 
 export function assembleLandingPage(): string {
