@@ -11,15 +11,19 @@ export function findBrowserAppExecutable(): string | null {
   const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
 
   const candidatePaths = [
-    // 1. Microsoft Edge (presente en 100% de Windows 10/11)
-    path.join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-    path.join(programFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-    path.join(localAppData, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-
-    // 2. Google Chrome (alternativa popular)
+    // 1. Google Chrome (prioridad para modo app nativo sin barra de navegación)
     path.join(programFiles, 'Google', 'Chrome', 'Application', 'chrome.exe'),
     path.join(programFilesX86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
     path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+
+    // 2. Microsoft Edge (presente en Windows 10/11)
+    path.join(programFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+    path.join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+    path.join(localAppData, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+
+    // 3. Brave Browser
+    path.join(programFiles, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
+    path.join(localAppData, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
   ];
 
   for (const p of candidatePaths) {
@@ -34,8 +38,8 @@ export function findBrowserAppExecutable(): string | null {
 let lastOpenedAt = 0;
 
 /**
- * Lanza la interfaz de Bentian Agent en una ventana nativa de escritorio
- * sin barra de direcciones ni pestañas (modo cromeless app).
+ * Lanza la interfaz de Bentian Agent en una ventana nativa de escritorio exclusiva
+ * sin barra de direcciones, sin pestañas y con marco de aplicación independiente.
  */
 export function openDesktopWindow(url: string): boolean {
   if (process.env['HEADLESS'] === 'true') {
@@ -52,6 +56,25 @@ export function openDesktopWindow(url: string): boolean {
 
   try {
     if (process.platform === 'win32') {
+      const browserExe = findBrowserAppExecutable();
+      if (browserExe) {
+        try {
+          logger.info(`Lanzando ventana de escritorio nativa independiente con: ${browserExe}`);
+          const child = childProcess.spawn(
+            browserExe,
+            [`--app=${url}`, '--new-window', '--window-size=1180,820'],
+            {
+              detached: true,
+              stdio: 'ignore',
+            }
+          );
+          child.unref();
+          return true;
+        } catch (spawnErr) {
+          logger.warn('Fallo al invocar modo app en browserExe:', { err: String(spawnErr) });
+        }
+      }
+
       logger.info('Abriendo interfaz de Bentian en el navegador del usuario...');
       childProcess.exec(`start "" "${url}"`);
       return true;
