@@ -81,7 +81,7 @@ async function uploadReleases(options = {}) {
     conn.on('ready', async () => {
       try {
         console.log('>>> [1/4] Creando directorios remotos en el servidor...');
-        await runSshCommand(conn, `mkdir -p "${remoteVersionDir}" "${remoteLatestDir}" "${remotePublicDir}" "${remotePublicDir}/assets" "${remotePublicDir}/dashboard"`);
+        await runSshCommand(conn, `mkdir -p "${remoteVersionDir}" "${remoteLatestDir}" "${remotePublicDir}" "${remotePublicDir}/assets" "${remotePublicDir}/dashboard" "${remotePublicDir}/dashboard/js" "${remotePublicDir}/css" "${remotePublicDir}/js"`);
         console.log('    ✓ Directorios remotos verificados.');
 
         console.log('>>> [2/4] Abriendo canal SFTP seguro...');
@@ -117,19 +117,33 @@ async function uploadReleases(options = {}) {
               });
             }
 
-            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard/index.html, assets)
+            // Archivos públicos (index.html, robots.txt, sitemap.xml, dashboard, assets, css, js)
             const localPublicDir = path.resolve(__dirname, '../apps/api/public');
             if (fs.existsSync(localPublicDir)) {
               const publicFiles = [
                 'index.html',
                 'robots.txt',
                 'sitemap.xml',
+                'favicon.ico',
                 'dashboard/index.html',
+                'dashboard/favicon.ico',
+                'dashboard/js/utils.js',
+                'dashboard/js/auth.js',
+                'dashboard/js/licenses.js',
+                'dashboard/js/fleet.js',
+                'dashboard/js/organizations.js',
+                'dashboard/js/audit-errors.js',
+                'dashboard/js/navigation.js',
                 'assets/og-preview.png',
                 'assets/icon-256.png',
                 'assets/icon.png',
                 'assets/icon.svg',
-                'assets/icon.ico'
+                'assets/icon.ico',
+                'css/styles.css',
+                'js/tailwind.config.js',
+                'js/checkout.js',
+                'js/releases.js',
+                'js/simulator.js'
               ];
               for (const pf of publicFiles) {
                 const localPf = path.join(localPublicDir, pf);
