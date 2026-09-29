@@ -3,6 +3,11 @@ import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
 import { renderDashboardHtml } from '../../ui-template';
 import { openDesktopWindow } from '../../window-launcher';
+import {
+  OFFICIAL_BENTIAN_SVG,
+  OFFICIAL_MANIFEST_JSON,
+  getOfficialIconBuffer,
+} from '../../assets/icon-data';
 
 const logger = new Logger('SystemController');
 
@@ -120,6 +125,42 @@ export class SystemController {
         } catch {}
         process.exit(0);
       }, 300);
+    };
+  }
+
+  public static serveFavicon(): RouteHandler {
+    const icoBuf = getOfficialIconBuffer();
+    return (_req, res) => {
+      res.writeHead(200, {
+        'Content-Type': 'image/x-icon',
+        'Content-Length': icoBuf.length,
+        'Cache-Control': 'public, max-age=86400',
+      });
+      res.end(icoBuf);
+    };
+  }
+
+  public static serveManifest(): RouteHandler {
+    const manifestBuf = Buffer.from(OFFICIAL_MANIFEST_JSON, 'utf-8');
+    return (_req, res) => {
+      res.writeHead(200, {
+        'Content-Type': 'application/manifest+json; charset=utf-8',
+        'Content-Length': manifestBuf.length,
+        'Cache-Control': 'public, max-age=86400',
+      });
+      res.end(manifestBuf);
+    };
+  }
+
+  public static serveIcon(): RouteHandler {
+    const svgBuf = Buffer.from(OFFICIAL_BENTIAN_SVG, 'utf-8');
+    return (_req, res) => {
+      res.writeHead(200, {
+        'Content-Type': 'image/svg+xml; charset=utf-8',
+        'Content-Length': svgBuf.length,
+        'Cache-Control': 'public, max-age=86400',
+      });
+      res.end(svgBuf);
     };
   }
 }

@@ -11,15 +11,15 @@ export function findBrowserAppExecutable(): string | null {
   const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
 
   const candidatePaths = [
-    // 1. Google Chrome (prioridad para modo app nativo sin barra de navegación)
-    path.join(programFiles, 'Google', 'Chrome', 'Application', 'chrome.exe'),
-    path.join(programFilesX86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
-    path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
-
-    // 2. Microsoft Edge (presente en Windows 10/11)
+    // 1. Microsoft Edge (prioridad #1 en Windows 10/11: ventana aislada nativa de escritorio independiente, sin interferir con pestañas de Chrome)
     path.join(programFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
     path.join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
     path.join(localAppData, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+
+    // 2. Google Chrome (fallback para modo app nativo)
+    path.join(programFiles, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    path.join(programFilesX86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
 
     // 3. Brave Browser
     path.join(programFiles, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
@@ -189,29 +189,20 @@ export async function openWindowsFileDialog(
       'Add-Type @"',
       'using System;',
       'using System.Runtime.InteropServices;',
-      'public class WinFocus {',
-      '    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);',
-      '    [DllImport("user32.dll")] public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);',
-      '    public static void Force(IntPtr h) {',
+      'using System.Windows.Forms;',
+      'public class WinOwner : IWin32Window {',
+      '    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();',
+      '    private IntPtr _h;',
+      '    public WinOwner(IntPtr h) { _h = h; }',
+      '    public IntPtr Handle { get { return _h; } }',
+      '    public static WinOwner Current() {',
       '        try {',
-      '            keybd_event(0x12, 0, 0, 0);',
-      '            keybd_event(0x12, 0, 2, 0);',
-      '            SetForegroundWindow(h);',
-      '        } catch {}',
+      '            IntPtr h = GetForegroundWindow();',
+      '            return (h != IntPtr.Zero) ? new WinOwner(h) : null;',
+      '        } catch { return null; }',
       '    }',
       '}',
       '"@;',
-      '$f = New-Object System.Windows.Forms.Form;',
-      '$f.Text = "Bentian ERP Bridge";',
-      '$f.StartPosition = "Manual";',
-      '$f.Location = New-Object System.Drawing.Point(-32000, -32000);',
-      '$f.Size = New-Object System.Drawing.Size(0, 0);',
-      '$f.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None;',
-      '$f.ShowInTaskbar = $false;',
-      '$f.Opacity = 0;',
-      '$f.TopMost = $true;',
-      '$f.Show();',
-      '[WinFocus]::Force($f.Handle);',
       '$d = New-Object System.Windows.Forms.OpenFileDialog;',
       `$d.Title = '${title.replace(/'/g, "''")}';`,
       `$d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*';`,
@@ -219,9 +210,10 @@ export async function openWindowsFileDialog(
       '$d.RestoreDirectory = $true;',
       '$d.AutoUpgradeEnabled = $true;',
       initialDirPs,
-      'if ($d.ShowDialog($f) -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) };',
+      '$owner = [WinOwner]::Current();',
+      'if ($owner) { $res = $d.ShowDialog($owner) } else { $res = $d.ShowDialog() };',
+      'if ($res -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($d.FileName) };',
       '$d.Dispose();',
-      '$f.Dispose();',
     ].join(' ');
 
     const output = await new Promise<string>((resolve) => {

@@ -89,9 +89,15 @@ async function buildAgentBundle(options = {}) {
     throw new Error('Fallo al empaquetar el agente');
   }
 
-  // Copiar el archivo auxiliar adodb.js requerido para consultas OLEDB de Access
-  console.log('[4/4] Copiando componente adodb.js y plantilla agent-config.json junto al bundle...');
+  // Copiar los archivos auxiliares adodb.js e icon.ico junto al bundle
+  console.log('[4/4] Copiando componentes adodb.js, icon.ico y plantilla agent-config.json junto al bundle...');
   fs.copyFileSync(adodbSource, adodbDest);
+
+  const iconSource = path.resolve(rootDir, 'apps/agent/src/gui/assets/icon.ico');
+  const iconDest = path.resolve(outDir, 'icon.ico');
+  if (fs.existsSync(iconSource)) {
+    fs.copyFileSync(iconSource, iconDest);
+  }
 
   const configDest = path.resolve(outDir, 'agent-config.json');
   // SIEMPRE forzar la regeneración de un agent-config.json limpio sin rutas hardcodeadas ni nombres de máquina

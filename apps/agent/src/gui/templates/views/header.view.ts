@@ -1,8 +1,13 @@
 export function renderHeader(): string {
   return `    <!-- Header -->
     <header class="header">
-      <div class="header-title" id="header-page-title">
-        <span>Estado General</span>
+      <div class="header-title" id="header-page-title" style="display:flex;align-items:center;gap:10px;">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:3px 10px 3px 6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;">
+          <img src="/api/local/icon" width="18" height="18" alt="Bentian" style="border-radius:4px;display:block;" />
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:#c7d2fe;text-transform:uppercase;">Bentian</span>
+        </div>
+        <span style="color:var(--text-muted);font-weight:400;font-size:13px;">/</span>
+        <span style="font-weight:600;font-size:15px;color:#f3f4f6;">Estado General</span>
       </div>
       <div class="header-actions">
         <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:9999px;font-size:11px;font-weight:500;color:#10b981;">

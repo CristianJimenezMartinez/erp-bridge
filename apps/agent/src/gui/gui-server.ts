@@ -82,12 +82,24 @@ export class LocalGuiServer {
     router.any(['GET', 'POST'], '/api/local/open-gui', SystemController.openWindow(() => this.getUrl()));
     router.post('/api/local/shutdown', SystemController.shutdown(this.agent, () => this.stop()));
 
+    // 8. Visual Identity, Favicon & Web App Manifest (Barra de tareas e icono de ventana)
+    router.get('/favicon.ico', SystemController.serveFavicon());
+    router.get('/manifest.json', SystemController.serveManifest());
+    router.get('/api/local/icon', SystemController.serveIcon());
+
     return router;
   }
 
   public async start(): Promise<{ port: number; url: string }> {
+    const fixedPort = this.defaultPort; // 39281 estricto e inmutable
+    const maxRetries = 8;
+    const retryDelayMs = 500;
+
     return new Promise((resolve, reject) => {
-      const tryListen = (portToTry: number) => {
+      let attempt = 0;
+
+      const attemptListen = () => {
+        attempt++;
         const srv = http.createServer((req, res) => {
           this.router.handle(req, res);
         });
@@ -101,29 +113,28 @@ export class LocalGuiServer {
 
         srv.once('error', (err: NodeJS.ErrnoException) => {
           if (err.code === 'EADDRINUSE') {
-            logger.warn(`Puerto ${portToTry} ocupado. Intentando siguiente puerto disponible...`);
-            if (portToTry === this.defaultPort) {
-              tryListen(this.defaultPort + 1);
-            } else {
-              tryListen(0);
+            if (attempt <= maxRetries) {
+              logger.info(`Puerto ${fixedPort} en uso/TIME_WAIT (intento ${attempt}/${maxRetries}). Reintentando en ${retryDelayMs}ms...`);
+              setTimeout(attemptListen, retryDelayMs);
+              return;
             }
+            logger.error(`Puerto ${fixedPort} ocupado tras ${maxRetries} intentos. Prohibido saltar de puerto.`);
+            reject(new Error(`Puerto ${fixedPort} bloqueado por otro proceso.`));
           } else {
             reject(err);
           }
         });
 
-        srv.listen(portToTry, '127.0.0.1', () => {
-          const addr = srv.address();
-          const port = typeof addr === 'object' && addr ? addr.port : portToTry;
-          this.activePort = port;
+        srv.listen(fixedPort, '127.0.0.1', () => {
+          this.activePort = fixedPort;
           this.server = srv;
-          const url = `http://127.0.0.1:${port}`;
-          logger.info(`✓ Servidor de interfaz gráfica local escuchando en: ${url}`);
-          resolve({ port, url });
+          const url = `http://127.0.0.1:${fixedPort}`;
+          logger.info(`✓ Servidor de interfaz gráfica local escuchando en puerto blindado: ${url}`);
+          resolve({ port: fixedPort, url });
         });
       };
 
-      tryListen(this.defaultPort);
+      attemptListen();
     });
   }
 

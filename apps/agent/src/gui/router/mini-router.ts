@@ -88,7 +88,8 @@ export class MiniRouter {
       return;
     }
 
-    const route = this.routes.find((r) => r.method === method && r.path === pathname);
+    const matchMethod = method === 'HEAD' ? 'GET' : method;
+    const route = this.routes.find((r) => r.method === matchMethod && r.path === pathname);
     if (!route) {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Endpoint no encontrado' }));

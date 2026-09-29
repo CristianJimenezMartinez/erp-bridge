@@ -212,6 +212,7 @@ async function runMasterBuild() {
   const targetExe = path.resolve(versionReleaseDir, 'BentianAgent.exe');
   const targetAdodb = path.resolve(versionReleaseDir, 'adodb.js');
   const targetTray = path.resolve(versionReleaseDir, 'BentianTray.exe');
+  const targetIcon = path.resolve(versionReleaseDir, 'icon.ico');
 
   fs.copyFileSync(exeResult.exePath, targetExe);
   fs.copyFileSync(exeResult.adodbPath, targetAdodb);
@@ -219,6 +220,11 @@ async function runMasterBuild() {
   const sourceTray = exeResult.trayPath || path.resolve(distDir, 'BentianTray.exe');
   if (fs.existsSync(sourceTray)) {
     fs.copyFileSync(sourceTray, targetTray);
+  }
+
+  const sourceIcon = path.resolve(distDir, 'icon.ico');
+  if (fs.existsSync(sourceIcon)) {
+    fs.copyFileSync(sourceIcon, targetIcon);
   }
 
   // 5. Empaquetar archivos ZIP
@@ -236,6 +242,9 @@ async function runMasterBuild() {
   const portableFiles = [targetExe, targetAdodb];
   if (fs.existsSync(targetTray)) {
     portableFiles.push(targetTray);
+  }
+  if (fs.existsSync(targetIcon)) {
+    portableFiles.push(targetIcon);
   }
   console.log(`  📦 Generando Paquete Portable en ZIP: BentianAgent-v${version}-Portable.zip...`);
   createZipArchive(portableFiles, portableZipPath);

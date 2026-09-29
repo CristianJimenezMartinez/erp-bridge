@@ -40,7 +40,11 @@ async function buildExecutable(options = {}) {
   fs.copyFileSync(process.execPath, exePath);
 
   // Inyectar icono personalizado y metadatos de producto ANTES de postject
+  const iconSource = path.resolve(builderDir, '../apps/agent/src/gui/assets/icon.ico');
   const iconPath = path.resolve(distDir, 'icon.ico');
+  if (!fs.existsSync(iconPath) && fs.existsSync(iconSource)) {
+    fs.copyFileSync(iconSource, iconPath);
+  }
   applyCustomIconAndMetadata(exePath, iconPath);
 
   console.log('[5/5] Inyectando blob en BentianAgent.exe mediante postject...');

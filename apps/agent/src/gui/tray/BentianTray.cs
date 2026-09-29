@@ -25,6 +25,15 @@ namespace Bentian.Tray
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
@@ -35,6 +44,14 @@ namespace Bentian.Tray
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_SHOWWINDOW = 0x0040;
+        private const int SW_RESTORE = 9;
+
+        internal class WindowWrapper : IWin32Window
+        {
+            private readonly IntPtr _hwnd;
+            public WindowWrapper(IntPtr handle) { _hwnd = handle; }
+            public IntPtr Handle { get { return _hwnd; } }
+        }
 
         private static void ForceForeground(IntPtr hWnd)
         {
@@ -102,41 +119,45 @@ namespace Bentian.Tray
                     }
                 }
 
-                using (var owner = new Form())
+                IntPtr fg = GetForegroundWindow();
+                IWin32Window owner = (fg != IntPtr.Zero) ? new WindowWrapper(fg) : null;
+
+                using (var dialog = new OpenFileDialog())
                 {
-                    owner.Text = "Bentian ERP Bridge";
-                    owner.StartPosition = FormStartPosition.Manual;
-                    owner.Location = new Point(-32000, -32000);
-                    owner.Size = new Size(0, 0);
-                    owner.FormBorderStyle = FormBorderStyle.None;
-                    owner.ShowInTaskbar = false;
-                    owner.Opacity = 0;
-                    owner.TopMost = true;
-                    owner.Show();
-                    ForceForeground(owner.Handle);
+                    dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
+                    dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
+                    dialog.CheckFileExists = true;
+                    dialog.RestoreDirectory = true;
+                    dialog.AutoUpgradeEnabled = true;
 
-                    using (var dialog = new OpenFileDialog())
+                    if (!string.IsNullOrEmpty(initialDir))
                     {
-                        dialog.Title = "Seleccionar Base de Datos Factusol (Local o NAS / Red)";
-                        dialog.Filter = "Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb|Todos los archivos (*.*)|*.*";
-                        dialog.CheckFileExists = true;
-                        dialog.RestoreDirectory = true;
-                        dialog.AutoUpgradeEnabled = true;
-
-                        if (!string.IsNullOrEmpty(initialDir))
-                        {
-                            dialog.InitialDirectory = initialDir;
-                        }
-                        if (!string.IsNullOrEmpty(initialFileName))
-                        {
-                            dialog.FileName = initialFileName;
-                        }
-
-                        if (dialog.ShowDialog(owner) == DialogResult.OK)
-                        {
-                            Console.WriteLine(dialog.FileName);
-                        }
+                        dialog.InitialDirectory = initialDir;
                     }
+                    if (!string.IsNullOrEmpty(initialFileName))
+                    {
+                        dialog.FileName = initialFileName;
+                    }
+
+                    if (dialog.ShowDialog(owner) == DialogResult.OK)
+                    {
+                        Console.WriteLine(dialog.FileName);
+                    }
+                }
+                return;
+            }
+
+            if (args.Length > 0 && args[0] == "--bring-to-front")
+            {
+                IntPtr hWnd = FindWindow(null, "Bentian ERP Bridge — Centro de Control Local");
+                if (hWnd == IntPtr.Zero)
+                {
+                    hWnd = FindWindow(null, "Bentian ERP Bridge");
+                }
+                if (hWnd != IntPtr.Zero)
+                {
+                    ShowWindow(hWnd, SW_RESTORE);
+                    ForceForeground(hWnd);
                 }
                 return;
             }
