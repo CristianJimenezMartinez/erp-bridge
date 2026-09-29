@@ -64,8 +64,7 @@ flowchart TD
 ### Módulos Adicionales y Puestos Extra (Add-ons)
 
 - **Puesto Adicional / Terminal Extra:** **49 € / año (+ IVA) por equipo.**
-  - Ideal para empresas donde Factusol se ejecuta en varios ordenadores en red local o servidor de Terminal Server / Escritorio Remoto y se desea supervisar o ejecutar agentes adicionales.
-- **Tienda Web Adicional (Multitienda B2B / B2C):** Consúltanos para enlazar dos o más tiendas online distintas a la misma empresa de Factusol.
+- **Segunda Tienda Online (Mismo CIF - B2B / B2C):** Cada tienda online conectada requiere 1 Licencia Base independiente para garantizar su canal y sincronización aislada. Las empresas que enlacen una segunda tienda bajo el mismo CIF disfrutan de un **20% de descuento por fidelización** en la 2ª licencia base. Contacta con soporte para emitir tu cupón.
 
 ---
 

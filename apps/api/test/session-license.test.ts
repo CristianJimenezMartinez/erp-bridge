@@ -42,6 +42,21 @@ async function testSessionLicenseOnboarding() {
     assert.strictEqual(verification.payload?.sub, json2.licenseKey);
     console.log('  ✓ Test 2 superado (Licencia y JWT TENANT_CLIENT emitidos correctamente).');
 
+    // 3. Caso intento de compra de add-on descontinuado (debe responder 400)
+    console.log('  -> Test 3: Solicitud de checkout con addon_extra_store_annual (debe responder 400)');
+    const res3 = await fetch(`${baseUrl}/billing/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: 'addon_extra_store_annual',
+        email: 'agencia-arbitraje@test.es',
+      }),
+    });
+    assert.strictEqual(res3.status, 400, 'Debe devolver 400 si se intenta contratar un add-on descontinuado');
+    const json3 = await res3.json() as any;
+    assert.strictEqual(json3.error?.code, 'ADDON_STORE_DISCONTINUED');
+    console.log('  ✓ Test 3 superado (400 ADDON_STORE_DISCONTINUED verificado).');
+
     console.log('======================================================================');
     console.log('🎉 TODOS LOS TESTS DE ONBOARDING STRIPE PASARON CON ÉXITO');
     console.log('======================================================================');

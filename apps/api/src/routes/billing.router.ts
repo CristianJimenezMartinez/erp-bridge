@@ -75,35 +75,6 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     ],
   },
   {
-    id: 'addon_extra_store_annual',
-    name: 'Add-on Tienda Extra (Anual)',
-    priceEur: 99,
-    billingCycle: 'annual',
-    mode: 'subscription',
-    seats: 0,
-    storesIncluded: 1,
-    description: '+1 Conexión de Tienda Online adicional (ej. WooCommerce B2B + Shopify B2C).',
-    features: [
-      '+1 Tienda Online conectada al mismo ERP',
-      'Sincronización simultánea multi-tienda',
-      'Filtrado por almacenes y tarifas específicas por tienda',
-    ],
-  },
-  {
-    id: 'addon_extra_store_monthly',
-    name: 'Add-on Tienda Extra (Mensual)',
-    priceEur: 12,
-    billingCycle: 'monthly',
-    mode: 'subscription',
-    seats: 0,
-    storesIncluded: 1,
-    description: '+1 Tienda Online adicional con facturación mensual.',
-    features: [
-      '+1 Tienda Online conectada al mismo ERP',
-      'Cancelable mensualmente',
-    ],
-  },
-  {
     id: 'setup_assisted',
     name: 'Puesta en Marcha Asistida (Setup One-Off)',
     priceEur: 99,
@@ -168,13 +139,23 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       return res.status(400).json({ error: { message: 'El parámetro email es obligatorio para generar la suscripción.' } });
     }
 
+    // Blindaje comercial: El Add-on Tienda Extra fue retirado para evitar arbitraje y subarriendo no autorizado.
+    if (plan && (plan.startsWith('addon_extra_store') || plan.startsWith('addon_'))) {
+      return res.status(400).json({
+        error: {
+          code: 'ADDON_STORE_DISCONTINUED',
+          message: 'La política oficial de Bentian ERP Bridge establece 1 Licencia Base por cada Tienda Online conectada. Para sincronizar múltiples tiendas o entornos multiempresa, adquiere una Licencia Base adicional o contacta con soporte.'
+        }
+      });
+    }
+
     // Normalizar identificador de plan
     let matchedPlan = CATALOG_PLANS.find(p => p.id === plan);
     if (!matchedPlan) {
       if (billingCycle === 'monthly' || plan === 'base_monthly' || plan === 'monthly') {
         matchedPlan = CATALOG_PLANS[1]!;
       } else if (plan === 'setup' || plan === 'setup_assisted') {
-        matchedPlan = CATALOG_PLANS[4]!;
+        matchedPlan = CATALOG_PLANS[2]!;
       } else {
         matchedPlan = CATALOG_PLANS[0]!; // Por defecto Plan Base Anual
       }
@@ -204,13 +185,14 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       params.append('metadata[organizationId]', orgId);
       params.append('metadata[planId]', matchedPlan.id);
       params.append('metadata[planName]', matchedPlan.name);
-      params.append('metadata[maxActivations]', String(matchedPlan.seats || 1));
+      const safeActivations = typeof matchedPlan.seats === 'number' && matchedPlan.seats > 0 ? matchedPlan.seats : 1;
+      params.append('metadata[maxActivations]', String(safeActivations));
       params.append('metadata[storesIncluded]', String(matchedPlan.storesIncluded || 1));
 
       if (isSubscription) {
         params.append('subscription_data[metadata][organizationId]', orgId);
         params.append('subscription_data[metadata][planId]', matchedPlan.id);
-        params.append('subscription_data[metadata][maxActivations]', String(matchedPlan.seats || 1));
+        params.append('subscription_data[metadata][maxActivations]', String(safeActivations));
       }
 
       // Línea de producto
@@ -426,6 +408,10 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
 
         if (!license) {
+          if (planId.startsWith('addon_')) {
+            logger.warn(`Alerta de seguridad: Intento de generar licencia base mediante add-on huérfano (${planId}) para ${customerEmail}. Operación bloqueada.`);
+            return res.status(400).json({ error: { message: 'No se permite generar una licencia base a partir de un add-on huérfano.' } });
+          }
           license = await licenseService.createLicense({
             organizationId,
             plan: 'professional', // Mapeo de compatibilidad con schema DB existente
@@ -606,6 +592,12 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
     let license = existingLicenses.length > 0 ? existingLicenses[0]! : null;
 
     if (!license) {
+      if (planId.startsWith('addon_')) {
+        logger.warn(`Alerta de seguridad: Intento de onboarding post-checkout con add-on huérfano (${planId}) para ${customerEmail}.`);
+        return res.status(400).json({
+          error: { code: 'ORPHAN_ADDON_NOT_ALLOWED', message: 'Un add-on requiere disponer previamente de una Licencia Base activa.' }
+        });
+      }
       logger.info(`Creando licencia on-demand tras validación de sesión ${sessionId} para ${customerEmail}`);
       license = await licenseService.createLicense({
         organizationId,

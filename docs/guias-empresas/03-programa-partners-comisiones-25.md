@@ -157,7 +157,17 @@ Uno de los mayores temores de los informáticos y distribuidores al prescribir s
 
 ---
 
-## 8. RESUMEN: CÓMO EMPEZAR HOY
+## 8. REGLA DE TRANSPARENCIA Y NO SUBARRIENDO (1 TIENDA = 1 LICENCIA)
+
+Para mantener la máxima transparencia, cumplir estrictamente con el RGPD y proteger los ingresos de todos los partners autorizados:
+
+* **1 Tienda Online = 1 Licencia Base:** Cada tienda online de cada cliente final debe disponer de su propia Licencia Base registrada bajo el CIF/NIF de su empresa titular.
+* **Prohibición estricta de subarriendo o reventa encubierta:** Queda terminantemente prohibido intentar conectar tiendas de diferentes empresas o clientes finales a una misma licencia. Dicha práctica vulnera el RGPD (acceso indebido a datos personales cruzados de clientes), invalida el soporte técnico y es motivo de revocación inmediata de la condición de partner.
+* **Maximización de comisiones para el Partner:** El canal oficial premia al distribuidor con el **25% neto y recurrente** por cada empresa dada de alta, asegurando que cuantas más empresas conectes, mayor será tu cartera pasiva anual garantizada.
+
+---
+
+## 9. RESUMEN: CÓMO EMPEZAR HOY
 
 | Paso | Acción | Tiempo estimado |
 | :---: | :--- | :---: |
