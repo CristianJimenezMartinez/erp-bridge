@@ -24,40 +24,38 @@ Diseñados para adaptarse con precisión tanto a pequeños negocios con un únic
 
 ```mermaid
 flowchart TD
-    subgraph S["🟢 PLAN STARTER (99 € / año)"]
-        S1["1 Tienda Web (WooCommerce / Universal)"]
-        S2["1 Puesto de Factusol"]
-        S3["Sincronización Bidireccional de Stock y Pedidos"]
-        S4["Vigilante en Tiempo Real Continuo"]
+    subgraph A["🟢 PLAN BASE ANUAL (199 € / año + IVA)"]
+        A1["1 Tienda Web (WooCommerce / PrestaShop / Universal)"]
+        A2["Sincronización Centralizada (Cubre toda tu red local)"]
+        A3["Catálogo y Pedidos Ilimitados en Tiempo Real"]
+        A4["Tolerancia Offline 30 Días (Store-and-Forward)"]
+        A5["Multitarifa, Familias, Variantes y Recargo de Eq."]
+        A6["Actualizaciones Automáticas y Soporte Continuo"]
     end
-    subgraph B["🚀 PLAN BUSINESS (199 € / año)"]
-        B1["Todo lo incluido en Starter"]
-        B2["Múltiples Tarifas (PVP, Web, Oferta, Mayorista)"]
-        B3["Stock de Seguridad y Filtros Avanzados"]
-        B4["Subida Masiva de Catálogo Inicial en 1 Clic"]
-        B5["Soporte Técnico Prioritario Express (< 24h)"]
+    subgraph M["⚡ PLAN MENSUAL (29 € / mes + IVA)"]
+        M1["Mismas características completas con pago flexible mensual"]
     end
-    subgraph P["➕ PUESTOS ADICIONALES (49 € / año)"]
-        P1["Terminal o Puesto Extra para Red Local / Servidor"]
+    subgraph D["🏷️ DESCUENTO 2ª TIENDA (-20%)"]
+        D1["20% de descuento para segundas tiendas bajo el mismo CIF"]
     end
 ```
 
-### Tabla Comparativa de Características
+### Tabla Resumen de Condiciones
 
-| Característica / Capacidad | Plan Starter | Plan Business (Recomendado) |
+| Concepto | Plan Base Anual (Recomendado) | Plan Flexible Mensual |
 | :--- | :---: | :---: |
-| **Precio Anual (pago único anual)** | **99 € / año** (+ IVA) | **199 € / año** (+ IVA) |
-| **Coste equivalente al mes** | *8,25 € / mes* | *16,58 € / mes* |
-| **Tiendas Web conectadas** | 1 tienda web | 1 tienda web *(ampliable)* |
-| **Puestos de Factusol incluidos** | 1 terminal principal | 1 terminal principal *(ampliable)* |
-| **Sincronización de Stock Disponible** | ✅ Sí (Tiempo Real) | ✅ Sí (Tiempo Real) |
-| **Descarga e Inyección de Pedidos Web** | ✅ Sí (Tiempo Real) | ✅ Sí (Tiempo Real) |
-| **Vigilante Local con Autorecuperación** | ✅ Incluido | ✅ Incluido |
-| **Soporte de Múltiples Tarifas Factusol** | 1 Tarifa estándar | **Tarifa Habitual + Tarifa Oferta/Web + Mayorista** |
-| **Buffer de Stock de Seguridad** | Estándar | **Configurable por unidades mínimas** |
-| **Herramienta de Carga Inicial de Catálogo** | Manual | **✅ Subida Masiva con 1 Clic** |
-| **Actualizaciones Automáticas de Versión** | ✅ Incluidas | ✅ Incluidas |
-| **Nivel de Soporte Técnico** | Soporte Estándar por Ticket / Email | **Soporte Prioritario VIP (< 24h laborables)** |
+| **Precio** | **199 € / año** (+ IVA) | **29 € / mes** (+ IVA) |
+| **Ahorro** | **Ahorra 149 € al año** frente a cuota mensual | Máxima flexibilidad sin compromiso anual |
+| **Periodo de Prueba** | **14 Días Gratis** sin compromiso | **14 Días Gratis** sin compromiso |
+| **Tiendas Web Conectadas** | 1 tienda *(2ª tienda con 20% dto. mismo CIF)* | 1 tienda *(2ª tienda con 20% dto. mismo CIF)* |
+| **Puestos de Factusol** | **Sincronización Centralizada** (toda tu red incluida) | **Sincronización Centralizada** (toda tu red incluida) |
+| **Límite de Catálogo y Pedidos** | **Ilimitado** (sin comisiones por venta) | **Ilimitado** (sin comisiones por venta) |
+| **Sincronización de Stock Disponible** | ✅ Sí (Tiempo Real OLEDB) | ✅ Sí (Tiempo Real OLEDB) |
+| **Descarga e Inyección de Pedidos** | ✅ Sí (Tiempo Real atómico) | ✅ Sí (Tiempo Real atómico) |
+| **Soporte de Múltiples Tarifas** | ✅ Todas las tarifas de Factusol | ✅ Todas las tarifas de Factusol |
+| **Tolerancia a Caídas de Red** | ✅ Hasta 30 días offline | ✅ Hasta 30 días offline |
+| **Actualizaciones Automáticas** | ✅ Incluidas (sin coste extra) | ✅ Incluidas (sin coste extra) |
+| **Soporte Técnico Oficial** | ✅ Por email (`soporte@cristianjm.com`) | ✅ Por email (`soporte@cristianjm.com`) |
 
 ---
 
