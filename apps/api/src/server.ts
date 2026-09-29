@@ -12,7 +12,6 @@ import {
   SyncScheduler,
 } from '@erp-bridge/core';
 import { FactusolConnector } from '@erp-bridge/connector-factusol';
-import { PrestaShopConnector } from '@erp-bridge/connector-prestashop';
 import { SimplyGestConnector } from '@erp-bridge/connector-simplygest';
 import { WooCommerceConnector } from '@erp-bridge/connector-woocommerce';
 import { errorHandler } from './middleware/error.middleware';
@@ -58,7 +57,10 @@ export async function bootstrapApp(): Promise<Express> {
   // 1. Initialize & Register Connectors in Core Registry
   const registry = ConnectorRegistry.getInstance();
   registry.register(() => new FactusolConnector());
-  registry.register(() => new PrestaShopConnector());
+  try {
+    const { PrestaShopConnector } = require('@erp-bridge/connector-prestashop');
+    registry.register(() => new PrestaShopConnector());
+  } catch {}
   registry.register(() => new SimplyGestConnector());
   registry.register(() => new WooCommerceConnector());
 
