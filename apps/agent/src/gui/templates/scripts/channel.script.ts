@@ -38,9 +38,10 @@ export const channelScript = `
         cEnd.className = chks.endpointFound ? 'checklist-step ok' : 'checklist-step fail';
         cDb.className = chks.databaseReady ? 'checklist-step ok' : 'checklist-step fail';
 
-        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message;
+        const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
+        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message + timeSuffix;
         alertBox.style.color = data.success ? '#34d399' : '#f87171';
-        showToast(data.message, data.success ? 'success' : 'warn');
+        showToast(data.message + timeSuffix, data.success ? 'success' : 'warn');
       } catch (err) {
         alertBox.textContent = 'Error de comunicación local al probar conector';
         alertBox.style.color = '#f87171';
@@ -70,10 +71,11 @@ export const channelScript = `
           body: JSON.stringify({ storeUrl, consumerKey, consumerSecret })
         });
         const data = await res.json();
+        const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         alertBox.style.display = 'block';
         alertBox.style.color = data.success ? '#34d399' : '#f87171';
-        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message;
-        showToast(data.message, data.success ? 'success' : 'error');
+        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message + timeSuffix;
+        showToast(data.message + timeSuffix, data.success ? 'success' : 'error');
       } catch (err) {
         alertBox.style.display = 'block';
         alertBox.style.color = '#f87171';

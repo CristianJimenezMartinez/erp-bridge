@@ -5,17 +5,21 @@ import { CompanionGenerator } from '../../../channels';
 export class ChannelController {
   public static testWooCommerce(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const t0 = performance.now();
       const result = await agent.testWooCommerceConnection(ctx.body);
+      const durationMs = Math.round((performance.now() - t0) * 10) / 10;
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify({ ...result, durationMs }));
     };
   }
 
   public static testUniversalBridge(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const t0 = performance.now();
       const result = await agent.testUniversalBridge(ctx.body);
+      const durationMs = Math.round((performance.now() - t0) * 10) / 10;
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify({ ...result, durationMs }));
     };
   }
 

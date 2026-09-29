@@ -29,7 +29,7 @@ import {
   ConfigManager,
 } from './config';
 import { SyncHistoryRecord, HistoryManager } from './history';
-import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport } from './diagnostics';
+import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport } from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
@@ -319,6 +319,13 @@ export class LocalAgent {
       update: this.getUpdateStatus(),
       preflight,
     };
+  }
+
+  public async getLiveHealth(): Promise<LiveHealthReport> {
+    return LiveHealthService.runDiagnostics(
+      this.configManager.get(),
+      this.licenseService.getLicenseStatus()
+    );
   }
 
   // --- Métodos de Licenciamiento ---

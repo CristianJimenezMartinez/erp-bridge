@@ -276,6 +276,74 @@ async function main() {
       return;
     }
 
+    case 'health':
+    case 'diagnostics': {
+      const agent = new LocalAgent();
+      const isJson = args.includes('--json') || process.argv.includes('--json');
+      const health = await agent.getLiveHealth();
+
+      if (isJson) {
+        console.log(JSON.stringify(health, null, 2));
+        process.exitCode = health.overallStatus === 'OFFLINE' ? 1 : 0;
+        return;
+      }
+
+      console.log('\n=============================================================');
+      console.log('🩺 DIAGNÓSTICO EN VIVO DE BENTIAN DESKTOP AGENT');
+      console.log(`   Generado: ${health.timestamp} (Duración prueba: ${health.diagnosticsDurationMs} ms)`);
+      console.log(`   Estado Global: [${health.overallStatus}]`);
+      console.log('=============================================================');
+
+      console.log('\n[1] PROCESO Y RECURSOS:');
+      console.log(`    PID: ${health.process.pid} | Uptime: ${health.process.uptimeSeconds}s | CPUs: ${health.process.cpuCores}`);
+      console.log(`    Memoria RAM: ${health.process.memoryRssMb} MB (RSS) / ${health.process.memoryHeapMb} MB (Heap)`);
+
+      console.log('\n[2] BASE DE DATOS FACTUSOL:');
+      console.log(`    Ruta: ${health.factusol.path || 'No configurada'}`);
+      console.log(`    Estado: [${health.factusol.status}] | Latencia disco: ${health.factusol.latencyMs} ms | Tamaño: ${health.factusol.sizeMb} MB`);
+      if (health.factusol.lockFile.exists) {
+        console.log(`    Archivo candado: ${health.factusol.lockFile.path} (Huérfano: ${health.factusol.lockFile.isOrphan ? 'SÍ (PELIGRO)' : 'NO (en uso normal)'})`);
+      }
+      console.log(`    Detalle: ${health.factusol.message}`);
+
+      console.log('\n[3] CANAL TIENDA WEB:');
+      console.log(`    Tipo: ${health.channel.type} | URL: ${health.channel.url || 'No configurada'}`);
+      console.log(`    Alcanzable: ${health.channel.reachable ? 'SÍ' : 'NO'} | Latencia web: ${health.channel.latencyMs} ms`);
+      console.log(`    Detalle: ${health.channel.message}`);
+
+      console.log('\n[4] SERVIDOR CENTRAL & LICENCIA:');
+      console.log(`    Licencia: ${health.license.status} (Plan: ${health.license.plan || 'Ninguno'})`);
+      console.log(`    Servidor Central: ${health.license.centralApiReachable ? 'CONECTADO' : 'INACCESIBLE'} (${health.license.centralApiLatencyMs} ms)`);
+
+      console.log('\n[5] ÚLTIMOS ERRORES REGISTRADOS EN LOG (%APPDATA%\\Bentian Agent\\logs\\agent.log):');
+      if (health.recentErrors.length === 0) {
+        console.log('    ✓ Cero errores recientes en el log.');
+      } else {
+        health.recentErrors.forEach((err, idx) => {
+          console.log(`    [${idx + 1}] [${err.timestamp}] [${err.component}] ${err.action}: ${err.message}`);
+          if (err.duration_ms) console.log(`        Duración: ${err.duration_ms} ms`);
+        });
+      }
+      console.log('=============================================================\n');
+
+      process.exitCode = health.overallStatus === 'OFFLINE' ? 1 : 0;
+      return;
+    }
+
+    case 'logs': {
+      const { AgentDiskLogger } = await import('./diagnostics/disk-logger');
+      const limit = parseInt(args[1] || '30', 10);
+      const logs = AgentDiskLogger.getInstance().getRecentLogs(limit);
+      console.log(`\n📋 Últimos ${logs.length} eventos registrados en disco (%APPDATA%\\Bentian Agent\\logs\\agent.log):`);
+      logs.forEach((l) => {
+        const dur = typeof l.duration_ms === 'number' ? ` (${l.duration_ms}ms)` : '';
+        console.log(`[${l.timestamp}] [${l.level}] [${l.component}] ${l.action}${dur}: ${l.message}`);
+      });
+      console.log('');
+      process.exitCode = 0;
+      return;
+    }
+
     case 'activate': {
       let key = args[1];
       if (!key) {

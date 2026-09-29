@@ -39,13 +39,17 @@ export class LocalGuiServer {
     // 2. Status & Logs
     router.get('/api/local/status', StatusController.getStatus(this.agent));
     router.get('/api/local/logs', StatusController.getLogs(this.agent));
+    router.get('/api/local/logs/structured', StatusController.getStructuredLogs());
     router.get('/api/local/export-diagnostic', StatusController.exportDiagnostic(this.agent));
     router.get('/api/local/preflight', StatusController.getPreflight(this.agent));
-    router.get('/api/local/diagnostics', StatusController.getPreflight(this.agent));
+    router.get('/api/local/diagnostics', StatusController.getLiveHealth(this.agent));
+    router.get('/api/local/live-health', StatusController.getLiveHealth(this.agent));
 
-    // Endpoints estándar v1 (diagnóstico pre-flight y salud)
+    // Endpoints estándar v1 (diagnóstico en vivo y salud)
     router.get('/v1/status', StatusController.getStatus(this.agent));
-    router.get('/v1/diagnostics', StatusController.getPreflight(this.agent));
+    router.get('/v1/diagnostics', StatusController.getLiveHealth(this.agent));
+    router.get('/v1/live-health', StatusController.getLiveHealth(this.agent));
+    router.get('/v1/logs/structured', StatusController.getStructuredLogs());
 
     // 3. Factusol
     router.any(['GET', 'POST'], '/api/local/open-file-dialog', FactusolController.openNativeFileDialog(this.agent));

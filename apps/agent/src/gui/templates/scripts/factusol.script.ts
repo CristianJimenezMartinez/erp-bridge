@@ -213,17 +213,18 @@ export const factusolScript = `
         const data = await res.json();
         if (alertBox) {
           alertBox.style.display = 'block';
+          const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
           if (data.success) {
             alertBox.style.color = '#34d399';
-            alertBox.textContent = '✓ ' + data.message;
-            showToast('Conexión con Factusol exitosa');
+            alertBox.textContent = '✓ ' + data.message + timeSuffix;
+            showToast('Conexión con Factusol exitosa' + timeSuffix, 'success');
             if (typeof loadArticlePreview === 'function') {
               loadArticlePreview();
             }
           } else {
             alertBox.style.color = '#f87171';
-            alertBox.textContent = '✕ ' + data.message;
-            showToast('Error conectando con Factusol', 'error');
+            alertBox.textContent = '✕ ' + data.message + timeSuffix;
+            showToast('Error conectando con Factusol' + timeSuffix, 'error');
           }
         }
       } catch (err) {

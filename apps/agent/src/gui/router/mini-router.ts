@@ -106,9 +106,40 @@ export class MiniRouter {
       body,
     };
 
+    const start = performance.now();
     try {
       await route.handler(req, res, ctx);
+      const durationMs = Math.round((performance.now() - start) * 10) / 10;
+
+      // Omitir logs ruidosos de polling cada 3s (/api/local/status y /api/local/logs) para no saturar
+      const isPolling = pathname === '/api/local/status' || pathname === '/api/local/logs';
+      if (!isPolling) {
+        try {
+          const { AgentDiskLogger } = await import('../../diagnostics/disk-logger');
+          AgentDiskLogger.getInstance().log({
+            level: 'INFO',
+            component: 'MiniRouter',
+            action: `${method} ${pathname}`,
+            duration_ms: durationMs,
+            status: 'SUCCESS',
+            message: `Ruta ${method} ${pathname} ejecutada en ${durationMs} ms`,
+          });
+        } catch {}
+      }
     } catch (err) {
+      const durationMs = Math.round((performance.now() - start) * 10) / 10;
+      try {
+        const { AgentDiskLogger } = await import('../../diagnostics/disk-logger');
+        AgentDiskLogger.getInstance().log({
+          level: 'ERROR',
+          component: 'MiniRouter',
+          action: `${method} ${pathname}`,
+          duration_ms: durationMs,
+          status: 'FAILURE',
+          message: `Fallo procesando ${method} ${pathname}: ${String(err)}`,
+          error: err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : { message: String(err) },
+        });
+      } catch {}
       this.logger.error(`Error procesando ruta ${method} ${pathname}:`, { err: String(err) });
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }));

@@ -38,6 +38,26 @@ export class StatusController {
       res.end(JSON.stringify(report));
     };
   }
+
+  public static getLiveHealth(agent: LocalAgent): RouteHandler {
+    return async (_req, res) => {
+      const health = await agent.getLiveHealth();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(health));
+    };
+  }
+
+  public static getStructuredLogs(): RouteHandler {
+    return (req, res) => {
+      const url = new URL(req.url || '/', 'http://127.0.0.1');
+      const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+      const level = url.searchParams.get('level') || undefined;
+      const { AgentDiskLogger } = require('../../../diagnostics/disk-logger');
+      const logs = AgentDiskLogger.getInstance().getRecentLogs(limit, level);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(logs));
+    };
+  }
 }
 
 

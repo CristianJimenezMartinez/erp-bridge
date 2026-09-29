@@ -8,12 +8,13 @@ export const syncScript = `
       try {
         const res = await fetch('/api/local/sync-now', { method: 'POST' });
         const data = await res.json();
+        const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
-          showToast(data.message);
+          showToast(data.message + timeSuffix, 'success');
           fetchStatus();
           loadSyncHistory();
         } else {
-          showToast('Aviso: ' + data.message, 'warn');
+          showToast('Aviso: ' + data.message + timeSuffix, 'warn');
         }
       } catch (err) {
         showToast('Error en sincronización manual', 'error');

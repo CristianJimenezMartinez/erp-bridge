@@ -55,9 +55,11 @@ export class FactusolController {
 
   public static testFactusol(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const t0 = performance.now();
       const result = await agent.testFactusolConnection(ctx.body.databasePath || '');
+      const durationMs = Math.round((performance.now() - t0) * 10) / 10;
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify({ ...result, durationMs }));
     };
   }
 
