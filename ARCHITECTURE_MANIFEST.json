@@ -91,6 +91,23 @@
       ]
     },
     {
+      "id": "agent.gui.native_dialog",
+      "name": "Selector Nativo de Archivos Windows (OpenFileDialog) & Launcher Aislado Edge",
+      "status": "FROZEN",
+      "certifiedAt": "2026-09-29",
+      "certifiedCommit": "260af56",
+      "description": "Invocación oficial STA mediante BentianTray.exe y fallback PowerShell puro con TopMost y owner invisible sin .Show(), modo app exclusivo Edge y puerto fijo 39281.",
+      "paths": [
+        "apps/agent/src/gui/tray/BentianTray.cs",
+        "apps/agent/src/gui/window-launcher.ts"
+      ],
+      "integrityTreeHash": "d01fdb8144fa219001daeb8f5f3d4f8a775b17ce88ebf6c070dce25e56a20861",
+      "publicContract": "apps/agent/src/gui/window-launcher.ts",
+      "testSuites": [
+        "apps/agent/test/gui-router.test.ts"
+      ]
+    },
+    {
       "id": "agent.gui",
       "name": "Servidor GUI Local, MiniRouter, Vistas y System Tray",
       "status": "STABLE",

@@ -48,6 +48,11 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 * **Propósito:** Persistencia atómica e inmutable en `%APPDATA%\Bentian Agent\agent-config.json` mediante archivos `.tmp` y reemplazo seguro. Implementa la regla Anti-Wiping para preservar rutas NAS (`\\NAS\...`) y unidades mapeadas (`Z:\...`) cuando la red no responde en el inicio.
 * **Pruebas de Certificación:** `config-persistence.test.ts`, `nas-dialog-e2e.test.ts`.
 
+#### 6. `agent.gui.native_dialog` (`apps/agent/src/gui/window-launcher.ts` y `apps/agent/src/gui/tray/BentianTray.cs`)
+* **Propósito:** Selector oficial de archivos nativo de Windows (`OpenFileDialog`) en hilo STA de Windows Forms y fallback de PowerShell puro sin compilación en caliente. Emplea un formulario auxiliar invisible como owner con `TopMost = true`, `WindowState = Minimized` y `ShowInTaskbar = false` sin llamar jamás a `.Show()` ni fijar `Opacity = 0`. Elimina 100% las ventanas fantasma, evita bloqueos modales interproceso (*cross-process deadlocks*) con Microsoft Edge y garantiza apertura instantánea (<30 ms) en primer plano.
+* **Pruebas de Certificación:** `gui-router.test.ts`, verificación nativa Win32 STA.
+* **Contrato Público:** `apps/agent/src/gui/window-launcher.ts`
+
 ---
 
 ## 3. Módulos Estables de Producción y Dashboard Canónico

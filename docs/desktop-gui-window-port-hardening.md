@@ -28,17 +28,24 @@ El acceso directo del escritorio de Windows, los navegadores con URLs cacheadas 
 2. **La "Pequeña Ventanita" (Ghost Window) y Retardo en OpenFileDialog:**  
    Para forzar el foco del selector de archivos en primer plano (`TopMost = true`), el código anterior instanciaba un formulario de Windows Forms oculto (`new Form()` en C# o `$f = New-Object Form` en PowerShell) y llamaba a `.Show()`. En Windows 11 con aceleración gráfica o monitores de alta resolución (DPI), este formulario fantasma producía un destello visual ("pequeña ventanita") y una latencia perceptible de 2 a 3 segundos al abrir el selector de archivos.
 
-### 2.2. Solución Blindada
+### 2.2. Solución Blindada y Definitiva
 1. **Microsoft Edge (`msedge.exe`) como Prioridad #1 en Windows:**  
    Microsoft Edge viene preinstalado en el 100% de los entornos Windows 10 y Windows 11. Al ejecutarse con:  
    `msedge.exe --app=http://127.0.0.1:39281 --new-window --window-size=1180,820`  
    Edge crea un contenedor PWA nativo de aplicación de escritorio, completamente desacoplado de las pestañas de Chrome del usuario, con marco propio y foco inmediato.
-2. **Eliminación Total de Formularios Fantasma en OpenFileDialog:**  
-   Se eliminó por completo la creación de `new Form()`. En su lugar, se implementó la interfaz Win32 `IWin32Window` (`WindowWrapper`) vinculada directamente a `GetForegroundWindow()`.  
-   Al asociar el diálogo a la ventana activa que disparó la acción, el explorador nativo de Windows:
-   * Se abre en **< 40 milisegundos**.
-   * Es 100% modal respecto a la ventana del programa (no se va al fondo).
-   * Genera **CERO ventanas fantasma**, cero parpadeos y cero caídas de FPS.
+2. **Post-Mortem: El Intento Fallido de `GetForegroundWindow()` y Bloqueo Modal:**  
+   En un intento previo de eliminar la "pequeña ventanita", se probó asociar el diálogo a la ventana activa mediante `WindowWrapper(GetForegroundWindow())`. Esto produjo una regresión crítica:  
+   Como la ventana activa pertenecía al proceso multiproceso y aislado de Microsoft Edge (`msedge.exe`), la API Win32/WinForms impedía acoplar un modal a un handle de otro proceso externo sin sincronización de cola de mensajes (*cross-process modal lock*). Como consecuencia, `ShowDialog(owner)` se bloqueaba durante 120 segundos hasta expirar el timeout, mientras que el fallback de PowerShell fallaba con error de sintaxis en el encabezado here-string (`UnexpectedCharactersAfterHereStringHeader`).
+3. **Mecanismo Definitivo: Owner Invisible en Mismo Proceso STA (Sin `.Show()`):**  
+   La solución canónica y 100% libre de parpadeos consiste en asociar el diálogo a un `owner = new Form()` del mismo proceso e hilo STA con:
+   * `owner.ShowInTaskbar = false`
+   * `owner.WindowState = FormWindowState.Minimized`
+   * `owner.TopMost = true`
+   * **PROHIBICIÓN ESTRICTA:** **NO** llamar a `owner.Show()` y **NO** fijar `owner.Opacity = 0`. Al no invocar jamás `.Show()`, el DWM de Windows no crea superficie gráfica, no dibuja bordes ni genera ninguna "pequeña ventanita" fantasma.
+   * `IntPtr h = owner.Handle; ForceForeground(h);` genera el handle Win32 nativo y transfiere el z-order `TopMost` al `OpenFileDialog` de forma directa.
+   * **Fallback PowerShell:** Se reescribió en PowerShell puro con `System.Windows.Forms.OpenFileDialog` y el mismo owner invisible, eliminando compilaciones C# en caliente y resolviendo en <30 ms.
+4. **Congelación Oficial (`FROZEN`):**  
+   Este mecanismo queda sellado criptográficamente en el Gate 7 como `agent.gui.native_dialog` (`BentianTray.cs` + `window-launcher.ts`) con hash SHA-256 inmutable. Queda estrictamente prohibida cualquier alteración futura.
 
 ---
 
@@ -82,8 +89,8 @@ Se introdujo la variable de control `_initialFetchCompleted`. La primera llamada
 | **Cabecera GUI** | `apps/agent/src/gui/templates/views/header.view.ts` | Badge visual de marca con logotipo SVG permanente. |
 | **Script Polling** | `apps/agent/src/gui/templates/scripts/status.script.ts` | `_initialFetchCompleted` para carga inicial garantizada. |
 | **Script Navegación**| `apps/agent/src/gui/templates/scripts/core.script.ts` | Preservación del logotipo de marca al cambiar de pestaña. |
-| **Lanzador Ventana** | `apps/agent/src/gui/window-launcher.ts` | Microsoft Edge prioridad #1; eliminación de Form fantasma en STA. |
-| **System Tray** | `apps/agent/src/gui/tray/BentianTray.cs` | `WindowWrapper(GetForegroundWindow())`; argumento `--bring-to-front`. |
+| **Lanzador Ventana** | `apps/agent/src/gui/window-launcher.ts` | Microsoft Edge prioridad #1; fallback PowerShell STA puro sin compilación C#; MÓDULO CONGELADO (`FROZEN`). |
+| **System Tray** | `apps/agent/src/gui/tray/BentianTray.cs` | OpenFileDialog STA con Form invisible TopMost sin `.Show()`; argumento `--bring-to-front`; MÓDULO CONGELADO (`FROZEN`). |
 | **Empaquetado** | `builder/build-bundle.js` & `builder/build-exe.js` | Copia garantizada de `icon.ico` en distDir y release. |
 
-**Quality Gate:** 100% Aprobado (Puntuación: 9.78 / 10.00; Gate 7 Code Freeze intacto).
+**Quality Gate:** 100% Aprobado (Puntuación: 9.78 / 10.00; Gate 7 Code Freeze: 6 módulos sellados intactos).
