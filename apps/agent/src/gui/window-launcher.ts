@@ -52,35 +52,8 @@ export function openDesktopWindow(url: string): boolean {
 
   try {
     if (process.platform === 'win32') {
-      const browserExe = findBrowserAppExecutable();
-      let launchedApp = false;
-
-      if (browserExe) {
-        try {
-          const profileDir = path.join(process.env['LOCALAPPDATA'] || 'C:\\Temp', 'Bentian Agent', 'gui-profile');
-          if (!fs.existsSync(profileDir)) {
-            fs.mkdirSync(profileDir, { recursive: true });
-          }
-          logger.info(`Lanzando ventana de escritorio nativa con: ${browserExe}`);
-          const child = childProcess.spawn(
-            browserExe,
-            [`--app=${url}`, `--user-data-dir=${profileDir}`, '--new-window', '--window-size=1120,780'],
-            {
-              detached: true,
-              stdio: 'ignore',
-            }
-          );
-          child.unref();
-          launchedApp = true;
-        } catch (spawnErr) {
-          logger.warn('Fallo al invocar browserExe como app:', { err: String(spawnErr) });
-        }
-      }
-
-      if (!launchedApp) {
-        logger.info('Usando launcher del sistema para abrir la interfaz en el navegador predeterminado...');
-        childProcess.exec(`start "" "${url}"`);
-      }
+      logger.info('Abriendo interfaz de Bentian en el navegador del usuario...');
+      childProcess.exec(`start "" "${url}"`);
       return true;
     } else if (process.platform === 'darwin') {
       childProcess.exec(`open "${url}"`);
@@ -91,12 +64,6 @@ export function openDesktopWindow(url: string): boolean {
     }
   } catch (err) {
     logger.warn('No se pudo lanzar automáticamente la ventana gráfica:', { err: String(err) });
-    try {
-      if (process.platform === 'win32') {
-        childProcess.exec(`start "" "${url}"`);
-        return true;
-      }
-    } catch {}
     return false;
   }
 }
