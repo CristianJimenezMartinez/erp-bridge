@@ -1,21 +1,70 @@
-CONTRATO DE LICENCIA DE USUARIO FINAL (EULA) - BENTIAN LOCAL AGENT
-(c) 2026 Cristian Jiménez Martínez. Todos los derechos reservados.
+CONTRATO DE LICENCIA DE USUARIO FINAL (EULA) — BENTIAN LOCAL AGENT
+================================================================================
+(c) 2026 Cristian Jiménez Martínez (Bentian ERP Bridge). Todos los derechos reservados.
+IMPORTANTE: LEA ATENTAMENTE ESTE CONTRATO ANTES DE INSTALAR O UTILIZAR EL SOFTWARE.
 
-1. CONCESIÓN DE LICENCIA LIMITADA
-Bentian otorga al Usuario una licencia no exclusiva, intransferible, revocable y limitada para instalar y ejecutar una (1) instancia de Bentian Local Agent en un único equipo o servidor, vinculada al identificador de hardware (HWID) registrado y a la suscripción activa.
+AL INSTALAR, COPIAR O UTILIZAR DE CUALQUIER FORMA EL SOFTWARE "BENTIAN LOCAL AGENT",
+USTED ACEPTA QUEDAR VINCULADO POR LOS TÉRMINOS Y CONDICIONES DE ESTE ACUERDO. SI NO
+ESTÁ DE ACUERDO CON ESTOS TÉRMINOS, NO INSTALE, NO COPIE NI UTILICE ESTE SOFTWARE.
 
-2. PROHIBICIÓN ESTRICTA DE INGENIERÍA INVERSA Y EXTRACCIÓN DE CÓDIGO
-El Usuario no podrá, ni permitirá a terceros:
-a) Descompilar, desensamblar, aplicar ingeniería inversa o intentar descifrar el código fuente, la estructura interna o los esquemas de bases de datos del Software.
-b) Modificar, adaptar, traducir o crear obras derivadas basadas en el Software.
-c) Monitorizar, interceptar o analizar las comunicaciones y llamadas a APIs generadas por el Software con fines de replicación tecnológica o benchmarking competitivo.
-d) Sublicenciar, alquilar, arrendar o revender el Software a terceros sin autorización expresa por escrito de Bentian.
+1. CONCESIÓN DE LICENCIA LIMITADA Y CONDICIONES DE USO
+Bentian otorga al Usuario (persona física o jurídica en ejercicio de su actividad
+empresarial o profesional) una licencia de uso no exclusiva, intransferible, revocable
+y temporal, para instalar y ejecutar una (1) instancia de Bentian Local Agent en un
+único equipo o servidor físico o virtual, vinculada a un identificador criptográfico
+de hardware (HWID) registrado y a la vigencia de una suscripción activa de pago.
+Queda expresamente prohibido el uso simultáneo de la misma clave en múltiples puestos
+sin la adquisición previa de las correspondientes licencias complementarias.
 
-3. AUDITORÍA Y PROTECCIÓN TÉCNICA
-El Software incorpora medidas tecnológicas de protección (TPM) y detección de manipulaciones. Cualquier intento de evasión del sistema de licencias, modificación del token de activación o manipulación del binario provocará la revocación inmediata de la licencia sin derecho a reembolso, reservándose Bentian las acciones civiles y penales previstas en la Ley de Propiedad Intelectual y en el Código Penal español.
+2. PROHIBICIÓN ESTRICTA DE INGENIERÍA INVERSA Y PROTECCIÓN DE CÓDIGO
+El Software contiene secretos comerciales y algoritmos propietarios protegidos por
+la Ley 1/2019 de Secretos Empresariales, el Real Decreto Legislativo 1/1996 (TRLPI) y
+el Código Penal español. El Usuario se compromete a NO realizar, facilitar ni permitir:
+a) La descompilación, desensamblado, ingeniería inversa o cualquier intento de obtener
+   el código fuente, binarios o protocolos internos de comunicación del Software.
+b) La modificación, parcheo, neutralización o elusión de los sistemas de verificación
+   de licencias, firmas criptográficas Ed25519 o controles de integridad anti-tamper.
+c) La creación de obras derivadas, productos conectores competidores basados en la
+   arquitectura del Software o la distribución de binarios no oficiales.
+d) La cesión, sublicencia, alquiler o reventa no autorizada de la licencia a terceros.
 
-4. EXENCIÓN Y LIMITACIÓN DE RESPONSABILIDAD
-El Software interactúa en modo de lectura/escritura con el software de gestión (ERP) y la tienda online del Usuario. Bentian no será responsable de daños directos, indirectos, lucro cesante o pérdida de datos derivados de caídas de red, incompatibilidades de versiones no soportadas del ERP, o bloqueos ocasionados por bases de datos dañadas del cliente. La responsabilidad máxima total de Bentian frente al Usuario por cualquier concepto quedará limitada al importe efectivamente pagado por el Usuario en los tres (3) meses anteriores al hecho causante.
+3. OBLIGACIÓN IMPERATIVA DE COPIAS DE SEGURIDAD Y EXONERACIÓN DE RESPONSABILIDAD
+El Software interactúa directamente con bases de datos locales de Factusol en formato
+Microsoft Access (.accdb / .mdb). El Usuario reconoce que las bases de datos de escritorio
+pueden sufrir bloqueos o daños derivados de cortes de corriente, caídas de red, reinicios
+del sistema operativo o problemas de disco en su propia máquina.
+POR ELLO, ES OBLIGACIÓN CONTRACTUAL DEL USUARIO MANTENER COPIAS DE SEGURIDAD (BACKUPS)
+DIARIAS E INDEPENDIENTES DE TODAS SUS BASES DE DATOS DE FACTUSOL.
+Bentian NO responderá bajo ninguna circunstancia de la pérdida de datos, corrupción de
+ficheros, caídas de ventas, paradas operativas, pérdidas de pedidos o lucro cesante
+ocasionados por fallos del ERP, desconexiones de red, cortes de suministro eléctrico
+o problemas en la infraestructura local del Usuario.
 
-5. ARQUITECTURA LOCAL-FIRST Y PROTECCIÓN DE DATOS (RGPD ART. 28)
-El Software opera bajo una arquitectura técnica "Local-First". Toda la extracción, transformación y mapeo de datos de clientes, pedidos y facturas se realiza estrictamente en el equipo local del Usuario, transmitiéndose directamente de forma cifrada punto a punto (TLS 1.3) a la plataforma de destino. Bentian no custodia, no almacena ni realiza copias de seguridad de las bases de datos contables o fiscales en la nube.
+4. CUMPLIMIENTO DE LA LEY ANTIFRAUDE Y NORMATIVA VERI*FACTU
+Bentian Local Agent opera exclusivamente como un puente de sincronización logística de
+catálogo y pedidos de clientes (F_PCL) entre la tienda online y Factusol. El Software
+NO genera facturas oficiales ni constituye un Sistema Informático de Facturación (SIF)
+de doble uso al amparo de la Ley 11/2021 de Medidas de Lucha contra el Fraude Fiscal.
+El Usuario es el único sujeto obligado legal y tributariamente responsable de la correcta
+emisión de sus facturas en Factusol y del cumplimiento del reglamento Veri*Factu (RD 1007/2023)
+ante la Agencia Tributaria (AEAT).
+
+5. ARQUITECTURA "LOCAL-FIRST" Y PRIVACIDAD DE DATOS (RGPD)
+El Software opera bajo una estricta arquitectura Local-First. Toda la lectura, mapeo y
+procesamiento de datos se ejecuta en el equipo local del Usuario, transmitiéndose
+directamente de forma cifrada mediante TLS 1.3 a su propia tienda online.
+BENTIAN NO CUSTODIA, NO ALMACENA NI TIENE ACCESO EN LA NUBE A LAS BASES DE DATOS FISCALES,
+CONTABLES O DE CLIENTES FINALES DEL USUARIO. Los servidores de Bentian únicamente
+reciben metadatos técnicos de telemetría operativa y validación de licencias.
+
+6. LÍMITE CUANTITATIVO MÁXIMO DE RESPONSABILIDAD
+En la medida permitida por la ley aplicable, la responsabilidad máxima total acumulada
+de Bentian frente al Usuario por cualquier causa o reclamación derivada de este contrato
+o del uso del Software quedará estrictamente limitada al importe efectivamente abonado
+por el Usuario a Bentian en los tres (3) meses inmediatamente anteriores al hecho causante.
+
+7. LEGISLACIÓN Y TRIBUNALES COMPETENTES
+Este contrato se rige por la legislación española común. Ambas partes, con renuncia a
+cualquier otro fuero que pudiera corresponderles, se someten a la jurisdicción exclusiva
+de los Juzgados y Tribunales de la ciudad de Murcia (España).
+================================================================================
