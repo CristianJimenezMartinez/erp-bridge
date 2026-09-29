@@ -124,6 +124,68 @@ function copiarClaveBienvenida() {
   }
 }
 
+// -------------------------------------------------------------
+// Medidor de Latencia y Tiempos de Respuesta en Tiempo Real
+// -------------------------------------------------------------
+function recordLatency(durationMs) {
+  const badge = document.getElementById('top-latency-badge');
+  const dot = document.getElementById('top-latency-dot');
+  const text = document.getElementById('top-latency-text');
+  const rounded = Math.max(1, Math.round(durationMs));
+  if (text) text.innerText = `${rounded} ms`;
+
+  if (dot && badge) {
+    if (rounded < 200) {
+      dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-emerald-400 border border-emerald-500/30 transition cursor-pointer';
+    } else if (rounded < 600) {
+      dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-amber-400 border border-amber-500/30 transition cursor-pointer';
+    } else {
+      dot.className = 'w-1.5 h-1.5 rounded-full bg-red-400';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-red-400 border border-red-500/30 transition cursor-pointer';
+    }
+  }
+}
+
+async function pingLiveServer() {
+  const t0 = performance.now();
+  try {
+    const res = await fetch('/api/v1/health');
+    const elapsed = Math.round(performance.now() - t0);
+    recordLatency(elapsed);
+    if (res.ok) {
+      const data = await res.json();
+      const dbMs = data.database?.latencyMs !== undefined ? ` (DB: ${data.database.latencyMs} ms)` : '';
+      showToast(`⚡ Ping del servidor: ${elapsed} ms${dbMs}`, 'success');
+    } else {
+      showToast(`Ping respondido con código ${res.status} (${elapsed} ms)`, 'warning');
+    }
+  } catch (err) {
+    const elapsed = Math.round(performance.now() - t0);
+    recordLatency(elapsed);
+    showToast(`Error al medir ping (${elapsed} ms)`, 'error');
+  }
+}
+
+// Interceptor global de fetch: mide el tiempo real de cada clic, petición y acción
+if (typeof window !== 'undefined' && window.fetch) {
+  const nativeFetch = window.fetch;
+  window.fetch = async function(...args) {
+    const start = performance.now();
+    try {
+      const response = await nativeFetch.apply(this, args);
+      const elapsed = performance.now() - start;
+      recordLatency(elapsed);
+      return response;
+    } catch (error) {
+      const elapsed = performance.now() - start;
+      recordLatency(elapsed);
+      throw error;
+    }
+  };
+}
+
 // Exposición en el ámbito global para atributos onclick HTML
 window.escapeHtml = escapeHtml;
 window.showToast = showToast;
@@ -133,3 +195,6 @@ window.closeModal = closeModal;
 window.openInstructionsModal = openInstructionsModal;
 window.openStripePortal = openStripePortal;
 window.toggleUserDropdown = toggleUserDropdown;
+window.recordLatency = recordLatency;
+window.pingLiveServer = pingLiveServer;
+
