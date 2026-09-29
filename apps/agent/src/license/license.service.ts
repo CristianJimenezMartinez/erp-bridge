@@ -12,6 +12,7 @@ import { HWIDManager } from '../security/hwid';
 import { SecureStore } from '../security/secure-store';
 import { ConfigManager } from '../config/config.manager';
 import { EventBus } from '../diagnostics/event-bus';
+import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { AgentLicenseStatus, LicenseValidationStatus } from './license.types';
 
 export class LicenseService {
@@ -58,13 +59,29 @@ export class LicenseService {
       },
     };
 
+    const tActivateStart = performance.now();
     const response = await fetch(`${config.apiBaseUrl}/api/v1/licenses/activate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestPayload),
     });
+    const activateDurationMs = Math.round(performance.now() - tActivateStart);
 
     const resJson = (await response.json()) as { data?: LicenseActivationResponse; error?: { message?: string } };
+
+    AgentDiskLogger.getInstance().log({
+      level: response.ok && resJson.data?.success ? 'SUCCESS' : 'ERROR',
+      component: 'LicenseService',
+      action: 'activate_license',
+      duration_ms: activateDurationMs,
+      status: response.ok && resJson.data?.success ? 'SUCCESS' : 'FAILURE',
+      message: response.ok && resJson.data?.success
+        ? `Licencia activada con éxito en ${activateDurationMs}ms (Plan: ${resJson.data.plan})`
+        : `Fallo al activar licencia tras ${activateDurationMs}ms: ${resJson.error?.message || resJson.data?.error || `HTTP ${response.status}`}`,
+      metadata: {
+        plan: resJson.data?.plan,
+      },
+    });
 
     if (!response.ok || !resJson.data?.success) {
       const msg = resJson.error?.message || resJson.data?.error || `Error HTTP ${response.status}`;
@@ -138,14 +155,31 @@ export class LicenseService {
         agentVersion: this.configManager.getVersion(),
       };
 
+      const tValidateStart = performance.now();
       const response = await fetch(`${config.apiBaseUrl}/api/v1/licenses/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestPayload),
         signal: AbortSignal.timeout(2000),
       });
+      const validateDurationMs = Math.round(performance.now() - tValidateStart);
 
       const resJson = (await response.json()) as { data?: LicenseValidationResponse; error?: { message?: string } };
+
+      AgentDiskLogger.getInstance().log({
+        level: response.ok && resJson.data?.valid ? 'SUCCESS' : 'INFO',
+        component: 'LicenseService',
+        action: 'validate_license_online',
+        duration_ms: validateDurationMs,
+        status: response.ok && resJson.data?.valid ? 'SUCCESS' : 'FAILURE',
+        message: response.ok && resJson.data?.valid
+          ? `Validación online de licencia completada en ${validateDurationMs}ms (Plan: ${resJson.data.plan || 'Activo'})`
+          : `Validación online tras ${validateDurationMs}ms (HTTP ${response.status})`,
+        metadata: {
+          valid: resJson.data?.valid,
+          plan: resJson.data?.plan,
+        },
+      });
 
       if (response.ok && resJson.data?.valid) {
         if (resJson.data.renewedToken) {

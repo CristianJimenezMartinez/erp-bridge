@@ -4,11 +4,13 @@ import { AccessDriver, FactusolConnector, FactusolYearResolver } from '@erp-brid
 import { ConfigManager } from '../config/config.manager';
 import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
+import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService } from '../factusol/factusol.service';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
 import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
+import { CatalogUploadHelper } from './catalog-upload.helper';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -122,9 +124,11 @@ export class LocalSyncEngine {
         const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
         const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
         const driver = new AccessDriver({ databasePath: dbPath });
+        const timings: Record<string, number> = {};
 
         // 1. SINCRONIZACIÓN DE STOCK (Factusol -> WooCommerce)
         try {
+          const tStockQueryStart = performance.now();
           const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
           const stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
             `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
@@ -132,11 +136,32 @@ export class LocalSyncEngine {
             this.logger.warn('Error al consultar stock en Factusol:', err);
             return null;
           });
+          const stockQueryDurationMs = Math.round(performance.now() - tStockQueryStart);
+          timings['queryFactusolStockMs'] = stockQueryDurationMs;
 
           if (!stockRows || stockRows.length === 0) {
+            AgentDiskLogger.getInstance().log({
+              level: 'WARN',
+              component: 'SyncEngine',
+              action: 'query_factusol_stock',
+              duration_ms: stockQueryDurationMs,
+              status: 'FAILURE',
+              message: `Consulta de stock en Factusol devolvió 0 registros o falló en ${stockQueryDurationMs}ms`,
+              metadata: { warehouse },
+            });
             this.logger.warn('La consulta de stock en Factusol devolvió 0 registros o falló. Se aborta la sincronización de stock preventivamente para evitar vaciado en WooCommerce.');
             this.eventBus.addEvent('warn', 'Lectura de stock en Factusol inaccesible. Sincronización de stock omitida preventivamente.');
           } else {
+            AgentDiskLogger.getInstance().log({
+              level: 'SUCCESS',
+              component: 'SyncEngine',
+              action: 'query_factusol_stock',
+              duration_ms: stockQueryDurationMs,
+              status: 'SUCCESS',
+              message: `Consulta Factusol F_STO completada (${stockRows.length} referencias) en ${stockQueryDurationMs}ms`,
+              metadata: { warehouse, count: stockRows.length },
+            });
+
             const stockMap = new Map<string, number>();
             for (const row of stockRows) {
               const sku = String(row.ARTSTO || '').trim().toUpperCase();
@@ -146,6 +171,7 @@ export class LocalSyncEngine {
             }
 
             // Paginación completa de productos de WooCommerce (en lotes de 100 con bucle while (hasMore))
+            const tPaginationStart = performance.now();
             const allWcProducts: Array<{ id: number; sku: string; stock_quantity?: number | null }> = [];
             let page = 1;
             let hasMore = true;
@@ -173,6 +199,8 @@ export class LocalSyncEngine {
                 }
               }
             }
+            const paginationDurationMs = Math.round(performance.now() - tPaginationStart);
+            timings['paginateWcProductsMs'] = paginationDurationMs;
 
             // Si la tienda WooCommerce está vacía (0 productos), activar Install & Plug
             if (allWcProducts.length === 0 && !this.hasAutoUploadedCatalog) {
@@ -201,31 +229,54 @@ export class LocalSyncEngine {
               }
             }
 
-          if (batchUpdates.length > 0) {
-            const CHUNK_SIZE = 100;
-            for (let i = 0; i < batchUpdates.length; i += CHUNK_SIZE) {
-              const chunk = batchUpdates.slice(i, i + CHUNK_SIZE);
-              const batchRes: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
-                method: 'POST',
-                headers: {
-                  Authorization: authHeader,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ update: chunk }),
-                signal: AbortSignal.timeout(20000),
-              });
-              if (batchRes.ok) {
-                itemsUpdated += chunk.length;
-              } else {
-                this.logger.warn(`Fallo al enviar lote de stock a WooCommerce: HTTP ${batchRes.status}`);
+            const tBatchPushStart = performance.now();
+            if (batchUpdates.length > 0) {
+              const CHUNK_SIZE = 100;
+              for (let i = 0; i < batchUpdates.length; i += CHUNK_SIZE) {
+                const chunk = batchUpdates.slice(i, i + CHUNK_SIZE);
+                const batchRes: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
+                  method: 'POST',
+                  headers: {
+                    Authorization: authHeader,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ update: chunk }),
+                  signal: AbortSignal.timeout(20000),
+                });
+                if (batchRes.ok) {
+                  itemsUpdated += chunk.length;
+                } else {
+                  this.logger.warn(`Fallo al enviar lote de stock a WooCommerce: HTTP ${batchRes.status}`);
+                }
               }
+              const batchPushDurationMs = Math.round(performance.now() - tBatchPushStart);
+              timings['pushStockMs'] = batchPushDurationMs;
+              AgentDiskLogger.getInstance().log({
+                level: 'SUCCESS',
+                component: 'SyncEngine',
+                action: 'push_channel_stock',
+                duration_ms: batchPushDurationMs,
+                status: 'SUCCESS',
+                message: `Stock sincronizado en ${itemsUpdated} productos de WooCommerce (dirty-check) en ${batchPushDurationMs}ms`,
+                metadata: { channel: 'woocommerce', itemsUpdated },
+              });
+              this.eventBus.addEvent('success', `✓ Stock sincronizado en ${itemsUpdated} productos de WooCommerce (dirty-check)`);
+            } else {
+              const batchPushDurationMs = Math.round(performance.now() - tBatchPushStart);
+              timings['pushStockMs'] = batchPushDurationMs;
+              AgentDiskLogger.getInstance().log({
+                level: 'INFO',
+                component: 'SyncEngine',
+                action: 'push_channel_stock',
+                duration_ms: batchPushDurationMs,
+                status: 'SKIPPED',
+                message: `Dirty-check: Todos los stocks en WooCommerce se encuentran al día (0 modificaciones necesarias)`,
+                metadata: { channel: 'woocommerce', totalChecked: allWcProducts.length },
+              });
+              this.logger.info('Dirty-check: Todos los stocks en WooCommerce se encuentran al día.');
             }
-            this.eventBus.addEvent('success', `✓ Stock sincronizado en ${itemsUpdated} productos de WooCommerce (dirty-check)`);
-          } else {
-            this.logger.info('Dirty-check: Todos los stocks en WooCommerce se encuentran al día.');
           }
-        }
-      } catch (stockErr) {
+        } catch (stockErr) {
           this.logger.warn(`Aviso en sincronización de stock: ${String(stockErr)}`);
         }
 
@@ -251,8 +302,11 @@ export class LocalSyncEngine {
           let wcOrderPage = 1;
           const MAX_WC_PAGES = 10;
           let hasMoreWc = true;
+          let pullOrdersDurationMs = 0;
+          let orderInsertTotalMs = 0;
 
           while (hasMoreWc && wcOrderPage <= MAX_WC_PAGES) {
+            const tFetchPage = performance.now();
             const resOrders: any = await fetch(
               `${cleanUrl}/wp-json/wc/v3/orders?status=processing&per_page=100&page=${wcOrderPage}&orderby=date&order=desc`,
               {
@@ -263,6 +317,7 @@ export class LocalSyncEngine {
               this.logger.warn(`Error al consultar pedidos en WooCommerce (página ${wcOrderPage}): ${String(err)}`);
               return null;
             });
+            pullOrdersDurationMs += Math.round(performance.now() - tFetchPage);
 
             if (!resOrders || !resOrders.ok) {
               break;
@@ -282,7 +337,10 @@ export class LocalSyncEngine {
               newOrdersInBatch++;
 
               const canonicalOrder = OrderSyncHelper.wooCommerceToCanonical(wcOrder, series, warehouse);
+              const tInsertOrder = performance.now();
               const orderRes = await factusolConnector.createOrder(canonicalOrder);
+              const insertDurationMs = Math.round(performance.now() - tInsertOrder);
+              orderInsertTotalMs += insertDurationMs;
 
               if (orderRes.success) {
                 const assignedNum = String(orderRes.externalId || orderRes.orderNumber || wcOrder.id);
@@ -299,8 +357,36 @@ export class LocalSyncEngine {
                 }).catch(() => null);
 
                 ordersImported++;
+                AgentDiskLogger.getInstance().log({
+                  level: 'SUCCESS',
+                  component: 'SyncEngine',
+                  action: 'insert_factusol_order',
+                  duration_ms: insertDurationMs,
+                  status: 'SUCCESS',
+                  message: `Pedido #${wcOrder.id} procesado en Factusol en ${insertDurationMs}ms (Serie ${series}, Pedido #${assignedNum})`,
+                  metadata: {
+                    channel: 'woocommerce',
+                    wcOrderId: wcOrder.id,
+                    factusolOrderNumber: assignedNum,
+                    series,
+                  },
+                });
                 this.eventBus.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${assignedNum})`);
               } else {
+                AgentDiskLogger.getInstance().log({
+                  level: 'ERROR',
+                  component: 'SyncEngine',
+                  action: 'insert_factusol_order',
+                  duration_ms: insertDurationMs,
+                  status: 'FAILURE',
+                  message: `No se pudo importar pedido #${wcOrder.id} a Factusol tras ${insertDurationMs}ms: ${orderRes.error}`,
+                  metadata: {
+                    channel: 'woocommerce',
+                    wcOrderId: wcOrder.id,
+                    series,
+                    error: orderRes.error,
+                  },
+                });
                 this.logger.warn(`No se pudo importar pedido #${wcOrder.id} a Factusol: ${orderRes.error}`);
               }
             }
@@ -312,6 +398,9 @@ export class LocalSyncEngine {
               wcOrderPage++;
             }
           }
+
+          timings['pullOrdersMs'] = pullOrdersDurationMs;
+          timings['orderInsertMs'] = orderInsertTotalMs;
         } catch (orderErr) {
           this.logger.warn(`Aviso en importación de pedidos de WooCommerce: ${String(orderErr)}`);
         }
@@ -321,6 +410,7 @@ export class LocalSyncEngine {
           const cancelSeries = config.factusol?.orderSeries || '1';
           const cancelWarehouse = config.factusol?.warehouseCode || 'GEN';
           this.eventBus.addEvent('info', 'Comprobando pedidos cancelados/reembolsados en WooCommerce...');
+          const tCancelStart = performance.now();
           const cancelRes = await CancellationSyncHelper.syncWooCommerceCancellations({
             storeUrl: cleanUrl,
             authHeader,
@@ -329,7 +419,19 @@ export class LocalSyncEngine {
             defaultWarehouse: cancelWarehouse,
             eventBus: this.eventBus,
           });
+          const cancelDurationMs = Math.round(performance.now() - tCancelStart);
+          timings['cancellationsMs'] = cancelDurationMs;
+
           if (cancelRes.ordersCancelled > 0) {
+            AgentDiskLogger.getInstance().log({
+              level: 'SUCCESS',
+              component: 'SyncEngine',
+              action: 'sync_cancellations',
+              duration_ms: cancelDurationMs,
+              status: 'SUCCESS',
+              message: `Stock repuesto en Factusol para ${cancelRes.ordersCancelled} pedidos cancelados/reembolsados de WooCommerce en ${cancelDurationMs}ms`,
+              metadata: { channel: 'woocommerce', ordersCancelled: cancelRes.ordersCancelled },
+            });
             this.eventBus.addEvent('success', `✓ Stock repuesto en Factusol para ${cancelRes.ordersCancelled} pedidos cancelados/reembolsados de WooCommerce.`);
           }
         } catch (cancelErr) {
@@ -343,7 +445,8 @@ export class LocalSyncEngine {
         }
       }
 
-      const duration = ((Date.now() - start) / 1000).toFixed(1);
+      const cycleDurationMs = Date.now() - start;
+      const duration = (cycleDurationMs / 1000).toFixed(1);
       this.historyManager.addSyncHistoryRecord({
         type: 'manual',
         mode: 'full',
@@ -356,6 +459,19 @@ export class LocalSyncEngine {
 
       const summary = `Sincronización completada (${itemsUpdated} productos, ${ordersImported} pedidos en ${duration}s)`;
       this.eventBus.addEvent('success', `✓ ${summary}`);
+      AgentDiskLogger.getInstance().log({
+        level: 'SUCCESS',
+        component: 'SyncEngine',
+        action: 'sync_cycle_complete',
+        duration_ms: cycleDurationMs,
+        status: 'SUCCESS',
+        message: `Ciclo completo de sincronización WooCommerce finalizado en ${cycleDurationMs}ms`,
+        metadata: {
+          channel: 'woocommerce',
+          itemsUpdated,
+          ordersImported,
+        },
+      });
       return { success: true, message: summary };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -427,227 +543,18 @@ export class LocalSyncEngine {
     }
     this.isSyncing = true;
     try {
-      const start = Date.now();
-      this.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
-
-      const config = this.configManager.get();
-      let dbPath = config.factusol?.databasePath || config.factusolDbPath;
-      const woo = config.woocommerce || {};
-
-    if (dbPath) {
-      try {
-        const rollover = FactusolYearResolver.resolveActiveDatabase(dbPath);
-        if (rollover.switched && rollover.activePath && rollover.activePath !== dbPath) {
-          const oldFile = dbPath.split(/[/\\]/).pop() || dbPath;
-          const newFile = rollover.activePath.split(/[/\\]/).pop() || rollover.activePath;
-          this.logger.info(
-            `🔄 Rollover fiscal automático detectado en subida de catálogo: ${oldFile} -> ${newFile}`
-          );
-          this.eventBus.addEvent(
-            'info',
-            `🔄 Cambio de ejercicio fiscal Factusol automático: ${oldFile} ➔ ${newFile}`
-          );
-          const newPath = rollover.activePath;
-          dbPath = newPath;
-          this.configManager.setFactusolDbPath(newPath);
-          await this.factusolService.reconnect(newPath).catch((err) => {
-            this.logger.warn(`Aviso al reconectar factusolService tras rollover fiscal: ${String(err)}`);
-          });
-        }
-      } catch (resolverErr) {
-        this.logger.warn(`Aviso al verificar rollover fiscal de Factusol en catálogo: ${String(resolverErr)}`);
-      }
-    }
-
-    if (!dbPath || !fs.existsSync(dbPath)) {
-      const msg = 'Base de datos de Factusol no configurada o inaccesible.';
-      this.eventBus.addEvent('error', `❌ ${msg}`);
-      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
-    }
-
-    const isUniversalBridge =
-      config.channelType === 'universal_bridge' ||
-      (Boolean(config.universalBridge?.storeUrl) && !woo.storeUrl);
-
-    if (isUniversalBridge) {
-      return this.uploadUniversalBridgeCatalog(dbPath, config, options);
-    }
-
-    if (!woo.storeUrl || !woo.consumerKey || !woo.consumerSecret) {
-      const msg = 'Credenciales de WooCommerce no configuradas.';
-      this.eventBus.addEvent('error', `❌ ${msg}`);
-      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
-    }
-
-    const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
-    const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
-
-      // 1. Conectar a Factusol y leer artículos canónicos
-      let factusolConnector = this.factusolService.getConnector();
-      if (!factusolConnector) {
-        factusolConnector = new FactusolConnector();
-        await factusolConnector.connect({
-          configuration: {
-            databasePath: dbPath,
-            orderSeries: config.factusol?.orderSeries || '1',
-            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-            tariffCode: config.factusol?.tariffCode || '1',
-            saleTariffCode: config.factusol?.saleTariffCode,
-          },
-        });
-      }
-
-      this.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
-      const factusolProducts = await factusolConnector.readProducts({
-        limit: options?.limit,
-        activeOnly: true,
-      });
-
-      if (!factusolProducts || factusolProducts.length === 0) {
-        const msg = 'No se encontraron artículos activos en Factusol para subir.';
-        this.eventBus.addEvent('warn', msg);
-        return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
-      }
-
-      this.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de Factusol. Comprobando catálogo existente en WooCommerce...`);
-
-      // 2. Obtener lista de SKUs existentes en WooCommerce para no duplicar si onlyMissing=true
-      const onlyMissing = options?.onlyMissing ?? true;
-      const existingWcSkus = new Set<string>();
-
-      if (onlyMissing) {
-        let page = 1;
-        let hasMore = true;
-        while (hasMore) {
-          const res: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products?per_page=100&page=${page}&_fields=id,sku`, {
-            headers: { Authorization: authHeader },
-            signal: AbortSignal.timeout(15000),
-          }).catch(() => null);
-
-          if (!res || !res.ok) break;
-          const items = (await res.json()) as Array<{ id: number; sku: string }>;
-          if (!items || items.length === 0) {
-            hasMore = false;
-          } else {
-            for (const it of items) {
-              if (it.sku) existingWcSkus.add(it.sku.trim().toUpperCase());
-            }
-            if (items.length < 100) hasMore = false;
-            page++;
-          }
-        }
-      }
-
-      // 3. Filtrar artículos que deben crearse en WooCommerce
-      const toUpload = factusolProducts.filter((p) => {
-        if (!p.sku) return false;
-        if (onlyMissing && existingWcSkus.has(p.sku.trim().toUpperCase())) {
-          return false;
-        }
-        return true;
-      });
-
-      const skippedCount = factusolProducts.length - toUpload.length;
-      let uploadedCount = 0;
-      let failedCount = 0;
-
-      if (toUpload.length === 0) {
-        const msg = `Todos los artículos de Factusol (${factusolProducts.length}) ya existen en WooCommerce. No se requieren altas.`;
-        this.eventBus.addEvent('success', `✓ ${msg}`);
-        return {
-          success: true,
-          totalArticles: factusolProducts.length,
-          uploadedCount: 0,
-          skippedCount,
-          failedCount: 0,
-          message: msg,
-        };
-      }
-
-      this.eventBus.addEvent('info', `Subiendo ${toUpload.length} productos nuevos a WooCommerce (Omitidos ya existentes: ${skippedCount})...`);
-
-      // 4. Subir en lotes de 50 a WooCommerce Batch API
-      const BATCH_SIZE = 50;
-      for (let i = 0; i < toUpload.length; i += BATCH_SIZE) {
-        const chunk = toUpload.slice(i, i + BATCH_SIZE);
-        const payload = chunk.map((p) => ({
-          name: p.name || `Artículo ${p.sku}`,
-          sku: p.sku.trim(),
-          type: 'simple',
-          regular_price: p.regularPrice > 0 ? String(p.regularPrice) : '0',
-          sale_price: (p.salePrice && p.salePrice > 0) ? String(p.salePrice) : undefined,
-          manage_stock: true,
-          stock_quantity: Math.max(0, p.stockQuantity || 0),
-          description: p.description || '',
-          categories: p.categories && p.categories.length > 0 ? p.categories.map((c) => ({ name: c.name })) : undefined,
-          status: 'publish',
-        }));
-
-        const batchRes: any = await fetch(`${cleanUrl}/wp-json/wc/v3/products/batch`, {
-          method: 'POST',
-          headers: {
-            Authorization: authHeader,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ create: payload }),
-          signal: AbortSignal.timeout(30000),
-        }).catch((err) => {
-          this.logger.error('Fallo en petición batch de WooCommerce', err);
-          return null;
-        });
-
-        if (batchRes && batchRes.ok) {
-          const resJson = (await batchRes.json()) as { create?: Array<{ id: number; error?: any }> };
-          const created = resJson.create || [];
-          for (const item of created) {
-            if (item.error) {
-              failedCount++;
-            } else {
-              uploadedCount++;
-            }
-          }
-        } else {
-          failedCount += chunk.length;
-        }
-
-        // Breve pausa para no saturar servidores compartidos
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const duration = ((Date.now() - start) / 1000).toFixed(1);
-      const summary = `Subida inicial completada en ${duration}s: ${uploadedCount} productos creados, ${skippedCount} ya existentes, ${failedCount} incidencias.`;
-      this.eventBus.addEvent('success', `✓ ${summary}`);
-
-      this.historyManager.addSyncHistoryRecord({
-        type: 'manual',
-        mode: 'full',
-        status: failedCount === 0 ? 'success' : 'warning',
-        durationSeconds: parseFloat(duration),
-        itemsUpdated: uploadedCount,
-        ordersImported: 0,
-        message: summary,
-      });
-
-      return {
-        success: true,
-        totalArticles: factusolProducts.length,
-        uploadedCount,
-        skippedCount,
-        failedCount,
-        message: summary,
-      };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error('Error durante la subida inicial de catálogo', err);
-      this.eventBus.addEvent('error', `❌ Error al subir catálogo: ${msg}`);
-      return {
-        success: false,
-        totalArticles: 0,
-        uploadedCount: 0,
-        skippedCount: 0,
-        failedCount: 0,
-        message: msg,
-      };
+      return await CatalogUploadHelper.uploadCatalog(
+        {
+          configManager: this.configManager,
+          factusolService: this.factusolService,
+          historyManager: this.historyManager,
+          eventBus: this.eventBus,
+          logger: this.logger,
+          resolveBridgeEndpoint: (url) => this.resolveBridgeEndpoint(url),
+          getBridgeHeaders: (key) => this.getBridgeHeaders(key),
+        },
+        options
+      );
     } finally {
       this.isSyncing = false;
     }
@@ -660,6 +567,7 @@ export class LocalSyncEngine {
   ): Promise<SyncManualResult> {
     let itemsUpdated = 0;
     let ordersImported = 0;
+    const timings: Record<string, number> = {};
 
     const bridgeSettings = config.universalBridge || {};
     if (!bridgeSettings.storeUrl) {
@@ -705,6 +613,7 @@ export class LocalSyncEngine {
     // 1. Sincronización de existencias de stock (Factusol -> Universal Bridge)
     try {
       this.eventBus.addEvent('info', 'Consultando existencias de stock en Factusol...');
+      const tStockQueryStart = performance.now();
       const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
       const stockRows = await driver
         .query<{ ARTSTO: any; totalStock: any }>(
@@ -714,8 +623,20 @@ export class LocalSyncEngine {
           this.logger.warn('Error al consultar stock en Factusol:', err);
           return null;
         });
+      const stockQueryDurationMs = Math.round(performance.now() - tStockQueryStart);
+      timings['queryFactusolStockMs'] = stockQueryDurationMs;
 
       if (stockRows && stockRows.length > 0) {
+        AgentDiskLogger.getInstance().log({
+          level: 'SUCCESS',
+          component: 'SyncEngine',
+          action: 'query_factusol_stock',
+          duration_ms: stockQueryDurationMs,
+          status: 'SUCCESS',
+          message: `Consulta Factusol F_STO completada (${stockRows.length} referencias) en ${stockQueryDurationMs}ms`,
+          metadata: { warehouse, count: stockRows.length },
+        });
+
         const stockUpdates = stockRows
           .map((r) => ({
             code: String(r.ARTSTO || '').trim(),
@@ -723,6 +644,7 @@ export class LocalSyncEngine {
           }))
           .filter((u) => u.code);
 
+        const tPushStockStart = performance.now();
         const STOCK_BATCH = 500;
         for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
           const chunk = stockUpdates.slice(i, i + STOCK_BATCH);
@@ -740,7 +662,29 @@ export class LocalSyncEngine {
             itemsUpdated += chunk.length;
           }
         }
+        const pushStockDurationMs = Math.round(performance.now() - tPushStockStart);
+        timings['pushStockMs'] = pushStockDurationMs;
+
+        AgentDiskLogger.getInstance().log({
+          level: 'SUCCESS',
+          component: 'SyncEngine',
+          action: 'push_channel_stock',
+          duration_ms: pushStockDurationMs,
+          status: 'SUCCESS',
+          message: `Stock sincronizado en Universal Bridge: ${itemsUpdated} referencias actualizadas en ${pushStockDurationMs}ms`,
+          metadata: { channel: 'universal_bridge', itemsUpdated },
+        });
         this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+      } else {
+        AgentDiskLogger.getInstance().log({
+          level: 'WARN',
+          component: 'SyncEngine',
+          action: 'query_factusol_stock',
+          duration_ms: stockQueryDurationMs,
+          status: 'FAILURE',
+          message: `Consulta Factusol F_STO devolvió 0 registros o falló en ${stockQueryDurationMs}ms`,
+          metadata: { warehouse },
+        });
       }
     } catch (stockErr) {
       this.logger.warn(`Aviso en sincronización de stock con Universal Bridge: ${String(stockErr)}`);
@@ -771,9 +715,13 @@ export class LocalSyncEngine {
       const seenOrderIds = new Set<number>();
       let batchCount = 0;
       let hasMoreBatches = true;
+      let pullOrdersTotalMs = 0;
+      let orderInsertTotalMs = 0;
+      let ackOrdersTotalMs = 0;
 
       while (hasMoreBatches && batchCount < MAX_PULL_BATCHES) {
         batchCount++;
+        const tPullBatchStart = performance.now();
         const pullRes = await fetch(`${endpointUrl}?action=pull_orders&limit=100`, {
           method: 'GET',
           headers,
@@ -782,6 +730,7 @@ export class LocalSyncEngine {
           this.logger.warn(`Aviso al consultar pedidos en Universal Bridge: ${String(err)}`);
           return null;
         });
+        pullOrdersTotalMs += Math.round(performance.now() - tPullBatchStart);
 
         if (!pullRes || !pullRes.ok) {
           break;
@@ -809,7 +758,10 @@ export class LocalSyncEngine {
           seenOrderIds.add(numId);
           try {
             const canonicalOrder = OrderSyncHelper.universalBridgeToCanonical(po, series, warehouse);
+            const tInsertOrderStart = performance.now();
             const mutRes = await factusolConnector.createOrder(canonicalOrder);
+            const insertDurationMs = Math.round(performance.now() - tInsertOrderStart);
+            orderInsertTotalMs += insertDurationMs;
 
             if (mutRes.success) {
               ordersImported++;
@@ -821,8 +773,37 @@ export class LocalSyncEngine {
                 factusolOrderNumber: factNum,
                 factusolSeries: series,
               });
+
+              AgentDiskLogger.getInstance().log({
+                level: 'SUCCESS',
+                component: 'SyncEngine',
+                action: 'insert_factusol_order',
+                duration_ms: insertDurationMs,
+                status: 'SUCCESS',
+                message: `Pedido ${canonicalOrder.reference} registrado en Factusol en ${insertDurationMs}ms (Nº ${factNum || mutRes.externalId})`,
+                metadata: {
+                  channel: 'universal_bridge',
+                  orderId: numId,
+                  factusolOrderNumber: factNum,
+                  series,
+                },
+              });
               this.eventBus.addEvent('success', `✓ Pedido ${canonicalOrder.reference} registrado en Factusol (Nº ${factNum || mutRes.externalId}).`);
             } else {
+              AgentDiskLogger.getInstance().log({
+                level: 'ERROR',
+                component: 'SyncEngine',
+                action: 'insert_factusol_order',
+                duration_ms: insertDurationMs,
+                status: 'FAILURE',
+                message: `No se pudo registrar pedido web #${numId} (${po.order_number}) en Factusol tras ${insertDurationMs}ms: ${mutRes.error}`,
+                metadata: {
+                  channel: 'universal_bridge',
+                  orderId: numId,
+                  series,
+                  error: mutRes.error,
+                },
+              });
               this.logger.warn(`No se pudo registrar pedido web #${numId} (${po.order_number}) en Factusol: ${mutRes.error}`);
             }
           } catch (ordErr) {
@@ -831,6 +812,7 @@ export class LocalSyncEngine {
         }
 
         if (confirmations.length > 0) {
+          const tAckStart = performance.now();
           await fetch(`${endpointUrl}?action=ack_orders`, {
             method: 'POST',
             headers,
@@ -839,12 +821,28 @@ export class LocalSyncEngine {
           }).catch((err) => {
             this.logger.warn(`Aviso al confirmar pedidos en Universal Bridge: ${String(err)}`);
           });
+          const ackDurationMs = Math.round(performance.now() - tAckStart);
+          ackOrdersTotalMs += ackDurationMs;
+
+          AgentDiskLogger.getInstance().log({
+            level: 'SUCCESS',
+            component: 'SyncEngine',
+            action: 'ack_channel_orders',
+            duration_ms: ackDurationMs,
+            status: 'SUCCESS',
+            message: `Confirmación ACK de ${confirmations.length} pedidos en Universal Bridge en ${ackDurationMs}ms`,
+            metadata: { confirmedCount: confirmations.length },
+          });
         }
 
         if (rawBatch.length < 100 || confirmations.length === 0) {
           hasMoreBatches = false;
         }
       }
+
+      timings['pullOrdersMs'] = pullOrdersTotalMs;
+      timings['orderInsertMs'] = orderInsertTotalMs;
+      timings['ackOrdersMs'] = ackOrdersTotalMs;
     } catch (orderErr) {
       this.logger.warn(`Aviso en sincronización de pedidos con Universal Bridge: ${String(orderErr)}`);
     }
@@ -853,6 +851,7 @@ export class LocalSyncEngine {
     let ordersCancelled = 0;
     try {
       this.eventBus.addEvent('info', 'Comprobando pedidos cancelados en la tienda online...');
+      const tCancelStart = performance.now();
       const cancelRes = await CancellationSyncHelper.syncUniversalBridgeCancellations({
         endpointUrl,
         headers,
@@ -862,11 +861,26 @@ export class LocalSyncEngine {
         eventBus: this.eventBus,
       });
       ordersCancelled = cancelRes.ordersCancelled;
+      const cancelDurationMs = Math.round(performance.now() - tCancelStart);
+      timings['cancellationsMs'] = cancelDurationMs;
+
+      if (ordersCancelled > 0) {
+        AgentDiskLogger.getInstance().log({
+          level: 'SUCCESS',
+          component: 'SyncEngine',
+          action: 'sync_cancellations',
+          duration_ms: cancelDurationMs,
+          status: 'SUCCESS',
+          message: `Stock repuesto en Factusol para ${ordersCancelled} pedidos cancelados de Universal Bridge en ${cancelDurationMs}ms`,
+          metadata: { channel: 'universal_bridge', ordersCancelled },
+        });
+      }
     } catch (cancelErr) {
       this.logger.warn(`Aviso en sincronización inversa de cancelaciones con Universal Bridge: ${String(cancelErr)}`);
     }
 
-    const duration = ((Date.now() - start) / 1000).toFixed(1);
+    const cycleDurationMs = Date.now() - start;
+    const duration = (cycleDurationMs / 1000).toFixed(1);
     const cancelMsg = ordersCancelled > 0 ? `, ${ordersCancelled} pedidos cancelados/repuestos` : '';
     const summary = `Sincronización completada en ${duration}s: ${itemsUpdated} stock actualizado, ${ordersImported} pedidos importados${cancelMsg}.`;
 
@@ -881,6 +895,21 @@ export class LocalSyncEngine {
     });
 
     this.eventBus.addEvent('success', `✓ ${summary}`);
+    AgentDiskLogger.getInstance().log({
+      level: 'SUCCESS',
+      component: 'SyncEngine',
+      action: 'sync_cycle_complete',
+      duration_ms: cycleDurationMs,
+      status: 'SUCCESS',
+      message: `Ciclo completo de sincronización Universal Bridge finalizado en ${cycleDurationMs}ms`,
+      metadata: {
+        channel: 'universal_bridge',
+        itemsUpdated,
+        ordersImported,
+        ordersCancelled,
+        timings,
+      },
+    });
     return { success: true, message: summary };
   }
 
@@ -889,181 +918,19 @@ export class LocalSyncEngine {
     config: any,
     options?: { limit?: number; onlyMissing?: boolean }
   ): Promise<CatalogUploadResult> {
-    const start = Date.now();
-    const bridgeSettings = config.universalBridge || {};
-    if (!bridgeSettings.storeUrl) {
-      const msg = 'URL del sitio web no configurada en Universal Bridge.';
-      this.eventBus.addEvent('error', `❌ ${msg}`);
-      return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
-    }
-
-    const endpointUrl = this.resolveBridgeEndpoint(bridgeSettings.storeUrl);
-    const secretKey = bridgeSettings.secretKey;
-
-    // 1. Conectar a Factusol y leer artículos canónicos
-    let factusolConnector = this.factusolService.getConnector();
-    if (!factusolConnector) {
-      factusolConnector = new FactusolConnector();
-      await factusolConnector.connect({
-        configuration: {
-          databasePath: dbPath,
-          orderSeries: config.factusol?.orderSeries || '1',
-          defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-          tariffCode: config.factusol?.tariffCode || '1',
-          saleTariffCode: config.factusol?.saleTariffCode,
-        },
-      });
-    }
-
-    this.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
-    const factusolProducts = await factusolConnector.readProducts({
-      limit: options?.limit,
-      activeOnly: true,
-    });
-
-    if (!factusolProducts || factusolProducts.length === 0) {
-      const msg = 'No se encontraron artículos activos en Factusol para subir.';
-      this.eventBus.addEvent('warn', msg);
-      return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
-    }
-
-    this.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de Factusol.`);
-
-    // 2. Sincronización Directa y Automática de Fotos por HTTPS
-    try {
-      const imageSync = new ImageSyncService(
-        {
-          endpointUrl,
-          secretKey,
-          databasePath: dbPath,
-        },
-        this.eventBus
-      );
-      this.eventBus.addEvent('info', '📸 Comprobando y subiendo fotos de Factusol por HTTPS...');
-      await imageSync.syncImages(factusolProducts);
-    } catch (imgSyncErr) {
-      this.logger.warn(`Aviso durante la sincronización de imágenes: ${String(imgSyncErr)}`);
-      this.eventBus.addEvent('warn', `Aviso en subida de imágenes: ${String(imgSyncErr)}`);
-    }
-
-    // 3. Formatear y enviar productos a push_catalog
-    const bridgeProducts = factusolProducts.map((p) => {
-      const vatRate = p.taxRate ?? 21.0;
-      const price = p.regularPrice ?? 0;
-      const priceWithVat = Number((price * (1 + vatRate / 100)).toFixed(4));
-      const salePrice = p.salePrice && p.salePrice > 0 ? p.salePrice : undefined;
-      const salePriceWithVat = salePrice ? Number((salePrice * (1 + vatRate / 100)).toFixed(4)) : undefined;
-      const family = p.categories && p.categories.length > 0 ? p.categories[0] : undefined;
-
-      let imgart = p.attributes?.imgart || (p.images && p.images.length > 0 && p.images[0] ? p.images[0].url : '');
-      if (imgart) {
-        imgart = imgart.replace(/\\/g, '/');
-        const fIdx = imgart.toUpperCase().indexOf('FOTOS/');
-        if (fIdx !== -1) {
-          imgart = '/' + imgart.substring(fIdx);
-        } else if (!imgart.startsWith('/')) {
-          imgart = '/FOTOS/' + imgart.replace(/^\/+/, '');
-        }
-      }
-
-      return {
-        code: p.sku,
-        sku: p.sku,
-        name: p.name,
-        description: p.description || p.shortDescription || '',
-        familyCode: family?.id || '',
-        familyName: family?.name || '',
-        price,
-        salePrice,
-        vatRate,
-        priceWithVat,
-        salePriceWithVat,
-        unitOfMeasure: p.attributes?.unit || 'UNIDADES',
-        weight: p.weight,
-        barcode: p.barcode,
-        imgart: imgart || undefined,
-        active: p.status === 'published' && price > 0,
-      };
-    });
-
-    this.eventBus.addEvent('info', `Subiendo ${bridgeProducts.length} productos a la base de datos de la tienda online...`);
-
-    const PROD_BATCH = 200;
-    let uploadedCount = 0;
-    let failedCount = 0;
-
-    for (let i = 0; i < bridgeProducts.length; i += PROD_BATCH) {
-      const chunk = bridgeProducts.slice(i, i + PROD_BATCH);
-      const pushRes = await fetch(`${endpointUrl}?action=push_catalog`, {
-        method: 'POST',
-        headers: this.getBridgeHeaders(secretKey),
-        body: JSON.stringify({ products: chunk }),
-        signal: AbortSignal.timeout(30000),
-      }).catch((err) => {
-        this.logger.error('Error al enviar lote de catálogo a Universal Bridge', err);
-        return null;
-      });
-
-      if (pushRes && pushRes.ok) {
-        const resJson = (await pushRes.json()) as { success?: boolean; processed?: number };
-        uploadedCount += resJson.processed || chunk.length;
-      } else {
-        failedCount += chunk.length;
-      }
-    }
-
-    // 4. Enviar Existencias de Stock
-    try {
-      const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
-      const driver = new AccessDriver({ databasePath: dbPath });
-      const stockRows = await driver
-        .query<{ ARTSTO: any; totalStock: any }>(
-          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-        )
-        .catch(() => null);
-
-      if (stockRows && stockRows.length > 0) {
-        const stockUpdates = stockRows
-          .map((r) => ({
-            code: String(r.ARTSTO || '').trim(),
-            stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
-          }))
-          .filter((u) => u.code);
-
-        const STOCK_BATCH = 500;
-        for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
-          const chunk = stockUpdates.slice(i, i + STOCK_BATCH);
-          await fetch(`${endpointUrl}?action=push_stock`, {
-            method: 'POST',
-            headers: this.getBridgeHeaders(secretKey),
-            body: JSON.stringify({ stockUpdates: chunk }),
-            signal: AbortSignal.timeout(20000),
-          }).catch(() => null);
-        }
-      }
-    } catch {}
-
-    const duration = ((Date.now() - start) / 1000).toFixed(1);
-    const summary = `Catálogo y fotos sincronizados con éxito en ${duration}s: ${uploadedCount} productos procesados en la web (${failedCount} incidencias).`;
-    this.eventBus.addEvent('success', `✓ ${summary}`);
-
-    this.historyManager.addSyncHistoryRecord({
-      type: 'manual',
-      mode: 'full',
-      status: failedCount === 0 ? 'success' : 'warning',
-      durationSeconds: parseFloat(duration),
-      itemsUpdated: uploadedCount,
-      ordersImported: 0,
-      message: summary,
-    });
-
-    return {
-      success: true,
-      totalArticles: factusolProducts.length,
-      uploadedCount,
-      skippedCount: 0,
-      failedCount,
-      message: summary,
-    };
+    return CatalogUploadHelper.uploadUniversalBridgeCatalog(
+      {
+        configManager: this.configManager,
+        factusolService: this.factusolService,
+        historyManager: this.historyManager,
+        eventBus: this.eventBus,
+        logger: this.logger,
+        resolveBridgeEndpoint: (url) => this.resolveBridgeEndpoint(url),
+        getBridgeHeaders: (key) => this.getBridgeHeaders(key),
+      },
+      dbPath,
+      config,
+      options
+    );
   }
 }

@@ -10,6 +10,7 @@ import {
   UpdateChannel,
 } from '@erp-bridge/shared';
 import { EventBus } from '../diagnostics/event-bus';
+import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import {
   DownloadProgress,
   PendingUpdate,
@@ -163,6 +164,7 @@ export class UpdateClient {
       channel: chosenChannel,
     };
 
+    const tCheckStart = performance.now();
     try {
       this.logger.info(`Comprobando actualizaciones contra ${this.options.apiBaseUrl}...`);
       const checkUrl = `${this.options.apiBaseUrl.replace(/\/$/, '')}/api/v1/updates/check`;
@@ -241,6 +243,24 @@ export class UpdateClient {
         }
       }
 
+      const checkDurationMs = Math.round(performance.now() - tCheckStart);
+      AgentDiskLogger.getInstance().log({
+        level: checkData.available ? 'INFO' : 'DEBUG',
+        component: 'UpdateClient',
+        action: 'check_updates',
+        duration_ms: checkDurationMs,
+        status: 'SUCCESS',
+        message: checkData.available
+          ? `Nueva versión v${checkData.version} detectada en ${checkDurationMs}ms (Canal: ${chosenChannel})`
+          : `Comprobación de actualización remota finalizada en ${checkDurationMs}ms (agente al día v${this.options.currentVersion})`,
+        metadata: {
+          available: checkData.available,
+          targetVersion: checkData.version,
+          currentVersion: this.options.currentVersion,
+          channel: chosenChannel,
+        },
+      });
+
       if (checkData.available && checkData.version && checkData.downloadUrl && checkData.sha256 && checkData.signature) {
         const pending: PendingUpdate = {
           version: checkData.version,
@@ -270,10 +290,19 @@ export class UpdateClient {
       }
     } catch (err: any) {
       const errorMsg = String(err?.message || err);
+      const checkDurationMs = Math.round(performance.now() - tCheckStart);
       this.logger.warn(`Aviso al consultar actualizaciones: ${errorMsg}`);
       this.state.status = 'failed';
       this.state.lastError = errorMsg;
       this.emitUpdateEvent('update:failed', { error: errorMsg });
+      AgentDiskLogger.getInstance().log({
+        level: 'WARN',
+        component: 'UpdateClient',
+        action: 'check_updates',
+        duration_ms: checkDurationMs,
+        status: 'FAILURE',
+        message: `Fallo al comprobar actualizaciones tras ${checkDurationMs}ms: ${errorMsg}`,
+      });
       return { available: false };
     } finally {
       this.isChecking = false;

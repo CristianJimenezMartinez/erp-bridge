@@ -29,7 +29,7 @@ import {
   ConfigManager,
 } from './config';
 import { SyncHistoryRecord, HistoryManager } from './history';
-import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport } from './diagnostics';
+import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport, AgentDiskLogger } from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
@@ -477,10 +477,21 @@ export class LocalAgent {
       this.fileWatcherService.start(cfg.factusolDbPath, cfg.organizationId || 'org_default', async (reason) => {
         this.logger.info(`Cambio detectado en base Factusol (${reason}). Disparando sincronización de stock autónoma...`);
         this.addEvent('info', `Cambio detectado en Factusol (${reason}). Sincronizando stock...`);
+        AgentDiskLogger.getInstance().log({
+          level: 'INFO',
+          component: 'FileWatcher',
+          action: 'file_change_detected',
+          duration_ms: 0,
+          status: 'SUCCESS',
+          message: `Cambio en Factusol detectado por vigilante en tiempo real (${reason}). Sincronizando stock...`,
+          metadata: { reason, databasePath: cfg.factusolDbPath },
+        });
+
         if (!this.syncEngine.isBusy()) {
           void this.syncEngine.triggerManualSync();
         }
         if (cfg.agentId && cfg.apiBaseUrl) {
+          const tNotify = performance.now();
           await fetch(`${cfg.apiBaseUrl}/api/v1/sync/run-reactive`, {
             method: 'POST',
             headers: {
@@ -493,9 +504,21 @@ export class LocalAgent {
               reason,
               timestamp: new Date().toISOString(),
             }),
-          }).catch((err) => {
-            this.logger.warn(`No se pudo notificar sync reactivo a la API: ${err instanceof Error ? err.message : String(err)}`);
-          });
+          })
+            .then((res) => {
+              const dur = Math.round(performance.now() - tNotify);
+              AgentDiskLogger.getInstance().log({
+                level: res.ok ? 'DEBUG' : 'WARN',
+                component: 'FileWatcher',
+                action: 'notify_reactive_sync',
+                duration_ms: dur,
+                status: res.ok ? 'SUCCESS' : 'FAILURE',
+                message: `Notificación de sincronización reactiva a la API (${dur}ms, HTTP ${res.status})`,
+              });
+            })
+            .catch((err) => {
+              this.logger.warn(`No se pudo notificar sync reactivo a la API: ${err instanceof Error ? err.message : String(err)}`);
+            });
         }
       });
       this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
@@ -552,6 +575,7 @@ export class LocalAgent {
         };
 
         if (cfg.apiBaseUrl) {
+          const tBeatNetStart = performance.now();
           const res = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/${effectiveAgentId}/heartbeat`, {
             method: 'POST',
             headers: {
@@ -560,6 +584,26 @@ export class LocalAgent {
             },
             body: JSON.stringify(heartbeat),
           }).catch(() => null);
+          const beatLatencyMs = Math.round(performance.now() - tBeatNetStart);
+
+          AgentDiskLogger.getInstance().log({
+            level: res && res.ok ? 'INFO' : 'WARN',
+            component: 'Heartbeat',
+            action: 'send_heartbeat',
+            duration_ms: beatLatencyMs,
+            status: res && res.ok ? 'SUCCESS' : 'FAILURE',
+            message: res && res.ok
+              ? `Latido Heartbeat enviado a ${cfg.apiBaseUrl} en ${beatLatencyMs}ms (HTTP ${res.status})`
+              : `Aviso en latido Heartbeat al Core tras ${beatLatencyMs}ms (${res ? `HTTP ${res.status}` : 'Sin respuesta de red'})`,
+            metadata: {
+              agentId: effectiveAgentId,
+              apiBaseUrl: cfg.apiBaseUrl,
+              factusolStatus: factusolHealth?.status,
+              factusolLatencyMs: factusolHealth?.latencyMs,
+              articleCount: factusolHealth?.articleCount,
+              fileWatcherActive: this.fileWatcherService.isActive(),
+            },
+          });
 
           if (res && res.ok) {
             try {
@@ -595,6 +639,7 @@ export class LocalAgent {
   }): Promise<void> {
     if (this.isUpdating) return;
     this.isUpdating = true;
+    const tUpdateStart = performance.now();
 
     try {
       let { downloadUrl, sha256, signature } = info;
@@ -610,17 +655,39 @@ export class LocalAgent {
       }
 
       this.logger.info(`Iniciando auto-actualización silenciosa hacia v${info.version}...`);
+      const tDownloadStart = performance.now();
       const downloadedFile = await this.autoUpdater.downloadUpdate(downloadUrl, info.version);
+      const downloadMs = Math.round(performance.now() - tDownloadStart);
 
+      const tVerifyStart = performance.now();
       const isValid = this.autoUpdater.verifyUpdate(downloadedFile, sha256, signature);
+      const verifyMs = Math.round(performance.now() - tVerifyStart);
+
       if (!isValid) {
         this.logger.error(`Firma o integridad inválida para v${info.version}. Actualización rechazada de forma segura.`);
         await this.autoUpdater.reportStatus(info.version, 'failed', 'Fallo de verificación criptográfica Ed25519');
+        AgentDiskLogger.getInstance().log({
+          level: 'ERROR',
+          component: 'AutoUpdater',
+          action: 'apply_update',
+          duration_ms: Math.round(performance.now() - tUpdateStart),
+          status: 'FAILURE',
+          message: `Firma criptográfica inválida para v${info.version}`,
+        });
         this.isUpdating = false;
         return;
       }
 
       this.logger.info(`✓ Verificación criptográfica exitosa. Aplicando reemplazo atómico en Windows...`);
+      AgentDiskLogger.getInstance().log({
+        level: 'SUCCESS',
+        component: 'AutoUpdater',
+        action: 'apply_update',
+        duration_ms: Math.round(performance.now() - tUpdateStart),
+        status: 'SUCCESS',
+        message: `Actualización a v${info.version} descargada (${downloadMs}ms) y verificada (${verifyMs}ms). Iniciando reemplazo.`,
+        metadata: { version: info.version, downloadMs, verifyMs },
+      });
       await this.autoUpdater.applyUpdate(downloadedFile);
     } catch (err) {
       this.logger.error(`Error durante el ciclo de actualización automática: ${String(err)}`);
