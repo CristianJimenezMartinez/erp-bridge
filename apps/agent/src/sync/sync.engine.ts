@@ -11,6 +11,7 @@ import { ImageSyncService } from './image-sync.service';
 import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
 import { CatalogUploadHelper } from './catalog-upload.helper';
+import { OrderNotifierService } from '../notifications/order-notifier.service';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -385,6 +386,17 @@ export class LocalSyncEngine {
                   },
                 });
                 this.eventBus.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${assignedNum})`);
+
+                // Despachar alerta por correo (asíncrono sin bloquear ciclo de sync)
+                OrderNotifierService.notifyNewOrder({
+                  order: canonicalOrder,
+                  channel: 'woocommerce',
+                  factusolOrderNumber: assignedNum,
+                  series,
+                  config: this.configManager.get(),
+                }).catch((err) => {
+                  this.logger.warn(`Aviso al despachar email de pedido #${wcOrder.id}: ${String(err)}`);
+                });
               } else {
                 AgentDiskLogger.getInstance().log({
                   level: 'ERROR',
@@ -828,6 +840,17 @@ export class LocalSyncEngine {
                 },
               });
               this.eventBus.addEvent('success', `✓ Pedido ${canonicalOrder.reference} registrado en Factusol (Nº ${factNum || mutRes.externalId}).`);
+
+              // Despachar alerta por correo (asíncrono sin bloquear ciclo de sync)
+              OrderNotifierService.notifyNewOrder({
+                order: canonicalOrder,
+                channel: 'universal_bridge',
+                factusolOrderNumber: factNum || mutRes.externalId,
+                series,
+                config: this.configManager.get(),
+              }).catch((err) => {
+                this.logger.warn(`Aviso al despachar email de pedido ${canonicalOrder.reference}: ${String(err)}`);
+              });
             } else {
               AgentDiskLogger.getInstance().log({
                 level: 'ERROR',

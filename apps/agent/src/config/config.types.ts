@@ -35,6 +35,17 @@ export interface AgentSyncRules {
   safetyStockBuffer?: number;
 }
 
+export interface AgentNotificationSettings {
+  orderAlertsEnabled?: boolean;
+  alertEmail?: string;
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+  smtpPass?: string;
+  smtpFrom?: string;
+  smtpSecure?: boolean;
+}
+
 export interface AgentConfigFile {
   agentId?: string;
   agentName?: string;
@@ -50,4 +61,6 @@ export interface AgentConfigFile {
   universalBridge?: AgentUniversalBridgeSettings;
   channelType?: 'woocommerce' | 'universal_bridge';
   syncRules?: AgentSyncRules;
+  notifications?: AgentNotificationSettings;
 }
+

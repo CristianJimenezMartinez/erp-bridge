@@ -27,6 +27,15 @@ export class SystemController {
     };
   }
 
+  public static testEmail(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      logger.info('Solicitud de prueba de email de alerta recibida.');
+      const result = await agent.testEmailNotification(ctx.body?.notifications || ctx.body);
+      res.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(result));
+    };
+  }
+
   public static openWindow(getUrl: () => string): RouteHandler {
     return (_req, res) => {
       logger.info('Solicitud de apertura de ventana recibida desde System Tray o CLI.');

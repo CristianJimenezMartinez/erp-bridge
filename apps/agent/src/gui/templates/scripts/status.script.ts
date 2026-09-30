@@ -268,6 +268,46 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           chkOnlyPos.checked = rules.onlyStockAboveZero;
         }
 
+        // Notificaciones por Email
+        const notif = data.notifications || {};
+        const chkAlerts = document.getElementById('check-order-alerts-enabled');
+        if (chkAlerts && notif.orderAlertsEnabled !== undefined && (force || document.activeElement !== chkAlerts)) {
+          chkAlerts.checked = notif.orderAlertsEnabled;
+          if (typeof toggleOrderAlertsSection === 'function') {
+            toggleOrderAlertsSection(notif.orderAlertsEnabled);
+          }
+        }
+
+        const inNotifEmail = document.getElementById('input-notif-email');
+        if (inNotifEmail && (force || !inNotifEmail.value || document.activeElement !== inNotifEmail)) {
+          if (notif.alertEmail || force) inNotifEmail.value = notif.alertEmail || '';
+        }
+
+        const inSmtpHost = document.getElementById('input-notif-smtp-host');
+        if (inSmtpHost && (force || !inSmtpHost.value || document.activeElement !== inSmtpHost)) {
+          if (notif.smtpHost || force) inSmtpHost.value = notif.smtpHost || '';
+        }
+
+        const inSmtpPort = document.getElementById('input-notif-smtp-port');
+        if (inSmtpPort && (force || !inSmtpPort.value || document.activeElement !== inSmtpPort)) {
+          if (notif.smtpPort || force) inSmtpPort.value = notif.smtpPort || 465;
+        }
+
+        const inSmtpUser = document.getElementById('input-notif-smtp-user');
+        if (inSmtpUser && (force || !inSmtpUser.value || document.activeElement !== inSmtpUser)) {
+          if (notif.smtpUser || force) inSmtpUser.value = notif.smtpUser || '';
+        }
+
+        const inSmtpPass = document.getElementById('input-notif-smtp-pass');
+        if (inSmtpPass && (force || !inSmtpPass.value || document.activeElement !== inSmtpPass)) {
+          if (notif.smtpPass || force) inSmtpPass.value = notif.smtpPass || '';
+        }
+
+        const inSmtpFrom = document.getElementById('input-notif-smtp-from');
+        if (inSmtpFrom && (force || !inSmtpFrom.value || document.activeElement !== inSmtpFrom)) {
+          if (notif.smtpFrom || force) inSmtpFrom.value = notif.smtpFrom || '';
+        }
+
         const inLicKey = document.getElementById('input-lic-key');
         if (inLicKey && data.licenseKey && (force || !inLicKey.value || document.activeElement !== inLicKey)) {
           inLicKey.value = data.licenseKey;

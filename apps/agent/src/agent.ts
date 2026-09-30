@@ -26,6 +26,7 @@ import {
   AgentWooCommerceSettings,
   AgentUniversalBridgeSettings,
   AgentSyncRules,
+  AgentNotificationSettings,
   ConfigManager,
 } from './config';
 import { SyncHistoryRecord, HistoryManager } from './history';
@@ -35,6 +36,7 @@ import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolSer
 import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 import { AutoStartService } from './system';
+import { OrderNotifierService } from './notifications/order-notifier.service';
 
 // Re-exportar tipos para 100% de compatibilidad externa
 export * from './config';
@@ -137,6 +139,7 @@ export class LocalAgent {
     channelType?: 'woocommerce' | 'universal_bridge';
     syncRules?: AgentSyncRules;
     licenseKey?: string;
+    notifications?: AgentNotificationSettings;
   }): Promise<{ success: boolean; message: string }> {
     const cfg = this.configManager.get();
     if (updates.factusol) {
@@ -157,6 +160,9 @@ export class LocalAgent {
     }
     if (updates.syncRules) {
       cfg.syncRules = { ...(cfg.syncRules || {}), ...updates.syncRules };
+    }
+    if (updates.notifications) {
+      cfg.notifications = { ...(cfg.notifications || {}), ...updates.notifications };
     }
 
     let licenseMsg = '';
@@ -319,12 +325,19 @@ export class LocalAgent {
       universalBridgeSettings: cfg.universalBridge,
       channelType: cfg.channelType || 'woocommerce',
       syncRules: cfg.syncRules,
+      notifications: cfg.notifications,
       syncHistory: this.historyManager.getSyncHistory(),
       system: SystemInfoService.getSystemInfo(),
       recentEvents: this.eventBus.getRecentEvents(),
       update: this.getUpdateStatus(),
       preflight,
     };
+  }
+
+  public async testEmailNotification(customSettings?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    const cfg = this.configManager.get();
+    const settings = customSettings || cfg.notifications || {};
+    return OrderNotifierService.sendTestEmail(settings, cfg.apiBaseUrl, cfg.licenseKey);
   }
 
   public async getLiveHealth(): Promise<LiveHealthReport> {

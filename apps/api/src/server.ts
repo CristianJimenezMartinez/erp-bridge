@@ -28,6 +28,7 @@ import { updatesRouter } from './routes/updates.router';
 import { billingRouter } from './routes/billing.router';
 import { authRouter } from './routes/auth.router';
 import { monitoringRouter } from './routes/monitoring.router';
+import { notificationsRouter } from './routes/notifications.router';
 import { getLatestReleasedVersion } from './utils/version.util';
 
 dotenv.config();
@@ -105,6 +106,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', authRouter);
   app.use('/api/v1', monitoringRouter);
   app.use(monitoringRouter);
+  app.use('/api/v1', notificationsRouter);
+  app.use(notificationsRouter);
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)
   const releasesDir = path.resolve(__dirname, '../../../releases');
