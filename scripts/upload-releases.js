@@ -224,6 +224,7 @@ async function uploadReleases(options = {}) {
               });
             }
             console.log(`    ✓ ${uploadQueue.length} archivos transferidos con éxito.`);
+            try { sftp.end(); } catch {}
 
             // Copiar archivos clave a releases/latest/ en el servidor
             console.log('>>> [4/6] Sincronizando punteros genéricos /releases/latest/...');
