@@ -100,6 +100,15 @@ function applyVersionToAll(newVersion) {
     updatedCount++;
   }
 
+  // Sincronizar también el fallback estático en version-sync.js si existe
+  const versionSyncPath = path.resolve(rootDir, 'apps/api/public/js/version-sync.js');
+  if (fs.existsSync(versionSyncPath)) {
+    let syncContent = fs.readFileSync(versionSyncPath, 'utf8');
+    syncContent = syncContent.replace(/var DEFAULT_VERSION = '[^']+';/, `var DEFAULT_VERSION = '${targetVer}';`);
+    fs.writeFileSync(versionSyncPath, syncContent, 'utf8');
+    console.log(`  ✓ apps/api/public/js/version-sync.js           DEFAULT_VERSION -> ${targetVer}`);
+  }
+
   // Nota: apps/agent/src/gui/tray/BentianTray.cs es un módulo sellado (Gate 7).
   // Su integridad criptográfica se preserva intacta sin modificar el código fuente C#.
 

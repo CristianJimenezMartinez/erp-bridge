@@ -7,7 +7,6 @@ import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService } from '../factusol/factusol.service';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
-import { ImageSyncService } from './image-sync.service';
 import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
 import { CatalogUploadHelper } from './catalog-upload.helper';

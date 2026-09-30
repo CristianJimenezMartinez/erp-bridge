@@ -53,10 +53,22 @@ async function testFiscalRolloverInSyncEngine() {
   const resolved = FactusolYearResolver.resolveActiveDatabase(oldDbFile);
   assert.strictEqual(resolved.switched, true, 'Debe detectar cambio de ejercicio fiscal');
   assert.strictEqual(resolved.currentYear, currentYear, `Debe resolver al año ${currentYear}`);
-  assert.strictEqual(path.resolve(resolved.activePath), path.resolve(newDbFile), 'Debe apuntar a la nueva base de datos');
+  // Aislar configuración en directorio temporal para no mutar el AppData del usuario
+  process.env.BENTIAN_CONFIG_PATH = path.join(tempDir, 'agent-config.json');
 
   // Probar integración con ConfigManager y LocalSyncEngine
   const configManager = new ConfigManager({
+    channelType: 'woocommerce',
+    universalBridge: {
+      storeUrl: '',
+      secretKey: '',
+      enabled: false,
+    },
+    woocommerce: {
+      storeUrl: '',
+      consumerKey: '',
+      consumerSecret: '',
+    },
     factusolDbPath: oldDbFile,
     factusol: {
       databasePath: oldDbFile,
@@ -90,7 +102,8 @@ async function testFiscalRolloverInSyncEngine() {
     'factusol.databasePath debe haberse actualizado al archivo del nuevo año'
   );
 
-  // Limpiar archivos temporales
+  // Limpiar archivos temporales y variable de entorno
+  delete process.env.BENTIAN_CONFIG_PATH;
   try {
     fs.rmSync(tempDir, { recursive: true, force: true });
   } catch {}

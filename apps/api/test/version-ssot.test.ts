@@ -15,8 +15,9 @@ async function testVersionSSoT() {
   // 1. Verificar resolución canónica de versión
   console.log('  -> Test 1: Verificar función centralizada getLatestReleasedVersion()...');
   const ver = getLatestReleasedVersion();
+  const rootPkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../package.json'), 'utf8'));
   assert.ok(ver, 'La versión retornada no debe ser vacía');
-  assert.strictEqual(ver, '0.3.3', 'La versión canónica actual debe ser 0.3.3');
+  assert.strictEqual(ver, rootPkg.version, `La versión canónica actual debe ser ${rootPkg.version}`);
   console.log(`  ✓ Versión detectada correctamente: v${ver}`);
 
   // 2. Verificar URLs canónicas
