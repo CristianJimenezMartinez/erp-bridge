@@ -156,7 +156,7 @@ El pipeline de empaquetado en `builder/build.js` ya cuenta con el módulo `build
    - Añadir en el pie de página de la landing:
      * **Aviso Legal:** Titular (Autónomo o S.L.), NIF/CIF, domicilio social y email de contacto.
      * **Política de Privacidad:** Cumplimiento RGPD (derecho de acceso, rectificación y supresión).
-     * **Términos de Contratación:** Explicar el periodo de prueba de 14 días y la política de renovación/cancelación mensual o anual.
+     * **Términos de Contratación:** Explicar la política B2B de activación inmediata sin periodo de prueba ni devoluciones (Art. 103.m TRLGDCU) y la cancelación de renovación en 1 clic.
 3. **Facturación a Clientes**:
    - Las cuotas cobradas por Stripe deben registrarse en tu contabilidad con una serie correlativa de facturas (ej. `FRA-2026-001`). Stripe Invoicing puede generar la factura PDF automáticamente para el cliente.
 

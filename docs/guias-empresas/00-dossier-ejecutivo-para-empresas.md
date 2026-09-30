@@ -111,7 +111,7 @@ La transición no requiere detener la actividad de la empresa ni cambiar la form
 
 1. **Instalación Asistida en 30 minutos:** Nuestro equipo técnico o su informático de confianza configuran el enlace sin alterar su instalación actual de Factusol.
 2. **Prueba de Funcionamiento Garantizada:** Sincronizamos un artículo de muestra y realizamos un pedido de prueba conjunto para validar tarifas, impuestos y rutas de albarán.
-3. **Garantía Total de Satisfacción:** Si en los primeros 14 días el sistema no cumple exactamente con lo prometido, le devolvemos el 100% del importe sin preguntas.
+3. **Demostración y Validación Previa:** Comprobación de compatibilidad con su versión de Factusol y demostración técnica guiada sin compromiso. Sin permanencia: cancele la renovación de su plan en cualquier momento desde su panel en 1 clic.
 
 ---
 

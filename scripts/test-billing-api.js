@@ -231,7 +231,7 @@ async function runBillingTests() {
     const plansRes = await fetch(`${baseUrl}/billing/plans`);
     const plansData = await plansRes.json();
     assert(plansRes.status === 200, 'GET /billing/plans responde HTTP 200');
-    assert(plansData.trialDays === 14 && plansData.trialCardRequired === false, 'Prueba de 14 días gratis sin tarjeta incluida');
+    assert(plansData.trialDays === 0 && plansData.trialCardRequired === true, 'Suscripción B2B con activación inmediata sin prueba gratuita');
     assert(plansData.plans && plansData.plans.length === 6, 'Catálogo completo retornado (Plan Base Anual, Mensual, Addons Tienda y Setups)');
 
     const baseAnnual = plansData.plans.find(p => p.id === 'base_annual');

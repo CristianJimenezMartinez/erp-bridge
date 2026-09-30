@@ -46,7 +46,7 @@ flowchart TD
 | :--- | :---: | :---: |
 | **Precio** | **199 € / año** (+ IVA) | **29 € / mes** (+ IVA) |
 | **Ahorro** | **Ahorra 149 € al año** frente a cuota mensual | Máxima flexibilidad sin compromiso anual |
-| **Periodo de Prueba** | **14 Días Gratis** sin compromiso | **14 Días Gratis** sin compromiso |
+| **Modalidad de Contratación** | **Activación Inmediata B2B** (Sin permanencia) | **Activación Inmediata B2B** (Sin permanencia) |
 | **Tiendas Web Conectadas** | 1 tienda *(2ª tienda con 20% dto. mismo CIF)* | 1 tienda *(2ª tienda con 20% dto. mismo CIF)* |
 | **Puestos de Factusol** | **Sincronización Centralizada** (toda tu red incluida) | **Sincronización Centralizada** (toda tu red incluida) |
 | **Límite de Catálogo y Pedidos** | **Ilimitado** (sin comisiones por venta) | **Ilimitado** (sin comisiones por venta) |
@@ -170,6 +170,9 @@ Para que nunca tengas sorpresas en tu cuenta bancaria:
 
 ### ¿Se emite factura con retención de IRPF?
 El suministro de software bajo licencia SaaS no está sujeto a retención de IRPF según la normativa de la Dirección General de Tributos española; se factura con IVA repercutido estándar al 21%.
+
+### ¿Existe derecho de desistimiento o devolución de cuotas?
+**No.** Bentian ERP Bridge es un software de infraestructura profesional destinado exclusivamente a empresas y autónomos (B2B). De conformidad con el artículo 103, letra m) del Real Decreto Legislativo 1/2007 (TRLGDCU) y la normativa europea relativa a contenido digital no prestado en soporte material y servicios de ejecución inmediata, una vez entregada la clave de licencia y puesta en marcha la sincronización, el servicio se considera consumido y ejecutado en su totalidad, no admitiéndose devoluciones ni reembolsos del periodo contratado. El cliente puede cancelar la renovación automática en cualquier momento desde el portal de autoservicio de Stripe con un solo clic para evitar cualquier cargo futuro.
 
 ### ¿Qué ocurre con mis datos si decido no renovar?
 Los datos de tus artículos, clientes y ventas siempre residen en tu propio Factusol y en tu tienda online. Bentian no secuestra jamás tus datos. Si cancelas la suscripción, tus bases de datos quedan 100% intactas en tu poder; únicamente cesará el envío automático de sincronizaciones entre ambos sistemas.

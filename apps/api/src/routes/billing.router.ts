@@ -54,7 +54,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
       'Delta Sync por triada de hashes (descarte en local <100ms)',
       'Blindaje de imágenes por MD5 y Recargo de Equivalencia (R.E.)',
       'Centro de Control Local nativo y System Tray permanente',
-      'Prueba de 14 días gratis sin tarjeta',
+      'Activación y entrega de clave inmediata',
       'Actualizaciones continuas y soporte técnico por email',
     ],
   },
@@ -90,7 +90,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
       '1 ERP ⇄ 1 Tienda Online conectada',
       '1 Conexión ERP / Servidor (instalación en el equipo con Factusol)',
       'Delta Sync y blindaje de imágenes',
-      'Prueba de 14 días gratis sin tarjeta',
+      'Activación y entrega de clave inmediata',
       'Sin permanencia: cancelable en cualquier momento en 1 clic',
     ],
   },
@@ -134,8 +134,8 @@ export const CATALOG_PLANS: PlanDefinition[] = [
 billingRouter.get('/billing/plans', (_req: Request, res: Response) => {
   return res.json({
     currency: 'EUR',
-    trialDays: 14,
-    trialCardRequired: false,
+    trialDays: 0,
+    trialCardRequired: true,
     plans: CATALOG_PLANS,
   });
 });

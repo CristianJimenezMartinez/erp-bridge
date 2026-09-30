@@ -63,7 +63,20 @@ de Bentian frente al Usuario por cualquier causa o reclamación derivada de este
 o del uso del Software quedará estrictamente limitada al importe efectivamente abonado
 por el Usuario a Bentian en los tres (3) meses inmediatamente anteriores al hecho causante.
 
-7. LEGISLACIÓN Y TRIBUNALES COMPETENTES
+7. NATURALEZA B2B, INEXISTENCIA DE DERECHO DE DESISTIMIENTO Y POLÍTICA DE NO-REEMBOLSO
+El Software y los servicios de Bentian se comercializan exclusivamente a personas físicas
+o jurídicas en ejercicio de su actividad empresarial o profesional (B2B). De conformidad
+con el artículo 103, letra m) del Real Decreto Legislativo 1/2007 (TRLGDCU) y la Directiva
+Europea 2011/83/UE sobre suministro de contenido digital no prestado en soporte material
+y servicios profesionales de ejecución inmediata, el Usuario reconoce y consiente expresamente
+que, una vez generada o activada la clave de licencia y comenzada la sincronización o
+procesamiento de datos con Factusol, el servicio se considera consumido y ejecutado en su
+totalidad, perdiendo cualquier derecho de desistimiento, devolución o reembolso de importes
+abonados. El Usuario puede cancelar la renovación automática de su suscripción en cualquier
+momento a través del portal de cliente de Stripe, conservando la operatividad de la licencia
+hasta la expiración del periodo contratado sin derecho a liquidación o reintegro proporcional.
+
+8. LEGISLACIÓN Y TRIBUNALES COMPETENTES
 Este contrato se rige por la legislación española común. Ambas partes, con renuncia a
 cualquier otro fuero que pudiera corresponderles, se someten a la jurisdicción exclusiva
 de los Juzgados y Tribunales de la ciudad de Murcia (España).

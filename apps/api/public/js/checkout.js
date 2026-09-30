@@ -11,7 +11,7 @@ const PLAN_INFO = {
     name: 'Plan Base Todo Incluido (Anual)',
     price: '199 €',
     cycle: '/ año + IVA (Oferta Early Bird)',
-    desc: '14 días de prueba gratuita sin compromiso. Incluye 1 ERP y 1 Tienda.'
+    desc: 'Activación inmediata en 60s. Sin permanencia: cancela la renovación cuando quieras. Incluye 1 ERP y 1 Tienda.'
   },
   base_monthly: {
     name: 'Plan Base Todo Incluido (Mensual)',
