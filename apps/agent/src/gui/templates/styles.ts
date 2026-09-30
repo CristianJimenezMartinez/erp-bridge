@@ -165,4 +165,13 @@ export const dashboardStyles = `
 
     .spin { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* Reconnection Banner */
+    .connection-banner { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9999; background: rgba(20, 20, 26, 0.96); border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.15); border-radius: 12px; padding: 10px 22px; backdrop-filter: blur(12px); display: none; align-items: center; gap: 14px; animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .connection-banner.visible { display: flex; }
+    .banner-spinner { width: 18px; height: 18px; border: 2px solid rgba(245, 158, 11, 0.25); border-top-color: #f59e0b; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    .banner-text { display: flex; flex-direction: column; gap: 2px; }
+    .banner-text strong { font-size: 13px; color: #fef3c7; font-weight: 600; letter-spacing: -0.01em; }
+    .banner-text span { font-size: 11px; color: #d1d5db; }
+    @keyframes slideDown { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 `;

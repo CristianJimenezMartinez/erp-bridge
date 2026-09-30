@@ -5,7 +5,7 @@ export function renderFactusolTab(): string {
           <div class="section-header">
             <div>
               <div class="section-title">Base de Datos Factusol (.accdb / .mdb)</div>
-              <div class="section-desc">Selecciona la base de datos de tu empresa en Factusol para lectura directa local.</div>
+              <div class="section-desc">Selecciona o introduce la base de datos de tu Factusol. Admite disco local (C:\\...), unidades de red (X:\\...) y rutas de red UNC hacia tu NAS u otro equipo (\\\\NAS\\...).</div>
             </div>
             <div style="display: flex; gap: 8px;">
               <button onclick="detectFactusol()" id="btn-detect-fact" class="btn btn-secondary btn-sm">
@@ -25,13 +25,22 @@ export function renderFactusolTab(): string {
           </div>
 
           <div class="form-group">
-            <label class="form-label">Ruta de la base de datos (o carpeta de Factusol):</label>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta de Factusol):</label>
+              <span style="font-size: 11px; color: #818cf8; cursor: pointer;" onclick="document.getElementById('input-factusol-db').focus()" title="Puedes escribir o pegar cualquier ruta directamente">✍️ Escribir o pegar directamente</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+              Introduce la ruta del archivo <code>.accdb</code> o la carpeta de datos. Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\2262026.accdb</code> o <code>\\\\192.168.1.50\\Datos\\FS\\...</code>), pégala directamente aquí y pulsa en <strong>Guardar Ajustes Factusol</strong>.
+            </div>
             <div class="input-with-button">
-              <input type="text" id="input-factusol-db" onblur="handleFactusolInputBlur()" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
+              <input type="text" id="input-factusol-db" oninput="cleanPathInput(this)" onblur="handleFactusolInputBlur()" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\2262026.accdb  o  X:\\\\Datos\\\\FS\\\\...  o  \\\\\\\\NAS\\\\Datos\\\\..." style="font-family: monospace; font-size: 13px;">
               <button onclick="testFactusolConnection()" id="btn-test-fact" class="btn btn-secondary" style="white-space: nowrap;">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
                 <span>Probar Conexión</span>
               </button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+              <span style="font-size: 11px; color: var(--text-subtle);">💡 Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
             </div>
             <div id="fact-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>

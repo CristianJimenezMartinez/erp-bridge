@@ -40,6 +40,27 @@ export const coreScript = `
       }
     }
 
+    // Auto-sanitización de rutas de Windows (eliminar comillas de 'Copiar como ruta de acceso')
+    function cleanPathValue(val) {
+      if (!val) return '';
+      let cleaned = String(val).trim();
+      if ((cleaned.startsWith('"') && cleaned.endsWith('"')) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+        cleaned = cleaned.substring(1, cleaned.length - 1).trim();
+      }
+      return cleaned;
+    }
+
+    function cleanPathInput(inputIdOrEl) {
+      const el = typeof inputIdOrEl === 'string' ? document.getElementById(inputIdOrEl) : inputIdOrEl;
+      if (!el) return '';
+      const original = el.value;
+      const cleaned = cleanPathValue(original);
+      if (cleaned !== original) {
+        el.value = cleaned;
+      }
+      return cleaned;
+    }
+
     // Tabs
     function switchTab(tabId) {
       document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });

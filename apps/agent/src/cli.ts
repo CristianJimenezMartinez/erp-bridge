@@ -12,26 +12,28 @@ import { LocalAgent } from './agent';
 import { FactusolDetector } from './detector';
 import { LocalGuiServer, openDesktopWindow, openWindowsFileDialog, SystemTrayManager } from './gui';
 
-function getPanicLogPath(): string {
+import { AgentDiskLogger } from './diagnostics/disk-logger';
+
+function getCrashLogPath(): string {
   const baseDir =
     process.env.APPDATA ||
     (os.platform() === 'darwin'
       ? path.join(os.homedir(), 'Library', 'Application Support')
       : path.join(os.homedir(), '.config'));
 
-  const primaryLogsDir = path.join(baseDir, 'erp-bridge', 'logs');
+  const primaryLogsDir = path.join(baseDir, 'Bentian Agent', 'logs');
   try {
     if (!fs.existsSync(primaryLogsDir)) {
       fs.mkdirSync(primaryLogsDir, { recursive: true });
     }
-    return path.join(primaryLogsDir, 'panic.log');
+    return path.join(primaryLogsDir, 'crash.log');
   } catch {
-    return path.resolve(process.cwd(), 'agent-panic.log');
+    return path.resolve(process.cwd(), 'crash.log');
   }
 }
 
-function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string, err: unknown): string {
-  const logPath = getPanicLogPath();
+function writeCrashLog(type: 'uncaughtException' | 'unhandledRejection' | string, err: unknown): string {
+  const logPath = getCrashLogPath();
   try {
     const timestamp = new Date().toISOString();
     const errorMessage = err instanceof Error ? err.message : String(err);
@@ -39,7 +41,7 @@ function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string
 
     const report = [
       '================================================================================',
-      `🚨 [PANIC REPORT] ${timestamp}`,
+      `🚨 [CRASH REPORT] ${timestamp} — 🚨 [PANIC REPORT]`,
       `   Type: ${type}`,
       `   Platform: ${process.platform} (${process.arch}) | Node: ${process.version} | PID: ${process.pid}`,
       `   Executable: ${process.execPath}`,
@@ -52,6 +54,28 @@ function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string
 
     fs.appendFileSync(logPath, report, 'utf8');
 
+    // También escribir en panic.log para compatibilidad con auditorías y tests legacy
+    try {
+      const panicPath = path.join(path.dirname(logPath), 'panic.log');
+      fs.appendFileSync(panicPath, report.replace('🚨 [CRASH REPORT]', '🚨 [PANIC REPORT]'), 'utf8');
+    } catch {}
+
+    // Auditoría estructurada en AgentDiskLogger
+    try {
+      AgentDiskLogger.getInstance().log({
+        level: 'ERROR',
+        component: 'ProcessCrashGuard',
+        action: type,
+        status: 'FAILURE',
+        message: `Fallo crítico del proceso: ${errorMessage}`,
+        error: {
+          name: err instanceof Error ? err.name : 'CrashError',
+          message: errorMessage,
+          stack,
+        },
+      });
+    } catch {}
+
     console.error('\n=============================================================');
     console.error(`🚨 ERROR CRÍTICO DEL AGENTE [${type}]`);
     console.error('=============================================================');
@@ -59,9 +83,17 @@ function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string
     console.error(`Registro de auditoría guardado en:\n  ${logPath}`);
     console.error('=============================================================\n');
   } catch (fsErr) {
-    console.error('Fallo al escribir en panic.log:', fsErr, 'Error original:', err);
+    console.error('Fallo al escribir en crash.log:', fsErr, 'Error original:', err);
   }
   return logPath;
+}
+
+function getPanicLogPath(): string {
+  return getCrashLogPath();
+}
+
+function writePanicLog(type: 'uncaughtException' | 'unhandledRejection' | string, err: unknown): string {
+  return writeCrashLog(type, err);
 }
 
 let activeAgentInstance: LocalAgent | null = null;
@@ -93,11 +125,11 @@ async function handleGracefulShutdown(signal: string): Promise<void> {
 
 // 1. Manejadores globales de ciclo de vida y pánicos al inicio del archivo
 process.on('unhandledRejection', (reason: unknown, _promise: Promise<unknown>) => {
-  writePanicLog('unhandledRejection', reason);
+  writeCrashLog('unhandledRejection', reason);
 });
 
 process.on('uncaughtException', (error: Error) => {
-  writePanicLog('uncaughtException', error);
+  writeCrashLog('uncaughtException', error);
   process.exit(1);
 });
 
@@ -510,7 +542,6 @@ async function main() {
 
       const agent = new LocalAgent();
       activeAgentInstance = agent;
-      await agent.start();
 
       let guiServer: LocalGuiServer | null = null;
       if (!isHeadless) {
@@ -528,6 +559,14 @@ async function main() {
         }
       }
 
+      // Arranque resiliente y protegido de los subsistemas en segundo plano
+      try {
+        await agent.start();
+      } catch (agentErr) {
+        writeCrashLog('agent.start', agentErr);
+        console.error('⚠️ Error al inicializar subsistemas del agente en segundo plano:', agentErr);
+      }
+
       console.log('💡 Agente local ejecutándose en segundo plano. Presione Ctrl+C para detener.\n');
       break;
     }
@@ -541,6 +580,8 @@ export {
   openDesktopWindow,
   openWindowsFileDialog,
   SystemTrayManager,
+  writeCrashLog,
+  getCrashLogPath,
   writePanicLog,
   getPanicLogPath,
   handleGracefulShutdown,
@@ -548,7 +589,7 @@ export {
 
 if (!process.env['ERP_BRIDGE_TEST_MODE']) {
   main().catch((err) => {
-    writePanicLog('uncaughtException', err);
+    writeCrashLog('uncaughtException', err);
     process.exit(1);
   });
 }

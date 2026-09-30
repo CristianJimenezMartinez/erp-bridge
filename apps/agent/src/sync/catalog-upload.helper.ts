@@ -6,6 +6,7 @@ import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService } from '../factusol/factusol.service';
+import { FactusolPathResolver } from '../factusol/factusol.resolver';
 import { CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
 
@@ -28,8 +29,16 @@ export class CatalogUploadHelper {
     ctx.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
 
     const config = ctx.configManager.get();
-    let dbPath = config.factusol?.databasePath || config.factusolDbPath;
+    let dbPath = FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || '');
     const woo = config.woocommerce || {};
+
+    if (dbPath && !fs.existsSync(dbPath)) {
+      const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (uncFallback && fs.existsSync(uncFallback)) {
+        ctx.logger.info(`Unidad de red no accesible directamente, usando ruta UNC equivalente: ${uncFallback}`);
+        dbPath = uncFallback;
+      }
+    }
 
     if (dbPath) {
       try {

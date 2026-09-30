@@ -132,6 +132,14 @@ async function testGuiServer() {
     assert.strictEqual(resOptions.headers.get('access-control-allow-methods'), 'GET, POST, OPTIONS');
     console.log('  ✓ Preflight OPTIONS validado con CORS loopback.');
 
+    // 13. Test GET /health
+    console.log('13. Probando GET /health...');
+    const resHealth = await fetch(`${url}/health`);
+    assert.strictEqual(resHealth.status, 200, 'GET /health debe responder 200 OK');
+    const healthJson = await resHealth.json() as any;
+    assert.strictEqual(healthJson.status, 'OK', 'El status de health debe ser OK');
+    console.log('  ✓ GET /health respondió 200 OK.');
+
   } finally {
     await server.stop();
     console.log('✓ LocalGuiServer detenido limpiamente.');

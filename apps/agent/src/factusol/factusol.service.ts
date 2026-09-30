@@ -5,6 +5,7 @@ import { FactusolConnector, AccessDriver } from '@erp-bridge/connector-factusol'
 import { ConfigManager } from '../config/config.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { FactusolMetadata, ArticlePreviewItem } from './factusol.types';
+import { FactusolPathResolver } from './factusol.resolver';
 
 export class FactusolService {
   private readonly logger = new Logger('FactusolService');
@@ -21,13 +22,28 @@ export class FactusolService {
 
   public async connect(customDbPath?: string): Promise<boolean> {
     const config = this.configManager.get();
-    const dbPath = customDbPath || config.factusol?.databasePath || config.factusolDbPath;
+    let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
 
-    if (!dbPath || !fs.existsSync(dbPath)) {
-      this.logger.warn(`No se ha configurado o no existe el archivo de Factusol: ${dbPath || 'Sin ruta'}`);
+    if (!dbPath) {
+      this.logger.warn(`No se ha configurado el archivo de Factusol: ${dbPath || 'Sin ruta'}`);
       this.eventBus?.addEvent('warn', '⚠️ Base de datos Factusol no configurada.');
       return false;
     }
+
+    if (!fs.existsSync(dbPath)) {
+      const unc = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (unc && fs.existsSync(unc)) {
+        this.logger.info(`Ruta de unidad mapeada no accesible directamente, usando equivalente UNC: ${unc}`);
+        dbPath = unc;
+      }
+    }
+
+    if (!fs.existsSync(dbPath)) {
+      this.logger.warn(`No existe o no está accesible el archivo de Factusol (Desconectado/Offline): ${dbPath}`);
+      this.eventBus?.addEvent('warn', `⚠️ Base de datos Factusol no accesible (Desconectado/Offline): ${path.basename(dbPath) || dbPath}`);
+      return false;
+    }
+
 
     try {
       if (this.factusol) {
@@ -63,9 +79,28 @@ export class FactusolService {
     }
   }
 
-  public async testConnection(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number }> {
-    if (!dbPath || !fs.existsSync(dbPath)) {
+  public async testConnection(dbPathInput: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number; resolvedPath?: string }> {
+    let dbPath = FactusolPathResolver.cleanPath(dbPathInput);
+    if (!dbPath) {
       return { success: false, message: 'La ruta especificada no existe en el sistema.' };
+    }
+
+    // Auto-resolver si el usuario introdujo una carpeta
+    const resolved = FactusolPathResolver.resolve(dbPath);
+    if (resolved.success && resolved.resolvedPath) {
+      dbPath = resolved.resolvedPath;
+    } else if (!fs.existsSync(dbPath)) {
+      const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (uncFallback && fs.existsSync(uncFallback)) {
+        dbPath = uncFallback;
+      }
+    }
+
+    if (!fs.existsSync(dbPath)) {
+      return {
+        success: false,
+        message: `La ruta especificada no existe en el sistema: '${dbPathInput}'. Si es una unidad de red mapeada (ej: X:\\), comprueba que esté accesible o introduce la ruta UNC directa (ej: \\\\SERVIDOR\\Datos\\...).`,
+      };
     }
     const ext = path.extname(dbPath).toLowerCase();
     if (ext !== '.accdb' && ext !== '.mdb') {
@@ -83,6 +118,7 @@ export class FactusolService {
         message: `Conexión exitosa. Se detectaron ${count.toLocaleString('es-ES')} artículos.`,
         articleCount: count,
         fileSizeBytes: stats.size,
+        resolvedPath: dbPath !== dbPathInput.trim() ? dbPath : undefined,
       };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -90,7 +126,7 @@ export class FactusolService {
     }
   }
 
-  public async reconnect(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number }> {
+  public async reconnect(dbPath: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number; resolvedPath?: string }> {
     const testResult = await this.testConnection(dbPath);
     if (!testResult.success) {
       this.eventBus?.addEvent('error', `Error conectando Factusol: ${testResult.message}`);
@@ -98,17 +134,23 @@ export class FactusolService {
     }
 
     await this.disconnect();
-    this.configManager.setFactusolDbPath(dbPath);
-    await this.connect(dbPath);
+    const finalDbPath = testResult.resolvedPath || FactusolPathResolver.cleanPath(dbPath);
+    this.configManager.setFactusolDbPath(finalDbPath);
+    await this.connect(finalDbPath);
 
-    this.eventBus?.addEvent('success', `✓ Base de datos Factusol reconectada: ${path.basename(dbPath)}`);
+    this.eventBus?.addEvent('success', `✓ Base de datos Factusol reconectada: ${path.basename(finalDbPath)}`);
     return testResult;
   }
 
   public async getArticleCount(customDbPath?: string): Promise<number | undefined> {
     const config = this.configManager.get();
-    const dbPath = customDbPath || config.factusol?.databasePath || config.factusolDbPath;
-    if (!dbPath || !fs.existsSync(dbPath)) return undefined;
+    let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
+    if (!dbPath) return undefined;
+    if (!fs.existsSync(dbPath)) {
+      const unc = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (unc && fs.existsSync(unc)) dbPath = unc;
+    }
+    if (!fs.existsSync(dbPath)) return undefined;
 
     try {
       const driver = new AccessDriver({ databasePath: dbPath });
@@ -136,8 +178,13 @@ export class FactusolService {
     };
 
     const config = this.configManager.get();
-    const dbPath = customDbPath || config.factusol?.databasePath || config.factusolDbPath;
-    if (!dbPath || !fs.existsSync(dbPath)) return defaultRes;
+    let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
+    if (!dbPath) return defaultRes;
+    if (!fs.existsSync(dbPath)) {
+      const unc = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (unc && fs.existsSync(unc)) dbPath = unc;
+    }
+    if (!fs.existsSync(dbPath)) return defaultRes;
 
     try {
       const driver = new AccessDriver({ databasePath: dbPath });
@@ -175,13 +222,19 @@ export class FactusolService {
     total?: number;
   }> {
     const config = this.configManager.get();
-    const dbPath = customDbPath || config.factusol?.databasePath || config.factusolDbPath;
-    if (!dbPath || !fs.existsSync(dbPath)) return { articles: [], total: 0 };
+    let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
+    if (!dbPath) return { articles: [], total: 0 };
+    if (!fs.existsSync(dbPath)) {
+      const unc = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (unc && fs.existsSync(unc)) dbPath = unc;
+    }
+    if (!fs.existsSync(dbPath)) return { articles: [], total: 0 };
 
     try {
       const driver = new AccessDriver({ databasePath: dbPath });
       const query = `SELECT TOP ${Math.min(limit, 100)} CODART, DESART, FAMART, PCOART, EANART FROM F_ART WHERE CODART <> '' ORDER BY CODART`;
       const artRows = await driver.query<{ CODART: string; DESART: string; FAMART: string; PCOART: number; EANART: string }>(query);
+
 
       let stockMap = new Map<string, number>();
       let priceMap = new Map<string, number>();

@@ -503,7 +503,7 @@ export class UpdateClient {
         const result = UpdateSwapper.launchAtomicUpdateProcess({
           targetExePath: targetBinaryPath,
           newExePath: newBinaryPath,
-          timeoutSeconds: 10,
+          timeoutSeconds: 15,
           processNamesToKill: ['BentianAgent', 'BentianTray'],
           postUpdateArgs: ['start', '--post-update', '--minimized'],
         });

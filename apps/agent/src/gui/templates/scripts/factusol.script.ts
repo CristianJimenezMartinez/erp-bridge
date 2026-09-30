@@ -3,7 +3,9 @@ export const factusolScript = `
     async function handleFactusolInputBlur(inputId) {
       inputId = inputId || 'input-factusol-db';
       const el = document.getElementById(inputId);
-      if (!el || !el.value.trim()) return;
+      if (!el) return;
+      if (typeof cleanPathInput === 'function') cleanPathInput(el);
+      if (!el.value.trim()) return;
 
       try {
         const res = await fetch('/api/local/resolve-factusol-path', {
@@ -191,11 +193,11 @@ export const factusolScript = `
       inputId = inputId || 'input-factusol-db';
       alertId = alertId || 'fact-test-alert';
       const inputEl = document.getElementById(inputId);
-      const dbPath = inputEl ? inputEl.value.trim() : '';
+      const dbPath = (typeof cleanPathInput === 'function') ? cleanPathInput(inputEl) : (inputEl ? inputEl.value.trim() : '');
       const alertBox = document.getElementById(alertId);
       const btn = inputId === 'input-factusol-db' ? document.getElementById('btn-test-fact') : null;
       if (!dbPath) {
-        showToast('Selecciona la ruta de tu Factusol', 'warn');
+        showToast('Introduce o selecciona la ruta de tu Factusol', 'warn');
         return;
       }
       if (btn) btn.disabled = true;
@@ -211,6 +213,9 @@ export const factusolScript = `
           body: JSON.stringify({ databasePath: dbPath })
         });
         const data = await res.json();
+        if (data.resolvedPath && inputEl && inputEl.value !== data.resolvedPath) {
+          inputEl.value = data.resolvedPath;
+        }
         if (alertBox) {
           alertBox.style.display = 'block';
           const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
@@ -239,9 +244,11 @@ export const factusolScript = `
     }
 
     async function saveFactusolSettings() {
+      const inputEl = document.getElementById('input-factusol-db');
+      const cleanDbPath = (typeof cleanPathInput === 'function') ? cleanPathInput(inputEl) : (inputEl ? inputEl.value.trim() : '');
       const payload = {
         factusol: {
-          databasePath: document.getElementById('input-factusol-db').value.trim(),
+          databasePath: cleanDbPath,
           tariffCode: document.getElementById('select-factusol-tariff').value,
           saleTariffCode: document.getElementById('select-factusol-sale-tariff') ? document.getElementById('select-factusol-sale-tariff').value : '',
           warehouseCode: document.getElementById('select-factusol-warehouse').value,

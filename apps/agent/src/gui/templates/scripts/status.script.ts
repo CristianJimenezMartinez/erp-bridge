@@ -1,16 +1,64 @@
 export function renderStatusScript(agentVersion: string = '0.2.0'): string {
   return `
-    // Status Polling
+    // Status Polling & Connection Health Resilience
     let _lastStatusPayload = '';
     let _initialFetchCompleted = false;
+    let _consecutiveFailures = 0;
+    let _isReconnecting = false;
+    let _reconnectTimer = null;
+
+    function showConnectionBanner() {
+      const banner = document.getElementById('connection-lost-banner');
+      if (banner) banner.classList.add('visible');
+      const badge = document.getElementById('header-engine-status');
+      const dot = document.getElementById('header-engine-dot');
+      const txt = document.getElementById('header-engine-text');
+      if (badge && dot && txt) {
+        badge.style.background = 'rgba(245,158,11,0.12)';
+        badge.style.borderColor = 'rgba(245,158,11,0.35)';
+        badge.style.color = '#f59e0b';
+        dot.style.background = '#f59e0b';
+        dot.style.boxShadow = '0 0 6px #f59e0b';
+        txt.textContent = 'Reiniciando motor...';
+      }
+    }
+
+    function hideConnectionBanner() {
+      const banner = document.getElementById('connection-lost-banner');
+      if (banner) banner.classList.remove('visible');
+      const badge = document.getElementById('header-engine-status');
+      const dot = document.getElementById('header-engine-dot');
+      const txt = document.getElementById('header-engine-text');
+      if (badge && dot && txt) {
+        badge.style.background = 'rgba(16,185,129,0.1)';
+        badge.style.borderColor = 'rgba(16,185,129,0.25)';
+        badge.style.color = '#10b981';
+        dot.style.background = '#10b981';
+        dot.style.boxShadow = '0 0 6px #10b981';
+        txt.textContent = 'Motor Autónomo Activo';
+      }
+    }
 
     async function fetchStatus(forceFormSync) {
-      if (document.hidden && !forceFormSync && _initialFetchCompleted) return;
+      if (document.hidden && !forceFormSync && _initialFetchCompleted && !_isReconnecting) return;
       try {
         const res = await fetch('/api/local/status');
-        if (!res.ok) return;
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
         const text = await res.text();
         _initialFetchCompleted = true;
+
+        if (_isReconnecting) {
+          _isReconnecting = false;
+          _consecutiveFailures = 0;
+          hideConnectionBanner();
+          if (typeof showToast === 'function') {
+            showToast('✓ Enlace con el motor local restablecido.', 'success');
+          }
+        }
+        _consecutiveFailures = 0;
+
         if (!forceFormSync && text === _lastStatusPayload) {
           return;
         }
@@ -22,7 +70,22 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           loadAutoStart(forceFormSync);
         }
       } catch (err) {
-        console.warn('Servidor local:', err); // quality-allow-console (browser template script)
+        _consecutiveFailures++;
+        if (_consecutiveFailures === 1) {
+          console.warn('Servidor local (reintentando reconexión automática):', err); // quality-allow-console (browser template script)
+        }
+        if (_consecutiveFailures >= 2) {
+          _isReconnecting = true;
+          showConnectionBanner();
+          const countEl = document.getElementById('banner-reconnect-count');
+          if (countEl) countEl.textContent = String(_consecutiveFailures);
+
+          // Durante la reconexión, reintentar con sondeo rápido
+          if (_reconnectTimer) clearTimeout(_reconnectTimer);
+          _reconnectTimer = setTimeout(function() {
+            fetchStatus(false);
+          }, 1500);
+        }
       }
     }
 
@@ -171,7 +234,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inputFactDb = document.getElementById('input-factusol-db');
         if (inputFactDb && (force || !inputFactDb.value || document.activeElement !== inputFactDb)) {
           const dbVal = fact.databasePath || fSettings.databasePath || '';
-          if (dbVal || force) inputFactDb.value = dbVal;
+          if (dbVal) {
+            inputFactDb.value = dbVal;
+          }
         }
 
         const selTariff = document.getElementById('select-factusol-tariff');
@@ -349,6 +414,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         showToast('Actualización en curso. El agente se reiniciará en breves momentos...', 'success');
+        _isReconnecting = true;
+        showConnectionBanner();
 
         // Polling para reconexión y recarga automática
         let attempts = 0;

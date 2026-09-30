@@ -6,6 +6,7 @@ import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService } from '../factusol/factusol.service';
+import { FactusolPathResolver } from '../factusol/factusol.resolver';
 import { SyncManualResult, CatalogUploadResult } from './sync.types';
 import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
@@ -90,8 +91,17 @@ export class LocalSyncEngine {
     let ordersImported = 0;
 
     const config = this.configManager.get();
-    let dbPath = config.factusol?.databasePath || config.factusolDbPath;
+    let dbPath = FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || '');
     const woo = config.woocommerce || {};
+
+    // Comprobación de fallback UNC si es una unidad de red que no responde directamente
+    if (dbPath && !fs.existsSync(dbPath)) {
+      const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
+      if (uncFallback && fs.existsSync(uncFallback)) {
+        this.logger.info(`Unidad de red no accesible directamente, usando ruta UNC equivalente: ${uncFallback}`);
+        dbPath = uncFallback;
+      }
+    }
 
     // Comprobación y resolución de Rollover Fiscal Automático de Factusol
     if (dbPath) {
@@ -125,7 +135,7 @@ export class LocalSyncEngine {
 
     if (isUniversalBridge) {
       if (!dbPath || !fs.existsSync(dbPath)) {
-        const msg = 'Base de datos de Factusol no configurada o inaccesible.';
+        const msg = `Base de datos de Factusol no configurada o inaccesible (${dbPath || 'Sin ruta'}).`;
         this.eventBus.addEvent('error', `❌ ${msg}`);
         return { success: false, message: msg };
       }
@@ -143,12 +153,25 @@ export class LocalSyncEngine {
         try {
           const tStockQueryStart = performance.now();
           const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
-          const stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
+          let stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
             `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
           ).catch((err) => {
             this.logger.warn('Error al consultar stock en Factusol:', err);
             return null;
           });
+
+          // Fallback inteligente: si con el almacén configurado devolvió 0 registros, intentar agrupar por todos los almacenes de F_STO
+          if ((!stockRows || stockRows.length === 0) && warehouse) {
+            const fallbackRows = await driver
+              .query<{ ARTSTO: any; totalStock: any }>(
+                `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO GROUP BY ARTSTO`
+              )
+              .catch(() => null);
+            if (fallbackRows && fallbackRows.length > 0) {
+              this.logger.info(`ℹ Almacén '${warehouse}' no devolvió existencias en F_STO, pero se encontraron existencias agrupando todos los almacenes (${fallbackRows.length} referencias).`);
+              stockRows = fallbackRows;
+            }
+          }
           const stockQueryDurationMs = Math.round(performance.now() - tStockQueryStart);
           timings['queryFactusolStockMs'] = stockQueryDurationMs;
 
@@ -665,7 +688,7 @@ export class LocalSyncEngine {
       this.eventBus.addEvent('info', 'Consultando existencias de stock en Factusol...');
       const tStockQueryStart = performance.now();
       const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
-      const stockRows = await driver
+      let stockRows = await driver
         .query<{ ARTSTO: any; totalStock: any }>(
           `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
         )
@@ -673,6 +696,20 @@ export class LocalSyncEngine {
           this.logger.warn('Error al consultar stock en Factusol:', err);
           return null;
         });
+
+      // Fallback inteligente: si con el almacén configurado devolvió 0 registros, intentar agrupar por todos los almacenes de F_STO
+      if ((!stockRows || stockRows.length === 0) && warehouse) {
+        const fallbackRows = await driver
+          .query<{ ARTSTO: any; totalStock: any }>(
+            `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO GROUP BY ARTSTO`
+          )
+          .catch(() => null);
+        if (fallbackRows && fallbackRows.length > 0) {
+          this.logger.info(`ℹ Almacén '${warehouse}' no devolvió existencias en F_STO, pero se encontraron existencias agrupando todos los almacenes (${fallbackRows.length} referencias).`);
+          stockRows = fallbackRows;
+        }
+      }
+
       const stockQueryDurationMs = Math.round(performance.now() - tStockQueryStart);
       timings['queryFactusolStockMs'] = stockQueryDurationMs;
 
@@ -735,6 +772,9 @@ export class LocalSyncEngine {
           message: `Consulta Factusol F_STO devolvió 0 registros o falló en ${stockQueryDurationMs}ms`,
           metadata: { warehouse },
         });
+        if (stockRows === null) {
+          this.eventBus.addEvent('warn', '⚠️ Base de datos Factusol no accesible o fallo al consultar F_STO. Comprueba la conexión de red o permisos del archivo.');
+        }
       }
     } catch (stockErr) {
       this.logger.warn(`Aviso en sincronización de stock con Universal Bridge: ${String(stockErr)}`);

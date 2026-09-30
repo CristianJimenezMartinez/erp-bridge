@@ -141,12 +141,14 @@ export const wizardScript = `
     }
 
     async function finishWizardAndStart() {
+      const factInput = document.getElementById('wiz-input-fact-path');
+      const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
       // Guardar todo
       const payload = {
         licenseKey: document.getElementById('wiz-input-lic').value.trim() || undefined,
         channelType: currentChannelType,
         factusol: {
-          databasePath: document.getElementById('wiz-input-fact-path').value.trim() || undefined,
+          databasePath: factPath || undefined,
         },
         universalBridge: {
           storeUrl: document.getElementById('wiz-input-univ-url').value.trim() || undefined,

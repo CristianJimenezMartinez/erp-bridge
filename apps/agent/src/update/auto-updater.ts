@@ -284,22 +284,26 @@ export class AutoUpdater {
    */
   public async handlePostUpdate(targetBinaryPath?: string): Promise<boolean> {
     const targetExe = targetBinaryPath || process.execPath;
-    const oldExePath = `${targetExe}.old`;
+    const candidates = [`${targetExe}.old`, `${targetExe}.bak`];
+    let cleaned = false;
 
-    if (!fs.existsSync(oldExePath)) {
-      return true;
+    for (const backupPath of candidates) {
+      if (fs.existsSync(backupPath)) {
+        this.logger.info(`Detectada versión previa de actualización (${backupPath}). Limpiando y confirmando salud...`);
+        try {
+          fs.unlinkSync(backupPath);
+          this.logger.info(`✓ Archivo de respaldo eliminado correctamente: ${backupPath}`);
+          cleaned = true;
+        } catch (err) {
+          this.logger.warn(`Aviso en limpieza post-actualización (${backupPath}): ${String(err)}`);
+        }
+      }
     }
 
-    this.logger.info(`Detectada versión previa de actualización (${oldExePath}). Limpiando y confirmando salud...`);
-    try {
-      fs.unlinkSync(oldExePath);
-      this.logger.info(`✓ Archivo de respaldo .old eliminado correctamente.`);
+    if (cleaned) {
       await this.reportStatus(this.config.currentVersion, 'success');
-      return true;
-    } catch (err) {
-      this.logger.warn(`Aviso en limpieza post-actualización: ${String(err)}`);
-      return false;
     }
+    return true;
   }
 
   /**

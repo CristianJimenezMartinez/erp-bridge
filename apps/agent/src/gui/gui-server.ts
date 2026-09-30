@@ -51,8 +51,17 @@ export class LocalGuiServer {
     router.get('/v1/live-health', StatusController.getLiveHealth(this.agent));
     router.get('/v1/logs/structured', StatusController.getStructuredLogs());
 
+    // Health check rápido de disponibilidad de instancia (CLI & Updaters)
+    const handleHealthCheck = (_req: any, res: any) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'OK', agentVersion: this.agent.getVersion() }));
+    };
+    router.get('/health', handleHealthCheck);
+    router.get('/api/local/health', handleHealthCheck);
+
     // 3. Factusol
     router.any(['GET', 'POST'], '/api/local/open-file-dialog', FactusolController.openNativeFileDialog(this.agent));
+    router.any(['GET', 'POST'], '/api/local/browse-factusol-db', FactusolController.openNativeFileDialog(this.agent));
     router.post('/api/local/detect-factusol', FactusolController.detectFactusol(this.agent));
     router.post('/api/local/test-factusol', FactusolController.testFactusol(this.agent));
     router.get('/api/local/factusol/metadata', FactusolController.getMetadata(this.agent));
@@ -93,8 +102,8 @@ export class LocalGuiServer {
 
   public async start(): Promise<{ port: number; url: string }> {
     const fixedPort = this.defaultPort; // 39281 estricto e inmutable
-    const maxRetries = 8;
-    const retryDelayMs = 500;
+    const maxRetries = 12; // Resiliencia ampliada contra TIME_WAIT en reinicios / updates (hasta ~15-20s)
+    const baseDelayMs = 500;
 
     return new Promise((resolve, reject) => {
       let attempt = 0;
@@ -113,14 +122,19 @@ export class LocalGuiServer {
         });
 
         srv.once('error', (err: NodeJS.ErrnoException) => {
+          try {
+            srv.close();
+          } catch {}
+
           if (err.code === 'EADDRINUSE') {
             if (attempt <= maxRetries) {
-              logger.info(`Puerto ${fixedPort} en uso/TIME_WAIT (intento ${attempt}/${maxRetries}). Reintentando en ${retryDelayMs}ms...`);
-              setTimeout(attemptListen, retryDelayMs);
+              const currentDelay = Math.min(2500, Math.round(baseDelayMs * Math.pow(1.25, attempt - 1)));
+              logger.info(`Puerto ${fixedPort} en uso/TIME_WAIT (intento ${attempt}/${maxRetries}). Reintentando en ${currentDelay}ms...`);
+              setTimeout(attemptListen, currentDelay);
               return;
             }
             logger.error(`Puerto ${fixedPort} ocupado tras ${maxRetries} intentos. Prohibido saltar de puerto.`);
-            reject(new Error(`Puerto ${fixedPort} bloqueado por otro proceso.`));
+            reject(new Error(`Puerto ${fixedPort} bloqueado por otro proceso tras ${maxRetries} intentos.`));
           } else {
             reject(err);
           }

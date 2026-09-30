@@ -56,8 +56,15 @@ export function renderWizardModal(): string {
           </div>
 
           <div class="form-group">
-            <label class="form-label">Ruta seleccionada:</label>
-            <input type="text" id="wiz-input-fact-path" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta):</label>
+              <span style="font-size: 11px; color: #818cf8; cursor: pointer;" onclick="document.getElementById('wiz-input-fact-path').focus()">✍️ Escribir o pegar directamente</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+              Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\...</code> o <code>\\\\NAS\\Datos\\...</code>), puedes pegarla directamente aquí.
+            </div>
+            <input type="text" id="wiz-input-fact-path" oninput="cleanPathInput(this)" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb  o  X:\\\\...  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
+            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">💡 Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</div>
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
         </div>

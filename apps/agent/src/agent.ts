@@ -145,8 +145,12 @@ export class LocalAgent {
     if (updates.factusol) {
       cfg.factusol = { ...(cfg.factusol || {}), ...updates.factusol };
       if (updates.factusol.databasePath !== undefined) {
-        cfg.factusolDbPath = updates.factusol.databasePath;
-        cfg.factusol.databasePath = updates.factusol.databasePath;
+        const cleaned = FactusolPathResolver.cleanPath(updates.factusol.databasePath);
+        const resolved = FactusolPathResolver.resolve(cleaned);
+        const finalPath = (resolved.success && resolved.resolvedPath) ? resolved.resolvedPath : cleaned;
+        cfg.factusolDbPath = finalPath;
+        cfg.factusol.databasePath = finalPath;
+        updates.factusol.databasePath = finalPath;
       }
     }
     if (updates.woocommerce) {
@@ -188,10 +192,15 @@ export class LocalAgent {
     this.syncEngine.startAutoSyncLoop(() => this.isRunning);
 
     if (cfg.factusolDbPath) {
-      if (fs.existsSync(cfg.factusolDbPath)) {
-        await this.factusolService.reconnect(cfg.factusolDbPath).catch(() => null);
+      let activePath = cfg.factusolDbPath;
+      if (!fs.existsSync(activePath)) {
+        const unc = FactusolPathResolver.resolveMappedDriveToUnc(activePath);
+        if (unc && fs.existsSync(unc)) activePath = unc;
+      }
+      if (fs.existsSync(activePath)) {
+        await this.factusolService.reconnect(activePath).catch(() => null);
       } else {
-        this.logger.warn(`Ruta de Factusol guardada pero no accesible inmediatamente: ${cfg.factusolDbPath}`);
+        this.logger.warn(`Ruta de Factusol guardada pero no accesible inmediatamente (Desconectado/Offline): ${cfg.factusolDbPath}`);
       }
     }
 
@@ -262,7 +271,8 @@ export class LocalAgent {
     }
 
     const cfg = this.configManager.get();
-    const dbPath = cfg.factusol?.databasePath || cfg.factusolDbPath;
+    const rawDbPath = cfg.factusol?.databasePath || cfg.factusolDbPath || '';
+    const dbPath = FactusolPathResolver.cleanPath(rawDbPath);
 
     let preflight: PreflightHealthReport | undefined;
     try {
@@ -274,11 +284,19 @@ export class LocalAgent {
     let articleCount: number | undefined;
     let fileSizeBytes: number | undefined;
     let connected = false;
-    let statusMessage = 'No configurado';
+    let statusMessage = dbPath ? 'Desconectado / Offline (Ruta de red o disco no accesible)' : 'No configurado';
 
-    if (dbPath && fs.existsSync(dbPath)) {
+    let effectivePath = dbPath;
+    if (effectivePath && !fs.existsSync(effectivePath)) {
+      const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(effectivePath);
+      if (uncFallback && fs.existsSync(uncFallback)) {
+        effectivePath = uncFallback;
+      }
+    }
+
+    if (effectivePath && fs.existsSync(effectivePath)) {
       try {
-        const stats = fs.statSync(dbPath);
+        const stats = fs.statSync(effectivePath);
         fileSizeBytes = stats.size;
 
         if (this.cachedFactusolHealth && now - this.cachedFactusolHealth.timestamp < 30_000) {
@@ -292,7 +310,7 @@ export class LocalAgent {
             connected = health.status === 'HEALTHY';
             statusMessage = health.message || '';
             if (connected) {
-              articleCount = await this.factusolService.getArticleCount(dbPath);
+              articleCount = await this.factusolService.getArticleCount(effectivePath);
             }
           }
           this.cachedFactusolHealth = { connected, statusMessage, articleCount, timestamp: now };
@@ -311,7 +329,7 @@ export class LocalAgent {
       hwid,
       license,
       factusol: {
-        configured: Boolean(dbPath && fs.existsSync(dbPath)),
+        configured: Boolean(dbPath),
         databasePath: dbPath || '',
         fileName: dbPath ? path.basename(dbPath) : '',
         connected,
