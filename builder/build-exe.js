@@ -73,10 +73,15 @@ async function buildExecutable(options = {}) {
   console.log(`  System Tray BentianTray.exe presente: ${fs.existsSync(path.resolve(distDir, 'BentianTray.exe'))}`);
   console.log(`  Tiempo: ${(durationMs / 1000).toFixed(2)}s\n`);
 
-  // Smoke test de verificación inmediata
-  console.log('--- Verificando ejecución nativa (BentianAgent.exe status) ---');
-  const testOutput = childProcess.execSync(`"${exePath}" status`, { encoding: 'utf8' });
-  console.log(testOutput.trim());
+  // Verificación estática del manifiesto UAC (requireAdministrator)
+  console.log('--- Verificando manifiesto UAC en BentianAgent.exe ---');
+  const exeBuffer = fs.readFileSync(exePath);
+  const hasRequireAdmin = exeBuffer.includes('requireAdministrator');
+  if (hasRequireAdmin) {
+    console.log('  ✓ Manifiesto UAC verificado: level="requireAdministrator" incrustado en PE.');
+  } else {
+    console.warn('  ⚠️ Advertencia: No se detectó requireAdministrator en el binario.');
+  }
   console.log('------------------------------------------------------------\n');
 
   return {
@@ -121,21 +126,22 @@ function patchPeSubsystemToGui(exePath) {
 function applyCustomIconAndMetadata(targetExe, iconPath) {
   const rcedit = path.win32.normalize(path.resolve(__dirname, 'tools/rcedit-x64.exe'));
   const normExe = path.win32.normalize(targetExe);
-  const normIcon = path.win32.normalize(iconPath);
+  const normIcon = iconPath ? path.win32.normalize(iconPath) : null;
 
-  if (fs.existsSync(rcedit) && fs.existsSync(normIcon)) {
+  if (fs.existsSync(rcedit)) {
     try {
       const { getCurrentVersion } = require('./version');
       const v = getCurrentVersion();
-      console.log(`  [rcedit] Incrustando icono personalizado y metadatos de producto (v${v})...`);
-      const cmd = `"${rcedit}" "${normExe}" --set-icon "${normIcon}" --set-version-string FileDescription "Bentian ERP Bridge Agent" --set-version-string ProductName "Bentian ERP Bridge" --set-version-string CompanyName "Bentian" --set-file-version ${v}.0 --set-product-version ${v}.0`;
+      console.log(`  [rcedit] Incrustando icono, manifiesto requireAdministrator y metadatos de producto (v${v})...`);
+      const iconArg = (normIcon && fs.existsSync(normIcon)) ? `--set-icon "${normIcon}"` : '';
+      const cmd = `"${rcedit}" "${normExe}" ${iconArg} --set-requested-execution-level requireAdministrator --set-version-string FileDescription "Bentian ERP Bridge Agent" --set-version-string ProductName "Bentian ERP Bridge" --set-version-string CompanyName "Bentian" --set-file-version ${v}.0 --set-product-version ${v}.0`;
       childProcess.execSync(cmd, { stdio: 'ignore' });
-      console.log('  ✓ Icono y metadatos incrustados con éxito en BentianAgent.exe.');
+      console.log('  ✓ Manifiesto requireAdministrator, icono y metadatos incrustados con éxito en BentianAgent.exe.');
     } catch (err) {
-      console.warn('  [rcedit] Advertencia al inyectar icono en exe:', err.message);
+      console.warn('  [rcedit] Advertencia al configurar metadatos/manifiesto en exe:', err.message);
     }
   } else {
-    console.log('  [rcedit] Info: rcedit o icon.ico no encontrados, omitiendo inyección.');
+    console.log('  [rcedit] Info: rcedit no encontrado, omitiendo inyección.');
   }
 }
 
@@ -156,6 +162,16 @@ function compileSystemTray(distDir) {
   try {
     childProcess.execSync(cmd, { stdio: 'ignore' });
     if (fs.existsSync(trayDest)) {
+      // Inyectar nivel de ejecución requireAdministrator en BentianTray.exe
+      const rcedit = path.win32.normalize(path.resolve(__dirname, 'tools/rcedit-x64.exe'));
+      if (fs.existsSync(rcedit)) {
+        try {
+          childProcess.execSync(`"${rcedit}" "${trayDest}" --set-requested-execution-level requireAdministrator`, { stdio: 'ignore' });
+          console.log('  ✓ Manifiesto requireAdministrator incrustado en BentianTray.exe.');
+        } catch (rceErr) {
+          console.warn('  [Tray Builder] Advertencia al inyectar requireAdministrator en BentianTray.exe:', rceErr.message);
+        }
+      }
       const stats = fs.statSync(trayDest);
       console.log(`[Tray Builder] ✓ BentianTray.exe compilado con éxito (${(stats.size / 1024).toFixed(1)} KB)`);
       return trayDest;

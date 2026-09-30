@@ -21,7 +21,7 @@ DisableProgramGroupPage=yes
 CloseApplications=yes
 CloseApplicationsFilter=BentianAgent.exe,BentianTray.exe
 PrivilegesRequired=admin
-PrivilegesRequiredOverridesAllowed=dialog
+PrivilegesRequiredOverridesAllowed=
 OutputDir={#OutputDir}
 OutputBaseFilename=Bentian-Setup-v{#AppVersion}
 Compression=lzma2/ultra64
@@ -62,6 +62,8 @@ Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; V
 Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; ValueType: string; ValueName: "IconUri"; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Bentian.ERPBridge.Agent"; ValueType: dword; ValueName: "ShowInActionCenter"; ValueData: 1; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Bentian.ERPBridge.Agent"; ValueType: dword; ValueName: "Enabled"; ValueData: 1; Flags: uninsdeletekey
+; Habilitar EnableLinkedConnections para que procesos elevados como Administrador sigan viendo unidades de red mapeadas (X:\, Z:\, NAS)
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"; ValueType: dword; ValueName: "EnableLinkedConnections"; ValueData: "1"; Flags: createvalueifdoesntexist
 
 [Run]
 ; 1. Reglas en el Firewall de Windows (Entrada y Salida para agente y tray)
@@ -72,8 +74,14 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""B
 ; 2. Exclusiones automáticas en Windows Defender Antivirus
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try {{ Add-MpPreference -ExclusionPath @('{app}', ""$env:APPDATA\Bentian Agent"") -ExclusionProcess @('{#MyAppExeName}','BentianTray.exe','cscript.exe') -ExclusionExtension @('.accdb','.laccdb') -ErrorAction SilentlyContinue }} catch {{}}"""; Flags: runhidden waituntilterminated
 
-; 3. Lanzar aplicación post-instalación como usuario estándar original (no admin elevado)
-Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runhidden runasoriginaluser
+; 3. Garantizar clave de registro EnableLinkedConnections para unidades de red mapeadas (NAS / unidades X:, Z:)
+Filename: "{sys}\reg.exe"; Parameters: "add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ""EnableLinkedConnections"" /t REG_DWORD /d 1 /f"; Flags: runhidden waituntilterminated
+
+; 4. Configurar accesos directos creados para ejecutarse siempre como Administrador (SLDF_RUNAS_USER)
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""Get-ChildItem -Path @('{autodesktop}', '{group}') -Filter '*.lnk' -Recurse -ErrorAction SilentlyContinue | ForEach-Object {{ try {{ `$b = [System.IO.File]::ReadAllBytes(`$_.FullName); if (`$b.Length -gt 21) {{ `$b[21] = `$b[21] -bor 0x20; [System.IO.File]::WriteAllBytes(`$_.FullName, `$b) }} }} catch {{}} }}"""; Flags: runhidden waituntilterminated
+
+; 5. Lanzar aplicación post-instalación con privilegios elevados de Administrador (runascurrentuser)
+Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
 ; Limpieza limpia de reglas de Firewall

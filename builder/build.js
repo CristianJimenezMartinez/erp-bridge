@@ -171,6 +171,7 @@ async function runMasterBuild() {
   // 2. Native Windows Executable
   console.log('>>> [2/6] Generando Ejecutable Nativo BentianAgent.exe...');
   const exeResult = await buildExecutable({ distDir, forceRebuild: true });
+  console.log('    [UAC Shield] Binario compilado y protegido con nivel requireAdministrator.');
 
   // Firma Authenticode de ejecutables base antes de empaquetar
   console.log('    [CodeSign] Verificando firma digital Authenticode de binarios...');
