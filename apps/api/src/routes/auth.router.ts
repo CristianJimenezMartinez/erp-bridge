@@ -3,6 +3,10 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { LicenseService } from '@erp-bridge/core';
 import { MailerService } from '../services/mailer.service';
+import { EmailProtectionService } from '../services/email-protection.service';
+import { Logger } from '@erp-bridge/shared';
+
+const logger = new Logger('AuthRouter');
 
 export function computeOrganizationIdFromEmail(email: string): string {
   const normalized = (email || '').toLowerCase().trim();
@@ -615,43 +619,64 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
       return;
     }
 
-    // Caso 3: No se proporciona OTP ni licenseKey -> Generar OTP de 6 dígitos y despacharlo por email
-    const generatedOtp = crypto.randomInt(100000, 999999).toString();
-    pendingEmailOtps.set(cleanEmail, {
-      code: generatedOtp,
-      expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutos
-      attempts: 0,
+    // Caso 3: No se proporciona OTP ni licenseKey -> Solicitar código OTP por correo
+    const forwarded = req.headers['x-forwarded-for'];
+    const clientIp = (typeof forwarded === 'string' ? forwarded.split(',')[0]?.trim() : null) || req.socket.remoteAddress || req.ip || '127.0.0.1';
+
+    // A. Comprobar rate limit, cooldown y presupuesto de Resend
+    const check = EmailProtectionService.checkOtpAllowed(cleanEmail, clientIp);
+    if (!check.allowed) {
+      if (check.retryAfterSeconds) {
+        res.setHeader('Retry-After', String(check.retryAfterSeconds));
+      }
+      res.status(429).json({
+        error: {
+          code: check.code || 'TOO_MANY_REQUESTS',
+          message: check.reason,
+          retryAfterSeconds: check.retryAfterSeconds,
+        },
+      });
+      return;
+    }
+
+    // B. Reutilización de código existente vigente vs nuevo código
+    let generatedOtp: string;
+    const existingOtp = pendingEmailOtps.get(cleanEmail);
+    const validityMinutes = 10;
+
+    if (existingOtp && Date.now() < existingOtp.expiresAt && existingOtp.attempts < 3) {
+      // Reutilizar el mismo código para no desincronizar al usuario si el anterior sigue en tránsito
+      generatedOtp = existingOtp.code;
+    } else {
+      // Generar nuevo código criptográfico de 6 dígitos
+      generatedOtp = crypto.randomInt(100000, 999999).toString();
+      pendingEmailOtps.set(cleanEmail, {
+        code: generatedOtp,
+        expiresAt: Date.now() + validityMinutes * 60 * 1000,
+        attempts: 0,
+      });
+    }
+
+    // C. Registrar consumo en el monitor de cuota y rate-limiting
+    EmailProtectionService.recordOtpSent(cleanEmail, clientIp);
+
+    // D. Despachar email oficial formateado con texto plano y HTML responsive
+    MailerService.sendLoginOtpEmail({
+      email: cleanEmail,
+      otp: generatedOtp,
+      validityMinutes,
+    }).catch((err) => {
+      // Registrar en log pero no romper la respuesta del cliente
+      logger.error('Error al despachar email de código OTP:', err instanceof Error ? err.message : String(err));
     });
 
-    const emailHtml = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; background: #09090b; color: #f4f4f5; border-radius: 12px; padding: 32px; border: 1px solid rgba(255,255,255,0.1);">
-        <h2 style="color: #6366f1; margin-top: 0;">Bentian ERP Bridge — Código de Acceso</h2>
-        <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
-          Has solicitado acceder a tu panel de cliente para gestionar tus licencias de Factusol.
-        </p>
-        <div style="margin: 28px 0; text-align: center;">
-          <div style="display: inline-block; background: #18181b; border: 1px solid #6366f1; border-radius: 8px; padding: 16px 32px; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: monospace;">
-            ${generatedOtp}
-          </div>
-        </div>
-        <p style="color: #71717a; font-size: 12px; line-height: 1.5;">
-          Este código es válido durante 15 minutos. Si no has solicitado este acceso, puedes ignorar este mensaje de forma segura.
-        </p>
-      </div>
-    `;
-
-    // Intentar despacho de correo (asíncrono sin bloquear)
-    MailerService.sendEmail({
-      to: cleanEmail,
-      subject: `Tu código de acceso a Bentian ERP Bridge: ${generatedOtp}`,
-      html: emailHtml,
-    }).catch(() => {});
 
     res.json({
       success: true,
       requireOtp: true,
       message: `Hemos enviado un código de acceso de 6 dígitos a ${cleanEmail}`,
       email: cleanEmail,
+      cooldownSeconds: 60,
       ...(process.env['NODE_ENV'] !== 'production' ? { debugOtp: generatedOtp } : {}),
     });
   } catch (error) {
@@ -663,3 +688,4 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
     });
   }
 });
+

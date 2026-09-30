@@ -15,6 +15,7 @@ export interface OrderNotificationPayload {
 
 export class OrderNotifierService {
   private static readonly logger = new Logger('OrderNotifier');
+  private static readonly notifiedOrders = new Map<string, number>();
 
   public static async notifyNewOrder(payload: OrderNotificationPayload): Promise<{ success: boolean; error?: string }> {
     const { order, channel, factusolOrderNumber, series, config } = payload;
@@ -24,11 +25,22 @@ export class OrderNotifierService {
       return { success: false, error: 'Alertas de pedidos desactivadas o sin email de destino' };
     }
 
+    const ref = order.reference || order.orderNumber || 'S/REF';
+    const orderKey = `${channel}_${ref}_${series}_${factusolOrderNumber}`;
+    const now = Date.now();
+    const lastNotified = this.notifiedOrders.get(orderKey);
+
+    // Deduplicación en el agente: Si el pedido ya fue notificado hace menos de 24h, omitir reenvío
+    if (lastNotified && now - lastNotified < 24 * 60 * 60 * 1000) {
+      this.logger.info(`[Deduplicación Agente] Alerta de pedido #${ref} (${series}-${factusolOrderNumber}) ya enviada hace ${Math.round((now - lastNotified) / 1000)}s. Omitiendo duplicado.`);
+      return { success: true };
+    }
+
     const tStart = performance.now();
     const channelLabel = channel === 'woocommerce' ? 'WooCommerce' : 'Tienda Web (Universal Bridge)';
-    const ref = order.reference || order.orderNumber || 'S/REF';
     const totalEur = order.totalAmount.toFixed(2);
     const subject = `📦 [Nuevo Pedido Factusol] Web #${ref} ➔ Serie ${series} Nº ${factusolOrderNumber} (${totalEur} €)`;
+
 
     const customerName = order.customer.fiscalName || (order.customer as any).name || 'Cliente Web';
     const customerNif = order.customer.taxId || '';
@@ -180,14 +192,17 @@ export class OrderNotifierService {
         settings: notif,
         apiBaseUrl: config.apiBaseUrl,
         licenseKey: config.licenseKey,
+        orderReference: ref,
       });
 
       if (res.success) {
         anySent = true;
+        this.notifiedOrders.set(orderKey, now);
       } else {
         lastError = res.error;
       }
     }
+
 
     const durationMs = Math.round(performance.now() - tStart);
     AgentDiskLogger.getInstance().log({
@@ -255,8 +270,9 @@ export class OrderNotifierService {
     settings: AgentNotificationSettings;
     apiBaseUrl?: string;
     licenseKey?: string;
+    orderReference?: string;
   }): Promise<{ success: boolean; error?: string }> {
-    const { to, subject, html, text, settings, apiBaseUrl, licenseKey } = opts;
+    const { to, subject, html, text, settings, apiBaseUrl, licenseKey, orderReference } = opts;
 
     // 1. Si hay SMTP configurado, enviar vía SMTP directo
     if (settings.smtpHost && settings.smtpUser && settings.smtpPass) {
@@ -292,9 +308,10 @@ export class OrderNotifierService {
             'Content-Type': 'application/json',
             ...(licenseKey ? { 'x-license-key': licenseKey } : {}),
           },
-          body: JSON.stringify({ to, subject, html, text }),
+          body: JSON.stringify({ to, subject, html, text, orderReference }),
           signal: AbortSignal.timeout(12000),
         });
+
 
         if (res.ok) {
           return { success: true };

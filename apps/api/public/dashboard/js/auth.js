@@ -181,6 +181,7 @@ async function handleEmailLogin(e) {
           otpInput.value = data.debugOtp; // Facilitar modo demo/test local
         }
       }
+      startOtpCooldown(data.cooldownSeconds || 60);
       showToast(data.message || 'Código enviado a tu correo', 'info');
     } else {
       if (data.error?.code === 'ADMIN_ACCOUNT') {
@@ -191,13 +192,92 @@ async function handleEmailLogin(e) {
         if (adminPassInput) adminPassInput.focus();
         showToast(data.error.message, 'info');
       } else {
-        showLoginError(data.error?.message || 'Error al iniciar sesión con este correo');
+        const errorMsg = data.error?.message || 'Error al iniciar sesión con este correo';
+        showLoginError(errorMsg);
+        if (data.error?.retryAfterSeconds) {
+          startOtpCooldown(data.error.retryAfterSeconds);
+        }
+        showToast(errorMsg, 'warning');
       }
     }
   } catch (err) {
     showLoginError('Error de conexión con la API central');
   }
 }
+
+let otpCooldownInterval = null;
+
+function startOtpCooldown(seconds) {
+  const btn = document.getElementById('btn-resend-otp');
+  if (!btn) return;
+
+  if (otpCooldownInterval) {
+    clearInterval(otpCooldownInterval);
+    otpCooldownInterval = null;
+  }
+
+  let remaining = seconds;
+  btn.disabled = true;
+  btn.innerText = `Reenviar código (${remaining}s)`;
+
+  otpCooldownInterval = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(otpCooldownInterval);
+      otpCooldownInterval = null;
+      btn.disabled = false;
+      btn.innerText = 'Reenviar código';
+    } else {
+      btn.innerText = `Reenviar código (${remaining}s)`;
+    }
+  }, 1000);
+}
+
+async function handleResendOtp(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('login-billing-email');
+  const otpInput = document.getElementById('login-billing-otp');
+  const email = input ? input.value.trim() : '';
+
+  if (!email) {
+    showLoginError('Introduce tu correo de facturación antes de solicitar el código');
+    return;
+  }
+
+  const btn = document.getElementById('btn-resend-otp');
+  if (btn && btn.disabled) return;
+
+  if (otpInput) otpInput.value = '';
+  showToast('Solicitando reenvío de código...', 'info');
+
+  try {
+    const res = await fetch('/api/v1/auth/email-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.requireOtp) {
+      startOtpCooldown(data.cooldownSeconds || 60);
+      showToast(data.message || 'Nuevo código enviado a tu correo', 'info');
+      const err = document.getElementById('login-error');
+      if (err) err.classList.add('hidden');
+      if (otpInput) otpInput.focus();
+    } else {
+      const errorMsg = data.error?.message || 'No fue posible reenviar el código';
+      showLoginError(errorMsg);
+      if (data.error?.retryAfterSeconds) {
+        startOtpCooldown(data.error.retryAfterSeconds);
+      }
+      showToast(errorMsg, 'warning');
+    }
+  } catch (err) {
+    showLoginError('Error de red al solicitar el reenvío');
+  }
+}
+
 
 async function handlePartnerLogin(e) {
   e.preventDefault();
@@ -269,5 +349,8 @@ window.handleLogout = handleLogout;
 window.handleAutoLoginWithKey = handleAutoLoginWithKey;
 window.handleLicenseKeyLogin = handleLicenseKeyLogin;
 window.handleEmailLogin = handleEmailLogin;
+window.handleResendOtp = handleResendOtp;
+window.startOtpCooldown = startOtpCooldown;
 window.handlePartnerLogin = handlePartnerLogin;
 window.handleLoginSubmit = handleLoginSubmit;
+

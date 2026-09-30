@@ -297,6 +297,100 @@ export class MailerService {
   }
 
   /**
+   * Envía el código de acceso temporal (OTP) de 6 dígitos para el inicio de sesión del cliente.
+   */
+  public static async sendLoginOtpEmail(data: { email: string; otp: string; validityMinutes?: number }): Promise<boolean> {
+    const validity = data.validityMinutes || 10;
+    const subject = `Tu código de acceso a Bentian ERP Bridge: ${data.otp}`;
+
+    const text = [
+      '====================================================================',
+      ' BENTIAN ERP BRIDGE — CÓDIGO DE ACCESO',
+      '====================================================================',
+      '',
+      'Has solicitado acceder a tu panel de control para gestionar tus licencias de Factusol.',
+      '',
+      `TU CÓDIGO DE ACCESO (6 DÍGITOS):`,
+      `>>> ${data.otp} <<<`,
+      '',
+      `Este código es válido durante ${validity} minutos.`,
+      'Si no has solicitado este acceso, puedes ignorar este mensaje de forma segura.',
+      '',
+      '---',
+      'Bentian ERP Bridge — Tecnología Local-First y Edge Processing',
+    ].join('\n');
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f4f4f5;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #09090b; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 540px; background-color: #121215; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; overflow: hidden;">
+          <tr>
+            <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background-color: #18181b;">
+              <span style="font-size: 18px; font-weight: 800; color: #ffffff;">Bentian</span>
+              <span style="font-size: 13px; color: #818cf8; font-weight: 600; margin-left: 6px;">ERP Bridge Cloud</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px;">
+              <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 700; color: #ffffff;">
+                Tu código de acceso
+              </h2>
+              <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #a1a1aa;">
+                Introduce el siguiente código de 6 dígitos en la pantalla de inicio de sesión para acceder a tu panel de licencias:
+              </p>
+
+              <table role="presentation" width="100%" style="background-color: #18181b; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 12px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px; text-align: center;">
+                    <div style="font-size: 11px; font-family: monospace; color: #818cf8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
+                      Código de Verificación
+                    </div>
+                    <div style="font-size: 32px; font-family: monospace; font-weight: 800; color: #ffffff; letter-spacing: 8px;">
+                      ${data.otp}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #71717a;">
+                ⏱ Este código es válido durante <strong>${validity} minutos</strong>. Si tú no has solicitado este acceso, puedes ignorar este correo con tranquilidad.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 32px; background-color: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; color: #71717a; text-align: center;">
+              Bentian ERP Bridge — Conector e Integrador Factusol
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+
+    const result = await this.sendEmail({
+      to: data.email,
+      subject,
+      html,
+      text,
+    });
+
+    return result.success;
+  }
+
+
+  /**
    * Cliente SMTP directo con sockets nativos TLS/TCP (RFC 5321) sin dependencias externas.
    * Funciona con el servidor de correo Plesk, cPanel o cualquier SMTP estándar.
    */

@@ -4,6 +4,8 @@ import { LicenseService, DatabaseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService } from './auth.router';
 import { MailerService } from '../services/mailer.service';
+import { EmailProtectionService } from '../services/email-protection.service';
+
 
 export const billingRouter = Router();
 const licenseService = new LicenseService();
@@ -493,15 +495,19 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           }
         }
 
-        // Despacho de email transaccional de bienvenida y entrega de clave (a coste cero)
-        MailerService.sendLicenseWelcomeEmail({
-          customerEmail,
-          licenseKey: license.key,
-          planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
-          alias: license.alias || undefined,
-        }).catch((err) => {
-          logger.warn(`Aviso: Error no bloqueante al enviar email de bienvenida a ${customerEmail}: ${err.message}`);
-        });
+        // Despacho de email transaccional de bienvenida y entrega de clave (con deduplicación)
+        const dedupKey = session.id || license.key;
+        if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
+          MailerService.sendLicenseWelcomeEmail({
+            customerEmail,
+            licenseKey: license.key,
+            planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
+            alias: license.alias || undefined,
+          }).catch((err) => {
+            logger.warn(`Aviso: Error no bloqueante al enviar email de bienvenida a ${customerEmail}: ${err.message}`);
+          });
+        }
+
 
         return res.json({
           received: true,
@@ -700,15 +706,19 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
         ).catch(() => {});
       }
 
-      // Despachar email de bienvenida si la licencia fue generada en este momento
-      MailerService.sendLicenseWelcomeEmail({
-        customerEmail,
-        licenseKey: license.key,
-        planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
-        alias: license.alias || undefined,
-      }).catch((err) => {
-        logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
-      });
+      // Despachar email de bienvenida si no ha sido enviado previamente
+      const dedupKey = sessionId || license.key;
+      if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
+        MailerService.sendLicenseWelcomeEmail({
+          customerEmail,
+          licenseKey: license.key,
+          planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
+          alias: license.alias || undefined,
+        }).catch((err) => {
+          logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
+        });
+      }
+
     }
 
     const exp = Date.now() + 48 * 60 * 60 * 1000;

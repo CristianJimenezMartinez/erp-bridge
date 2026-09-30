@@ -26,6 +26,9 @@ services:
       - LICENSE_JWT_SECRET=${LICENSE_JWT_SECRET}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      # Correo Transaccional (Resend API)
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - MAIL_FROM=${MAIL_FROM}
     volumes:
       - ./releases:/app/releases:ro
       - ./apps/api/public:/app/apps/api/public:ro

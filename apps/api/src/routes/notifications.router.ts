@@ -1,13 +1,15 @@
 import { Router, Request, Response } from 'express';
 import { MailerService } from '../services/mailer.service';
+import { EmailProtectionService } from '../services/email-protection.service';
 import { Logger } from '@erp-bridge/shared';
+
 
 const logger = new Logger('NotificationsRouter');
 export const notificationsRouter = Router();
 
 notificationsRouter.post('/notifications/order', async (req: Request, res: Response) => {
   try {
-    const { to, subject, html, text } = req.body;
+    const { to, subject, html, text, orderReference } = req.body;
 
     if (!to || !subject || (!html && !text)) {
       res.status(400).json({
@@ -17,8 +19,21 @@ notificationsRouter.post('/notifications/order', async (req: Request, res: Respo
       return;
     }
 
-    const licenseKey = (req.headers['x-license-key'] as string) || req.body.licenseKey;
-    logger.info(`Solicitud de notificación de pedido recibida para: ${to}${licenseKey ? ` (Licencia: ${licenseKey})` : ''}`);
+    const licenseKey = (req.headers['x-license-key'] as string) || req.body.licenseKey || 'anon';
+    const orderRef = orderReference || subject;
+
+    // Deduplicación en el servidor: evitar bucles de sincronización que envíen el mismo pedido en 24h
+    if (!EmailProtectionService.shouldSendOrderAlert(licenseKey, orderRef)) {
+      res.status(200).json({
+        success: true,
+        duplicate: true,
+        message: 'Alerta de pedido ya despachada previamente en las últimas 24h (deduplicada)',
+      });
+      return;
+    }
+
+    logger.info(`Solicitud de notificación de pedido recibida para: ${to} (Licencia: ${licenseKey}, Ref: ${orderRef})`);
+
 
     const result = await MailerService.sendEmail({
       to,
