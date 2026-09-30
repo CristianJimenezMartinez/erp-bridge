@@ -519,13 +519,10 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         });
       }
 
-      case 'customer.subscription.deleted':
-      case 'invoice.payment_failed': {
+      case 'customer.subscription.deleted': {
         const subscription = event.data?.object || {};
-        const customerEmail = subscription.customer_email;
-        const reason = event.type === 'customer.subscription.deleted'
-          ? 'Suscripción cancelada en Stripe'
-          : 'Fallo de cobro recurrente en Stripe';
+        const customerEmail = subscription.customer_email || subscription.metadata?.customerEmail;
+        const reason = 'Suscripción cancelada en Stripe';
 
         logger.warn(`Evento de baja de suscripción para ${customerEmail || 'cliente'}: ${reason}`);
 
@@ -537,7 +534,40 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           }
         }
 
-        return res.json({ received: true, action: 'revoked', reason });
+        if (customerEmail) {
+          const effectiveDate = new Date(subscription.current_period_end ? subscription.current_period_end * 1000 : Date.now())
+            .toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+          MailerService.sendSubscriptionCanceledEmail({
+            email: customerEmail,
+            planName: subscription.metadata?.planId,
+            effectiveDate,
+          }).catch(err => {
+            logger.error('Error al despachar email de cancelación:', err.message);
+          });
+        }
+
+        return res.json({ received: true, action: 'canceled', reason });
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data?.object || {};
+        const customerEmail = invoice.customer_email || invoice.metadata?.customerEmail;
+        const reason = 'Fallo de cobro recurrente en Stripe';
+
+        logger.warn(`Evento de fallo de cobro para ${customerEmail || 'cliente'}: ${reason}`);
+
+        if (customerEmail) {
+          MailerService.sendPaymentFailedEmail({
+            email: customerEmail,
+            planName: invoice.metadata?.planId,
+            updatePaymentUrl: 'https://bridge.cristianjm.com/dashboard/',
+            gracePeriodDays: 7,
+          }).catch(err => {
+            logger.error('Error al despachar email de fallo de cobro:', err.message);
+          });
+        }
+
+        return res.json({ received: true, action: 'payment_failed_alert', reason });
       }
 
       default:

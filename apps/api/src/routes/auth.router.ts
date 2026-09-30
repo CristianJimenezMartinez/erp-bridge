@@ -489,7 +489,7 @@ authRouter.post('/auth/license-session', async (req: Request, res: Response): Pr
 // POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe con verificación OTP o Clave)
 authRouter.post('/auth/email-session', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, otp, licenseKey } = req.body as { email?: string; otp?: string; licenseKey?: string };
+    const { email, otp, licenseKey, action } = req.body as { email?: string; otp?: string; licenseKey?: string; action?: string };
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       res.status(400).json({
         error: {
@@ -521,6 +521,28 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
           code: 'NO_LICENSES_FOUND',
           message: `No se encontraron licencias activas vinculadas a ${cleanEmail}. Comprueba el correo o usa tu clave de licencia.`,
         },
+      });
+      return;
+    }
+
+    // Caso 0: Solicitud expresa de recordatorio de claves por correo
+    if (action === 'remind_licenses') {
+      MailerService.sendLicenseReminderEmail({
+        email: cleanEmail,
+        licenses: licenses.map((l) => ({
+          key: l.key,
+          plan: l.plan,
+          alias: l.alias || undefined,
+          status: l.status,
+          expiresAt: l.expiresAt ? l.expiresAt.toISOString() : null,
+        })),
+      }).catch((err) => {
+        logger.error('Error enviando recordatorio de licencias:', err instanceof Error ? err.message : String(err));
+      });
+
+      res.json({
+        success: true,
+        message: `Hemos enviado el listado de tus claves de activación a ${cleanEmail}`,
       });
       return;
     }
