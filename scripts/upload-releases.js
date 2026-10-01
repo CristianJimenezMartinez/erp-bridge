@@ -206,22 +206,39 @@ async function uploadReleases(options = {}) {
                 console.log(`  ↑ Subiendo ${item.name} (${sizeMb} MB)...`);
               }
 
-              await new Promise((resPut, rejPut) => {
-                sftp.fastPut(item.local, item.remote, {
-                  step: (total, nb, totalSize) => {
-                    if (isLarge) {
-                      const pct = Math.round((total / totalSize) * 100);
-                      process.stdout.write(`\r     Progreso: ${pct}% (${(total / 1024 / 1024).toFixed(1)} / ${(totalSize / 1024 / 1024).toFixed(1)} MB)`);
-                    }
+              let putSuccess = false;
+              let lastPutErr = null;
+              for (let attempt = 1; attempt <= 5; attempt++) {
+                try {
+                  await new Promise((resPut, rejPut) => {
+                    sftp.fastPut(item.local, item.remote, {
+                      step: (total, nb, totalSize) => {
+                        if (isLarge) {
+                          const pct = Math.round((total / totalSize) * 100);
+                          process.stdout.write(`\r     Progreso: ${pct}% (${(total / 1024 / 1024).toFixed(1)} / ${(totalSize / 1024 / 1024).toFixed(1)} MB)`);
+                        }
+                      }
+                    }, (putErr) => {
+                      if (putErr) rejPut(putErr);
+                      else {
+                        if (isLarge) process.stdout.write('\n');
+                        resPut();
+                      }
+                    });
+                  });
+                  putSuccess = true;
+                  break;
+                } catch (err) {
+                  lastPutErr = err;
+                  if (attempt < 5) {
+                    console.log(`\n     ⚠️ Reintento ${attempt}/5 para ${item.name} (${err.code || err.message})...`);
+                    await new Promise(r => setTimeout(r, 2000));
                   }
-                }, (putErr) => {
-                  if (putErr) rejPut(putErr);
-                  else {
-                    if (isLarge) process.stdout.write('\n');
-                    resPut();
-                  }
-                });
-              });
+                }
+              }
+              if (!putSuccess) {
+                throw lastPutErr;
+              }
             }
             console.log(`    ✓ ${uploadQueue.length} archivos transferidos con éxito.`);
             try { sftp.end(); } catch {}
