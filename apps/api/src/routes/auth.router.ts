@@ -356,16 +356,26 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
     return;
   }
 
-  // Validación de clave secreta del Partner
-  const expectedSecret = process.env['PARTNER_SECRET'] || process.env['ADMIN_PASSWORD'] || 'bentian-partner-2026';
+  // Validación de clave secreta del Partner (permite PIN oficial 'bentian-partner-2026', PARTNER_SECRET o contraseña de administración)
+  const allowedSecrets = [
+    process.env['PARTNER_SECRET'],
+    'bentian-partner-2026',
+    process.env['ADMIN_PASSWORD'],
+  ].filter((s): s is string => typeof s === 'string' && s.length > 0);
+
   const providedSecret = typeof partnerSecret === 'string' ? partnerSecret.trim() : '';
 
   let isSecretValid = false;
   try {
     const provBuf = Buffer.from(providedSecret, 'utf8');
-    const expBuf = Buffer.from(expectedSecret, 'utf8');
-    if (provBuf.length === expBuf.length && provBuf.length > 0) {
-      isSecretValid = crypto.timingSafeEqual(provBuf, expBuf);
+    for (const secret of allowedSecrets) {
+      const secBuf = Buffer.from(secret, 'utf8');
+      if (provBuf.length === secBuf.length && provBuf.length > 0) {
+        if (crypto.timingSafeEqual(provBuf, secBuf)) {
+          isSecretValid = true;
+          break;
+        }
+      }
     }
   } catch {
     isSecretValid = false;
