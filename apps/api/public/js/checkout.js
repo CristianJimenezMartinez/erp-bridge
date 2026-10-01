@@ -4,6 +4,21 @@ window.__BRAND_CONFIG__ = {
   brandName: "Bentian"
 };
 
+// Captura y persistencia de código de Partner / Afiliado (?ref=PT-XXXX o ?partner=PT-XXXX)
+(function initAffiliateRef() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref') || params.get('partner') || params.get('reseller');
+    if (refParam && typeof refParam === 'string') {
+      const cleanRef = refParam.trim().toUpperCase();
+      if (cleanRef.startsWith('PT-') || cleanRef.startsWith('PARTNER-')) {
+        localStorage.setItem('bentian_partner_ref', cleanRef);
+        document.cookie = `bentian_partner_ref=${encodeURIComponent(cleanRef)}; path=/; max-age=5184000; SameSite=Lax`;
+      }
+    }
+  } catch {}
+})();
+
 let currentSelectedPlan = 'base_annual';
 
 const PLAN_INFO = {
@@ -89,13 +104,15 @@ async function procesarCheckoutModal(e) {
   if (btnText) btnText.textContent = 'Conectando con pasarela segura...';
 
   try {
+    const partnerCode = localStorage.getItem('bentian_partner_ref') || '';
     const res = await fetch('/api/v1/billing/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         plan: currentSelectedPlan,
         email: email,
-        isEarlyBird: true
+        isEarlyBird: true,
+        partnerCode: partnerCode || undefined
       })
     });
     const data = await res.json();

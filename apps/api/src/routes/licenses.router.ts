@@ -127,19 +127,25 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
       `, [orgId, clientName, cleanTaxId.toLowerCase(), cleanTaxId, clientName, resellerCode]).catch(() => {});
     }
 
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    const plan = isSuperadmin ? 'starter' : 'trial';
+    const trialDays = isSuperadmin ? undefined : 15;
+    const billingStatus = isSuperadmin ? 'ACTIVE' : 'TRIAL';
+
     const license = await licenseService.createLicense({
       organizationId: orgId,
-      plan: 'starter',
-      alias: alias || `Licencia ${clientName}`,
+      plan,
+      trialDays,
+      alias: alias || (isSuperadmin ? `Licencia ${clientName}` : `Evaluación 15d - ${clientName}`),
       maxActivations: 1,
     });
 
     if (db.isAvailable()) {
       await db.query(`
         UPDATE licenses 
-        SET seat_type = 'BASE', tax_id = $1, billing_status = 'ACTIVE'
-        WHERE id = $2
-      `, [cleanTaxId, license.id]).catch(() => {});
+        SET seat_type = 'BASE', tax_id = $1, billing_status = $2, reseller_id = $3
+        WHERE id = $4
+      `, [cleanTaxId, billingStatus, resellerCode, license.id]).catch(() => {});
     }
 
     return res.status(201).json({
@@ -149,6 +155,7 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
         seatType: 'BASE',
         taxId: cleanTaxId,
         organizationId: orgId,
+        billingStatus,
       },
     });
   } catch (error) {
@@ -162,6 +169,7 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
     const sub = req.user?.sub;
     const orgId = req.user?.organizationId || 'org_default';
     const requestedKey = (req.query['key'] as string)?.trim();
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
 
     let all: any[] = [];
     if (orgId) {
@@ -170,15 +178,18 @@ licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedR
 
     let license = null;
     if (requestedKey) {
-      license = all.find(l => l.key === requestedKey) || await licenseService.getLicenseByKey(requestedKey);
+      license = all.find(l => l.key === requestedKey);
+      if (!license && isSuperadmin) {
+        license = await licenseService.getLicenseByKey(requestedKey);
+      }
     } else if (sub && sub.startsWith('EB-')) {
-      license = await licenseService.getLicenseByKey(sub);
-    } else if (orgId && req.user?.role !== 'SUPERADMIN' && req.user?.role !== 'ADMIN') {
+      license = all.find(l => l.key === sub) || (isSuperadmin ? await licenseService.getLicenseByKey(sub) : null);
+    } else if (orgId && !isSuperadmin) {
       license = all[0] || null;
     }
 
     // Si es SUPERADMIN inspeccionando la vista cliente, previsualizar la primera licencia disponible
-    if (!license && (req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN')) {
+    if (!license && isSuperadmin) {
       license = all.find(l => l.status === 'active') || all[0] || null;
     }
 
@@ -349,12 +360,20 @@ licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN'
 });
 
 // 2.1 Update license alias
-licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
     const { alias } = req.body as { alias: string };
     if (!alias || typeof alias !== 'string') {
       return res.status(400).json({ error: { message: 'El alias no puede estar vacío' } });
+    }
+    const lic = await licenseService.getLicenseById(id);
+    if (!lic) {
+      return res.status(404).json({ error: { message: 'Licencia no encontrada' } });
+    }
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    if (!isSuperadmin && lic.organizationId !== req.user?.organizationId) {
+      return res.status(403).json({ error: { message: 'No tienes permiso para modificar esta licencia' } });
     }
     await licenseService.updateLicenseAlias(id, alias.trim());
     return res.json({ success: true, id, alias: alias.trim() });
@@ -364,12 +383,20 @@ licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Request, re
 });
 
 // 2.2 Unbind machine activation (Mudar PC)
-licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
     const { hwid } = req.body as { hwid: string };
     if (!hwid) {
       return res.status(400).json({ error: { message: 'Se requiere el HWID de la máquina a desvincular' } });
+    }
+    const lic = await licenseService.getLicenseById(id);
+    if (!lic) {
+      return res.status(404).json({ error: { message: 'Licencia no encontrada' } });
+    }
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    if (!isSuperadmin && lic.organizationId !== req.user?.organizationId) {
+      return res.status(403).json({ error: { message: 'No tienes permiso para desvincular equipos de esta licencia' } });
     }
     const result = await licenseService.unbindMachine(id, hwid);
     if (!result.success) {
@@ -382,12 +409,30 @@ licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: Request, re
 });
 
 // 3. Get license details and its activations
-licensesRouter.get('/licenses/:key', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.get('/licenses/:key', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const key = req.params['key']!;
     const license = await licenseService.getLicenseByKey(key);
     if (!license) {
       return res.status(404).json({ error: { message: 'Licencia no encontrada' } });
+    }
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    if (!isSuperadmin) {
+      if (req.user?.role === 'RESELLER') {
+        const db = DatabaseService.getInstance();
+        const resellerCode = req.user?.resellerId || req.user?.sub;
+        const orgMatch = await db.query(
+          `SELECT o.reseller_id FROM organizations o WHERE o.id = $1`,
+          [license.organizationId]
+        ).then(r => r.rows[0]?.reseller_id === resellerCode).catch(() => false);
+        if (!orgMatch && license.organizationId !== req.user?.organizationId) {
+          return res.status(403).json({ error: { message: 'No tienes permiso para consultar esta licencia' } });
+        }
+      } else {
+        if (license.organizationId !== req.user?.organizationId && key !== req.user?.sub) {
+          return res.status(403).json({ error: { message: 'No tienes permiso para consultar esta licencia' } });
+        }
+      }
     }
     const activations = await licenseService.listActivations(license.id);
     return res.json({ data: { ...license, activations } });

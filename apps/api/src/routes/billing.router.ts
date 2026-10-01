@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { LicenseService, DatabaseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
-import { requireAuth, AuthService } from './auth.router';
+import { requireAuth, AuthService, requireRole, AuthenticatedRequest } from './auth.router';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
 
@@ -298,11 +298,89 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
 });
 
 /**
+ * 2.1 Crear sesión de Stripe Checkout Mayorista para Partners (Tarifa Distribuidor -25%: 149,25 €)
+ */
+billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESELLER', 'SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const { clientName, clientTaxId, clientEmail, alias, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
+    if (!clientName || !clientTaxId) {
+      return res.status(400).json({ error: { message: 'Razón Social y CIF/NIF del cliente son obligatorios' } });
+    }
+
+    const resellerCode = req.user?.resellerId || req.user?.sub || 'PT-PARTNER';
+    const cleanTaxId = clientTaxId.trim().toUpperCase();
+    const targetEmail = (clientEmail || `${cleanTaxId.toLowerCase()}@cliente.cristianjm.com`).trim().toLowerCase();
+    const orgId = `org_${crypto.createHash('md5').update(cleanTaxId).digest('hex').substring(0, 10)}`;
+    const wholesalePriceEur = 149.25;
+
+    if (STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
+      const params = new URLSearchParams();
+      params.append('mode', 'subscription');
+      params.append('customer_email', targetEmail);
+      params.append('success_url', returnUrl.includes('{CHECKOUT_SESSION_ID}') ? returnUrl : `${returnUrl}?session_id={CHECKOUT_SESSION_ID}&checkout=partner_success`);
+      params.append('cancel_url', `${returnUrl}?checkout=cancel`);
+      params.append('metadata[organizationId]', orgId);
+      params.append('metadata[resellerId]', resellerCode);
+      params.append('metadata[clientTaxId]', cleanTaxId);
+      params.append('metadata[clientName]', clientName);
+      params.append('metadata[alias]', alias || `Servidor Factusol - ${clientName}`);
+      params.append('metadata[planId]', 'partner_reseller_annual');
+      params.append('metadata[maxActivations]', '1');
+
+      params.append('subscription_data[metadata][organizationId]', orgId);
+      params.append('subscription_data[metadata][resellerId]', resellerCode);
+      params.append('subscription_data[metadata][clientTaxId]', cleanTaxId);
+      params.append('subscription_data[metadata][planId]', 'partner_reseller_annual');
+
+      params.append('line_items[0][price_data][currency]', 'eur');
+      params.append('line_items[0][price_data][unit_amount]', String(Math.round(wholesalePriceEur * 100)));
+      params.append('line_items[0][price_data][recurring][interval]', 'year');
+      params.append('line_items[0][price_data][product_data][name]', `Licencia Bentian ERP Bridge — Distribuidor Partner (-25%) [${clientName}]`);
+      params.append('line_items[0][price_data][product_data][description]', `Tarifa Mayorista Partner: 149,25 €/año. Cliente: ${clientName} (${cleanTaxId})`);
+      params.append('line_items[0][quantity]', '1');
+
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
+
+      const session = (await response.json()) as any;
+      if (response.ok && session.url) {
+        return res.json({ success: true, url: session.url, sessionId: session.id, wholesalePriceEur });
+      }
+    }
+
+    return res.json({
+      success: true,
+      url: `${DEFAULT_DASHBOARD_URL}?checkout=mock_partner_success`,
+      demo: true,
+      wholesalePriceEur
+    });
+  } catch (error) {
+    next(error);
+    return;
+  }
+});
+
+/**
  * 3. Crear sesión del Portal de Clientes de Stripe (Stripe Customer Portal)
  */
-billingRouter.post('/billing/create-portal-session', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+billingRouter.post('/billing/create-portal-session', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const { email, customerId, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
+    let { email, customerId, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+
+    // Aislamiento: si es un cliente normal, forzar su propio email del token verificado
+    if (!isSuperadmin && req.user?.role === 'TENANT_CLIENT') {
+      const userSub = req.user?.sub || '';
+      if (userSub.includes('@')) {
+        email = userSub;
+      }
+    }
 
     logger.info(`Solicitud de Portal de Clientes de Stripe para ${customerId || email || 'desconocido'}`);
 
@@ -639,13 +717,21 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 /**
  * 5. Consulta de licencias por email (Autoservicio protegido)
  */
-billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const email = req.query['email'] as string;
     if (!email) {
       return res.status(400).json({ error: { message: 'Parámetro email requerido' } });
     }
-    const orgId = computeOrganizationIdFromEmail(email);
+    const cleanEmail = email.toLowerCase().trim();
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    if (!isSuperadmin && req.user?.role === 'TENANT_CLIENT') {
+      const userSub = (req.user?.sub || '').toLowerCase().trim();
+      if (userSub.includes('@') && userSub !== cleanEmail) {
+        return res.status(403).json({ error: { message: 'No tienes permiso para consultar licencias de otro email' } });
+      }
+    }
+    const orgId = computeOrganizationIdFromEmail(cleanEmail);
     const list = await licenseService.listLicenses(orgId);
     return res.json({ data: list });
   } catch (error) {

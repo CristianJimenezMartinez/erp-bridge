@@ -69,13 +69,20 @@ async function loadPartnerClients() {
       const countEl = document.getElementById('partner-clients-count');
       if (countEl) countEl.innerText = `${clients.length} Empresas Registradas`;
 
+      // Actualizar enlace de afiliado con el código real del partner
+      const partnerCode = localStorage.getItem('bentian_cloud_partner_code') || localStorage.getItem('bentian_cloud_org') || 'PT-PARTNER';
+      const affInput = document.getElementById('partner-affiliate-link');
+      if (affInput) {
+        affInput.value = `https://bridge.cristianjm.com/?ref=${encodeURIComponent(partnerCode)}`;
+      }
+
       if (!tbody) return;
 
       if (clients.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="5" class="p-10 text-center text-zinc-500 text-xs">
-              Aún no tienes clientes dados de alta. Pulsa <strong>"+ Alta de Cliente"</strong> para emitir tu primera licencia.
+              Aún no tienes clientes dados de alta. Pulsa <strong>"Comprar Licencia (-25%)"</strong> o <strong>"+ Clave Evaluación"</strong> para comenzar.
             </td>
           </tr>
         `;
@@ -100,6 +107,81 @@ async function loadPartnerClients() {
   } catch (e) {
     if (tbody) {
       tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-400 font-mono text-xs">Error al cargar clientes.</td></tr>`;
+    }
+  }
+}
+
+function copyPartnerAffiliateLink() {
+  const affInput = document.getElementById('partner-affiliate-link');
+  if (affInput && affInput.value) {
+    navigator.clipboard.writeText(affInput.value).then(() => {
+      showToast('✓ Enlace de distribuidor copiado al portapapeles', 'success');
+    }).catch(() => {
+      affInput.select();
+      document.execCommand('copy');
+      showToast('✓ Enlace copiado', 'success');
+    });
+  }
+}
+
+function openPartnerBuyModal() {
+  const nameEl = document.getElementById('partner-buy-client-name');
+  const taxEl = document.getElementById('partner-buy-tax-id');
+  const emailEl = document.getElementById('partner-buy-email');
+  const aliasEl = document.getElementById('partner-buy-alias');
+  if (nameEl) nameEl.value = '';
+  if (taxEl) taxEl.value = '';
+  if (emailEl) emailEl.value = '';
+  if (aliasEl) aliasEl.value = '';
+  const modal = document.getElementById('modal-partner-buy');
+  if (modal) modal.classList.remove('hidden');
+}
+
+async function handlePartnerBuySubmit(e) {
+  e.preventDefault();
+  const nameEl = document.getElementById('partner-buy-client-name');
+  const taxEl = document.getElementById('partner-buy-tax-id');
+  const emailEl = document.getElementById('partner-buy-email');
+  const aliasEl = document.getElementById('partner-buy-alias');
+  const clientName = nameEl ? nameEl.value.trim() : '';
+  const clientTaxId = taxEl ? taxEl.value.trim() : '';
+  const clientEmail = emailEl ? emailEl.value.trim() : '';
+  const alias = aliasEl ? aliasEl.value.trim() : '';
+  const btn = document.getElementById('btn-submit-partner-buy');
+
+  if (!clientName || !clientTaxId) {
+    showToast('La Razón Social y el CIF son obligatorios', 'warning');
+    return;
+  }
+
+  if (btn) {
+    btn.innerText = 'Conectando con Stripe...';
+    btn.disabled = true;
+  }
+
+  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+
+  try {
+    const res = await fetch('/api/v1/billing/partner-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ clientName, clientTaxId, clientEmail, alias })
+    });
+    const data = await res.json();
+    if (res.ok && data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast(data.error?.message || 'Error al generar la pasarela de pago mayorista', 'error');
+    }
+  } catch (err) {
+    showToast('Error de conexión con la pasarela de pago', 'error');
+  } finally {
+    if (btn) {
+      btn.innerText = 'Pagar en Stripe (149,25 €) →';
+      btn.disabled = false;
     }
   }
 }
@@ -143,7 +225,7 @@ async function handlePartnerIssueSubmit(e) {
     const data = await res.json();
     if (res.ok && data.data?.key) {
       closeModal('modal-partner-issue');
-      showToast(`✓ Licencia Base emitida para ${clientName} (${data.data.key})`, 'success');
+      showToast(`✓ Clave de Evaluación (15d) emitida: ${data.data.key}`, 'success');
       loadPartnerClients();
     } else {
       showToast(data.error?.message || 'Error al emitir licencia', 'error');
@@ -152,7 +234,7 @@ async function handlePartnerIssueSubmit(e) {
     showToast('Error de conexión con el servidor central', 'error');
   } finally {
     if (btn) {
-      btn.innerText = 'Emitir Licencia Base';
+      btn.innerText = 'Emitir Clave de Evaluación (15d)';
       btn.disabled = false;
     }
   }
@@ -161,5 +243,8 @@ async function handlePartnerIssueSubmit(e) {
 // Exposición global
 window.loadOrganizations = loadOrganizations;
 window.loadPartnerClients = loadPartnerClients;
+window.openPartnerBuyModal = openPartnerBuyModal;
+window.handlePartnerBuySubmit = handlePartnerBuySubmit;
+window.copyPartnerAffiliateLink = copyPartnerAffiliateLink;
 window.openPartnerIssueModal = openPartnerIssueModal;
 window.handlePartnerIssueSubmit = handlePartnerIssueSubmit;
