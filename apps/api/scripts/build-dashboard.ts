@@ -270,16 +270,17 @@ export function buildDashboard(): void {
     'id="modal-welcome-checkout"',
     'id="welcome-license-key"',
 
-    // Notificaciones y Scripts
+    // Notificaciones, Logo y Scripts
     'id="toast"',
+    'src="/assets/icon.svg"',
     'src="/js/version-sync.js"',
-    'src="js/utils.js"',
-    'src="js/auth.js"',
-    'src="js/licenses.js"',
-    'src="js/fleet.js"',
-    'src="js/organizations.js"',
-    'src="js/audit-errors.js"',
-    'src="js/navigation.js"'
+    'src="/dashboard/js/utils.js"',
+    'src="/dashboard/js/auth.js"',
+    'src="/dashboard/js/licenses.js"',
+    'src="/dashboard/js/fleet.js"',
+    'src="/dashboard/js/organizations.js"',
+    'src="/dashboard/js/audit-errors.js"',
+    'src="/dashboard/js/navigation.js"'
   ];
 
   for (const req of requiredElements) {
