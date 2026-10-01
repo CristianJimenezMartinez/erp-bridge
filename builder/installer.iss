@@ -44,6 +44,7 @@ Source: "{#SourceDir}\BentianAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\BentianTray.exe"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#SourceDir}\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\adodb.js"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourceDir}\erp-bridge-endpoint.php"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#SourceDir}\agent-config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist
 
 [Icons]

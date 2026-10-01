@@ -237,6 +237,7 @@ async function uploadReleases(options = {}) {
               cp -f "${remoteVersionDir}/${setupZip}" "${remoteLatestDir}/Bentian-Setup.zip" 2>/dev/null || true;
               cp -f "${remoteVersionDir}/${portableZip}" "${remoteLatestDir}/BentianAgent-Portable.zip" 2>/dev/null || true;
               cp -f "${remoteVersionDir}/BentianAgent.exe" "${remoteLatestDir}/BentianAgent.exe" 2>/dev/null || true;
+              cp -f "${remoteVersionDir}/erp-bridge-endpoint.php" "${remoteLatestDir}/erp-bridge-endpoint.php" 2>/dev/null || true;
               cp -f "${remoteVersionDir}/manifest.json" "${remoteLatestDir}/manifest.json" 2>/dev/null || true;
             `;
             await runSshCommand(conn, linkCmd);

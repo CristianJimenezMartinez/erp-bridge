@@ -138,7 +138,19 @@ async function testGuiServer() {
     assert.strictEqual(resHealth.status, 200, 'GET /health debe responder 200 OK');
     const healthJson = await resHealth.json() as any;
     assert.strictEqual(healthJson.status, 'OK', 'El status de health debe ser OK');
-    console.log('  ✓ GET /health respondió 200 OK.');
+    // 14. Test GET /api/local/download-companion
+    console.log('14. Probando GET /api/local/download-companion...');
+    const resCompanion = await fetch(`${url}/api/local/download-companion?secretKey=EB_SEC_test123&dbName=test_db&dbUser=test_user&dbPass=test_pass`);
+    assert.strictEqual(resCompanion.status, 200, 'GET /api/local/download-companion debe responder 200 OK');
+    assert.strictEqual(resCompanion.headers.get('content-type'), 'application/x-php; charset=utf-8');
+    assert(resCompanion.headers.get('content-disposition')?.includes('filename="erp-bridge-endpoint.php"'));
+    const phpBody = await resCompanion.text();
+    assert(phpBody.startsWith('<?php'), 'El acompañante debe ser código PHP válido');
+    assert(phpBody.includes('EB_SEC_test123'), 'El script debe contener la clave secreta inyectada');
+    assert(phpBody.includes('test_db'), 'El script debe contener la base de datos inyectada');
+    assert(phpBody.includes('test_user'), 'El script debe contener el usuario inyectado');
+    assert(!phpBody.includes('%%EB_SECRET_KEY%%'), 'No deben quedar marcadores de posición sin reemplazar');
+    console.log(`  ✓ GET /api/local/download-companion respondió 200 OK con ${phpBody.length} bytes de PHP personalizado.`);
 
   } finally {
     await server.stop();

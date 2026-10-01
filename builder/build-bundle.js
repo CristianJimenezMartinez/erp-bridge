@@ -99,6 +99,12 @@ async function buildAgentBundle(options = {}) {
     fs.copyFileSync(iconSource, iconDest);
   }
 
+  const phpSource = path.resolve(rootDir, 'packages/connectors/universal-bridge/erp-bridge-endpoint.php');
+  const phpDest = path.resolve(outDir, 'erp-bridge-endpoint.php');
+  if (fs.existsSync(phpSource)) {
+    fs.copyFileSync(phpSource, phpDest);
+  }
+
   const configDest = path.resolve(outDir, 'agent-config.json');
   // SIEMPRE forzar la regeneración de un agent-config.json limpio sin rutas hardcodeadas ni nombres de máquina
   const defaultAgentConfig = {

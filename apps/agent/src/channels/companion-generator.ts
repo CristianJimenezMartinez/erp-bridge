@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { EMBEDDED_COMPANION_PHP_TEMPLATE } from './companion-template';
 
 export class CompanionGenerator {
   public static generate(options: {
@@ -7,26 +8,31 @@ export class CompanionGenerator {
     dbName?: string;
     dbUser?: string;
     dbPass?: string;
-  }): string | null {
+  }): string {
     const candidatePaths = [
+      path.resolve(path.dirname(process.execPath), 'erp-bridge-endpoint.php'),
+      path.resolve(process.cwd(), 'erp-bridge-endpoint.php'),
+      path.resolve(process.cwd(), 'packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
       path.resolve(__dirname, '../../../packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
       path.resolve(__dirname, '../../packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
-      path.resolve(process.cwd(), 'packages/connectors/universal-bridge/erp-bridge-endpoint.php'),
-      path.resolve(path.dirname(process.execPath), 'erp-bridge-endpoint.php'),
+      path.resolve(__dirname, 'erp-bridge-endpoint.php'),
     ];
 
     let phpTemplate = '';
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
         try {
-          phpTemplate = fs.readFileSync(p, 'utf8');
-          break;
+          const content = fs.readFileSync(p, 'utf8');
+          if (content && content.includes('%%EB_SECRET_KEY%%')) {
+            phpTemplate = content;
+            break;
+          }
         } catch {}
       }
     }
 
     if (!phpTemplate) {
-      return null;
+      phpTemplate = EMBEDDED_COMPANION_PHP_TEMPLATE;
     }
 
     const secret = options.secretKey || 'eb_sec_' + Math.random().toString(36).substring(2, 15);
