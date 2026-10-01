@@ -26,14 +26,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// ----------------------------------------------------------------------------
-// 1. CONFIGURACIÓN DE BASE DE DATOS Y SEGURIDAD
-// ----------------------------------------------------------------------------
+// ============================================================================
+// ⚠️ ATENCIÓN: CONFIGURACIÓN PARA EL PROGRAMADOR WEB / ADMINISTRADOR DE HOSTING
+// ============================================================================
+// SOLO TIENES QUE RELLENAR ESTAS 4 LÍNEAS CON LOS DATOS DE TU BASE DE DATOS:
+// (La clave secreta EB_SECRET_KEY ya viene configurada por Bentian ERP Bridge)
+// ============================================================================
+
 define('EB_SECRET_KEY', getenv('EB_SECRET_KEY') ?: '%%EB_SECRET_KEY%%');
-define('EB_DB_HOST', getenv('EB_DB_HOST') ?: '%%EB_DB_HOST%%');
-define('EB_DB_NAME', getenv('EB_DB_NAME') ?: '%%EB_DB_NAME%%');
-define('EB_DB_USER', getenv('EB_DB_USER') ?: '%%EB_DB_USER%%');
-define('EB_DB_PASS', getenv('EB_DB_PASS') ?: '%%EB_DB_PASS%%');
+define('EB_DB_HOST',    getenv('EB_DB_HOST')    ?: '%%EB_DB_HOST%%');   // Habitualmente 'localhost' o '127.0.0.1'
+define('EB_DB_NAME',    getenv('EB_DB_NAME')    ?: '%%EB_DB_NAME%%');   // Nombre de la base de datos de tu tienda web
+define('EB_DB_USER',    getenv('EB_DB_USER')    ?: '%%EB_DB_USER%%');   // Usuario con permisos en MySQL / MariaDB
+define('EB_DB_PASS',    getenv('EB_DB_PASS')    ?: '%%EB_DB_PASS%%');   // Contraseña de MySQL / MariaDB
+
+// ============================================================================
+// 🛑 NO MODIFICAR NADA POR DEBAJO DE ESTA LÍNEA
+// El resto del archivo es el motor automático de sincronización con Factusol.
+// Al ejecutarse por primera vez, el archivo creará automáticamente las tablas
+// necesarias (eb_products, eb_stock, eb_orders) de forma 100% idempotente y segura.
+// ============================================================================
 
 // ----------------------------------------------------------------------------
 // 2. CONEXIÓN PDO A MARIADB / MYSQL LOCAL
