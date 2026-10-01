@@ -20,6 +20,27 @@ export function computeOrganizationIdFromEmail(email: string): string {
   return `org_${hash}`;
 }
 
+export async function ensureOrganizationExists(
+  db: DatabaseService,
+  organizationId: string,
+  customerEmail: string,
+  resellerId?: string | null
+): Promise<void> {
+  if (!db.isAvailable()) return;
+  try {
+    const slug = organizationId.toLowerCase();
+    const name = customerEmail.split('@')[0] || customerEmail;
+    await db.query(
+      `INSERT INTO organizations (id, name, slug, status, plan, reseller_id, created_at, updated_at)
+       VALUES ($1, $2, $3, 'ACTIVE', 'standard', $4, NOW(), NOW())
+       ON CONFLICT (id) DO UPDATE SET reseller_id = COALESCE(EXCLUDED.reseller_id, organizations.reseller_id), updated_at = NOW()`,
+      [organizationId, name, slug, resellerId || null]
+    );
+  } catch (err: any) {
+    logger.warn(`Aviso al asegurar organización ${organizationId}: ${err?.message || err}`);
+  }
+}
+
 export interface PlanDefinition {
   id: string;
   name: string;
@@ -422,20 +443,22 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
     logger.info(`Stripe Webhook recibido y validado: ${event.type || 'unknown'}`);
 
     switch (event.type) {
-      case 'checkout.session.completed':
-      case 'invoice.payment_succeeded': {
+      case 'checkout.session.completed': {
         const session = event.data?.object || {};
-        const customerEmail = session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com';
+        const customerEmail = (session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com').toLowerCase().trim();
         const organizationId = session.metadata?.organizationId || computeOrganizationIdFromEmail(customerEmail);
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
         const maxActivations = Number(session.metadata?.maxActivations) || 1;
         const alias = session.metadata?.alias || 'Servidor Factusol Principal';
         const sessionId = (session.id || '') as string;
         const customerId = (session.customer || '') as string;
+        const resellerId = session.metadata?.resellerId || null;
 
-        logger.info(`Generando o reutilizando licencia tras pago de ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId || 'n/a'})...`);
+        logger.info(`[Stripe Webhook] checkout.session.completed para ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId})...`);
 
         const db = DatabaseService.getInstance();
+        await ensureOrganizationExists(db, organizationId, customerEmail, resellerId);
+
         let license: any = null;
 
         // Idempotencia precisa: verificar si esta sesión de Stripe ya emitió una clave previamente
@@ -447,7 +470,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 
           if (sessionRow) {
             license = sessionRow;
-            logger.info(`✓ Licencia ${license.key} ya existente para la sesión Stripe ${sessionId}. Reutilizando.`);
+            logger.info(`✓ [Stripe Webhook] Licencia ${license.key} ya existente para la sesión Stripe ${sessionId}. Reutilizando.`);
           }
         }
 
@@ -473,31 +496,28 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
             await db.query(
               `UPDATE licenses SET stripe_session_id = $1, stripe_customer_id = $2, billing_status = 'ACTIVE' WHERE id = $3`,
               [sessionId, customerId || null, license.id]
-            ).catch(() => {});
+            ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id a licencia: ${err}`));
           }
-          logger.info(`✓ Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${dynamicAlias}, Sesión: ${sessionId}]`);
+          logger.info(`✓ [Stripe Webhook] Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${dynamicAlias}, Sesión: ${sessionId}]`);
         }
 
         // Vincular al Partner si la compra vino referida por código PT-XXXX
-        const resellerId = session.metadata?.resellerId || null;
-        if (resellerId) {
+        if (resellerId && db.isAvailable()) {
           try {
-            const db = DatabaseService.getInstance();
-            if (db.isAvailable()) {
-              await db.query(
-                `UPDATE organizations SET reseller_id = $1 WHERE id = $2`,
-                [resellerId, organizationId]
-              );
-              logger.info(`✓ Organización ${organizationId} vinculada al Partner ${resellerId}`);
-            }
+            await db.query(
+              `UPDATE organizations SET reseller_id = $1 WHERE id = $2`,
+              [resellerId, organizationId]
+            );
+            logger.info(`✓ Organización ${organizationId} vinculada al Partner ${resellerId}`);
           } catch (dbErr) {
             logger.warn('Aviso al vincular reseller_id en base de datos:', { err: String(dbErr) });
           }
         }
 
         // Despacho de email transaccional de bienvenida y entrega de clave (con deduplicación)
-        const dedupKey = session.id || license.key;
+        const dedupKey = sessionId || license.key;
         if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
+          if (license.key) EmailProtectionService.shouldSendBillingWelcome(license.key);
           MailerService.sendLicenseWelcomeEmail({
             customerEmail,
             licenseKey: license.key,
@@ -508,7 +528,6 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           });
         }
 
-
         return res.json({
           received: true,
           licenseKey: license.key,
@@ -517,6 +536,43 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           maxActivations: license.maxActivations,
           organizationId: license.organizationId,
         });
+      }
+
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data?.object || {};
+        const billingReason = invoice.billing_reason || '';
+        const customerEmail = (invoice.customer_email || invoice.customer_details?.email || '').toLowerCase().trim();
+        const customerId = (invoice.customer || '') as string;
+
+        logger.info(`[Stripe Webhook] invoice.payment_succeeded recibido (Razón: ${billingReason || 'desconocida'}, Cliente: ${customerEmail || customerId})...`);
+
+        // A. Si es el cobro inicial de suscripción, NUNCA emitir nueva clave ni duplicar emails
+        if (billingReason === 'subscription_create') {
+          logger.info(`[Stripe Webhook] Cobro inicial 'subscription_create' omitido: la licencia canónica se gestiona en checkout.session.completed.`);
+          return res.json({ received: true, ignored: true, reason: 'subscription_create handled by checkout.session.completed' });
+        }
+
+        // B. Si es una renovación periódica ('subscription_cycle'), extender la validez de la licencia existente
+        const db = DatabaseService.getInstance();
+        if (db.isAvailable() && customerId) {
+          try {
+            const periodEndSec = invoice.lines?.data?.[0]?.period?.end || Math.floor(Date.now() / 1000) + 365 * 24 * 3600;
+            const periodEndDate = new Date(periodEndSec * 1000);
+
+            const updateRes = await db.query(
+              `UPDATE licenses 
+               SET expires_at = $1, billing_status = 'ACTIVE', status = 'active'
+               WHERE stripe_customer_id = $2`,
+              [periodEndDate, customerId]
+            );
+
+            logger.info(`✓ Licencia renovada hasta ${periodEndDate.toISOString()} tras ciclo de facturación (${updateRes.rowCount} filas actualizadas).`);
+          } catch (renewErr: any) {
+            logger.error(`Error al procesar renovación de licencia en invoice.payment_succeeded:`, renewErr?.message || renewErr);
+          }
+        }
+
+        return res.json({ received: true, action: 'cycle_renewed', billingReason });
       }
 
       case 'customer.subscription.deleted': {
@@ -692,9 +748,13 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
     const planId = sessionData.metadata?.planId || 'base_annual';
     const maxActivations = Number(sessionData.metadata?.maxActivations) || 1;
     const alias = sessionData.metadata?.alias || 'Servidor Factusol Principal';
+    const customerId = (sessionData.customer || '') as string;
+    const resellerId = sessionData.metadata?.resellerId || null;
+
+    const db = DatabaseService.getInstance();
+    await ensureOrganizationExists(db, organizationId, customerEmail, resellerId);
 
     // Idempotencia: Verificar si ya existe una licencia para esta sesión específica de Stripe
-    const db = DatabaseService.getInstance();
     let license: any = null;
 
     if (sessionId && db.isAvailable()) {
@@ -705,6 +765,7 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
 
       if (sessionRow) {
         license = sessionRow;
+        logger.info(`✓ [Session-License] Licencia ${license.key} ya existente para sesión ${sessionId}. Reutilizando.`);
       }
     }
 
@@ -731,14 +792,15 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
 
       if (db.isAvailable() && sessionId) {
         await db.query(
-          `UPDATE licenses SET stripe_session_id = $1, billing_status = 'ACTIVE' WHERE id = $2`,
-          [sessionId, license.id]
-        ).catch(() => {});
+          `UPDATE licenses SET stripe_session_id = $1, stripe_customer_id = $2, billing_status = 'ACTIVE' WHERE id = $3`,
+          [sessionId, customerId || null, license.id]
+        ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id en session-license: ${err}`));
       }
 
       // Despachar email de bienvenida si no ha sido enviado previamente
       const dedupKey = sessionId || license.key;
       if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
+        if (license.key) EmailProtectionService.shouldSendBillingWelcome(license.key);
         MailerService.sendLicenseWelcomeEmail({
           customerEmail,
           licenseKey: license.key,
