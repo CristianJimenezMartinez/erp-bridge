@@ -72,16 +72,7 @@ Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""B
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Agent Salida"" dir=out action=allow program=""{app}\{#MyAppExeName}"" enable=yes profile=any"; Flags: runhidden waituntilterminated
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Bentian Tray"" dir=in action=allow program=""{app}\BentianTray.exe"" enable=yes profile=any"; Flags: runhidden waituntilterminated
 
-; 2. Exclusiones automáticas en Windows Defender Antivirus
-Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try {{ Add-MpPreference -ExclusionPath @('{app}', ""$env:APPDATA\Bentian Agent"") -ExclusionProcess @('{#MyAppExeName}','BentianTray.exe','cscript.exe') -ExclusionExtension @('.accdb','.laccdb') -ErrorAction SilentlyContinue }} catch {{}}"""; Flags: runhidden waituntilterminated
-
-; 3. Garantizar clave de registro EnableLinkedConnections para unidades de red mapeadas (NAS / unidades X:, Z:)
-Filename: "{sys}\reg.exe"; Parameters: "add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ""EnableLinkedConnections"" /t REG_DWORD /d 1 /f"; Flags: runhidden waituntilterminated
-
-; 4. Configurar accesos directos creados para ejecutarse siempre como Administrador (SLDF_RUNAS_USER)
-Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""Get-ChildItem -Path @('{autodesktop}', '{group}') -Filter '*.lnk' -Recurse -ErrorAction SilentlyContinue | ForEach-Object {{ try {{ `$b = [System.IO.File]::ReadAllBytes(`$_.FullName); if (`$b.Length -gt 21) {{ `$b[21] = `$b[21] -bor 0x20; [System.IO.File]::WriteAllBytes(`$_.FullName, `$b) }} }} catch {{}} }}"""; Flags: runhidden waituntilterminated
-
-; 5. Lanzar aplicación post-instalación con privilegios elevados de Administrador (runascurrentuser)
+; 2. Lanzar aplicación post-instalación con privilegios elevados de Administrador (runascurrentuser)
 Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configurar Factusol"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]
@@ -89,9 +80,6 @@ Filename: "{app}\{#MyAppExeName}"; Description: "Abrir Bentian Agent y configura
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Agent"""; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Agent Salida"""; Flags: runhidden
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Bentian Tray"""; Flags: runhidden
-
-; Limpieza completa de exclusiones en Windows Defender
-Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -NonInteractive -WindowStyle Hidden -Command ""try {{ Remove-MpPreference -ExclusionPath @('{app}', ""$env:APPDATA\Bentian Agent"") -ExclusionProcess @('{#MyAppExeName}','BentianTray.exe','cscript.exe') -ExclusionExtension @('.accdb','.laccdb') -ErrorAction SilentlyContinue }} catch {{}}"""; Flags: runhidden
 
 [UninstallDelete]
 Type: files; Name: "{app}\*.bak"

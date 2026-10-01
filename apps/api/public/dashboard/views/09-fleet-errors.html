@@ -1,0 +1,44 @@
+      <!-- ================================================================= -->
+      <!-- PESTAÑA SUPERADMIN: TELEMETRÍA DE ERRORES DE FLOTA                 -->
+      <!-- ================================================================= -->
+      <div id="view-tab-fleet-errors" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Telemetría de Errores y Diagnóstico de Agentes</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Registro centralizado de fallos en equipos clientes: caídas de OLEDB Factusol, desconexiones, bloqueos (.ldb) y anomalías.
+            </p>
+          </div>
+          <button onclick="loadFleetErrors()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Actualizar Fallos</span>
+          </button>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+                <tr>
+                  <th class="p-3">Equipo / Hostname</th>
+                  <th class="p-3">Organización / Cliente</th>
+                  <th class="p-3">Componente</th>
+                  <th class="p-3">Mensaje & Código de Error</th>
+                  <th class="p-3">Fecha / Ocurrencia</th>
+                  <th class="p-3 text-right">Severidad</th>
+                </tr>
+              </thead>
+              <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando telemetría de errores...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>

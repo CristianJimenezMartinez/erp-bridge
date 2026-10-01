@@ -1,0 +1,51 @@
+  <!-- ============================================================ -->
+  <!-- MODAL: GUÍA DE INSTALACIÓN RÁPIDA                           -->
+  <!-- ============================================================ -->
+  <div id="modal-instructions" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-zinc-100">Cómo Instalar Bentian en tu Servidor Factusol</h3>
+        <button onclick="closeModal('modal-instructions')" class="text-zinc-500 hover:text-zinc-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-zinc-300">
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
+          <div>
+            <strong class="text-white">Descarga el Instalador</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Descarga <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-indigo-400 underline">Bentian-Setup.exe</a> directamente en el equipo con Factusol.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">2</span>
+          <div>
+            <strong class="text-white">Ejecuta la Instalación</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Sigue el asistente de Windows. No requiere consola ni permisos complejos de administrador.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+          <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">3</span>
+          <div>
+            <strong class="text-white">Introduce tu Clave de Activación</strong>
+            <p class="text-zinc-400 text-[11px] mt-0.5">
+              Copia cualquiera de las claves disponibles en este panel y pégala en la pantalla inicial de la aplicación. ¡Quedará activado al instante!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="closeModal('modal-instructions')" class="px-4 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>

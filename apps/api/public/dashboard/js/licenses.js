@@ -69,9 +69,7 @@ function renderLicenses(list) {
     const hostname = act?.machineInfo?.hostname || 'Sin asignar';
     const shortHwid = act?.hwid ? `${act.hwid.substring(0, 16)}...` : '—';
     const fullHwid = act?.hwid || '';
-    const seatBadge = lic.seatType === 'ADDITIONAL_SEAT' 
-      ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">2ª Tienda (-20%)</span>'
-      : '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Licencia Base</span>';
+    const seatBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Licencia Base</span>';
 
     return `
       <tr class="hover:bg-white/[0.02] transition-colors">
@@ -220,7 +218,7 @@ async function loadClientPortal(requestedKey) {
 
       const seatTypeEl = document.getElementById('client-seat-type');
       if (seatTypeEl) {
-        seatTypeEl.innerText = lic.seatType === 'ADDITIONAL_SEAT' ? 'Puesto Adicional (99 €/año)' : 'Licencia Base (1 ERP ⇄ 1 Tienda Web)';
+        seatTypeEl.innerText = 'Licencia Base (1 ERP ⇄ 1 Tienda Web)';
       }
 
       const subStatus = document.getElementById('client-subscription-status');

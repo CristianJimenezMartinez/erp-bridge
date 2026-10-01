@@ -1,0 +1,70 @@
+      <!-- ================================================================= -->
+      <!-- PESTAÑA: SALUD DE SERVIDORES (SUPERADMIN & RESELLER)               -->
+      <!-- ================================================================= -->
+      <div id="view-tab-fleet" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Telemetría y Salud de Servidores ERP</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Supervisión de cada equipo Windows: latidos de conexión, estado OLEDB con Factusol y versiones activas.
+            </p>
+          </div>
+          <button onclick="loadFleetHealthData()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Refrescar Salud</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Servidores ERP Vinculados</div>
+            <div class="text-2xl font-bold text-white font-mono mt-1" id="health-kpi-total-seats">0</div>
+            <div class="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Monitorizados en tiempo real
+            </div>
+          </div>
+
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Salud Conexión Factusol</div>
+            <div class="text-2xl font-bold text-emerald-400 font-mono mt-1" id="health-kpi-db-status">ÓPTIMA</div>
+            <div class="text-[11px] text-zinc-400 mt-1">Lectura OLEDB local sin bloqueos</div>
+          </div>
+
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
+            <div class="text-[11px] font-mono text-zinc-500 uppercase">Versión del Agente</div>
+            <div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version" data-app-version>v0.3.5</div>
+            <div class="text-[11px] text-zinc-400 mt-1">Firma Ed25519 verificada</div>
+          </div>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
+            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Detalle de Máquinas & Agentes</h3>
+            <span class="text-[11px] text-zinc-500 font-mono" id="table-last-heartbeat">Actualizado continuamente</span>
+          </div>
+
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs text-zinc-300">
+              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <tr>
+                  <th class="py-3 px-4">Servidor / Hostname</th>
+                  <th class="py-3 px-4">Organización</th>
+                  <th class="py-3 px-4">Versión</th>
+                  <th class="py-3 px-4">Último Latido</th>
+                  <th class="py-3 px-4 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando estado de máquinas...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>

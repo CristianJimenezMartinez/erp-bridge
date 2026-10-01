@@ -382,19 +382,36 @@ async function runMasterBuild() {
   if (!fs.existsSync(latestLocalDir)) {
     fs.mkdirSync(latestLocalDir, { recursive: true });
   }
+
+  const safeCopy = (src, dest) => {
+    try {
+      if (fs.existsSync(dest)) {
+        try { fs.unlinkSync(dest); } catch {}
+      }
+      fs.copyFileSync(src, dest);
+    } catch {
+      try {
+        const buf = fs.readFileSync(src);
+        fs.writeFileSync(dest, buf);
+      } catch (e) {
+        console.warn(`    ⚠️ Aviso al copiar ${path.basename(dest)}: ${e.message}`);
+      }
+    }
+  };
+
   if (installerPath && fs.existsSync(installerPath)) {
-    fs.copyFileSync(installerPath, path.resolve(latestLocalDir, 'Bentian-Setup.exe'));
+    safeCopy(installerPath, path.resolve(latestLocalDir, 'Bentian-Setup.exe'));
   }
   if (installerZipPath && fs.existsSync(installerZipPath)) {
-    fs.copyFileSync(installerZipPath, path.resolve(latestLocalDir, 'Bentian-Setup.zip'));
+    safeCopy(installerZipPath, path.resolve(latestLocalDir, 'Bentian-Setup.zip'));
   }
   if (portableZipPath && fs.existsSync(portableZipPath)) {
-    fs.copyFileSync(portableZipPath, path.resolve(latestLocalDir, 'BentianAgent-Portable.zip'));
+    safeCopy(portableZipPath, path.resolve(latestLocalDir, 'BentianAgent-Portable.zip'));
   }
   if (fs.existsSync(targetExe)) {
-    fs.copyFileSync(targetExe, path.resolve(latestLocalDir, 'BentianAgent.exe'));
+    safeCopy(targetExe, path.resolve(latestLocalDir, 'BentianAgent.exe'));
   }
-  fs.copyFileSync(
+  safeCopy(
     path.resolve(versionReleaseDir, 'manifest.json'),
     path.resolve(latestLocalDir, 'manifest.json')
   );

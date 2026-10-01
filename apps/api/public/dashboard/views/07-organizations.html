@@ -1,0 +1,35 @@
+      <!-- ================================================================= -->
+      <!-- PESTAÑA SUPERADMIN: ORGANIZACIONES                                 -->
+      <!-- ================================================================= -->
+      <div id="view-tab-organizations" class="hidden space-y-6">
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <h2 class="text-sm font-semibold text-zinc-100">Clientes & Cuentas Empresariales Registradas</h2>
+          <p class="text-[11px] text-zinc-400 mt-1">
+            Gestión de organizaciones dadas de alta en Bentian Cloud, asignación de planes y partner asociado.
+          </p>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs text-zinc-300">
+              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <tr>
+                  <th class="py-3 px-4">Organización / Empresa</th>
+                  <th class="py-3 px-4">CIF / NIF</th>
+                  <th class="py-3 px-4">Licencias (Activas / Tot.)</th>
+                  <th class="py-3 px-4">Partner Asociado</th>
+                  <th class="py-3 px-4">Plan Stripe</th>
+                  <th class="py-3 px-4 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="orgs-tbody" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando organizaciones...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>

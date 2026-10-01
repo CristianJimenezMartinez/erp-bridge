@@ -1,0 +1,141 @@
+      <!-- ================================================================= -->
+      <!-- PESTAÑA: GESTIÓN DE LICENCIAS (SUPERADMIN & RESELLER)               -->
+      <!-- ================================================================= -->
+      <div id="view-tab-licenses" class="hidden space-y-6">
+
+        <!-- BANNER DE KPIS DE CONEXIÓN -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card 1: Plan & Facturación -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Plan Contratado</span>
+              <span id="kpi-plan-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                PROFESSIONAL
+              </span>
+            </div>
+            <div class="mt-2">
+              <div class="text-lg font-bold text-zinc-100 flex items-center gap-2">
+                <span id="kpi-plan-name">Plan Base (1 ERP ⇄ 1 Tienda Web)</span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">Suscripción recurrente con soporte prioritario Factusol.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
+              <span class="text-emerald-400 text-[11px] flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Pagos al día en Stripe
+              </span>
+              <button onclick="openStripePortal()" class="text-indigo-400 hover:text-indigo-300 font-medium text-[11px] transition">
+                Gestionar Plan →
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Conector ERP / Servidor Vinculado -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Conector ERP</span>
+              <span class="text-zinc-400 font-mono text-[10px]">Factusol ⇄ Web</span>
+            </div>
+            <div class="mt-2">
+              <div class="text-2xl font-extrabold text-zinc-100 font-mono">
+                <span id="kpi-active-seats">0</span> <span class="text-sm font-normal text-zinc-500">/ <span id="kpi-total-seats">1</span> Servidor</span>
+              </div>
+              <div class="w-full bg-[#1c1c20] rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="kpi-progress-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+              <span id="kpi-seats-available-text">Conexión Factusol</span>
+              <button onclick="openNewKeyModal()" class="text-indigo-400 hover:text-indigo-300 font-medium transition">
+                + Nueva Licencia
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Estado de Conexión del Servidor -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Telemetría del Conector</span>
+              <span class="text-emerald-400 font-mono text-[10px]">Latidos &lt; 24h</span>
+            </div>
+            <div class="mt-2">
+              <div class="text-2xl font-extrabold text-zinc-100 font-mono flex items-center gap-2">
+                <span id="kpi-online-seats">0</span>
+                <span class="text-xs font-normal text-emerald-400 flex items-center gap-1 font-sans">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
+                </span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-1">Equipos sincronizando stock y pedidos con Factusol.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+              <span>Tolerancia offline: 7 días</span>
+              <button onclick="loadLicenses()" class="text-zinc-400 hover:text-white transition" title="Refrescar lista">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTADO DE CLAVES Y CONEXIONES -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#151518]">
+            <div>
+              <h2 class="text-sm font-semibold text-zinc-100">Conexiones ERP & Servidores Vinculados</h2>
+              <p class="text-[11px] text-zinc-400 mt-0.5">
+                El conector se ejecuta en el PC/servidor donde reside Factusol. Si cambias de máquina, puedes desvincular el HWID con 1 clic.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="search-input" 
+                  oninput="handleSearch(this.value)" 
+                  placeholder="Buscar por alias, clave, hostname..." 
+                  class="bg-[#18181b] border border-white/[0.08] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-52 sm:w-64 transition"
+                />
+                <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+              <button 
+                onclick="openNewKeyModal()" 
+                class="px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow-sm transition flex items-center gap-1.5 shrink-0"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Generar Clave</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TABLA DE CLAVES -->
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+                <tr>
+                  <th class="p-3">Servidor / Alias</th>
+                  <th class="p-3">Clave de Activación</th>
+                  <th class="p-3">Tipo & Puesto</th>
+                  <th class="p-3">Estado Conexión</th>
+                  <th class="p-3">Equipo Vinculado (HWID)</th>
+                  <th class="p-3 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="licenses-tbody" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando parque de licencias...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER INFORMATIVO -->
+          <div class="p-3.5 bg-[#121215] border-t border-white/[0.06] text-[11px] text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span>
+              💡 <strong>Aviso First-Local:</strong> Toda la configuración de Factusol y credenciales se realiza de forma privada y local en el propio servidor del cliente.
+            </span>
+            <a href="#instrucciones" onclick="openInstructionsModal()" class="text-indigo-400 hover:underline shrink-0">
+              ¿Cómo instalar en mi servidor Factusol?
+            </a>
+          </div>
+        </div>
+      </div>

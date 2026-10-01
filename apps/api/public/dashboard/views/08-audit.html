@@ -1,0 +1,37 @@
+      <!-- ================================================================= -->
+      <!-- PESTAÑA SUPERADMIN: AUDITORÍA EN VIVO                              -->
+      <!-- ================================================================= -->
+      <div id="view-tab-audit" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Stream de Auditoría Global de Seguridad</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Trazabilidad en tiempo real de accesos, comprobaciones de licencia, activaciones y llamadas de agentes.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="loadAuditLogs()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition">
+              Actualizar
+            </button>
+            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-400 hover:text-white border border-white/[0.08] text-xs font-medium transition">
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-[#09090b] border border-white/[0.08] rounded-xl p-5 font-mono text-xs overflow-hidden shadow-2xl">
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-500 mb-3">
+            <span>Terminal de Eventos y Trazas de Seguridad</span>
+            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
+            </span>
+          </div>
+
+          <div class="space-y-2 text-zinc-300 max-h-[420px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
+            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">--:--:--</span> <span class="text-indigo-400 font-semibold">[SYSTEM]</span> Monitor de auditoría cloud inicializado</div>
+          </div>
+        </div>
+      </div>

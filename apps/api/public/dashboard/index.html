@@ -45,7 +45,7 @@
 </head>
 <body class="bg-[#09090b] text-[#f4f4f5] antialiased min-h-full flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- 1. VISTA DE LOGIN MULTI-MODO (CLAVE, EMAIL, PARTNER, ADMIN)   -->
   <!-- ============================================================ -->
   <div id="login-view" class="min-h-screen flex items-center justify-center p-4 bg-[#09090b] relative overflow-hidden">
@@ -255,8 +255,7 @@
   <!-- ============================================================ -->
   <div id="dashboard-view" class="hidden min-h-screen flex flex-col bg-[#09090b]">
 
-    <!-- TOPBAR MAESTRO -->
-    <header class="h-14 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
+<header class="h-14 border-b border-white/[0.06] bg-[#09090b]/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-indigo-500/20">
           EB
@@ -365,249 +364,7 @@
         <!-- Renderizado dinámico vía JavaScript -->
       </div>
 
-      <!-- ================================================================= -->
-      <!-- PESTAÑA SUPERADMIN: RESUMEN FINANCIERO & REVENUE                   -->
-      <!-- ================================================================= -->
-      <div id="view-tab-admin-overview" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-purple-950/40 via-[#121215] to-[#121215] border border-purple-500/20 rounded-xl p-5">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-white">Panel de Control de Dirección & Facturación</h2>
-            </div>
-            <p class="text-[11px] text-zinc-400 mt-1">
-              Visión global de ingresos recurrentes, desglose de puestos base vs adicionales y telemetría de fallos del parque ERP.
-            </p>
-          </div>
-          <button onclick="loadAdminOverview()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5 self-start sm:self-auto">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Actualizar Métricas</span>
-          </button>
-        </div>
-
-        <!-- 4 KPIS FINANCIEROS Y DE LICENCIAS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- KPI 1: ARR & MRR -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Ingresos Estimados</span>
-            <div class="mt-2">
-              <div class="text-2xl font-bold text-white font-mono flex items-baseline gap-1">
-                <span id="kpi-arr">0 €</span>
-                <span class="text-xs font-normal text-zinc-500">/ año</span>
-              </div>
-              <div class="text-[11px] text-purple-400 font-mono mt-1">
-                MRR: <span id="kpi-mrr">0 €</span> / mes
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
-              <span id="kpi-seats-breakdown">0 Licencias Base Activas</span>
-            </div>
-          </div>
-
-          <!-- KPI 2: Licencias Pagadas Activas -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Licencias Pagadas Activas</span>
-            <div class="mt-2">
-              <div class="text-2xl font-bold text-emerald-400 font-mono" id="kpi-active-paid">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">
-                Cobro recurrente al día en Stripe
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-emerald-400 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Servicio operativo 100%
-            </div>
-          </div>
-
-          <!-- KPI 3: Licencias en Trial o Pruebas -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Período de Prueba (Trial)</span>
-            <div class="mt-2">
-              <div class="text-2xl font-bold text-amber-400 font-mono" id="kpi-trials">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">
-                En evaluación de integración ERP
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
-              Conversión guiada activa
-            </div>
-          </div>
-
-          <!-- KPI 4: Impagadas o Canceladas -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Impagadas / Canceladas</span>
-            <div class="mt-2">
-              <div class="text-2xl font-bold text-red-400 font-mono" id="kpi-unpaid">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">
-                Acceso a sincronización bloqueado
-              </div>
-            </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-red-400/80">
-              Reintento de cobro Stripe activo
-            </div>
-          </div>
-        </div>
-
-        <!-- TARJETA INFORMATIVA: BLINDAJE DE LICENCIAS Y CIF -->
-        <div class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/20 flex items-start gap-3">
-          <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          </div>
-          <div class="text-xs leading-relaxed text-zinc-300">
-            <strong class="text-white font-semibold">Regla de Protección de Licencia y CIF:</strong>
-            Cada tienda conectada opera bajo su Licencia Base vinculada al CIF fiscal y HWID del equipo servidor de Factusol. Para entornos multi-tienda bajo la misma empresa (mismo CIF), se aplica un 20% de descuento directo por fidelización. Intentos de activación con CIFs o HWIDs no autorizados son bloqueados automáticamente por el backend con error <code class="text-purple-300 font-mono">ERR_TAX_ID_MISMATCH</code>.
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================================================= -->
-      <!-- PESTAÑA SUPERADMIN: TELEMETRÍA DE ERRORES DE FLOTA                 -->
-      <!-- ================================================================= -->
-      <div id="view-tab-fleet-errors" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-zinc-100">Telemetría de Errores y Diagnóstico de Agentes</h2>
-            </div>
-            <p class="text-[11px] text-zinc-400 mt-1">
-              Registro centralizado de fallos en equipos clientes: caídas de OLEDB Factusol, desconexiones, bloqueos (.ldb) y anomalías.
-            </p>
-          </div>
-          <button onclick="loadFleetErrors()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Actualizar Fallos</span>
-          </button>
-        </div>
-
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
-                <tr>
-                  <th class="p-3">Equipo / Hostname</th>
-                  <th class="p-3">Organización / Cliente</th>
-                  <th class="p-3">Componente</th>
-                  <th class="p-3">Mensaje & Código de Error</th>
-                  <th class="p-3">Fecha / Ocurrencia</th>
-                  <th class="p-3 text-right">Severidad</th>
-                </tr>
-              </thead>
-              <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.04]">
-                <tr>
-                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
-                    Cargando telemetría de errores...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================================================= -->
-      <!-- PESTAÑA RESELLER: CARTERA DE CLIENTES & EMISIÓN                   -->
-      <!-- ================================================================= -->
-      <div id="view-tab-partner-clients" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/40 via-[#121215] to-[#121215] border border-emerald-500/20 rounded-xl p-5">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <h2 class="text-sm font-semibold text-white">Cartera de Clientes & Empresas Instaladas</h2>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PARTNER OFICIAL</span>
-            </div>
-            <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-              Gestión de clientes, compras de licencias con tarifa mayorista (-25%) y seguimiento de servidores Factusol.
-            </p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="openPartnerBuyModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-              <span>Comprar Licencia (-25%: 149,25 €)</span>
-            </button>
-            <button onclick="openPartnerIssueModal()" class="px-3 py-2 rounded-md bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white border border-white/[0.1] text-xs font-medium transition flex items-center gap-1.5 shrink-0">
-              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              <span>+ Clave Evaluación (15d)</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- TARJETAS DE AFILIADO & COMISIONES -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Card 1: Enlace de Afiliado -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
-            <div>
-              <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Tu Enlace de Distribuidor</span>
-              <div class="mt-2 flex items-center gap-2">
-                <input 
-                  type="text" 
-                  id="partner-affiliate-link" 
-                  readonly 
-                  value="https://bridge.cristianjm.com/?ref=PT-TEST" 
-                  class="w-full bg-[#18181b] border border-white/[0.06] rounded px-2.5 py-1 text-[11px] font-mono text-zinc-300 select-all"
-                />
-                <button onclick="copyPartnerAffiliateLink()" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] font-medium shrink-0 transition">
-                  Copiar
-                </button>
-              </div>
-            </div>
-            <p class="text-[10px] text-zinc-500 mt-2">
-              Tus clientes compran en la web y se vinculan automáticamente a tu código.
-            </p>
-          </div>
-
-          <!-- Card 2: Margen Mayorista en Origen -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Margen Mayorista Directo</span>
-            <div class="mt-1">
-              <span class="text-xl font-bold font-mono text-emerald-400">25% Retenido</span>
-              <span class="text-[11px] text-zinc-400 block mt-0.5">Pagas 149,25 € / Facturas 199,00 € al cliente</span>
-            </div>
-            <span class="text-[10px] text-emerald-400/80 mt-2 block">✓ Cero esperas ni papeleo de comisiones</span>
-          </div>
-
-          <!-- Card 3: Comisiones Afiliado (Garantía 30d & Anual) -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Comisiones Venta Web</span>
-            <div class="mt-1 flex items-baseline gap-2">
-              <span class="text-xl font-bold font-mono text-zinc-100" id="partner-commission-available">0,00 €</span>
-              <span class="text-[11px] text-zinc-500">(Acumulado liquidable)</span>
-            </div>
-            <p class="text-[10px] text-zinc-500 mt-2">
-              Garantía: 30d maduración. Mensuales: Liquidación a cierre anual o &gt;100 €.
-            </p>
-          </div>
-        </div>
-
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
-            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Empresas en tu Cartera</h3>
-            <span id="partner-clients-count" class="text-[11px] text-zinc-400 font-mono">Cargando...</span>
-          </div>
-
-          <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
-                <tr>
-                  <th class="p-3">Empresa / Razón Social</th>
-                  <th class="p-3">CIF / NIF</th>
-                  <th class="p-3">Licencias Asignadas</th>
-                  <th class="p-3">Fecha de Alta</th>
-                  <th class="p-3 text-right">Estado</th>
-                </tr>
-              </thead>
-              <tbody id="partner-clients-tbody" class="divide-y divide-white/[0.04]">
-                <tr>
-                  <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
-                    Cargando cartera de clientes...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================================================= -->
+<!-- ================================================================= -->
       <!-- PESTAÑA CLIENTE FINAL: MI CONEXIÓN ERP & INSTALADOR               -->
       <!-- ================================================================= -->
       <div id="view-tab-client-portal" class="hidden space-y-6">
@@ -775,7 +532,7 @@
 
       </div>
 
-      <!-- ================================================================= -->
+<!-- ================================================================= -->
       <!-- PESTAÑA: GESTIÓN DE LICENCIAS (SUPERADMIN & RESELLER)               -->
       <!-- ================================================================= -->
       <div id="view-tab-licenses" class="hidden space-y-6">
@@ -917,7 +674,7 @@
         </div>
       </div>
 
-      <!-- ================================================================= -->
+<!-- ================================================================= -->
       <!-- PESTAÑA: SALUD DE SERVIDORES (SUPERADMIN & RESELLER)               -->
       <!-- ================================================================= -->
       <div id="view-tab-fleet" class="hidden space-y-6">
@@ -988,7 +745,238 @@
         </div>
       </div>
 
+<!-- ================================================================= -->
+      <!-- PESTAÑA RESELLER: CARTERA DE CLIENTES & EMISIÓN                   -->
       <!-- ================================================================= -->
+      <div id="view-tab-partner-clients" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/40 via-[#121215] to-[#121215] border border-emerald-500/20 rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h2 class="text-sm font-semibold text-white">Cartera de Clientes & Empresas Instaladas</h2>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PARTNER OFICIAL</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+              Gestión de clientes, compras de licencias con tarifa mayorista (-25%) y seguimiento de servidores Factusol.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openPartnerBuyModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              <span>Comprar Licencia (-25%: 149,25 €)</span>
+            </button>
+            <button onclick="openPartnerIssueModal()" class="px-3 py-2 rounded-md bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white border border-white/[0.1] text-xs font-medium transition flex items-center gap-1.5 shrink-0">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>+ Clave Evaluación (15d)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TARJETAS DE AFILIADO & COMISIONES -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card 1: Enlace de Afiliado -->
+          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Tu Enlace de Distribuidor</span>
+              <div class="mt-2 flex items-center gap-2">
+                <input 
+                  type="text" 
+                  id="partner-affiliate-link" 
+                  readonly 
+                  value="https://bridge.cristianjm.com/?ref=PT-TEST" 
+                  class="w-full bg-[#18181b] border border-white/[0.06] rounded px-2.5 py-1 text-[11px] font-mono text-zinc-300 select-all"
+                />
+                <button onclick="copyPartnerAffiliateLink()" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] font-medium shrink-0 transition">
+                  Copiar
+                </button>
+              </div>
+            </div>
+            <p class="text-[10px] text-zinc-500 mt-2">
+              Tus clientes compran en la web y se vinculan automáticamente a tu código.
+            </p>
+          </div>
+
+          <!-- Card 2: Margen Mayorista en Origen -->
+          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Margen Mayorista Directo</span>
+            <div class="mt-1">
+              <span class="text-xl font-bold font-mono text-emerald-400">25% Retenido</span>
+              <span class="text-[11px] text-zinc-400 block mt-0.5">Pagas 149,25 € / Facturas 199,00 € al cliente</span>
+            </div>
+            <span class="text-[10px] text-emerald-400/80 mt-2 block">✓ Cero esperas ni papeleo de comisiones</span>
+          </div>
+
+          <!-- Card 3: Comisiones Afiliado (Garantía 30d & Anual) -->
+          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Comisiones Venta Web</span>
+            <div class="mt-1 flex items-baseline gap-2">
+              <span class="text-xl font-bold font-mono text-zinc-100" id="partner-commission-available">0,00 €</span>
+              <span class="text-[11px] text-zinc-500">(Acumulado liquidable)</span>
+            </div>
+            <p class="text-[10px] text-zinc-500 mt-2">
+              Garantía: 30d maduración. Mensuales: Liquidación a cierre anual o &gt;100 €.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
+            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Empresas en tu Cartera</h3>
+            <span id="partner-clients-count" class="text-[11px] text-zinc-400 font-mono">Cargando...</span>
+          </div>
+
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+                <tr>
+                  <th class="p-3">Empresa / Razón Social</th>
+                  <th class="p-3">CIF / NIF</th>
+                  <th class="p-3">Licencias Asignadas</th>
+                  <th class="p-3">Fecha de Alta</th>
+                  <th class="p-3 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="partner-clients-tbody" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando cartera de clientes...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+<!-- ================================================================= -->
+      <div id="view-tab-admin-overview" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-purple-950/40 via-[#121215] to-[#121215] border border-purple-500/20 rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-white">Panel de Control de Dirección & Facturación</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Visión global de ingresos recurrentes, desglose de puestos base vs adicionales y telemetría de fallos del parque ERP.
+            </p>
+          </div>
+          <button onclick="loadAdminOverview()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5 self-start sm:self-auto">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Actualizar Métricas</span>
+          </button>
+        </div>
+
+        <!-- 4 KPIS FINANCIEROS Y DE LICENCIAS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- KPI 1: ARR & MRR -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono text-zinc-500 uppercase">Ingresos Estimados</span>
+            <div class="mt-2">
+              <div class="text-2xl font-bold text-white font-mono flex items-baseline gap-1">
+                <span id="kpi-arr">0 €</span>
+                <span class="text-xs font-normal text-zinc-500">/ año</span>
+              </div>
+              <div class="text-[11px] text-purple-400 font-mono mt-1">
+                MRR: <span id="kpi-mrr">0 €</span> / mes
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+              <span id="kpi-seats-breakdown">0 Licencias Base Activas</span>
+            </div>
+          </div>
+
+          <!-- KPI 2: Licencias Pagadas Activas -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono text-zinc-500 uppercase">Licencias Pagadas Activas</span>
+            <div class="mt-2">
+              <div class="text-2xl font-bold text-emerald-400 font-mono" id="kpi-active-paid">0</div>
+              <div class="text-[11px] text-zinc-400 mt-1">
+                Cobro recurrente al día en Stripe
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-emerald-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Servicio operativo 100%
+            </div>
+          </div>
+
+          <!-- KPI 3: Licencias en Trial o Pruebas -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono text-zinc-500 uppercase">Período de Prueba (Trial)</span>
+            <div class="mt-2">
+              <div class="text-2xl font-bold text-amber-400 font-mono" id="kpi-trials">0</div>
+              <div class="text-[11px] text-zinc-400 mt-1">
+                En evaluación de integración ERP
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+              Conversión guiada activa
+            </div>
+          </div>
+
+          <!-- KPI 4: Impagadas o Canceladas -->
+          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono text-zinc-500 uppercase">Impagadas / Canceladas</span>
+            <div class="mt-2">
+              <div class="text-2xl font-bold text-red-400 font-mono" id="kpi-unpaid">0</div>
+              <div class="text-[11px] text-zinc-400 mt-1">
+                Acceso a sincronización bloqueado
+              </div>
+            </div>
+            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-red-400/80">
+              Reintento de cobro Stripe activo
+            </div>
+          </div>
+        </div>
+
+        <!-- TARJETA INFORMATIVA: BLINDAJE DE LICENCIAS Y CIF -->
+        <div class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/20 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div class="text-xs leading-relaxed text-zinc-300">
+            <strong class="text-white font-semibold">Regla de Protección de Licencia y CIF:</strong>
+            Cada tienda conectada opera bajo su Licencia Base vinculada al CIF fiscal y HWID del equipo servidor de Factusol. Para entornos multi-tienda bajo la misma empresa (mismo CIF), se aplica un 20% de descuento directo por fidelización. Intentos de activación con CIFs o HWIDs no autorizados son bloqueados automáticamente por el backend con error <code class="text-purple-300 font-mono">ERR_TAX_ID_MISMATCH</code>.
+          </div>
+        </div>
+      </div>
+
+<!-- ================================================================= -->
+      <!-- PESTAÑA SUPERADMIN: ORGANIZACIONES                                 -->
+      <!-- ================================================================= -->
+      <div id="view-tab-organizations" class="hidden space-y-6">
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <h2 class="text-sm font-semibold text-zinc-100">Clientes & Cuentas Empresariales Registradas</h2>
+          <p class="text-[11px] text-zinc-400 mt-1">
+            Gestión de organizaciones dadas de alta en Bentian Cloud, asignación de planes y partner asociado.
+          </p>
+        </div>
+
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs text-zinc-300">
+              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                <tr>
+                  <th class="py-3 px-4">Organización / Empresa</th>
+                  <th class="py-3 px-4">CIF / NIF</th>
+                  <th class="py-3 px-4">Licencias (Activas / Tot.)</th>
+                  <th class="py-3 px-4">Partner Asociado</th>
+                  <th class="py-3 px-4">Plan Stripe</th>
+                  <th class="py-3 px-4 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="orgs-tbody" class="divide-y divide-white/[0.04]">
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                    Cargando organizaciones...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+<!-- ================================================================= -->
       <!-- PESTAÑA SUPERADMIN: AUDITORÍA EN VIVO                              -->
       <!-- ================================================================= -->
       <div id="view-tab-audit" class="hidden space-y-6">
@@ -1026,34 +1014,43 @@
         </div>
       </div>
 
+<!-- ================================================================= -->
+      <!-- PESTAÑA SUPERADMIN: TELEMETRÍA DE ERRORES DE FLOTA                 -->
       <!-- ================================================================= -->
-      <!-- PESTAÑA SUPERADMIN: ORGANIZACIONES                                 -->
-      <!-- ================================================================= -->
-      <div id="view-tab-organizations" class="hidden space-y-6">
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5">
-          <h2 class="text-sm font-semibold text-zinc-100">Clientes & Cuentas Empresariales Registradas</h2>
-          <p class="text-[11px] text-zinc-400 mt-1">
-            Gestión de organizaciones dadas de alta en Bentian Cloud, asignación de planes y partner asociado.
-          </p>
+      <div id="view-tab-fleet-errors" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+              <h2 class="text-sm font-semibold text-zinc-100">Telemetría de Errores y Diagnóstico de Agentes</h2>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Registro centralizado de fallos en equipos clientes: caídas de OLEDB Factusol, desconexiones, bloqueos (.ldb) y anomalías.
+            </p>
+          </div>
+          <button onclick="loadFleetErrors()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Actualizar Fallos</span>
+          </button>
         </div>
 
         <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs text-zinc-300">
-              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
                 <tr>
-                  <th class="py-3 px-4">Organización / Empresa</th>
-                  <th class="py-3 px-4">CIF / NIF</th>
-                  <th class="py-3 px-4">Licencias (Activas / Tot.)</th>
-                  <th class="py-3 px-4">Partner Asociado</th>
-                  <th class="py-3 px-4">Plan Stripe</th>
-                  <th class="py-3 px-4 text-right">Estado</th>
+                  <th class="p-3">Equipo / Hostname</th>
+                  <th class="p-3">Organización / Cliente</th>
+                  <th class="p-3">Componente</th>
+                  <th class="p-3">Mensaje & Código de Error</th>
+                  <th class="p-3">Fecha / Ocurrencia</th>
+                  <th class="p-3 text-right">Severidad</th>
                 </tr>
               </thead>
-              <tbody id="orgs-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.04]">
                 <tr>
                   <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
-                    Cargando organizaciones...
+                    Cargando telemetría de errores...
                   </td>
                 </tr>
               </tbody>
@@ -1065,7 +1062,7 @@
     </main>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: GENERAR NUEVA CLAVE DE SERVIDOR                       -->
   <!-- ============================================================ -->
   <div id="modal-new-key" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1113,7 +1110,7 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: COMPRA MAYORISTA DE LICENCIA (PARTNER -25%)           -->
   <!-- ============================================================ -->
   <div id="modal-partner-buy" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1191,7 +1188,7 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: EMISIÓN DE EVALUACIÓN TEMPORAL (15 DÍAS)              -->
   <!-- ============================================================ -->
   <div id="modal-partner-issue" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1253,7 +1250,7 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: EDITAR ALIAS                                         -->
   <!-- ============================================================ -->
   <div id="modal-edit-alias" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1286,7 +1283,7 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: DESVINCULAR EQUIPO (MUDANZA PC)                       -->
   <!-- ============================================================ -->
   <div id="modal-unbind" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1321,7 +1318,7 @@
     </div>
   </div>
 
-  <!-- ============================================================ -->
+<!-- ============================================================ -->
   <!-- MODAL: GUÍA DE INSTALACIÓN RÁPIDA                           -->
   <!-- ============================================================ -->
   <div id="modal-instructions" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1373,7 +1370,7 @@
     </div>
   </div>
 
-  <!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA -->
+<!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA -->
   <div id="modal-welcome-checkout" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="relative w-full max-w-lg bg-[#121215] border border-emerald-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/30 text-center">
       <!-- Icono de éxito animado -->
@@ -1454,7 +1451,7 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
+<!-- TOAST NOTIFICATION -->
   <div id="toast" class="hidden fixed bottom-4 right-4 bg-[#18181b] border border-white/[0.12] text-white text-xs px-3.5 py-2.5 rounded-lg shadow-2xl flex items-center gap-2.5 z-50 transition-all">
     <span id="toast-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
     <span id="toast-msg">Notificación</span>

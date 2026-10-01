@@ -1,0 +1,34 @@
+  <!-- ============================================================ -->
+  <!-- MODAL: DESVINCULAR EQUIPO (MUDANZA PC)                       -->
+  <!-- ============================================================ -->
+  <div id="modal-unbind" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#121215] border border-red-500/20 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center gap-3 text-amber-400">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-zinc-100">¿Mudar Licencia a un Nuevo PC?</h3>
+      </div>
+
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        Estás a punto de desvincular el equipo <strong id="unbind-machine-name" class="text-white font-mono">PC-ACTUAL</strong> de la clave <span id="unbind-key-display" class="font-mono text-indigo-400">EB-XXXXX</span>.
+      </p>
+
+      <p class="text-[11px] text-zinc-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04]">
+        ✓ La licencia quedará liberada al instante para que actives esta misma clave en tu nuevo ordenador.<br/>
+        ✓ No necesitas contactar a soporte técnico.
+      </p>
+
+      <input type="hidden" id="unbind-license-id" />
+      <input type="hidden" id="unbind-hwid" />
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-unbind')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+          Cancelar
+        </button>
+        <button onclick="confirmUnbind()" id="btn-confirm-unbind" class="px-3.5 py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium transition">
+          Confirmar y Liberar Licencia
+        </button>
+      </div>
+    </div>
+  </div>
