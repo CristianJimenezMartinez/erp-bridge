@@ -3,6 +3,35 @@
  * Gestión de organizaciones multi-tenant y cartera de clientes de partners revendedores.
  */
 
+// Utilidades locales desacopladas para garantizar resiliencia total contra fallos de red o carga tardía
+function _safeEscapeHtml(str) {
+  if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function _safeShowToast(msg, type) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg, type);
+  } else {
+    console.log(`[Bentian Toast ${type || 'info'}]: ${msg}`);
+  }
+}
+
+function _safeCloseModal(id) {
+  if (typeof window.closeModal === 'function') {
+    window.closeModal(id);
+  } else {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+}
+
 async function loadOrganizations() {
   const tbody = document.getElementById('orgs-tbody');
   if (tbody) {
@@ -32,11 +61,11 @@ async function loadOrganizations() {
 
         return `
           <tr class="hover:bg-white/[0.02] transition">
-            <td class="py-3.5 px-4 font-semibold text-white">${escapeHtml(o.legal_name || o.name || 'Organización')}</td>
-            <td class="py-3.5 px-4 font-mono text-indigo-300">${escapeHtml(o.tax_id || '—')}</td>
+            <td class="py-3.5 px-4 font-semibold text-white">${_safeEscapeHtml(o.legal_name || o.name || 'Organización')}</td>
+            <td class="py-3.5 px-4 font-mono text-indigo-300">${_safeEscapeHtml(o.tax_id || '—')}</td>
             <td class="py-3.5 px-4 font-mono">${licDisplay}</td>
-            <td class="py-3.5 px-4 font-mono text-zinc-400">${escapeHtml(o.reseller_id || 'Directo')}</td>
-            <td class="py-3.5 px-4 text-zinc-300">${escapeHtml(o.plan || 'Standard')}</td>
+            <td class="py-3.5 px-4 font-mono text-zinc-400">${_safeEscapeHtml(o.reseller_id || 'Directo')}</td>
+            <td class="py-3.5 px-4 text-zinc-300">${_safeEscapeHtml(o.plan || 'Standard')}</td>
             <td class="py-3.5 px-4 text-right">
               <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVA</span>
             </td>
@@ -93,8 +122,8 @@ async function loadPartnerClients() {
         const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('es-ES') : '—';
         return `
           <tr class="hover:bg-white/[0.02] transition">
-            <td class="p-3 font-semibold text-white">${escapeHtml(c.legal_name || c.name || 'Cliente')}</td>
-            <td class="p-3 font-mono text-indigo-300">${escapeHtml(c.tax_id || '—')}</td>
+            <td class="p-3 font-semibold text-white">${_safeEscapeHtml(c.legal_name || c.name || 'Cliente')}</td>
+            <td class="p-3 font-mono text-indigo-300">${_safeEscapeHtml(c.tax_id || '—')}</td>
             <td class="p-3 font-mono">${c.active_licenses || 0} activas / ${c.total_licenses || 0} tot.</td>
             <td class="p-3 text-zinc-400">${dateStr}</td>
             <td class="p-3 text-right">
@@ -115,11 +144,11 @@ function copyPartnerAffiliateLink() {
   const affInput = document.getElementById('partner-affiliate-link');
   if (affInput && affInput.value) {
     navigator.clipboard.writeText(affInput.value).then(() => {
-      showToast('✓ Enlace de distribuidor copiado al portapapeles', 'success');
+      _safeShowToast('✓ Enlace de distribuidor copiado al portapapeles', 'success');
     }).catch(() => {
       affInput.select();
       document.execCommand('copy');
-      showToast('✓ Enlace copiado', 'success');
+      _safeShowToast('✓ Enlace copiado', 'success');
     });
   }
 }
@@ -150,7 +179,7 @@ async function handlePartnerBuySubmit(e) {
   const btn = document.getElementById('btn-submit-partner-buy');
 
   if (!clientName || !clientTaxId) {
-    showToast('La Razón Social y el CIF son obligatorios', 'warning');
+    _safeShowToast('La Razón Social y el CIF son obligatorios', 'warning');
     return;
   }
 
@@ -174,10 +203,10 @@ async function handlePartnerBuySubmit(e) {
     if (res.ok && data.url) {
       window.location.href = data.url;
     } else {
-      showToast(data.error?.message || 'Error al generar la pasarela de pago mayorista', 'error');
+      _safeShowToast(data.error?.message || 'Error al generar la pasarela de pago mayorista', 'error');
     }
   } catch (err) {
-    showToast('Error de conexión con la pasarela de pago', 'error');
+    _safeShowToast('Error de conexión con la pasarela de pago', 'error');
   } finally {
     if (btn) {
       btn.innerText = 'Pagar en Stripe (149,25 €) →';
@@ -224,14 +253,14 @@ async function handlePartnerIssueSubmit(e) {
     });
     const data = await res.json();
     if (res.ok && data.data?.key) {
-      closeModal('modal-partner-issue');
-      showToast(`✓ Clave de Evaluación (15d) emitida: ${data.data.key}`, 'success');
+      _safeCloseModal('modal-partner-issue');
+      _safeShowToast(`✓ Clave de Evaluación (15d) emitida: ${data.data.key}`, 'success');
       loadPartnerClients();
     } else {
-      showToast(data.error?.message || 'Error al emitir licencia', 'error');
+      _safeShowToast(data.error?.message || 'Error al emitir licencia', 'error');
     }
   } catch (err) {
-    showToast('Error de conexión con el servidor central', 'error');
+    _safeShowToast('Error de conexión con el servidor central', 'error');
   } finally {
     if (btn) {
       btn.innerText = 'Emitir Clave de Evaluación (15d)';

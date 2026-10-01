@@ -117,6 +117,16 @@ function updateDashboardHtml(rootDir, version) {
       `$1v${version} Cloud$2`
     );
 
+    // Actualizar cache-busting en scripts y estilos
+    content = content.replace(
+      /(<script\s+[^>]*src=")(\/(?:dashboard\/)?js\/[^"?]+)(?:\?[^"]*)?(")/g,
+      `$1$2?v=${version}$3`
+    );
+    content = content.replace(
+      /(<link\s+[^>]*href=")(\/(?:assets\/|dashboard\/)?[^"?]+\.(?:css|ico|svg))(?:\?[^"]*)?(")/g,
+      `$1$2?v=${version}$3`
+    );
+
     fs.writeFileSync(dashPath, content, 'utf8');
     console.log(`  📊 Dashboard (apps/api/public/dashboard/index.html) sincronizado con versión v${version}.`);
   }

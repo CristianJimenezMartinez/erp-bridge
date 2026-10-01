@@ -6,8 +6,8 @@
   <base href="/dashboard/">
   <meta name="robots" content="noindex, nofollow">
   <title>Bentian ERP Bridge — Panel de Control Cloud Multi-Tenant</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
-  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg?v=0.3.5">
+  <link rel="alternate icon" href="/favicon.ico?v=0.3.5">
   <meta name="theme-color" content="#09090b">
   <meta name="application-name" content="Bentian Cloud Dashboard">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -47,6 +47,63 @@
     }
     .status-pulse { animation: pulse-subtle 2s infinite ease-in-out; }
   </style>
+  <script>
+    // Fail-safe modal & interactive controller (Immediate availability guarantee)
+    function closeModal(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+    function openPartnerBuyModal() {
+      var nameEl = document.getElementById('partner-buy-client-name');
+      var taxEl = document.getElementById('partner-buy-tax-id');
+      var emailEl = document.getElementById('partner-buy-email');
+      var aliasEl = document.getElementById('partner-buy-alias');
+      if (nameEl) nameEl.value = '';
+      if (taxEl) taxEl.value = '';
+      if (emailEl) emailEl.value = '';
+      if (aliasEl) aliasEl.value = '';
+      var modal = document.getElementById('modal-partner-buy');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function openPartnerIssueModal() {
+      var nameEl = document.getElementById('partner-issue-client-name');
+      var taxEl = document.getElementById('partner-issue-tax-id');
+      var aliasEl = document.getElementById('partner-issue-alias');
+      if (nameEl) nameEl.value = '';
+      if (taxEl) taxEl.value = '';
+      if (aliasEl) aliasEl.value = '';
+      var modal = document.getElementById('modal-partner-issue');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function openNewKeyModal() {
+      var modal = document.getElementById('modal-new-key');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function openInstructionsModal() {
+      var modal = document.getElementById('modal-instructions');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function openEditAliasModal(id, currentAlias) {
+      var idEl = document.getElementById('edit-alias-license-id');
+      var inputEl = document.getElementById('edit-alias-input');
+      if (idEl) idEl.value = id || '';
+      if (inputEl) inputEl.value = currentAlias || '';
+      var modal = document.getElementById('modal-edit-alias');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function openUnbindModal(id, key, hostname, hwid) {
+      var idEl = document.getElementById('unbind-license-id');
+      var hwidEl = document.getElementById('unbind-hwid');
+      var nameEl = document.getElementById('unbind-machine-name');
+      var keyEl = document.getElementById('unbind-key-display');
+      if (idEl) idEl.value = id || '';
+      if (hwidEl) hwidEl.value = hwid || '';
+      if (nameEl) nameEl.innerText = hostname || 'Equipo Actual';
+      if (keyEl) keyEl.innerText = key || 'EB-XXXXX';
+      var modal = document.getElementById('modal-unbind');
+      if (modal) modal.classList.remove('hidden');
+    }
+  </script>
 </head>
 <body class="bg-[#09090b] text-[#f4f4f5] antialiased min-h-full flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -1463,15 +1520,16 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- SCRIPTS MODULARES DEL DASHBOARD                              -->
+  <!-- SCRIPTS MODULARES DEL DASHBOARD (ARQUITECTURA WEB LIMPIA)    -->
   <!-- ============================================================ -->
-  <script src="/js/version-sync.js"></script>
-  <script src="/dashboard/js/utils.js"></script>
-  <script src="/dashboard/js/auth.js"></script>
-  <script src="/dashboard/js/licenses.js"></script>
-  <script src="/dashboard/js/fleet.js"></script>
-  <script src="/dashboard/js/organizations.js"></script>
-  <script src="/dashboard/js/audit-errors.js"></script>
-  <script src="/dashboard/js/navigation.js"></script>
+  <script src="/js/version-sync.js?v=0.3.5"></script>
+  <script src="/dashboard/js/utils.js?v=0.3.5"></script>
+  <script src="/dashboard/js/auth.js?v=0.3.5"></script>
+  <script src="/dashboard/js/client-portal.js?v=0.3.5"></script>
+  <script src="/dashboard/js/licenses.js?v=0.3.5"></script>
+  <script src="/dashboard/js/fleet.js?v=0.3.5"></script>
+  <script src="/dashboard/js/organizations.js?v=0.3.5"></script>
+  <script src="/dashboard/js/audit-errors.js?v=0.3.5"></script>
+  <script src="/dashboard/js/navigation.js?v=0.3.5"></script>
 </body>
 </html>

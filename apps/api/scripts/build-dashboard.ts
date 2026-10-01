@@ -36,6 +36,20 @@ export const DASHBOARD_MODALS = [
 ];
 
 /**
+ * Orden estricto de scripts para empaquetado en dashboard.bundle.js
+ */
+export const DASHBOARD_SCRIPTS = [
+  'utils.js',
+  'auth.js',
+  'client-portal.js',
+  'licenses.js',
+  'fleet.js',
+  'organizations.js',
+  'audit-errors.js',
+  'navigation.js'
+];
+
+/**
  * Obtiene la versión canónica centralizada (SSoT)
  */
 export function getCanonicalVersion(): string {
@@ -186,6 +200,19 @@ export function assembleDashboardPage(): string {
     'href="/releases/latest/Bentian-Setup.exe"'
   );
 
+  // 6.1 Reemplazar variables {{VERSION}} en plantillas
+  assembled = assembled.replace(/{{VERSION}}/g, currentVersion);
+
+  // 6.2 Inyección de cache-busting dinámico para scripts y estilos del dashboard
+  assembled = assembled.replace(
+    /(<script\s+[^>]*src=")(\/(?:dashboard\/)?(?:js\/[^"?]+|dashboard\.bundle\.js))(?:\?[^"]*)?(")/g,
+    `$1$2?v=${currentVersion}$3`
+  );
+  assembled = assembled.replace(
+    /(<link\s+[^>]*href=")(\/(?:assets\/|dashboard\/)?[^"?]+\.(?:css|ico|svg))(?:\?[^"]*)?(")/g,
+    `$1$2?v=${currentVersion}$3`
+  );
+
   // 7. Normalizar saltos de línea consistentes
   assembled = assembled.replace(/\r\n/g, '\n');
 
@@ -204,6 +231,17 @@ export function assembleDashboardPage(): string {
 export function buildDashboard(): void {
   console.log('[Dashboard Build] Starting modular assembly of Bentian Cloud Dashboard...');
 
+  // 1. Validar existencia física de cada módulo JavaScript
+  const jsDir = path.join(DASHBOARD_DIR, 'js');
+  for (const scriptName of DASHBOARD_SCRIPTS) {
+    const scriptPath = path.join(jsDir, scriptName);
+    if (!fs.existsSync(scriptPath)) {
+      throw new Error(`[Dashboard Build] Required modular script missing: ${scriptPath}`);
+    }
+  }
+  console.log(`[Dashboard Build] Verified all ${DASHBOARD_SCRIPTS.length} modular JS components in dashboard/js/.`);
+
+  // 2. Ensamblar página HTML
   const html = assembleDashboardPage();
 
   // Guardar archivo index.html en disco
@@ -270,17 +308,18 @@ export function buildDashboard(): void {
     'id="modal-welcome-checkout"',
     'id="welcome-license-key"',
 
-    // Notificaciones, Logo y Scripts
+    // Notificaciones, Logo y Scripts Modulares
     'id="toast"',
-    'src="/assets/icon.svg"',
-    'src="/js/version-sync.js"',
-    'src="/dashboard/js/utils.js"',
-    'src="/dashboard/js/auth.js"',
-    'src="/dashboard/js/licenses.js"',
-    'src="/dashboard/js/fleet.js"',
-    'src="/dashboard/js/organizations.js"',
-    'src="/dashboard/js/audit-errors.js"',
-    'src="/dashboard/js/navigation.js"'
+    'src="/assets/icon.svg',
+    'src="/js/version-sync.js',
+    'src="/dashboard/js/utils.js',
+    'src="/dashboard/js/auth.js',
+    'src="/dashboard/js/client-portal.js',
+    'src="/dashboard/js/licenses.js',
+    'src="/dashboard/js/fleet.js',
+    'src="/dashboard/js/organizations.js',
+    'src="/dashboard/js/audit-errors.js',
+    'src="/dashboard/js/navigation.js'
   ];
 
   for (const req of requiredElements) {

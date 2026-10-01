@@ -3,6 +3,34 @@
  * Gestión de licencias, puestos adicionales, vinculación/desvinculación HWID y portal de cliente.
  */
 
+function _safeEscapeHtml(str) {
+  if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function _safeShowToast(msg, type) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg, type);
+  } else {
+    console.log(`[Bentian Toast ${type || 'info'}]: ${msg}`);
+  }
+}
+
+function _safeCloseModal(id) {
+  if (typeof window.closeModal === 'function') {
+    window.closeModal(id);
+  } else {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+}
+
 window.allLicenses = [];
 
 async function loadLicenses() {
@@ -75,8 +103,8 @@ function renderLicenses(list) {
       <tr class="hover:bg-white/[0.02] transition-colors">
         <td class="p-3">
           <div class="flex items-center gap-2">
-            <span class="font-semibold text-zinc-100 text-xs">${escapeHtml(lic.alias || 'Servidor Factusol')}</span>
-            <button onclick="openEditAliasModal('${lic.id}', '${escapeHtml(lic.alias || '')}')" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
+            <span class="font-semibold text-zinc-100 text-xs">${_safeEscapeHtml(lic.alias || 'Servidor Factusol')}</span>
+            <button onclick="openEditAliasModal('${lic.id}', '${_safeEscapeHtml(lic.alias || '')}')" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>
           </div>
@@ -113,13 +141,13 @@ function renderLicenses(list) {
           `}
         </td>
         <td class="p-3">
-          <div class="text-zinc-200 text-xs font-medium">${escapeHtml(hostname)}</div>
+          <div class="text-zinc-200 text-xs font-medium">${_safeEscapeHtml(hostname)}</div>
           <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${fullHwid}">HWID: ${shortHwid}</div>
         </td>
         <td class="p-3 text-right">
           ${hasMachine ? `
             <button 
-              onclick="openUnbindModal('${lic.id}', '${escapeHtml(lic.key)}', '${escapeHtml(hostname)}', '${act.hwid}')" 
+              onclick="openUnbindModal('${lic.id}', '${_safeEscapeHtml(lic.key)}', '${_safeEscapeHtml(hostname)}', '${act.hwid}')" 
               class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
@@ -166,155 +194,6 @@ async function loadFleetOverview() {
   } catch (e) {
     console.warn('Error cargando KPIs:', e);
   }
-}
-
-async function loadClientPortal(requestedKey) {
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-  const url = requestedKey ? `/api/v1/client/my-license?key=${encodeURIComponent(requestedKey)}` : '/api/v1/client/my-license';
-
-  try {
-    const res = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const json = await res.json();
-      window.currentClientData = json.data;
-      const lic = window.currentClientData;
-
-      // Actualizar selector multi-licencia si la cuenta tiene varias licencias
-      const multiBanner = document.getElementById('client-multi-license-banner');
-      const multiBadge = document.getElementById('client-multi-count-badge');
-      const multiSelect = document.getElementById('client-license-select');
-
-      if (lic.totalLicenses && lic.totalLicenses > 1) {
-        if (multiBanner) multiBanner.classList.remove('hidden');
-        if (multiBadge) multiBadge.innerText = `${lic.totalLicenses} Licencias Contratadas`;
-        if (multiSelect && lic.allLicenses) {
-          multiSelect.innerHTML = lic.allLicenses.map(l => {
-            const isSelected = l.key === lic.key ? 'selected' : '';
-            return `<option value="${escapeHtml(l.key)}" ${isSelected}>${escapeHtml(l.alias || 'Servidor Factusol')} — ${escapeHtml(l.key)}</option>`;
-          }).join('');
-        }
-      } else {
-        if (multiBanner) multiBanner.classList.add('hidden');
-      }
-
-      const keyEl = document.getElementById('client-license-key');
-      if (keyEl) keyEl.innerText = lic.key || '—';
-
-      const statusBadge = document.getElementById('client-status-badge');
-      if (statusBadge) {
-        if (lic.status === 'active') {
-          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-          statusBadge.innerText = 'ACTIVA';
-        } else if (lic.status === 'trial') {
-          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20';
-          statusBadge.innerText = 'EVALUACIÓN';
-        } else {
-          statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20';
-          statusBadge.innerText = (lic.status || 'INACTIVA').toUpperCase();
-        }
-      }
-
-      const seatTypeEl = document.getElementById('client-seat-type');
-      if (seatTypeEl) {
-        seatTypeEl.innerText = 'Licencia Base (1 ERP ⇄ 1 Tienda Web)';
-      }
-
-      const subStatus = document.getElementById('client-subscription-status');
-      if (subStatus) {
-        if (lic.billingStatus === 'ACTIVE' || lic.status === 'active') {
-          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Suscripción al día';
-          subStatus.className = 'text-emerald-400 flex items-center gap-1';
-        } else if (lic.billingStatus === 'PAST_DUE') {
-          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Pago pendiente';
-          subStatus.className = 'text-red-400 flex items-center gap-1';
-        } else {
-          subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Modo Directo';
-          subStatus.className = 'text-zinc-400 flex items-center gap-1';
-        }
-      }
-
-      const act = lic.activations && lic.activations.length > 0 ? lic.activations[0] : null;
-      const hostnameEl = document.getElementById('client-device-hostname');
-      const badgeEl = document.getElementById('client-device-status-badge');
-      const hwidEl = document.getElementById('client-device-hwid');
-      const unbindBtn = document.getElementById('btn-client-unbind');
-
-      if (act) {
-        if (hostnameEl) hostnameEl.innerText = act.machineInfo?.hostname || 'PC Conectado';
-        if (hwidEl) hwidEl.innerText = 'HWID: ' + (act.hwid ? act.hwid.substring(0, 20) + '...' : '—');
-        if (badgeEl) {
-          badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-          badgeEl.innerText = 'En Línea';
-        }
-        if (unbindBtn) unbindBtn.classList.remove('hidden');
-      } else {
-        if (hostnameEl) hostnameEl.innerText = 'Esperando vinculación...';
-        if (hwidEl) hwidEl.innerText = 'HWID: Pendiente de activar en tu ordenador';
-        if (badgeEl) {
-          badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20';
-          badgeEl.innerText = 'Sin activar';
-        }
-        if (unbindBtn) unbindBtn.classList.add('hidden');
-      }
-    } else {
-      // Manejo de estado vacío si la cuenta no tiene licencia
-      window.currentClientData = null;
-      const keyEl = document.getElementById('client-license-key');
-      if (keyEl) keyEl.innerText = 'Sin licencia asignada';
-
-      const statusBadge = document.getElementById('client-status-badge');
-      if (statusBadge) {
-        statusBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-500/10 text-zinc-400 border border-zinc-500/20';
-        statusBadge.innerText = 'SIN LICENCIA';
-      }
-
-      const seatTypeEl = document.getElementById('client-seat-type');
-      if (seatTypeEl) seatTypeEl.innerText = 'No hay ninguna licencia activa asociada a esta sesión';
-
-      const subStatus = document.getElementById('client-subscription-status');
-      if (subStatus) {
-        subStatus.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span> Sin suscripción activa';
-        subStatus.className = 'text-zinc-500 flex items-center gap-1';
-      }
-
-      const hostnameEl = document.getElementById('client-device-hostname');
-      if (hostnameEl) hostnameEl.innerText = 'Sin ordenador vinculado';
-
-      const hwidEl = document.getElementById('client-device-hwid');
-      if (hwidEl) hwidEl.innerText = 'HWID: —';
-
-      const badgeEl = document.getElementById('client-device-status-badge');
-      if (badgeEl) {
-        badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-500 border border-zinc-500/20';
-        badgeEl.innerText = 'Inactivo';
-      }
-
-      const unbindBtn = document.getElementById('btn-client-unbind');
-      if (unbindBtn) unbindBtn.classList.add('hidden');
-    }
-  } catch (e) {
-    console.warn('Error cargando portal de cliente:', e);
-  }
-}
-
-function copyClientKey() {
-  const keyEl = document.getElementById('client-license-key');
-  const key = keyEl ? keyEl.innerText : '';
-  if (key && !key.includes('Cargando') && !key.includes('Sin licencia') && key !== '—') {
-    navigator.clipboard.writeText(key);
-    showToast('✓ Clave copiada al portapapeles', 'success');
-  } else {
-    showToast('No hay ninguna clave activa para copiar', 'warning');
-  }
-}
-
-function handleClientUnbindClick() {
-  if (!window.currentClientData) return;
-  const act = window.currentClientData.activations && window.currentClientData.activations[0];
-  if (!act) return;
-  openUnbindModal(window.currentClientData.id, window.currentClientData.key, act.machineInfo?.hostname || 'PC Actual', act.hwid);
 }
 
 function openNewKeyModal() {
@@ -373,15 +252,15 @@ async function handleCreateLicenseSubmit(e) {
     });
     const data = await res.json();
     if (res.ok && data.data?.key) {
-      closeModal('modal-new-key');
-      showToast(`✓ Clave ${data.data.key} generada para ${alias}`, 'success');
+      _safeCloseModal('modal-new-key');
+      _safeShowToast(`✓ Clave ${data.data.key} generada para ${alias}`, 'success');
       loadLicenses();
       loadFleetOverview();
     } else {
-      showToast(data.error?.message || 'Error al generar clave', 'error');
+      _safeShowToast(data.error?.message || 'Error al generar clave', 'error');
     }
   } catch (err) {
-    showToast('Error de conexión', 'error');
+    _safeShowToast('Error de conexión', 'error');
   } finally {
     if (btn) {
       btn.innerText = 'Generar Clave';
@@ -409,14 +288,14 @@ async function handleSaveAlias() {
       body: JSON.stringify({ alias: newAlias })
     });
     if (res.ok) {
-      closeModal('modal-edit-alias');
-      showToast('✓ Alias actualizado con éxito', 'success');
+      _safeCloseModal('modal-edit-alias');
+      _safeShowToast('✓ Alias actualizado con éxito', 'success');
       loadLicenses();
     } else {
-      showToast('Error al actualizar alias', 'error');
+      _safeShowToast(data.error?.message || 'Error al actualizar alias', 'error');
     }
   } catch (err) {
-    showToast('Error de conexión', 'error');
+    _safeShowToast('Error de conexión', 'error');
   }
 }
 
@@ -444,8 +323,8 @@ async function confirmUnbind() {
       body: JSON.stringify({ hwid })
     });
     if (res.ok) {
-      closeModal('modal-unbind');
-      showToast('✓ Licencia liberada. Ya puedes activarla en el nuevo PC.', 'success');
+      _safeCloseModal('modal-unbind');
+      _safeShowToast('✓ Licencia liberada. Ya puedes activarla en el nuevo PC.', 'success');
       if (role === 'TENANT_CLIENT') {
         loadClientPortal();
       } else {
@@ -453,10 +332,10 @@ async function confirmUnbind() {
         loadFleetOverview();
       }
     } else {
-      showToast('Error al desvincular equipo', 'error');
+      _safeShowToast('Error al desvincular equipo', 'error');
     }
   } catch (err) {
-    showToast('Error de conexión', 'error');
+    _safeShowToast('Error de conexión', 'error');
   } finally {
     if (btn) {
       btn.innerText = 'Confirmar y Liberar Licencia';
@@ -485,9 +364,6 @@ function handleSearch(query) {
 window.loadLicenses = loadLicenses;
 window.renderLicenses = renderLicenses;
 window.loadFleetOverview = loadFleetOverview;
-window.loadClientPortal = loadClientPortal;
-window.copyClientKey = copyClientKey;
-window.handleClientUnbindClick = handleClientUnbindClick;
 window.openNewKeyModal = openNewKeyModal;
 window.openEditAliasModal = openEditAliasModal;
 window.openUnbindModal = openUnbindModal;

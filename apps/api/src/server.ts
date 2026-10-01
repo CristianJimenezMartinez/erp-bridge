@@ -168,26 +168,65 @@ export async function bootstrapApp(): Promise<Express> {
     }
   }));
 
-  // Servir landing page de descargas y dashboard web
-  app.use(express.static(publicDir));
+  // Servir landing page de descargas y dashboard web con control de caché óptimo
+  app.use(express.static(publicDir, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+      }
+    }
+  }));
+
   app.get('/', (_req, res) => {
     const indexPath = path.join(publicDir, 'index.html');
     if (fs.existsSync(indexPath)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.sendFile(indexPath);
     }
     return res.json({ message: 'Bentian ERP Bridge API', status: 'OK', docs: '/health' });
   });
 
-  // Servir Dashboard Angular 17 SPA real
+  // Servir Dashboard Cloud Multi-Tenant
   const dashboardDir = path.join(publicDir, 'dashboard');
-  app.use('/dashboard', express.static(dashboardDir));
-  app.get('/dashboard*', (_req, res) => {
+  app.use('/dashboard', express.static(dashboardDir, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+      }
+    }
+  }));
+
+  // Enrutamiento SPA seguro: solo responder con index.html para rutas de navegación (sin extensiones .js, .css, etc.)
+  app.get('/dashboard*', (req, res) => {
+    const ext = path.extname(req.path);
+    if (ext && ext !== '.html') {
+      return res.status(404).json({ error: { message: `Recurso estático no encontrado: ${req.path}` } });
+    }
+
     const angularIndex = path.join(dashboardDir, 'index.html');
     if (fs.existsSync(angularIndex)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.sendFile(angularIndex);
     }
     const dashFallback = path.resolve(process.cwd(), 'dashboard.html');
     if (fs.existsSync(dashFallback)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.sendFile(dashFallback);
     }
     return res.status(404).send('Dashboard file not found');

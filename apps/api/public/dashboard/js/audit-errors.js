@@ -3,6 +3,17 @@
  * Monitorización de errores de flota, auditoría del sistema y métricas financieras de Superadmin.
  */
 
+function _safeEscapeHtml(str) {
+  if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 async function loadAdminOverview() {
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
 
@@ -70,12 +81,12 @@ async function loadFleetErrors() {
         const isFatal = !!err.fatal;
         return `
           <tr class="hover:bg-white/[0.02] transition">
-            <td class="p-3 font-mono font-semibold text-white">${escapeHtml(err.agent_name || err.agent_id || 'Servidor')}</td>
-            <td class="p-3 text-zinc-300">${escapeHtml(err.org_name || err.organization_id || 'General')}</td>
-            <td class="p-3 font-mono text-zinc-400">${escapeHtml(err.component || 'OLEDB / Factusol')}</td>
+            <td class="p-3 font-mono font-semibold text-white">${_safeEscapeHtml(err.agent_name || err.agent_id || 'Servidor')}</td>
+            <td class="p-3 text-zinc-300">${_safeEscapeHtml(err.org_name || err.organization_id || 'General')}</td>
+            <td class="p-3 font-mono text-zinc-400">${_safeEscapeHtml(err.component || 'OLEDB / Factusol')}</td>
             <td class="p-3">
-              <div class="text-zinc-200">${escapeHtml(err.message || 'Error de sincronización')}</div>
-              <div class="text-[10px] text-zinc-500 font-mono">${escapeHtml(err.error_code || 'ERR_UNKNOWN')}</div>
+              <div class="text-zinc-200">${_safeEscapeHtml(err.message || 'Error de sincronización')}</div>
+              <div class="text-[10px] text-zinc-500 font-mono">${_safeEscapeHtml(err.error_code || 'ERR_UNKNOWN')}</div>
             </td>
             <td class="p-3 text-zinc-400 font-mono text-[11px]">${dateStr}</td>
             <td class="p-3 text-right">
@@ -112,8 +123,17 @@ async function loadAuditLogs() {
         return;
       }
       container.innerHTML = logs.map(l => {
-        const time = l.created_at ? new Date(l.created_at).toLocaleTimeString('es-ES') : '--:--:--';
-        return `<div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">${time}</span> <span class="text-indigo-400 font-semibold">[${escapeHtml(l.action || 'EVENT')}]</span> ${escapeHtml(l.details || l.entity_type || 'Operación registrada')}</div>`;
+        const rawTime = l.timestamp || l.created_at;
+        const time = rawTime ? new Date(rawTime).toLocaleTimeString('es-ES') : '--:--:--';
+        const actionTag = _safeEscapeHtml(l.action || 'EVENT');
+        const desc = _safeEscapeHtml(
+          l.details ||
+          l.entity_type ||
+          (l.resourceType ? `${l.resourceType}${l.resourceId ? ` (#${l.resourceId.substring(0, 8)})` : ''}` : '') ||
+          'Operación registrada'
+        );
+        const resultBadge = l.result && l.result !== 'SUCCESS' ? `<span class="text-red-400 font-mono text-[10px]">[${_safeEscapeHtml(l.result)}]</span> ` : '';
+        return `<div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">${time}</span> ${resultBadge}<span class="text-indigo-400 font-semibold">[${actionTag}]</span> ${desc}</div>`;
       }).join('');
     }
   } catch (e) {
