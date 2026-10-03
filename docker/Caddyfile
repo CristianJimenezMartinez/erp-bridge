@@ -1,0 +1,10 @@
+:80 {
+    redir https://bridge.cristianjm.com{uri} permanent
+}
+
+bridge.cristianjm.com, api.bridge.cristianjm.com {
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+    reverse_proxy localhost:3000
+}
