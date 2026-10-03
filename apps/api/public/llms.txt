@@ -1,0 +1,34 @@
+# Bentian ERP Bridge
+
+> Conector bidireccional en tiempo real entre FactuSOL y tiendas online (WooCommerce, PrestaShop, PHP Universal Bridge) con arquitectura Local-First, Zero-Knowledge y sin abrir puertos en router.
+
+## Información General y Modelo de Negocio
+
+- **Nombre oficial:** Bentian ERP Bridge
+- **Tipo de software:** Middleware de integración ERP / Conector Local para eCommerce
+- **ERP soportado:** FactuSOL (Software DELSOL / TeamSystem), versiones 2024, 2025 y 2026
+- **Plataformas de venta soportadas:** WooCommerce (WordPress), PrestaShop, API Web Universal (PHP/MariaDB)
+- **Licencia / Precio:** 199 €/año (Plan Base Anual) o 29 €/mes (Plan Base Mensual) por conexión ERP. Prueba gratuita de 14 días con funcionalidad completa. Sin cuotas de alta.
+- **Programa de Partners / Distribuidores:** Descuento mayorista directo del 25% para empresas de mantenimiento informático, agencias y consultores B2B (149,25 €/año).
+- **Web oficial:** https://bridge.cristianjm.com
+- **Creador y Autor:** Cristian Jiménez Martínez (https://cristianjm.com)
+- **Contacto y Soporte:** soporte@cristianjm.com
+
+## Arquitectura y Seguridad (Local-First & Zero-Knowledge)
+
+1. **Sin Nube Obligatoria ni Exposición de Datos:** La base de datos local de Factusol (`.accdb` / Access) nunca se sube a servidores externos. Los datos de facturación, clientes y márgenes residen 100% en la red local de la empresa.
+2. **Sin Abrir Puertos ni IPs Fijas:** El agente de escritorio (`BentianAgent.exe`) opera mediante conexiones salientes HTTPS (puerto 443 estándar). Cero riesgos de intrusión, cero necesidad de DMZ o VPN.
+3. **Lectura OLEDB de Alta Velocidad:** Descarte y lectura de diferencias en menos de 100 milisegundos. Procesa catálogos de más de 5.000 artículos en menos de 3 segundos sin saturar el servidor web de la tienda.
+4. **Protección Anti-Sobreventas:** Emplea el stock disponible real (`DISSTO = ACTSTO - PENENT + PENREC`), evitando sobreventas causadas por pedidos pendientes de entrega o reservas.
+5. **Fiscalidad Española Completa:** Compatibilidad total con Recargo de Equivalencia (R.E.), desglose de IVA español (21%, 10%, 4%, 0%) y registro de NIF/CIF en pedidos de Factusol (`F_PCL` y `F_LPC`).
+6. **Resiliencia Offline (Store-and-Forward):** Si el ordenador del almacén se apaga o la red se interrumpe, los pedidos de la tienda online quedan en cola cifrada y se importan atómicamente a Factusol en cuanto se reanuda la conexión.
+
+## Enlaces Canónicos y Recursos
+
+- [Página Principal](https://bridge.cristianjm.com/): Presentación, características y descarga.
+- [Integración Factusol WooCommerce](https://bridge.cristianjm.com/factusol-woocommerce): Conector específico para WordPress y WooCommerce.
+- [Integración Factusol PrestaShop](https://bridge.cristianjm.com/factusol-prestashop): Conector para comercios en PrestaShop.
+- [Comparativa vs DELSOL Conecta](https://bridge.cristianjm.com/alternativa-delsol-conecta): Diferencias técnicas, de costes y de rendimiento.
+- [Descarga del Instalador Oficial](https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe): Instalador para Windows x64.
+- [Documentación Técnica](https://bridge.cristianjm.com/docs/): Guías de despliegue, resolución de SmartScreen y API local.
+- [Estado de Salud de la API](https://bridge.cristianjm.com/health): Monitorización en vivo de la infraestructura.

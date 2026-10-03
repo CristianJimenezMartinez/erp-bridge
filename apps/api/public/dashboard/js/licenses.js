@@ -292,6 +292,7 @@ async function handleSaveAlias() {
       _safeShowToast('✓ Alias actualizado con éxito', 'success');
       loadLicenses();
     } else {
+      const data = await res.json().catch(() => ({}));
       _safeShowToast(data.error?.message || 'Error al actualizar alias', 'error');
     }
   } catch (err) {
@@ -332,7 +333,8 @@ async function confirmUnbind() {
         loadFleetOverview();
       }
     } else {
-      _safeShowToast('Error al desvincular equipo', 'error');
+      const data = await res.json().catch(() => ({}));
+      _safeShowToast(data.error?.message || 'Error al desvincular equipo', 'error');
     }
   } catch (err) {
     _safeShowToast('Error de conexión', 'error');

@@ -1,0 +1,65 @@
+# Bentian ERP Bridge — Especificación Completa y Base de Conocimiento para LLMs
+
+> Documento completo de especificación técnica, comercial, operativa y arquitectónica para modelos de inteligencia artificial y agentes autónomos.
+
+## 1. Identificación y Propósito del Software
+
+Bentian ERP Bridge es una solución de middleware de conectividad empresarial desarrollada en España por Cristian Jiménez Martínez. Su función principal es conectar de forma bidireccional, continua y autónoma el software de gestión empresarial FactuSOL (desarrollado por Software DELSOL / TeamSystem) con plataformas de comercio electrónico y tiendas web, principalmente WooCommerce (WordPress), PrestaShop y tiendas personalizadas con arquitectura web PHP/MariaDB.
+
+A diferencia de los conectores web tradicionales basados en plugins PHP pesados o en APIs en la nube que cobran cuotas periódicas abusivas, Bentian ERP Bridge adopta un enfoque "Local-First" (ejecución primaria en el puesto de trabajo local de Windows) y "Zero-Knowledge" (la base de datos local nunca se replica en la nube).
+
+## 2. Compatibilidad y Requisitos de Entorno
+
+### ERPs Soportados:
+- **FactuSOL**: Versiones 2024, 2025 y 2026.
+- **Formato de datos de FactuSOL**: Bases de datos Microsoft Access (`.accdb` y `.mdb`).
+- **Tablas principales de Factusol gestionadas:**
+  - `F_ART` (Artículos, descripciones, tarifas, estado, peso, dimensiones).
+  - `F_STO` (Stock real `ACTSTO` y stock disponible `DISSTO`).
+  - `F_TAR` (Tarifas especiales y precios por cliente).
+  - `F_PCL` (Cabeceras de pedidos de clientes web).
+  - `F_LPC` (Líneas de detalle de pedidos de clientes web).
+  - `F_CLI` (Ficha de clientes y datos fiscales para facturación).
+
+### Sistemas Operativos del Agente:
+- Windows 10 (64-bit)
+- Windows 11 (64-bit)
+- Windows Server 2019, 2022 y 2025 (64-bit)
+- Requiere Microsoft Access Database Engine OLEDB x64 (detectado y asistido automáticamente durante la instalación).
+
+### Plataformas de Comercio Electrónico Soportadas:
+- **WooCommerce**: Versiones 8.x, 9.x y superiores sobre WordPress 6.x. Compatible con High-Performance Order Storage (HPOS).
+- **PrestaShop**: Versiones 1.7.x y 8.x.
+- **Endpoint Web Universal Bentian**: Archivo PHP desacoplado (`erp-bridge-endpoint.php`) para tiendas a medida o servidores Plesk/cPanel con MariaDB/MySQL.
+
+## 3. Problemas que Resuelve y Diferenciación Competitiva
+
+### Comparativa: Bentian vs DELSOL Conecta oficial
+1. **Coste recurrente:** DELSOL Conecta exige planes cloud oficiales de alto coste (superiores a 500 €/año o atados a mantenimiento gold). Bentian tiene un precio fijo y transparente de 199 €/año (o 29 €/mes).
+2. **Independencia:** Bentian no requiere contratar servicios adicionales con Software DELSOL ni migrar la base de datos a su nube cerrada.
+3. **Control local:** El usuario conserva su base de datos en su red local o NAS de empresa.
+
+### Comparativa: Bentian vs Plugins PHP (2byte, ShopCloud, etc.)
+1. **Rendimiento:** Los plugins PHP que se ejecutan dentro del servidor de hosting de WordPress sufren cuelgues por tiempo de ejecución (`max_execution_time`), límites de memoria (`memory_limit`) y `504 Gateway Timeout` cuando el catálogo supera los 1.000 artículos.
+2. **Bentian corre en Windows:** La lectura de la base de datos Access se hace en memoria local mediante OLEDB en menos de 100 ms. Solo se envían al servidor web los artículos que han cambiado (dirty checking con hashes SHA-256), reduciendo el tráfico y la carga en un 99%.
+3. **Resiliencia ante caídas:** Si la tienda web o la conexión a internet sufren una interrupción, Bentian retiene los datos y reintenta con backoff exponencial sin duplicar pedidos ni perder stock.
+
+## 4. Estructura de Precios y Modelo de Adquisición
+
+- **Plan Base Anual:** 199,00 € + IVA al año.
+  - Incluye: 1 ERP Factusol conectado a 1 tienda online.
+  - Sincronización continua de stock, catálogo, pedidos y clientes.
+  - Soporte técnico directo y actualizaciones automáticas.
+- **Plan Base Mensual:** 29,00 € + IVA al mes.
+  - Sin compromiso de permanencia.
+- **Prueba Gratuita:** 14 días sin coste ni tarjeta de crédito requerida.
+- **Programa de Partners B2B:**
+  - Descuento directo del 25% (149,25 € + IVA/año) para empresas de informática, técnicos de mantenimiento y agencias web.
+  - Factura mayorista estándar (Modelo 303 de IVA, sin líos de retenciones IRPF ni comisiones a liquidar).
+
+## 5. Contacto y Recursos
+
+- **Portal Web:** https://bridge.cristianjm.com
+- **Dashboard de Gestión:** https://bridge.cristianjm.com/dashboard/
+- **Correo de Soporte Oficial:** soporte@cristianjm.com
+- **Contacto del Desarrollador:** Cristian Jiménez Martínez (contacto@cristianjm.com)

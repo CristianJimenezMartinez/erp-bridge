@@ -186,10 +186,22 @@ if (typeof window !== 'undefined' && window.fetch) {
   };
 }
 
+function copyToClipboard(text, successMsg = 'Copiado al portapapeles') {
+  if (!text) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(successMsg, 'success');
+    }).catch(() => {
+      showToast('Error al copiar al portapapeles', 'error');
+    });
+  }
+}
+
 // Exposición en el ámbito global para atributos onclick HTML
 window.escapeHtml = escapeHtml;
 window.showToast = showToast;
 window.copyKey = copyKey;
+window.copyToClipboard = copyToClipboard;
 window.copiarClaveBienvenida = copiarClaveBienvenida;
 window.closeModal = closeModal;
 window.openInstructionsModal = openInstructionsModal;

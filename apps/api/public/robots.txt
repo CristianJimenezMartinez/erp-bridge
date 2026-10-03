@@ -40,6 +40,11 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-# 3. Ubicación del Sitemap Canónico
+# 3. Ubicación del Sitemap Canónico y Ficheros LLMs
 Sitemap: https://bridge.cristianjm.com/sitemap.xml
 Host: bridge.cristianjm.com
+
+# 4. Descubrimiento para Modelos de Inteligencia Artificial (GEO)
+# https://llmstxt.org/
+# https://bridge.cristianjm.com/llms.txt
+# https://bridge.cristianjm.com/llms-full.txt
