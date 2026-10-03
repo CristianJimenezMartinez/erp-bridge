@@ -463,8 +463,12 @@ if ($mainAction === 'catalog' || $mainAction === 'articles') {
     $where = "WHERE p.active = 1";
     $params = [];
     if (!empty($searchQuery)) {
-        $where .= " AND (p.name LIKE :q OR p.code LIKE :q OR p.barcode LIKE :q OR p.description LIKE :q)";
-        $params[':q'] = '%' . $searchQuery . '%';
+        $where .= " AND (p.name LIKE :q1 OR p.code LIKE :q2 OR p.barcode LIKE :q3 OR p.description LIKE :q4)";
+        $searchTerm = '%' . $searchQuery . '%';
+        $params[':q1'] = $searchTerm;
+        $params[':q2'] = $searchTerm;
+        $params[':q3'] = $searchTerm;
+        $params[':q4'] = $searchTerm;
     }
 
     $stmt = $pdo->prepare("
