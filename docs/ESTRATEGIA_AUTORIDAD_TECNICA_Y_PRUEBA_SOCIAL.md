@@ -435,10 +435,60 @@ Para que cualquier visitante que entre en la Beta se sienta identificado de inme
 ## 7. Plan de Acción y Próximos Pasos
 
 1. **Creación de la Ruta Canónica del Caso de Éxito:**  
-   Implementar la página `/casos-de-exito/suministros-rubio/index.html` con la estructura editorial y técnica descrita en la Sección 2.
+   Implementar la página `/casos-de-exito/suministros-rubio/index.html` con la estructura editorial y técnica descrita en la Sección 2. *(Completado y desplegado).*
 2. **Inyección de los Sellos en la Landing y en `/beta/`:**  
-   Añadir el bloque de los 5 sellos técnicos en `apps/api/public/beta/index.html` y en `apps/api/public/sections/11-security.html`.
+   Añadir el bloque de los 5 sellos técnicos en `apps/api/public/beta/index.html` y en `apps/api/public/sections/11-security.html`. *(Completado y desplegado).*
 3. **Alta y Configuración del Perfil de Trustpilot B2B:**  
    Configurar la ficha de empresa de Bentian ERP Bridge y preparar los enlaces con parámetros UTM para trazabilidad.
 4. **Activación de Automatismos de Email en la API (`apps/api/src/services/mailer.service.ts`):**  
    Vincular las plantillas de correo para los hitos de la Beta (Día 1, Día 7 y solicitud de reseña del Plan Fundador).
+
+---
+
+## 8. Directorio Maestro de Plataformas, Ecosistemas y Registro de Software
+
+Para consolidar la huella digital y reputación de Bentian ERP Bridge en los motores de búsqueda y departamentos de TI, se establece el registro oficial de plataformas clasificadas por impacto y estado:
+
+### 8.1 Registro de Plataformas Oficiales y Estatus de Despliegue
+
+| Plataforma / Directorio | Autoridad (DA) | Enlace de Registro / Ficha | Tipo de Presencia | Estado Actual |
+| :--- | :---: | :--- | :--- | :---: |
+| **AlternativeTo** | DA 82 | [alternativeto.net/software/bentian-erp-bridge/](https://alternativeto.net/software/bentian-erp-bridge/) | Alternativa a Zapier, Make y conectores Factusol | ✅ **Activo y Publicado** |
+| **Microsoft WinGet** | DA 98 | [github.com/microsoft/winget-pkgs/pull/446582](https://github.com/microsoft/winget-pkgs/pull/446582) | Comando oficial: `winget install Bentian.ERPBridge` | ⏳ **En Revisión (CI Verde)** |
+| **Uptodown (España)** | DA 90 | [developers.uptodown.com](https://developers.uptodown.com/) | Ficha en español, análisis de 70 antivirus | ⏳ **Enviado a Revisión** |
+| **Softpedia** | DA 92 | Correo: `submit@softpedia.com` / [Formulario](https://www.softpedia.com/user/contact.php) | Sello "100% Clean: No Spyware, No Viruses" | ✉️ **Listo para envío** |
+| **SaaSHub** | DA 75 | [saashub.com/submit](https://www.saashub.com/submit) | Alternativa B2B a software de sincronización | 📋 **Pendiente de alta** |
+| **SourceForge** | DA 93 | [sourceforge.net/p/add_project/](https://sourceforge.net/p/add_project/) | Repositorio histórico de software para Windows | 📋 **Pendiente de alta** |
+| **Capterra España (Gartner)** | DA 91 | [vendorportal.gartner.com](https://vendorportal.gartner.com/) | Reseñas B2B y presencia en comparador líder | 📋 **Pendiente de alta** |
+| **SoftDoit (España)** | DA 52 | [softdoit.com](https://www.softdoit.com/) | Comparador español especializado en ERPs | 📋 **Pendiente de alta** |
+| **Trustpilot B2B** | DA 94 | [es.business.trustpilot.com](https://es.business.trustpilot.com/) | Perfil de empresa para opiniones de los 25 fundadores | 📋 **Pendiente de alta** |
+| **G2.com** | DA 93 | [g2.com/products/new](https://www.g2.com/products/new) | Reseñas y cuadrante de software empresarial | 📋 **Pendiente de alta** |
+| **Product Hunt** | DA 91 | [producthunt.com](https://www.producthunt.com/) | Lanzamiento comunitario para agencias y desarrolladores | 📋 **Pendiente de alta** |
+
+---
+
+### 8.2 Protocolo de Mantenimiento ante Nuevas Versiones: ¿Qué se hace en cada release?
+
+Una duda operativa crítica para el equipo de desarrollo es: **¿Es necesario volver a subir y rellenar fichas en todas las plataformas cada vez que se compila una nueva versión (ej. v0.3.6 o v0.4.0)?**
+
+**RESPUESTA OFICIAL:** **NO. El 90% de las plataformas NO requieren intervención manual.**
+
+#### Matriz de Automatización por Plataforma:
+
+1. **Tu Web Oficial y Clientes Instalados (100% Automático):**
+   - El agente local de Windows cuenta con el subsistema `UpdateSwapper` atómico. Cuando publicas una versión con `node builder/build.js [patch] --deploy`, los clientes reciben la actualización silenciosa en segundo plano sin entrar a ninguna web ni tocar nada.
+2. **Directorios Web (AlternativeTo, SaaSHub, Capterra, SoftDoit, Trustpilot, G2, SourceForge):**
+   - **Cero mantenimiento manual:** Estas plataformas funcionan como **fichas de producto permanentes**. Apuntan directamente a tu web oficial (`https://bridge.cristianjm.com`). Cuando un usuario hace clic en *"Download"* o *"Website"*, aterriza en tu web donde siempre se descarga la última versión gracias a los punteros canónicos inmutables (`/releases/latest/Bentian-Setup.exe` - Regla Mandataria 13).
+   - No hay que volver a subir capturas ni textos. La ficha permanece indexada en Google para siempre.
+3. **Uptodown:**
+   - **Rastreador Automático:** Como configuramos la descarga mediante la URL canónica directa (`https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe`), el robot rastreador de Uptodown visita periódicamente esa URL. Cuando detecta un nuevo archivo con hash diferente, lo analiza en sus máquinas y actualiza el número de versión automáticamente en la ficha.
+4. **Microsoft WinGet:**
+   - Para WinGet, cada nueva versión se actualiza con un simple comando de 1 línea desde PowerShell:
+     ```powershell
+     wingetcreate update Bentian.ERPBridge --version 0.3.6 --urls "https://bridge.cristianjm.com/releases/v0.3.6/Bentian-Setup-v0.3.6.exe"
+     ```
+     La herramienta de Microsoft descarga el binario, calcula el nuevo SHA-256, actualiza los 3 archivos y abre el Pull Request automáticamente sin tocar nada a mano.
+   - Opcionalmente, se automatiza mediante GitHub Actions en `.github/workflows/winget-publish.yml` para que al hacer `git tag v0.3.6` se envíe solo.
+
+**Conclusión:** El alta inicial es un trabajo que se hace **UNA ÚNICA VEZ**. A partir de ahí, la infraestructura canónica y los bots se encargan del mantenimiento.
+
