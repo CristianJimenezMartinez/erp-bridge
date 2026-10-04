@@ -47,6 +47,9 @@ export function renderLicenseTab(): string {
               </button>
             </div>
             <div id="lic-activate-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+            <div style="margin-top: 6px; font-size: 11px; color: var(--text-subtle);">
+              ¿Aún no tienes tu clave? <a href="https://bridge.cristianjm.com/beta/" target="_blank" style="color: #818cf8; text-decoration: underline;">Consigue tu clave de activación de la Beta (60 días gratis) ↗</a>
+            </div>
           </div>
 
           <div class="form-group" style="margin-top: 18px;">

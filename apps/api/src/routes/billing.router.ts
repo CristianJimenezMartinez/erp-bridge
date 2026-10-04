@@ -250,24 +250,65 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       matchedPlan = CATALOG_PLANS[0]!;
     }
 
-    // Blindaje estricto: El Plan Fundador (139 €/año) está limitado exclusivamente a 25 plazas
+    // Blindaje estricto: El Plan Fundador (139 €/año) está limitado exclusivamente a 25 plazas para los participantes de la Beta
     const MAX_FOUNDER_KEYS = 25;
     if (matchedPlan.id === 'founder_annual') {
       const db = DatabaseService.getInstance();
-      let founderCount = 0;
+      const normalizedEmail = (email || '').trim().toLowerCase();
+      const orgId = customOrgId || computeOrganizationIdFromEmail(normalizedEmail);
+      const providedKey = String(req.body.licenseKey || req.body.key || req.query['key'] || '').trim().toUpperCase();
+
       if (db.isAvailable()) {
+        // Regla 1 (Anti-Acaparamiento): Máximo 1 sola Licencia Fundador por cliente / correo / organización
+        const alreadyHasFounder = await db.query(
+          `SELECT COUNT(*)::int as count FROM licenses l 
+           JOIN organizations o ON l.organization_id = o.id 
+           WHERE (l.plan = 'founder_annual' OR l.plan = 'founder' OR l.alias ILIKE '%Fundador%') 
+             AND l.billing_status = 'ACTIVE' 
+             AND (o.id = $1 OR o.slug = $2)`,
+          [orgId, normalizedEmail]
+        ).catch(() => ({ rows: [{ count: 0 }] }));
+
+        if (alreadyHasFounder.rows[0]?.count > 0) {
+          return res.status(400).json({
+            error: {
+              message: 'Ya dispones de una Licencia del Plan Fundador vinculada a tu cuenta. Para evitar el acaparamiento y la reventa especulativa, el Plan Fundador está estrictamente limitado a 1 licencia por empresa.',
+              code: 'FOUNDER_LIMIT_PER_CUSTOMER_EXCEEDED',
+            },
+          });
+        }
+
+        // Regla 2 (Exclusividad Beta Testers): Debe existir una clave Beta o registro previo en la BD
+        const betaCheck = await db.query(
+          `SELECT l.id, l.key, l.plan FROM licenses l 
+           JOIN organizations o ON l.organization_id = o.id 
+           WHERE (o.id = $1 OR o.slug = $2 OR l.key = $3)`,
+          [orgId, normalizedEmail, providedKey || 'NO_KEY']
+        ).catch(() => ({ rows: [] }));
+
+        if (betaCheck.rows.length === 0) {
+          return res.status(400).json({
+            error: {
+              message: 'El Plan Fundador con descuento vitalicio (139 €/año) es exclusivo para empresas participantes en la Beta Pública. No se ha encontrado ninguna clave Beta asociada a este correo. Para activar el conector, adquiere la Licencia Oficial Estándar (199 €/año) o solicita primero tu acceso en bridge.cristianjm.com/beta/.',
+              code: 'FOUNDER_BETA_PARTICIPANT_REQUIRED',
+            },
+          });
+        }
+
+        // Regla 3 (Cupo Global): Máximo 25 plazas en total
         const resCount = await db.query(
           `SELECT COUNT(*)::int as count FROM licenses WHERE (plan = 'founder_annual' OR plan = 'founder' OR alias ILIKE '%Fundador%') AND billing_status = 'ACTIVE'`
         ).catch(() => ({ rows: [{ count: 0 }] }));
-        founderCount = resCount.rows[0]?.count || 0;
-      }
-      if (founderCount >= MAX_FOUNDER_KEYS) {
-        return res.status(400).json({
-          error: {
-            message: `Las ${MAX_FOUNDER_KEYS} plazas exclusivas del Plan Fundador (139 €/año) ya han sido cubiertas. El conector está disponible bajo la Licencia Oficial Estándar (199 €/año).`,
-            code: 'FOUNDER_LIMIT_REACHED',
-          },
-        });
+        const founderCount = resCount.rows[0]?.count || 0;
+
+        if (founderCount >= MAX_FOUNDER_KEYS) {
+          return res.status(400).json({
+            error: {
+              message: `Las ${MAX_FOUNDER_KEYS} plazas exclusivas del Plan Fundador (139 €/año) ya han sido cubiertas por los primeros participantes. El conector está disponible bajo la Licencia Oficial Estándar (199 €/año).`,
+              code: 'FOUNDER_LIMIT_REACHED',
+            },
+          });
+        }
       }
     }
 

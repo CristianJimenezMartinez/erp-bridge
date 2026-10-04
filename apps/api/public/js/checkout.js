@@ -111,12 +111,15 @@ async function procesarCheckoutModal(e) {
 
   try {
     const partnerCode = localStorage.getItem('bentian_partner_ref') || '';
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlKey = urlParams.get('key') || urlParams.get('licenseKey') || '';
     const res = await fetch('/api/v1/billing/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         plan: currentSelectedPlan,
         email: email,
+        licenseKey: urlKey || undefined,
         isEarlyBird: true,
         partnerCode: partnerCode || undefined
       })

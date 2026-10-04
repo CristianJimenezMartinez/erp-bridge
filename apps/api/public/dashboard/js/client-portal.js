@@ -164,12 +164,14 @@ async function handleClientUpgradeFounder() {
     btn.innerText = 'Conectando con Stripe...';
   }
   try {
+    const currentKey = (_currentClientPortalLicense && _currentClientPortalLicense.key) || '';
     const res = await fetch('/api/v1/billing/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         plan: 'founder_annual',
         email: email || undefined,
+        licenseKey: currentKey || undefined,
         isEarlyBird: true
       })
     });
