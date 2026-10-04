@@ -176,62 +176,62 @@ export const fiscalidadArticles: DocArticle[] = [
     slug: 'fiscalidad/verifactu-ley-antifraude',
     categorySlug: 'fiscalidad',
     title: 'Veri*Factu, Ley Antifraude y la Facturación en Factusol',
-    subtitle: 'Por qué la escritura de pedidos en F_PCL delega la seguridad en Factusol y preserva la cadena criptográfica TRZFAC.',
-    badge: 'Legal & Fiscal',
+    subtitle: 'Por qué la escritura en F_PCL mantiene la facturación fiscal bajo el control del ERP y respeta la trazabilidad nativa.',
+    badge: 'Operativa Fiscal',
     readingTime: '5 min de lectura',
     metaTitle: 'Factusol, WooCommerce y VeriFactu (Ley Antifraude) | Bentian',
-    metaDescription: 'Cómo afecta VeriFactu y la Ley Antifraude a los conectores de Factusol. Por qué operar en pedidos (F_PCL) preserva el encadenamiento TRZFAC oficial.',
-    keywords: 'verifactu factusol, ley antifraude factusol woocommerce, cadena criptografica trzfac, multas verifactu conectores, facturacion legal factusol',
+    metaDescription: 'Cómo interactúa Bentian con Factusol en el marco de VeriFactu. Por qué operar sobre pedidos comerciales (F_PCL) evita interferir con la emisión fiscal.',
+    keywords: 'verifactu factusol, ley antifraude factusol woocommerce, trazabilidad fiscal factusol, pedidos comerciales f_pcl, facturacion factusol',
     toc: [
       { id: 'marco-legal-verifactu', label: '1. El Marco Legal de la Ley Antifraude y Veri*Factu', level: 2 },
-      { id: 'el-peligro-facturas-directas', label: '2. El Peligro de Insertar Facturas Directas por SQL', level: 2 },
-      { id: 'la-solucion-fpcl', label: '3. La Arquitectura Segura de Bentian: Escribir en F_PCL', level: 2 },
-      { id: 'encadenamiento-trzfac', label: '4. La Cadena Criptográfica TRZFAC de Factusol', level: 2 },
-      { id: 'declaracion-responsabilidad', label: '5. Dictamen Técnico y Declaración de Responsabilidad', level: 2 },
+      { id: 'el-peligro-facturas-directas', label: '2. El Riesgo de Manipular Registros de Facturación por SQL', level: 2 },
+      { id: 'la-solucion-fpcl', label: '3. Arquitectura de Separación: Operar Exclusivamente en F_PCL', level: 2 },
+      { id: 'encadenamiento-trzfac', label: '4. Trazabilidad y Encadenamiento Fiscal en Factusol', level: 2 },
+      { id: 'delimitacion-responsabilidad', label: '5. Delimitación de Responsabilidad Operativa', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        La entrada en vigor de la Ley 11/2021 de Medidas de Prevención y Lucha contra el Fraude Fiscal y el posterior Reglamento Veri*Factu imponen obligaciones estrictas a todos los sistemas de facturación en España: inalterabilidad, trazabilidad, registro de eventos y encadenamiento criptográfico mediante hashes.
+        La Ley 11/2021 de Medidas de Prevención y Lucha contra el Fraude Fiscal y el desarrollo reglamentario de Veri*Factu establecen requisitos de integridad, conservación, trazabilidad e inalterabilidad para los sistemas informáticos que soporten procesos de facturación. Comprender qué capa corresponde al conector y cuál al ERP es clave para una operativa rigurosa.
       </p>
 
       <h2 id="marco-legal-verifactu" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Marco Legal de la Ley Antifraude y Veri*Factu</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        La normativa prohíbe taxativamente el uso de software de gestión que permita llevar dobles contabilidades, alterar registros de facturas ya emitidas o eliminar transacciones sin dejar rastro de auditoría. Las sanciones por comercializar o utilizar software no conforme alcanzan hasta los 50.000 € por ejercicio.
+        La normativa prohíbe el uso de sistemas que permitan la alteración u omisión de registros de facturación sin la debida trazabilidad. La Agencia Tributaria (AEAT) establece que la responsabilidad sobre la generación de registros de facturación, encadenamiento y remisión telemática recae en los sistemas de facturación utilizados formalmente por la empresa para expedir facturas.
       </p>
 
-      <h2 id="el-peligro-facturas-directas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. El Peligro de Insertar Facturas Directas por SQL</h2>
+      <h2 id="el-peligro-facturas-directas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. El Riesgo de Manipular Registros de Facturación por SQL</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Algunos conectores imprudentes intentan insertar directamente registros en la tabla de facturas (<code class="text-rose-400 font-mono">F_FAC</code>). Esto constituye un <strong>fallo crítico de seguridad y legalidad</strong>:
+        Insertar o modificar directamente registros en las tablas de facturas (<code class="text-rose-400 font-mono">F_FAC</code>) mediante scripts externos introduce riesgos severos de integridad:
       </p>
       <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 mb-6">
-        <strong>Riesgo de Ruptura de Cadena:</strong> Cuando Factusol emite una factura legal, su motor certificado calcula un hash criptográfico SHA-256 encadenado con el hash de la factura anterior y lo registra en la tabla de trazabilidad fiscal (<code class="font-mono text-white">TRZFAC</code>). Si un conector externo inyecta una factura en <code class="font-mono text-white">F_FAC</code> sin que Factusol calcule ese hash oficial, <strong>la cadena se rompe</strong> y la empresa queda en situación de irregularidad tributaria.
+        <strong>Riesgo de Inconsistencia de Trazabilidad:</strong> Cuando Factusol genera una factura, sus rutinas internas calculan encadenamientos de auditoría y registros en tablas de trazabilidad (<code class="font-mono text-white">TRZFAC</code>). Si una herramienta externa inserta filas en tablas de facturación sin pasar por el motor del ERP, se corre el riesgo de generar inconsistencias o romper la secuencia cronológica requerida por la normativa.
       </div>
 
-      <h2 id="la-solucion-fpcl" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. La Arquitectura Segura de Bentian: Escribir en F_PCL</h2>
+      <h2 id="la-solucion-fpcl" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Arquitectura de Separación: Operar Exclusivamente en F_PCL</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge adopta el enfoque de ingeniería fiscalmente defendible y certificado:
+        Bentian ERP Bridge adopta un principio de diseño estricto de separación de capas:
       </p>
       <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 mb-6">
-        <strong>Principio de Separación Comercial vs Fiscal:</strong> Bentian actúa estrictamente sobre el flujo de <strong>pedidos de clientes (<code class="font-mono text-white">F_PCL</code>)</strong>. Los pedidos son documentos comerciales preparatorios que no constituyen factura fiscal ni devengan IVA contable hasta su emisión formal.
+        <strong>Operativa Exclusiva sobre Documentos Comerciales Preparatorios:</strong> Bentian interactúa únicamente con la tabla de <strong>pedidos de clientes (<code class="font-mono text-white">F_PCL</code>)</strong> y sus líneas (<code class="font-mono text-white">F_LPC</code>). Un pedido web es un documento comercial preparatorio, no una factura fiscal expedida.
       </div>
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        Al introducir las ventas de WooCommerce como pedidos de cliente, tu empresa conserva el control total: el responsable de almacén o el administrativo revisa el pedido y hace clic en <em>"Facturar"</em> dentro de Factusol.
+        Al recepcionar las compras online como pedidos de cliente, tu personal administrativo o de almacén mantiene el control operativo: el pedido se valida y se factura formalmente desde la interfaz habitual de Factusol mediante su proceso estándar.
       </p>
 
-      <h2 id="encadenamiento-trzfac" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. La Cadena Criptográfica TRZFAC de Factusol</h2>
+      <h2 id="encadenamiento-trzfac" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Trazabilidad y Encadenamiento Fiscal en Factusol</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Al facturar el pedido desde la interfaz oficial de Factusol:
+        Al facturar el pedido a través del procedimiento oficial de Factusol:
       </p>
       <ol class="text-sm text-zinc-300 space-y-1.5 list-decimal list-inside mb-6">
-        <li>Factusol asigna el número oficial de serie y factura.</li>
-        <li>Genera el registro de trazabilidad en <code class="text-indigo-300 font-mono">TRZFAC</code> con fecha, hora y firma SHA-256.</li>
-        <li>Imprime el código QR oficial exigido por la AEAT.</li>
-        <li>Genera el registro de alta para remisión telemática inmediata si la empresa está acogida al sistema Veri*Factu.</li>
+        <li>Factusol asigna la numeración oficial según la serie configurada.</li>
+        <li>El motor de Factusol ejecuta sus rutinas de trazabilidad y encadenamiento normativo en <code class="text-indigo-300 font-mono">TRZFAC</code>.</li>
+        <li>Se generan los códigos QR y las estructuras exigidas por el sistema Veri*Factu cuando la empresa esté acogida al mismo.</li>
+        <li>La integridad fiscal de las facturas queda gestionada íntegramente por el software de gestión.</li>
       </ol>
 
-      <h2 id="declaracion-responsabilidad" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Dictamen Técnico y Declaración de Responsabilidad</h2>
+      <h2 id="delimitacion-responsabilidad" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Delimitación de Responsabilidad Operativa</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        Bentian no altera ni manipula ningún registro fiscal emitido. La custodia, integridad y cumplimiento del software de facturación corresponde íntegramente al motor certificado de Factusol (Software DELSOL), garantizando la tranquilidad jurídica absoluta de tu negocio.
+        Bentian registra pedidos comerciales en Factusol y no emite directamente facturas fiscales ni sustituye al software de facturación. La emisión, inalterabilidad y custodia de los registros tributarios permanecen bajo el control exclusivo del software de facturación del cliente (Factusol / Software DELSOL), en estricto cumplimiento del marco legal vigente.
       </p>
     `,
   },

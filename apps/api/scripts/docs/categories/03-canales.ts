@@ -232,8 +232,8 @@ export const canalesArticles: DocArticle[] = [
     toc: [
       { id: 'para-que-sirve', label: '1. ¿Para qué sirve el Endpoint Universal?', level: 2 },
       { id: 'esquema-comunicacion', label: '2. Esquema de Comunicación', level: 2 },
-      { id: 'autenticacion-firmas', label: '3. Autenticación y Token Secreto', level: 2 },
-      { id: 'ejemplo-php', label: '4. Script de Ejemplo en PHP Nativo', level: 2 },
+      { id: 'autenticacion-firmas', label: '3. Seguridad: Autenticación, HMAC y Anti-Replay', level: 2 },
+      { id: 'ejemplo-php', label: '4. Script de Ejemplo Seguro en PHP', level: 2 },
       { id: 'formato-pedidos', label: '5. Formato JSON del Pedido Entrante', level: 2 },
     ],
     contentHtml: `
@@ -243,38 +243,57 @@ export const canalesArticles: DocArticle[] = [
 
       <h2 id="para-que-sirve" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. ¿Para qué sirve el Endpoint Universal?</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        El <strong>Endpoint Universal</strong> de Bentian permite que cualquier programador conecte una tienda online con Factusol creando un sencillo script de menos de 50 líneas en su servidor web. El agente de Bentian se encarga de consultar periódicamente ese endpoint para descargar pedidos e inyectar el stock actualizado.
+        El <strong>Endpoint Universal</strong> de Bentian permite que cualquier programador conecte una tienda online con Factusol creando un script en su servidor web. El agente de Bentian consulta periódicamente este endpoint para descargar pedidos pendientes e inyectar las actualizaciones de stock en Factusol.
       </p>
 
       <h2 id="esquema-comunicacion" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Esquema de Comunicación</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        La comunicación se realiza mediante peticiones HTTP salientes desde el PC con Factusol hacia tu servidor:
+        La comunicación se realiza mediante peticiones HTTP salientes desde el PC con Factusol hacia tu servidor mediante TLS 1.3:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6 font-mono text-xs">
         <li><strong class="text-white font-sans">Descarga de pedidos:</strong> <code class="text-indigo-300">GET https://tutienda.com/api/bentian-orders.php</code></li>
         <li><strong class="text-white font-sans">Actualización de stock:</strong> <code class="text-indigo-300">POST https://tutienda.com/api/bentian-stock.php</code></li>
       </ul>
 
-      <h2 id="autenticacion-firmas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Autenticación y Token Secreto</h2>
+      <h2 id="autenticacion-firmas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Seguridad: Autenticación, HMAC y Anti-Replay</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Cada petición incluye la cabecera HTTP <code class="text-emerald-400 font-mono">X-Bentian-Token</code> con una clave secreta que tú defines en el agente. De este modo, tu servidor valida que la petición proviene exclusivamente de tu conector autorizado.
+        Para entornos de producción y cumplimiento empresarial, el conector implementa tres salvaguardas de seguridad:
       </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong class="text-white">Token Secreto en Cabecera:</strong> Cada petición incluye <code class="text-emerald-400 font-mono">X-Bentian-Token</code>. Debe almacenarse en variables de entorno del servidor (nunca hardcodeado en ficheros públicos).</li>
+        <li><strong class="text-white">Marca de Tiempo Anti-Replay:</strong> La cabecera <code class="text-indigo-300 font-mono">X-Bentian-Timestamp</code> envía la época UNIX. Tu servidor puede rechazar cualquier petición con más de 300 segundos de diferencia para impedir ataques de repetición.</li>
+        <li><strong class="text-white">Clave de Idempotencia por Pedido:</strong> Cada pedido retornado debe incluir un identificador unívoco o hash en el campo <code class="text-zinc-200 font-mono">id</code> para garantizar que un reintento de red jamás genere pedidos duplicados en Factusol.</li>
+      </ul>
 
-      <h2 id="ejemplo-php" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Script de Ejemplo en PHP Nativo</h2>
+      <h2 id="ejemplo-php" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Script de Ejemplo Seguro en PHP</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Ejemplo mínimo de endpoint en PHP para servir pedidos pendientes al agente de Factusol:
+        Ejemplo de endpoint en PHP con validación de token seguro mediante tiempo constante (<code class="text-zinc-200 font-mono">hash_equals</code>) y lectura desde variable de entorno:
       </p>
       <pre class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 overflow-x-auto mb-6"><code>&lt;?php
 // Archivo: erp-bridge-endpoint.php
 header('Content-Type: application/json; charset=utf-8');
 
-$SECRET_TOKEN = 'mi_clave_secreta_super_segura_123';
-$headers = getallheaders();
-$receivedToken = $headers['X-Bentian-Token'] ?? ($_SERVER['HTTP_X_BENTIAN_TOKEN'] ?? '');
+// 1. Obtener el token secreto desde variable de entorno del sistema o fichero seguro
+$expectedToken = getenv('BENTIAN_ENDPOINT_TOKEN') ?: 'CONFIGURA_TU_TOKEN_SECRETO_AQUI';
 
-if ($receivedToken !== $SECRET_TOKEN) {
+// 2. Extraer cabeceras HTTP de forma compatible con Apache / Nginx / LiteSpeed
+$headers = function_exists('getallheaders') ? getallheaders() : [];
+$receivedToken = $headers['X-Bentian-Token'] 
+    ?? $headers['x-bentian-token'] 
+    ?? ($_SERVER['HTTP_X_BENTIAN_TOKEN'] ?? '');
+
+// 3. Validación en tiempo constante (protección contra timing attacks)
+if (empty($receivedToken) || !hash_equals($expectedToken, $receivedToken)) {
     http_response_code(401);
-    echo json_encode(['error' => 'No autorizado']);
+    echo json_encode(['error' => 'No autorizado: Token de Bentian no coincide o ausente']);
+    exit;
+}
+
+// 4. Verificación de timestamp anti-replay (opcional, margen de 5 minutos)
+$requestTime = (int)($headers['X-Bentian-Timestamp'] ?? $_SERVER['HTTP_X_BENTIAN_TIMESTAMP'] ?? 0);
+if ($requestTime > 0 && abs(time() - $requestTime) > 300) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Peticion expirada']);
     exit;
 }
 

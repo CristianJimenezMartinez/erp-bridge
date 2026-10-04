@@ -386,7 +386,7 @@ export const factusolArticles: DocArticle[] = [
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        Esta matriz especifica los componentes, tablas y versiones de Factusol oficialmente certificados para Bentian ERP Bridge.
+        Esta matriz especifica los componentes, tablas y versiones de Factusol validados técnicamente en nuestros entornos de prueba para Bentian ERP Bridge.
       </p>
 
       <h2 id="versiones-soportadas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Versiones de Factusol Soportadas</h2>
@@ -396,8 +396,8 @@ export const factusolArticles: DocArticle[] = [
             <tr>
               <th class="px-4 py-3 font-semibold">Edición Factusol</th>
               <th class="px-4 py-3 font-semibold">Formato Base de Datos</th>
-              <th class="px-4 py-3 font-semibold">Controlador Certificado</th>
-              <th class="px-4 py-3 font-semibold">Estado</th>
+              <th class="px-4 py-3 font-semibold">Controlador Recomendado</th>
+              <th class="px-4 py-3 font-semibold">Estado de Compatibilidad</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/[0.06] text-zinc-400">
@@ -405,25 +405,25 @@ export const factusolArticles: DocArticle[] = [
               <td class="px-4 py-2.5 font-medium text-white">Factusol 2026</td>
               <td class="px-4 py-2.5 font-mono">.accdb</td>
               <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0</td>
-              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Validado en pruebas</span></td>
             </tr>
             <tr>
               <td class="px-4 py-2.5 font-medium text-white">Factusol 2025 / 2024</td>
               <td class="px-4 py-2.5 font-mono">.accdb</td>
               <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0 / 12.0</td>
-              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Validado en pruebas</span></td>
             </tr>
             <tr>
               <td class="px-4 py-2.5 font-medium text-white">Factusol 2020 – 2023</td>
               <td class="px-4 py-2.5 font-mono">.accdb</td>
               <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0 / 12.0</td>
-              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Validado en pruebas</span></td>
             </tr>
             <tr>
               <td class="px-4 py-2.5 font-medium text-white">Factusol 2018 / 2019</td>
               <td class="px-4 py-2.5 font-mono">.accdb / .mdb</td>
               <td class="px-4 py-2.5 font-mono">ACE.OLEDB.12.0</td>
-              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Compatible</span></td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-500/10 text-zinc-300">Compatible (Legacy)</span></td>
             </tr>
           </tbody>
         </table>

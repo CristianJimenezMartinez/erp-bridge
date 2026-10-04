@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cola SQLite Store-and-Forward para Factusol | Bentian ERP</title>
-  <meta name="description" content="Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder ventas online.">
-  <meta name="keywords" content="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos">
+  <meta name="description" content="Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder pedidos online.">
+  <meta name="keywords" content="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, pedidos offline factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
   <link rel="canonical" href="https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/">
 
@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="Cola SQLite Store-and-Forward para Factusol | Bentian ERP">
-  <meta property="og:description" content="Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder ventas online.">
+  <meta property="og:description" content="Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder pedidos online.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -32,7 +32,7 @@
         "@type": "TechArticle",
         "@id": "https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/#article",
         "headline": "Cola Desacoplada Store-and-Forward (SQLite)",
-        "description": "Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder ventas online.",
+        "description": "Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder pedidos online.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -318,7 +318,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos">
+                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, pedidos offline factusol">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
                         Cola Desacoplada Store-and-Forward (SQLite)
                       </a>
@@ -353,7 +353,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="veri*factu, ley antifraude y la facturación en factusol" data-keywords="verifactu factusol, ley antifraude factusol woocommerce, cadena criptografica trzfac, multas verifactu conectores, facturacion legal factusol">
+                    <li data-title="veri*factu, ley antifraude y la facturación en factusol" data-keywords="verifactu factusol, ley antifraude factusol woocommerce, trazabilidad fiscal factusol, pedidos comerciales f_pcl, facturacion factusol">
                       <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Veri*Factu, Ley Antifraude y la Facturación en Factusol
                       </a>
@@ -498,7 +498,7 @@
             Cola Desacoplada Store-and-Forward (SQLite)
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Cómo Bentian garantiza cero pérdida de pedidos cuando el PC del almacén está apagado o se corta la fibra óptica.
+            Protección de pedidos frente a caídas de conexión, apagado del PC o indisponibilidad temporal de Factusol.
           </p>
         </div>
 
@@ -506,7 +506,7 @@
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        En una empresa real, los ordenadores se apagan por la noche, los fines de semana se va la luz en el polígono industrial y los operadores de fibra sufren microcortes. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> con base de datos local SQLite es el escudo de ingeniería que garantiza que ni un solo pedido se pierda jamás.
+        En una empresa real, los ordenadores se apagan por la noche, los fines de semana se va la luz en el polígono industrial y los operadores de fibra sufren microcortes. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> con base de datos local SQLite es el mecanismo de resiliencia diseñado para retener y proteger los pedidos frente a cortes de red, apagados del equipo del almacén o bloqueos temporales de la base de datos.
       </p>
 
       <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Problema del PC del Almacén Apagado</h2>

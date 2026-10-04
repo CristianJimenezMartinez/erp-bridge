@@ -56,12 +56,12 @@ export const arquitecturaArticles: DocArticle[] = [
     slug: 'arquitectura/cola-store-and-forward',
     categorySlug: 'arquitectura',
     title: 'Cola Desacoplada Store-and-Forward (SQLite)',
-    subtitle: 'Cómo Bentian garantiza cero pérdida de pedidos cuando el PC del almacén está apagado o se corta la fibra óptica.',
+    subtitle: 'Protección de pedidos frente a caídas de conexión, apagado del PC o indisponibilidad temporal de Factusol.',
     badge: 'Tolerancia a Fallos',
     readingTime: '5 min de lectura',
     metaTitle: 'Cola SQLite Store-and-Forward para Factusol | Bentian ERP',
-    metaDescription: 'Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder ventas online.',
-    keywords: 'store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos',
+    metaDescription: 'Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder pedidos online.',
+    keywords: 'store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, pedidos offline factusol',
     toc: [
       { id: 'el-problema-del-pc-apagado', label: '1. El Problema del PC del Almacén Apagado', level: 2 },
       { id: 'como-funciona-store-and-forward', label: '2. Principio de Operación Store-and-Forward', level: 2 },
@@ -71,7 +71,7 @@ export const arquitecturaArticles: DocArticle[] = [
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        En una empresa real, los ordenadores se apagan por la noche, los fines de semana se va la luz en el polígono industrial y los operadores de fibra sufren microcortes. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> con base de datos local SQLite es el escudo de ingeniería que garantiza que ni un solo pedido se pierda jamás.
+        En una empresa real, los ordenadores se apagan por la noche, los fines de semana se va la luz en el polígono industrial y los operadores de fibra sufren microcortes. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> con base de datos local SQLite es el mecanismo de resiliencia diseñado para retener y proteger los pedidos frente a cortes de red, apagados del equipo del almacén o bloqueos temporales de la base de datos.
       </p>
 
       <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Problema del PC del Almacén Apagado</h2>
