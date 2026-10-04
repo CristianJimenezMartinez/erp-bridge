@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Factusol con PrestaShop 8 (PHP 8.1 / 8.2) | Bentian ERP</title>
+  <meta name="description" content="Sincroniza tu base de datos de Factusol con PrestaShop 8 sin módulos antiguos ni errores de PHP 8. Control de existencias en tiempo real, variaciones y pedidos.">
+  <meta name="keywords" content="conector factusol prestashop 8, sincronizar factusol prestashop 8.1, modulo factusol prestashop 8 php, prestashop 8 factusol webservice, integracion prestashop 8 factusol">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-prestashop-8/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-prestashop-8/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol para PrestaShop 8: Cero Incompatibilidades con PHP 8">
+  <meta property="og:description" content="Integración nativa y moderna entre Factusol y PrestaShop 8 mediante WebService REST API.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Bentian Conector Factusol para PrestaShop 8",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Windows 10, Windows 11, Windows Server",
+    "description": "Software de escritorio para sincronizar de forma bidireccional el catálogo, stock disponible y pedidos entre Factusol y PrestaShop 8 sobre PHP 8.1 y 8.2.",
+    "offers": {
+      "@type": "Offer",
+      "price": "199.00",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| PrestaShop 8</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/factusol-prestashop/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">PrestaShop General</a>
+        <a href="/docs/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Docs</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-5xl mx-auto px-6 py-14 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Compatibilidad Certificada • PrestaShop 8.0, 8.1 y 8.2 con PHP 8.x</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector Factusol para <span class="text-indigo-400">PrestaShop 8</span>: Sincronización Moderna sin Módulos Obsoletos
+    </h1>
+
+    <p class="text-base sm:text-xl text-zinc-400 mb-12 max-w-3xl leading-relaxed">
+      ¿Has actualizado tu tienda a <strong>PrestaShop 8</strong> y tu conector tradicional de Factusol ha dejado de funcionar por incompatibilidades con PHP 8.1 o 8.2? Bentian ERP Bridge se conecta a través del <strong>WebService REST API oficial de PrestaShop 8</strong>, garantizando una sincronización continua, robusta y libre de errores de código.
+    </p>
+
+    <!-- Por qué fallan los conectores antiguos -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-12">
+      <h2 class="text-2xl font-bold text-white mb-4">El Gran Problema de la Migración a PrestaShop 8</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        La llegada de PrestaShop 8 supuso una modernización radical del núcleo hacia las versiones más estrictas de PHP (PHP 8.1 y PHP 8.2). La gran mayoría de módulos y conectores de Factusol comercializados en los últimos 10 años fueron programados para PHP 7 o incluso PHP 5.6.
+      </p>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Al actualizar a PrestaShop 8, estos módulos antiguos arrojan errores fatales de tipado (<code>Fatal error: Uncaught TypeError</code>), rompen la pantalla de administración del backoffice o dejan de registrar pedidos.
+      </p>
+      <div class="border border-indigo-500/20 bg-indigo-500/[0.04] rounded-xl p-4">
+        <h3 class="font-bold text-indigo-400 text-sm mb-1">La Solución Bentian: WebService REST API Nativo</h3>
+        <p class="text-xs text-zinc-300 leading-relaxed">
+          Bentian no requiere que instales módulos de terceros en el backoffice de PrestaShop. Utiliza las claves oficiales del WebService REST API de PrestaShop 8 con cifrado SSL/TLS. Las actualizaciones futuras de PrestaShop 8 nunca romperán tu integración.
+        </p>
+      </div>
+    </div>
+
+    <!-- Características Específicas -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Tallas y Combinaciones</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Sincronización exacta de artículos con variantes de talla y color, asociando cada código de barras y referencia de Factusol con su combinación correspondiente en PrestaShop 8.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Stock Disponible en &lt;50ms</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Lectura OLEDB no bloqueante sobre la base de datos de Factusol, respetando existencias disponibles (DISSTO) para evitar sobreventas y cancelaciones.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold mb-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Pedidos a Factusol F_PCL</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Los pedidos web ingresan en Factusol al instante con desglose de impuestos, NIF/CIF del cliente, gastos de envío y recargos aplicables.
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 sm:p-10 text-center">
+      <h3 class="text-2xl font-bold text-white mb-3">Conecta tu PrestaShop 8 con Factusol hoy mismo</h3>
+      <p class="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto mb-6">
+        Instalación en 2 minutos sin riesgos ni modificaciones en tus archivos de PrestaShop. Prueba el agente de Bentian durante la Beta Pública abierta.
+      </p>
+      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
+        <span>Descargar Bentian-Setup.exe para Windows</span>
+        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Compatibilidad Garantizada con PrestaShop 8</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+        <span>•</span>
+        <a href="/factusol-prestashop/" class="hover:text-white transition">PrestaShop</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

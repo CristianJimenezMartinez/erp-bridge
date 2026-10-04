@@ -223,6 +223,18 @@ export async function bootstrapApp(): Promise<Express> {
     res.redirect(301, '/factusol-api-rest/');
   });
 
+  app.get('/comparativa-conector-windows-vs-plugin-wordpress', (_req, res) => {
+    res.redirect(301, '/comparativa-conector-windows-vs-plugin-wordpress/');
+  });
+
+  app.get('/factusol-prestashop-8', (_req, res) => {
+    res.redirect(301, '/factusol-prestashop-8/');
+  });
+
+  app.get('/docs', (_req, res) => {
+    res.redirect(301, '/docs/');
+  });
+
   // Servir Dashboard Cloud Multi-Tenant
   const dashboardDir = path.join(publicDir, 'dashboard');
   app.use('/dashboard', express.static(dashboardDir, {

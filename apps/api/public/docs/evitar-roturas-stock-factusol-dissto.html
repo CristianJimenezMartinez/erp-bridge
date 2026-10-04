@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Evitar Sobreventas en Factusol: Stock Disponible (DISSTO) vs Actual | Bentian</title>
+  <meta name="description" content="Descubre por qué sincronizar el stock actual (ACTSTO) en vez del disponible (DISSTO) de Factusol causa roturas de stock y sobreventas en WooCommerce y PrestaShop.">
+  <meta name="keywords" content="evitar sobreventas factusol, stock disponible factusol dissto, actsto vs dissto factusol, sincronizar existencias factusol, rotura de stock tienda online">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/evitar-roturas-stock-factusol-dissto.html">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/evitar-roturas-stock-factusol-dissto.html">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Evita Sobreventas en tu Tienda Online con Factusol: DISSTO vs ACTSTO">
+  <meta property="og:description" content="Guía técnica para garantizar que el stock publicado en tu web refleja únicamente las existencias libres de reservas.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Cómo evitar sobreventas y cancelaciones de pedidos sincronizando el stock disponible (DISSTO) de Factusol",
+    "description": "Análisis técnico de la diferencia entre existencias físicas (ACTSTO) y existencias disponibles (DISSTO) en la base de datos de Factusol.",
+    "inLanguage": "es-ES",
+    "author": {
+      "@type": "Person",
+      "name": "Cristian Jiménez Martínez",
+      "url": "https://cristianjm.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Bentian",
+      "url": "https://bridge.cristianjm.com"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/" class="text-sm text-zinc-400 hover:text-white transition">Todas las Guías</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-4xl mx-auto px-6 py-12 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Logística y Gestión de Inventarios • Motor de Stock Factusol</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Evitar Sobreventas en Factusol: Stock Disponible (<code class="text-indigo-400 text-2xl sm:text-3xl">DISSTO</code>) vs Actual (<code class="text-zinc-500 text-2xl sm:text-3xl">ACTSTO</code>)
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed">
+      Uno de los errores más costosos y frustrantes para cualquier comercio electrónico que sincroniza con Factusol es <strong>vender online artículos que físicamente están en la estantería pero que ya pertenecen a un pedido pendiente de entrega</strong>. El cliente paga, pero luego tienes que llamarlo para cancelar el pedido o retrasar el envío. A continuación explicamos por qué sucede y cómo evitarlo técnicamente.
+    </p>
+
+    <!-- La Diferencia Crucial -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">1. La Diferencia Crucial entre ACTSTO y DISSTO</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
+        En las tablas de artículos e inventario de Factusol (<code>F_ART</code> y <code>F_STO</code>), existen dos campos numéricos para las existencias:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div class="border border-white/[0.06] bg-black/40 rounded-xl p-4">
+          <h3 class="text-zinc-300 font-mono font-bold text-sm mb-2">ACTSTO (Stock Actual Físico)</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Representa las unidades que físicamente se encuentran dentro de las cuatro paredes de tu almacén o tienda física en este mismo instante.
+          </p>
+        </div>
+        <div class="border border-emerald-500/30 bg-emerald-500/[0.04] rounded-xl p-4">
+          <h3 class="text-emerald-400 font-mono font-bold text-sm mb-2">DISSTO (Stock Disponible Libre)</h3>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Representa las existencias reales que puedes vender libremente. Se calcula restando los pedidos de clientes pendientes de servir (reservas):<br>
+            <strong class="text-white mt-1 block font-mono text-xs">DISSTO = ACTSTO - Reservas Clientes</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- El Fallo de los Conectores Baratos -->
+    <div class="space-y-6 mb-12">
+      <h2 class="text-2xl font-bold text-white mb-4">2. El Fallo de los Conectores y Scripts Básicos</h2>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center text-sm">✕</span>
+          <h3 class="font-bold text-white text-base">El Error de Sincronizar ACTSTO</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Muchos plugins y desarrollos caseros cometen el grave error de consultar el campo <code>ACTSTO</code> porque es el más evidente.
+        </p>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          <strong>Ejemplo real:</strong> Tienes 10 unidades de una hidrolimpiadora en la estantería. Por la mañana, un cliente de mostrador encarga 8 unidades en un pedido formal (quedan reservadas). Si tu conector envía <code>ACTSTO = 10</code> a WooCommerce, un comprador online puede adquirir 5 unidades. En ese instante se produce una rotura de stock: <strong>has vendido 13 unidades teniendo únicamente 10</strong>.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold flex items-center justify-center text-sm">✓</span>
+          <h3 class="font-bold text-white text-base">La Solución Correcta: Respetar DISSTO</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Al sincronizar exclusivamente <code>DISSTO</code>, WooCommerce solo mostrará <strong>2 unidades disponibles</strong> para venta en la tienda online. En cuanto esas 2 unidades se compren en la web, el producto se marcará de forma instantánea como <em>"Agotado"</em> o pasará a reserva bajo pedido según tu configuración, impidiendo la venta de material ya comprometido.
+        </p>
+      </div>
+    </div>
+
+    <!-- Blindaje de Bentian -->
+    <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8 mb-12">
+      <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold mb-3">
+        QUALITY GATE 5 • BLINDAJE CERTIFICADO
+      </div>
+      <h2 class="text-xl font-bold text-white mb-3">¿Cómo garantiza Bentian ERP Bridge cero sobreventas?</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-3">
+        En <strong>Bentian ERP Bridge</strong>, el blindaje anti-sobreventas no es una opción de configuración: es una regla arquitectónica inmutable protegida por nuestro Quality Gate automatizado.
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside">
+        <li>Todas las consultas OLEDB leen de forma prioritaria el stock disponible (<code>DISSTO</code>) por almacén o consolidado.</li>
+        <li>Si <code>DISSTO</code> cae por debajo de cero debido a reservas de clientes, el conector publica automáticamente stock cero en la tienda online para proteger a la empresa.</li>
+        <li>Detección delta en menos de 50ms: en cuanto se genera un albarán o pedido en la oficina física, el stock web se ajusta inmediatamente.</li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 text-center">
+      <h3 class="text-xl font-bold text-white mb-3">Protege tu reputación online y elimina las sobreventas</h3>
+      <p class="text-sm text-zinc-400 max-w-xl mx-auto mb-6">
+        Descarga Bentian ERP Bridge y conecta tu Factusol con WooCommerce o PrestaShop con total tranquilidad durante la Beta Pública gratuita.
+      </p>
+      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
+        <span>Descargar Bentian-Setup.exe</span>
+        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Guías Técnicas y Soporte de Factusol</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+        <span>•</span>
+        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

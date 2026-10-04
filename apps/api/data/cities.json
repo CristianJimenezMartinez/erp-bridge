@@ -406,6 +406,312 @@
         "a": "Sí. Bentian traslada de forma íntegra los tipos de IVA, recargos y NIF/CIF de cada cliente a los pedidos de Factusol, facilitando la posterior emisión y registro contable oficial."
       }
     ]
+  },
+  {
+    "slug": "murcia",
+    "name": "Murcia",
+    "province": "Murcia",
+    "region": "Región de Murcia",
+    "schemaRegion": "ES-MC",
+    "coordinates": {
+      "lat": 37.9922,
+      "lng": -1.1307
+    },
+    "tagline": "Sincronización en tiempo real para empresas del sector agroalimentario, suministros y distribución en Murcia",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Murcia | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Murcia. Polígonos Oeste, Alcantarilla y Molina de Segura. Sincroniza stock y pedidos en tiempo real sin comisiones.",
+    "keywords": "conector factusol murcia, sincronizar factusol prestashop murcia, factusol poligono oeste alcantarilla, conector woocommerce factusol molina de segura",
+    "heroSubtitle": "Diseñado para distribuidores agrícolas, suministros industriales, conservas, alimentación y comercio mayorista en la Huerta de Murcia y el Valle del Segura.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Oeste (Alcantarilla y San Ginés)",
+        "desc": "Uno de los polígonos más extensos del sureste español, con más de 1.200 empresas de suministros, maquinaria y distribución."
+      },
+      {
+        "name": "Molina de Segura (La Serreta, El Tapiado y La Polvorista)",
+        "desc": "Eje neurálgico de la industria conservera, packaging, frío industrial y transporte hacia toda la península."
+      },
+      {
+        "name": "Valle del Segura y Cartagena",
+        "desc": "Empresas de suministros náuticos, packaging agrícola, ferretería y maquinaria auxiliar para exportación."
+      }
+    ],
+    "sectors": [
+      "Distribución Agroalimentaria y Frutas/Hortalizas",
+      "Suministros Industriales, Tuberías y Riego",
+      "Packaging, Envases y Logística Refrigerada",
+      "Calzado, Textil y Comercio Mayorista"
+    ],
+    "localContextParagraph": "La Región de Murcia es el epicentro exportador y logístico del sureste peninsular. Con una intensa actividad en distribución hortofrutícola, suministros para riego, maquinaria auxiliar y comercio mayorista, las pymes murcianas necesitan una sincronización instantánea entre su almacén y su canal de venta online. Intentar coordinar el stock de miles de referencias mediante exportaciones manuales en Excel o plugins web que bloquean la base de datos de Factusol resulta inviable y genera roturas de stock continuas. Bentian ERP Bridge se ejecuta localmente en el servidor o puesto de trabajo de la empresa en Murcia, leyendo la base de datos Factusol en menos de 50ms sin bloquear a los usuarios de oficina y volcando los pedidos web al instante.",
+    "faqs": [
+      {
+        "q": "¿Funciona con empresas de distribución agrícola y suministros de riego en Murcia?",
+        "a": "Totalmente. Bentian gestiona catálogos de miles de referencias técnicas con tarifas profesionales por grupos de clientes y descuentos escalonados directamente desde Factusol."
+      },
+      {
+        "q": "¿Puedo conectar un Factusol instalado en un servidor local del Polígono Oeste con WooCommerce?",
+        "a": "Sí. Bentian se conecta a la base de datos local en red o NAS y se comunica con tu WooCommerce o PrestaShop mediante la API REST segura sin requerir IP fija ni abrir puertos en tu router."
+      },
+      {
+        "q": "¿Cómo se procesan los pedidos que entran desde la web?",
+        "a": "Entran automáticamente en Factusol como Pedidos de Clientes (F_PCL) con todos los datos fiscales, recargo de equivalencia si aplica y la serie de facturación asignada."
+      }
+    ]
+  },
+  {
+    "slug": "coruna",
+    "name": "A Coruña",
+    "province": "A Coruña",
+    "region": "Galicia",
+    "schemaRegion": "ES-GA",
+    "coordinates": {
+      "lat": 43.3623,
+      "lng": -8.4115
+    },
+    "tagline": "Control de stock e inventario en tiempo real para pymes, distribuidores y retail en A Coruña",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en A Coruña | Bentian ERP",
+    "metaDescription": "Conecta tu Factusol con WooCommerce o PrestaShop en A Coruña, Arteixo y Bergondo. Sincronización ultrarrápida de stock y pedidos automáticos para empresas gallegas.",
+    "keywords": "conector factusol a coruña, sincronizar factusol galicia, factusol poligono sabon arteixo, conector prestashop factusol pocomaco",
+    "heroSubtitle": "Optimizado para distribución textil, suministros navales, materiales de construcción y comercio mayorista en Sabón, Pocomaco y Bergondo.",
+    "industrialHubs": [
+      {
+        "name": "Polígono de Sabón (Arteixo)",
+        "desc": "Polo neurálgico del textil, la siderurgia y la gran distribución industrial en el área metropolitana de A Coruña."
+      },
+      {
+        "name": "Polígono Pocomaco (A Coruña)",
+        "desc": "El mayor enclave de distribución mayorista, paquetería y suministros comerciales de la ciudad."
+      },
+      {
+        "name": "Polígono de Bergondo y Espíritu Santo",
+        "desc": "Área de concentración de empresas auxiliares del mueble, carpintería, ferretería y alimentación."
+      }
+    ],
+    "sectors": [
+      "Moda, Confección y Distribución Textil",
+      "Suministros Navales, Pesca y Logística Portuaria",
+      "Construcción, Saneamiento y Ferretería Gallega",
+      "Distribución Alimentaria y Productos Típicos"
+    ],
+    "localContextParagraph": "En el área comercial de A Coruña y su cinturón industrial de Arteixo y Pocomaco, el comercio mayorista y la distribución retail exigen una sincronización impecable entre los puntos de venta físicos y las tiendas electrónicas. Con un mercado altamente competitivo influenciado por los gigantes de la moda y la distribución logística gallega, una pyme no puede permitirse vender en su tienda online un producto agotado en almacén. Bentian ERP Bridge proporciona una conexión ultrarrápida y fiable con Factusol, ejecutándose en local en Windows sin requerir configuraciones de puertos ni suscripciones cloud mensuales.",
+    "faqs": [
+      {
+        "q": "¿Gestiona tallas y colores para tiendas de moda y textil en A Coruña?",
+        "a": "Sí. Bentian sincroniza tanto artículos simples como artículos con variaciones de tallas y colores manteniendo el stock exacto por combinación en WooCommerce y PrestaShop."
+      },
+      {
+        "q": "¿Funciona si la base de datos de Factusol está en un servidor local en Sabón o Pocomaco?",
+        "a": "Totalmente. Se conecta directamente a través de OLEDB con control de concurrencia para que todos los puestos de almacén y administración trabajen sin bloqueos."
+      },
+      {
+        "q": "¿Qué requisitos de servidor web tiene en la tienda online?",
+        "a": "Ninguno especial. Al procesar todo el trabajo pesado en Windows local, el servidor de la tienda online solo recibe peticiones REST estándar de actualización de stock, reduciendo el consumo de RAM a cero."
+      }
+    ]
+  },
+  {
+    "slug": "vigo",
+    "name": "Vigo",
+    "province": "Pontevedra",
+    "region": "Galicia",
+    "schemaRegion": "ES-GA",
+    "coordinates": {
+      "lat": 42.2406,
+      "lng": -8.7207
+    },
+    "tagline": "Automatización de stock y pedidos online para la industria y el comercio de Vigo y las Rías Baixas",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Vigo | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Vigo y Pontevedra. Polígonos de Balaídos, As Gándaras y O Campiño. Sincronización local-first sin comisiones.",
+    "keywords": "conector factusol vigo, sincronizar factusol pontevedra, factusol poligono balaidos, conector woocommerce factusol as gandaras",
+    "heroSubtitle": "Especialmente diseñado para empresas auxiliares de automoción, naval, congelados, suministros técnicos y distribución en el sur de Galicia.",
+    "industrialHubs": [
+      {
+        "name": "Zona Franca y Polígono de Balaídos",
+        "desc": "Epicentro de la automoción europea e industria auxiliar de componentes, matricería y maquinaria."
+      },
+      {
+        "name": "Polígono As Gándaras (Porriño)",
+        "desc": "El gran nudo logístico del sur de Galicia, con empresas de piedra natural, transporte y suministros técnicos."
+      },
+      {
+        "name": "Polígono do Caramuxo y Área Portuaria",
+        "desc": "Hub de empresas de suministros navales, reparación, frío industrial y transformación de productos del mar."
+      }
+    ],
+    "sectors": [
+      "Industria Auxiliar de Automoción y Mecanizado",
+      "Suministros Navales, Náutica y Frío Industrial",
+      "Distribución de Congelados y Alimentación Marina",
+      "Ferretería Técnica y Maquinaria Profesional"
+    ],
+    "localContextParagraph": "Vigo es el motor industrial y exportador de Galicia, con una actividad incesante en suministros para automoción, construcción naval, pesca congelada y distribución comercial hacia España y Portugal. Para las pymes de Vigo y Porriño que confían su gestión a Factusol, dar el salto al comercio electrónico B2B o B2C requiere que los pedidos web se transformen de manera transparente en pedidos de clientes (F_PCL) en Factusol sin intervención humana. Bentian ERP Bridge resuelve este desafío con una arquitectura Local-First que enlaza Factusol con WooCommerce y PrestaShop de forma blindada y sin sobrecostes recurrentes.",
+    "faqs": [
+      {
+        "q": "¿Es compatible con venta B2B para clientes de España y Portugal desde Vigo?",
+        "a": "Sí. Bentian respeta los NIF intracomunitarios (VIES), validando impuestos y registrando los pedidos con su desglose fiscal correspondiente en Factusol."
+      },
+      {
+        "q": "¿Permite actualizar precios y tarifas especiales por volumen en tiempo real?",
+        "a": "Totalmente. Mapea las diferentes tarifas configuradas en Factusol con los roles y grupos de clientes de WooCommerce o PrestaShop."
+      },
+      {
+        "q": "¿Se requiere suscripción mensual en la nube para sincronizar?",
+        "a": "No. Bentian funciona bajo licencia anual fija para tu empresa sin tramos por volumen de catálogo ni comisiones por pedido."
+      }
+    ]
+  },
+  {
+    "slug": "valladolid",
+    "name": "Valladolid",
+    "province": "Valladolid",
+    "region": "Castilla y León",
+    "schemaRegion": "ES-CL",
+    "coordinates": {
+      "lat": 41.6523,
+      "lng": -4.7245
+    },
+    "tagline": "Conectividad total entre Factusol y tu eCommerce en Valladolid y Castilla y León",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Valladolid | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Valladolid. Polígonos San Cristóbal y Argales. Control de inventario en tiempo real para pymes de Castilla y León.",
+    "keywords": "conector factusol valladolid, sincronizar factusol castilla y leon, factusol poligono san cristobal, conector prestashop factusol argales",
+    "heroSubtitle": "La solución definitiva para automoción auxiliar, distribución agroalimentaria, suministros y comercio mayorista en San Cristóbal y Argales.",
+    "industrialHubs": [
+      {
+        "name": "Polígono San Cristóbal (Valladolid)",
+        "desc": "El mayor parque industrial de Castilla y León, con cientos de empresas de distribución, metal, suministros y servicios."
+      },
+      {
+        "name": "Polígono Argales",
+        "desc": "Tradicional zona empresarial urbana de talleres, ferreterías industriales y distribución mayorista."
+      },
+      {
+        "name": "Parque Tecnológico de Boecillo",
+        "desc": "Polo de innovación y empresas de base tecnológica, telecomunicaciones y logística especializada."
+      }
+    ],
+    "sectors": [
+      "Industria Auxiliar de Automoción y Componentes",
+      "Distribución Mayorista Agroalimentaria y Vinos de la Ribera",
+      "Ferretería Industrial, Climatización y Fontanería",
+      "Repuestos de Maquinaria y Suministros Agrícolas"
+    ],
+    "localContextParagraph": "Situada en el corazón estratégico de las comunicaciones del norte y centro de España, Valladolid destaca por su potente tejido industrial vinculado al automóvil, los suministros agropecuarios y la distribución vinícola y alimentaria. Las empresas vallisoletanas que utilizan Factusol necesitan atender simultáneamente a sus clientes presenciales en nave y a sus compradores digitales a través de WooCommerce o PrestaShop. Con Bentian ERP Bridge, la sincronización de stock se ejecuta directamente contra el archivo Factusol (.accdb) en milisegundos, garantizando que el stock disponible (DISSTO) siempre sea exacto y previniendo la venta de productos sin existencias.",
+    "faqs": [
+      {
+        "q": "¿Funciona con bodegas y distribuidoras de vino en Valladolid y la Ribera del Duero?",
+        "a": "Sí. Bentian gestiona perfectamente referencias de vinos, añadas, cajas y botellas individuales con control de stock exacto en tienda online."
+      },
+      {
+        "q": "¿Es compatible con Factusol instalado en un NAS o red local en San Cristóbal?",
+        "a": "Totalmente. Soporta rutas UNC de red y unidades de red compartidas con reconexión automática en caso de cortes."
+      },
+      {
+        "q": "¿Cómo evita la saturación del servidor web de la tienda?",
+        "a": "Bentian solo envía peticiones ligeras cuando detecta cambios en Factusol, evitando las sobrecargas de CPU habituales de los plugins de sincronización."
+      }
+    ]
+  },
+  {
+    "slug": "cordoba",
+    "name": "Córdoba",
+    "province": "Córdoba",
+    "region": "Andalucía",
+    "schemaRegion": "ES-AN",
+    "coordinates": {
+      "lat": 37.8882,
+      "lng": -4.7794
+    },
+    "tagline": "Sincronización automatizada de Factusol para joyeros, instaladores y distribuidores en Córdoba",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Córdoba | Bentian ERP",
+    "metaDescription": "Enlaza Factusol con WooCommerce y PrestaShop en Córdoba. Polígonos Las Quemadas, Amargacena y Chinales. Stock al instante y pedidos automáticos sin cuotas mensuales.",
+    "keywords": "conector factusol cordoba, sincronizar factusol andalucia, factusol poligono las quemadas, conector woocommerce factusol amargacena",
+    "heroSubtitle": "Diseñado para el Parque Joyero, fabricantes de frío comercial, suministros agrícolas y distribución en Las Quemadas y Amargacena.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Las Quemadas",
+        "desc": "El gran polo empresarial de Córdoba con empresas de distribución, maquinaria, climatización y metal."
+      },
+      {
+        "name": "Parque Joyero de Córdoba",
+        "desc": "El mayor complejo joyero de Europa, donde la gestión de tarifas, metales y stock de piezas exclusivas es crítica."
+      },
+      {
+        "name": "Polígono Amargacena y La Torrecilla",
+        "desc": "Centros de suministros industriales, distribución agroalimentaria y materiales de construcción."
+      }
+    ],
+    "sectors": [
+      "Joyería, Platería y Orfebrería Fina",
+      "Fabricación de Frío Comercial y Climatización",
+      "Maquinaria y Suministros para el Olivar y la Agricultura",
+      "Distribución Mayorista y Ferretería"
+    ],
+    "localContextParagraph": "Córdoba aúna la tradición artesanal y de alta precisión de su Parque Joyero con una potente industria de frío comercial y maquinaria agrícola. En estos sectores, la gestión precisa de referencias, tarifas especiales y disponibilidad de existencias no admite errores. Cuando una empresa cordobesa vende online a través de PrestaShop o WooCommerce, los pedidos deben ingresar en Factusol con su serie de facturación, retenciones o recargos de equivalencia correctos. Bentian ERP Bridge permite a las empresas de Córdoba automatizar toda su operativa de eCommerce directamente desde su ordenador Windows, eliminando el trabajo manual repetitivo.",
+    "faqs": [
+      {
+        "q": "¿Es adecuado para empresas del Parque Joyero de Córdoba?",
+        "a": "Totalmente. Controla referencias de alta rotación y stock unitario de piezas de joyería y orfebrería actualizando al segundo para evitar sobreventas."
+      },
+      {
+        "q": "¿Cómo gestiona el recargo de equivalencia para clientes minoristas?",
+        "a": "El conector traslada el NIF y la condición fiscal del cliente para que el pedido se registre en Factusol con los tipos de IVA y recargo correspondientes."
+      },
+      {
+        "q": "¿Necesito pagar por cada pedido sincronizado?",
+        "a": "No. En Bentian no hay costes por volumen de pedidos ni comisiones sobre tus ventas."
+      }
+    ]
+  },
+  {
+    "slug": "palma",
+    "name": "Palma de Mallorca",
+    "province": "Baleares",
+    "region": "Islas Baleares",
+    "schemaRegion": "ES-IB",
+    "coordinates": {
+      "lat": 39.5696,
+      "lng": 2.6502
+    },
+    "tagline": "Control de stock e integración Factusol para hostelería, náutica y retail en Baleares",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Palma de Mallorca | Bentian ERP",
+    "metaDescription": "Conecta Factusol con tu tienda online en Palma de Mallorca y Baleares. Polígonos Son Castelló y Can Valero. Sincronización rápida para hostelería, náutica y comercio.",
+    "keywords": "conector factusol palma mallorca, sincronizar factusol baleares, factusol poligono son castello, conector prestashop factusol can valero",
+    "heroSubtitle": "Especializado en suministros hosteleros, repuestos náuticos, menaje profesional y comercio en Son Castelló y Can Valero.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Son Castelló",
+        "desc": "El mayor polígono de las Islas Baleares y pulmón económico de Mallorca, con alta concentración de distribuidores mayoristas."
+      },
+      {
+        "name": "Polígono Can Valero (Palma)",
+        "desc": "Centro neurálgico de empresas de servicios, automoción, suministros de hostelería y materiales de construcción."
+      },
+      {
+        "name": "Polígono Son Bugadelles (Calvià) y Marratxí",
+        "desc": "Enclaves de empresas náuticas, ferretería especializada y equipamiento comercial."
+      }
+    ],
+    "sectors": [
+      "Suministros para Hostelería, Restauración y Colectividades",
+      "Repuestos Náuticos, Marina y Embarcaciones",
+      "Menaje, Decoración y Retail Turístico",
+      "Ferretería, Pinturas y Mantenimiento de Instalaciones"
+    ],
+    "localContextParagraph": "La insularidad de las Islas Baleares y la altísima estacionalidad turística obligan a las empresas mallorquinas a tener un control milimétrico de sus existencias físicas y sus canales online. Con una demanda disparada en suministros para hoteles, restaurantes y náutica, vender online productos sin stock debido a la lentitud de los plugins tradicionales ocasiona retrasos inasumibles de aprovisionamiento marítimo. Bentian ERP Bridge ofrece a los distribuidores y tiendas de Palma una sincronización local continua contra su base de datos Factusol (.accdb), actualizando los cambios al instante en WooCommerce y PrestaShop para evitar cualquier rotura de stock.",
+    "faqs": [
+      {
+        "q": "¿Funciona para distribuidores de suministros de hostelería y náutica en Mallorca?",
+        "a": "Sí. Gestiona catálogos amplios con tarifas profesionales para hoteles y restaurantes, actualizando precios y stock en tiempo real."
+      },
+      {
+        "q": "¿Soporta la facturación con diferentes tipos impositivos en Factusol?",
+        "a": "Totalmente. Todos los pedidos se importan con los tipos impositivos y desglose de bases exactos respetando la configuración contable de tu empresa."
+      },
+      {
+        "q": "¿Es fácil de instalar para una pyme en Palma?",
+        "a": "Se instala en menos de 5 minutos mediante un instalador estándar de Windows y detecta automáticamente tu base de datos de Factusol."
+      }
+    ]
   }
 ]
 

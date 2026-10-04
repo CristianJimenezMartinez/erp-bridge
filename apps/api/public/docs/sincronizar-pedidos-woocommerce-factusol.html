@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Sincronizar Pedidos de WooCommerce a Factusol Automáticamente | Bentian</title>
+  <meta name="description" content="Guía completa para automatizar la importación de pedidos de WooCommerce a Factusol (F_PCL y F_LPC): NIF, recargo de equivalencia, series y estados sin trabajo manual.">
+  <meta name="keywords" content="sincronizar pedidos woocommerce factusol, exportar pedidos woocommerce a factusol, F_PCL factusol, pedidos clientes factusol, nif pedidos woocommerce factusol">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/sincronizar-pedidos-woocommerce-factusol.html">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/sincronizar-pedidos-woocommerce-factusol.html">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Automatización de Pedidos de WooCommerce a Factusol sin Trabajo Manual">
+  <meta property="og:description" content="Aprende cómo viajar las cabeceras, líneas y fiscalidad de los pedidos de tu tienda online directamente a Factusol.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Cómo sincronizar pedidos de WooCommerce a Factusol automáticamente sin duplicidades ni errores fiscales",
+    "description": "Manual técnico sobre la estructura de tablas F_PCL y F_LPC de Factusol para la recepción de pedidos web de WooCommerce.",
+    "inLanguage": "es-ES",
+    "author": {
+      "@type": "Person",
+      "name": "Cristian Jiménez Martínez",
+      "url": "https://cristianjm.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Bentian",
+      "url": "https://bridge.cristianjm.com"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/" class="text-sm text-zinc-400 hover:text-white transition">Todas las Guías</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-4xl mx-auto px-6 py-12 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Guía de Integración • Arquitectura de Pedidos Factusol</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Sincronizar Pedidos de WooCommerce a Factusol Automáticamente
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed">
+      Picar pedidos a mano desde el panel de WordPress a Factusol es una fuente continua de erratas tipográficas en NIFs, costes de personal innecesarios y retrasos en la preparación de paquetes. En esta guía técnica explicamos cómo funciona la estructura interna de pedidos de Factusol y cómo automatizar el volcado de ventas online en tiempo real.
+    </p>
+
+    <!-- Estructura de Tablas -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">1. Estructura de Tablas de Pedidos en Factusol</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
+        Factusol almacena los pedidos de los clientes en dos tablas relacionales vinculadas mediante el número y la serie del pedido:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div class="border border-white/[0.06] bg-black/40 rounded-xl p-4">
+          <h3 class="text-emerald-400 font-mono font-bold text-sm mb-2">Tabla F_PCL (Cabeceras de Pedido)</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Contiene la fecha, serie, número correlativo, código de cliente, NIF/CIF, dirección de entrega, totales, tipo de IVA y forma de pago.
+          </p>
+        </div>
+        <div class="border border-white/[0.06] bg-black/40 rounded-xl p-4">
+          <h3 class="text-indigo-400 font-mono font-bold text-sm mb-2">Tabla F_LPC (Líneas de Pedido)</h3>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Contiene cada artículo vendido: código de referencia (ARTLPC), descripción, cantidad (CANLPC), precio unitario, porcentaje de descuento y tipo de IVA.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aspectos Críticos -->
+    <div class="space-y-6 mb-12">
+      <h2 class="text-2xl font-bold text-white mb-4">2. Aspectos Críticos de la Sincronización</h2>
+
+      <!-- NIF / CIF y Facturación -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">1</span>
+          <h3 class="font-bold text-white text-base">Captura del NIF / CIF en el Checkout</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          WooCommerce no incluye por defecto un campo obligatorio para el NIF o CIF en su proceso de compra estándar. Para emitir facturas legales en España, el conector debe mapear el campo de NIF de la orden de WooCommerce directamente en la columna <code>NIFPCL</code> de la cabecera en Factusol, evitando crear clientes genéricos sin identificación fiscal.
+        </p>
+      </div>
+
+      <!-- Recargo de Equivalencia -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">2</span>
+          <h3 class="font-bold text-white text-base">Tratamiento del Recargo de Equivalencia</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Si vendes a comerciantes minoristas en España sujetos a recargo de equivalencia (ej: 5.2% para IVA general del 21%), el pedido web debe activar el flag correspondiente en Factusol para desglosar la base, el IVA y el recargo contable correctamente.
+        </p>
+      </div>
+
+      <!-- Series de Facturación Web -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">3</span>
+          <h3 class="font-bold text-white text-base">Aislamiento por Series de Documento</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Es una excelente práctica contable asignar una serie específica a los pedidos procedentes de internet (por ejemplo, serie <code>W</code> para WooCommerce o serie <code>T</code> para tienda online). De este modo, no interfieres en la numeración correlativa de los albaranes y facturas presenciales de tienda o comerciales.
+        </p>
+      </div>
+    </div>
+
+    <!-- Bentian Soluciona Esto -->
+    <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8 mb-12">
+      <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold mb-3">
+        INSERCIÓN ATÓMICA Y SEGURA
+      </div>
+      <h2 class="text-xl font-bold text-white mb-3">¿Cómo automatiza Bentian ERP Bridge la entrada de pedidos?</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-3">
+        <strong>Bentian ERP Bridge</strong> consulta periódicamente tu WooCommerce mediante su REST API segura. Cuando detecta un nuevo pedido pagado o en proceso:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside">
+        <li>Crea o asocia el cliente en Factusol con su NIF/CIF y direcciones de facturación y envío.</li>
+        <li>Genera el pedido en <code>F_PCL</code> y sus líneas en <code>F_LPC</code> de forma transaccional (si una línea falla, se hace rollback completo para evitar pedidos corruptos).</li>
+        <li>Registra el ID del pedido web como identificador único, evitando que un pedido se importe dos veces.</li>
+        <li>Descuenta de inmediato el stock disponible en almacén para que el equipo de preparación comience el empaquetado.</li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 text-center">
+      <h3 class="text-xl font-bold text-white mb-3">Deja de picar pedidos a mano hoy mismo</h3>
+      <p class="text-sm text-zinc-400 max-w-xl mx-auto mb-6">
+        Descarga Bentian ERP Bridge y prueba la sincronización bidireccional automática con tu Factusol en minutos durante la Beta Pública gratuita.
+      </p>
+      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
+        <span>Descargar Bentian-Setup.exe</span>
+        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Guías Técnicas y Soporte de Factusol</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+        <span>•</span>
+        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

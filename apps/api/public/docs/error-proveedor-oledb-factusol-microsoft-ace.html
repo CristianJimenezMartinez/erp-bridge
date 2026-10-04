@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solución al Error de Proveedor OLEDB en Factusol (Microsoft.ACE.OLEDB) | Bentian</title>
+  <meta name="description" content="Guía paso a paso para resolver el error 'El proveedor Microsoft.ACE.OLEDB.12.0 (o 16.0) no está registrado en el equipo local' al conectar con Factusol en Windows.">
+  <meta name="keywords" content="error proveedor oledb factusol, microsoft ace oledb 12.0 no registrado, microsoft ace oledb 16.0 equipo local, access database engine factusol, oledb factusol 64 bits">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Resolver el Error Microsoft.ACE.OLEDB no registrado en Factusol">
+  <meta property="og:description" content="Manual de resolución para administradores y desarrolladores: cómo instalar y registrar el proveedor OLEDB de Factusol en Windows.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Cómo resolver el error Microsoft.ACE.OLEDB no registrado en el equipo local al conectar con Factusol",
+    "description": "Guía técnica para solucionar incompatibilidades de arquitectura de 32/64 bits con el proveedor OLEDB de Microsoft Access en Factusol.",
+    "inLanguage": "es-ES",
+    "author": {
+      "@type": "Person",
+      "name": "Cristian Jiménez Martínez",
+      "url": "https://cristianjm.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Bentian",
+      "url": "https://bridge.cristianjm.com"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/" class="text-sm text-zinc-400 hover:text-white transition">Todas las Guías</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-4xl mx-auto px-6 py-12 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Resolución de Incidencias • Drivers OLEDB y Access Database Engine</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Solución al Error: <span class="text-indigo-400 font-mono text-2xl sm:text-3xl block mt-1">"El proveedor Microsoft.ACE.OLEDB no está registrado en el equipo local"</span>
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed">
+      Este error es el obstáculo más común cuando un informático, programador o agencia intenta conectar una tienda online o una aplicación externa con la base de datos de <strong>Factusol (.accdb)</strong>. A continuación explicamos por qué sucede el conflicto de arquitectura y cómo repararlo de forma definitiva.
+    </p>
+
+    <!-- Origen del Error -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">1. ¿Por qué ocurre este error?</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
+        Factusol almacena sus datos en formato <strong>Microsoft Access</strong>. Para leer y escribir en estos archivos sin tener abierto el programa Factusol, Windows requiere una librería del sistema llamada <strong>Microsoft Access Database Engine (ACE OLEDB)</strong>.
+      </p>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
+        El error se produce por una <strong>incompatibilidad de arquitectura (32 bits vs 64 bits)</strong>:
+      </p>
+      <ul class="text-sm text-zinc-400 space-y-2 list-disc list-inside">
+        <li>Factusol históricamente corre como proceso de 32 bits (x86).</li>
+        <li>La mayoría de ordenadores modernos con Windows 10 u 11 ejecutan sistemas y entornos de ejecución de 64 bits (x64).</li>
+        <li>Si tu aplicación o script (Node.js, Python, C#, PHP) se ejecuta en 64 bits, buscará la DLL de 64 bits de <code>Microsoft.ACE.OLEDB.12.0</code> o <code>16.0</code>. Si Windows solo tiene registrados los componentes de 32 bits de Microsoft Office, arroja la excepción inmediata.</li>
+      </ul>
+    </div>
+
+    <!-- Pasos de Solución -->
+    <div class="space-y-6 mb-12">
+      <h2 class="text-2xl font-bold text-white mb-4">2. Cómo Solucionarlo Paso a Paso</h2>
+
+      <!-- Paso 1 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">1</span>
+          <h3 class="font-bold text-white text-base">Descargar Microsoft Access Database Engine Redistributable</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Descarga el paquete oficial desde la web de Microsoft:
+        </p>
+        <ul class="text-sm text-zinc-400 space-y-1 list-disc list-inside mb-3">
+          <li><strong>Microsoft Access Database Engine 2016 Redistributable</strong> (oficial de Microsoft).</li>
+          <li>Descarga el archivo <code>accessdatabaseengine_X64.exe</code> (para entornos de 64 bits) o <code>accessdatabaseengine.exe</code> (32 bits).</li>
+        </ul>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">2</span>
+          <h3 class="font-bold text-white text-base">Instalación en Modo Silencioso (/quiet)</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Si tienes instalado Office en 32 bits e intentas instalar los drivers de 64 bits mediante doble clic, el instalador de Microsoft mostrará un mensaje bloqueante: <em>"No se puede instalar la versión de 64 bits de Access Database Engine porque tiene productos de Office de 32 bits"</em>.
+        </p>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Para saltarte esta restricción innecesaria y registrar el proveedor OLEDB correctamente:
+        </p>
+        <div class="bg-black/60 rounded-lg p-3 font-mono text-xs text-emerald-400 border border-white/[0.06] overflow-x-auto">
+          # Abre CMD o PowerShell como Administrador y ejecuta:<br>
+          accessdatabaseengine_X64.exe /quiet
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">3</span>
+          <h3 class="font-bold text-white text-base">Verificar la Cadena de Conexión (Connection String)</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Asegúrate de que tu cadena de conexión utilice la versión registrada en el sistema:
+        </p>
+        <div class="bg-black/60 rounded-lg p-3 font-mono text-xs text-zinc-300 border border-white/[0.06] overflow-x-auto">
+          Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Datos\FS\2262026.accdb;Persist Security Info=False;Mode=Share Deny None;
+        </div>
+      </div>
+    </div>
+
+    <!-- Bentian Soluciona Esto -->
+    <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8 mb-12">
+      <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold mb-3">
+        AUTOMATIZADO EN BENTIAN
+      </div>
+      <h2 class="text-xl font-bold text-white mb-3">¿Cómo te ahorra Bentian ERP Bridge toda esta configuración?</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-3">
+        El conector <strong>Bentian ERP Bridge</strong> está diseñado como un agente de escritorio nativo de Windows. Cuenta con detección automática de arquitecturas x86 y x64, fallback a scripting COM nativo del sistema y resolución interna de controladores OLEDB.
+      </p>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        No tienes que instalar controladores manualmente, compilar módulos de Node en C++, ni pelear con versiones de Office. Instalas el agente y se comunica de inmediato con tu Factusol en menos de 50 milisegundos.
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 text-center">
+      <h3 class="text-xl font-bold text-white mb-3">Conecta tu Factusol con WooCommerce o PrestaShop sin errores</h3>
+      <p class="text-sm text-zinc-400 max-w-xl mx-auto mb-6">
+        Prueba Bentian ERP Bridge de forma gratuita durante la Beta Pública. Instalación en 2 minutos sin cuotas mensuales ni configuraciones complejas de OLEDB.
+      </p>
+      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
+        <span>Descargar Bentian-Setup.exe</span>
+        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Guías Técnicas y Soporte de Factusol</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+        <span>•</span>
+        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>
