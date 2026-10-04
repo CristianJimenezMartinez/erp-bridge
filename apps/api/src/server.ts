@@ -249,6 +249,9 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/factusol-recargo-equivalencia', (_req, res) => {
     res.redirect(301, '/factusol-recargo-equivalencia/');
   });
+  app.get('/casos-de-exito/suministros-rubio', (_req, res) => {
+    res.redirect(301, '/casos-de-exito/suministros-rubio/');
+  });
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
   });
