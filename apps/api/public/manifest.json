@@ -1,0 +1,26 @@
+{
+  "name": "Bentian ERP Bridge",
+  "short_name": "Bentian",
+  "description": "Conector y sincronizador bidireccional en tiempo real entre Factusol ERP y plataformas eCommerce",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48 64x64",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/assets/icon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
