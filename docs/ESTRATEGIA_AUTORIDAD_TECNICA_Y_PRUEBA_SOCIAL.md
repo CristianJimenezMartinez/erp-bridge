@@ -493,3 +493,64 @@ Una duda operativa crítica para el equipo de desarrollo es: **¿Es necesario vo
 
 **Conclusión:** El alta inicial es un trabajo que se hace **UNA ÚNICA VEZ**. A partir de ahí, la infraestructura canónica y los bots se encargan del mantenimiento.
 
+---
+
+## 9. Matriz de Coherencia de Producto, Claims Demostrables y Hoja de Ruta de 4 Niveles
+
+A raíz de la auditoría técnica externa, se establecen las siguientes directrices obligatorias para la web pública y la estrategia de posicionamiento orgánico:
+
+### 9.1 Matriz de Coherencia de Estado de Conectores (Anti-Confusión)
+Queda prohibido presentar estados contradictorios entre diferentes secciones de la web (ej. mostrar un conector como "En Roadmap" en la sección de producto pero listarlo como conector activo en el menú o footer).
+* **Conectores Operativos / Producción:** Factusol ERP y WooCommerce (REST API v3).
+* **Conectores en Fase Beta / Soporte Asistido:** PrestaShop (WebServices / PHP bridge).
+* **Conectores en Desarrollo / Roadmap:** Shopify (Admin GraphQL) y SimplyGest.
+* **Canales en Expansión:** Mirakl y Portales B2B.
+* **Regla de Etiquetado:** Todo elemento del menú o footer que enlace a un conector no operativo al 100% debe incluir el distintivo explícito *(Próximamente)* o *(En Roadmap)* para preservar la credibilidad técnica.
+
+### 9.2 Protocolo de Claims Sobrios de Ingeniería (Claims Demostrables)
+El comprador B2B (directores de IT, contables y gerentes de pymes industriales) desconfía por instinto de promesas absolutas estilo teletienda. Se sustituyen las afirmaciones absolutas por métricas contextualizadas y demostrables:
+
+| Claim Antiguo (Absoluto) | Claim Nuevo (Ingeniería Sobria y Demostrable) |
+| :--- | :--- |
+| *"El Conector Definitivo"* | *"Capa de Integración Local-First de Alto Rendimiento para Factusol"* |
+| *"100% Stock Fiable"* | *"Cálculo Exacto de Stock Disponible (DISSTO) con Transacciones Atómicas"* |
+| *"Cero Bloqueos"* | *"Diseñado con Consultas OLEDB en Modo Compartido para Prevenir Bloqueos .ldb"* |
+| *"99,4% reducción de carga"* | *"Hasta un 99,4% menos datos transferidos en ciclos incrementales (Benchmark Interno)"* |
+| *"Ultra-baja latencia (<42ms)"* | *"Tiempo de respuesta en memoria <42ms en entornos locales verificados"* |
+| *"Garantía de Cero Exposición"* | *"Conexiones salientes unidireccionales cifradas por TLS 1.3 sin apertura de puertos"* |
+
+### 9.3 Arquitectura Temática de Contenidos en 4 Niveles
+
+Para evitar la canibalización de palabras clave y la creación de "thin content" (contenido artificial), toda URL del sitio debe pertenecer a uno de los 4 niveles estructurales:
+
+```
+NIVEL 1: Páginas Comerciales de Alta Conversión (Dinero)
+├── /factusol-woocommerce/ (Foco principal 80%)
+├── /alternativa-delsol-conecta/ (Alternativa de ahorro directo)
+└── /factusol-prestashop/ (Foco secundario)
+
+NIVEL 2: Páginas de Dolor y Problemas Técnicos Específicos (El Gran Valor)
+├── /factusol-tallas-colores/ (Variaciones complejas de moda y calzado)
+├── /factusol-recargo-equivalencia/ (Cuadre fiscal IVA 21% + R.E. 5.2%)
+├── /factusol-ferreterias-suministros/ (Catálogos masivos de 20k a 50k referencias)
+├── /factusol-verifactu-woocommerce/ (Normativa fiscal española)
+└── /factusol-api-rest/ (Acceso programático a bases de datos Access)
+
+NIVEL 3: Guías de Resolución de Problemas Prácticos (Informacional con Intención)
+├── /guias/conectar-factusol-local-con-woocommerce/
+├── /guias/solucionar-bloqueo-ficheros-ldb-factusol/
+└── /guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/
+
+NIVEL 4: Autoridad Técnica, Casos Reales y Documentación (E-E-A-T)
+├── /casos-de-exito/suministros-rubio/ (+5.000 artículos y sincronización en producción)
+├── /docs/ (Arquitectura técnica, esquema relacional Factusol y endpoints)
+└── /comparativa-conector-windows-vs-plugin-wordpress/ (Arquitectura de servidor)
+```
+
+### 9.4 Próximos Pasos Priorizados de Ejecución
+1. **Auditoría y Ajuste de Claims en la Landing:** Refinar textos de la home aplicando la tabla de claims demostrables (Sección 9.2).
+2. **Homogeneización de Conectores:** Ajustar etiquetas en `10-connectors.html` y footer para que el estado de PrestaShop y Shopify sea 100% consistente.
+3. **Creación del Pilar de Guías Técnicas (Nivel 3):** Desarrollar las 3 guías de resolución de dolor en `/guias/`.
+4. **Monitorización de Indexación en Search Console:** Trazar la inclusión del sitemap de 46 URLs enviadas por Cristian.
+
+
