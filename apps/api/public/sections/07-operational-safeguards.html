@@ -79,8 +79,9 @@
               Cola de mensajería persistente Store-and-Forward en base de datos local SQLite. Retiene las ventas aunque el PC del almacén esté apagado o se corte la fibra óptica de la oficina. Al reconectar, se vuelcan cronológicamente sin duplicidades.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero ventas perdidas</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero pérdidas</strong></div>
+            <a href="/docs/arquitectura/cola-store-and-forward/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -96,8 +97,9 @@
               Una caída temporal de red local, desconexión de unidad mapeada (Z:\) o retardo SMB jamás borra tu configuración en <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">%APPDATA%</code>. El agente entra en modo espera segura y reintenta sin tocar tus rutas.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero reconfiguraciones</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Anti-wiping</strong></div>
+            <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -113,8 +115,9 @@
               Desglose exacto de bases y cuotas (ej: 89,00 € = 73,55 € base + 15,45 € IVA 21%). Blindaje anti-doble IVA: evita que Factusol vuelva a sumar el impuesto sobre importes brutos al convertir el pedido en factura oficial.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cuadre contable al céntimo</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cuadre exacto</strong></div>
+            <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -130,8 +133,9 @@
               Los pedidos web entran directamente en la Serie 1 (o la serie de tu elección) en la tabla <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">F_PCL</code>. Llegan exactamente a la pantalla donde tu equipo de almacén y expediciones trabaja cada día, sin filtros raros ni carpetas ocultas.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Expedición sin retrasos</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Sin filtros</strong></div>
+            <a href="/docs/factusol/series-de-pedidos/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -147,8 +151,9 @@
               Catálogo inteligente de 22 reglas amigables que traducen códigos crípticos OLEDB (como 0x80004005, bloqueo .ldb o credenciales REST erróneas) en explicaciones en castellano con un botón que te lleva directo al campo a corregir.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Sin llamadas a soporte</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Autoservicio</strong></div>
+            <a href="/docs/troubleshooting/errores-humanizados/" class="text-purple-400 hover:text-purple-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -164,8 +169,9 @@
               Confirmaciones corporativas inmediatas enviadas por SMTP propio o relay central con firma criptográfica DKIM. Notifican el número correlativo oficial generado por Factusol al minuto de registrarse la venta.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Aviso inmediato a almacén</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Aviso instantáneo</strong></div>
+            <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="text-purple-400 hover:text-purple-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -181,8 +187,9 @@
               Diálogo oficial de Windows (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">OpenFileDialog</code> STA) con primer plano forzado (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">TopMost</code>). Permite seleccionar rutas de red UNC y archivos .accdb en milisegundos sin ventanas fantasma ni bloqueos en Microsoft Edge.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Experiencia de escritorio real</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Nativo x64</strong></div>
+            <a href="/docs/factusol/localizacion-base-datos/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -198,8 +205,9 @@
               Conexión nativa con WooCommerce REST API v3 y endpoint universal de alto rendimiento para tiendas personalizadas en servidores Plesk, arquitecturas Angular o backend PHP/MariaDB sin depender de plugins de terceros.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cero ataduras tecnológicas</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cero ataduras</strong></div>
+            <a href="/docs/canales/endpoint-universal/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 

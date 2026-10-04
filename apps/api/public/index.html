@@ -140,11 +140,15 @@
       </a>
 
       <!-- Navegación Principal Organizada & Respirada -->
-      <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-xs text-zinc-400 font-medium">
+      <nav class="hidden lg:flex items-center gap-5 xl:gap-7 text-xs text-zinc-400 font-medium">
         <a href="#salvaguardas" class="hover:text-white transition">Salvaguardas</a>
         <a href="#como-funciona" class="hover:text-white transition">Cómo Funciona</a>
         <a href="#conectores" class="hover:text-white transition">Conectores</a>
         <a href="#seguridad" class="hover:text-white transition">Seguridad</a>
+        <a href="/docs/" class="hover:text-white transition flex items-center gap-1.5 font-semibold text-zinc-200">
+          <span>Docs</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Guías</span>
+        </a>
         <a href="/casos-de-exito/suministros-rubio/" class="hover:text-white transition flex items-center gap-1.5">
           <span>Casos de Éxito</span>
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -154,8 +158,12 @@
       </nav>
 
       <!-- Botones de Acción (Con margen y divisor visual de separación) -->
-      <div class="flex items-center gap-3.5 shrink-0 ml-auto lg:ml-8 pl-6 lg:pl-8 border-l border-white/[0.08]">
-        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-3.5 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition flex items-center gap-2 whitespace-nowrap">
+      <div class="flex items-center gap-3 shrink-0 ml-auto lg:ml-6 pl-4 lg:pl-6 border-l border-white/[0.08]">
+        <a href="/docs/" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          <span class="inline">Docs</span>
+        </a>
+        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition hidden sm:flex items-center gap-2 whitespace-nowrap">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           Acceso Clientes
         </a>
@@ -209,7 +217,12 @@
             <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
-          <a id="btn-hero-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" download="Bentian-Setup.zip" class="text-xs text-zinc-500 hover:text-zinc-300 font-mono underline underline-offset-4 ml-2 transition">
+          <a href="/docs/" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 hover:text-white border border-indigo-500/20 hover:border-indigo-500/40 font-medium text-sm transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <span>Documentación Técnica</span>
+          </a>
+
+          <a id="btn-hero-zip" data-download-zip href="/releases/latest/Bentian-Setup.zip" download="Bentian-Setup.zip" class="text-xs text-zinc-500 hover:text-zinc-300 font-mono underline underline-offset-4 ml-1 transition">
             Descargar versión .zip
           </a>
         </div>
@@ -690,8 +703,9 @@
               Cola de mensajería persistente Store-and-Forward en base de datos local SQLite. Retiene las ventas aunque el PC del almacén esté apagado o se corte la fibra óptica de la oficina. Al reconectar, se vuelcan cronológicamente sin duplicidades.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero ventas perdidas</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero pérdidas</strong></div>
+            <a href="/docs/arquitectura/cola-store-and-forward/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -707,8 +721,9 @@
               Una caída temporal de red local, desconexión de unidad mapeada (Z:\) o retardo SMB jamás borra tu configuración en <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">%APPDATA%</code>. El agente entra en modo espera segura y reintenta sin tocar tus rutas.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero reconfiguraciones</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Anti-wiping</strong></div>
+            <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -724,8 +739,9 @@
               Desglose exacto de bases y cuotas (ej: 89,00 € = 73,55 € base + 15,45 € IVA 21%). Blindaje anti-doble IVA: evita que Factusol vuelva a sumar el impuesto sobre importes brutos al convertir el pedido en factura oficial.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cuadre contable al céntimo</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cuadre exacto</strong></div>
+            <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -741,8 +757,9 @@
               Los pedidos web entran directamente en la Serie 1 (o la serie de tu elección) en la tabla <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">F_PCL</code>. Llegan exactamente a la pantalla donde tu equipo de almacén y expediciones trabaja cada día, sin filtros raros ni carpetas ocultas.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Expedición sin retrasos</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Sin filtros</strong></div>
+            <a href="/docs/factusol/series-de-pedidos/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -758,8 +775,9 @@
               Catálogo inteligente de 22 reglas amigables que traducen códigos crípticos OLEDB (como 0x80004005, bloqueo .ldb o credenciales REST erróneas) en explicaciones en castellano con un botón que te lleva directo al campo a corregir.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Sin llamadas a soporte</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Autoservicio</strong></div>
+            <a href="/docs/troubleshooting/errores-humanizados/" class="text-purple-400 hover:text-purple-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -775,8 +793,9 @@
               Confirmaciones corporativas inmediatas enviadas por SMTP propio o relay central con firma criptográfica DKIM. Notifican el número correlativo oficial generado por Factusol al minuto de registrarse la venta.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Aviso inmediato a almacén</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Aviso instantáneo</strong></div>
+            <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="text-purple-400 hover:text-purple-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -792,8 +811,9 @@
               Diálogo oficial de Windows (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">OpenFileDialog</code> STA) con primer plano forzado (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">TopMost</code>). Permite seleccionar rutas de red UNC y archivos .accdb en milisegundos sin ventanas fantasma ni bloqueos en Microsoft Edge.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Experiencia de escritorio real</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Nativo x64</strong></div>
+            <a href="/docs/factusol/localizacion-base-datos/" class="text-emerald-400 hover:text-emerald-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
@@ -809,8 +829,9 @@
               Conexión nativa con WooCommerce REST API v3 y endpoint universal de alto rendimiento para tiendas personalizadas en servidores Plesk, arquitecturas Angular o backend PHP/MariaDB sin depender de plugins de terceros.
             </p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cero ataduras tecnológicas</strong>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+            <div><span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cero ataduras</strong></div>
+            <a href="/docs/canales/endpoint-universal/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
 
