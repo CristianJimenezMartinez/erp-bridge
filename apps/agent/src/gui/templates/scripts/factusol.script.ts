@@ -231,10 +231,11 @@ export const factusolScript = `
           alertBox.style.display = 'block';
           const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
           if (data.success) {
+            const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
             alertBox.innerHTML = 
               '<div class="smart-success-card">' +
                 '<span>✓</span>' +
-                '<span>' + data.message + timeSuffix + '</span>' +
+                '<span>' + cleanMsg + timeSuffix + '</span>' +
               '</div>';
             showSmartToast({
               title: 'Factusol ERP Conectado',
@@ -246,11 +247,12 @@ export const factusolScript = `
             }
           } else {
             const errInfo = humanizeErrorMessage(data.message, 'factusol');
+            const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
             alertBox.innerHTML = 
               '<div class="smart-error-card">' +
                 '<div class="smart-error-header">' +
                   '<span>💡</span>' +
-                  '<span>' + errInfo.title + '</span>' +
+                  '<span>' + cleanTitle + '</span>' +
                 '</div>' +
                 '<div class="smart-error-cause">' +
                   '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
@@ -275,10 +277,11 @@ export const factusolScript = `
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'factusol');
         if (alertBox) {
+          const cleanCatchTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           alertBox.style.display = 'block';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-header"><span>💡</span><span>' + cleanCatchTitle + '</span></div>' +
               '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
               '<div class="smart-error-actions">' +
                 '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>' +

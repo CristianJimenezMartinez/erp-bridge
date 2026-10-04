@@ -31,6 +31,26 @@ export const coreScript = `
       hideToast();
     }
 
+    function stripLeadingIcons(str) {
+      if (!str) return '';
+      let s = String(str).trim();
+      const icons = ['✓', '✔', '✕', '❌', '⚠️', 'ℹ️', '🎉', '💡', '🚨', '•', '—', '–', '-', ':'];
+      let changed = true;
+      while (changed && s.length > 0) {
+        changed = false;
+        s = s.trim();
+        for (let i = 0; i < icons.length; i++) {
+          if (s.startsWith(icons[i])) {
+            s = s.substring(icons[i].length).trim();
+            changed = true;
+            break;
+          }
+        }
+      }
+      return s;
+    }
+    window.stripLeadingIcons = stripLeadingIcons;
+
     function showSmartToast(options) {
       if (!options) return;
       if (typeof options === 'string') {
@@ -57,20 +77,24 @@ export const coreScript = `
 
       if (!toast) return;
 
+      // Sanitización anti-duplicado de iconos y emojis
+      const cleanMessage = stripLeadingIcons(message);
+      const cleanTitle = stripLeadingIcons(title);
+
       toast.className = 'toast-' + type;
       if (toastIcon) {
         toastIcon.textContent = type === 'success' ? '✓' : (type === 'warn' ? '⚠️' : (type === 'info' ? 'ℹ️' : '✕'));
       }
       if (toastTitle) {
-        if (title) {
-          toastTitle.textContent = title;
+        if (cleanTitle) {
+          toastTitle.textContent = cleanTitle;
           toastTitle.style.display = 'block';
         } else {
           toastTitle.style.display = 'none';
         }
       }
       if (toastText) {
-        toastText.textContent = message;
+        toastText.textContent = cleanMessage;
       }
 
       if (actionLabel && (targetTab || targetInputId || onAction)) {

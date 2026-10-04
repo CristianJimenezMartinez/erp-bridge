@@ -143,12 +143,14 @@ export const wizardScript = `
 
     function renderWizardErrorCard(alertEl, errInfo, extraActionsHtml) {
       if (!alertEl) return;
+      const rawTitle = errInfo.title || '¿Qué ha ocurrido?';
+      const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(rawTitle) : rawTitle;
       alertEl.style.display = 'block';
       alertEl.innerHTML = 
         '<div class="smart-error-card">' +
           '<div class="smart-error-header">' +
             '<span>💡</span>' +
-            '<span>' + (errInfo.title || '¿Qué ha ocurrido?') + '</span>' +
+            '<span>' + cleanTitle + '</span>' +
           '</div>' +
           '<div class="smart-error-cause">' +
             (errInfo.cause ? ('<strong>Causa:</strong> ' + errInfo.cause + '<br>') : '') +
@@ -160,11 +162,12 @@ export const wizardScript = `
 
     function renderWizardSuccessCard(alertEl, message) {
       if (!alertEl) return;
+      const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(message) : (message || '');
       alertEl.style.display = 'block';
       alertEl.innerHTML = 
         '<div class="smart-success-card">' +
           '<span>✓</span>' +
-          '<span>' + message + '</span>' +
+          '<span>' + cleanMsg + '</span>' +
         '</div>';
     }
 

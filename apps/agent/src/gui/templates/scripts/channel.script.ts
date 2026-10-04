@@ -46,10 +46,11 @@ export const channelScript = `
 
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
+          const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
               '<span>✓</span>' +
-              '<span>' + data.message + timeSuffix + '</span>' +
+              '<span>' + cleanMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
             title: 'Canal Web Conectado',
@@ -58,6 +59,7 @@ export const channelScript = `
           });
         } else {
           const errInfo = humanizeErrorMessage(data.message, 'channel');
+          const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           let extraActions = '';
           if (!url.startsWith('https://')) {
             extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-universal-url&quot;); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
@@ -66,7 +68,7 @@ export const channelScript = `
           extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-header"><span>💡</span><span>' + cleanTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
                 '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
                 '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
@@ -136,10 +138,11 @@ export const channelScript = `
         const data = await res.json();
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
+          const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
               '<span>✓</span>' +
-              '<span>' + data.message + timeSuffix + '</span>' +
+              '<span>' + cleanMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
             title: 'WooCommerce Conectado',
@@ -148,6 +151,7 @@ export const channelScript = `
           });
         } else {
           const errInfo = humanizeErrorMessage(data.message, 'channel');
+          const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
             extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-wc-url&quot;); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
@@ -155,7 +159,7 @@ export const channelScript = `
           extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn"><span>🔄 Reintentar conexión</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-header"><span>💡</span><span>' + cleanTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
                 '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
                 '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
