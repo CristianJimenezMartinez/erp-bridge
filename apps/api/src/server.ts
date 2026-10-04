@@ -161,7 +161,7 @@ export async function bootstrapApp(): Promise<Express> {
   const docsDir = path.join(publicDir, 'docs');
   app.use('/docs', express.static(docsDir, {
     dotfiles: 'ignore',
-    index: ['windows-antivirus-smartscreen-guide.html', 'index.html'],
+    index: ['index.html'],
     extensions: ['html', 'md'],
     setHeaders: (res, filePath) => {
       if (filePath.endsWith('.md')) {
