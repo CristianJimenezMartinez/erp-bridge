@@ -33,6 +33,12 @@ const PLAN_INFO = {
     price: '29 €',
     cycle: '/ mes + IVA',
     desc: 'Sin permanencia: cancelable en cualquier momento en 1 clic.'
+  },
+  founder_annual: {
+    name: 'Plan Fundador Beta (Anual - Cupo 25 Plazas)',
+    price: '139 €',
+    cycle: '/ año + IVA (30% dto. vitalicio)',
+    desc: 'Tarifa exclusiva limitada a las primeras 25 claves. 139 €/año renovable de por vida. Incluye 1 ERP y 1 Tienda.'
   }
 };
 

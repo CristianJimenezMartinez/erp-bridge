@@ -18,9 +18,10 @@ export function renderLicenseTab(): string {
                   <span>Periodo de Beta Pública Finalizado</span>
                 </div>
                 <div style="font-size:12px;color:#fca5a5;margin-top:4px;">Tu periodo de evaluación de 60 días ha concluido. La sincronización se ha detenido de forma segura. Tus rutas y credenciales siguen guardadas intactas en este equipo.</div>
+                <div style="font-size:11px;color:#fca5a5;margin-top:2px;">⚠️ Tarifa Fundador con -30% vitalicio (139 €/año) limitada estrictamente a las primeras 25 plazas. Agotadas las 25 plazas, regirá la tarifa oficial de 199 €/año.</div>
               </div>
               <button onclick="openCloudUpgrade(event)" class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;white-space:nowrap;">
-                Activar Plan Fundador (139 €/año) ↗
+                Activar Plan Fundador (139 €/año - Solo 25 plazas) ↗
               </button>
             </div>
           </div>

@@ -59,8 +59,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
   {
     id: 'base_annual',
     name: 'Plan Base Todo Incluido (Anual)',
-    priceEur: 249,
-    promoPriceEur: 199,
+    priceEur: 199,
     billingCycle: 'annual',
     mode: 'subscription',
     popular: true,
@@ -81,7 +80,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
   },
   {
     id: 'founder_annual',
-    name: 'Plan Fundador Beta (Anual -30% Vitalicio)',
+    name: 'Plan Fundador Beta (Anual -30% Vitalicio - Cupo 25 Plazas)',
     priceEur: 199,
     promoPriceEur: 139,
     billingCycle: 'annual',
@@ -89,10 +88,11 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     popular: false,
     seats: 1,
     storesIncluded: 1,
-    description: 'Tarifa exclusiva para participantes de la Beta Pública. 139 €/año renovable de por vida.',
+    description: 'Tarifa exclusiva limitada estrictamente a las primeras 25 claves de la Beta. 139 €/año renovable de por vida.',
     features: [
       'Sincronización completa Factusol con WooCommerce o PrestaShop',
       'Descuento Fundador del 30% vitalicio garantizado (139 € vs 199 €)',
+      'Cupo estricto limitado a las primeras 25 empresas',
       '1 ERP ⇄ 1 Tienda Online conectada sin límites de SKUs',
       'Actualizaciones automáticas y soporte técnico prioritario',
       'Condiciones blindadas de por vida sin subidas de precio',
@@ -101,7 +101,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
   {
     id: 'partner_reseller_annual',
     name: 'Licencia Cliente Final (Tarifa Distribuidor Partner -25%)',
-    priceEur: 186.75,
+    priceEur: 149.25,
     billingCycle: 'annual',
     mode: 'subscription',
     popular: false,
@@ -110,7 +110,7 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     description: 'Tarifa mayorista para agencias y partners B2B acreditados. Margen directo del 25% retenido en origen.',
     features: [
       'Licencia Base Completa para 1 cliente final',
-      'Descuento del 25% directo de distribuidor ya aplicado (186,75 € vs 249,00 €)',
+      'Descuento del 25% directo de distribuidor ya aplicado (149,25 € vs 199,00 €)',
       'Asignación automática a la cartera del partner',
       'Sincronización ilimitada Factusol ⇄ WooCommerce / PrestaShop',
       'Soporte técnico prioritario de segundo nivel para el partner',
@@ -181,6 +181,32 @@ billingRouter.get('/billing/plans', (_req: Request, res: Response) => {
 });
 
 /**
+ * 1.1 Plazas restantes del Plan Fundador (Blindaje estricto: máximo 25 claves a 139 €/año)
+ */
+billingRouter.get('/billing/founder-spots', async (_req: Request, res: Response) => {
+  const MAX_FOUNDER_KEYS = 25;
+  const db = DatabaseService.getInstance();
+  let founderCount = 0;
+  if (db.isAvailable()) {
+    const r = await db.query(
+      `SELECT COUNT(*)::int as count FROM licenses WHERE (plan = 'founder_annual' OR plan = 'founder' OR alias ILIKE '%Fundador%') AND billing_status = 'ACTIVE'`
+    ).catch(() => ({ rows: [{ count: 0 }] }));
+    founderCount = r.rows[0]?.count || 0;
+  }
+  const remaining = Math.max(0, MAX_FOUNDER_KEYS - founderCount);
+  return res.json({
+    data: {
+      totalSpots: MAX_FOUNDER_KEYS,
+      claimedSpots: founderCount,
+      remainingSpots: remaining,
+      isAvailable: remaining > 0,
+      priceEur: 139,
+      officialPriceEur: 199,
+    },
+  });
+});
+
+/**
  * 2. Crear sesión de Stripe Checkout (Planes Anuales/Mensuales, Add-ons o Setup)
  */
 billingRouter.post('/billing/create-checkout-session', async (req: Request, res: Response, next: NextFunction) => {
@@ -222,6 +248,27 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
     }
     if (!matchedPlan) {
       matchedPlan = CATALOG_PLANS[0]!;
+    }
+
+    // Blindaje estricto: El Plan Fundador (139 €/año) está limitado exclusivamente a 25 plazas
+    const MAX_FOUNDER_KEYS = 25;
+    if (matchedPlan.id === 'founder_annual') {
+      const db = DatabaseService.getInstance();
+      let founderCount = 0;
+      if (db.isAvailable()) {
+        const resCount = await db.query(
+          `SELECT COUNT(*)::int as count FROM licenses WHERE (plan = 'founder_annual' OR plan = 'founder' OR alias ILIKE '%Fundador%') AND billing_status = 'ACTIVE'`
+        ).catch(() => ({ rows: [{ count: 0 }] }));
+        founderCount = resCount.rows[0]?.count || 0;
+      }
+      if (founderCount >= MAX_FOUNDER_KEYS) {
+        return res.status(400).json({
+          error: {
+            message: `Las ${MAX_FOUNDER_KEYS} plazas exclusivas del Plan Fundador (139 €/año) ya han sido cubiertas. El conector está disponible bajo la Licencia Oficial Estándar (199 €/año).`,
+            code: 'FOUNDER_LIMIT_REACHED',
+          },
+        });
+      }
     }
 
     const orgId = customOrgId || computeOrganizationIdFromEmail(email);

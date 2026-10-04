@@ -163,10 +163,19 @@
     <section class="py-20 px-6 border-b border-white/[0.05]">
       <div class="max-w-4xl mx-auto">
         <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-transparent border border-indigo-500/20">
-          <h2 class="text-2xl font-bold text-white mb-6">Condiciones Transparentes de la Beta</h2>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h2 class="text-2xl font-bold text-white">Condiciones Transparentes de la Beta</h2>
+            <div id="founderSpotsBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-medium text-amber-400">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              <span id="founderSpotsText">Cupo Fundador: Máximo 25 plazas (139€/año)</span>
+            </div>
+          </div>
           <div class="space-y-4 text-sm text-zinc-300">
             <p><strong class="text-white">✅ Gratuita durante la fase de pruebas:</strong> La beta es totalmente funcional y no requiere tarjeta de crédito ni pago inicial.</p>
-            <p><strong class="text-white">✅ Descuento Fundador para siempre:</strong> Cuando finalice la beta, el precio oficial será de 199€/año. Los participantes de la beta tendrán reservado un <strong>30% de descuento (139€/año para siempre)</strong>.</p>
+            <p><strong class="text-white">✅ Descuento Fundador para siempre (Cupo estricto 25 claves):</strong> Cuando finalice la beta, el precio oficial del conector será de 199€/año. Los primeros participantes tendrán reservado el <strong>Plan Fundador con un 30% de descuento vitalicio (139€/año para siempre) limitado estrictamente a las primeras 25 empresas</strong>. Agotadas las 25 plazas, el sistema bloqueará automáticamente la tarifa promocional y regirá el precio oficial estándar de 199€/año.</p>
             <p><strong class="text-white">🤝 Soporte:</strong> Atención por email con respuesta en 48-72h laborales. <em>(Por favor, comprende que no ofrecemos asistencia telefónica para no saturar nuestro desarrollo).</em></p>
           </div>
         </div>
@@ -279,6 +288,26 @@
         }, 2000);
       });
     }
+
+    // Consulta en vivo del cupo de 25 plazas del Plan Fundador
+    async function checkFounderSpots() {
+      try {
+        const res = await fetch('/api/v1/billing/founder-spots');
+        if (res.ok) {
+          const json = await res.json();
+          const info = json.data;
+          const textEl = document.getElementById('founderSpotsText');
+          if (textEl && info) {
+            if (info.remainingSpots > 0) {
+              textEl.textContent = `Cupo Fundador: ${info.remainingSpots} de ${info.totalSpots} plazas disponibles (139€/año)`;
+            } else {
+              textEl.textContent = `Cupo Fundador cubierto (25/25). Tarifa oficial: 199€/año`;
+            }
+          }
+        }
+      } catch {}
+    }
+    checkFounderSpots();
   </script>
 </body>
 </html>

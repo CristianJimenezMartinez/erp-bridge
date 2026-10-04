@@ -31,6 +31,22 @@
             <span>Descargar Instalador (.exe)</span>
           </a>
         </div>
+
+        <!-- BANNER DE UPGRADE / EXPIRACIÓN BETA (Visible si es plan BETA o EXPIRED) -->
+        <div id="client-upgrade-banner" class="hidden bg-gradient-to-r from-amber-500/10 via-amber-900/10 to-transparent border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">CUPO LIMITADO: 25 CLAVES</span>
+              <span class="text-xs font-semibold text-white">Conserva tu conector con el Plan Fundador (-30% vitalicio)</span>
+            </div>
+            <p class="text-[11px] text-zinc-400 mt-1">
+              Descuento vitalicio garantizado a 139 €/año (vs 199 €/año oficial). Cupo estricto reservado a las primeras 25 plazas.
+            </p>
+          </div>
+          <button onclick="handleClientUpgradeFounder()" id="btn-client-upgrade-founder" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs transition shrink-0 shadow-lg shadow-amber-500/20 flex items-center gap-1.5 cursor-pointer">
+            <span>Activar Plan Fundador (139 €/año) ↗</span>
+          </button>
+        </div>
         <!-- MULTI-LICENCIA SELECTOR (Visible solo si la cuenta tiene > 1 licencia) -->
         <div id="client-multi-license-banner" class="hidden bg-[#121215] border border-indigo-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
           <div class="flex items-center gap-2.5">

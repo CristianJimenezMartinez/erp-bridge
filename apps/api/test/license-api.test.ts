@@ -148,15 +148,27 @@ async function run() {
     assert.strictEqual(betaClaimDupJson.alreadyClaimed, true);
     assert.strictEqual(betaClaimDupJson.data.licenseKey, betaClaimJson.data.licenseKey, 'Debe devolver la misma clave original');
 
-    // 8. Test Founder Plan en catálogo de facturación
+    // 8. Test Founder Plan y Cupo de 25 plazas en facturación
     const plansRes = await fetch(`${baseUrl}/api/v1/billing/plans`);
     assert.strictEqual(plansRes.status, 200);
     const plansJson = (await plansRes.json()) as any;
+    const basePlan = plansJson.plans.find((p: any) => p.id === 'base_annual');
+    assert(basePlan, 'El catálogo debe contener base_annual');
+    assert.strictEqual(basePlan.priceEur, 199, 'La tarifa oficial de base_annual debe ser 199€/año');
+
     const founderPlan = plansJson.plans.find((p: any) => p.id === 'founder_annual');
     assert(founderPlan, 'El catálogo debe contener el Plan Fundador (founder_annual)');
     assert.strictEqual(founderPlan.promoPriceEur, 139, 'El Plan Fundador debe ser de 139€/año');
+    assert.strictEqual(founderPlan.priceEur, 199, 'El precio base de referencia debe ser 199€/año');
 
-    console.log('✓ License API E2E Tests Passed');
+    const spotsRes = await fetch(`${baseUrl}/api/v1/billing/founder-spots`);
+    assert.strictEqual(spotsRes.status, 200);
+    const spotsJson = (await spotsRes.json()) as any;
+    assert.strictEqual(spotsJson.data.totalSpots, 25, 'El cupo de fundador debe ser estrictamente de 25 plazas');
+    assert.strictEqual(spotsJson.data.priceEur, 139, 'Precio fundador debe ser 139€');
+    assert.strictEqual(spotsJson.data.officialPriceEur, 199, 'Precio oficial debe ser 199€');
+
+    console.log('✓ License API E2E Tests Passed (including 25-key founder quota and 199€ pricing)');
   } finally {
     server.close();
   }

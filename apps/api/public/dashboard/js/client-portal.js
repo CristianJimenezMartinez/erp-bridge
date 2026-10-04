@@ -83,6 +83,17 @@ async function loadClientPortal(selectedKeyOrId) {
         : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Estado: ' + target.status;
     }
 
+    // Banner de upgrade al Plan Fundador si la licencia es BETA o está EXPIRADA
+    const upgradeBanner = document.getElementById('client-upgrade-banner');
+    if (upgradeBanner) {
+      const isBetaOrExpired = (target.plan === 'BETA' || target.status === 'EXPIRED' || target.billingStatus === 'TRIALING');
+      if (isBetaOrExpired) {
+        upgradeBanner.classList.remove('hidden');
+      } else {
+        upgradeBanner.classList.add('hidden');
+      }
+    }
+
     // Pintar datos del equipo vinculado
     const act = target.activations && target.activations.length > 0 ? target.activations[0] : null;
     const hostEl = document.getElementById('client-device-hostname');
@@ -144,7 +155,45 @@ function handleClientUnbindClick() {
   }
 }
 
+async function handleClientUpgradeFounder() {
+  const email = localStorage.getItem('bentian_cloud_email') || '';
+  const btn = document.getElementById('btn-client-upgrade-founder');
+  const originalText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Conectando con Stripe...';
+  }
+  try {
+    const res = await fetch('/api/v1/billing/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: 'founder_annual',
+        email: email || undefined,
+        isEarlyBird: true
+      })
+    });
+    const data = await res.json();
+    if (data && data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data?.error?.message || 'No se pudo generar la pasarela de pago.');
+    }
+  } catch (err) {
+    if (typeof window.showToast === 'function') {
+      window.showToast(err.message, 'error');
+    } else {
+      alert(err.message);
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText || '<span>Activar Plan Fundador (139 €/año) ↗</span>';
+    }
+  }
+}
+
 // Exposición global
 window.loadClientPortal = loadClientPortal;
 window.copyClientKey = copyClientKey;
 window.handleClientUnbindClick = handleClientUnbindClick;
+window.handleClientUpgradeFounder = handleClientUpgradeFounder;
