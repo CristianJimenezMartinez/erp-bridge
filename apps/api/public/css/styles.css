@@ -1,10 +1,14 @@
-﻿:root {
+:root {
   --bg: #09090b;
   --surface: #121215;
   --surface-elevated: #18181b;
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-medium: rgba(255, 255, 255, 0.12);
   --accent-indigo: #6366f1;
+}
+
+html, body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Micro-animaciones sutiles y respetuosas */

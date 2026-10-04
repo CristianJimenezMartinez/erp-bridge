@@ -22,6 +22,11 @@
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
   <link rel="apple-touch-icon" href="/assets/icon.png">
 
+  <!-- Tipografía Oficial: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <!-- TailwindCSS y Config -->
   <link rel="stylesheet" href="/css/styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,25 +37,39 @@
   <meta name="application-name" content="Bentian ERP Bridge">
   <link rel="manifest" href="/manifest.json">
 </head>
-<body class="bg-[#09090b] selection:bg-indigo-500/30 font-sans text-zinc-300 min-h-screen flex flex-col justify-between">
+<body class="bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-indigo-500/30 font-sans min-h-screen flex flex-col justify-between">
 
-  <!-- Header -->
-  <header class="border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
+  <!-- Header Canónico Unificado -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12]">
-          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+      <!-- Marca Desacoplada -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900 group-hover:border-indigo-500/50 transition">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="32" height="32">
         </div>
         <div class="flex items-baseline gap-2">
-          <span class="font-semibold text-sm tracking-tight text-white">Bentian</span>
+          <span class="font-bold text-base tracking-tight text-white">Bentian</span>
           <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
         </div>
       </a>
-      <a href="/" class="text-xs font-medium text-zinc-400 hover:text-white transition">← Volver al sitio principal</a>
+
+      <!-- Navegación alineada a la derecha -->
+      <nav class="flex items-center gap-3 sm:gap-6 text-xs font-medium">
+        <a href="/" class="text-zinc-400 hover:text-white transition flex items-center gap-1.5">
+          <span>&larr; Web Principal</span>
+        </a>
+        <a href="/docs/" class="text-zinc-400 hover:text-white transition hidden md:inline">Docs</a>
+        <a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Ciudades</a>
+        <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden lg:inline">Clientes</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+          <span>Descargar Agente</span>
+          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v0.3.6</span>
+        </a>
+      </nav>
     </div>
   </header>
 
-  <main class="py-16 md:py-24 px-6 flex-1">
+  <main class="py-16 md:py-24 px-6 flex-1 bg-[#09090b]">
     <div class="max-w-5xl mx-auto">
       <div class="text-center max-w-3xl mx-auto mb-16">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
@@ -66,7 +85,7 @@
 
       <div class="grid md:grid-cols-3 gap-6">
         
-        <a href="/conector-factusol/madrid/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/madrid/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Madrid</span>
@@ -80,7 +99,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/barcelona/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/barcelona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Barcelona</span>
@@ -94,7 +113,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/valencia/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/valencia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Valencia</span>
@@ -108,7 +127,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/sevilla/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/sevilla/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Sevilla</span>
@@ -122,7 +141,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/zaragoza/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/zaragoza/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Zaragoza</span>
@@ -136,7 +155,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/malaga/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/malaga/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Málaga</span>
@@ -150,7 +169,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/alicante/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/alicante/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Alicante</span>
@@ -164,7 +183,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/bilbao/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/bilbao/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Bizkaia</span>
@@ -178,7 +197,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/murcia/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/murcia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Murcia</span>
@@ -192,7 +211,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/coruna/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/coruna/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">A Coruña</span>
@@ -206,7 +225,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/vigo/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/vigo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Pontevedra</span>
@@ -220,7 +239,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/valladolid/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/valladolid/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Valladolid</span>
@@ -234,7 +253,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/cordoba/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/cordoba/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Córdoba</span>
@@ -248,7 +267,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/palma/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/palma/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Baleares</span>
@@ -262,7 +281,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/granada/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/granada/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Granada</span>
@@ -276,7 +295,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/toledo/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/toledo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Toledo</span>
@@ -290,7 +309,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/santander/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/santander/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cantabria</span>
@@ -304,7 +323,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/gijon/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/gijon/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Asturias</span>
@@ -318,7 +337,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/oviedo/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/oviedo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Asturias</span>
@@ -332,7 +351,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/pamplona/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/pamplona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Navarra</span>
@@ -346,7 +365,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/vitoria/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/vitoria/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Álava</span>
@@ -360,7 +379,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/castellon/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/castellon/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Castellón</span>
@@ -374,7 +393,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/burgos/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/burgos/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Burgos</span>
@@ -388,7 +407,7 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/salamanca/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/salamanca/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Salamanca</span>
@@ -405,7 +424,7 @@
     </div>
   </main>
 
-  <footer class="border-t border-white/[0.05] py-8 text-center text-xs text-zinc-500">
+  <footer class="border-t border-white/[0.08] py-8 text-center text-xs text-zinc-500 bg-[#09090b]">
     <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
   </footer>
 

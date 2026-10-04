@@ -26,19 +26,15 @@
   <meta name="application-name" content="Bentian ERP Bridge">
   <link rel="manifest" href="/manifest.json">
 
+  <!-- Tipografía Oficial: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/styles.css">
   <!-- Tailwind Play CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 500: '#6366f1', 600: '#4f46e5' }
-          }
-        }
-      }
-    }
-  </script>
+  <script src="/js/tailwind.config.js"></script>
 
   <!-- Schema.org JSON-LD -->
   <script type="application/ld+json">
@@ -72,65 +68,72 @@
   }
   </script>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+<body class="min-h-screen flex flex-col justify-between bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-indigo-500/30">
 
-  <!-- Navbar -->
-  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
-          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+  <!-- Header Canónico Unificado -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Marca Desacoplada -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900 group-hover:border-indigo-500/50 transition">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="32" height="32">
         </div>
         <div class="flex items-baseline gap-2">
-          <span class="font-bold text-lg text-white">Bentian</span>
-          <span class="text-[11px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Caso de Éxito</span>
+          <span class="font-bold text-base tracking-tight text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
         </div>
       </a>
-      <div class="flex items-center gap-4">
-        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Precios</a>
-        <a href="/beta/" class="text-sm text-amber-400 hover:text-amber-300 transition hidden sm:inline">Beta (60 Días Gratis)</a>
-        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
-          Descargar (<span data-app-version>v0.3.5</span>)
+
+      <!-- Navegación alineada a la derecha -->
+      <nav class="flex items-center gap-3 sm:gap-6 text-xs font-medium">
+        <a href="/" class="text-zinc-400 hover:text-white transition flex items-center gap-1.5">
+          <span>&larr; Web Principal</span>
         </a>
-      </div>
+        <a href="/docs/" class="text-zinc-400 hover:text-white transition hidden md:inline">Docs</a>
+        <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Clientes</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+          <span>Descargar Agente</span>
+          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version></span>
+        </a>
+      </nav>
     </div>
   </header>
 
   <!-- Hero Section -->
   <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
     
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
+      <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
       <span>ESTUDIO TÉCNICO OFICIAL • SUMINISTROS INDUSTRIALES Y CONSTRUCCIÓN</span>
     </div>
 
     <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-      Cómo Suministros Rubio automatizó <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400">+5.000 artículos en Factusol</span> y sincroniza en 3 segundos
+      Cómo Suministros Rubio automatizó <span class="text-indigo-400">+5.000 artículos en Factusol</span> y sincroniza en 3 segundos
     </h1>
 
     <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
       De sufrir bloqueos de archivos en mostrador, caídas constantes por <em>timeouts</em> en PHP y perder 2 horas diarias picando pedidos a mano, a un flujo <strong>100% automatizado, stock disponible real (DISSTO) y cero incidencias</strong>.
     </p>
 
-    <!-- Métricas Auditadas en Cifras Grandes -->
+    <!-- Métricas Auditadas en Cifras Grandes (Diseño Sobrio de Ingeniería) -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
-      <div class="p-5 rounded-2xl bg-zinc-900/80 border border-white/[0.08] text-center">
-        <div class="text-3xl sm:text-4xl font-black text-emerald-400 mb-1">+5.000</div>
+      <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] text-center">
+        <div class="text-3xl sm:text-4xl font-extrabold text-white mb-1">+5.000</div>
         <div class="text-xs text-zinc-400 font-medium">Artículos Activos</div>
         <div class="text-[11px] text-zinc-500 mt-1">Con variantes y medidas</div>
       </div>
-      <div class="p-5 rounded-2xl bg-zinc-900/80 border border-white/[0.08] text-center">
-        <div class="text-3xl sm:text-4xl font-black text-indigo-400 mb-1">3,2 s</div>
+      <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] text-center">
+        <div class="text-3xl sm:text-4xl font-extrabold text-white mb-1">3,2 s</div>
         <div class="text-xs text-zinc-400 font-medium">Tiempo de Sync</div>
         <div class="text-[11px] text-zinc-500 mt-1">Motor diferencial local</div>
       </div>
-      <div class="p-5 rounded-2xl bg-zinc-900/80 border border-white/[0.08] text-center">
-        <div class="text-3xl sm:text-4xl font-black text-amber-400 mb-1">0 Bloqueos</div>
+      <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] text-center">
+        <div class="text-3xl sm:text-4xl font-extrabold text-white mb-1">0 Bloqueos</div>
         <div class="text-xs text-zinc-400 font-medium">Ficheros .ldb Factusol</div>
         <div class="text-[11px] text-zinc-500 mt-1">Modo Share Deny None</div>
       </div>
-      <div class="p-5 rounded-2xl bg-zinc-900/80 border border-white/[0.08] text-center">
-        <div class="text-3xl sm:text-4xl font-black text-teal-300 mb-1">2 h / día</div>
+      <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] text-center">
+        <div class="text-3xl sm:text-4xl font-extrabold text-white mb-1">2 h / día</div>
         <div class="text-xs text-zinc-400 font-medium">Tiempo Ahorrado</div>
         <div class="text-[11px] text-zinc-500 mt-1">Pedidos web directos a F_PCL</div>
       </div>
@@ -157,7 +160,7 @@
         </div>
         <div>
           <span class="text-zinc-500 block mb-1">Tecnología de Enlace</span>
-          <strong class="text-emerald-400 text-sm">Bentian ERP Bridge</strong>
+          <strong class="text-indigo-400 text-sm">Bentian ERP Bridge</strong>
           <span class="text-zinc-400 block mt-0.5">Agente Windows OLEDB</span>
         </div>
       </div>
@@ -204,7 +207,7 @@
 
       <div class="space-y-6 text-sm text-zinc-300 leading-relaxed">
         <div class="flex items-start gap-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
           <div>
             <h4 class="font-semibold text-white">Sincronización Diferencial Criptográfica en 3 Segundos</h4>
             <p class="text-xs text-zinc-400 mt-1">
@@ -214,7 +217,7 @@
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
           <div>
             <h4 class="font-semibold text-white">Diseñado con Consultas OLEDB en Modo Compartido para Prevenir Bloqueos .ldb (Share Deny None)</h4>
             <p class="text-xs text-zinc-400 mt-1">
@@ -224,17 +227,17 @@
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
           <div>
             <h4 class="font-semibold text-white">Cálculo Exacto de Stock Disponible (DISSTO) con Transacciones Atómicas</h4>
             <p class="text-xs text-zinc-400 mt-1">
-              El conector aplica la fórmula contable estricta: <code class="text-emerald-300 font-mono">Stock Disponible = F_STO.ACTSTO - F_PCL.PENPCL</code>. Lo que el cliente ve en la tienda web es la disponibilidad neta real, erradicando al 100% las ventas de material comprometido.
+              El conector aplica la fórmula contable estricta: <code class="text-indigo-300 font-mono">Stock Disponible = F_STO.ACTSTO - F_PCL.PENPCL</code>. Lo que el cliente ve en la tienda web es la disponibilidad neta real, erradicando al 100% las ventas de material comprometido.
             </p>
           </div>
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 font-bold text-xs mt-1">✓</div>
           <div>
             <h4 class="font-semibold text-white">Inyección Inmediata de Pedidos a F_PCL</h4>
             <p class="text-xs text-zinc-400 mt-1">
@@ -248,7 +251,7 @@
     <!-- Testimonios Reales -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
       
-      <div class="p-8 rounded-2xl bg-zinc-900/60 border border-white/[0.08] flex flex-col justify-between">
+      <div class="p-8 rounded-2xl bg-[#121215] border border-white/[0.08] flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-1 text-amber-400 mb-4">
             ★★★★★
@@ -258,7 +261,7 @@
           </p>
         </div>
         <div class="pt-4 border-t border-white/[0.06] flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+          <div class="w-10 h-10 rounded-full bg-zinc-800 border border-white/[0.1] flex items-center justify-center text-zinc-200 font-bold text-xs">
             SR
           </div>
           <div>
@@ -268,7 +271,7 @@
         </div>
       </div>
 
-      <div class="p-8 rounded-2xl bg-zinc-900/60 border border-white/[0.08] flex flex-col justify-between">
+      <div class="p-8 rounded-2xl bg-[#121215] border border-white/[0.08] flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-1 text-amber-400 mb-4">
             ★★★★★
@@ -278,7 +281,7 @@
           </p>
         </div>
         <div class="pt-4 border-t border-white/[0.06] flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-xs">
+          <div class="w-10 h-10 rounded-full bg-zinc-800 border border-white/[0.1] flex items-center justify-center text-zinc-200 font-bold text-xs">
             AF
           </div>
           <div>
@@ -291,7 +294,7 @@
     </div>
 
     <!-- CTA Final -->
-    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/40 via-indigo-600/20 to-teal-950/40 border border-emerald-500/30 p-8 sm:p-12 text-center">
+    <div class="rounded-2xl bg-[#121215] border border-white/[0.08] p-8 sm:p-12 text-center shadow-xl">
       <h2 class="text-3xl font-extrabold text-white mb-4">Consigue los Mismos Resultados en tu Empresa</h2>
       <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
         Prueba Bentian ERP Bridge durante la Beta Pública Abierta con 60 días de licencia completa y asegura tu plaza en la Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año).

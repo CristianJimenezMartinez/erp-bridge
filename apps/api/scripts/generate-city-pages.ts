@@ -57,11 +57,43 @@ function getCanonicalVersion(): string {
   return '0.3.5';
 }
 
+function renderHeader(currentVersion: string): string {
+  return `  <!-- Header Canónico Unificado -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Marca Desacoplada -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900 group-hover:border-indigo-500/50 transition">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="32" height="32">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-base tracking-tight text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
+        </div>
+      </a>
+
+      <!-- Navegación alineada a la derecha -->
+      <nav class="flex items-center gap-3 sm:gap-6 text-xs font-medium">
+        <a href="/" class="text-zinc-400 hover:text-white transition flex items-center gap-1.5">
+          <span>&larr; Web Principal</span>
+        </a>
+        <a href="/docs/" class="text-zinc-400 hover:text-white transition hidden md:inline">Docs</a>
+        <a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Ciudades</a>
+        <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden lg:inline">Clientes</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+          <span>Descargar Agente</span>
+          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v${currentVersion}</span>
+        </a>
+      </nav>
+    </div>
+  </header>`;
+}
+
 function renderCityPage(city: CityData, currentVersion: string): string {
   const hubsHtml = city.industrialHubs
     .map(
       (hub) => `
-        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.06] hover:border-indigo-500/40 transition">
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition">
           <div class="flex items-center gap-3 mb-3">
             <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
             <h3 class="text-base font-semibold text-white tracking-tight">${hub.name}</h3>
@@ -74,8 +106,8 @@ function renderCityPage(city: CityData, currentVersion: string): string {
   const sectorsHtml = city.sectors
     .map(
       (sec) => `
-        <div class="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/40 border border-white/[0.04]">
-          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
           <span class="text-xs sm:text-sm font-medium text-zinc-300">${sec}</span>
         </div>`
     )
@@ -84,7 +116,7 @@ function renderCityPage(city: CityData, currentVersion: string): string {
   const faqsHtml = city.faqs
     .map(
       (faq) => `
-        <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
           <h4 class="text-sm sm:text-base font-semibold text-white mb-2">${faq.q}</h4>
           <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">${faq.a}</p>
         </div>`
@@ -143,6 +175,11 @@ function renderCityPage(city: CityData, currentVersion: string): string {
   <meta name="twitter:title" content="${city.metaTitle}">
   <meta name="twitter:description" content="${city.metaDescription}">
   <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tipografía Oficial: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- TailwindCSS y Config -->
   <link rel="stylesheet" href="/css/styles.css">
@@ -219,30 +256,13 @@ ${schemaFaqs}
   }
   </script>
 </head>
-<body class="bg-[#09090b] selection:bg-indigo-500/30 font-sans text-zinc-300">
+<body class="bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-indigo-500/30 font-sans min-h-screen flex flex-col justify-between">
 
-  <!-- Header -->
-  <header class="border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12]">
-          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
-        </div>
-        <div class="flex items-baseline gap-2">
-          <span class="font-semibold text-sm tracking-tight text-white">Bentian</span>
-          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
-        </div>
-      </a>
-      <div class="flex items-center gap-4 text-xs font-medium">
-        <a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Todas las Ciudades</a>
-        <a href="/beta/" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm font-semibold">Probar Beta Gratis</a>
-      </div>
-    </div>
-  </header>
+${renderHeader(currentVersion)}
 
   <main>
     <!-- Breadcrumbs -->
-    <nav class="border-b border-white/[0.04] bg-zinc-950/40 text-xs py-3 px-6" aria-label="Breadcrumb">
+    <nav class="border-b border-white/[0.08] bg-[#09090b] text-xs py-3 px-6" aria-label="Breadcrumb">
       <div class="max-w-5xl mx-auto flex items-center gap-2 text-zinc-500">
         <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
         <span>/</span>
@@ -253,25 +273,24 @@ ${schemaFaqs}
     </nav>
 
     <!-- Hero Localizado -->
-    <section class="py-16 md:py-24 px-6 border-b border-white/[0.05] relative overflow-hidden">
-      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent pointer-events-none"></div>
+    <section class="py-16 md:py-24 px-6 border-b border-white/[0.08] relative overflow-hidden bg-[#09090b]">
       <div class="max-w-4xl mx-auto text-center relative z-10">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
           <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
           Conector Factusol • ${city.name} (${city.province})
         </div>
         <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6 leading-tight">
-          Sincroniza Factusol con tu Tienda Online en <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">${city.name}</span>
+          Sincroniza Factusol con tu Tienda Online en <span class="text-indigo-400">${city.name}</span>
         </h1>
         <p class="text-base sm:text-lg text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed">
           ${city.heroSubtitle}
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
             Descargar Agente Windows (.exe)
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </a>
-          <a href="/beta/" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition text-center font-medium">
+          <a href="/beta/" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#121215] hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition text-center font-medium">
             Ver Condiciones de la Beta Gratuita
           </a>
         </div>
@@ -280,7 +299,7 @@ ${schemaFaqs}
     </section>
 
     <!-- Contexto Industrial y Logístico Local -->
-    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05] bg-[#0c0c0e]">
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.08] bg-[#09090b]">
       <div class="max-w-5xl mx-auto">
         <div class="text-center max-w-3xl mx-auto mb-12">
           <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">Integración adaptada a las empresas de ${city.name}</h2>
@@ -306,25 +325,25 @@ ${schemaFaqs}
     </section>
 
     <!-- Cómo Funciona (Arquitectura Local-First) -->
-    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05]">
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.08] bg-[#09090b]">
       <div class="max-w-5xl mx-auto">
         <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First: Máxima Privacidad y Cero Caídas</h2>
         <p class="text-sm text-zinc-400 text-center max-w-2xl mx-auto mb-12">
           A diferencia de los conectores que exigen subir tu base de datos contable a servidores de terceros, Bentian se ejecuta en tu propio ordenador en ${city.name}.
         </p>
         <div class="grid md:grid-cols-3 gap-8">
-          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">1</div>
             <h3 class="text-base font-semibold text-white mb-2">Lectura Directa Factusol</h3>
             <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente se conecta directamente al archivo .accdb o .mdb mediante OLEDB en menos de 100 ms. Cero lentitud.</p>
           </div>
-          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold mb-4">2</div>
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">2</div>
             <h3 class="text-base font-semibold text-white mb-2">Detección Inteligente de Stock</h3>
             <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula el stock disponible real (DISSTO) excluyendo mercancía reservada o pendiente de servir para evitar sobreventas.</p>
           </div>
-          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold mb-4">3</div>
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">3</div>
             <h3 class="text-base font-semibold text-white mb-2">Buffer Store-and-Forward</h3>
             <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la conexión de internet de tu nave o polígono sufre cortes, los pedidos se retienen y se vuelcan automáticamente al volver la red.</p>
           </div>
@@ -333,7 +352,7 @@ ${schemaFaqs}
     </section>
 
     <!-- FAQs Locales -->
-    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05] bg-[#0c0c0e]">
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.08] bg-[#09090b]">
       <div class="max-w-3xl mx-auto">
         <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-10">Preguntas Frecuentes en ${city.name}</h2>
         <div class="space-y-4">
@@ -343,18 +362,18 @@ ${schemaFaqs}
     </section>
 
     <!-- CTA Final -->
-    <section class="py-16 md:py-20 px-6 text-center">
-      <div class="max-w-3xl mx-auto">
+    <section class="py-16 md:py-20 px-6 text-center bg-[#09090b]">
+      <div class="max-w-3xl mx-auto rounded-2xl bg-[#121215] border border-white/[0.08] p-8 sm:p-12 text-center">
         <h2 class="text-2xl md:text-4xl font-bold text-white mb-4">Empieza a sincronizar tu Factusol en ${city.name} hoy</h2>
         <p class="text-sm text-zinc-400 mb-8 max-w-xl mx-auto">
           Prueba la Beta Pública sin tarjeta de crédito. Instalación limpia en Windows en menos de 2 minutos.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/25 flex items-center gap-2">
-            Descargar Bentian Agent (.exe)
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-600/20 flex items-center gap-2">
+            <span>Descargar Bentian Agent (.exe)</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </a>
-          <a href="/beta/" class="px-6 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition font-medium">
+          <a href="/beta/" class="px-6 py-3.5 rounded-xl bg-[#18181b] hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition font-medium">
             Más información de la Beta
           </a>
         </div>
@@ -363,16 +382,16 @@ ${schemaFaqs}
   </main>
 
   <!-- Footer con Hub de Ciudades -->
-  <footer class="border-t border-white/[0.05] py-12 px-6 bg-[#09090b] text-xs text-zinc-500">
+  <footer class="border-t border-white/[0.08] py-12 px-6 bg-[#09090b] text-xs text-zinc-500">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <p>&copy; 2026 Bentian ERP Bridge. Solución especializada en Factusol para España.</p>
       <div class="flex flex-wrap items-center gap-4">
         <a href="/conector-factusol/madrid/" class="hover:text-zinc-300 transition">Madrid</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="/conector-factusol/barcelona/" class="hover:text-zinc-300 transition">Barcelona</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="/conector-factusol/valencia/" class="hover:text-zinc-300 transition">Valencia</a>
-        <span>•</span>
+        <span>&bull;</span>
         <a href="/conector-factusol/" class="hover:text-white transition font-medium text-zinc-400">Ver todas las ciudades</a>
       </div>
     </div>
@@ -383,11 +402,11 @@ ${schemaFaqs}
 </html>`;
 }
 
-function renderHubPage(cities: CityData[]): string {
+function renderHubPage(cities: CityData[], currentVersion: string): string {
   const cardsHtml = cities
     .map(
       (c) => `
-        <a href="/conector-factusol/${c.slug}/" class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06] hover:border-indigo-500/50 hover:bg-zinc-900/80 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/${c.slug}/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${c.province}</span>
@@ -427,6 +446,11 @@ function renderHubPage(cities: CityData[]): string {
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
   <link rel="apple-touch-icon" href="/assets/icon.png">
 
+  <!-- Tipografía Oficial: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
   <!-- TailwindCSS y Config -->
   <link rel="stylesheet" href="/css/styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -437,25 +461,11 @@ function renderHubPage(cities: CityData[]): string {
   <meta name="application-name" content="Bentian ERP Bridge">
   <link rel="manifest" href="/manifest.json">
 </head>
-<body class="bg-[#09090b] selection:bg-indigo-500/30 font-sans text-zinc-300 min-h-screen flex flex-col justify-between">
+<body class="bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-indigo-500/30 font-sans min-h-screen flex flex-col justify-between">
 
-  <!-- Header -->
-  <header class="border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12]">
-          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
-        </div>
-        <div class="flex items-baseline gap-2">
-          <span class="font-semibold text-sm tracking-tight text-white">Bentian</span>
-          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
-        </div>
-      </a>
-      <a href="/" class="text-xs font-medium text-zinc-400 hover:text-white transition">← Volver al sitio principal</a>
-    </div>
-  </header>
+${renderHeader(currentVersion)}
 
-  <main class="py-16 md:py-24 px-6 flex-1">
+  <main class="py-16 md:py-24 px-6 flex-1 bg-[#09090b]">
     <div class="max-w-5xl mx-auto">
       <div class="text-center max-w-3xl mx-auto mb-16">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
@@ -475,7 +485,7 @@ function renderHubPage(cities: CityData[]): string {
     </div>
   </main>
 
-  <footer class="border-t border-white/[0.05] py-8 text-center text-xs text-zinc-500">
+  <footer class="border-t border-white/[0.08] py-8 text-center text-xs text-zinc-500 bg-[#09090b]">
     <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
   </footer>
 
@@ -561,7 +571,7 @@ export function generateCityPages() {
   }
 
   // 2. Generar Hub central
-  const hubHtml = renderHubPage(cities);
+  const hubHtml = renderHubPage(cities, currentVersion);
   const hubFile = path.join(CITIES_OUTPUT_ROOT, 'index.html');
   fs.writeFileSync(hubFile, hubHtml, 'utf8');
   console.log(`✓ [cities] Generado Hub central nacional -> ${hubFile}`);
