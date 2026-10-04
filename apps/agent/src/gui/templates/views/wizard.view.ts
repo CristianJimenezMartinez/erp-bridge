@@ -67,6 +67,58 @@ export function renderWizardModal(): string {
             <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">💡 Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</div>
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
+
+          <!-- BLOQUE PEDAGÓGICO: SERIE PARA PEDIDOS WEB EN FACTUSOL -->
+          <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <div>
+                <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                  <span>Serie para Pedidos Web en Factusol</span>
+                  <span style="font-size: 10px; background: rgba(99, 102, 241, 0.25); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.4); padding: 1px 7px; border-radius: 999px; font-weight: 600;">Recomendado: Serie 1 Directo</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                  Define en qué serie de Factusol se registrarán las ventas de tu tienda online.
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                <label for="wiz-input-fact-order-series" style="font-size: 11px; color: var(--text-muted); margin: 0;">Serie:</label>
+                <input type="text" id="wiz-input-fact-order-series" value="1" maxlength="1" oninput="this.value = this.value.toUpperCase(); onWizOrderSeriesInput(this.value);" class="form-control" style="width: 44px; text-align: center; font-weight: 700; font-size: 14px; text-transform: uppercase; padding: 4px 6px;">
+              </div>
+            </div>
+
+            <!-- Opciones rápidas de selección interactiva -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <button type="button" id="wiz-btn-series-1" onclick="setWizOrderSeries('1')" class="btn" style="text-align: left; padding: 10px 12px; background: rgba(99, 102, 241, 0.18); border: 2px solid #6366f1; border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <span style="font-weight: 700; font-size: 12px; color: #a5b4fc;">⭐ Serie 1 (Directo a Bandeja Principal)</span>
+                  <span id="wiz-badge-series-1" style="font-size: 10px; background: #6366f1; color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: 600;">Recomendado</span>
+                </div>
+                <span style="font-size: 11px; color: #cbd5e1; line-height: 1.3;">Entran en la bandeja principal. Abres Factusol y el pedido está el primero a la vista. Cero despistes.</span>
+              </button>
+
+              <button type="button" id="wiz-btn-series-w" onclick="setWizOrderSeries('W')" class="btn" style="text-align: left; padding: 10px 12px; background: #18181f; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <span style="font-weight: 700; font-size: 12px; color: var(--text-muted);">Serie W (Separada para Web)</span>
+                  <span id="wiz-badge-series-w" style="font-size: 10px; background: rgba(255,255,255,0.08); color: var(--text-subtle); padding: 1px 6px; border-radius: 10px; font-weight: 500;">Contabilidad aislada</span>
+                </div>
+                <span style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Quedan separados, pero requiere cambiar el filtro de Factusol a "Todas" o "Serie W" para verlos.</span>
+              </button>
+            </div>
+
+            <!-- Card visual pedagógico: ¿Por qué recomendamos la Serie 1? -->
+            <div style="padding: 12px 14px; background: rgba(30, 27, 75, 0.45); border: 1px solid rgba(129, 140, 248, 0.28); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
+              <div style="font-weight: 700; color: #a5b4fc; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                <span>💡 ¿Por qué recomendamos la Serie 1?</span>
+              </div>
+              <p style="margin: 0 0 6px 0; color: #cbd5e1; font-size: 11.5px;">
+                En Factusol, cada documento tiene una Serie. La pantalla de <strong>Comercial → Pedidos de cliente</strong> suele abrirse por defecto filtrada en la <strong>Serie 1</strong>:
+              </p>
+              <ul style="margin: 0; padding-left: 18px; color: #94a3b8; font-size: 11px; line-height: 1.45;">
+                <li style="margin-bottom: 4px;"><strong style="color: #38bdf8;">Si entran en la Serie 1 (Directo):</strong> Entran en la bandeja principal de Factusol. Abres Factusol y el pedido web está el primero de la lista a la vista de cualquiera. No hay que tocar filtros, ni desplegables, ni configurar series nuevas en Factusol. <em>Cero líos.</em></li>
+                <li><strong style="color: #cbd5e1;">Si llegan con la Serie W (Web):</strong> Contablemente quedan separados de la tienda física, pero si un usuario entra a Factusol y ve la Serie 1 vacía, pensará que el pedido no ha entrado, cuando en realidad está en la pestaña/filtro de la Serie W.</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <!-- PASO 3: CANAL WEB -->

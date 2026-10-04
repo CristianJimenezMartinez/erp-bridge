@@ -68,9 +68,14 @@ export function renderFactusolTab(): string {
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Serie para Pedidos Web:</label>
-              <input type="text" id="input-factusol-order-series" class="form-control" value="W" maxlength="1" placeholder="W" style="text-transform: uppercase;">
-              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Por defecto 'W' (Web) o '1'. Los pedidos online se registrarán en esta serie dentro de Factusol.</div>
+              <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+                <span>Serie para Pedidos Web:</span>
+                <span class="tag tag-indigo" style="font-size: 10px; padding: 1px 6px;">⭐ Recomendado: 1</span>
+              </label>
+              <input type="text" id="input-factusol-order-series" class="form-control" value="1" maxlength="1" placeholder="1" style="text-transform: uppercase; font-weight: 700; width: 64px;">
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
+                <strong style="color: #a5b4fc;">Recomendado '1' (Directo y a prueba de despistes):</strong> los pedidos entran en la bandeja principal de Factusol y están a la vista de cualquiera al entrar. Si usas <strong>'W' (Separada)</strong>, los pedidos quedan contablemente aislados pero requerirá cambiar el filtro en Factusol a 'Todas' o 'Serie W' para verlos.
+              </div>
             </div>
           </div>
 

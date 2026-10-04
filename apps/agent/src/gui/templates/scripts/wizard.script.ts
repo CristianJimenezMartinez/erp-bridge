@@ -3,6 +3,90 @@ export const wizardScript = `
     function openWizardModal() {
       document.getElementById('modal-wizard').classList.add('open');
       setWizardStep(1);
+
+      // Cargar la serie configurada previamente o '1' por defecto
+      let existingSeries = '1';
+      try {
+        if (typeof currentStatus !== 'undefined' && currentStatus) {
+          const fs = currentStatus.factusolSettings || currentStatus.factusol || (currentStatus.config && currentStatus.config.factusol);
+          if (fs && fs.orderSeries) {
+            existingSeries = fs.orderSeries;
+          }
+        }
+        if (existingSeries === '1') {
+          const mainInput = document.getElementById('input-factusol-order-series');
+          if (mainInput && mainInput.value) {
+            existingSeries = mainInput.value;
+          }
+        }
+      } catch (e) {}
+      setWizOrderSeries(existingSeries);
+
+      // Pre-cargar ruta si ya existe en la pantalla de Factusol
+      try {
+        const wizFactInput = document.getElementById('wiz-input-fact-path');
+        const mainFactInput = document.getElementById('input-factusol-db');
+        if (wizFactInput && !wizFactInput.value && mainFactInput && mainFactInput.value) {
+          wizFactInput.value = mainFactInput.value;
+        }
+      } catch (e) {}
+    }
+
+    function setWizOrderSeries(serie) {
+      const cleanSerie = (serie || '1').toString().trim().toUpperCase().substring(0, 1) || '1';
+      const input = document.getElementById('wiz-input-fact-order-series');
+      if (input) {
+        input.value = cleanSerie;
+      }
+      updateWizOrderSeriesButtons(cleanSerie);
+    }
+
+    function updateWizOrderSeriesButtons(serie) {
+      const btn1 = document.getElementById('wiz-btn-series-1');
+      const btnW = document.getElementById('wiz-btn-series-w');
+      const badge1 = document.getElementById('wiz-badge-series-1');
+      const badgeW = document.getElementById('wiz-badge-series-w');
+
+      if (btn1) {
+        if (serie === '1') {
+          btn1.style.background = 'rgba(99, 102, 241, 0.18)';
+          btn1.style.border = '2px solid #6366f1';
+          if (badge1) {
+            badge1.style.background = '#6366f1';
+            badge1.style.color = '#fff';
+          }
+        } else {
+          btn1.style.background = '#18181f';
+          btn1.style.border = '1px solid var(--card-border)';
+          if (badge1) {
+            badge1.style.background = 'rgba(255,255,255,0.08)';
+            badge1.style.color = 'var(--text-subtle)';
+          }
+        }
+      }
+
+      if (btnW) {
+        if (serie === 'W') {
+          btnW.style.background = 'rgba(99, 102, 241, 0.18)';
+          btnW.style.border = '2px solid #6366f1';
+          if (badgeW) {
+            badgeW.style.background = '#6366f1';
+            badgeW.style.color = '#fff';
+          }
+        } else {
+          btnW.style.background = '#18181f';
+          btnW.style.border = '1px solid var(--card-border)';
+          if (badgeW) {
+            badgeW.style.background = 'rgba(255,255,255,0.08)';
+            badgeW.style.color = 'var(--text-subtle)';
+          }
+        }
+      }
+    }
+
+    function onWizOrderSeriesInput(val) {
+      const cleanVal = (val || '').trim().toUpperCase().substring(0, 1);
+      updateWizOrderSeriesButtons(cleanVal);
     }
 
     function closeWizardModal() {
@@ -267,12 +351,15 @@ export const wizardScript = `
     async function finishWizardAndStart() {
       const factInput = document.getElementById('wiz-input-fact-path');
       const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
+      const orderSeriesInput = document.getElementById('wiz-input-fact-order-series');
+      const orderSeriesVal = (orderSeriesInput ? orderSeriesInput.value : '1').trim().toUpperCase().substring(0, 1) || '1';
       // Guardar todo
       const payload = {
         licenseKey: document.getElementById('wiz-input-lic').value.trim() || undefined,
         channelType: currentChannelType,
         factusol: {
           databasePath: factPath || undefined,
+          orderSeries: orderSeriesVal
         },
         universalBridge: {
           storeUrl: document.getElementById('wiz-input-univ-url').value.trim() || undefined,
