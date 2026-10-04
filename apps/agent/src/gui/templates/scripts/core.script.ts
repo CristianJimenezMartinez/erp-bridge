@@ -438,4 +438,190 @@ export const coreScript = `
       window.open('/api/local/download-companion?secretKey=' + encodeURIComponent(key), '_blank');
       showToast('Descargando erp-bridge-endpoint.php...');
     }
+
+    // ================= SPOTLIGHT TOUR (GUIDED WALKTHROUGH) =================
+    let _spotlightCurrentStep = 0;
+    const _spotlightSteps = [
+      {
+        target: '#zen-hero-card',
+        badge: 'Foco 1 de 3',
+        title: 'Estado en Tiempo Real',
+        description: 'Monitorea Factusol, tu tienda web y la salud de la sincronización en vivo.',
+        position: 'bottom'
+      },
+      {
+        target: '#overview-recent-activity-section',
+        fallback: '#overview-logs-list',
+        badge: 'Foco 2 de 3',
+        title: 'Cola de Pedidos',
+        description: 'Cada pedido web que entra en Factusol aparece aquí con su serie, número y total.',
+        position: 'top'
+      },
+      {
+        target: '#btn-sync-header',
+        fallback: '.sidebar',
+        badge: 'Foco 3 de 3',
+        title: 'Sincronización Manual',
+        description: 'Puedes forzar lecturas de stock o pausar el agente cuando lo necesites.',
+        position: 'bottom'
+      }
+    ];
+
+    function startSpotlightTour(force) {
+      if (!force && localStorage.getItem('bentian_spotlight_completed') === 'true') {
+        return;
+      }
+      if (typeof switchTab === 'function') {
+        switchTab('overview');
+      }
+
+      _spotlightCurrentStep = 0;
+      createSpotlightDom();
+      renderSpotlightStep(_spotlightCurrentStep);
+    }
+
+    function createSpotlightDom() {
+      removeSpotlightDom();
+
+      const frame = document.createElement('div');
+      frame.id = 'bentian-spotlight-frame';
+      document.body.appendChild(frame);
+
+      const card = document.createElement('div');
+      card.id = 'bentian-spotlight-card';
+      document.body.appendChild(card);
+
+      window.addEventListener('resize', handleSpotlightReposition);
+      window.addEventListener('scroll', handleSpotlightReposition, true);
+    }
+
+    function handleSpotlightReposition() {
+      if (document.getElementById('bentian-spotlight-frame')) {
+        updateSpotlightPositions(_spotlightCurrentStep);
+      }
+    }
+
+    function renderSpotlightStep(index) {
+      const step = _spotlightSteps[index];
+      if (!step) return;
+
+      const card = document.getElementById('bentian-spotlight-card');
+      if (!card) return;
+
+      const isLast = (index === _spotlightSteps.length - 1);
+
+      card.innerHTML = 
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<span class="spotlight-badge">' + step.badge + '</span>' +
+            '<span style="font-size:11px;color:var(--text-muted);">' + (index + 1) + ' de ' + _spotlightSteps.length + '</span>' +
+          '</div>' +
+          '<button type="button" onclick="closeSpotlightTour()" style="background:none;border:none;color:var(--text-subtle);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;" title="Cerrar recorrido">✕</button>' +
+        '</div>' +
+        '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px;">' +
+          '<span>✨</span><span>' + step.title + '</span>' +
+        '</div>' +
+        '<p style="font-size:12.5px;color:#cbd5e1;line-height:1.5;margin:0 0 16px 0;">' +
+          step.description +
+        '</p>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;">' +
+          '<div style="display:flex;gap:4px;">' +
+            _spotlightSteps.map(function(_, i) {
+              return '<span style="width:7px;height:7px;border-radius:50%;background:' + (i === index ? '#818cf8' : 'rgba(255,255,255,0.18)') + ';display:inline-block;transition:all 0.2s;"></span>';
+            }).join('') +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            (index > 0 ? '<button type="button" onclick="prevSpotlightStep()" class="btn btn-secondary btn-sm" style="padding:4px 10px;font-size:11.5px;">← Anterior</button>' : '') +
+            (isLast 
+              ? '<button type="button" onclick="finishSpotlightTour()" class="btn btn-primary btn-sm" style="padding:5px 14px;font-weight:700;font-size:12px;background:linear-gradient(135deg, #10b981, #059669);border:none;box-shadow:0 0 15px rgba(16,185,129,0.4);"><span>Entendido, ¡a trabajar!</span> 🚀</button>'
+              : '<button type="button" onclick="nextSpotlightStep()" class="btn btn-primary btn-sm" style="padding:4px 12px;font-size:11.5px;">Siguiente Paso →</button>'
+            ) +
+          '</div>' +
+        '</div>';
+
+      updateSpotlightPositions(index);
+    }
+
+    function updateSpotlightPositions(index) {
+      const step = _spotlightSteps[index];
+      if (!step) return;
+
+      let el = document.querySelector(step.target);
+      if (!el && step.fallback) {
+        el = document.querySelector(step.fallback);
+      }
+      if (!el) return;
+
+      try {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      } catch (e) {}
+
+      setTimeout(function() {
+        const rect = el.getBoundingClientRect();
+        const pad = 8;
+        const frame = document.getElementById('bentian-spotlight-frame');
+        if (frame) {
+          frame.style.top = Math.max(0, rect.top - pad) + 'px';
+          frame.style.left = Math.max(0, rect.left - pad) + 'px';
+          frame.style.width = Math.max(20, rect.width + (pad * 2)) + 'px';
+          frame.style.height = Math.max(20, rect.height + (pad * 2)) + 'px';
+        }
+
+        const card = document.getElementById('bentian-spotlight-card');
+        if (card) {
+          const cardWidth = 360;
+          const cardHeight = card.offsetHeight || 180;
+          let cardTop;
+          let cardLeft = rect.left + (rect.width / 2) - (cardWidth / 2);
+
+          if (step.position === 'top' || (rect.bottom + cardHeight + pad + 20 > window.innerHeight && rect.top > cardHeight + 20)) {
+            cardTop = Math.max(16, rect.top - cardHeight - pad - 12);
+          } else {
+            cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + pad + 12);
+          }
+
+          cardLeft = Math.max(16, Math.min(window.innerWidth - cardWidth - 16, cardLeft));
+          card.style.top = cardTop + 'px';
+          card.style.left = cardLeft + 'px';
+        }
+      }, 120);
+    }
+
+    function nextSpotlightStep() {
+      if (_spotlightCurrentStep < _spotlightSteps.length - 1) {
+        _spotlightCurrentStep++;
+        renderSpotlightStep(_spotlightCurrentStep);
+      } else {
+        finishSpotlightTour();
+      }
+    }
+
+    function prevSpotlightStep() {
+      if (_spotlightCurrentStep > 0) {
+        _spotlightCurrentStep--;
+        renderSpotlightStep(_spotlightCurrentStep);
+      }
+    }
+
+    function finishSpotlightTour() {
+      localStorage.setItem('bentian_spotlight_completed', 'true');
+      removeSpotlightDom();
+      if (typeof showToast === 'function') {
+        showToast('✓ ¡Recorrido completado! Bentian Agent está activo.', 'success');
+      }
+    }
+
+    function closeSpotlightTour() {
+      localStorage.setItem('bentian_spotlight_completed', 'true');
+      removeSpotlightDom();
+    }
+
+    function removeSpotlightDom() {
+      window.removeEventListener('resize', handleSpotlightReposition);
+      window.removeEventListener('scroll', handleSpotlightReposition, true);
+      const frame = document.getElementById('bentian-spotlight-frame');
+      if (frame) frame.remove();
+      const card = document.getElementById('bentian-spotlight-card');
+      if (card) card.remove();
+    }
 `;

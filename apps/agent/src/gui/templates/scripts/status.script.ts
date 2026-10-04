@@ -64,7 +64,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
         _lastStatusPayload = text;
         currentStatus = JSON.parse(text);
-        renderStatus(currentStatus);
+        handleStatusUpdate(currentStatus);
         updateFormInputs(currentStatus, forceFormSync);
         if (typeof loadAutoStart === 'function') {
           loadAutoStart(forceFormSync);
@@ -94,6 +94,30 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         fetchStatus(false);
       }
     });
+
+    let _zeroStateCheckDone = false;
+    function handleStatusUpdate(data) {
+      renderStatus(data);
+      if (!_zeroStateCheckDone && data) {
+        _zeroStateCheckDone = true;
+        try {
+          const completed = localStorage.getItem('bentian_onboarding_completed');
+          const lic = data.license || {};
+          const isLicValid = lic.valid === true || lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
+          const isFactConfigured = !!(data.factusol && data.factusol.configured);
+
+          if (!completed && (!isLicValid || !isFactConfigured)) {
+            setTimeout(function() {
+              if (typeof openWizardModal === 'function') {
+                openWizardModal();
+              }
+            }, 450);
+          }
+        } catch (e) {
+          console.warn('Incidencia al verificar estado de primer inicio:', e); // quality-allow-console (browser template script)
+        }
+      }
+    }
 
     function renderStatus(data) {
       if (!data) return;

@@ -113,7 +113,7 @@ export function renderSyncTab(): string {
             </div>
           </label>
 
-          <div id="order-alerts-panel" style="margin-top: 14px;">
+          <div id="order-alerts-panel" style="margin-top: 14px; display: none;">
             <div class="form-group">
               <label class="form-label">Email(s) para recibir las alertas:</label>
               <input type="text" id="input-notif-email" class="form-control" placeholder="pedidos@empresa.com, almacen@empresa.com">

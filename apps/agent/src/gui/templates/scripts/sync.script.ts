@@ -156,7 +156,7 @@ export const syncScript = `
     function toggleOrderAlertsSection(enabled) {
       const panel = document.getElementById('order-alerts-panel');
       if (panel) {
-        panel.style.opacity = enabled ? '1' : '0.6';
+        panel.style.display = enabled ? 'block' : 'none';
       }
     }
 

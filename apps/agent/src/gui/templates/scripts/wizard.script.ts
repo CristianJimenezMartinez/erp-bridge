@@ -30,6 +30,21 @@ export const wizardScript = `
           wizFactInput.value = mainFactInput.value;
         }
       } catch (e) {}
+
+      // Pre-cargar avisos por email si ya existen en la configuración
+      try {
+        const notif = (typeof currentStatus !== 'undefined' && currentStatus) ? (currentStatus.notifications || (currentStatus.config && currentStatus.config.notifications)) : null;
+        if (notif) {
+          const chk = document.getElementById('wiz-check-alerts-enabled');
+          if (chk && notif.orderAlertsEnabled !== undefined) {
+            chk.checked = !!notif.orderAlertsEnabled;
+          }
+          const emailInput = document.getElementById('wiz-input-notif-email');
+          if (emailInput && notif.alertEmail) {
+            emailInput.value = notif.alertEmail;
+          }
+        }
+      } catch (e) {}
     }
 
     function setWizOrderSeries(serie) {
@@ -95,7 +110,7 @@ export const wizardScript = `
 
     function setWizardStep(step) {
       wizardCurrentStep = step;
-      [1, 2, 3, 4].forEach(function(i) {
+      [1, 2, 3, 4, 5].forEach(function(i) {
         const pane = document.getElementById('wizard-pane-' + i);
         const stepHeader = document.getElementById('w-step-' + i);
         if (pane) pane.style.display = (i === step) ? 'block' : 'none';
@@ -106,7 +121,7 @@ export const wizardScript = `
 
       document.getElementById('wiz-btn-prev').style.visibility = (step === 1) ? 'hidden' : 'visible';
       const nextBtn = document.getElementById('wiz-btn-next');
-      if (step === 4) {
+      if (step === 5) {
         nextBtn.style.display = 'none';
       } else {
         nextBtn.style.display = 'inline-flex';
@@ -115,7 +130,7 @@ export const wizardScript = `
     }
 
     function wizNextStep() {
-      if (wizardCurrentStep < 4) {
+      if (wizardCurrentStep < 5) {
         setWizardStep(wizardCurrentStep + 1);
       }
     }
@@ -348,11 +363,79 @@ export const wizardScript = `
       }
     }
 
+    async function wizTestOrderEmail() {
+      const emailInput = document.getElementById('wiz-input-notif-email');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const alertBox = document.getElementById('wiz-email-alert');
+      const btn = document.getElementById('wiz-btn-test-email');
+
+      if (!email) {
+        renderWizardErrorCard(alertBox, {
+          title: 'Correo de destino requerido',
+          cause: 'No has especificado ninguna dirección de email para recibir las notificaciones.',
+          suggestion: 'Introduce la dirección de correo corporativa donde deseas recibir los avisos de pedidos.'
+        }, '<button type="button" onclick="document.getElementById(\\'wiz-input-notif-email\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir correo</span></button>');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spin">⏳</span> Enviando prueba...';
+      }
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Enviando correo de prueba a ' + email + ' a través de Bentian Relay...</div>';
+
+      try {
+        const res = await fetch('/api/local/test-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderAlertsEnabled: true,
+            alertEmail: email
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderWizardSuccessCard(alertBox, data.message || 'Correo de prueba enviado con éxito a ' + email + '. Revisa tu bandeja de entrada o spam.');
+          showSmartToast({
+            title: 'Correo de Prueba Enviado',
+            message: 'Mensaje de verificación entregado a ' + email,
+            type: 'success'
+          });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message || 'No se pudo enviar el correo', 'channel');
+          renderWizardErrorCard(alertBox, errInfo, 
+            '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar envío</span></button>'
+          );
+          showSmartToast({
+            title: 'Aviso en Envío de Email',
+            message: data.message || 'Revisa la dirección indicada',
+            type: 'warn'
+          });
+        }
+      } catch (err) {
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        renderWizardErrorCard(alertBox, errInfo, 
+          '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>'
+        );
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> <span>Probar Envío de Email</span>';
+        }
+      }
+    }
+
     async function finishWizardAndStart() {
       const factInput = document.getElementById('wiz-input-fact-path');
       const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
       const orderSeriesInput = document.getElementById('wiz-input-fact-order-series');
       const orderSeriesVal = (orderSeriesInput ? orderSeriesInput.value : '1').trim().toUpperCase().substring(0, 1) || '1';
+      const alertsChk = document.getElementById('wiz-check-alerts-enabled');
+      const wizAlertsEnabled = alertsChk ? alertsChk.checked : true;
+      const emailInput = document.getElementById('wiz-input-notif-email');
+      const wizAlertEmail = emailInput ? emailInput.value.trim() : '';
+
       // Guardar todo
       const payload = {
         licenseKey: document.getElementById('wiz-input-lic').value.trim() || undefined,
@@ -369,11 +452,22 @@ export const wizardScript = `
           storeUrl: document.getElementById('wiz-input-wc-url').value.trim() || undefined,
           consumerKey: document.getElementById('wiz-input-wc-key').value.trim() || undefined,
           consumerSecret: document.getElementById('wiz-input-wc-secret').value.trim() || undefined,
+        },
+        notifications: {
+          orderAlertsEnabled: wizAlertsEnabled,
+          alertEmail: wizAlertEmail
         }
       };
       await submitConfigUpdates(payload, '¡Configuración completada con éxito!');
+      localStorage.setItem('bentian_onboarding_completed', 'true');
       closeWizardModal();
       switchTab('overview');
       triggerManualSync();
+
+      if (typeof startSpotlightTour === 'function') {
+        setTimeout(function() {
+          startSpotlightTour();
+        }, 500);
+      }
     }
 `;

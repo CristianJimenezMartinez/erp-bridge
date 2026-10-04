@@ -14,8 +14,9 @@ export function renderWizardModal(): string {
         <div class="wizard-steps-bar">
           <div id="w-step-1" class="wizard-step-item active">1. Licencia</div>
           <div id="w-step-2" class="wizard-step-item">2. Factusol</div>
-          <div id="w-step-3" class="wizard-step-item">3. Tu Canal Web</div>
-          <div id="w-step-4" class="wizard-step-item">4. ¡Listo!</div>
+          <div id="w-step-3" class="wizard-step-item">3. Tienda Web</div>
+          <div id="w-step-4" class="wizard-step-item">4. Avisos por Email</div>
+          <div id="w-step-5" class="wizard-step-item">5. ¡Listo!</div>
         </div>
 
         <!-- PASO 1: LICENCIA -->
@@ -185,8 +186,48 @@ export function renderWizardModal(): string {
           </div>
         </div>
 
-        <!-- PASO 4: ¡LISTO! -->
+        <!-- PASO 4: AVISOS DE PEDIDOS POR EMAIL -->
         <div id="wizard-pane-4" style="display: none;">
+          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 4: Avisos de Nuevos Pedidos por Email</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Recibe un correo corporativo automático con el desglose contable cada vez que un cliente compra en la web y el pedido entra en Factusol.</p>
+
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="wiz-check-alerts-enabled" checked style="width: 18px; height: 18px; accent-color: #6366f1; cursor: pointer;">
+              <span style="font-weight: 600; font-size: 13.5px; color: #fff;">Activar alertas de nuevos pedidos por correo electrónico</span>
+            </label>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px; padding-left: 28px;">
+              Te notificaremos al instante con los datos del comprador, líneas de artículos, base imponible e IVA desglosado.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="wiz-input-notif-email">Dirección de correo para recibir los avisos:</label>
+            <div class="input-with-button">
+              <input type="text" id="wiz-input-notif-email" class="form-control" placeholder="pedidos@tuempresa.com, almacen@tuempresa.com">
+              <button onclick="wizTestOrderEmail()" id="wiz-btn-test-email" type="button" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                <span>Probar Envío de Email</span>
+              </button>
+            </div>
+            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Puedes indicar varios destinatarios separándolos por comas.</div>
+            <div id="wiz-email-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <!-- Card pedagógico relay DKIM -->
+          <div style="padding: 12px 14px; background: rgba(30, 27, 75, 0.45); border: 1px solid rgba(129, 140, 248, 0.28); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
+            <div style="font-weight: 700; color: #a5b4fc; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span>Seguridad y Entrega Garantizada (Bentian Relay)</span>
+            </div>
+            <p style="margin: 0; color: #cbd5e1; font-size: 11.5px; line-height: 1.45;">
+              El conector despacha los correos con firma criptográfica DKIM verificada a través del relay seguro de Bentian. No necesitas configurar servidores SMTP ni contraseñas a menos que quieras usar un correo corporativo propio.
+            </p>
+          </div>
+        </div>
+
+        <!-- PASO 5: ¡LISTO! -->
+        <div id="wizard-pane-5" style="display: none;">
           <div style="text-align: center; padding: 20px 0;">
             <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--emerald);">
               <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>

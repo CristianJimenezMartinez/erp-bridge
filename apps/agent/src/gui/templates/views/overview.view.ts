@@ -182,7 +182,7 @@ export function renderOverviewTab(): string {
         </div>
 
         <!-- Terminal de Eventos Recientes -->
-        <div class="form-section">
+        <div class="form-section" id="overview-recent-activity-section">
           <div class="section-header">
             <div>
               <div class="section-title">Actividad Reciente del Sistema</div>

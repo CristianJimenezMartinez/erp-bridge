@@ -374,4 +374,45 @@ export const dashboardStyles = `
       gap: 8px;
       flex-wrap: wrap;
     }
+
+    /* Spotlight Tour */
+    #bentian-spotlight-frame {
+      position: fixed;
+      z-index: 9998;
+      border-radius: 12px;
+      box-shadow: 0 0 0 9999px rgba(5, 7, 13, 0.82), 0 0 35px rgba(99, 102, 241, 0.7);
+      border: 2px solid #818cf8;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #bentian-spotlight-card {
+      position: fixed;
+      z-index: 9999;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      background: #14141d;
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(99, 102, 241, 0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: #fff;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+      animation: spotlightPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes spotlightPop {
+      from { opacity: 0; transform: scale(0.94) translateY(6px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .spotlight-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.16);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
 `;
