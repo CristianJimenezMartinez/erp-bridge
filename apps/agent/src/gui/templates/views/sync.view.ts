@@ -101,7 +101,7 @@ export function renderSyncTab(): string {
           <div class="section-header">
             <div>
               <div class="section-title" style="color: #34d399;">📧 Avisos de Nuevos Pedidos por Email</div>
-              <div class="section-desc">Recibe un correo electrónico automático cada vez que un cliente compra en la web y el pedido entra en Factusol (Serie W).</div>
+              <div class="section-desc">Recibe un correo electrónico automático cada vez que un cliente compra en la web y el pedido entra en Factusol (con su serie y número asignado).</div>
             </div>
           </div>
 
