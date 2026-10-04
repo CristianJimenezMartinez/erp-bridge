@@ -107,28 +107,34 @@ Start-Process -FilePath "$env:USERPROFILE\Downloads\Bentian-Setup-*.exe"
 
 ---
 
-## 3. Lista Obligatoria de Exclusiones en Antivirus y EDRs
+## 3. Exclusiones en Antivirus y EDRs: Principio de Mínimo Privilegio
 
-### 3.1 ¿Por Qué son Críticas las Exclusiones en el Agente Bentian?
-Bentian ERP Bridge trabaja directamente con el motor de base de datos relacional de Factusol:
-* **Lectura/Escritura Concurrente OLEDB:** Emplea el controlador Microsoft Access Database Engine (ACE/Jet OLEDB) a través del subproceso `cscript.exe` / `adodb.js`.
-* **Archivos `.accdb` y Cerrojos `.laccdb` en Red Local o NAS:** Monitoriza en tiempo real los cambios en la base de datos de Factusol mediante *FileSystemWatcher* y sondeos *delta*. Si un antivirus analiza el fichero `.accdb` o el cerrojo de concurrencia `.laccdb` en cada escritura, provocará errores críticos `3045: Could not use ''; file already in use` o congelación de Factusol en caja física.
-* **Auto-actualizador Atómico (`UpdateSwapper`):** Descarga binarios en `%TEMP%\bentian-updates\` y realiza reemplazos atómicos mediante `fs.renameSync`. Las suites heurísticas que bloquean la ejecución desde `%TEMP%` impedirán la actualización silenciosa del agente.
+### 3.1 Advertencia de Seguridad EDR / IT y Justificación Técnica
+> **AVISO DE SEGURIDAD PARA ADMINISTRADORES IT Y EDR:**
+> Queda **terminantemente desaconsejado** aplicar exclusiones globales a ejecutables del sistema operativo como `cscript.exe` o comodines globales de extensión como `*.accdb` en todo el disco duro. Estas prácticas son rechazadas por administradores de sistemas y suites EDR corporativas debido a que abren vectores de evasión para malware ajeno.
+>
+> Bentian ERP Bridge se configura bajo el **Principio de Mínimo Privilegio**: las excepciones se acotan exclusivamente a las rutas de instalación de sus propios binarios y al directorio concreto donde reside la base de datos de la empresa de Factusol.
+
+* **Exclusión acotada al directorio de datos:** Factusol emplea el motor relacional Microsoft Access Database Engine (ACE/Jet OLEDB). Si el antivirus intercepta en tiempo real cada microescritura en el fichero de datos o en el archivo de cerrojo `.laccdb`, Windows provocará errores críticos `3045: Could not use ''; file already in use` o bloqueos en caja física. Excluir el análisis en tiempo real **únicamente en la carpeta de la empresa** (ej. `C:\Factusol\Datos\FS01\`) resuelve el problema sin comprometer la seguridad global del puesto de trabajo.
+* **Auto-actualizador Atómico (`UpdateSwapper`):** Descarga binarios en `%TEMP%\bentian-updates\` y realiza reemplazos atómicos mediante `fs.renameSync`.
+* **Arquitectura de Red Saliente HTTPS (Puerto 443):**
+  - **Tráfico 100% Saliente:** Bentian se comunica exclusivamente vía peticiones HTTPS salientes estándar (puerto TCP 443) hacia el endpoint de la tienda web (WooCommerce, PrestaShop, Shopify) y hacia la API central (`bridge.cristianjm.com`).
+  - **Cero Puertos Entrantes:** El agente no abre ni expone ningún puerto hacia el exterior o la red local. No requiere reglas NAT ni aperturas en el firewall perimetral.
+  - **Aislamiento Local:** El servidor web de administración escucha estrictamente en el bucle invertido local `127.0.0.1:39281`, inaccesible desde otros hosts de la red.
 
 ---
 
-### 3.2 Lista Exacta de Carpetas, Archivos y Procesos a Excluir
+### 3.2 Tabla de Exclusiones de Mínimo Privilegio
 
-| Elemento | Ruta Exacta / Nombre de Proceso | Tipo de Exclusión |
-| :--- | :--- | :--- |
-| **Configuración y Base Local** | `%APPDATA%\Bentian Agent\` *(o `C:\Users\*\AppData\Roaming\Bentian Agent\`)* | **Carpeta / Directorio** |
-| **Logs de Operación** | `%APPDATA%\Bentian Agent\logs\` | **Carpeta / Directorio** |
-| **Instalación Principal** | `C:\Program Files\Bentian Agent\` | **Carpeta / Directorio** |
-| **Proceso Agente (Daemon)** | `C:\Program Files\Bentian Agent\BentianAgent.exe` | **Proceso / Aplicación** |
-| **Proceso Bandeja del Sistema** | `C:\Program Files\Bentian Agent\BentianTray.exe` | **Proceso / Aplicación** |
-| **Intérprete OLEDB Factusol** | `cscript.exe` *(invocado por `adodb.js`)* | **Proceso / Aplicación** |
-| **Directorio de Actualizaciones** | `%TEMP%\bentian-updates\` | **Carpeta / Directorio** |
-| **Base de Datos y Cerrojo Factusol** | Extensión `*.accdb` y `*.laccdb` en carpeta de datos local o de red (`\\SERVIDOR\Datos\*`) | **Extensiones `.accdb` / `.laccdb` y Carpeta** |
+| Elemento | Ruta Exacta / Ámbito | Tipo de Exclusión | Criterio de Seguridad EDR |
+| :--- | :--- | :--- | :--- |
+| **Configuración Local** | `%APPDATA%\Bentian Agent\` *(o `C:\Users\*\AppData\Roaming\Bentian Agent\`)* | **Carpeta / Directorio** | Persistencia local de configuración y claves seguras. |
+| **Logs de Operación** | `%APPDATA%\Bentian Agent\logs\` | **Carpeta / Directorio** | Trazas rotativas de diagnóstico. |
+| **Instalación Sistema** | `C:\Program Files\Bentian Agent\` | **Carpeta / Directorio** | Binarios oficiales `BentianAgent.exe` y `BentianTray.exe`. |
+| **Instalación Usuario** | `%LOCALAPPDATA%\Bentian Agent\` | **Carpeta / Directorio** | Binarios en instalaciones por usuario sin elevación UAC. |
+| **Directorio de Updates** | `%TEMP%\bentian-updates\` | **Carpeta / Directorio** | Directorio transitorio de actualización atómica. |
+| **Directorio de Factusol** | `C:\Factusol\Datos\FS01\` *(o `\\SERVIDOR\Datos\FS01\`)* | **Carpeta Específica** | **Únicamente la carpeta de la empresa**. Prohibido `*.accdb` global. |
+| **Subproceso OLEDB** | Regla condicional EDR (`Parent=BentianAgent.exe`) | **Regla EDR / IOA** | Autoriza invocación de `adodb.js` solo desde el agente. |
 
 ---
 
@@ -137,27 +143,31 @@ Bentian ERP Bridge trabaja directamente con el motor de base de datos relacional
 ### 4.1 Microsoft Defender Antivirus (Seguridad de Windows)
 
 #### Script de Automatización PowerShell (Ejecutar como Administrador):
-Abre una consola de **PowerShell como Administrador** y pega el siguiente bloque:
+Abre una consola de **PowerShell como Administrador** y ejecuta el siguiente script ajustado a Mínimo Privilegio:
 
 ```powershell
-Write-Host "Configurando exclusiones de Bentian ERP Bridge en Microsoft Defender..." -ForegroundColor Cyan
+Write-Host "Configurando exclusiones de Bentian ERP Bridge (Principio de Mínimo Privilegio)..." -ForegroundColor Cyan
 
-# 1. Excluir directorios del Agente y registros
+# 1. Excluir directorios específicos de Bentian Agent
 Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent"
 Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent\logs"
 Add-MpPreference -ExclusionPath "C:\Program Files\Bentian Agent"
+Add-MpPreference -ExclusionPath "$env:LOCALAPPDATA\Bentian Agent"
 Add-MpPreference -ExclusionPath "$env:TEMP\bentian-updates"
 
-# 2. Excluir procesos ejecutables del agente y motor OLEDB
-Add-MpPreference -ExclusionProcess "BentianAgent.exe"
-Add-MpPreference -ExclusionProcess "BentianTray.exe"
-Add-MpPreference -ExclusionProcess "cscript.exe"
+# 2. Excluir procesos ejecutables de Bentian por ruta específica
+Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianAgent.exe"
+Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianTray.exe"
+Add-MpPreference -ExclusionProcess "$env:LOCALAPPDATA\Bentian Agent\BentianAgent.exe"
+Add-MpPreference -ExclusionProcess "$env:LOCALAPPDATA\Bentian Agent\BentianTray.exe"
 
-# 3. Excluir extensiones de base de datos y archivos de cerrojo Factusol
-Add-MpPreference -ExclusionExtension ".accdb"
-Add-MpPreference -ExclusionExtension ".laccdb"
+# 3. Excluir ÚNICAMENTE el directorio de datos de Factusol (ajusta a la ruta real de tu empresa)
+# NOTA: NUNCA añadir exclusión global de la extensión *.accdb ni de cscript.exe
+Add-MpPreference -ExclusionPath "C:\Factusol\Datos\FS01"
+# Si la base de datos se encuentra en un servidor o NAS en red local:
+# Add-MpPreference -ExclusionPath "\\SERVIDOR\Datos\FS01"
 
-Write-Host "✓ Exclusiones aplicadas con éxito en Windows Defender." -ForegroundColor Green
+Write-Host "✓ Exclusiones de Mínimo Privilegio aplicadas con éxito en Windows Defender." -ForegroundColor Green
 ```
 
 #### Comandos de Verificación y Auditoría:
@@ -168,9 +178,6 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
 
 # Inspeccionar procesos excluidos
 Get-MpPreference | Select-Object -ExpandProperty ExclusionProcess
-
-# Inspeccionar extensiones excluidas
-Get-MpPreference | Select-Object -ExpandProperty ExclusionExtension
 ```
 
 #### Opción Manual vía Interfaz Gráfica:
@@ -181,16 +188,12 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionExtension
 5. Pulsa **Agregar una exclusión**:
    - Selecciona **Carpeta** y añade:
      - `C:\Program Files\Bentian Agent`
+     - `%LOCALAPPDATA%\Bentian Agent`
      - `%APPDATA%\Bentian Agent`
-   - Selecciona **Proceso** y escribe:
-     - `BentianAgent.exe`
-     - `BentianTray.exe`
-     - `cscript.exe`
-   - Selecciona **Tipo de archivo** y escribe:
-     - `.accdb`
-     - `.laccdb`
-
----
+     - La carpeta de datos de Factusol (ej. `C:\Factusol\Datos\FS01`)
+   - Selecciona **Proceso** y escribe la ruta completa de:
+     - `C:\Program Files\Bentian Agent\BentianAgent.exe`
+     - `C:\Program Files\Bentian Agent\BentianTray.exe`
 
 ---
 
@@ -200,23 +203,16 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionExtension
 2. Entra en **Configuración de seguridad** -> **Exclusiones y aplicaciones de confianza**.
 3. En la sección *Exclusiones*, haz clic en **Administrar exclusiones** -> **Agregar**:
    - `C:\Program Files\Bentian Agent\*`
+   - `%LOCALAPPDATA%\Bentian Agent\*`
    - `%APPDATA%\Bentian Agent\*`
-   - `*.accdb` y `*.laccdb` (en la ruta de Factusol).
-   - Componentes a marcar: *Antivirus de archivos, Control de aplicaciones, Prevención de intrusiones (HIPS)*.
+   - Carpeta específica de datos de Factusol (ej: `C:\Factusol\Datos\FS01\*` o `\\SERVIDOR\Datos\FS01\*`). *(NUNCA exclusión global de *.accdb)*.
 4. En la sección **Aplicaciones de confianza**, añade:
    - `C:\Program Files\Bentian Agent\BentianAgent.exe`
    - `C:\Program Files\Bentian Agent\BentianTray.exe`
-   - `C:\Windows\System32\cscript.exe` y `C:\Windows\SysWOW64\cscript.exe` *(vital para que el subproceso OLEDB `adodb.js` no sea interceptado por el motor de prevención de exploits)*.
    - Parámetros de confianza a activar:
      - [x] *"No supervisar la actividad de la aplicación"*
      - [x] *"No heredar restricciones del proceso principal"*
-     - [x] *"Permitir interactuar con la interfaz del sistema"*
 5. Haz clic en **Guardar**.
-6. *(Administradores de Red vía CLI - Kaspersky Endpoint Security):*
-   ```cmd
-   kescli --manage-exclusions --add --path "C:\Program Files\Bentian Agent\*"
-   kescli --manage-exclusions --add --path "%APPDATA%\Bentian Agent\*"
-   ```
 
 ---
 
@@ -224,22 +220,19 @@ Get-MpPreference | Select-Object -ExpandProperty ExclusionExtension
 
 1. Abre el panel de Bitdefender y pulsa en la sección **Protección**.
 2. En el módulo **Antivirus**, haz clic en **Abrir** / **Ajustes** -> pestaña **Exclusiones**:
-   - Haz clic en **Añadir exclusión**: selecciona Carpeta y añade `C:\Program Files\Bentian Agent` y `%APPDATA%\Bentian Agent`. Asegúrate de que la casilla *"Ambos (En acceso y Bajo demanda)"* esté seleccionada.
-   - Añadir exclusión por extensión: `.accdb` y `.laccdb`.
+   - Haz clic en **Añadir exclusión**: selecciona Carpeta y añade `C:\Program Files\Bentian Agent`, `%LOCALAPPDATA%\Bentian Agent`, `%APPDATA%\Bentian Agent` y la carpeta de datos de Factusol (`C:\Factusol\Datos\FS01\`). Marca *"Ambos (En acceso y Bajo demanda)"*.
 3. En **Defensa contra amenazas avanzadas (Advanced Threat Defense - ATD)**:
-   - Añade a la lista de excepciones `BentianAgent.exe`, `BentianTray.exe` y `cscript.exe`. Esto evita que el monitor heurístico de memoria bloquee la comunicación OLEDB de Factusol.
+   - Añade a la lista de excepciones por ruta absoluta `BentianAgent.exe` y `BentianTray.exe`.
 4. En entornos corporativos gestionados por **Bitdefender GravityZone Console**:
    - Dirígete a **Policies** -> tu política activa -> **Antimalware** -> **Exclusions**:
-     - *Folder Exclusion:* `C:\Program Files\Bentian Agent\` y `*:\Users\*\AppData\Roaming\Bentian Agent\*`.
+     - *Folder Exclusion:* `C:\Program Files\Bentian Agent\`, `%LOCALAPPDATA%\Bentian Agent\` y la carpeta de datos de Factusol.
      - *Process Exclusion:* `BentianAgent.exe` y `BentianTray.exe`.
-     - *Extension Exclusion:* `accdb` y `laccdb`.
-   - En **Advanced Anti-Exploit**: desmarcar intercepción sobre scripts de base de datos en hosts autorizados de Factusol.
 
 ---
 
 ### 4.4 CrowdStrike Falcon EDR
 
-En entornos corporativos donde los puestos de facturación y servidores están controlados por **Falcon Sensor**, el motor heurístico de aprendizaje automático suele categorizar la invocación de `cscript.exe` ejecutando `adodb.js` como una técnica sospechosa de *Living off the Land (LotL)*. Para garantizar la operativa ininterrumpida sin comprometer la seguridad del endpoint:
+En entornos corporativos donde los puestos de facturación y servidores están controlados por **Falcon Sensor**, el motor heurístico puede categorizar la invocación de `cscript.exe` ejecutando `adodb.js` como una técnica de *Living off the Land (LotL)*. Para garantizar la operativa ininterrumpida respetando el **Principio de Mínimo Privilegio**:
 
 1. Inicia sesión en la **Falcon Console** con rol de Administrador de Políticas.
 2. Dirígete a **Configuration** -> **Prevention Policies**:
@@ -249,42 +242,40 @@ En entornos corporativos donde los puestos de facturación y servidores están c
      - Añadir exclusión por hash **SHA-256** del binario publicado en cada release de Bentian ERP Bridge.
    - **Path Exclusions:**
      - `\Device\HarddiskVolume*\Program Files\Bentian Agent\*`
+     - `\Device\HarddiskVolume*\Users\*\AppData\Local\Bentian Agent\*`
      - `\Device\HarddiskVolume*\Users\*\AppData\Roaming\Bentian Agent\*`
-     - `\Device\HarddiskVolume*\*\*.accdb`
-     - `\Device\HarddiskVolume*\*\*.laccdb`
+     - `\Device\HarddiskVolume*\Factusol\Datos\FS01\*` (Directorio específico de la empresa)
    - **Process Exclusions:**
      - Proceso padre: `BentianAgent.exe`
      - Proceso secundario: `BentianTray.exe`
 4. **Regla de Exclusión de Indicadores de Ataque (Custom IOA Exclusion):**
-   - Para silenciar la alerta LotL sobre el motor OLEDB:
+   - Para silenciar la alerta LotL sobre el motor OLEDB acotándola estrictamente al agente:
      - **Parent Image Filename:** `.*\\BentianAgent\.exe`
      - **Image Filename:** `.*\\cscript\.exe`
      - **Command Line:** `.*adodb\.js.*`
      - **Action:** Allow / No Alert.
-5. Guarda la política; el sensor actualizará los puestos en menos de 60 segundos.
+5. Guarda la política; el sensor actualizará los puestos en menos de 60 segundos manteniendo protegido el resto del sistema.
 
 ---
 
 ### 4.5 Avast Antivirus & AVG AntiVirus (Motor Gen Digital)
 
-Avast y AVG comparten el mismo motor de detección y sistema de escudos en tiempo real (*File Shield* y *Behavior Shield / Escudo de Comportamiento*). Si no se configuran excepciones, el análisis en tiempo real puede bloquear las llamadas OLEDB o aislar el actualizador atómico en `%TEMP%`.
+Avast y AVG comparten el mismo motor de detección y sistema de escudos en tiempo real (*File Shield* y *Behavior Shield*). Configura excepciones por ruta específica para evitar bloqueos del conector:
 
 1. Abre la interfaz principal de **Avast** o **AVG**.
-2. Haz clic en **Menú** (esquina superior derecha, icono de tres líneas o engranaje) -> **Opciones** (o **Configuración**).
+2. Haz clic en **Menú** (esquina superior derecha) -> **Opciones** (o **Configuración**).
 3. En la pestaña **General**, selecciona la subsección **Excepciones**.
-4. Haz clic en el botón verde **Añadir excepción** y agrega una por una las siguientes rutas:
+4. Haz clic en el botón verde **Añadir excepción** y agrega una por una las siguientes rutas específicas:
    - `C:\Program Files\Bentian Agent\*`
+   - `%LOCALAPPDATA%\Bentian Agent\*`
    - `%APPDATA%\Bentian Agent\*`
    - `%TEMP%\bentian-updates\*`
-   - Ruta completa de la base de datos de Factusol (ej. `C:\Factusol\Datos\*` o `\\SERVIDOR\Datos\*`).
-5. Pulsa en **Añadir excepción avanzada** -> **Filtros / Extensiones** y añade:
-   - `*.accdb`
-   - `*.laccdb`
-6. En el menú lateral, dirígete a **Protección** -> **Escudo contra ransomware** (o *Ransomware Shield*):
+   - Ruta completa de la base de datos de Factusol (ej. `C:\Factusol\Datos\FS01\*` o `\\SERVIDOR\Datos\FS01\*`).
+5. En el menú lateral, dirígete a **Protección** -> **Escudo contra ransomware**:
    - Ve a **Aplicaciones bloqueadas y permitidas**.
-   - Si `BentianAgent.exe` o `cscript.exe` aparecen en "Bloqueadas", haz clic en los tres puntos y selecciona **Permitir**.
-   - Haz clic en **Permitir aplicación** e incluye explícitamente `C:\Program Files\Bentian Agent\BentianAgent.exe`.
-7. Reinicia el Agente de Bentian desde el icono de la bandeja del sistema.
+   - Si `BentianAgent.exe` o `BentianTray.exe` aparecen bloqueados, haz clic en los tres puntos y selecciona **Permitir**.
+   - Haz clic en **Permitir aplicación** e incluye explícitamente `C:\Program Files\Bentian Agent\BentianAgent.exe` y `%LOCALAPPDATA%\Bentian Agent\BentianAgent.exe`.
+6. Reinicia el Agente de Bentian desde el icono de la bandeja del sistema.
 
 ---
 

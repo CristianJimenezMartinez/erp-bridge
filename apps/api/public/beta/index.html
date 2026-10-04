@@ -267,12 +267,12 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
-              <span id="founderSpotsText">Cupo Fundador: Máximo 25 plazas (139€/año)</span>
+              <span id="founderSpotsText">Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año)</span>
             </div>
           </div>
           <div class="space-y-4 text-sm text-zinc-300">
             <p><strong class="text-white">✅ Gratuita durante la fase de pruebas:</strong> La beta es totalmente funcional y no requiere tarjeta de crédito ni pago inicial.</p>
-            <p><strong class="text-white">✅ Descuento Fundador para siempre (Cupo estricto 25 claves):</strong> Cuando finalice la beta, el precio oficial del conector será de 199€/año. Los primeros participantes tendrán reservado el <strong>Plan Fundador con un 30% de descuento vitalicio (139€/año para siempre) limitado estrictamente a las primeras 25 empresas</strong>. Agotadas las 25 plazas, el sistema bloqueará automáticamente la tarifa promocional y regirá el precio oficial estándar de 199€/año.</p>
+            <p><strong class="text-white">✅ Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año):</strong> Cuando finalice la beta pública de 60 días, el precio oficial del conector será de 199 €/año. Los primeros participantes tendrán reservada su plaza en la <strong>Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año)</strong>. Agotadas las 25 plazas, el sistema bloqueará automáticamente la tarifa promocional y regirá el precio oficial estándar de 199 €/año.</p>
             <p><strong class="text-white">🤝 Soporte:</strong> Atención por email con respuesta en 48-72h laborales. <em>(Por favor, comprende que no ofrecemos asistencia telefónica para no saturar nuestro desarrollo).</em></p>
           </div>
         </div>
@@ -292,7 +292,7 @@
             </div>
             <div class="p-5 rounded-xl bg-zinc-900/30 border border-white/[0.03]">
               <h4 class="font-semibold text-white mb-2">¿Es seguro para mis datos?</h4>
-              <p class="text-sm text-zinc-400">Totalmente. El agente funciona 100% en local, no enviamos tus datos de facturación a ningún servidor externo. Solo se comunica entre tu PC y tu tienda online.</p>
+              <p class="text-sm text-zinc-400 leading-relaxed">Totalmente. Operamos con <strong>Arquitectura Local-First:</strong> Tu base de datos de Factusol (.accdb) nunca se sube a servidores ajenos ni se replica en la nube de Bentian. La sincronización se realiza punto a punto directamente entre tu equipo y tu tienda online mediante HTTPS / TLS 1.3 sin intermediarios ni bases de datos de terceros intermediarias.</p>
             </div>
           </div>
         </div>
@@ -396,9 +396,9 @@
           const textEl = document.getElementById('founderSpotsText');
           if (textEl && info) {
             if (info.remainingSpots > 0) {
-              textEl.textContent = `Cupo Fundador: ${info.remainingSpots} de ${info.totalSpots} plazas disponibles (139€/año)`;
+              textEl.textContent = `Fase 1: ${info.remainingSpots} de ${info.totalSpots} plazas de Fundador disponibles (139 €/año en lugar de 199 €/año)`;
             } else {
-              textEl.textContent = `Cupo Fundador cubierto (25/25). Tarifa oficial: 199€/año`;
+              textEl.textContent = `Fase 1 completada: 25/25 plazas de Fundador cubiertas. Tarifa oficial: 199 €/año`;
             }
           }
         }

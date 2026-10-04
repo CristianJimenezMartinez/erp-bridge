@@ -258,6 +258,9 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
   });
+  app.get('/docs/matriz-compatibilidad-factusol', (_req, res) => {
+    res.redirect(301, '/docs/matriz-compatibilidad-factusol/');
+  });
   app.get('/guias/conectar-factusol-local-con-woocommerce', (_req, res) => {
     res.redirect(301, '/guias/conectar-factusol-local-con-woocommerce/');
   });
