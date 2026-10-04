@@ -1,0 +1,278 @@
+<!-- ========================================================================= -->
+<!-- 5B / 07. SECCIÓN SALVAGUARDAS OPERATIVAS: RESILIENCIA EN EL MUNDO REAL     -->
+<!-- ========================================================================= -->
+<section class="py-24 px-6 border-b border-white/[0.06] bg-[#09090b] scroll-mt-24" id="salvaguardas">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- Cabecera de Sección -->
+    <div class="max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/25 bg-emerald-950/40 text-emerald-400 text-xs font-mono uppercase tracking-widest mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Resiliencia de Ingeniería & Negocio</span>
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+        Diseñado para los fallos que otros conectores ignoran.
+      </h2>
+      <p class="mt-5 text-zinc-400 text-base sm:text-lg leading-relaxed">
+        El verdadero valor de Bentian no es mover datos: es resolver la parte fea y peligrosa del día a día (caídas de red, números contables, bloqueos OLEDB y céntimos de IVA).
+      </p>
+    </div>
+
+    <!-- Las 3 Grandes Promesas Comerciales -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-16">
+      
+      <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-emerald-500/20 relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 font-mono font-bold text-sm">
+          01
+        </div>
+        <div class="text-xs font-mono text-emerald-400 uppercase tracking-wider">Promesa de Disponibilidad</div>
+        <h3 class="text-lg font-bold text-white mt-1">Tus Pedidos Jamás se Pierden</h3>
+        <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+          Tolerancia total a fallos de red o cortes eléctricos mediante arquitectura persistente Store-and-Forward. Tu tienda sigue vendiendo con el almacén cerrado o sin internet.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-indigo-500/20 relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-28 h-28 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
+          02
+        </div>
+        <div class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Promesa de Precisión</div>
+        <h3 class="text-lg font-bold text-white mt-1">Cero Descuadres Contables e IVA</h3>
+        <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+          Desglose matemático centesimal de bases y cuotas de IVA + Recargo de Equivalencia. La factura legal oficial se genera en Factusol bajo su motor certificado Veri*Factu.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-purple-500/20 relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-28 h-28 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4 font-mono font-bold text-sm">
+          03
+        </div>
+        <div class="text-xs font-mono text-purple-400 uppercase tracking-wider">Promesa de Operatividad</div>
+        <h3 class="text-lg font-bold text-white mt-1">Cero Fricción en el Día a Día</h3>
+        <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+          Pedidos directos en la Bandeja Principal (Serie 1), sin bloqueos de archivo .ldb mientras se factura en mostrador y con resolución guiada de incidencias en 1 clic.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Las 8 Salvaguardas Operativas -->
+    <div class="border-t border-white/[0.08] pt-12">
+      <div class="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-8">
+        8 Salvaguardas de Ingeniería Integradas en el Agente
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- 1. Pedidos protegidos offline -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-emerald-400 transition font-bold">01 / STORE-AND-FORWARD</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-emerald-300 transition">Pedidos Protegidos Offline</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Cola de mensajería persistente Store-and-Forward en base de datos local SQLite. Retiene las ventas aunque el PC del almacén esté apagado o se corte la fibra óptica de la oficina. Al reconectar, se vuelcan cronológicamente sin duplicidades.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero ventas perdidas</strong>
+          </div>
+        </div>
+
+        <!-- 2. Rutas NAS preservadas -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-emerald-400 transition font-bold">02 / ANTI-WIPING NAS</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-emerald-300 transition">Rutas NAS Preservadas</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Una caída temporal de red local, desconexión de unidad mapeada (Z:\) o retardo SMB jamás borra tu configuración en <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">%APPDATA%</code>. El agente entra en modo espera segura y reintenta sin tocar tus rutas.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Cero reconfiguraciones</strong>
+          </div>
+        </div>
+
+        <!-- 3. IVA y céntimos calculados con precisión -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-indigo-400 transition font-bold">03 / FISCALIDAD EXACTA</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-indigo-300 transition">IVA y Céntimos con Precisión</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Desglose exacto de bases y cuotas (ej: 89,00 € = 73,55 € base + 15,45 € IVA 21%). Blindaje anti-doble IVA: evita que Factusol vuelva a sumar el impuesto sobre importes brutos al convertir el pedido en factura oficial.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cuadre contable al céntimo</strong>
+          </div>
+        </div>
+
+        <!-- 4. Pedidos directos en Bandeja Principal (Serie 1) -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-indigo-400 transition font-bold">04 / FLUJO DE TRABAJO</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-indigo-300 transition">Bandeja Principal (Serie 1)</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Los pedidos web entran directamente en la Serie 1 (o la serie de tu elección) en la tabla <code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">F_PCL</code>. Llegan exactamente a la pantalla donde tu equipo de almacén y expediciones trabaja cada día, sin filtros raros ni carpetas ocultas.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Expedición sin retrasos</strong>
+          </div>
+        </div>
+
+        <!-- 5. Errores explicados con resolución en 1 clic -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-purple-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-purple-400 transition font-bold">05 / AUTO-DIAGNÓSTICO</span>
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-purple-300 transition">Errores en 1 Clic (22 Reglas)</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Catálogo inteligente de 22 reglas amigables que traducen códigos crípticos OLEDB (como 0x80004005, bloqueo .ldb o credenciales REST erróneas) en explicaciones en castellano con un botón que te lleva directo al campo a corregir.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Sin llamadas a soporte</strong>
+          </div>
+        </div>
+
+        <!-- 6. Alertas transaccionales por email -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-purple-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-purple-400 transition font-bold">06 / NOTIFICACIONES</span>
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-purple-300 transition">Alertas Email con DKIM</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Confirmaciones corporativas inmediatas enviadas por SMTP propio o relay central con firma criptográfica DKIM. Notifican el número correlativo oficial generado por Factusol al minuto de registrarse la venta.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-purple-400">Aviso inmediato a almacén</strong>
+          </div>
+        </div>
+
+        <!-- 7. Selector nativo de Windows (STA) -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-emerald-400 transition font-bold">07 / WINDOWS NATIVO</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-emerald-300 transition">Selector Nativo Windows (STA)</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Diálogo oficial de Windows (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">OpenFileDialog</code> STA) con primer plano forzado (<code class="text-zinc-300 bg-black/40 px-1 py-0.5 rounded">TopMost</code>). Permite seleccionar rutas de red UNC y archivos .accdb en milisegundos sin ventanas fantasma ni bloqueos en Microsoft Edge.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-emerald-400">Experiencia de escritorio real</strong>
+          </div>
+        </div>
+
+        <!-- 8. Compatibilidad universal -->
+        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-zinc-500 group-hover:text-indigo-400 transition font-bold">08 / CONECTIVIDAD</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-indigo-300 transition">Compatibilidad Universal</h4>
+            <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
+              Conexión nativa con WooCommerce REST API v3 y endpoint universal de alto rendimiento para tiendas personalizadas en servidores Plesk, arquitecturas Angular o backend PHP/MariaDB sin depender de plugins de terceros.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
+            <span class="text-zinc-500">Impacto:</span> <strong class="text-indigo-400">Cero ataduras tecnológicas</strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Comparativa Técnica: Store-and-Forward vs Conectores Síncronos Tradicionales -->
+    <div class="mt-14 p-8 rounded-3xl bg-[#121215] border border-white/[0.09] relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+        <div>
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Comparativa Arquitectónica</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white mt-1">
+            Por qué los conectores directos fallan donde Bentian triunfa
+          </h3>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+            Diferencias estructurales entre una llamada síncrona frágil y una cola persistente de grado industrial.
+          </p>
+        </div>
+        <div class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.08] text-xs font-mono text-zinc-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Arquitectura Asíncrona Garantizada</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        
+        <!-- Modelo Tradicional -->
+        <div class="p-5 rounded-xl bg-black/40 border border-red-500/20">
+          <div class="flex items-center gap-2 text-red-400 font-mono text-xs font-bold uppercase mb-3">
+            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+            Conectores Tradicionales (Llamada Síncrona Directa)
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-400">
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Pérdida en cortes de red:</strong> Si la fibra óptica parpadea durante la compra, la petición HTTP se pierde para siempre sin dejar rastro en el ERP.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Bloqueos de archivo .ldb:</strong> Intentan escribir en caliente mientras un operario factura en Factusol, provocando errores de colisión.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Dependencia de PC Encendido:</strong> Si el ordenador de oficina se apaga a las 19:00, las ventas de la noche quedan congeladas o huérfanas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Modelo Bentian -->
+        <div class="p-5 rounded-xl bg-emerald-950/20 border border-emerald-500/30">
+          <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold uppercase mb-3">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Bentian ERP Bridge (Arquitectura Store-and-Forward)
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Retención persistente en SQLite:</strong> Los eventos y pedidos se encolan de forma inmutable. Nada se pierde aunque el enlace caiga durante horas.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Microtransacciones Share Deny None:</strong> Inserciones OLEDB en &lt;15 ms que respetan el trabajo concurrente de los TPVs físicos sin bloquear Access.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Reconciliación automática al arranque:</strong> Al encender el equipo por la mañana, todos los pedidos nocturnos se descargan ordenados y numerados.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ========================================================================= -->

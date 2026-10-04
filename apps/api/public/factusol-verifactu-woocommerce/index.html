@@ -80,7 +80,7 @@
             "name": "¿Cómo resuelve Bentian ERP Bridge la exigencia de VeriFactu?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Bentian establece una arquitectura en la que WooCommerce actúa exclusivamente como pasarela de venta (capturando pedidos en F_PCL), y transfiere los datos a Factusol. Factusol, como software de facturación profesional homologado por la AEAT, es el encargado de generar la factura legal definitiva (F_FAC) con su QR y hash correspondiente."
+              "text": "Bentian actúa estrictamente sobre el flujo de pedidos comerciales (F_PCL) y no genera ni altera directamente los registros de facturación sujetos a la Ley Antifraude y Veri*Factu. De este modo, la inalterabilidad de la serie, el encadenamiento criptográfico (TRZFAC) y la remisión tributaria quedan delegados íntegramente en el motor certificado de Factusol, preservando la plena validez legal de tus facturas."
             }
           },
           {
@@ -207,6 +207,19 @@
       </div>
     </div>
 
+    <!-- Blindaje Legal Oficial Veri*Factu -->
+    <div class="border border-emerald-500/30 bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16 flex items-start gap-4 shadow-xl">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400 mt-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white mb-2">Blindaje Legal Sobrio y Defendible (Ley Antifraude & Veri*Factu)</h3>
+        <p class="text-sm text-zinc-300 leading-relaxed">
+          Bentian actúa estrictamente sobre el flujo de pedidos comerciales (F_PCL) y no genera ni altera directamente los registros de facturación sujetos a la Ley Antifraude y Veri*Factu. De este modo, la inalterabilidad de la serie, el encadenamiento criptográfico (TRZFAC) y la remisión tributaria quedan delegados íntegramente en el motor certificado de Factusol, preservando la plena validez legal de tus facturas.
+        </p>
+      </div>
+    </div>
+
     <!-- Tabla Comparativa -->
     <div class="border border-white/[0.08] rounded-2xl overflow-hidden bg-[#121215] mb-16 shadow-2xl">
       <div class="p-6 border-b border-white/[0.08] bg-white/[0.02]">
@@ -290,6 +303,16 @@
           </summary>
           <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
             Software DELSOL ha adaptado sus versiones recientes (Factusol 2024, 2025 y 2026) a los requisitos técnicos de la Agencia Tributaria. Bentian ERP Bridge es compatible con todas estas versiones tanto en mono-puesto como en red local.
+          </p>
+        </details>
+
+        <details class="group border border-emerald-500/20 bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Cómo garantiza Bentian la plena validez legal de las facturas frente a Veri*Factu?</span>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-300 mt-4 leading-relaxed">
+            Bentian actúa estrictamente sobre el flujo de pedidos comerciales (F_PCL) y no genera ni altera directamente los registros de facturación sujetos a la Ley Antifraude y Veri*Factu. De este modo, la inalterabilidad de la serie, el encadenamiento criptográfico (TRZFAC) y la remisión tributaria quedan delegados íntegramente en el motor certificado de Factusol, preservando la plena validez legal de tus facturas.
           </p>
         </details>
       </div>

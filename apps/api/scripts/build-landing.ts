@@ -13,6 +13,7 @@ const CONTENT_SECTIONS = [
   '03-problem.html',
   '04-solution.html',
   '05-philosophy.html',
+  '07-operational-safeguards.html',
   '06-pipeline.html',
   '07-data-in-flight.html',
   '08-agent.html',
