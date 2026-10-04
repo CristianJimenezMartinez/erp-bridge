@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Matriz Oficial de Compatibilidad de Factusol | Bentian ERP Bridge</title>
-  <meta name="description" content="Matriz técnica oficial de compatibilidad de Factusol (2018 a 2026): versiones de base de datos .accdb y .mdb, controladores OLEDB ACE, tablas leídas (F_ART, F_STO, F_TAR), escrituras transaccionales (F_PCL), cálculo de stock DISSTO y compatibilidad eCommerce.">
-  <meta name="keywords" content="matriz compatibilidad factusol, versiones factusol compatibles, factusol 2026, factusol 2025, tablas factusol f_art f_sto f_pcl, driver oledb factusol ace, conectar factusol woocommerce prestashop">
-  <meta name="author" content="Bentian ERP Bridge">
-  <link rel="canonical" href="https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/">
+  <title>Matriz de Compatibilidad Factusol (2018-2026) | Bentian ERP</title>
+  <meta name="description" content="Matriz técnica oficial: versiones compatibles de Factusol (2018 a 2026), formato .accdb, tablas F_ART, F_STO, F_TAR, F_PCL y cálculo de stock.">
+  <meta name="keywords" content="matriz compatibilidad factusol, tablas factusol, factusol 2026 2025 2024, formato accdb factusol, f_art f_pcl factusol">
+  <meta name="author" content="Cristian Jiménez Martínez">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/">
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
@@ -15,10 +15,10 @@
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Matriz Oficial de Compatibilidad de Factusol (2018–2026) | Bentian">
-  <meta property="og:description" content="Especificación técnica exhaustiva para informáticos y decisores B2B: versiones de Factusol, formatos de archivo, drivers OLEDB, tablas leídas y cálculo de stock seguro.">
+  <meta property="og:title" content="Matriz de Compatibilidad Factusol (2018-2026) | Bentian ERP">
+  <meta property="og:description" content="Matriz técnica oficial: versiones compatibles de Factusol (2018 a 2026), formato .accdb, tablas F_ART, F_STO, F_TAR, F_PCL y cálculo de stock.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -30,9 +30,9 @@
     "@graph": [
       {
         "@type": "TechArticle",
-        "@id": "https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/#article",
-        "headline": "Matriz Oficial de Compatibilidad de Factusol (2018 a 2026) para Bentian ERP Bridge",
-        "description": "Documentación técnica detallada sobre las versiones de Factusol compatibles, controladores de base de datos ACE OLEDB, tablas relacionales leídas y escritas, modos de cálculo de stock disponible (DISSTO) y soporte eCommerce.",
+        "@id": "https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/#article",
+        "headline": "Matriz Oficial de Compatibilidad de Factusol (2018–2026)",
+        "description": "Matriz técnica oficial: versiones compatibles de Factusol (2018 a 2026), formato .accdb, tablas F_ART, F_STO, F_TAR, F_PCL y cálculo de stock.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -49,7 +49,7 @@
           }
         },
         "datePublished": "2026-10-04T20:00:00+02:00",
-        "dateModified": "2026-10-04T20:00:00+02:00"
+        "dateModified": "2026-10-05T00:00:00+02:00"
       },
       {
         "@type": "BreadcrumbList",
@@ -69,8 +69,14 @@
           {
             "@type": "ListItem",
             "position": 3,
-            "name": "Matriz de Compatibilidad Factusol",
-            "item": "https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/"
+            "name": "Factusol ERP",
+            "item": "https://bridge.cristianjm.com/docs/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Matriz Oficial de Compatibilidad de Factusol (2018–2026)",
+            "item": "https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/"
           }
         ]
       }
@@ -78,571 +84,585 @@
   }
   </script>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+<body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
-  <!-- Navbar -->
-  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
-    <div class="max-w-5xl mx-auto flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
-        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
-      </a>
+  
+    <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <a href="/docs/" class="text-sm text-zinc-400 hover:text-white transition">Todas las Guías</a>
-        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20 flex items-center gap-1.5">
-          <span>Descargar Agente</span>
-          <span class="text-[10px] bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200" data-app-version>v0.3.6</span>
+        <!-- Mobile hamburger toggle -->
+        <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition" aria-label="Abrir navegación">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <a href="/" class="flex items-center gap-3">
+          <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7">
+          <span class="font-bold text-base text-white tracking-tight">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
         </a>
       </div>
-    </div>
-  </header>
 
-  <!-- Contenido Principal -->
-  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow w-full">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <a href="/docs/" class="text-xs text-zinc-300 hover:text-white transition hidden sm:inline-block">Índice General</a>
+        <a href="https://github.com/CristianJimenezMartinez/Bentian" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-white transition p-1.5 hidden md:inline-block" title="GitHub">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
+          <span>Descargar</span>
+          <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.3.6</span>
+        </a>
+      </div>
+    </header>
+  
+  
+    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <!-- Search Input in Sidebar -->
+      <div class="mb-6">
+        <label for="sidebar-search" class="sr-only">Buscar documentación</label>
+        <div class="relative">
+          <input type="text" id="sidebar-search" placeholder="Buscar... (Ctrl+K)" 
+            class="w-full bg-[#121215] border border-white/[0.1] rounded-xl px-3.5 py-2 pl-9 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <!-- Navigation Hierarchy -->
+      <nav class="space-y-6" id="docs-nav-tree">
+        
+            <div class="category-group" data-category="primeros-pasos">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🚀</span>
+                <span>Primeros Pasos</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian">
+                      <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Requisitos del Sistema y Entorno Operativo
+                      </a>
+                    </li>
+                  
+                    <li data-title="instalación y despliegue del agente en windows" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, desplegar conector factusol, bentian tray windows">
+                      <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Instalación y Despliegue del Agente en Windows
+                      </a>
+                    </li>
+                  
+                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian, plan fundador bentian, licenciamiento erp bridge">
+                      <a href="/docs/primeros-pasos/activacion-de-licencias/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Activación de Licencias, Beta de 60 Días y Plan Fundador
+                      </a>
+                    </li>
+                  
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil">
+                      <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Guía del Asistente de Configuración (Onboarding Wizard)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="factusol">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-indigo-400">
+                <span>🗄️</span>
+                <span>Factusol ERP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="localización de la base de datos de factusol (.accdb y .mdb)" data-keywords="donde esta base datos factusol, ruta base de datos factusol, accdb factusol, software delsol datos fs, estructura base datos factusol">
+                      <a href="/docs/factusol/localizacion-base-datos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Localización de la Base de Datos de Factusol (.accdb y .mdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="rutas de red, servidores nas y protección anti-wiping" data-keywords="factusol en red, factusol nas, factusol synology qnap, ruta unc factusol, anti wiping bentian, desconexion red factusol">
+                      <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Rutas de Red, Servidores NAS y Protección Anti-Wiping
+                      </a>
+                    </li>
+                  
+                    <li data-title="controladores microsoft ace oledb vs odbc" data-keywords="oledb factusol, microsoft ace oledb 12.0 16.0, oledb vs odbc factusol, access database engine factusol, conexion rapida factusol">
+                      <a href="/docs/factusol/controladores-oledb-ace/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Controladores Microsoft ACE OLEDB vs ODBC
+                      </a>
+                    </li>
+                  
+                    <li data-title="series de pedidos en factusol: serie 1 directa vs serie w" data-keywords="series factusol pedidos, serie 1 factusol, serie w pedidos web factusol, pedidos no aparecen factusol, f_pcl factusol serie">
+                      <a href="/docs/factusol/series-de-pedidos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Series de Pedidos en Factusol: Serie 1 Directa vs Serie W
+                      </a>
+                    </li>
+                  
+                    <li data-title="cálculo de stock disponible (dissto) vs stock real (actsto)" data-keywords="dissto factusol, actsto factusol, calcular stock disponible factusol, sobreventas woocommerce factusol, reservas clientes factusol f_sto">
+                      <a href="/docs/factusol/calculo-stock-disponible/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO)
+                      </a>
+                    </li>
+                  
+                    <li data-title="matriz oficial de compatibilidad de factusol (2018–2026)" data-keywords="matriz compatibilidad factusol, tablas factusol, factusol 2026 2025 2024, formato accdb factusol, f_art f_pcl factusol">
+                      <a href="/docs/factusol/matriz-compatibilidad/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
+                        Matriz Oficial de Compatibilidad de Factusol (2018–2026)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="canales">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛒</span>
+                <span>Canales eCommerce</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="conexión con woocommerce y compatibilidad hpos" data-keywords="conectar factusol woocommerce, rest api woocommerce factusol, hpos factusol, consumer key woocommerce, sincronizar pedidos woocommerce factusol">
+                      <a href="/docs/canales/woocommerce/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con WooCommerce y Compatibilidad HPOS
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con shopify mediante admin rest y graphql" data-keywords="conectar factusol shopify, shopify factusol sin intermediarios, conector shopify factusol, custom app shopify factusol, inventario shopify factusol">
+                      <a href="/docs/canales/shopify/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con Shopify mediante Admin REST y GraphQL
+                      </a>
+                    </li>
+                  
+                    <li data-title="endpoint universal: conecta cualquier tienda personalizada" data-keywords="api universal factusol, endpoint json factusol, conectar php factusol, conectar laravel factusol, sincronizar tienda a medida factusol">
+                      <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Endpoint Universal: Conecta Cualquier Tienda Personalizada
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="arquitectura">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>⚡</span>
+                <span>Arquitectura & Sincronización</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce">
+                      <a href="/docs/arquitectura/arquitectura-local-first/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Arquitectura Local-First y Privacidad de Datos
+                      </a>
+                    </li>
+                  
+                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos">
+                      <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cola Desacoplada Store-and-Forward (SQLite)
+                      </a>
+                    </li>
+                  
+                    <li data-title="filewatcher en tiempo real y ciclos incrementales" data-keywords="filewatcher factusol, cambios tiempo real factusol, debounce factusol bentian, sincronizacion incremental factusol, consumo cpu conector factusol">
+                      <a href="/docs/arquitectura/deteccion-tiempo-real/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        FileWatcher en Tiempo Real y Ciclos Incrementales
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="fiscalidad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🧾</span>
+                <span>Fiscalidad & Facturación</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="cuadre de iva al céntimo y prevención de descuadres" data-keywords="descuadre iva factusol woocommerce, cuadre centimo factusol, base imponible pedido factusol, f_pcl f_lpc iva factusol, calcular iva exacto factusol">
+                      <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cuadre de IVA al Céntimo y Prevención de Descuadres
+                      </a>
+                    </li>
+                  
+                    <li data-title="recargo de equivalencia en woocommerce y prestashop" data-keywords="recargo de equivalencia factusol, recargo equivalencia woocommerce, factusol f_pcl recargo, minoristas 5.2 recargo factusol, impuestos espanoles factusol">
+                      <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Recargo de Equivalencia en WooCommerce y PrestaShop
+                      </a>
+                    </li>
+                  
+                    <li data-title="veri*factu, ley antifraude y la facturación en factusol" data-keywords="verifactu factusol, ley antifraude factusol woocommerce, cadena criptografica trzfac, multas verifactu conectores, facturacion legal factusol">
+                      <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Veri*Factu, Ley Antifraude y la Facturación en Factusol
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="troubleshooting">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🔧</span>
+                <span>Resolución de Incidencias</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="catálogo de errores humanizados y resolución en 1 clic" data-keywords="errores factusol, solucionar error conector factusol, errores humanizados bentian, mensajes claros factusol, soporte tecnico factusol">
+                      <a href="/docs/troubleshooting/errores-humanizados/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Catálogo de Errores Humanizados y Resolución en 1 Clic
+                      </a>
+                    </li>
+                  
+                    <li data-title="cómo solucionar el error 3045: base de datos bloqueada (.laccdb)" data-keywords="error 3045 factusol, desbloquear laccdb factusol, base de datos en uso exclusivo factusol, archivo ldb bloqueado factusol, colapso factusol red">
+                      <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="error de proveedor oledb microsoft.ace no registrado" data-keywords="microsoft ace oledb no esta registrado, descargar access database engine 64 bits, error oledb factusol 0x80004005, instalar oledb windows 11">
+                      <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error de Proveedor OLEDB Microsoft.ACE no Registrado
+                      </a>
+                    </li>
+                  
+                    <li data-title="error 401 unauthorized en woocommerce (.htaccess)" data-keywords="error 401 woocommerce rest api, cabecera authorization bloqueada htaccess, raiola webempresa woocommerce 401, conector factusol woocommerce 401">
+                      <a href="/docs/troubleshooting/error-401-autorizacion-hosting/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error 401 Unauthorized en WooCommerce (.htaccess)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="seguridad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛡️</span>
+                <span>Seguridad & Redes</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, bitdefender factusol, seguridad edr conector factusol">
+                      <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
+                      </a>
+                    </li>
+                  
+                    <li data-title="windows smartscreen: autorización y reputación de binarios" data-keywords="windows smartscreen bentian, windows protegio su pc factusol, desbloquear ejecutable windows defender, smartscreen bentian setup exe">
+                      <a href="/docs/seguridad/windows-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Windows SmartScreen: Autorización y Reputación de Binarios
+                      </a>
+                    </li>
+                  
+                    <li data-title="criptografía asimétrica ed25519 y actualización atómica" data-keywords="firmas ed25519 bentian, update swapper windows, actualizacion atomica factusol, seguridad ejecutable bentian, rollback automatico bentian">
+                      <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Criptografía Asimétrica Ed25519 y Actualización Atómica
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="api">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>📡</span>
+                <span>API REST & Esquemas</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="referencia de la api rest local del agente (39281)" data-keywords="api rest factusol local, endpoints bentian 39281, api local conector factusol, json factusol local, telemetria conector factusol">
+                      <a href="/docs/api/api-rest-local/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Referencia de la API REST Local del Agente (39281)
+                      </a>
+                    </li>
+                  
+                    <li data-title="esquema json de pedidos (orderpayload) y validación zod" data-keywords="json pedidos factusol, order payload factusol, esquema json woocommerce factusol, zod pedidos erp bridge, api pedidos f_pcl">
+                      <a href="/docs/api/esquema-pedidos-json/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Esquema JSON de Pedidos (OrderPayload) y Validación Zod
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+      </nav>
+
+      <!-- Sidebar Footer Badge -->
+      <div class="mt-8 pt-4 border-t border-white/[0.08] px-2 text-[11px] text-zinc-500 flex items-center justify-between">
+        <span>Agente <span data-app-version>v0.3.6</span></span>
+        <span class="inline-flex items-center gap-1 text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>100% Local-First</span>
+        </span>
+      </div>
+    </aside>
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+  
+
+  <!-- Main Layout Container (Sidebar width: lg:pl-72, Right TOC width: xl:pr-64) -->
+  <div class="pt-16 lg:pl-72">
+    <div class="max-w-7xl mx-auto flex">
+      
+      <!-- Center Content Column -->
+      <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-10 max-w-4xl">
+        
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-6 flex-wrap">
+          <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+          <span>/</span>
+          <a href="/docs/" class="hover:text-zinc-300 transition">Docs</a>
+          <span>/</span>
+          <span class="text-zinc-400">Factusol ERP</span>
+          <span>/</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Matriz Oficial de Compatibilidad de Factusol (2018–2026)</span>
+        </nav>
+
+        <!-- Article Header -->
+        <div class="mb-8 pb-6 border-b border-white/[0.08]">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              Especificación Técnica
+            </span>
+            <span class="text-xs text-zinc-500">·</span>
+            <span class="text-xs text-zinc-500 font-mono">6 min de lectura</span>
+            <span class="text-xs text-zinc-500">·</span>
+            <span class="text-xs text-zinc-500 font-mono">Actualizado v0.3.6</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
+            Matriz Oficial de Compatibilidad de Factusol (2018–2026)
+          </h1>
+          <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+            Especificación de versiones de base de datos, tablas relacionales leídas, transacciones atómicas de pedidos y motores de cálculo.
+          </p>
+        </div>
+
+        <!-- Article Rich Content Body -->
+        <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
+          
+      <p class="text-base text-zinc-300 leading-relaxed mb-6">
+        Esta matriz especifica los componentes, tablas y versiones de Factusol oficialmente certificados para Bentian ERP Bridge.
+      </p>
+
+      <h2 id="versiones-soportadas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Versiones de Factusol Soportadas</h2>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Edición Factusol</th>
+              <th class="px-4 py-3 font-semibold">Formato Base de Datos</th>
+              <th class="px-4 py-3 font-semibold">Controlador Certificado</th>
+              <th class="px-4 py-3 font-semibold">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-2.5 font-medium text-white">Factusol 2026</td>
+              <td class="px-4 py-2.5 font-mono">.accdb</td>
+              <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0</td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-medium text-white">Factusol 2025 / 2024</td>
+              <td class="px-4 py-2.5 font-mono">.accdb</td>
+              <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0 / 12.0</td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-medium text-white">Factusol 2020 – 2023</td>
+              <td class="px-4 py-2.5 font-mono">.accdb</td>
+              <td class="px-4 py-2.5 font-mono">ACE.OLEDB.16.0 / 12.0</td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Certificado 100%</span></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-medium text-white">Factusol 2018 / 2019</td>
+              <td class="px-4 py-2.5 font-mono">.accdb / .mdb</td>
+              <td class="px-4 py-2.5 font-mono">ACE.OLEDB.12.0</td>
+              <td class="px-4 py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Compatible</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="tablas-leidas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Tablas Leídas en Modo Compartido</h2>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6 font-mono text-xs">
+        <li><strong class="text-white">F_ART:</strong> Artículos, descripciones, estado comercial (DESART, EANART, PHAART).</li>
+        <li><strong class="text-white">F_STO:</strong> Stock físico y reservas por almacén (ACTSTO, RESCLI).</li>
+        <li><strong class="text-white">F_TAR:</strong> Tarifas de precios (1 a 5) y precios específicos B2B/B2C.</li>
+        <li><strong class="text-white">F_TLL / F_COL:</strong> Tallas y colores para variaciones de producto en moda y textil.</li>
+        <li><strong class="text-white">F_FAM / F_SEC:</strong> Familias y secciones para generación automática de categorías web.</li>
+      </ul>
+
+      <h2 id="tablas-escritas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Tablas Escritas en Transacciones Atómicas</h2>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6 font-mono text-xs">
+        <li><strong class="text-white">F_PCL:</strong> Cabecera de pedidos de cliente (Numpcl, Feepcl, Clicpcl, Totpcl, Ivapcl, Reqpcl).</li>
+        <li><strong class="text-white">F_LPC:</strong> Líneas de detalle de pedidos de cliente con cálculo exacto de bases y tipos impositivos.</li>
+        <li><strong class="text-white">F_CLI:</strong> Creación o vinculación de fichas de cliente con NIF/CIF validado.</li>
+      </ul>
+
+      <h2 id="plataformas-ecommerce" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Compatibilidad con Plataformas eCommerce</h2>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>WooCommerce:</strong> Versiones 6.x a 9.x con soporte nativo para almacenamiento de pedidos HPOS (*High-Performance Order Storage*).</li>
+        <li><strong>PrestaShop:</strong> Versiones 1.7.x y 8.x mediante Webservices API nativa.</li>
+        <li><strong>Shopify:</strong> Integración directa mediante Shopify Admin REST / GraphQL.</li>
+        <li><strong>Tiendas a medida / Plesk:</strong> Integración mediante Endpoint Universal JSON sin plugins intermedios.</li>
+      </ul>
     
-    <!-- Badge Cabecera -->
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span>Especificación de Ingeniería • Matriz Oficial de Compatibilidad ERP</span>
-    </div>
+        </article>
 
-    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-      Matriz Oficial de Compatibilidad: <span class="text-indigo-400">Factusol ERP &amp; Plataformas Web</span>
-    </h1>
-
-    <p class="text-base sm:text-lg text-zinc-400 mb-10 leading-relaxed max-w-4xl">
-      Esta matriz técnica detalla el soporte exhaustivo y transparente de <strong>Bentian ERP Bridge</strong> con el software de gestión <strong>Factusol (Software DELSOL)</strong>. Dirigida a directores de IT, integradores de sistemas y responsables de eCommerce que requieren certidumbre sobre formatos relacionales, versiones de motor ACE OLEDB, topologías de red local/NAS, tablas mapeadas y cálculos de inventario en tiempo real.
-    </p>
-
-    <!-- Resumen Ejecutivo de Compatibilidad -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-        <div class="text-xs text-zinc-500 font-mono uppercase mb-1">Versiones ERP</div>
-        <div class="text-lg font-bold text-white font-mono">Factusol 2018–2026</div>
-        <div class="text-[11px] text-emerald-400 mt-1">9 Años de compatibilidad</div>
-      </div>
-      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-        <div class="text-xs text-zinc-500 font-mono uppercase mb-1">Formatos de BD</div>
-        <div class="text-lg font-bold text-white font-mono">.accdb y .mdb</div>
-        <div class="text-[11px] text-emerald-400 mt-1">Access 2000 a 2026</div>
-      </div>
-      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-        <div class="text-xs text-zinc-500 font-mono uppercase mb-1">Topologías de Red</div>
-        <div class="text-lg font-bold text-white font-mono">Local, LAN &amp; NAS</div>
-        <div class="text-[11px] text-emerald-400 mt-1">SMB / CIFS / UNC nativo</div>
-      </div>
-      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-        <div class="text-xs text-zinc-500 font-mono uppercase mb-1">eCommerce</div>
-        <div class="text-lg font-bold text-white font-mono">WooCommerce &amp; PS</div>
-        <div class="text-[11px] text-emerald-400 mt-1">Woo 6–9 (HPOS) &amp; PS 1.7/8</div>
-      </div>
-    </div>
-
-    <!-- SECCIÓN 1: VERSIONES DE FACTUSOL -->
-    <section id="versiones-factusol" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">1</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Versiones de Factusol Soportadas</h2>
-      </div>
-
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        Bentian ERP Bridge es compatible tanto con instalaciones monousuario en discos locales (<code class="text-zinc-200 font-mono">C:\Factusol\Datos\</code>) como con despliegues multiusuario en servidores Windows Server o cabinas de red NAS (<code class="text-zinc-200 font-mono">\\NAS_EMPRESA\Factusol\Datos\</code> o unidades mapeadas <code class="text-zinc-200 font-mono">Z:\...</code>) mediante el protocolo SMB/CIFS.
-      </p>
-
-      <div class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#121215] mb-6">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-white/[0.04] text-zinc-400 font-mono uppercase tracking-wider border-b border-white/[0.08]">
-            <tr>
-              <th class="p-3.5">Edición Factusol</th>
-              <th class="p-3.5">Año / Versión</th>
-              <th class="p-3.5">Formato Nativo</th>
-              <th class="p-3.5">Instalación Local</th>
-              <th class="p-3.5">Red LAN / Servidor / NAS</th>
-              <th class="p-3.5">Estado de Soporte</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-300">
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2026</td>
-              <td class="p-3.5 font-mono text-zinc-300">v26.x (Edición Actual)</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 16.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo (&lt;25ms)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2025</td>
-              <td class="p-3.5 font-mono text-zinc-300">v25.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 16.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo (&lt;25ms)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2024</td>
-              <td class="p-3.5 font-mono text-zinc-300">v24.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 16.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo (&lt;25ms)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2023</td>
-              <td class="p-3.5 font-mono text-zinc-300">v23.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 12.0/16.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2022</td>
-              <td class="p-3.5 font-mono text-zinc-300">v22.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 12.0/16.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2021</td>
-              <td class="p-3.5 font-mono text-zinc-300">v21.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 12.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2020</td>
-              <td class="p-3.5 font-mono text-zinc-300">v20.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 12.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2019</td>
-              <td class="p-3.5 font-mono text-zinc-300">v19.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb (ACE 12.0)</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-white">Factusol 2018</td>
-              <td class="p-3.5 font-mono text-zinc-300">v18.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">.accdb / .mdb</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Nativo</td>
-              <td class="p-3.5 text-emerald-400 font-mono">✓ Soporte UNC / SMB</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-semibold">Oficial &amp; Certificado</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-semibold text-zinc-300">Factusol Legacy (&lt;2018)</td>
-              <td class="p-3.5 font-mono text-zinc-400">2010 a 2017</td>
-              <td class="p-3.5 font-mono text-amber-300">.mdb / .accdb heredado</td>
-              <td class="p-3.5 text-zinc-300 font-mono">✓ Modo Compatibilidad Jet</td>
-              <td class="p-3.5 text-zinc-300 font-mono">✓ Soporte LAN</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">Soporte Heredado</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-200/90 flex items-start gap-3">
-        <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div>
-          <strong class="font-semibold text-blue-300 block mb-0.5">Topologías en Red y Servidores NAS (Regla Mandataria Anti-Wiping):</strong>
-          Bentian ERP Bridge soporta rutas UNC de red con espacios y caracteres especiales (ej: <code class="text-white">\\SERVIDOR_CENTRAL\Factusol 2026\Datos\FS01\2262026.accdb</code>). Si la conexión de red o unidad mapeada se desactiva temporalmente por mantenimiento, el conector marca internamente el estado como <em>"Desconectado / Offline"</em> sin borrar jamás la configuración guardada por el administrador en disco.
+        <!-- Pagination: Prev / Next Buttons -->
+        <div class="mt-12 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+            <a href="/docs/factusol/calculo-stock-disponible/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
+              <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">← Artículo Anterior</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO)</span>
+            </a>
+          
+          
+            <a href="/docs/canales/woocommerce/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
+              <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">Siguiente Artículo →</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión con WooCommerce y Compatibilidad HPOS</span>
+            </a>
+          
         </div>
-      </div>
-    </section>
 
-    <!-- SECCIÓN 2: MOTORES Y DRIVERS OLEDB -->
-    <section id="motores-oledb" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">2</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Controladores OLEDB y Motor de Base de Datos (ACE Engine)</h2>
-      </div>
-
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        El agente se comunica con Factusol a través de la interfaz OLEDB nativa del sistema operativo Windows. Esto garantiza que las consultas SQL se procesen directamente sobre el motor de base de datos sin necesidad de abrir la interfaz gráfica de Factusol ni consumir licencias de usuario del ERP.
-      </p>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <!-- Tarjeta 1: ACE 16.0 -->
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] flex flex-col justify-between">
+        <!-- Support Assistance Card -->
+        <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-indigo-950/30 via-[#121215] to-[#121215] border border-indigo-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="px-2.5 py-0.5 rounded text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">Motor Primario</span>
-              <span class="text-xs text-zinc-500 font-mono">64-bit &amp; 32-bit</span>
-            </div>
-            <h3 class="text-base font-bold text-white font-mono mb-2">Microsoft.ACE.OLEDB.16.0</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed mb-4">
-              Driver incluido en Microsoft Access Database Engine 2016 / Microsoft 365. Es el controlador preferente para todas las versiones de Factusol desde 2016 hasta 2026 sobre archivos <code class="text-zinc-200">.accdb</code>.
-            </p>
+            <h4 class="text-sm font-bold text-white mb-1">¿Tienes dudas sobre la configuración en tu empresa?</h4>
+            <p class="text-xs text-zinc-400">Nuestro equipo de ingeniería te asiste con tu base de datos Factusol o red local.</p>
           </div>
-          <div class="pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            Detección y fallback automático en Windows 10 y 11.
-          </div>
+          <a href="mailto:cristianjimeneztrabajo@gmail.com" class="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-white shrink-0 transition">
+            Contactar con Soporte
+          </a>
         </div>
 
-        <!-- Tarjeta 2: ACE 12.0 -->
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="px-2.5 py-0.5 rounded text-[11px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">Fallback Estable</span>
-              <span class="text-xs text-zinc-500 font-mono">64-bit &amp; 32-bit</span>
-            </div>
-            <h3 class="text-base font-bold text-white font-mono mb-2">Microsoft.ACE.OLEDB.12.0</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed mb-4">
-              Driver correspondiente a Access Database Engine 2010. Máxima compatibilidad en entornos industriales o servidores con versiones heredadas de Office instaladas.
-            </p>
-          </div>
-          <div class="pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            Resuelve discrepancias de arquitectura x86/x64.
-          </div>
+      </main>
+
+      <!-- Right Table of Contents Column (Sticky) -->
+      <aside class="hidden xl:block w-64 shrink-0 px-6 py-10 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+        <div class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">En esta página</div>
+        <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
+          
+            <li>
+              <a href="#versiones-soportadas" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="versiones-soportadas">
+                1. Versiones de Factusol Soportadas
+              </a>
+            </li>
+          
+            <li>
+              <a href="#tablas-leidas" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="tablas-leidas">
+                2. Tablas Leídas en Modo Compartido
+              </a>
+            </li>
+          
+            <li>
+              <a href="#tablas-escritas" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="tablas-escritas">
+                3. Tablas Escritas en Transacciones Atómicas
+              </a>
+            </li>
+          
+            <li>
+              <a href="#plataformas-ecommerce" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="plataformas-ecommerce">
+                4. Compatibilidad con Plataformas eCommerce
+              </a>
+            </li>
+          
+        </ul>
+
+        <!-- Action Card -->
+        <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+          <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
+            Descargar v0.3.6
+          </a>
         </div>
+      </aside>
 
-        <!-- Tarjeta 3: Jet 4.0 -->
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <span class="px-2.5 py-0.5 rounded text-[11px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">Modo Heredado</span>
-              <span class="text-xs text-zinc-500 font-mono">32-bit Nativo</span>
-            </div>
-            <h3 class="text-base font-bold text-white font-mono mb-2">Microsoft.Jet.OLEDB.4.0</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed mb-4">
-              Motor clásico integrado de fábrica en todas las versiones de Windows. Utilizado exclusivamente para bases de datos históricas en formato Access 97-2003 (<code class="text-zinc-200">.mdb</code>).
-            </p>
-          </div>
-          <div class="pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-400">
-            Cero instalación de librerías externas requerida.
-          </div>
-        </div>
-      </div>
-
-      <!-- Bloque de Concurrencia OLEDB -->
-      <div class="p-4 sm:p-5 rounded-2xl bg-[#121215] border border-white/[0.08]">
-        <h4 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Cadena Canónica de Conexión OLEDB de Bentian ERP Bridge:</span>
-        </h4>
-        <pre class="p-3.5 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-indigo-300 overflow-x-auto mb-3"><code>Provider=Microsoft.ACE.OLEDB.16.0;Data Source=C:\Factusol\Datos\FS01\2262026.accdb;Mode=Share Deny None;Jet OLEDB:Database Locking Mode=1;Persist Security Info=False;</code></pre>
-        <p class="text-xs text-zinc-400 leading-relaxed">
-          Los parámetros <code class="text-zinc-200 font-mono">Mode=Share Deny None</code> y <code class="text-zinc-200 font-mono">Database Locking Mode=1</code> (bloqueo a nivel de registro en lugar de página) son obligatorios para garantizar que las lecturas de Bentian <strong>jamás interfieran con la facturación física, el TPV o los albaranes de almacén</strong>.
-        </p>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 3: TABLAS LEÍDAS (READ-ONLY) -->
-    <section id="tablas-leidas" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">3</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Tablas de Factusol Leídas en Modo Compartido (Read-Only)</h2>
-      </div>
-
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        Bentian ERP Bridge extrae el catálogo de productos, existencias, tarifas y familias mediante consultas <code class="text-indigo-300 font-mono">SELECT</code> de sólo lectura. En memoria RAM local de Windows, el agente computa sumas criptográficas SHA-256 de cada registro para enviar <em>únicamente las filas modificadas (Delta Sync)</em> hacia la tienda online:
-      </p>
-
-      <div class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#121215] mb-6">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-white/[0.04] text-zinc-400 font-mono uppercase tracking-wider border-b border-white/[0.08]">
-            <tr>
-              <th class="p-3.5">Tabla Factusol</th>
-              <th class="p-3.5">Descripción de Negocio</th>
-              <th class="p-3.5">Campos Clave Extraídos</th>
-              <th class="p-3.5">Mapeo en WooCommerce / PrestaShop</th>
-              <th class="p-3.5">Modo de Bloqueo</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-300">
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_ART</td>
-              <td class="p-3.5 font-semibold text-white">Maestro de Artículos</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODART, DESART, PHAART, CCOART, FAMART, SECART, BLOART, ACTART</td>
-              <td class="p-3.5 text-zinc-300">SKU, Nombre del Producto, Precio Coste, Estado (Borrador/Publicado), Peso.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_STO</td>
-              <td class="p-3.5 font-semibold text-white">Stock y Existencias</td>
-              <td class="p-3.5 font-mono text-zinc-400">ARTSTO, ALMSTO, ACTSTO, DISSTO, RESCLI, PENENT</td>
-              <td class="p-3.5 text-emerald-300 font-semibold">Stock Disponible Web (<code class="font-mono">DISSTO</code>), Gestión Multialmacén.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_TAR</td>
-              <td class="p-3.5 font-semibold text-white">Tarifas de Precios</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODTAR, ARTTAR, PRETAR, IVATAR</td>
-              <td class="p-3.5 text-zinc-300">Tarifas 1 a 5 (PVP Público, B2B Profesional, Distribuidores).</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_TLL</td>
-              <td class="p-3.5 font-semibold text-white">Maestro de Tallas</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODTLL, DESTLL</td>
-              <td class="p-3.5 text-zinc-300">Atributo global de producto (Talla / Medida / Calzado).</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_COL</td>
-              <td class="p-3.5 font-semibold text-white">Maestro de Colores</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODCOL, DESCOL</td>
-              <td class="p-3.5 text-zinc-300">Atributo global de producto (Color / Acabado / Tonalidad).</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_FAM</td>
-              <td class="p-3.5 font-semibold text-white">Familias de Artículos</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODFAM, DESFAM</td>
-              <td class="p-3.5 text-zinc-300">Categorías madre en WooCommerce / Categorías raíz en PrestaShop.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-indigo-300">F_SEC</td>
-              <td class="p-3.5 font-semibold text-white">Secciones de Catálogo</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODSEC, DESSEC</td>
-              <td class="p-3.5 text-zinc-300">Subcategorías y jerarquías departamentales de la tienda.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono">Share Deny None</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 4: TABLAS ESCRITAS EN TRANSACCIONES ATÓMICAS -->
-    <section id="tablas-escritas" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">4</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Tablas de Factusol Escritas en Transacciones Atómicas (ACID)</h2>
-      </div>
-
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        Cuando un cliente finaliza una compra en la web, Bentian descarga el pedido y lo inserta en Factusol mediante una transacción OLEDB atómica (<code class="text-indigo-300 font-mono">BeginTrans / CommitTrans</code>). Si ocurre un corte de red o un fallo en una de las líneas, se ejecuta un <code class="text-amber-400 font-mono">RollbackTrans</code> inmediato. <strong>Jamás se generan pedidos a medias ni descuadres contables</strong>.
-      </p>
-
-      <div class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#121215] mb-6">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-white/[0.04] text-zinc-400 font-mono uppercase tracking-wider border-b border-white/[0.08]">
-            <tr>
-              <th class="p-3.5">Tabla Factusol</th>
-              <th class="p-3.5">Función Operativa</th>
-              <th class="p-3.5">Campos Escritos</th>
-              <th class="p-3.5">Tratamiento Fiscal / Tributario</th>
-              <th class="p-3.5">Garantía de Integridad</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-300">
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-emerald-400">F_PCL</td>
-              <td class="p-3.5 font-semibold text-white">Cabeceras de Pedidos de Clientes</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODPCL, FECPCL, CLIPCL, TOTPCL, ESTPCL, SERPCL, FPAPCL</td>
-              <td class="p-3.5 text-zinc-300">Serie web asignada (ej: Serie "W"), fecha oficial, forma de pago (Tarjeta/Stripe/Bizum).</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono font-bold">Atómica (ACID)</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-emerald-400">F_LPC</td>
-              <td class="p-3.5 font-semibold text-white">Líneas de Pedidos de Clientes</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODLPC, POSLPC, ARTLPC, CANLPC, PRELPC, IVALPC, RECLPC</td>
-              <td class="p-3.5 text-zinc-300">Desglose de IVA (21%, 10%, 4%) y <strong class="text-amber-300">Recargo de Equivalencia (5.2%, 1.4%, 0.5%)</strong> sin descuadre de céntimos.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono font-bold">Atómica (ACID)</span></td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold font-mono text-emerald-400">F_CLI</td>
-              <td class="p-3.5 font-semibold text-white">Fichero de Clientes</td>
-              <td class="p-3.5 font-mono text-zinc-400">CODCLI, NOFCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, TELCLI, EMACLI</td>
-              <td class="p-3.5 text-zinc-300">Alta de nuevo cliente o vinculación por NIF/CIF. Asignación automática del flag de Recargo de Equivalencia.</td>
-              <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono font-bold">Atómica (ACID)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200/90 flex items-start gap-3">
-        <svg class="w-5 h-5 text-purple-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <div>
-          <strong class="font-semibold text-purple-300 block mb-0.5">Cumplimiento Legal Veri*factu y Ley Antifraude:</strong>
-          Bentian ERP Bridge escribe exclusivamente en las tablas de pedidos de cliente (<code class="text-white">F_PCL</code> / <code class="text-white">F_LPC</code>), <strong>jamás en el libro oficial de facturas (<code class="text-white">F_FAC</code>)</strong>. De acuerdo con la normativa tributaria española (Real Decreto 1007/2023), es el propio Factusol quien genera la factura final inmutable con encadenamiento hash y código QR de la AEAT, garantizando que el comercio online cumpla al 100% con la legalidad sin arriesgar multas de hasta 50.000 €.
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 5: CÁLCULO DE STOCK (DISSTO VS ACTSTO) -->
-    <section id="modos-stock" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">5</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Modos de Cálculo de Stock: Blindaje Anti-Sobreventas</h2>
-      </div>
-
-      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
-        Uno de los fallos más graves en conectores no profesionales o plugins PHP es sincronizar con la web las existencias físicas brutas (<code class="text-amber-300 font-mono">ACTSTO</code>) de Factusol. Si una empresa tiene 10 unidades en la estantería pero 8 ya están comprometidas en pedidos de oficina, sincronizar <code class="text-zinc-200 font-mono">ACTSTO</code> provocará sobreventas y cancelaciones forzadas.
-      </p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="p-6 rounded-2xl bg-[#121215] border border-emerald-500/30">
-          <div class="flex items-center gap-2 text-emerald-400 font-mono font-bold text-xs uppercase mb-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-            <span>Modo Canónico Recomendado (Por Defecto)</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-2">Stock Disponible Libre (DISSTO)</h3>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-4">
-            Bentian calcula en tiempo real el stock neto que realmente se puede vender en la tienda online sin provocar roturas de stock con la siguiente fórmula nativa de Factusol:
-          </p>
-          <div class="p-3.5 rounded-xl bg-[#09090c] border border-white/[0.06] font-mono text-xs text-emerald-300 mb-3">
-            DISSTO = ACTSTO - RESCLI - PENENT
-          </div>
-          <ul class="text-xs text-zinc-400 space-y-1.5 list-disc list-inside">
-            <li><strong class="text-white">ACTSTO:</strong> Existencias físicas en almacén.</li>
-            <li><strong class="text-white">RESCLI:</strong> Unidades reservadas o en pedidos de clientes pendientes de servir.</li>
-            <li><strong class="text-white">PENENT:</strong> Unidades en pedidos a proveedor pendientes de recibir.</li>
-          </ul>
-        </div>
-
-        <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
-          <div class="flex items-center gap-2 text-zinc-400 font-mono font-bold text-xs uppercase mb-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-zinc-500"></span>
-            <span>Modo Alternativo Configurable</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-2">Stock Físico Real (ACTSTO)</h3>
-          <p class="text-xs text-zinc-400 leading-relaxed mb-4">
-            Sincroniza directamente las existencias brutas contabilizadas en el almacén de Factusol sin deducir los pedidos pendientes de expedición.
-          </p>
-          <div class="p-3.5 rounded-xl bg-[#09090c] border border-white/[0.06] font-mono text-xs text-zinc-300 mb-3">
-            STOCK_WEB = ACTSTO
-          </div>
-          <p class="text-xs text-zinc-400 leading-relaxed">
-            Indicado únicamente para comercios de venta exclusiva online sin comerciales de calle, sin preventa ni presupuestos telefónicos donde todo pedido web se factura de inmediato.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 6: PLATAFORMAS ECOMMERCE -->
-    <section id="plataformas-ecommerce" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">6</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Plataformas eCommerce Soportadas</h2>
-      </div>
-
-      <div class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#121215] mb-6">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-white/[0.04] text-zinc-400 font-mono uppercase tracking-wider border-b border-white/[0.08]">
-            <tr>
-              <th class="p-3.5">Plataforma eCommerce</th>
-              <th class="p-3.5">Versiones Soportadas</th>
-              <th class="p-3.5">Protocolo de Conexión</th>
-              <th class="p-3.5">Arquitectura de Pedidos</th>
-              <th class="p-3.5">Capacidad Máxima Catálogo</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-300">
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold text-white flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-violet-400"></span>
-                <span>WooCommerce (WordPress)</span>
-              </td>
-              <td class="p-3.5 font-mono text-zinc-300">WooCommerce 6.x, 7.x, 8.x, 9.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">REST API v3 (HTTPS / TLS 1.3)</td>
-              <td class="p-3.5 text-emerald-400 font-medium">Soporte Nativo HPOS (High-Performance Order Storage) y modo CPT clásico</td>
-              <td class="p-3.5 font-mono text-zinc-300">+50.000 referencias (&lt;150ms delta)</td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold text-white flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-                <span>PrestaShop</span>
-              </td>
-              <td class="p-3.5 font-mono text-zinc-300">PrestaShop 1.7.x y PrestaShop 8.x</td>
-              <td class="p-3.5 font-mono text-indigo-300">WebService REST API XML/JSON</td>
-              <td class="p-3.5 text-zinc-300">Inyección directa en tabla de órdenes con asignación de transportista y estados nativos</td>
-              <td class="p-3.5 font-mono text-zinc-300">+40.000 referencias</td>
-            </tr>
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-3.5 font-bold text-zinc-300 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <span>Shopify</span>
-              </td>
-              <td class="p-3.5 font-mono text-zinc-400">Shopify Plus &amp; Basic</td>
-              <td class="p-3.5 font-mono text-indigo-300">Admin API GraphQL &amp; REST</td>
-              <td class="p-3.5 text-zinc-400">Webhook ingestion &amp; fulfillment tracking bidireccional</td>
-              <td class="p-3.5 font-mono text-zinc-400">Ilimitado (Rate limit bucket token)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 7: PREGUNTAS FRECUENTES DE AUDITORÍA IT -->
-    <section id="faq-it" class="mb-14 scroll-mt-24">
-      <div class="flex items-center gap-3 pb-3 border-b border-white/[0.08] mb-6">
-        <span class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 font-mono font-bold text-xs flex items-center justify-center">7</span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Preguntas Frecuentes para Departamentos de IT</h2>
-      </div>
-
-      <div class="space-y-4 text-xs sm:text-sm">
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="font-bold text-white mb-2">¿Requiere Bentian ERP Bridge instalar plugins PHP pesados en el hosting o CMS?</h3>
-          <p class="text-zinc-400 leading-relaxed">
-            No. Bentian es un conector desacoplado (Local-First Desktop Agent) que se comunica directamente con las APIs REST oficiales y autenticadas de WooCommerce y PrestaShop. No consume memoria RAM de tu servidor Apache/Nginx ni se cuelga con los temidos errores <code class="text-zinc-200">504 Gateway Timeout</code>.
-          </p>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="font-bold text-white mb-2">¿Es seguro trabajar sobre la base de datos de Factusol mientras los administrativos la usan?</h3>
-          <p class="text-zinc-400 leading-relaxed">
-            Totalmente seguro. Bentian utiliza la capa OLEDB de Microsoft Access con el modo compartido <code class="text-zinc-200">Share Deny None</code>. La lectura de artículos o stock dura menos de 25 milisegundos en memoria RAM local y las escrituras de pedidos son atómicas, evitando cualquier bloqueo o retardo en los puestos físicos de facturación.
-          </p>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="font-bold text-white mb-2">¿Qué ocurre si se interrumpe la conexión a internet en la oficina?</h3>
-          <p class="text-zinc-400 leading-relaxed">
-            El agente dispone de una cola de mensajería persistente en SQLite local (Store-and-Forward). Si internet se cae, ningún pedido se pierde: en cuanto la conexión HTTPS con la tienda online se restablece, el agente sincroniza automáticamente todos los eventos pendientes con verificación criptográfica de entrega.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Final -->
-    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 sm:p-10 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-mono font-medium mb-4">
-        <span>Instalación Lista para Windows 10 &amp; 11 x64</span>
-      </div>
-      <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Conecta tu Factusol con Garantía de Compatibilidad</h3>
-      <p class="text-sm text-zinc-400 max-w-2xl mx-auto mb-6 leading-relaxed">
-        Descarga el instalador oficial de Bentian ERP Bridge y comprueba la sincronización en menos de 2 minutos sin coste durante la Beta Pública.
-      </p>
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-          <span>Descargar Bentian-Setup.exe</span>
-          <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.6</span>
-        </a>
-        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-4 py-3 rounded-xl border border-white/[0.08] hover:bg-white/[0.03] transition font-medium">
-          <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <span>Guía de Antivirus &amp; SmartScreen</span>
-        </a>
-      </div>
     </div>
+  </div>
 
-  </main>
+  <script src="/js/version-sync.js" defer></script>
+  <script>
+    // 1. Mobile Menu Toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('docs-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
-  <!-- Footer -->
-  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
-    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>© 2026 Bentian ERP Bridge • Matriz Oficial de Compatibilidad y Soporte Técnico</div>
-      <div class="flex items-center gap-4 text-zinc-400">
-        <a href="/" class="hover:text-white transition">Inicio</a>
-        <span>•</span>
-        <a href="/docs/" class="hover:text-white transition">Documentación</a>
-        <span>•</span>
-        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="hover:text-white transition">Guía Antivirus</a>
-        <span>•</span>
-        <a href="/factusol-woocommerce/" class="hover:text-white transition">WooCommerce</a>
-        <span>•</span>
-        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
-      </div>
-    </div>
-  </footer>
+    if (mobileBtn && sidebar && overlay) {
+      const toggleSidebar = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      };
+      mobileBtn.addEventListener('click', toggleSidebar);
+      overlay.addEventListener('click', toggleSidebar);
+    }
 
-  <script src="/js/version-sync.js"></script>
+    // 2. Client-side Search in Sidebar
+    const searchInput = document.getElementById('sidebar-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const items = document.querySelectorAll('#docs-nav-tree li');
+        const groups = document.querySelectorAll('#docs-nav-tree .category-group');
+
+        items.forEach((li) => {
+          const title = li.getAttribute('data-title') || '';
+          const keywords = li.getAttribute('data-keywords') || '';
+          const matches = title.includes(query) || keywords.includes(query);
+          li.style.display = matches ? '' : 'none';
+        });
+
+        groups.forEach((group) => {
+          const visibleItems = group.querySelectorAll('li:not([style*="display: none"])');
+          group.style.display = visibleItems.length > 0 ? '' : 'none';
+        });
+      });
+
+      // Shortcut: Ctrl+K / Cmd+K to focus search
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
+
+    // 3. Scrollspy for Table of Contents
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const headings = Array.from(document.querySelectorAll('article h2, article h3'));
+
+    if (tocLinks.length > 0 && headings.length > 0) {
+      window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 100;
+        let currentHeading = null;
+        for (const h of headings) {
+          if (h.offsetTop <= scrollPos) {
+            currentHeading = h;
+          } else {
+            break;
+          }
+        }
+        if (currentHeading) {
+          const currentId = currentHeading.id;
+          tocLinks.forEach((link) => {
+            if (link.getAttribute('data-id') === currentId) {
+              link.classList.add('text-indigo-400', 'font-semibold');
+              link.classList.remove('text-zinc-400');
+            } else {
+              link.classList.remove('text-indigo-400', 'font-semibold');
+              link.classList.add('text-zinc-400');
+            }
+          });
+        }
+      }, { passive: true });
+    }
+  </script>
 </body>
 </html>

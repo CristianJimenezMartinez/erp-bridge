@@ -404,7 +404,7 @@ export class MailerService {
       `${dashboardUrl}`,
       '',
       'GUÍA RÁPIDA DE INSTALACIÓN Y WINDOWS DEFENDER:',
-      'https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html',
+      'https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/',
       '',
       '¿Necesitas soporte técnico? Responde a este correo o escríbenos a soporte@cristianjm.com.',
       '',
@@ -475,7 +475,7 @@ export class MailerService {
           </a>
         </p>
         <p style="margin: 0; font-size: 12px;">
-          ¿Dudas con SmartScreen o antivirus? <a href="https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html" style="color: #a1a1aa; text-decoration: underline;">Consulta aquí la Guía de Instalación</a>.
+          ¿Dudas con SmartScreen o antivirus? <a href="https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/" style="color: #a1a1aa; text-decoration: underline;">Consulta aquí la Guía de Instalación</a>.
         </p>
       </div>
     `;

@@ -682,6 +682,31 @@ export function buildDocs() {
   // 4. Actualizar llms.txt
   updateLlmsTxt(DOC_ARTICLES);
 
+  // 5. Unificar páginas legacy para que presenten siempre el layout oficial de 3 columnas
+  const legacyMappings: Array<{ legacyPath: string; targetSlug: string }> = [
+    { legacyPath: 'windows-antivirus-smartscreen-guide.html', targetSlug: 'seguridad/antivirus-edr-smartscreen' },
+    { legacyPath: 'matriz-compatibilidad-factusol/index.html', targetSlug: 'factusol/matriz-compatibilidad' },
+    { legacyPath: 'error-base-datos-bloqueada-factusol-laccdb.html', targetSlug: 'troubleshooting/error-3045-base-datos-bloqueada' },
+    { legacyPath: 'error-proveedor-oledb-factusol-microsoft-ace.html', targetSlug: 'troubleshooting/error-oledb-no-registrado' },
+    { legacyPath: 'evitar-roturas-stock-factusol-dissto.html', targetSlug: 'factusol/calculo-stock-disponible' },
+    { legacyPath: 'sincronizar-pedidos-woocommerce-factusol.html', targetSlug: 'canales/woocommerce' },
+    { legacyPath: 'protocolo-beta-precios-fundador.html', targetSlug: 'primeros-pasos/licencias-beta-fundador' },
+  ];
+
+  for (const mapping of legacyMappings) {
+    const targetArticle = DOC_ARTICLES.find((a) => a.slug === mapping.targetSlug);
+    if (targetArticle) {
+      const legacyFile = path.join(DOCS_OUTPUT_ROOT, mapping.legacyPath);
+      const legacyDir = path.dirname(legacyFile);
+      if (!fs.existsSync(legacyDir)) {
+        fs.mkdirSync(legacyDir, { recursive: true });
+      }
+      const threeColHtml = renderDocArticlePage(targetArticle);
+      fs.writeFileSync(legacyFile, threeColHtml, 'utf8');
+      console.log(`✓ [legacy 3-col unified] /docs/${mapping.legacyPath} -> layout 3 columnas sincronizado`);
+    }
+  }
+
   console.log(`\n🎉 Compilación de documentación finalizada con éxito.`);
   console.log(`Total páginas generadas: ${generatedCount + 1}`);
   console.log(`====================================================\n`);

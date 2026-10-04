@@ -13,10 +13,11 @@ export const seguridadArticles: DocArticle[] = [
     keywords: 'exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, bitdefender factusol, seguridad edr conector factusol',
     toc: [
       { id: 'principio-minimo-privilegio', label: '1. El Principio de Mínimo Privilegio', level: 2 },
-      { id: 'windows-defender', label: '2. Configuración en Microsoft Defender Antivirus', level: 2 },
-      { id: 'antivirus-corporativos', label: '3. Bitdefender GravityZone y Kaspersky Endpoint', level: 2 },
-      { id: 'crowdstrike-falcon', label: '4. CrowdStrike Falcon EDR (Reglas IOA)', level: 2 },
-      { id: 'verificacion-conexiones', label: '5. Verificación de Conexiones Salientes', level: 2 },
+      { id: 'windows-defender', label: '2. Configuración en Microsoft Defender Antivirus y SmartScreen', level: 2 },
+      { id: 'avast-avg', label: '3. Configuración en Avast Antivirus y AVG', level: 2 },
+      { id: 'antivirus-corporativos', label: '4. Bitdefender GravityZone y Kaspersky Endpoint', level: 2 },
+      { id: 'crowdstrike-falcon', label: '5. CrowdStrike Falcon EDR (Reglas IOA)', level: 2 },
+      { id: 'verificacion-conexiones', label: '6. Verificación de Conexiones Salientes', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
@@ -36,18 +37,30 @@ export const seguridadArticles: DocArticle[] = [
         <div class="text-amber-300">Carpeta de datos de Factusol (ej: C:\\Software DELSOL\\Factusol\\Datos\\FS\\*)</div>
       </div>
 
-      <h2 id="windows-defender" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Configuración en Microsoft Defender Antivirus</h2>
+      <h2 id="windows-defender" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Configuración en Microsoft Defender Antivirus y SmartScreen</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Para añadir una exclusión en Windows 10 o Windows 11 mediante la interfaz gráfica:
+        Para autorizar el conector en <strong>Microsoft Defender SmartScreen</strong> y configurar la exclusión en Microsoft Defender Antivirus en Windows 10 o Windows 11:
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Abre <strong class="text-white">Seguridad de Windows</strong> (icono de escudo junto al reloj).</li>
+        <li>Si aparece la ventana azul de <em>Windows Defender SmartScreen</em> ("Windows protegió su PC"), haz clic en <strong>Más información</strong> y selecciona <strong>Ejecutar de todas formas</strong>.</li>
+        <li>Abre <strong class="text-white">Seguridad de Windows</strong> (icono de escudo junto al reloj del sistema).</li>
         <li>Selecciona <strong class="text-white">Protección contra virus y amenazas → Administrar la configuración</strong>.</li>
         <li>En la sección <em>Exclusiones</em>, haz clic en <strong class="text-indigo-400">Agregar o quitar exclusiones</strong>.</li>
         <li>Pulsa <em>Agregar una exclusión</em> y selecciona <strong>Carpeta</strong> para incluir <code class="text-zinc-200">C:\\Program Files\\Bentian Agent</code>.</li>
       </ol>
 
-      <h2 id="antivirus-corporativos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Bitdefender GravityZone y Kaspersky Endpoint</h2>
+      <h2 id="avast-avg" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Configuración en Avast Antivirus y AVG</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        En <strong>Avast Antivirus</strong> o <strong>AVG Internet Security</strong>, añade una excepción para evitar que el escudo de comportamiento bloquee las llamadas OLEDB locales:
+      </p>
+      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+        <li>Abre la interfaz de Avast Antivirus o AVG y accede a <strong class="text-white">Menú → Opciones (Configuración)</strong>.</li>
+        <li>En la pestaña <em>General</em>, haz clic en <strong class="text-indigo-400">Excepciones</strong> y pulsa <strong>Añadir excepción</strong>.</li>
+        <li>Introduce la ruta de instalación: <code class="text-zinc-200">C:\\Program Files\\Bentian Agent\\*</code>.</li>
+        <li>Haz clic en <em>Añadir excepción</em> para confirmar y reiniciar el agente.</li>
+      </ol>
+
+      <h2 id="antivirus-corporativos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Bitdefender GravityZone y Kaspersky Endpoint</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         En las consolas centralizadas de Bitdefender o Kaspersky:
       </p>
@@ -56,7 +69,7 @@ export const seguridadArticles: DocArticle[] = [
         <li>En el módulo de <em>Protección contra ransomware</em> o <em>Control de aplicaciones</em>, añade los binarios <code class="text-zinc-200">BentianAgent.exe</code> y <code class="text-zinc-200">BentianTray.exe</code> al grupo de <strong>Aplicaciones Confiables</strong>.</li>
       </ul>
 
-      <h2 id="crowdstrike-falcon" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. CrowdStrike Falcon EDR (Reglas IOA)</h2>
+      <h2 id="crowdstrike-falcon" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. CrowdStrike Falcon EDR (Reglas IOA)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         El sensor de Falcon vigila la invocación de herramientas de administración de Windows. Para entornos de máxima seguridad, define una regla personalizada IOA Exclusion condicionada a que el proceso padre sea el binario legítimo de Bentian:
       </p>
@@ -65,7 +78,7 @@ export const seguridadArticles: DocArticle[] = [
         <div>Action: <span class="text-emerald-400 font-bold">Allow / No Alert</span></div>
       </div>
 
-      <h2 id="verificacion-conexiones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Verificación de Conexiones Salientes</h2>
+      <h2 id="verificacion-conexiones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Verificación de Conexiones Salientes</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
         Bentian solo realiza peticiones salientes por el puerto 443 TCP (HTTPS) hacia el dominio de tu tienda online y hacia <code class="text-indigo-300">bridge.cristianjm.com</code>. No abre puertos de escucha en la red local ni requiere excepciones en el firewall perimetral.
       </p>

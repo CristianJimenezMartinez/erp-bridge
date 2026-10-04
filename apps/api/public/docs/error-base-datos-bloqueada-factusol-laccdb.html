@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solución al Error de Base de Datos Bloqueada en Factusol (.laccdb) | Bentian</title>
-  <meta name="description" content="Guía paso a paso para solucionar el error de base de datos bloqueada, archivo en uso (Error 3045) y fichero .laccdb huérfano en Factusol al trabajar en red local o NAS.">
-  <meta name="keywords" content="error base de datos bloqueada factusol, factusol archivo en uso, borrar laccdb factusol, error 3045 access factusol, factusol red nas bloqueo">
-  <meta name="author" content="Bentian">
-  <link rel="canonical" href="https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html">
+  <title>Solucionar Error 3045 Factusol (.laccdb Bloqueado) | Bentian ERP</title>
+  <meta name="description" content="Cómo desbloquear el archivo .laccdb huérfano de Factusol y solucionar el Error 3045 en red local o NAS sin reiniciar el servidor.">
+  <meta name="keywords" content="error 3045 factusol, desbloquear laccdb factusol, base de datos en uso exclusivo factusol, archivo ldb bloqueado factusol, colapso factusol red">
+  <meta name="author" content="Cristian Jiménez Martínez">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/">
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
@@ -15,10 +15,10 @@
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Cómo Solucionar el Error de Base de Datos Bloqueada (.laccdb) en Factusol">
-  <meta property="og:description" content="Solución técnica para desbloquear archivos .laccdb y evitar bloqueos en red local y servidores NAS con Factusol.">
+  <meta property="og:title" content="Solucionar Error 3045 Factusol (.laccdb Bloqueado) | Bentian ERP">
+  <meta property="og:description" content="Cómo desbloquear el archivo .laccdb huérfano de Factusol y solucionar el Error 3045 en red local o NAS sin reiniciar el servidor.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -27,158 +27,607 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": "Cómo solucionar el error de base de datos bloqueada (.laccdb) en Factusol al trabajar en red",
-    "description": "Manual de resolución técnica para administradores de sistemas y usuarios de Factusol ante bloqueos por concurrencia y archivos .laccdb huérfanos.",
-    "inLanguage": "es-ES",
-    "author": {
-      "@type": "Person",
-      "name": "Cristian Jiménez Martínez",
-      "url": "https://cristianjm.com"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Bentian",
-      "url": "https://bridge.cristianjm.com"
-    }
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/#article",
+        "headline": "Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)",
+        "description": "Cómo desbloquear el archivo .laccdb huérfano de Factusol y solucionar el Error 3045 en red local o NAS sin reiniciar el servidor.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://bridge.cristianjm.com/assets/icon.svg"
+          }
+        },
+        "datePublished": "2026-10-04T20:00:00+02:00",
+        "dateModified": "2026-10-05T00:00:00+02:00"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://bridge.cristianjm.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Documentación",
+            "item": "https://bridge.cristianjm.com/docs/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Resolución de Incidencias",
+            "item": "https://bridge.cristianjm.com/docs/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)",
+            "item": "https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/"
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+<body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
-  <!-- Navbar -->
-  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
-    <div class="max-w-4xl mx-auto flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
-        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
-      </a>
+  
+    <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Guía Antivirus</a>
-        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
-      </div>
-    </div>
-  </header>
+        <!-- Mobile hamburger toggle -->
+        <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition" aria-label="Abrir navegación">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
 
-  <!-- Contenido Principal -->
-  <main class="max-w-4xl mx-auto px-6 py-12 flex-grow">
+        <a href="/" class="flex items-center gap-3">
+          <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7">
+          <span class="font-bold text-base text-white tracking-tight">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3 sm:gap-4">
+        <a href="/docs/" class="text-xs text-zinc-300 hover:text-white transition hidden sm:inline-block">Índice General</a>
+        <a href="https://github.com/CristianJimenezMartinez/Bentian" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-white transition p-1.5 hidden md:inline-block" title="GitHub">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
+          <span>Descargar</span>
+          <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.3.6</span>
+        </a>
+      </div>
+    </header>
+  
+  
+    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <!-- Search Input in Sidebar -->
+      <div class="mb-6">
+        <label for="sidebar-search" class="sr-only">Buscar documentación</label>
+        <div class="relative">
+          <input type="text" id="sidebar-search" placeholder="Buscar... (Ctrl+K)" 
+            class="w-full bg-[#121215] border border-white/[0.1] rounded-xl px-3.5 py-2 pl-9 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <!-- Navigation Hierarchy -->
+      <nav class="space-y-6" id="docs-nav-tree">
+        
+            <div class="category-group" data-category="primeros-pasos">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🚀</span>
+                <span>Primeros Pasos</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian">
+                      <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Requisitos del Sistema y Entorno Operativo
+                      </a>
+                    </li>
+                  
+                    <li data-title="instalación y despliegue del agente en windows" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, desplegar conector factusol, bentian tray windows">
+                      <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Instalación y Despliegue del Agente en Windows
+                      </a>
+                    </li>
+                  
+                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian, plan fundador bentian, licenciamiento erp bridge">
+                      <a href="/docs/primeros-pasos/activacion-de-licencias/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Activación de Licencias, Beta de 60 Días y Plan Fundador
+                      </a>
+                    </li>
+                  
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil">
+                      <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Guía del Asistente de Configuración (Onboarding Wizard)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="factusol">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🗄️</span>
+                <span>Factusol ERP</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="localización de la base de datos de factusol (.accdb y .mdb)" data-keywords="donde esta base datos factusol, ruta base de datos factusol, accdb factusol, software delsol datos fs, estructura base datos factusol">
+                      <a href="/docs/factusol/localizacion-base-datos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Localización de la Base de Datos de Factusol (.accdb y .mdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="rutas de red, servidores nas y protección anti-wiping" data-keywords="factusol en red, factusol nas, factusol synology qnap, ruta unc factusol, anti wiping bentian, desconexion red factusol">
+                      <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Rutas de Red, Servidores NAS y Protección Anti-Wiping
+                      </a>
+                    </li>
+                  
+                    <li data-title="controladores microsoft ace oledb vs odbc" data-keywords="oledb factusol, microsoft ace oledb 12.0 16.0, oledb vs odbc factusol, access database engine factusol, conexion rapida factusol">
+                      <a href="/docs/factusol/controladores-oledb-ace/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Controladores Microsoft ACE OLEDB vs ODBC
+                      </a>
+                    </li>
+                  
+                    <li data-title="series de pedidos en factusol: serie 1 directa vs serie w" data-keywords="series factusol pedidos, serie 1 factusol, serie w pedidos web factusol, pedidos no aparecen factusol, f_pcl factusol serie">
+                      <a href="/docs/factusol/series-de-pedidos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Series de Pedidos en Factusol: Serie 1 Directa vs Serie W
+                      </a>
+                    </li>
+                  
+                    <li data-title="cálculo de stock disponible (dissto) vs stock real (actsto)" data-keywords="dissto factusol, actsto factusol, calcular stock disponible factusol, sobreventas woocommerce factusol, reservas clientes factusol f_sto">
+                      <a href="/docs/factusol/calculo-stock-disponible/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO)
+                      </a>
+                    </li>
+                  
+                    <li data-title="matriz oficial de compatibilidad de factusol (2018–2026)" data-keywords="matriz compatibilidad factusol, tablas factusol, factusol 2026 2025 2024, formato accdb factusol, f_art f_pcl factusol">
+                      <a href="/docs/factusol/matriz-compatibilidad/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Matriz Oficial de Compatibilidad de Factusol (2018–2026)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="canales">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛒</span>
+                <span>Canales eCommerce</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="conexión con woocommerce y compatibilidad hpos" data-keywords="conectar factusol woocommerce, rest api woocommerce factusol, hpos factusol, consumer key woocommerce, sincronizar pedidos woocommerce factusol">
+                      <a href="/docs/canales/woocommerce/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con WooCommerce y Compatibilidad HPOS
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con shopify mediante admin rest y graphql" data-keywords="conectar factusol shopify, shopify factusol sin intermediarios, conector shopify factusol, custom app shopify factusol, inventario shopify factusol">
+                      <a href="/docs/canales/shopify/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con Shopify mediante Admin REST y GraphQL
+                      </a>
+                    </li>
+                  
+                    <li data-title="endpoint universal: conecta cualquier tienda personalizada" data-keywords="api universal factusol, endpoint json factusol, conectar php factusol, conectar laravel factusol, sincronizar tienda a medida factusol">
+                      <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Endpoint Universal: Conecta Cualquier Tienda Personalizada
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="arquitectura">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>⚡</span>
+                <span>Arquitectura & Sincronización</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce">
+                      <a href="/docs/arquitectura/arquitectura-local-first/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Arquitectura Local-First y Privacidad de Datos
+                      </a>
+                    </li>
+                  
+                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos">
+                      <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cola Desacoplada Store-and-Forward (SQLite)
+                      </a>
+                    </li>
+                  
+                    <li data-title="filewatcher en tiempo real y ciclos incrementales" data-keywords="filewatcher factusol, cambios tiempo real factusol, debounce factusol bentian, sincronizacion incremental factusol, consumo cpu conector factusol">
+                      <a href="/docs/arquitectura/deteccion-tiempo-real/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        FileWatcher en Tiempo Real y Ciclos Incrementales
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="fiscalidad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🧾</span>
+                <span>Fiscalidad & Facturación</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="cuadre de iva al céntimo y prevención de descuadres" data-keywords="descuadre iva factusol woocommerce, cuadre centimo factusol, base imponible pedido factusol, f_pcl f_lpc iva factusol, calcular iva exacto factusol">
+                      <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cuadre de IVA al Céntimo y Prevención de Descuadres
+                      </a>
+                    </li>
+                  
+                    <li data-title="recargo de equivalencia en woocommerce y prestashop" data-keywords="recargo de equivalencia factusol, recargo equivalencia woocommerce, factusol f_pcl recargo, minoristas 5.2 recargo factusol, impuestos espanoles factusol">
+                      <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Recargo de Equivalencia en WooCommerce y PrestaShop
+                      </a>
+                    </li>
+                  
+                    <li data-title="veri*factu, ley antifraude y la facturación en factusol" data-keywords="verifactu factusol, ley antifraude factusol woocommerce, cadena criptografica trzfac, multas verifactu conectores, facturacion legal factusol">
+                      <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Veri*Factu, Ley Antifraude y la Facturación en Factusol
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="troubleshooting">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-indigo-400">
+                <span>🔧</span>
+                <span>Resolución de Incidencias</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="catálogo de errores humanizados y resolución en 1 clic" data-keywords="errores factusol, solucionar error conector factusol, errores humanizados bentian, mensajes claros factusol, soporte tecnico factusol">
+                      <a href="/docs/troubleshooting/errores-humanizados/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Catálogo de Errores Humanizados y Resolución en 1 Clic
+                      </a>
+                    </li>
+                  
+                    <li data-title="cómo solucionar el error 3045: base de datos bloqueada (.laccdb)" data-keywords="error 3045 factusol, desbloquear laccdb factusol, base de datos en uso exclusivo factusol, archivo ldb bloqueado factusol, colapso factusol red">
+                      <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
+                        Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="error de proveedor oledb microsoft.ace no registrado" data-keywords="microsoft ace oledb no esta registrado, descargar access database engine 64 bits, error oledb factusol 0x80004005, instalar oledb windows 11">
+                      <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error de Proveedor OLEDB Microsoft.ACE no Registrado
+                      </a>
+                    </li>
+                  
+                    <li data-title="error 401 unauthorized en woocommerce (.htaccess)" data-keywords="error 401 woocommerce rest api, cabecera authorization bloqueada htaccess, raiola webempresa woocommerce 401, conector factusol woocommerce 401">
+                      <a href="/docs/troubleshooting/error-401-autorizacion-hosting/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error 401 Unauthorized en WooCommerce (.htaccess)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="seguridad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛡️</span>
+                <span>Seguridad & Redes</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, bitdefender factusol, seguridad edr conector factusol">
+                      <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
+                      </a>
+                    </li>
+                  
+                    <li data-title="windows smartscreen: autorización y reputación de binarios" data-keywords="windows smartscreen bentian, windows protegio su pc factusol, desbloquear ejecutable windows defender, smartscreen bentian setup exe">
+                      <a href="/docs/seguridad/windows-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Windows SmartScreen: Autorización y Reputación de Binarios
+                      </a>
+                    </li>
+                  
+                    <li data-title="criptografía asimétrica ed25519 y actualización atómica" data-keywords="firmas ed25519 bentian, update swapper windows, actualizacion atomica factusol, seguridad ejecutable bentian, rollback automatico bentian">
+                      <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Criptografía Asimétrica Ed25519 y Actualización Atómica
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="api">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>📡</span>
+                <span>API REST & Esquemas</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="referencia de la api rest local del agente (39281)" data-keywords="api rest factusol local, endpoints bentian 39281, api local conector factusol, json factusol local, telemetria conector factusol">
+                      <a href="/docs/api/api-rest-local/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Referencia de la API REST Local del Agente (39281)
+                      </a>
+                    </li>
+                  
+                    <li data-title="esquema json de pedidos (orderpayload) y validación zod" data-keywords="json pedidos factusol, order payload factusol, esquema json woocommerce factusol, zod pedidos erp bridge, api pedidos f_pcl">
+                      <a href="/docs/api/esquema-pedidos-json/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Esquema JSON de Pedidos (OrderPayload) y Validación Zod
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+      </nav>
+
+      <!-- Sidebar Footer Badge -->
+      <div class="mt-8 pt-4 border-t border-white/[0.08] px-2 text-[11px] text-zinc-500 flex items-center justify-between">
+        <span>Agente <span data-app-version>v0.3.6</span></span>
+        <span class="inline-flex items-center gap-1 text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>100% Local-First</span>
+        </span>
+      </div>
+    </aside>
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+  
+
+  <!-- Main Layout Container (Sidebar width: lg:pl-72, Right TOC width: xl:pr-64) -->
+  <div class="pt-16 lg:pl-72">
+    <div class="max-w-7xl mx-auto flex">
+      
+      <!-- Center Content Column -->
+      <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-10 max-w-4xl">
+        
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-6 flex-wrap">
+          <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+          <span>/</span>
+          <a href="/docs/" class="hover:text-zinc-300 transition">Docs</a>
+          <span>/</span>
+          <span class="text-zinc-400">Resolución de Incidencias</span>
+          <span>/</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)</span>
+        </nav>
+
+        <!-- Article Header -->
+        <div class="mb-8 pb-6 border-b border-white/[0.08]">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              Bloqueos de Ficheros
+            </span>
+            <span class="text-xs text-zinc-500">·</span>
+            <span class="text-xs text-zinc-500 font-mono">5 min de lectura</span>
+            <span class="text-xs text-zinc-500">·</span>
+            <span class="text-xs text-zinc-500 font-mono">Actualizado v0.3.6</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
+            Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)
+          </h1>
+          <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+            Qué hacer cuando Factusol o Bentian muestran que el archivo está en uso exclusivo por otro usuario o proceso.
+          </p>
+        </div>
+
+        <!-- Article Rich Content Body -->
+        <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
+          
+      <p class="text-base text-zinc-300 leading-relaxed mb-6">
+        El <strong>Error 3045</strong> (<em>"No se pudo utilizar el archivo; actualmente está en uso por otro usuario o proceso"</em>) es la incidencia más clásica en empresas que utilizan Factusol en red local. Ocurre cuando Microsoft Access detecta un cerrojo exclusivo activo y rechaza cualquier nueva conexión.
+      </p>
+
+      <h2 id="que-es-el-archivo-laccdb" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. ¿Qué es el Archivo .laccdb o .ldb?</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Cada vez que alguien abre Factusol, el motor de base de datos crea de forma automática un archivo temporal con el mismo nombre y extensión <code class="text-indigo-300 font-mono">.laccdb</code> (ej: <code class="text-zinc-200">0012026.laccdb</code>) en la misma carpeta. Este fichero registra qué usuarios de la red tienen tablas abiertas para coordinar los bloqueos de registros.
+      </p>
+
+      <h2 id="por-que-se-queda-bloqueado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Por qué se Queda Bloqueado en Red Local</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Normalmente, cuando el último usuario cierra Factusol, Windows elimina automáticamente el archivo <code class="text-zinc-200">.laccdb</code>. Sin embargo, puede quedar <strong>"huérfano" y bloqueado</strong> si:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li>Un ordenador de la oficina sufrió un corte de luz o se apagó a la fuerza sin cerrar Factusol.</li>
+        <li>Un PC perdió la conexión Wi-Fi dejando la sesión SMB colgada en el servidor o NAS.</li>
+        <li>Un antivirus de terceros está analizando el archivo <code class="text-zinc-200">.accdb</code> y mantiene el handle abierto.</li>
+      </ul>
+
+      <h2 id="pasos-para-desbloquear" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Procedimiento Paso a Paso para Desbloquear</h2>
+      <ol class="text-sm text-zinc-300 space-y-2.5 list-decimal list-inside mb-6">
+        <li><strong>Cerrar Factusol en todos los puestos:</strong> Pide a los empleados que cierren Factusol en sus escritorios durante 1 minuto.</li>
+        <li><strong>Cerrar Bentian temporalmente:</strong> Clic derecho en el icono de Bentian en la bandeja del sistema → <em>Salir</em>.</li>
+        <li><strong>Navegar a la carpeta de la empresa:</strong> Abre el Explorador de Windows y dirígete a la carpeta donde reside la base de datos (ej: <code class="text-zinc-200">C:\Software DELSOL\Factusol\Datos\FS\</code> o la ruta de tu servidor NAS).</li>
+        <li><strong>Eliminar el archivo de cerrojo huérfano:</strong> Localiza el archivo con extensión <code class="text-rose-400 font-mono">.laccdb</code> (o <code class="text-rose-400 font-mono">.ldb</code>) y bórralo. Si Windows indica que no se puede borrar porque está en uso por un equipo, reinicia el servicio SMB del servidor o cierra las sesiones abiertas en <em>Administración de equipos → Carpetas compartidas → Sesiones</em>.</li>
+        <li><strong>Reiniciar Factusol y Bentian:</strong> Abre Factusol para verificar que entra normalmente y después inicia Bentian ERP Bridge.</li>
+      </ol>
+
+      <h2 id="como-evitar-futuros-bloqueos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Cómo Previene Bentian Futuros Bloqueos</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Bentian nunca abre la base de datos en modo exclusivo. Todas las conexiones OLEDB utilizan el flag <code class="text-emerald-400 font-mono">Mode=Share Deny None</code> y cierran los recordsets inmediatamente tras completar cada consulta, evitando que el conector bloquee el trabajo diario del mostrador.
+      </p>
     
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
-      <span>Soporte Técnico Factusol • Microsoft Access Database Engine</span>
-    </div>
+        </article>
 
-    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-      Cómo Solucionar el Error de Base de Datos Bloqueada (<code class="text-indigo-400 text-2xl sm:text-3xl">.laccdb</code>) en Factusol
-    </h1>
-
-    <p class="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed">
-      Uno de los problemas más habituales al trabajar con <strong>Factusol en red local o en un servidor NAS (Synology, QNAP, Windows Server)</strong> es el bloqueo imprevisto de la base de datos (Error 3045: <em>"El archivo ya está en uso por otro proceso o usuario"</em>). En esta guía técnica explicamos por qué ocurre y cómo resolverlo sin peligro de corrupción.
-    </p>
-
-    <!-- Explicación Técnica -->
-    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-10">
-      <h2 class="text-xl font-bold text-white mb-3">1. ¿Qué es el archivo .laccdb (o .ldb)?</h2>
-      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
-        Factusol utiliza como motor relacional <strong>Microsoft Access (ACE / Jet OLEDB)</strong>. Cada vez que un usuario abre una empresa en Factusol (ej: <code>2262026.accdb</code>), el motor de base de datos crea de forma automática en la misma carpeta un archivo complementario con el mismo nombre y extensión <code>.laccdb</code> (o <code>.ldb</code> en versiones antiguas).
-      </p>
-      <p class="text-sm text-zinc-400 leading-relaxed">
-        Este archivo registra qué ordenador de la red está conectado para coordinar los bloqueos de registro. Si un equipo se apaga bruscamente, entra en suspensión, sufre un microcorte de Wi-Fi o un conector externo se cierra de forma inesperada, <strong>el archivo .laccdb queda huérfano</strong> y Windows sigue marcando la base de datos como "ocupada exclusivamente", impidiendo que nadie pueda entrar.
-      </p>
-    </div>
-
-    <!-- Pasos de Resolución -->
-    <div class="space-y-6 mb-12">
-      <h2 class="text-2xl font-bold text-white mb-4">2. Pasos para Desbloquear la Base de Datos</h2>
-
-      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">1</span>
-          <h3 class="font-bold text-white text-base">Cerrar Factusol en todos los puestos de la oficina</h3>
+        <!-- Pagination: Prev / Next Buttons -->
+        <div class="mt-12 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+            <a href="/docs/troubleshooting/errores-humanizados/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
+              <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">← Artículo Anterior</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Catálogo de Errores Humanizados y Resolución en 1 Clic</span>
+            </a>
+          
+          
+            <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
+              <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">Siguiente Artículo →</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Error de Proveedor OLEDB Microsoft.ACE no Registrado</span>
+            </a>
+          
         </div>
-        <p class="text-sm text-zinc-400 leading-relaxed">
-          Pide a todos los usuarios de la red local que cierren completamente el programa Factusol. Comprueba en el Administrador de Tareas (Ctrl + Mayús + Esc) que ningún proceso huérfano (<code>FACTUSOL.exe</code> o <code>cscript.exe</code>) continúe ejecutándose en segundo plano.
-        </p>
-      </div>
 
-      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">2</span>
-          <h3 class="font-bold text-white text-base">Liberar archivos abiertos en el Servidor o NAS</h3>
+        <!-- Support Assistance Card -->
+        <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-indigo-950/30 via-[#121215] to-[#121215] border border-indigo-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h4 class="text-sm font-bold text-white mb-1">¿Tienes dudas sobre la configuración en tu empresa?</h4>
+            <p class="text-xs text-zinc-400">Nuestro equipo de ingeniería te asiste con tu base de datos Factusol o red local.</p>
+          </div>
+          <a href="mailto:cristianjimeneztrabajo@gmail.com" class="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-white shrink-0 transition">
+            Contactar con Soporte
+          </a>
         </div>
-        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
-          Si la base de datos reside en un servidor Windows o en un NAS:
-        </p>
-        <ul class="text-sm text-zinc-400 list-disc list-inside space-y-1">
-          <li><strong>En Windows Server:</strong> Abre <code>compmgmt.msc</code> (Administración de equipos) → Carpetas compartidas → Archivos abiertos. Busca el archivo <code>.laccdb</code>, haz clic derecho y selecciona <em>Cerrar archivo abierto</em>.</li>
-          <li><strong>En Synology / QNAP:</strong> En el Panel de Control → Servicios de archivo → Administrador de conexiones SMB, desconecta la sesión residual del equipo cliente.</li>
+
+      </main>
+
+      <!-- Right Table of Contents Column (Sticky) -->
+      <aside class="hidden xl:block w-64 shrink-0 px-6 py-10 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+        <div class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">En esta página</div>
+        <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
+          
+            <li>
+              <a href="#que-es-el-archivo-laccdb" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="que-es-el-archivo-laccdb">
+                1. ¿Qué es el Archivo .laccdb o .ldb?
+              </a>
+            </li>
+          
+            <li>
+              <a href="#por-que-se-queda-bloqueado" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="por-que-se-queda-bloqueado">
+                2. Por qué se Queda Bloqueado en Red Local
+              </a>
+            </li>
+          
+            <li>
+              <a href="#pasos-para-desbloquear" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="pasos-para-desbloquear">
+                3. Procedimiento Paso a Paso para Desbloquear
+              </a>
+            </li>
+          
+            <li>
+              <a href="#como-evitar-futuros-bloqueos" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="como-evitar-futuros-bloqueos">
+                4. Cómo Previene Bentian Futuros Bloqueos
+              </a>
+            </li>
+          
         </ul>
-      </div>
 
-      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">3</span>
-          <h3 class="font-bold text-white text-base">Eliminar el archivo de bloqueo huérfano (.laccdb)</h3>
+        <!-- Action Card -->
+        <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+          <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
+            Descargar v0.3.6
+          </a>
         </div>
-        <p class="text-sm text-zinc-400 leading-relaxed">
-          Una vez verificado que ningún equipo tiene el programa abierto, accede a la carpeta de datos de Factusol (ej: <code>\\NAS\Datos\FS\</code>) y elimina manualmente el archivo con extensión <code>.laccdb</code> (o <code>.ldb</code>). <strong>ATENCIÓN:</strong> Elimina ÚNICAMENTE el archivo <code>.laccdb</code> de pocos kilobytes, jamás el archivo principal <code>.accdb</code>.
-        </p>
-      </div>
+      </aside>
 
-      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">4</span>
-          <h3 class="font-bold text-white text-base">Revisar permisos de red de la carpeta compartida</h3>
-        </div>
-        <p class="text-sm text-zinc-400 leading-relaxed">
-          Para que Factusol pueda crear y destruir el archivo <code>.laccdb</code> sin errores, todos los usuarios de la red necesitan permisos completos de <strong>Lectura, Escritura, Modificación y Eliminación</strong> en la carpeta compartida. Si un usuario carece de permiso de eliminación, el archivo de bloqueo no se borra al salir y causa bloqueos recurrentes.
-        </p>
-      </div>
     </div>
+  </div>
 
-    <!-- Cómo lo previene Bentian -->
-    <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8 mb-12">
-      <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold mb-3">
-        TECNOLOGÍA BENTIAN ZERO-LOCK
-      </div>
-      <h2 class="text-xl font-bold text-white mb-3">¿Cómo evita Bentian ERP Bridge los bloqueos de base de datos?</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-3">
-        Muchos conectores y scripts caseros abren la base de datos de Factusol en modo exclusivo o realizan consultas SQL de escritura sin cerrar la conexión, provocando el bloqueo del ERP para los comerciales y administrativos de la oficina.
-      </p>
-      <p class="text-sm text-zinc-300 leading-relaxed">
-        <strong>Bentian ERP Bridge</strong> utiliza una cadena de conexión OLEDB blindada con el parámetro <code>Mode=Share Deny None;Jet OLEDB:Database Locking Mode=1;</code>. Esto garantiza que las lecturas de stock y catálogo para tu tienda online se ejecuten en milisegundos <strong>en modo lectura compartida no bloqueante</strong>, permitiendo que tus empleados sigan facturando y creando albaranes simultáneamente sin sufrir cuelgues ni errores de archivo en uso.
-      </p>
-    </div>
+  <script src="/js/version-sync.js" defer></script>
+  <script>
+    // 1. Mobile Menu Toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('docs-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
-    <!-- CTA -->
-    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 text-center">
-      <h3 class="text-xl font-bold text-white mb-3">¿Buscas un conector Factusol que no bloquee tu red?</h3>
-      <p class="text-sm text-zinc-400 max-w-xl mx-auto mb-6">
-        Prueba Bentian ERP Bridge durante la Beta Pública gratuita. Se integra con tu Factusol local en red o NAS en 2 minutos sin interferir en el trabajo de tu empresa.
-      </p>
-      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
-        <span>Descargar Bentian-Setup.exe</span>
-        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
-      </a>
-    </div>
+    if (mobileBtn && sidebar && overlay) {
+      const toggleSidebar = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      };
+      mobileBtn.addEventListener('click', toggleSidebar);
+      overlay.addEventListener('click', toggleSidebar);
+    }
 
-  </main>
+    // 2. Client-side Search in Sidebar
+    const searchInput = document.getElementById('sidebar-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const items = document.querySelectorAll('#docs-nav-tree li');
+        const groups = document.querySelectorAll('#docs-nav-tree .category-group');
 
-  <!-- Footer -->
-  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
-    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>© 2026 Bentian ERP Bridge • Guías Técnicas y Soporte de Factusol</div>
-      <div class="flex items-center gap-4 text-zinc-400">
-        <a href="/" class="hover:text-white transition">Inicio</a>
-        <span>•</span>
-        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="hover:text-white transition">Antivirus</a>
-        <span>•</span>
-        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
-        <span>•</span>
-        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
-      </div>
-    </div>
-  </footer>
+        items.forEach((li) => {
+          const title = li.getAttribute('data-title') || '';
+          const keywords = li.getAttribute('data-keywords') || '';
+          const matches = title.includes(query) || keywords.includes(query);
+          li.style.display = matches ? '' : 'none';
+        });
 
-  <script src="/js/version-sync.js"></script>
+        groups.forEach((group) => {
+          const visibleItems = group.querySelectorAll('li:not([style*="display: none"])');
+          group.style.display = visibleItems.length > 0 ? '' : 'none';
+        });
+      });
+
+      // Shortcut: Ctrl+K / Cmd+K to focus search
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
+
+    // 3. Scrollspy for Table of Contents
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const headings = Array.from(document.querySelectorAll('article h2, article h3'));
+
+    if (tocLinks.length > 0 && headings.length > 0) {
+      window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 100;
+        let currentHeading = null;
+        for (const h of headings) {
+          if (h.offsetTop <= scrollPos) {
+            currentHeading = h;
+          } else {
+            break;
+          }
+        }
+        if (currentHeading) {
+          const currentId = currentHeading.id;
+          tocLinks.forEach((link) => {
+            if (link.getAttribute('data-id') === currentId) {
+              link.classList.add('text-indigo-400', 'font-semibold');
+              link.classList.remove('text-zinc-400');
+            } else {
+              link.classList.remove('text-indigo-400', 'font-semibold');
+              link.classList.add('text-zinc-400');
+            }
+          });
+        }
+      }, { passive: true });
+    }
+  </script>
 </body>
 </html>
