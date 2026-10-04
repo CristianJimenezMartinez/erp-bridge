@@ -454,16 +454,17 @@ Para consolidar la huella digital y reputación de Bentian ERP Bridge en los mot
 | Plataforma / Directorio | Autoridad (DA) | Enlace de Registro / Ficha | Tipo de Presencia | Estado Actual |
 | :--- | :---: | :--- | :--- | :---: |
 | **AlternativeTo** | DA 82 | [alternativeto.net/software/bentian-erp-bridge/](https://alternativeto.net/software/bentian-erp-bridge/) | Alternativa a Zapier, Make y conectores Factusol | ✅ **Activo y Publicado** |
+| **SourceForge** | DA 93 | [sourceforge.net/projects/bentian-erp-bridge/](https://sourceforge.net/projects/bentian-erp-bridge/) | Repositorio histórico con instalador oficial Windows | ✅ **Activo y Publicado** |
+| **G2.com** | DA 93 | [g2.com/products/bentian-erp-bridge](https://g2.com/) | Perfil de producto empresarial y cuadrante B2B | ✅ **Perfil Aprobado** |
+| **Capterra España (Gartner)** | DA 91 | [capterra.es](https://capterra.es/) / [G2 Network](https://g2.com/) | Reseñas B2B sincronizadas vía G2 Network | ⏳ **En Verificación de Red** |
+| **GetApp & Software Advice** | DA 89 | [getapp.com](https://getapp.com/) / [softwareadvice.com](https://softwareadvice.com/) | Red Gartner integrada con G2 | ⏳ **En Verificación de Red** |
 | **Microsoft WinGet** | DA 98 | [github.com/microsoft/winget-pkgs/pull/446582](https://github.com/microsoft/winget-pkgs/pull/446582) | Comando oficial: `winget install Bentian.ERPBridge` | ⏳ **En Revisión (CI Verde)** |
 | **Uptodown (España)** | DA 90 | [developers.uptodown.com](https://developers.uptodown.com/) | Ficha en español, análisis de 70 antivirus | ⏳ **Enviado a Revisión** |
-| **Softpedia** | DA 92 | Correo: `submit@softpedia.com` / [Formulario](https://www.softpedia.com/user/contact.php) | Sello "100% Clean: No Spyware, No Viruses" | ✉️ **Listo para envío** |
-| **SaaSHub** | DA 75 | [saashub.com/submit](https://www.saashub.com/submit) | Alternativa B2B a software de sincronización | 📋 **Pendiente de alta** |
-| **SourceForge** | DA 93 | [sourceforge.net/p/add_project/](https://sourceforge.net/p/add_project/) | Repositorio histórico de software para Windows | 📋 **Pendiente de alta** |
-| **Capterra España (Gartner)** | DA 91 | [vendorportal.gartner.com](https://vendorportal.gartner.com/) | Reseñas B2B y presencia en comparador líder | 📋 **Pendiente de alta** |
-| **SoftDoit (España)** | DA 52 | [softdoit.com](https://www.softdoit.com/) | Comparador español especializado en ERPs | 📋 **Pendiente de alta** |
+| **SaaSHub** | DA 75 | [saashub.com](https://saashub.com/) | Alternativa B2B a software de sincronización | ⏳ **Enviado a Revisión** |
+| **Softpedia** | DA 92 | Correo: `submit@softpedia.com` / [Formulario](https://www.softpedia.com/) | Sello "100% Clean: No Spyware, No Viruses" | ✉️ **Listo para envío** |
 | **Trustpilot B2B** | DA 94 | [es.business.trustpilot.com](https://es.business.trustpilot.com/) | Perfil de empresa para opiniones de los 25 fundadores | 📋 **Pendiente de alta** |
-| **G2.com** | DA 93 | [g2.com/products/new](https://www.g2.com/products/new) | Reseñas y cuadrante de software empresarial | 📋 **Pendiente de alta** |
-| **Product Hunt** | DA 91 | [producthunt.com](https://www.producthunt.com/) | Lanzamiento comunitario para agencias y desarrolladores | 📋 **Pendiente de alta** |
+| **SoftDoit (España)** | DA 52 | [softdoit.com](https://www.softdoit.com/) | Comparador español especializado en ERPs | 📋 **Pendiente de contacto** |
+| **Product Hunt** | DA 91 | [producthunt.com](https://www.producthunt.com/) | Lanzamiento comunitario para agencias y desarrolladores | 📋 **Pendiente de fecha** |
 
 ---
 
