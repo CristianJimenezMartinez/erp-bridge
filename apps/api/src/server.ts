@@ -215,27 +215,7 @@ export async function bootstrapApp(): Promise<Express> {
     res.redirect(301, '/conector-factusol/');
   });
 
-<<<<<<< HEAD
-  app.get('/factusol-verifactu-woocommerce', (_req, res) => {
-    res.redirect(301, '/factusol-verifactu-woocommerce/');
-  });
-
-  app.get('/factusol-api-rest', (_req, res) => {
-    res.redirect(301, '/factusol-api-rest/');
-  });
-
-  app.get('/comparativa-conector-windows-vs-plugin-wordpress', (_req, res) => {
-    res.redirect(301, '/comparativa-conector-windows-vs-plugin-wordpress/');
-  });
-
-  app.get('/factusol-prestashop-8', (_req, res) => {
-    res.redirect(301, '/factusol-prestashop-8/');
-  });
-
-  app.get('/docs', (_req, res) => {
-    res.redirect(301, '/docs/');
-=======
-  // Redirecciones canónicas 301 para páginas pilar SEO
+  // Redirecciones canónicas 301 para páginas pilar SEO y guías
   app.get('/factusol-woocommerce', (_req, res) => {
     res.redirect(301, '/factusol-woocommerce/');
   });
@@ -244,6 +224,18 @@ export async function bootstrapApp(): Promise<Express> {
   });
   app.get('/alternativa-delsol-conecta', (_req, res) => {
     res.redirect(301, '/alternativa-delsol-conecta/');
+  });
+  app.get('/factusol-verifactu-woocommerce', (_req, res) => {
+    res.redirect(301, '/factusol-verifactu-woocommerce/');
+  });
+  app.get('/factusol-api-rest', (_req, res) => {
+    res.redirect(301, '/factusol-api-rest/');
+  });
+  app.get('/comparativa-conector-windows-vs-plugin-wordpress', (_req, res) => {
+    res.redirect(301, '/comparativa-conector-windows-vs-plugin-wordpress/');
+  });
+  app.get('/factusol-prestashop-8', (_req, res) => {
+    res.redirect(301, '/factusol-prestashop-8/');
   });
   app.get('/factusol-tallas-colores', (_req, res) => {
     res.redirect(301, '/factusol-tallas-colores/');
@@ -256,7 +248,9 @@ export async function bootstrapApp(): Promise<Express> {
   });
   app.get('/factusol-recargo-equivalencia', (_req, res) => {
     res.redirect(301, '/factusol-recargo-equivalencia/');
->>>>>>> af62ed8 (feat(seo): add 4 high-value pillar landing pages (tallas-colores, shopify, ferreterias, recargo-equivalencia))
+  });
+  app.get('/docs', (_req, res) => {
+    res.redirect(301, '/docs/');
   });
 
   // Servir Dashboard Cloud Multi-Tenant
