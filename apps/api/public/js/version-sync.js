@@ -11,7 +11,7 @@
 (function(window, document) {
   'use strict';
 
-  var DEFAULT_VERSION = '0.3.5';
+  var DEFAULT_VERSION = '0.3.6';
   var INSTALLER_URL = '/releases/latest/Bentian-Setup.exe';
   var ZIP_URL = '/releases/latest/Bentian-Setup.zip';
   var PORTABLE_URL = '/releases/latest/BentianAgent-Portable.zip';
