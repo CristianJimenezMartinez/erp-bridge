@@ -62,28 +62,40 @@
           <li><a href="/dashboard" class="text-zinc-400 hover:text-white transition">Panel de Control</a></li>
         </ul>
       </div>
+    </div>
 
-    <!-- Ecosistemas y Directorios Oficiales -->
-    <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-4 text-xs">
-      <div class="flex items-center gap-2 text-zinc-400 font-mono text-[11px]">
-        <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-        <span>Ecosistemas &amp; Distribución:</span>
+    <!-- Ecosistemas y Directorios Oficiales (Ancho Completo) -->
+    <div class="mt-12 pt-8 border-t border-white/[0.08] flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5 text-zinc-300 font-mono text-xs">
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs">✓</span>
+        <span class="font-semibold text-white">Distribución &amp; Certificación Oficial:</span>
       </div>
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-zinc-400">
-        <a href="https://github.com/microsoft/winget-pkgs/pull/446582" target="_blank" rel="noopener noreferrer" class="hover:text-blue-300 transition font-mono">Microsoft WinGet</a>
-        <span class="text-zinc-700">•</span>
-        <a href="https://sourceforge.net/projects/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition font-mono">SourceForge</a>
-        <span class="text-zinc-700">•</span>
-        <a href="https://alternativeto.net/software/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-300 transition font-mono">AlternativeTo</a>
-        <span class="text-zinc-700">•</span>
-        <a href="https://es.trustpilot.com/review/bridge.cristianjm.com" target="_blank" rel="noopener noreferrer" class="hover:text-teal-300 transition font-mono">Trustpilot</a>
-        <span class="text-zinc-700">•</span>
-        <a href="https://www.g2.com/" target="_blank" rel="noopener noreferrer" class="hover:text-red-300 transition font-mono">G2 Marketplace</a>
+      <div class="flex flex-wrap items-center justify-center gap-2.5">
+        <a href="https://github.com/microsoft/winget-pkgs/pull/446582" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#121215] border border-white/[0.08] hover:border-blue-500/40 text-xs font-mono text-zinc-300 hover:text-white transition">
+          <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+          <span>Microsoft WinGet</span>
+        </a>
+        <a href="https://sourceforge.net/projects/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#121215] border border-white/[0.08] hover:border-amber-500/40 text-xs font-mono text-zinc-300 hover:text-white transition">
+          <svg class="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>SourceForge</span>
+        </a>
+        <a href="https://alternativeto.net/software/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 text-xs font-mono text-zinc-300 hover:text-white transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>AlternativeTo</span>
+        </a>
+        <a href="https://es.trustpilot.com/review/bridge.cristianjm.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#121215] border border-white/[0.08] hover:border-teal-500/40 text-xs font-mono text-zinc-300 hover:text-white transition">
+          <span class="text-emerald-400 text-xs">★</span>
+          <span>Trustpilot</span>
+        </a>
+        <a href="https://www.g2.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#121215] border border-white/[0.08] hover:border-red-500/40 text-xs font-mono text-zinc-300 hover:text-white transition">
+          <span class="text-red-400 font-bold text-xs">G2</span>
+          <span>Marketplace</span>
+        </a>
       </div>
     </div>
 
-    <!-- Barra Inferior: Copyright & Legal -->
-    <div class="mt-6 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+    <!-- Barra Inferior: Copyright & Legal (Ancho Completo) -->
+    <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
       <div class="flex items-center gap-1.5 text-center sm:text-left">
         <span>© 2026 Bentian ERP Bridge.</span>
         <span class="hidden sm:inline text-zinc-700">•</span>
