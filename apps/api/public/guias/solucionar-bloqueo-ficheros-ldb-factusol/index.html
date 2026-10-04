@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Solucionar y Evitar el Bloqueo de Archivos .ldb en Factusol | Guía Técnica</title>
+  <meta name="description" content="Guía técnica avanzada para eliminar bloqueos de archivos .ldb y .laccdb en Factusol (Error 3045). Concurrencia OLEDB Share Deny None, bloqueo de registro y arquitectura Store-and-Forward sin cuelgues en el TPV.">
+  <meta name="keywords" content="bloqueo archivos ldb factusol, solucionar laccdb factusol, error 3045 factusol archivo en uso, factusol tpv bloqueado f_art, share deny none factusol oledb, base de datos bloqueada factusol nas">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Solucionar y Evitar el Bloqueo de Archivos .ldb en Factusol | Guía Técnica">
+  <meta property="og:description" content="Resuelve el Error 3045 de archivo bloqueado en Factusol y descubre cómo evitar que los conectores web cuelguen el TPV físico de tu empresa.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Evitar Bloqueos de Archivos .ldb y .laccdb en Factusol | Guía Técnica">
+  <meta name="twitter:description" content="Manual de concurrencia y arquitectura OLEDB para evitar caídas en Factusol y TPV.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0e0e11; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Guías Técnicas", "item": "https://bridge.cristianjm.com/docs/" },
+          { "@type": "ListItem", "position": 3, "name": "Solucionar Bloqueo Archivos .ldb Factusol", "item": "https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/" }
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Cómo Solucionar y Evitar el Bloqueo de Archivos .ldb y .laccdb en Factusol",
+        "description": "Explicación técnica del mecanismo de cerrojos del Microsoft Access Database Engine en Factusol, resolución de archivos huérfanos y arquitectura de concurrencia OLEDB Share Deny None.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com"
+        },
+        "mainEntityOfPage": "https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/"
+      },
+      {
+        "@type": "HowTo",
+        "name": "Cómo desbloquear un archivo .laccdb huérfano en Windows y configurar OLEDB sin bloqueos",
+        "description": "Procedimiento paso a paso para liberar un archivo de bloqueo retenido en Factusol y configurar cadenas de conexión concurrentes.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Identificar el proceso bloqueante o sesión SMB abierta",
+            "text": "Comprobar en el Administrador de Tareas si existen instancias colgadas de FACTUSOL.exe, cscript.exe o procesos OLEDB, o revisar sesiones abiertas en Administración de Equipos (fsmgmt.msc).",
+            "position": 1
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Cerrar handles de archivo y eliminar el .laccdb huérfano",
+            "text": "Liberar el identificador del archivo .laccdb y eliminarlo del disco una vez confirmada la ausencia de escrituras activas.",
+            "position": 2
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Configurar la cadena OLEDB con Share Deny None y bloqueo por registro",
+            "text": "Utilizar Mode=Share Deny None y Jet OLEDB:Database Locking Mode=1 para evitar bloqueos exclusivos de página de 4KB en la tabla F_ART.",
+            "position": 3
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Implementar arquitectura desacoplada Store-and-Forward",
+            "text": "Usar Bentian ERP Bridge para desacoplar las lecturas de catálogo a memoria RAM y ejecutar transacciones de pedidos atómicas en menos de 15 ms.",
+            "position": 4
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Por qué se genera el archivo .ldb o .laccdb en Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "El archivo de cerrojo (.ldb en bases de datos .mdb o .laccdb en bases de datos .accdb) es creado de forma automática por el Microsoft Access Database Engine (ACE/Jet) para registrar los nombres de usuario y nombres de equipo conectados concurrentemente y coordinar los bloqueos de registro."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Por qué se congela el TPV físico cuando un conector web sincroniza?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Los plugins tradicionales y scripts ODBC no optimizados abren consultas SELECT directas sin el parámetro 'Share Deny None' o con bloqueo a nivel de página (bloques de 4.096 bytes). Si el conector lee 10.000 artículos de F_ART mientras el cajero intenta cobrar un ticket o actualizar existencias en F_STO, el motor de Access bloquea la tabla entera y Factusol entra en estado 'No responde'."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué es el parámetro 'Jet OLEDB:Database Locking Mode=1'?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Por defecto, Access utiliza el bloqueo de página (Locking Mode=0), bloqueando un bloque completo de 4 KB de registros. Al configurar Locking Mode=1, se instruye al motor para que aplique bloqueo a nivel de fila o registro individual (Record-Level Locking), impidiendo que la lectura de un artículo bloquee a los artículos vecinos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo elimina Bentian permanentemente el Error 3045?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian no mantiene conexiones ODBC abiertas contra Factusol. Realiza lecturas instantáneas (snapshot) en local con dirty checking en memoria RAM (<50 ms) y encola las escrituras de pedidos en una base de datos local SQLite bajo una arquitectura Store-and-Forward. Las escrituras en Factusol se ejecutan en microtransacciones atómicas de menos de 15 ms, cediendo el acceso al TPV de inmediato."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">Resolución de Incidencias</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/error-base-datos-bloqueada-factusol-laccdb.html" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Guía Rápida .laccdb</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden md:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Agente (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Breadcrumbs -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-8 font-mono">
+      <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+      <span>/</span>
+      <a href="/docs/" class="hover:text-zinc-300 transition">Guías</a>
+      <span>/</span>
+      <span class="text-rose-400">Solucionar Bloqueo .ldb en Factusol</span>
+    </nav>
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/20 bg-rose-500/10 text-rose-400 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+      <span>Microsoft Access Database Engine • Concurrencia OLEDB &amp; Error 3045</span>
+    </div>
+
+    <!-- H1 -->
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Solucionar y Evitar el <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-amber-400 to-indigo-400">Bloqueo de Archivos .ldb</span> en Factusol
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Es el escenario temido por todo comercio: la cola de clientes crece en la tienda física, el empleado escanea un producto en el <strong>TPV de Factusol</strong> y el programa se congela por completo mostrando <em class="text-zinc-200">"No responde"</em> o el <strong>Error 3045: "El archivo ya está en uso por otro proceso"</strong>. La causa suele ser un conector web externo o plugin ODBC bloqueando la tabla maestra de artículos (<code class="text-rose-300">F_ART</code>). Aquí tienes la explicación técnica detallada y su solución definitiva.
+    </p>
+
+    <!-- Alerta Técnica Explicativa -->
+    <div class="border border-rose-500/30 bg-rose-950/20 rounded-2xl p-6 sm:p-8 mb-12 backdrop-blur">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-rose-600/30 border border-rose-500/40 flex items-center justify-center flex-shrink-0 text-rose-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white mb-1">El Mecanismo Interno del Bloqueo .ldb / .laccdb</h3>
+          <p class="text-sm text-zinc-300 leading-relaxed">
+            Factusol se apoya en el motor Microsoft Access (Jet/ACE OLEDB). Cuando un proceso abre el archivo <code class="text-zinc-200">FSC26.accdb</code>, el motor crea automáticamente un archivo de bloqueo (<code class="text-rose-300">FSC26.laccdb</code> de 64 bytes por cada sesión). Si un conector abre la base de datos solicitando acceso exclusivo o sin especificar cerrojo compartido, <strong>Windows bloquea físicamente la apertura del archivo para cualquier otro puesto</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparación Gráfica del Conflicto de Concurrencia -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      
+      <!-- Lado Erróneo -->
+      <div class="border border-red-500/20 bg-red-500/[0.03] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-red-400 text-lg">❌</span>
+          <h3 class="text-lg font-bold text-red-400">Conector Tradicional / Plugin ODBC</h3>
+        </div>
+        <ul class="space-y-3 text-sm text-zinc-400">
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">•</span>
+            <span><strong>Conexiones ODBC persistentes:</strong> Mantiene el archivo <code class="text-zinc-300">.laccdb</code> permanentemente abierto durante minutos.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">•</span>
+            <span><strong>Bloqueo por página (4 KB):</strong> Bloquea bloques enteros de registros contiguos de <code class="text-zinc-300">F_ART</code> mientras lee el catálogo.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">•</span>
+            <span><strong>Conflicto directo con el TPV:</strong> Cuando la dependienta pulsa "Cobrar", Factusol intenta escribir en <code class="text-zinc-300">F_LAL</code> y actualizar <code class="text-zinc-300">F_STO</code>. Se produce un interbloqueo (*deadlock*) y la pantalla se congela.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">•</span>
+            <span><strong>Ficheros huérfanos:</strong> Si el conector sufre un timeout, el archivo <code class="text-zinc-300">.laccdb</code> queda atrapado en el NAS.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Lado Correcto: Bentian -->
+      <div class="border border-emerald-500/20 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-emerald-400 text-lg">✅</span>
+          <h3 class="text-lg font-bold text-emerald-400">Bentian ERP Bridge (Store-and-Forward)</h3>
+        </div>
+        <ul class="space-y-3 text-sm text-zinc-300">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">•</span>
+            <span><strong>Modo 'Share Deny None':</strong> Nunca solicita acceso exclusivo. Comparte lectura con todos los puestos de la oficina.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">•</span>
+            <span><strong>Bloqueo a nivel de registro (Locking Mode=1):</strong> Aísla únicamente la fila concreta en edición puntual (&lt;15 ms).</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">•</span>
+            <span><strong>Dirty Checking en RAM:</strong> Carga un snapshot en local en menos de 50 ms y cierra de inmediato la conexión OLEDB.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">•</span>
+            <span><strong>Escritura atómica Store-and-Forward:</strong> Los pedidos web se encolan en SQLite y se insertan cuando Factusol no está transaccionando.</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- La Cadena OLEDB Correcta -->
+    <div class="border border-white/[0.08] rounded-2xl p-6 sm:p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">ARQUITECTURA DE CÓDIGO</span>
+        <h2 class="text-2xl font-bold text-white">La Cadena de Conexión OLEDB Anti-Bloqueo</h2>
+      </div>
+
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Para que cualquier aplicación externa pueda interactuar con la base de datos de Factusol sin perturbar a los puestos de trabajo físicos ni causar el Error 3045, la cadena de conexión del proveedor <strong>Microsoft.ACE.OLEDB.12.0</strong> debe incorporar obligatoriamente los flags de concurrencia compartida:
+      </p>
+
+      <!-- Bloque de Conexión -->
+      <div class="rounded-xl bg-[#09090b] border border-white/[0.08] p-5 font-mono text-xs text-zinc-300 mb-6 overflow-x-auto leading-relaxed">
+        <div class="text-zinc-500">// Cadena canónica blindada utilizada por Bentian ERP Bridge:</div>
+        <div class="text-emerald-400">Provider=Microsoft.ACE.OLEDB.12.0;</div>
+        <div class="text-emerald-400">Data Source=\\NAS_SERVIDOR\FactuSOL\Datos\FS\2026\FSC26.accdb;</div>
+        <div class="text-sky-300 font-bold">Mode=Share Deny None;</div>
+        <div class="text-indigo-400 font-bold">Jet OLEDB:Database Locking Mode=1;</div>
+        <div class="text-amber-300">Jet OLEDB:Engine Type=6;</div>
+        <div class="text-zinc-400">Persist Security Info=False;</div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-400">
+        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <strong class="text-white block mb-1">Mode=Share Deny None</strong>
+          Indica expresamente al sistema operativo que la aplicación no deniega permisos ni de lectura ni de escritura a ningún otro usuario o equipo de la red.
+        </div>
+        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <strong class="text-white block mb-1">Jet OLEDB:Database Locking Mode=1</strong>
+          Fuerza al motor Access a utilizar bloqueo de registro individual (Row-Level Locking) suprimiendo el bloqueo de páginas de 4.096 bytes que bloqueaba a artículos colindantes en F_ART.
+        </div>
+      </div>
+    </div>
+
+    <!-- Guía Práctica de Emergencia: Cómo Desbloquear un .laccdb Atrapado -->
+    <div class="border border-white/[0.08] rounded-2xl p-6 sm:p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">PROTOCOLO DE EMERGENCIA</span>
+        <h2 class="text-2xl font-bold text-white">Cómo Desbloquear un Archivo .laccdb Huérfano en Windows</h2>
+      </div>
+
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Si un equipo sufrió un corte de luz o se apagó bruscamente mientras Factusol estaba abierto, el archivo <code class="text-zinc-200">.laccdb</code> permanece retenido por el servicio del servidor de archivos SMB. Sigue estos pasos para liberarlo sin tener que reiniciar el servidor:
+      </p>
+
+      <div class="space-y-6">
+        
+        <div class="flex items-start gap-4">
+          <span class="w-7 h-7 rounded-lg bg-white/[0.1] text-zinc-200 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+          <div>
+            <h4 class="font-bold text-white text-sm mb-1">Cerrar Factusol en todas las estaciones de trabajo</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Verifica en el Administrador de Tareas (Ctrl + Mayús + Esc) de los puestos de la oficina que no haya ningún proceso <code class="text-zinc-300">FACTUSOL.exe</code> o <code class="text-zinc-300">cscript.exe</code> colgado en segundo plano.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <span class="w-7 h-7 rounded-lg bg-white/[0.1] text-zinc-200 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+          <div>
+            <h4 class="font-bold text-white text-sm mb-1">Abrir la consola de Administración de Equipos en el Servidor</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              En el servidor o PC que aloja los datos, pulsa <kbd class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[11px] font-mono">Win + R</kbd>, escribe <code class="text-indigo-300">fsmgmt.msc</code> y pulsa Enter.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <span class="w-7 h-7 rounded-lg bg-white/[0.1] text-zinc-200 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
+          <div>
+            <h4 class="font-bold text-white text-sm mb-1">Cerrar los handles abiertos del archivo .laccdb</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Navega a <strong>Carpetas compartidas &gt; Archivos abiertos</strong>. Localiza en la lista cualquier entrada que haga referencia a <code class="text-zinc-300">FSC26.laccdb</code> o <code class="text-zinc-300">FSC26.accdb</code>. Haz clic derecho y selecciona <strong>Cerrar archivo abierto</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <span class="w-7 h-7 rounded-lg bg-white/[0.1] text-zinc-200 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">4</span>
+          <div>
+            <h4 class="font-bold text-white text-sm mb-1">Eliminar manualmente el archivo de cerrojo .laccdb</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Abre el Explorador de Archivos, acude a la carpeta de datos de Factusol y elimina directamente el archivo <code class="text-rose-400">*.laccdb</code>. Ahora los usuarios podrán entrar normalmente en Factusol sin errores.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- La Solución de Bentian -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">ARQUITECTURA INDUSTRIAL</span>
+        <h3 class="text-xl font-bold text-white">Cómo Bentian ERP Bridge Blinda tu Factusol contra Bloqueos</h3>
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Para negocios con alto volumen comercial o venta combinada en tienda física y tienda online (WooCommerce, PrestaShop, Shopify), Bentian fue diseñado desde cero para respetar las limitaciones del motor Access:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div class="text-indigo-400 font-mono text-xs font-bold uppercase mb-2">01. Snapshot Efímero</div>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Las lecturas no mantienen la conexión abierta. El agente ejecuta una consulta ultrarrápida, lee los datos a RAM en menos de 50 ms y cierra de inmediato el canal OLEDB.
+          </p>
+        </div>
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div class="text-indigo-400 font-mono text-xs font-bold uppercase mb-2">02. Store-and-Forward</div>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Los pedidos recibidos desde la web se almacenan en una cola SQLite interna. Si la base de datos de Factusol está ocupada por el TPV físico, el agente espera milisegundos y reintenta sin generar errores ni colapsar la caja.
+          </p>
+        </div>
+        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div class="text-indigo-400 font-mono text-xs font-bold uppercase mb-2">03. Transacciones Atómicas</div>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            La inserción del pedido en <code class="text-zinc-300">F_PCL</code> y de sus líneas en <code class="text-zinc-300">F_LPC</code> se ejecuta dentro de una transacción que dura entre 5 y 15 milisegundos, imperceptible para los usuarios físicos.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Cerrojos y Concurrencia en Factusol</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Borrar el archivo .laccdb puede corromper los datos de Factusol?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            No, siempre que todos los programas y usuarios estén cerrados. El archivo .laccdb contiene únicamente metadatos de bloqueo y sesiones activas. Las tablas, artículos y facturas residen exclusivamente en el archivo .accdb.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Por qué Factusol va más lento en servidores NAS de red (Synology / QNAP)?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            El motor Access no procesa consultas en el servidor NAS, sino que transfiere fragmentos enteros del archivo accdb a través del protocolo SMB hacia la memoria del PC cliente. Si la red tiene latencia o el protocolo de red está mal ajustado, la sincronización de cerrojos .laccdb se ralentiza exponencialmente.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Cómo ayuda la herramienta compactar y reparar de Factusol?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            En Factusol, ir a Archivo &gt; Opciones &gt; Mantenimiento de bases de datos &gt; Compactación elimina el espacio no utilizado y reconstruye los índices B-Tree de las tablas F_ART y F_PCL, reduciendo el riesgo de fragmentación y bloqueos residuales.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-rose-950/40 via-indigo-900/20 to-purple-950/40 border border-rose-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Di Adiós a los Cuelgues de Factusol y el TPV</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga Bentian ERP Bridge y disfruta de una sincronización web sin bloqueos de ficheros .ldb ni interrupciones en tu tienda física.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador de Windows (<span data-app-version>v0.3.5</span>)
+        </a>
+        <a href="/guias/conectar-factusol-local-con-woocommerce/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Guía Factusol Local con WooCommerce &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/guias/conectar-factusol-local-con-woocommerce/" class="hover:text-zinc-300 transition">Conectar Factusol Local</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/docs/error-base-datos-bloqueada-factusol-laccdb.html" class="hover:text-zinc-300 transition">Error .laccdb</a>
+        <a href="/docs/" class="hover:text-zinc-300 transition">Documentación</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

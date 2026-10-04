@@ -68,6 +68,9 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
 - **Ferreterías y Suministros Industriales:** https://bridge.cristianjm.com/factusol-ferreterias-suministros/
 - **Factusol y Recargo de Equivalencia:** https://bridge.cristianjm.com/factusol-recargo-equivalencia/
 - **Alternativa a DELSOL Conecta:** https://bridge.cristianjm.com/alternativa-delsol-conecta/
+- **Guía Conectar Factusol Local con WooCommerce:** https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/
+- **Guía Solucionar Bloqueo de Archivos .ldb:** https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/
+- **Guía Pedidos WooCommerce a Factusol con Recargo:** https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/
 - **Dashboard de Gestión:** https://bridge.cristianjm.com/dashboard/
 - **Correo de Soporte Oficial:** soporte@cristianjm.com
 - **Contacto del Desarrollador:** Cristian Jiménez Martínez (contacto@cristianjm.com)

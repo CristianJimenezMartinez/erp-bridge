@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Pasar Pedidos de WooCommerce a Factusol con IVA y Recargo de Equivalencia | Guía Técnica</title>
+  <meta name="description" content="Guía técnica definitiva para volcar pedidos de WooCommerce a Factusol aplicando IVA y Recargo de Equivalencia (21%+5.2%, 10%+1.4%). Mapeo exacto de tablas F_PCL y F_LPC sin descuadres fiscales.">
+  <meta name="keywords" content="pasar pedidos woocommerce a factusol recargo equivalencia, pedidos woocommerce factusol iva recargo, mapeo f_pcl f_lpc factusol impuestos, cuadre redondeo iva factusol woocommerce, recargo equivalencia factusol api">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Pasar Pedidos de WooCommerce a Factusol con IVA y Recargo de Equivalencia | Guía Técnica">
+  <meta property="og:description" content="Mapeo relacional de pedidos WooCommerce a Factusol con desglose legal de bases, IVA y Recargo de Equivalencia. Evita descuadres con Hacienda y multas tributarias.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pedidos de WooCommerce a Factusol con Recargo de Equivalencia | Guía Técnica">
+  <meta name="twitter:description" content="Mapeo a F_PCL y F_LPC sin descuadres de céntimos para minoristas españoles.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0e0e11; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Guías Técnicas", "item": "https://bridge.cristianjm.com/docs/" },
+          { "@type": "ListItem", "position": 3, "name": "Pedidos WooCommerce a Factusol con Recargo", "item": "https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/" }
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Cómo Pasar Pedidos de WooCommerce a Factusol con IVA y Recargo de Equivalencia",
+        "description": "Especificación técnica y mapeo relacional para importar pedidos de WooCommerce a Factusol (tablas F_PCL y F_LPC) desglosando correctamente el régimen especial de Recargo de Equivalencia español.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com"
+        },
+        "mainEntityOfPage": "https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/"
+      },
+      {
+        "@type": "HowTo",
+        "name": "Cómo integrar pedidos de WooCommerce en Factusol con Recargo de Equivalencia",
+        "description": "Procedimiento de captura, validación de cliente y mapeo a las tablas relacionales de Factusol respetando las fórmulas impositivas de la Agencia Tributaria.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Captura del NIF y solicitud opcional de Recargo en el Checkout",
+            "text": "Configurar en WooCommerce la recogida obligatoria del NIF/CIF y casilla de recargo de equivalencia para autónomos en régimen especial.",
+            "position": 1
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Comprobación y conciliación de la ficha de cliente en F_CLI",
+            "text": "Comprobar si el cliente ya existe en Factusol (F_CLI) y contrastar el estado del flag REC para aplicar la tarifa fiscal correcta.",
+            "position": 2
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Mapeo de cabecera a F_PCL con tipos de IVA y Recargo desglosados",
+            "text": "Asignar bases TOTB1-3, porcentajes TIVA1-3 (21%, 10%, 4%), porcentajes de recargo PREC1-3 (5.2%, 1.4%, 0.5%) y calcular cuotas exactas TOTI1-3 y TOTR1-3.",
+            "position": 3
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Inserción de líneas netas en F_LPC y asignación de serie contable",
+            "text": "Insertar las líneas de pedido con importes netos y puntero IVA=1/2/3, asignando una serie específica (ej: Serie R) para la liquidación trimestral del Modelo 303.",
+            "position": 4
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Por qué los plugins genéricos de WooCommerce provocan descuadres de céntimos en Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "WooCommerce está diseñado bajo la legislación fiscal anglosajona donde no existe el recargo de equivalencia. Los plugins genéricos suelen sumar el 21% de IVA y el 5.2% de R.E. como un tipo único del 26.2% o introducen el recargo como un producto de tarifa adicional. Al multiplicar por cantidad y redondear línea por línea, se producen descuadres de entre 0,01 € y 0,05 € respecto a la fórmula nativa de Factusol, descuadre que la gestoría y Hacienda no aceptan."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cuáles son las tablas y campos de Factusol donde se graba el Recargo de Equivalencia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "En la cabecera del pedido (F_PCL) se graban los porcentajes en PREC1 (5.2%), PREC2 (1.4%), PREC3 (0.5%), las cuotas calculadas en TOTR1, TOTR2, TOTR3 y las bases en TOTB1, TOTB2, TOTB3. En las líneas (F_LPC) se graba el código de artículo (ARTLPC), precio unitario neto y el tipo de IVA aplicable (IVA=1, 2 ó 3)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Es legal facturar con WooCommerce directamente bajo la nueva Ley Antifraude y VeriFactu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No es recomendable ni legal en la mayoría de los casos. WooCommerce y los plugins de facturación en PDF no cuentan con sistemas de encadenamiento criptográfico de registros, hashes SHA-256 inalterables ni generación de código QR tributario según el Real Decreto 1007/2023. La arquitectura correcta consiste en que WooCommerce reciba los pedidos (F_PCL) y sea Factusol (el ERP homologado) quien emita la factura oficial (F_FAC)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo gestiona Bentian ERP Bridge los clientes mixtos (con y sin recargo)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian examina la condición fiscal del comprador antes de insertar el pedido. Si el cliente tiene activado el campo REC en su ficha de Factusol (F_CLI), calcula y añade automáticamente las cuotas de R.E. en F_PCL; si es un particular o empresa ordinaria, aplica exclusivamente el IVA general sin recargo."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded">Fiscalidad B2B</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/factusol-recargo-equivalencia/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Página R.E.</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden md:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Agente (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Breadcrumb -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-8 font-mono">
+      <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+      <span>/</span>
+      <a href="/docs/" class="hover:text-zinc-300 transition">Guías</a>
+      <span>/</span>
+      <span class="text-pink-400">WooCommerce a Factusol con Recargo de Equivalencia</span>
+    </nav>
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-pink-500/20 bg-pink-500/10 text-pink-400 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
+      <span>AEAT Modelo 303 • Factusol F_PCL / F_LPC • Sin Descuadres de Redondeo</span>
+    </div>
+
+    <!-- H1 -->
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Pasar Pedidos de WooCommerce a Factusol con <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-indigo-400">IVA y Recargo de Equivalencia</span>
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      El <strong>Régimen Especial del Recargo de Equivalencia</strong> es obligatorio en España para los autónomos personas físicas que venden a consumidor final en comercio minorista. Integrar estos pedidos desde WooCommerce hacia Factusol es una de las mayores fuentes de descuadres contables y discusiones con las asesorías fiscales. En esta guía técnica desglosamos las fórmulas matemáticas oficiales, el esquema de tablas en Factusol y cómo automatizar el proceso sin errores de céntimos.
+    </p>
+
+    <!-- Caja de Dolor: Los 3 Errores Fatales del Recargo en WooCommerce -->
+    <div class="border border-red-500/30 bg-red-950/20 rounded-2xl p-6 sm:p-8 mb-12 backdrop-blur">
+      <h3 class="text-base font-bold text-red-300 mb-3 flex items-center gap-2">
+        <span>🚨</span> La Pesadilla de las Asesorías en la Declaración Trimestral
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-zinc-300 leading-relaxed">
+        <div class="p-4 rounded-xl bg-black/40 border border-red-500/20">
+          <strong class="text-red-400 block mb-1">1. Sumar 21% + 5.2% = 26.2%</strong>
+          WooCommerce calcula un tipo único consolidado. Al redondear cada línea de pedido, la suma de los impuestos da un importe diferente que calcular primero el 21% de IVA y luego el 5.2% de R.E. sobre la base.
+        </div>
+        <div class="p-4 rounded-xl bg-black/40 border border-red-500/20">
+          <strong class="text-red-400 block mb-1">2. Recargo como 'Línea de Producto'</strong>
+          Muchos plugins insertan una línea ficticia llamada "Recargo de Equivalencia". Esto incrementa artificialmente la base imponible del pedido y descuadra los libros de IVA en ContaSol.
+        </div>
+        <div class="p-4 rounded-xl bg-black/40 border border-red-500/20">
+          <strong class="text-red-400 block mb-1">3. Factura sin desglose fiscal</strong>
+          La Agencia Tributaria exige que el emisor detalle en columnas separadas la cuota de IVA y la cuota de recargo. Si no constan, la factura es inválida y acarrea sanciones.
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla Oficial de Tipos y Recargos en España -->
+    <div class="border border-white/[0.08] rounded-2xl p-6 sm:p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="px-2.5 py-1 rounded bg-pink-500/20 border border-pink-500/30 text-pink-400 text-xs font-mono font-semibold">LEGISLACIÓN TRIBUTARIA ESPAÑOLA</span>
+        <h2 class="text-2xl font-bold text-white">Los 3 Tramos Impositivos de IVA y R.E.</h2>
+      </div>
+      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
+        Factusol soporta internamente 3 tipos de gravamen para compras y ventas. Es imprescindible asociar cada artículo de WooCommerce a su tramo correspondiente:
+      </p>
+
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.02] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4">Tipo Impositivo</th>
+              <th class="p-4">Campo Tipo IVA (F_PCL)</th>
+              <th class="p-4 text-emerald-400 font-mono">% IVA</th>
+              <th class="p-4">Campo % Recargo (F_PCL)</th>
+              <th class="p-4 text-pink-400 font-mono">% Recargo (R.E.)</th>
+              <th class="p-4 font-bold text-white">Total Tributario</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 font-semibold text-white">General</td>
+              <td class="p-4 font-mono text-zinc-400">TIVA1</td>
+              <td class="p-4 font-mono text-emerald-400 font-semibold">21,00 %</td>
+              <td class="p-4 font-mono text-zinc-400">PREC1</td>
+              <td class="p-4 font-mono text-pink-400 font-bold">5,20 %</td>
+              <td class="p-4 font-mono font-bold text-white">26,20 %</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Reducido</td>
+              <td class="p-4 font-mono text-zinc-400">TIVA2</td>
+              <td class="p-4 font-mono text-emerald-400 font-semibold">10,00 %</td>
+              <td class="p-4 font-mono text-zinc-400">PREC2</td>
+              <td class="p-4 font-mono text-pink-400 font-bold">1,40 %</td>
+              <td class="p-4 font-mono font-bold text-white">11,40 %</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Superreducido</td>
+              <td class="p-4 font-mono text-zinc-400">TIVA3</td>
+              <td class="p-4 font-mono text-emerald-400 font-semibold">4,00 %</td>
+              <td class="p-4 font-mono text-zinc-400">PREC3</td>
+              <td class="p-4 font-mono text-pink-400 font-bold">0,50 %</td>
+              <td class="p-4 font-mono font-bold text-white">4,50 %</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mapeo Relacional de Base de Datos: Tablas F_PCL y F_LPC -->
+    <div class="border border-white/[0.08] rounded-2xl p-6 sm:p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">ESQUEMA RELACIONAL</span>
+        <h2 class="text-2xl font-bold text-white">Mapeo Técnico de Tablas en Factusol</h2>
+      </div>
+
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Para que el pedido web se convierta en un pedido válido de Factusol y posteriormente en un albarán o factura (<code class="text-zinc-200">F_FAC</code>) sin intervención manual, la inserción debe respetar escrupulosamente los tipos de datos y nombres de campos de Factusol:
+      </p>
+
+      <!-- Grid de Mapeo Cabecera y Líneas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        
+        <!-- F_PCL Cabecera -->
+        <div class="p-5 rounded-xl bg-[#09090b] border border-white/[0.08]">
+          <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-2">
+            <h3 class="font-bold text-indigo-400 text-sm font-mono">Tabla F_PCL (Cabecera Pedido)</h3>
+            <span class="text-[10px] text-zinc-500 font-mono">1 fila por pedido</span>
+          </div>
+          <ul class="space-y-2 text-xs font-mono text-zinc-300">
+            <li><span class="text-zinc-500">TIPPCL:</span> Tipo/Serie (ej: "W" o "R")</li>
+            <li><span class="text-zinc-500">CODPCL:</span> Número correlativo de pedido</li>
+            <li><span class="text-zinc-500">CLIPCL:</span> Código de cliente en F_CLI</li>
+            <li><span class="text-zinc-500">TOTB1:</span> Base imponible tipo general</li>
+            <li><span class="text-zinc-500">TIVA1:</span> 21.00</li>
+            <li><span class="text-zinc-500">TOTI1:</span> Cuota IVA = Round(TOTB1 * 0.21, 2)</li>
+            <li><span class="text-pink-400 font-bold">PREC1:</span> 5.20 (Porcentaje recargo)</li>
+            <li><span class="text-pink-400 font-bold">TOTR1:</span> Cuota Recargo = Round(TOTB1 * 0.052, 2)</li>
+            <li><span class="text-emerald-400 font-bold">TOTFAC:</span> TOTB + TOTI + TOTR (Total neto)</li>
+          </ul>
+        </div>
+
+        <!-- F_LPC Líneas -->
+        <div class="p-5 rounded-xl bg-[#09090b] border border-white/[0.08]">
+          <div class="flex items-center justify-between mb-3 border-b border-white/[0.08] pb-2">
+            <h3 class="font-bold text-emerald-400 text-sm font-mono">Tabla F_LPC (Líneas de Pedido)</h3>
+            <span class="text-[10px] text-zinc-500 font-mono">N filas por artículo</span>
+          </div>
+          <ul class="space-y-2 text-xs font-mono text-zinc-300">
+            <li><span class="text-zinc-500">TIPLPC:</span> Misma serie que F_PCL</li>
+            <li><span class="text-zinc-500">CODLPC:</span> Mismo número que F_PCL</li>
+            <li><span class="text-zinc-500">POSLPC:</span> Posición ordinal de línea (1, 2, 3...)</li>
+            <li><span class="text-zinc-500">ARTLPC:</span> Código del artículo en Factusol</li>
+            <li><span class="text-zinc-500">CANLPC:</span> Cantidad de unidades compradas</li>
+            <li><span class="text-zinc-500">PRELPC:</span> Precio unitario neto (sin IVA)</li>
+            <li><span class="text-zinc-500">TOTLPC:</span> Importe de la línea = CAN * PRE</li>
+            <li><span class="text-indigo-400 font-bold">IVA:</span> Puntero al tipo (1=General, 2=Red., 3=Super.)</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-indigo-300 text-xs">
+        <strong>Fórmula de Conciliación Matemática:</strong> En Factusol, los recargos <code>TOTR1</code>, <code>TOTR2</code> y <code>TOTR3</code> se calculan exclusivamente en la cabecera <code>F_PCL</code> sumando primero las bases imponibles de las líneas de cada tramo y aplicando después el porcentaje con redondeo bancario a 2 decimales. Nunca se debe calcular el recargo línea a línea por separado.
+      </div>
+    </div>
+
+    <!-- Guía Paso a Paso para Conectar WooCommerce y Factusol con R.E. -->
+    <div class="space-y-12 mb-16">
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 rounded bg-pink-500/20 border border-pink-500/30 text-pink-400 text-xs font-mono font-semibold">PROCEDIMIENTO OPERATIVO</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">Configuración del Flujo en 4 Pasos</h2>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-pink-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-pink-600/30">1</span>
+          <h3 class="text-xl font-bold text-white">Recogida del NIF/CIF y Casilla de Recargo en el Checkout</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Para que una tienda online pueda distinguir si una compra debe llevar recargo de equivalencia o no, el checkout de WooCommerce debe solicitar el NIF/CIF y ofrecer una casilla de verificación para autónomos acogidos a este régimen.
+        </p>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Esto se puede configurar de forma estándar con el bloque de Checkout nativo de WooCommerce o mediante campos de metadatos del pedido (<code class="text-zinc-200">_billing_nif</code> y <code class="text-zinc-200">_billing_recargo_equivalencia</code>).
+        </p>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-pink-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-pink-600/30">2</span>
+          <h3 class="text-xl font-bold text-white">Conciliación con la Ficha de Cliente en Factusol (F_CLI)</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Cuando Bentian recibe el pedido desde la REST API de WooCommerce, comprueba si el NIF del comprador ya figura registrado en la tabla de clientes de Factusol (<code class="text-zinc-200">F_CLI</code>):
+        </p>
+        <ul class="space-y-2 text-xs text-zinc-400 mb-4">
+          <li>• <strong>Si el cliente ya existe:</strong> Se comprueba el campo <code class="text-pink-400">REC</code> de su ficha. Si está marcado como "Sí", se aplica el recargo independientemente de lo que haya marcado en la web.</li>
+          <li>• <strong>Si es un cliente nuevo:</strong> Bentian crea automáticamente la ficha en <code class="text-zinc-200">F_CLI</code> con sus datos fiscales (Nombre, Dirección, NIF) y marca el flag <code class="text-pink-400">REC = true</code> si solicitó recargo en el checkout.</li>
+        </ul>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-pink-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-pink-600/30">3</span>
+          <h3 class="text-xl font-bold text-white">Separación de Series Contables (Serie W vs. Serie R)</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Para que tu departamento de contabilidad o gestoría no pierda horas separando pedidos en el momento de presentar el Modelo 303 en la Agencia Tributaria, Bentian permite enrutar automáticamente las ventas por serie:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <strong class="text-indigo-400 block mb-1">Serie W (Web General)</strong>
+            Ventas a clientes particulares y empresas ordinarias con IVA general sin recargo.
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <strong class="text-pink-400 block mb-1">Serie R (Recargo de Equivalencia)</strong>
+            Ventas a comerciantes minoristas autónomos con IVA + 5.2% R.E. totalmente desglosado.
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-pink-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-pink-600/30">4</span>
+          <h3 class="text-xl font-bold text-white">Emisión de la Factura Oficial Homologada en Factusol</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Bajo la normativa de la Ley Crea y Crece y VeriFactu (Real Decreto 1007/2023), WooCommerce <strong>no es un sistema de facturación legalmente homologado</strong>. El flujo reglamentario blindado consiste en:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-xs text-zinc-400 leading-relaxed">
+          <li>WooCommerce actúa únicamente como pasarela de venta y genera un <em>recibo de pedido</em>.</li>
+          <li>Bentian vuelca el pedido a Factusol en la tabla <code class="text-zinc-200">F_PCL</code>.</li>
+          <li>Desde Factusol se emite la factura reglamentaria (<code class="text-zinc-200">F_FAC</code>) con su encadenamiento criptográfico, código QR de la AEAT y desglose exacto de IVA y Recargo.</li>
+          <li>Bentian detecta la emisión de la factura y sube el PDF legal a la cuenta del cliente en WooCommerce de forma totalmente desatendida.</li>
+        </ol>
+      </div>
+
+    </div>
+
+    <!-- Preguntas Frecuentes FAQ -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Factusol y Recargo de Equivalencia</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Qué pasa si un cliente pide recargo pero introduce un DNI particular?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian incluye validación algorítmica de NIF/CIF y comprobación en el censo de autónomos o en la ficha de cliente de Factusol. Puedes configurar el agente para que requiera validación manual en almacén o lo procese en la serie de revisión.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Soporta artículos con tipos de IVA mixtos en un mismo carrito?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Si un pedido contiene un producto al 21% de IVA (con 5.2% R.E.) y otro al 10% de IVA (con 1.4% R.E.), Bentian desglosa las bases en TOTB1 y TOTB2, aplicando con exactitud matemática las cuotas respectivas en TOTI1, TOTI2, TOTR1 y TOTR2 en F_PCL.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Funciona también con PrestaShop y Shopify?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Exactamente igual. El motor de mapeo tributario de Bentian es agnóstico a la plataforma de origen: normaliza los pedidos procedentes de WooCommerce, PrestaShop 1.7 / 8.x o Shopify Admin API y los introduce con las mismas reglas relacionales en Factusol.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-pink-950/40 via-indigo-900/20 to-purple-950/40 border border-pink-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Automatiza tu Facturación B2B con Recargo de Equivalencia</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga Bentian ERP Bridge y asegura el cuadre contable perfecto entre tu tienda WooCommerce y Factusol.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador de Windows (<span data-app-version>v0.3.5</span>)
+        </a>
+        <a href="/factusol-recargo-equivalencia/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Ficha Técnica Recargo de Equivalencia &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/guias/conectar-factusol-local-con-woocommerce/" class="hover:text-zinc-300 transition">Factusol Local WooCommerce</a>
+        <a href="/guias/solucionar-bloqueo-ficheros-ldb-factusol/" class="hover:text-zinc-300 transition">Bloqueo .ldb Factusol</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-recargo-equivalencia/" class="hover:text-zinc-300 transition">Recargo Equivalencia</a>
+        <a href="/docs/" class="hover:text-zinc-300 transition">Documentación</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

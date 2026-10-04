@@ -258,6 +258,15 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
   });
+  app.get('/guias/conectar-factusol-local-con-woocommerce', (_req, res) => {
+    res.redirect(301, '/guias/conectar-factusol-local-con-woocommerce/');
+  });
+  app.get('/guias/solucionar-bloqueo-ficheros-ldb-factusol', (_req, res) => {
+    res.redirect(301, '/guias/solucionar-bloqueo-ficheros-ldb-factusol/');
+  });
+  app.get('/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo', (_req, res) => {
+    res.redirect(301, '/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/');
+  });
 
   // Servir Dashboard Cloud Multi-Tenant
   const dashboardDir = path.join(publicDir, 'dashboard');

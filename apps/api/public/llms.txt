@@ -68,6 +68,9 @@
 - [Conector Factusol Córdoba](https://bridge.cristianjm.com/conector-factusol/cordoba/): Especializado para Las Quemadas, Parque Joyero y frío comercial.
 - [Conector Factusol Palma de Mallorca](https://bridge.cristianjm.com/conector-factusol/palma/): Especializado para Son Castelló, hostelería y náutica en Baleares.
 - [Descarga del Instalador Oficial](https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe): Instalador para Windows x64.
+- [Guía Conectar Factusol Local con WooCommerce](https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/): Integración directa sin contratar la nube de DELSOL ni pagar 600€-1200€/año.
+- [Guía Solucionar Bloqueo de Archivos .ldb](https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/): Resolución del Error 3045, modo Share Deny None, bloqueo de registro y cero cuelgues en TPV.
+- [Guía Pedidos WooCommerce a Factusol con Recargo](https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/): Mapeo tributario a F_PCL y F_LPC con IVA y Recargo de Equivalencia (21%+5.2%) sin descuadres fiscales.
 - [Documentación Técnica](https://bridge.cristianjm.com/docs/): Hub de manuales, resolución de SmartScreen y solución a bloqueos .laccdb.
 - [Guía Error Base de Datos Bloqueada](https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html): Solución al Error 3045 en NAS y redes Windows.
 - [Guía Error Proveedor OLEDB Factusol](https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html): Resolución de Microsoft.ACE.OLEDB no registrado en x86/x64.

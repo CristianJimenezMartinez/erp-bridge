@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Conectar Factusol Local con WooCommerce (Sin Contratar la Nube) | Guía Técnica</title>
+  <meta name="description" content="Guía técnica definitiva para conectar Factusol en red local o PC con WooCommerce sin pagar DELSOL Cloud ni 600€-1200€ al año. Lectura OLEDB de alta velocidad, claves REST API y pedidos en tiempo real.">
+  <meta name="keywords" content="conectar factusol local con woocommerce, sincronizar factusol woocommerce sin nube, alternativa delsol nube woocommerce, factusol escritorio woocommerce api, factusol oledb woocommerce, sincronizacion pedidos factusol woocommerce">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Conectar Factusol Local con WooCommerce (Sin Contratar la Nube) | Guía Técnica">
+  <meta property="og:description" content="Conecta tu base de datos de Factusol en tu propio servidor o PC Windows con WooCommerce sin cuotas mensuales cloud ni plugins que saturen tu hosting.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cómo Conectar Factusol Local con WooCommerce sin Nube | Guía Técnica">
+  <meta name="twitter:description" content="Ahorra 600€-1200€ al año y mantén el control de tus datos conectando Factusol local con WooCommerce.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0e0e11; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Guías Técnicas", "item": "https://bridge.cristianjm.com/docs/" },
+          { "@type": "ListItem", "position": 3, "name": "Conectar Factusol Local con WooCommerce", "item": "https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/" }
+        ]
+      },
+      {
+        "@type": "TechArticle",
+        "headline": "Cómo Conectar Factusol Local con WooCommerce (Sin Contratar la Nube)",
+        "description": "Manual técnico completo para sincronizar Factusol de escritorio o red local con WooCommerce mediante agente Windows nativo y REST API sin pagar suscripciones a DELSOL Cloud.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com"
+        },
+        "mainEntityOfPage": "https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/"
+      },
+      {
+        "@type": "HowTo",
+        "name": "Cómo conectar Factusol local de escritorio con WooCommerce",
+        "description": "Pasos para integrar la base de datos local Microsoft Access de Factusol con una tienda online WooCommerce mediante el conector local-first de Bentian.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Generar claves REST API en WooCommerce",
+            "text": "Accede a WooCommerce > Ajustes > Avanzado > REST API y crea una clave con permisos de Lectura/Escritura.",
+            "position": 1
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Localizar la ruta de base de datos Factusol (.accdb)",
+            "text": "Identifica la ruta del fichero accdb del ejercicio contable activo, ya sea en unidad local (C:) o en recurso de red UNC (\\\\SERVIDOR\\Datos).",
+            "position": 2
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Instalar y configurar el agente Bentian ERP Bridge",
+            "text": "Instala el agente en Windows, vincula la ruta de Factusol y las credenciales de WooCommerce con comprobación de conexión.",
+            "position": 3
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Activar la sincronización continua y verificación de pedidos",
+            "text": "Configura la frecuencia de actualización de catálogo, lectura de stock disponible DISSTO e importación automática de pedidos a F_PCL.",
+            "position": 4
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Es obligatorio contratar Factusol en la nube para conectar una tienda online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Software DELSOL comercializa Factusol Alojamiento (DELSOL Cloud) con costes entre 600 € y 1.200 € anuales, pero la versión local de escritorio comparte exactamente la misma base de datos relacional Microsoft Access (.accdb). Con Bentian ERP Bridge, un agente de Windows lee y escribe en tu Factusol local y comunica con WooCommerce por HTTPS de forma segura."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Tengo que abrir puertos en el router o tener IP fija en la oficina?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Abrir puertos ODBC o SMB a Internet es un grave fallo de seguridad. Bentian opera con arquitectura saliente (outbound): es el agente de tu ordenador el que realiza peticiones HTTPS seguras hacia la API REST de WooCommerce, por lo que no requiere abrir puertos, ni tocar el cortafuegos, ni contratar IP fija."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué sucede con los pedidos web si el ordenador de la oficina está apagado?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Los pedidos quedan almacenados con total seguridad en la base de datos de WooCommerce. En el momento en que el ordenador o servidor de la oficina se enciende por la mañana, Bentian detecta los pedidos pendientes y los importa en segundos en las tablas F_PCL y F_LPC de Factusol."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo se evita sobrecargar el hosting de WordPress al actualizar miles de referencias?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A diferencia de plugins PHP pesados que ejecutan bucles en el servidor web provocando errores 504 Gateway Timeout y agotamiento de memoria RAM, Bentian calcula los cambios (dirty checking mediante hash SHA-256) en la RAM de Windows en menos de 100 ms y envía exclusivamente los artículos modificados a la API de WooCommerce."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">Guía Técnica</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/factusol-woocommerce/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Conector WooCommerce</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden md:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Agente (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Breadcrumb -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-8 font-mono">
+      <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+      <span>/</span>
+      <a href="/docs/" class="hover:text-zinc-300 transition">Guías</a>
+      <span>/</span>
+      <span class="text-indigo-400">Factusol Local con WooCommerce</span>
+    </nav>
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+      <span>Arquitectura Local-First • Factusol 2024 / 2025 / 2026 ↔ WooCommerce 8.x / 9.x</span>
+    </div>
+
+    <!-- H1 -->
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Conectar <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-400">Factusol Local</span> con WooCommerce <span class="text-zinc-400 font-normal text-2xl sm:text-3xl block mt-2">(Sin Contratar la Nube de DELSOL)</span>
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Cientos de pymes españolas se ven empujadas a pagar entre <strong>600 € y 1.200 € al año</strong> por suscripciones a la nube comercial de Factusol con la promesa de poder sincronizar su tienda online. Descubre por qué es un gasto prescindible si ya dispones de tu servidor o PC Windows en la oficina y cómo conectar WooCommerce directamente mediante el agente nativo de <strong>Bentian ERP Bridge</strong>.
+    </p>
+
+    <!-- Quick Takeaway Banner -->
+    <div class="border border-indigo-500/30 bg-indigo-950/20 rounded-2xl p-6 sm:p-8 mb-12 backdrop-blur">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center flex-shrink-0 text-indigo-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white mb-1">El Resumen Ejecutivo para Gerentes y Administradores de Sistemas</h3>
+          <p class="text-sm text-zinc-300 leading-relaxed">
+            Factusol en local almacena exactamente los mismos datos relacionales en archivos Microsoft Access (<code class="text-indigo-300">.accdb</code>) que su versión en la nube. Instalar un agente ligero en Windows que traduzca esas tablas locales y hable con la API REST de WooCommerce elimina costes recurrentes, acelera la sincronización a milisegundos y garantiza que el TPV de la tienda física siga funcionando sin Internet.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparativa de Costes y Rendimiento -->
+    <div class="border border-white/[0.08] rounded-2xl p-6 sm:p-8 bg-[#121215] mb-16 shadow-2xl">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+        <span class="text-indigo-400">⚖️</span> Factusol Local + Bentian vs. Factusol Alojamiento (DELSOL Cloud)
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.02] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4">Criterio Técnico / Económico</th>
+              <th class="p-4 text-red-400">DELSOL Cloud + Módulos Nube</th>
+              <th class="p-4 text-emerald-400 font-bold">Bentian ERP Bridge (Local-First)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 font-semibold text-white">Coste Anual Recurrente</td>
+              <td class="p-4 text-red-300 font-mono">600 € - 1.200 € / año</td>
+              <td class="p-4 text-emerald-300 font-bold font-mono">199 € / año (Tarifa Plana)</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Ubicación y Soberanía del Dato</td>
+              <td class="p-4 text-zinc-400">Servidores remotos externos</td>
+              <td class="p-4 text-emerald-300">En tu propio PC o Servidor Windows</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Operativa si se cae Internet en la oficina</td>
+              <td class="p-4 text-red-300">Bloqueo total: no puedes emitir tickets ni albaranes</td>
+              <td class="p-4 text-emerald-300">El TPV físico sigue facturando al 100% en local</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Velocidad de Lectura de Catálogo</td>
+              <td class="p-4 text-zinc-400">Sujeto a latencia HTTP y colas cloud</td>
+              <td class="p-4 text-emerald-300 font-mono">&lt; 50 ms en RAM local (OLEDB nativo)</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Impacto en el Hosting de WordPress</td>
+              <td class="p-4 text-zinc-400">Scripts PHP que bloquean la CPU del hosting</td>
+              <td class="p-4 text-emerald-300">Dirty checking en local: 0 sobrecarga al servidor</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Soporte Multi-Almacén y Disponibilidad Real</td>
+              <td class="p-4 text-zinc-400">Limitado a existencias físicas globales</td>
+              <td class="p-4 text-emerald-300 font-mono">Stock Disponible DISSTO real (menos pedidos)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Guía Paso a Paso -->
+    <div class="space-y-12 mb-16">
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">TUTORIAL PASO A PASO</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">Configuración Técnica de Conexión en 4 Pasos</h2>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 relative">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-indigo-600/30">1</span>
+          <h3 class="text-xl font-bold text-white">Habilitar las Claves REST API en WooCommerce</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          WooCommerce incluye de forma nativa un motor REST API basado en los estándares de WordPress Core. No necesitas instalar ningún plugin de terceros para exponer los endpoints de productos y pedidos.
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-sm text-zinc-400 mb-6 leading-relaxed">
+          <li>Accede al panel de administración de WordPress (<code class="text-zinc-200">/wp-admin</code>).</li>
+          <li>Ve a <strong>WooCommerce &gt; Ajustes &gt; pestaña Avanzado &gt; REST API</strong>.</li>
+          <li>Haz clic en el botón <strong>Añadir clave</strong>.</li>
+          <li>En <em>Descripción</em> introduce <code class="text-indigo-300">Bentian ERP Bridge</code>.</li>
+          <li>En <em>Permisos</em> selecciona obligatoriamente <strong>Lectura/Escritura (Read/Write)</strong>.</li>
+          <li>Copia y guarda en un lugar seguro el <strong>Consumer Key</strong> (<code class="text-zinc-200">ck_...</code>) y el <strong>Consumer Secret</strong> (<code class="text-zinc-200">cs_...</code>).</li>
+        </ol>
+        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2.5">
+          <span class="text-base">⚠️</span>
+          <p>
+            <strong>Requisito HTTPS obligatorio:</strong> WooCommerce desactiva la autenticación básica de la REST API si tu tienda no cuenta con un certificado SSL válido. Asegúrate de que la URL de tu tienda comience por <code class="text-amber-200">https://</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 relative">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-indigo-600/30">2</span>
+          <h3 class="text-xl font-bold text-white">Identificar la Ruta de la Base de Datos Factusol (.accdb)</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Factusol almacena cada ejercicio anual de tu empresa en un archivo independiente con formato Microsoft Access. Por defecto, Factusol crea una estructura estandarizada en el disco local o en el servidor compartido de red:
+        </p>
+
+        <!-- Bloque de Código de Rutas -->
+        <div class="rounded-xl bg-[#09090b] border border-white/[0.08] p-4 font-mono text-xs text-zinc-300 mb-6 overflow-x-auto">
+          <div class="text-zinc-500 mb-2">// 1. Ruta estándar en instalación monousuario:</div>
+          <div class="text-emerald-400">C:\Software DELSOL\FactuSOL\Datos\FS\2026\*.accdb</div>
+          <div class="text-zinc-500 my-2">// 2. Ruta estándar en red local compartida (UNC nativo soportado):</div>
+          <div class="text-sky-400">\\SERVIDOR_EMPRESA\FactuSOL\Datos\FS\2026\FSC26.accdb</div>
+          <div class="text-zinc-500 my-2">// 3. Unidad mapeada en Windows:</div>
+          <div class="text-amber-400">Z:\Datos\FS\2026\FSC26.accdb</div>
+        </div>
+
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Para conocer la ruta exacta desde Factusol: ve a <strong>Archivo &gt; Información</strong> o revisa la cabecera superior de la ventana principal, donde Factusol indica el código de empresa y el ejercicio contable activo.
+        </p>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 relative">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-indigo-600/30">3</span>
+          <h3 class="text-xl font-bold text-white">Instalar el Agente Bentian ERP Bridge en Windows</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Descarga el instalador oficial de Windows (<code class="text-indigo-300">Bentian-Setup.exe</code>) e instálalo en el ordenador o servidor donde se encuentre la base de datos de Factusol o que tenga acceso a la carpeta compartida en red.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+            <h4 class="font-bold text-white text-sm mb-1">Sin dependencias complejas</h4>
+            <p class="text-xs text-zinc-400">
+              El instalador incluye automáticamente el motor OLEDB optimizado y se ejecuta como servicio en segundo plano minimizado en la bandeja del sistema (System Tray).
+            </p>
+          </div>
+          <div class="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+            <h4 class="font-bold text-white text-sm mb-1">Configuración en 3 minutos</h4>
+            <p class="text-xs text-zinc-400">
+              El asistente te pedirá seleccionar la base de datos de Factusol con el diálogo nativo de Windows e introducir la URL de WooCommerce y tus claves API.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-lg transition text-xs shadow-lg shadow-indigo-600/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Descargar Instalador de Windows (<span data-app-version>v0.3.5</span>)
+          </a>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 relative">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-indigo-600/30">4</span>
+          <h3 class="text-xl font-bold text-white">Mapeo de Almacenes, Tarifas e Importación de Pedidos</h3>
+        </div>
+        <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+          Una vez establecida la conexión, Bentian te permite definir las reglas comerciales específicas de tu negocio:
+        </p>
+        <ul class="space-y-3 text-sm text-zinc-400 mb-6">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Stock Disponible Real (DISSTO):</strong> En lugar de sincronizar las existencias físicas brutas (<code class="text-zinc-300">ACTSTO</code>), Bentian calcula el stock disponible restando los pedidos de clientes pendientes de servir (<code class="text-zinc-300">DISSTO = ACTSTO - PCL</code>), blindando tu tienda contra sobreventas.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Tarifas B2B / B2C:</strong> Selecciona cuál de las 5 tarifas de Factusol (<code class="text-zinc-300">F_TAR</code>) corresponde a tu tienda online (por ejemplo, Tarifa 1 para público general y Tarifa 2 para distribuidores mayoristas).</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Entrada automática de pedidos a F_PCL:</strong> Cuando un cliente compra en WooCommerce, el pedido se registra de inmediato en la tabla de pedidos de clientes (<code class="text-zinc-300">F_PCL</code>) y sus líneas correspondientes (<code class="text-zinc-300">F_LPC</code>), asignando la serie configurada (ej: Serie W).</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Arquitectura de Seguridad Outbound -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold">SEGURIDAD CORPORATIVA</span>
+        <h3 class="text-xl font-bold text-white">¿Por qué es 100% seguro sin abrir puertos en el router?</h3>
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        Muchos informáticos temen conectar ERPs locales con la web porque creen que deben abrir el puerto SMB (445) o MySQL (3306) en el cortafuegos de la empresa, lo que atrae ataques de ransomware automatizados. Bentian utiliza una <strong>arquitectura saliente (Outbound TLS 1.3)</strong>:
+      </p>
+
+      <!-- Diagrama de Arquitectura en Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <div class="p-5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+          <div class="text-2xl mb-2">🖥️</div>
+          <h4 class="font-bold text-white text-sm mb-1">Factusol Local</h4>
+          <p class="text-xs text-zinc-400">Base de datos .accdb en red interna protegida sin exposición pública.</p>
+        </div>
+        <div class="p-5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 flex flex-col justify-center">
+          <div class="text-xs font-mono text-indigo-400 font-bold mb-1">CONEXIÓN SALIENTE HTTPS &rarr;</div>
+          <div class="text-xs text-zinc-300">Bentian Agent consulta cambios en RAM y despacha JSON cifrado a través del puerto 443 estándar.</div>
+        </div>
+        <div class="p-5 rounded-xl bg-zinc-900 border border-white/[0.06]">
+          <div class="text-2xl mb-2">🛒</div>
+          <h4 class="font-bold text-white text-sm mb-1">WooCommerce</h4>
+          <p class="text-xs text-zinc-400">Recibe las actualizaciones mediante REST API protegida con firmas criptográficas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preguntas Frecuentes FAQ -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre la Conexión de Factusol con WooCommerce</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Funciona con versiones antiguas de Factusol o solo con la última?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian ERP Bridge es compatible tanto con versiones modernas de Factusol (2024, 2025, 2026) que emplean el formato .accdb como con versiones históricas (.mdb), respetando el esquema de datos relacional nativo de Software DELSOL.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Soporta artículos con variantes de tallas y colores?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Mapea la combinación de tablas F_ART, F_TLL, F_COL y F_STC generando productos variables limpios en WooCommerce, con su respectivo código de barras EAN-13 y stock individual por variante.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.06] rounded-xl bg-white/[0.01] p-4 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Qué ocurre si tengo cortes intermitentes de fibra en el almacén?</span>
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian incorpora una cola transaccional Store-and-Forward con cerrojos SQLite. Si se pierde la conexión a Internet, los cambios se retienen de forma segura y se transmiten automáticamente en cuanto se restablece la red, sin pérdida de datos ni duplicación de pedidos.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-900/20 to-indigo-950/40 border border-indigo-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Empieza a Sincronizar Factusol Local Hoy Mismo</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga el agente oficial para Windows y prueba la sincronización bidireccional durante 14 días gratis sin compromiso.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador de Windows (<span data-app-version>v0.3.5</span>)
+        </a>
+        <a href="/#pricing" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Comparativa de Precios (199 €/año) &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/factusol-shopify/" class="hover:text-zinc-300 transition">Shopify</a>
+        <a href="/alternativa-delsol-conecta/" class="hover:text-zinc-300 transition">Alternativa DELSOL</a>
+        <a href="/docs/" class="hover:text-zinc-300 transition">Documentación</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

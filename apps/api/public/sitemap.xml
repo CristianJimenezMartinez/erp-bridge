@@ -196,6 +196,39 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Guía Técnica B2B: Conectar Factusol Local con WooCommerce Sin Nube -->
+  <url>
+    <loc>https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/</loc>
+    <lastmod>2026-10-04T19:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/" />
+  </url>
+
+  <!-- Guía Técnica B2B: Solucionar Bloqueo de Archivos .ldb en Factusol -->
+  <url>
+    <loc>https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/</loc>
+    <lastmod>2026-10-04T19:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/" />
+  </url>
+
+  <!-- Guía Técnica B2B: Pasar Pedidos de WooCommerce a Factusol con Recargo de Equivalencia -->
+  <url>
+    <loc>https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/</loc>
+    <lastmod>2026-10-04T19:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/" />
+  </url>
+
   <!-- Página Pilar: Comparativa Conector Windows vs Plugins WordPress -->
   <url>
     <loc>https://bridge.cristianjm.com/comparativa-conector-windows-vs-plugin-wordpress/</loc>
