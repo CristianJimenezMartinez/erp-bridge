@@ -195,6 +195,26 @@ export async function bootstrapApp(): Promise<Express> {
     return res.json({ message: 'Bentian ERP Bridge API', status: 'OK', docs: '/health' });
   });
 
+  // Rutas directas para Beta Pública y SEO por Ciudades
+  app.get('/beta', (_req, res) => {
+    res.redirect(301, '/beta/');
+  });
+
+  app.get('/beta/', (_req, res) => {
+    const betaPath = path.join(publicDir, 'beta/index.html');
+    if (fs.existsSync(betaPath)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      return res.sendFile(betaPath);
+    }
+    res.redirect(302, '/');
+  });
+
+  app.get('/conector-factusol', (_req, res) => {
+    res.redirect(301, '/conector-factusol/');
+  });
+
   // Servir Dashboard Cloud Multi-Tenant
   const dashboardDir = path.join(publicDir, 'dashboard');
   app.use('/dashboard', express.static(dashboardDir, {
