@@ -6,7 +6,8 @@
   "scripts": {
     "build:landing": "ts-node scripts/build-landing.ts",
     "build:dashboard": "ts-node scripts/build-dashboard.ts",
-    "build": "ts-node scripts/build-landing.ts && ts-node scripts/build-dashboard.ts && tsc",
+    "build:cities": "ts-node scripts/generate-city-pages.ts",
+    "build": "ts-node scripts/build-landing.ts && ts-node scripts/build-dashboard.ts && ts-node scripts/generate-city-pages.ts && tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
     "test": "ts-node test/license-api.test.ts && ts-node test/update-api.test.ts && ts-node test/agent-monitor.test.ts && ts-node test/auth-security.test.ts"

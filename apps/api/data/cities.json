@@ -1,0 +1,143 @@
+[
+  {
+    "slug": "madrid",
+    "name": "Madrid",
+    "province": "Madrid",
+    "region": "Comunidad de Madrid",
+    "schemaRegion": "ES-MD",
+    "tagline": "Sincronización en tiempo real para pymes, distribuidores y mayoristas de Madrid",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Madrid | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Madrid. Almacenes en Cobo Calleja, Coslada y San Fernando. Stock en tiempo real y pedidos automáticos sin cuotas mensuales.",
+    "keywords": "conector factusol woocommerce madrid, sincronizar factusol prestashop madrid, factusol cobo calleja, enlace factusol tienda online coslada",
+    "heroSubtitle": "Automatiza la comunicación bidireccional entre tu base de datos de Factusol en tus oficinas o naves de la Comunidad de Madrid y tu tienda online WooCommerce o PrestaShop.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Cobo Calleja (Fuenlabrada)",
+        "desc": "El mayor enclave mayorista e importador de Europa. Gestiona catálogos de decenas de miles de referencias actualizando precios y disponibilidad al segundo."
+      },
+      {
+        "name": "Corredor del Henares (Coslada y San Fernando)",
+        "desc": "El corazón logístico del centro peninsular. Sincronización ultrarrápida que evita vender online stock comprometido en almacén físico."
+      },
+      {
+        "name": "Área Sur (Getafe, Leganés y Villaverde)",
+        "desc": "Zonas industriales de gran tradición en ferretería técnica, suministros de construcción y recambios donde Factusol es el ERP de cabecera."
+      }
+    ],
+    "sectors": [
+      "Distribución Mayorista B2B y Retail Multiprecio",
+      "Recambios y Componentes para Automoción",
+      "Suministros Industriales y Ferretería Técnica",
+      "Hostelería y Comercio Electrónico de Consumo"
+    ],
+    "localContextParagraph": "En el mercado de Madrid, donde la inmediatez logística y el reparto en el mismo día marcan la diferencia competitiva, los comercios y mayoristas no pueden permitirse roturas de stock ni errores de inventario. Si vendes en tu nave en Fuenlabrada o Coslada al mismo tiempo que en tu tienda online WooCommerce, sincronizar mediante plugins PHP tradicionales colapsa el servidor de WordPress con errores 504 Gateway Timeout. Bentian ERP Bridge opera como un agente nativo en tu ordenador Windows local, leyendo directamente la base de datos de Factusol (.accdb) y actualizando únicamente las variaciones de stock en milisegundos, sin cuotas cloud mensuales.",
+    "faqs": [
+      {
+        "q": "¿Funciona con varias tiendas online si tenemos la central en Madrid y tiendas en otras ciudades?",
+        "a": "Sí. Bentian soporta arquitecturas multisucursal y multitienda, permitiendo sincronizar el stock del almacén central de Madrid con diferentes dominios WooCommerce o PrestaShop de forma coordinada."
+      },
+      {
+        "q": "¿Es compatible con redes locales y unidades compartidas en servidores de Madrid?",
+        "a": "Totalmente. Soporta rutas de red UNC (\\\\NAS_EMPRESA\\Factusol\\) y unidades mapeadas (Z:\\Datos\\FS\\) con reconexión automática si se producen microcortes de red local."
+      },
+      {
+        "q": "¿Cómo puedo empezar a probarlo en mi empresa en Madrid?",
+        "a": "Puedes descargar el agente en nuestra fase de Beta Pública sin necesidad de introducir tarjeta de crédito ni firmar permanencias. Se instala en 2 minutos y funciona de inmediato."
+      }
+    ]
+  },
+  {
+    "slug": "barcelona",
+    "name": "Barcelona",
+    "province": "Barcelona",
+    "region": "Cataluña",
+    "schemaRegion": "ES-CT",
+    "tagline": "Conexión Local-First entre Factusol y eCommerce para empresas y comercios de Barcelona",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.",
+    "keywords": "conector factusol woocommerce barcelona, sincronizar factusol prestashop cataluña, factusol zona franca barcelona, integrar factusol valles",
+    "heroSubtitle": "Diseñado para el tejido manufacturero, químico, textil y logístico de Barcelona y su área metropolitana. Sincronización continua de pedidos y stock sin intermediarios en la nube.",
+    "industrialHubs": [
+      {
+        "name": "Zona Franca y Área Portuaria",
+        "desc": "Hub neurálgico logístico e industrial. Automatización directa entre la recepción de mercancías en almacén y la disponibilidad en el canal digital."
+      },
+      {
+        "name": "Vallès Occidental y Oriental (Sabadell, Terrassa, Granollers)",
+        "desc": "El núcleo industrial catalán de manufactura, textil, packaging y metal, donde Factusol gestiona el inventario histórico de miles de empresas."
+      },
+      {
+        "name": "Baix Llobregat (Cornellà, Sant Boi, El Prat)",
+        "desc": "Polígonos metropolitanos dedicados a la distribución mayorista y repuestos de alta rotación con entregas rápidas."
+      }
+    ],
+    "sectors": [
+      "Fabricación Textil, Confección y Moda",
+      "Química, Pinturas y Adhesivos Industriales",
+      "Suministros Industriales y Ferretería",
+      "Packaging, Papel y Artes Gráficas"
+    ],
+    "localContextParagraph": "El tejido empresarial de Barcelona y su corona metropolitana destaca por su potencia manufacturera y su liderazgo en comercio electrónico con plataformas como PrestaShop y WooCommerce. Muchas empresas catalanas que utilizan Factusol para gestionar sus almacenes en el Vallès o la Zona Franca se ven frenadas por los conectores convencionales que obligan a migrar a la nube o a pagar cuotas mensuales fijas por cada producto sincronizado. Bentian ERP Bridge se ejecuta localmente en tu propio servidor o PC con Windows, garantizando total privacidad de datos y procesando miles de variantes con IVA, recargo de equivalencia y tarifas profesionales a máxima velocidad.",
+    "faqs": [
+      {
+        "q": "¿Soporta PrestaShop además de WooCommerce para empresas de Barcelona?",
+        "a": "Sí. Bentian dispone de conectores nativos específicos tanto para WooCommerce como para PrestaShop (versiones 1.7 y 8.x), gestionando combinaciones complejas de tallas, colores y tarifas por grupo de cliente."
+      },
+      {
+        "q": "¿Cómo gestiona el Recargo de Equivalencia y clientes B2B en Cataluña?",
+        "a": "Bentian detecta automáticamente a los clientes con RE en tu tienda online y traslada los tipos impositivos exactos a las líneas de pedido de Factusol (F_PCL / F_LPC)."
+      },
+      {
+        "q": "¿Requiere contratar el servicio cloud de DELSOL?",
+        "a": "No. Bentian lee directamente tu base de datos local (.accdb / .mdb) de Factusol. No dependes de APIs externas lentas ni de suscripciones adicionales."
+      }
+    ]
+  },
+  {
+    "slug": "valencia",
+    "name": "Valencia",
+    "province": "Valencia",
+    "region": "Comunidad Valenciana",
+    "schemaRegion": "ES-VC",
+    "tagline": "Integración Factusol con WooCommerce para el comercio, la industria y distribución valenciana",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Valencia | Bentian ERP",
+    "metaDescription": "Conecta tu Factusol con WooCommerce y PrestaShop en Valencia, Paterna, Ribarroja y Almussafes. Stock disponible en tiempo real, tarifas B2B y pedidos automáticos sin cuotas mensuales.",
+    "keywords": "conector factusol woocommerce valencia, factusol fuente del jarro paterna, sincronizar factusol ribarroja, conectar factusol prestashop valencia",
+    "heroSubtitle": "Optimizado para almacenes de suministros industriales, cerámica, muebles y alimentación en Paterna, Ribarroja, Vara de Quart y Almussafes.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Fuente del Jarro (Paterna)",
+        "desc": "Uno de los mayores parques industriales de España. Integración ágil para catálogos con miles de SKUs de ferretería, envases y maquinaria."
+      },
+      {
+        "name": "Polígono El Oliveral y Sector 13 (Ribarroja)",
+        "desc": "El nudo logístico clave conectado a la A-3 y el Puerto de Valencia, donde el control de stock exacto en almacén es fundamental."
+      },
+      {
+        "name": "Almussafes y Polígono Vara de Quart",
+        "desc": "Industria auxiliar, automoción y distribución comercial con requerimientos exigentes de control de pedidos B2B."
+      }
+    ],
+    "sectors": [
+      "Suministros Industriales, Soldadura y Ferretería",
+      "Mobiliario, Iluminación y Equipamiento del Hogar",
+      "Materiales de Construcción y Cerámica",
+      "Agroalimentación y Productos del Levante"
+    ],
+    "localContextParagraph": "En la Comunidad Valenciana, la integración entre la venta directa en mostrador en polígonos como Fuente del Jarro o Ribarroja y el canal online es indispensable. Los almacenes que operan con Factusol suelen manejar catálogos extensos (+5.000 artículos), tarifas múltiples (Tarifa 1 mayorista, Tarifa 2 minorista, etc.) y la necesidad de calcular el stock disponible real (DISSTO) para no vender material reservado en tienda física. Bentian ERP Bridge se conecta directamente a Factusol por OLEDB en tu PC local, calculando el stock neto en menos de 100 ms y publicándolo en tu tienda online al instante, blindando tu operativa ante sobreventas.",
+    "faqs": [
+      {
+        "q": "¿Se puede elegir qué tarifa de Factusol enviar a la tienda online?",
+        "a": "Sí. Puedes seleccionar desde el panel del agente qué tarifa (Tarifa 1, Tarifa 2, Tarifa 3...) de Factusol se publica en la tienda web, aplicando automáticamente los precios correspondientes con o sin IVA."
+      },
+      {
+        "q": "¿Qué sucede si la conexión a internet en el polígono sufre microcortes?",
+        "a": "Bentian incluye tecnología Store-and-Forward: si internet se interrumpe, los pedidos de la tienda online se retienen de forma segura y se generan en Factusol en cuanto se recupera la conexión."
+      },
+      {
+        "q": "¿Es compatible con el nuevo Factusol 2024 / 2025 / 2026?",
+        "a": "Sí, es 100% compatible con todas las versiones de Factusol desde Factusol 2018 hasta las versiones más recientes en formato .accdb y .mdb."
+      }
+    ]
+  }
+]

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP</title>
+  <meta name="description" content="Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.">
+  <meta name="keywords" content="conector factusol woocommerce barcelona, sincronizar factusol prestashop cataluña, factusol zona franca barcelona, integrar factusol valles">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/barcelona/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/barcelona/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP">
+  <meta property="og:description" content="Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- TailwindCSS y Config -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+
+  <!-- Metadatos de Web App -->
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Schema.org JSON-LD Localizado -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conectores Factusol", "item": "https://bridge.cristianjm.com/conector-factusol/" },
+          { "@type": "ListItem", "position": 3, "name": "Barcelona", "item": "https://bridge.cristianjm.com/conector-factusol/barcelona/" }
+        ]
+      },
+      {
+        "@type": "Service",
+        "name": "Conector Factusol para WooCommerce y PrestaShop en Barcelona",
+        "serviceType": "Software Integration Service",
+        "description": "Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.",
+        "provider": {
+          "@type": "Organization",
+          "name": "Bentian ERP Bridge",
+          "url": "https://bridge.cristianjm.com/"
+        },
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "Barcelona, Cataluña",
+          "addressCountry": "ES"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge - Barcelona",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/conector-factusol/barcelona/",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#precios",
+          "availability": "https://schema.org/InStock"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+
+          {
+            "@type": "Question",
+            "name": "¿Soporta PrestaShop además de WooCommerce para empresas de Barcelona?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Bentian dispone de conectores nativos específicos tanto para WooCommerce como para PrestaShop (versiones 1.7 y 8.x), gestionando combinaciones complejas de tallas, colores y tarifas por grupo de cliente."
+            }
+          },
+
+          {
+            "@type": "Question",
+            "name": "¿Cómo gestiona el Recargo de Equivalencia y clientes B2B en Cataluña?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian detecta automáticamente a los clientes con RE en tu tienda online y traslada los tipos impositivos exactos a las líneas de pedido de Factusol (F_PCL / F_LPC)."
+            }
+          },
+
+          {
+            "@type": "Question",
+            "name": "¿Requiere contratar el servicio cloud de DELSOL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Bentian lee directamente tu base de datos local (.accdb / .mdb) de Factusol. No dependes de APIs externas lentas ni de suscripciones adicionales."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-[#09090b] selection:bg-indigo-500/30 font-sans text-zinc-300">
+
+  <!-- Header -->
+  <header class="border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12]">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4 text-xs font-medium">
+        <a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Todas las Ciudades</a>
+        <a href="/beta/" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm font-semibold">Probar Beta Gratis</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Breadcrumbs -->
+    <nav class="border-b border-white/[0.04] bg-zinc-950/40 text-xs py-3 px-6" aria-label="Breadcrumb">
+      <div class="max-w-5xl mx-auto flex items-center gap-2 text-zinc-500">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <span>/</span>
+        <a href="/conector-factusol/" class="hover:text-zinc-300 transition">Conectores Factusol</a>
+        <span>/</span>
+        <span class="text-zinc-300 font-medium">Barcelona</span>
+      </div>
+    </nav>
+
+    <!-- Hero Localizado -->
+    <section class="py-16 md:py-24 px-6 border-b border-white/[0.05] relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent pointer-events-none"></div>
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          Conector Factusol • Barcelona (Barcelona)
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6 leading-tight">
+          Sincroniza Factusol con tu Tienda Online en <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Barcelona</span>
+        </h1>
+        <p class="text-base sm:text-lg text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+          Diseñado para el tejido manufacturero, químico, textil y logístico de Barcelona y su área metropolitana. Sincronización continua de pedidos y stock sin intermediarios en la nube.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
+            Descargar Agente Windows (.exe)
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          </a>
+          <a href="/beta/" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition text-center font-medium">
+            Ver Condiciones de la Beta Gratuita
+          </a>
+        </div>
+        <p class="mt-4 text-xs text-zinc-500 font-mono">Compatible con Factusol 2018-2026 • WooCommerce y PrestaShop • Sin cuotas cloud</p>
+      </div>
+    </section>
+
+    <!-- Contexto Industrial y Logístico Local -->
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05] bg-[#0c0c0e]">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">Integración adaptada a las empresas de Barcelona</h2>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            El tejido empresarial de Barcelona y su corona metropolitana destaca por su potencia manufacturera y su liderazgo en comercio electrónico con plataformas como PrestaShop y WooCommerce. Muchas empresas catalanas que utilizan Factusol para gestionar sus almacenes en el Vallès o la Zona Franca se ven frenadas por los conectores convencionales que obligan a migrar a la nube o a pagar cuotas mensuales fijas por cada producto sincronizado. Bentian ERP Bridge se ejecuta localmente en tu propio servidor o PC con Windows, garantizando total privacidad de datos y procesando miles de variantes con IVA, recargo de equivalencia y tarifas profesionales a máxima velocidad.
+          </p>
+        </div>
+
+        <div class="mb-14">
+          <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-6 text-center">Polígonos y Áreas de Distribución Principales</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.06] hover:border-indigo-500/40 transition">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            <h3 class="text-base font-semibold text-white tracking-tight">Zona Franca y Área Portuaria</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Hub neurálgico logístico e industrial. Automatización directa entre la recepción de mercancías en almacén y la disponibilidad en el canal digital.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.06] hover:border-indigo-500/40 transition">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            <h3 class="text-base font-semibold text-white tracking-tight">Vallès Occidental y Oriental (Sabadell, Terrassa, Granollers)</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El núcleo industrial catalán de manufactura, textil, packaging y metal, donde Factusol gestiona el inventario histórico de miles de empresas.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/60 border border-white/[0.06] hover:border-indigo-500/40 transition">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            <h3 class="text-base font-semibold text-white tracking-tight">Baix Llobregat (Cornellà, Sant Boi, El Prat)</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Polígonos metropolitanos dedicados a la distribución mayorista y repuestos de alta rotación con entregas rápidas.</p>
+        </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-4 text-center">Sectores Empresariales con Mayor Adopción</h3>
+          <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+            
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/40 border border-white/[0.04]">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span class="text-xs sm:text-sm font-medium text-zinc-300">Fabricación Textil, Confección y Moda</span>
+        </div>
+
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/40 border border-white/[0.04]">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span class="text-xs sm:text-sm font-medium text-zinc-300">Química, Pinturas y Adhesivos Industriales</span>
+        </div>
+
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/40 border border-white/[0.04]">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span class="text-xs sm:text-sm font-medium text-zinc-300">Suministros Industriales y Ferretería</span>
+        </div>
+
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/40 border border-white/[0.04]">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+          <span class="text-xs sm:text-sm font-medium text-zinc-300">Packaging, Papel y Artes Gráficas</span>
+        </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cómo Funciona (Arquitectura Local-First) -->
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05]">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First: Máxima Privacidad y Cero Caídas</h2>
+        <p class="text-sm text-zinc-400 text-center max-w-2xl mx-auto mb-12">
+          A diferencia de los conectores que exigen subir tu base de datos contable a servidores de terceros, Bentian se ejecuta en tu propio ordenador en Barcelona.
+        </p>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">1</div>
+            <h3 class="text-base font-semibold text-white mb-2">Lectura Directa Factusol</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente se conecta directamente al archivo .accdb o .mdb mediante OLEDB en menos de 100 ms. Cero lentitud.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold mb-4">2</div>
+            <h3 class="text-base font-semibold text-white mb-2">Detección Inteligente de Stock</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula el stock disponible real (DISSTO) excluyendo mercancía reservada o pendiente de servir para evitar sobreventas.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold mb-4">3</div>
+            <h3 class="text-base font-semibold text-white mb-2">Buffer Store-and-Forward</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la conexión de internet de tu nave o polígono sufre cortes, los pedidos se retienen y se vuelcan automáticamente al volver la red.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQs Locales -->
+    <section class="py-16 md:py-20 px-6 border-b border-white/[0.05] bg-[#0c0c0e]">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-10">Preguntas Frecuentes en Barcelona</h2>
+        <div class="space-y-4">
+          
+        <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+          <h4 class="text-sm sm:text-base font-semibold text-white mb-2">¿Soporta PrestaShop además de WooCommerce para empresas de Barcelona?</h4>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Sí. Bentian dispone de conectores nativos específicos tanto para WooCommerce como para PrestaShop (versiones 1.7 y 8.x), gestionando combinaciones complejas de tallas, colores y tarifas por grupo de cliente.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+          <h4 class="text-sm sm:text-base font-semibold text-white mb-2">¿Cómo gestiona el Recargo de Equivalencia y clientes B2B en Cataluña?</h4>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Bentian detecta automáticamente a los clientes con RE en tu tienda online y traslada los tipos impositivos exactos a las líneas de pedido de Factusol (F_PCL / F_LPC).</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/40 border border-white/[0.05]">
+          <h4 class="text-sm sm:text-base font-semibold text-white mb-2">¿Requiere contratar el servicio cloud de DELSOL?</h4>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">No. Bentian lee directamente tu base de datos local (.accdb / .mdb) de Factusol. No dependes de APIs externas lentas ni de suscripciones adicionales.</p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-16 md:py-20 px-6 text-center">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl md:text-4xl font-bold text-white mb-4">Empieza a sincronizar tu Factusol en Barcelona hoy</h2>
+        <p class="text-sm text-zinc-400 mb-8 max-w-xl mx-auto">
+          Prueba la Beta Pública sin tarjeta de crédito. Instalación limpia en Windows en menos de 2 minutos.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/25 flex items-center gap-2">
+            Descargar Bentian Agent (.exe)
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          </a>
+          <a href="/beta/" class="px-6 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] transition font-medium">
+            Más información de la Beta
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer con Hub de Ciudades -->
+  <footer class="border-t border-white/[0.05] py-12 px-6 bg-[#09090b] text-xs text-zinc-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <p>&copy; 2026 Bentian ERP Bridge. Solución especializada en Factusol para España.</p>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/conector-factusol/madrid/" class="hover:text-zinc-300 transition">Madrid</a>
+        <span>•</span>
+        <a href="/conector-factusol/barcelona/" class="hover:text-zinc-300 transition">Barcelona</a>
+        <span>•</span>
+        <a href="/conector-factusol/valencia/" class="hover:text-zinc-300 transition">Valencia</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition font-medium text-zinc-400">Ver todas las ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

@@ -1,4 +1,34 @@
-<!-- 1. HEADER MINIMALISTA & DESACOPLADO                                       -->
+<!-- 0. ANNOUNCEMENT BAR (BETA) -->
+  <div id="beta-announcement-bar" class="relative bg-indigo-600 px-4 py-2 sm:px-6 lg:px-8 flex items-center justify-center transition-all duration-300">
+    <div class="text-xs sm:text-sm font-medium text-white flex items-center gap-2 flex-wrap justify-center text-center">
+      🚀 Beta Pública Abierta: Conecta tu Factusol gratis durante el lanzamiento 
+      <a href="/beta/" class="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded-md transition ml-1">
+        Probar Beta Gratuita <span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+    <button type="button" id="close-beta-banner" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-indigo-500 rounded-md text-indigo-100 hover:text-white transition focus:outline-none" aria-label="Dismiss">
+      <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+      </svg>
+    </button>
+  </div>
+  <script>
+    (function() {
+      var banner = document.getElementById('beta-announcement-bar');
+      var btn = document.getElementById('close-beta-banner');
+      if (localStorage.getItem('hideBetaBanner') === 'true') {
+        if(banner) banner.style.display = 'none';
+      }
+      if (btn && banner) {
+        btn.addEventListener('click', function() {
+          banner.style.display = 'none';
+          localStorage.setItem('hideBetaBanner', 'true');
+        });
+      }
+    })();
+  </script>
+
+  <!-- 1. HEADER MINIMALISTA & DESACOPLADO                                       -->
   <!-- ========================================================================= -->
   <header class="sticky top-0 z-50 border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">

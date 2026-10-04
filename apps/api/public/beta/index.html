@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beta Pública Abierta - Bentian ERP Bridge</title>
+  <meta name="description" content="Únete a la beta pública de Bentian ERP Bridge. Conecta Factusol con WooCommerce o PrestaShop gratis y sin compromiso.">
+  <meta name="author" content="Bentian">
+  
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <!-- TailwindCSS y Estilos -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+
+  <!-- Metadatos de Web App -->
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body class="bg-[#09090b] selection:bg-indigo-500/30 font-sans text-zinc-300">
+
+  <!-- Header Simplificado para la Beta -->
+  <header class="border-b border-white/[0.07] bg-[#09090b]/85 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12]">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-semibold text-sm tracking-tight text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">Beta</span>
+        </div>
+      </a>
+      <a href="/" class="text-xs font-medium text-zinc-400 hover:text-white transition">← Volver al sitio principal</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="py-20 px-6 border-b border-white/[0.05]">
+      <div class="max-w-3xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          BETA PÚBLICA ABIERTA
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
+          Conecta tu Factusol Gratis<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Durante el Lanzamiento</span>
+        </h1>
+        <p class="text-lg text-zinc-400 mb-8 leading-relaxed">
+          100% autoservicio, sin tarjeta de crédito y sin compromiso. Descarga el agente, conéctalo a tu ERP y empieza a sincronizar tu tienda en minutos.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+            Descargar Agente (Beta)
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          </a>
+        </div>
+        <div class="mt-6 flex flex-col items-center justify-center text-xs text-zinc-500 gap-1">
+          <p>Versión <span data-app-version>v0.3.5</span> para Windows 10/11 x64.</p>
+          <p>Requiere Factusol instalado y funcionando localmente.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cómo Funciona (3 Pasos) -->
+    <section class="py-20 px-6 bg-[#0c0c0e]">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl font-bold text-white text-center mb-12">Cómo empezar en 3 pasos</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-lg mb-4">1</div>
+            <h3 class="text-white font-semibold mb-2">Descargar</h3>
+            <p class="text-sm text-zinc-400">Descarga e instala Bentian Agent en el mismo equipo donde tienes tu Factusol.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-lg mb-4">2</div>
+            <h3 class="text-white font-semibold mb-2">Elegir Factusol</h3>
+            <p class="text-sm text-zinc-400">Selecciona tu base de datos de Factusol usando el selector nativo de Windows. Sin subidas a la nube.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.05]">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg mb-4">3</div>
+            <h3 class="text-white font-semibold mb-2">Conectar Tienda</h3>
+            <p class="text-sm text-zinc-400">Genera las claves REST API en tu WooCommerce o PrestaShop y pégalas en el agente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Condiciones Transparentes y Descuento -->
+    <section class="py-20 px-6 border-b border-white/[0.05]">
+      <div class="max-w-4xl mx-auto">
+        <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-transparent border border-indigo-500/20">
+          <h2 class="text-2xl font-bold text-white mb-6">Condiciones Transparentes de la Beta</h2>
+          <div class="space-y-4 text-sm text-zinc-300">
+            <p><strong class="text-white">✅ Gratuita durante la fase de pruebas:</strong> La beta es totalmente funcional y no requiere tarjeta de crédito ni pago inicial.</p>
+            <p><strong class="text-white">✅ Descuento Fundador para siempre:</strong> Cuando finalice la beta, el precio oficial será de 199€/año. Los participantes de la beta tendrán reservado un <strong>30% de descuento (139€/año para siempre)</strong>.</p>
+            <p><strong class="text-white">🤝 Soporte:</strong> Atención por email con respuesta en 48-72h laborales. <em>(Por favor, comprende que no ofrecemos asistencia telefónica para no saturar nuestro desarrollo).</em></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ & Legal -->
+    <section class="py-20 px-6 bg-[#0c0c0e]">
+      <div class="max-w-3xl mx-auto space-y-12">
+        <!-- FAQ -->
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes</h2>
+          <div class="space-y-4">
+            <div class="p-5 rounded-xl bg-zinc-900/30 border border-white/[0.03]">
+              <h4 class="font-semibold text-white mb-2">¿Hasta cuándo dura la beta?</h4>
+              <p class="text-sm text-zinc-400">La beta se mantendrá abierta hasta que validemos la estabilidad en suficientes entornos de producción. Avisaremos con al menos 30 días de antelación antes de pasar a la versión comercial.</p>
+            </div>
+            <div class="p-5 rounded-xl bg-zinc-900/30 border border-white/[0.03]">
+              <h4 class="font-semibold text-white mb-2">¿Es seguro para mis datos?</h4>
+              <p class="text-sm text-zinc-400">Totalmente. El agente funciona 100% en local, no enviamos tus datos de facturación a ningún servidor externo. Solo se comunica entre tu PC y tu tienda online.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descargo de responsabilidad -->
+        <div>
+          <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Responsabilidad y Copias de Seguridad (AS-IS)
+          </h2>
+          <div class="p-5 rounded-xl bg-amber-500/5 border border-amber-500/10 text-xs text-amber-500/80 space-y-3">
+            <p><strong>IMPORTANTE:</strong> Este software en fase Beta se proporciona "TAL CUAL" (AS-IS), sin garantías explícitas ni implícitas de ningún tipo.</p>
+            <p><strong>OBLIGACIÓN DE BACKUP:</strong> El cliente declara conocer que las bases de datos de Factusol operan sobre tecnología Microsoft Access (.accdb / .mdb). Es <strong>obligación exclusiva e ineludible del usuario</strong> mantener copias de seguridad (backups) diarias e independientes antes de utilizar este software.</p>
+            <p>Bentian no responderá por corrupción de archivos, caídas de red o pérdida de datos. Al descargar y utilizar el software, aceptas estas condiciones.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/[0.05] py-8 text-center text-xs text-zinc-500">
+    <p>&copy; 2026 Bentian. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- Scripts de Sincronización (Versiones SSoT) -->
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>
