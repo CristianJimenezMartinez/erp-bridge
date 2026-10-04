@@ -1,72 +1,89 @@
-<!-- 14. FOOTER MINIMALISTA & DESACOPLADO                                      -->
-  <!-- ========================================================================= -->
-  <footer class="border-t border-white/[0.07] bg-[#09090b] py-12 px-6 text-xs text-zinc-500">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+<!-- 14. FOOTER ESTRUCTURADO, COMPACTO & ELEGANTE                              -->
+<!-- ========================================================================= -->
+<footer class="border-t border-white/[0.07] bg-[#09090b] pt-10 pb-8 px-6 sm:px-8 text-xs text-zinc-500">
+  <div class="max-w-6xl mx-auto">
+    <!-- Grid Principal: 4 Columnas Compactas -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
       
-      <!-- Marca y Copyright -->
-      <div class="flex items-center gap-3">
-        <div class="w-6 h-6 rounded bg-[#18181b] border border-white/[0.1] flex items-center justify-center overflow-hidden p-0.5">
-          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="24" height="24">
+      <!-- Columna 1: Marca & Estado -->
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-6 h-6 rounded bg-[#18181b] border border-white/[0.1] flex items-center justify-center overflow-hidden p-0.5">
+            <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="24" height="24">
+          </div>
+          <div>
+            <span class="text-zinc-200 font-semibold text-sm tracking-tight" data-brand-name>Bentian</span>
+            <span class="text-zinc-500 text-xs font-medium ml-1" data-product-name>ERP Bridge</span>
+          </div>
         </div>
-        <div>
-          <span class="text-zinc-300 font-semibold" data-brand-name>Bentian</span>
-          <span class="text-zinc-600"> — </span>
-          <span data-product-name>ERP Bridge</span>
-          <span class="text-zinc-600"> • © 2026 Todos los derechos reservados</span>
-        </div>
-      </div>
-
-      <!-- Soluciones e Integraciones SEO -->
-      <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-400 font-sans">
-                <a href="/factusol-woocommerce/" class="hover:text-indigo-400 transition">Factusol WooCommerce</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-prestashop/" class="hover:text-indigo-400 transition">Factusol PrestaShop</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-shopify/" class="hover:text-indigo-400 transition">Factusol Shopify</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-tallas-colores/" class="hover:text-indigo-400 transition">Tallas y Colores</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-ferreterias-suministros/" class="hover:text-indigo-400 transition">Ferreterías y Suministros</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-recargo-equivalencia/" class="hover:text-indigo-400 transition">Recargo de Equivalencia</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-prestashop-8/" class="hover:text-indigo-400 transition">PrestaShop 8</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/comparativa-conector-windows-vs-plugin-wordpress/" class="hover:text-indigo-400 transition">Windows vs Plugins</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-verifactu-woocommerce/" class="hover:text-emerald-400 transition">Guía VeriFactu</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/factusol-api-rest/" class="hover:text-blue-400 transition">Factusol API REST</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/alternativa-delsol-conecta/" class="hover:text-indigo-400 transition">Alternativa DELSOL Conecta</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/conector-factusol/" class="hover:text-indigo-400 transition">Cobertura por Ciudades</a>
-        <span class="text-zinc-700">•</span>
-        <a href="/docs/" class="hover:text-indigo-400 transition">Documentación</a>
-      </div>
-
-      <!-- Enlaces Técnicos, de Estado y Regulatorios -->
-      <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 font-mono text-[11px]">
-        <!-- Enlaces Legales Oficiales (LSSI / RGPD) -->
-        <div class="flex items-center gap-3 text-zinc-500 font-sans">
-          <a href="javascript:void(0)" onclick="abrirModalLegal('aviso')" class="hover:text-zinc-300 transition">Aviso Legal</a>
-          <span>•</span>
-          <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="hover:text-zinc-300 transition">Privacidad (RGPD)</a>
-          <span>•</span>
-          <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="hover:text-zinc-300 transition">Términos</a>
-          <span>•</span>
-          <a href="javascript:void(0)" onclick="abrirModalLegal('cookies')" class="hover:text-zinc-300 transition">Cookies</a>
-        </div>
-        <div class="hidden sm:block w-px h-3 bg-white/[0.1]"></div>
-        <!-- Enlaces Técnicos -->
-        <div class="flex items-center gap-4">
-          <a href="/health" class="hover:text-emerald-400 transition flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> API Health
+        <p class="text-xs text-zinc-500 leading-relaxed max-w-xs">
+          Sincronizador local-first de Factusol con tiendas online. Sin intermediarios cloud ni comisiones por pedido.
+        </p>
+        <div class="mt-4 flex items-center gap-2">
+          <a href="/health" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400 hover:bg-emerald-500/15 transition">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            API Operativa
           </a>
-          <a href="/releases/latest.json" class="hover:text-zinc-300 transition">Manifest</a>
-          <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
         </div>
+      </div>
+
+      <!-- Columna 2: Conectores e-Commerce -->
+      <div>
+        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-3 font-mono">Conectores</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="/factusol-woocommerce/" class="text-zinc-400 hover:text-white transition">Factusol WooCommerce</a></li>
+          <li><a href="/factusol-prestashop/" class="text-zinc-400 hover:text-white transition">Factusol PrestaShop</a></li>
+          <li><a href="/factusol-shopify/" class="text-zinc-400 hover:text-white transition">Factusol Shopify</a></li>
+          <li><a href="/factusol-prestashop-8/" class="text-zinc-400 hover:text-white transition">PrestaShop 8</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Especialidades & Casos de Uso -->
+      <div>
+        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-3 font-mono">Soluciones</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="/factusol-tallas-colores/" class="text-zinc-400 hover:text-white transition">Tallas y Colores (Moda)</a></li>
+          <li><a href="/factusol-ferreterias-suministros/" class="text-zinc-400 hover:text-white transition">Ferreterías y Suministros</a></li>
+          <li><a href="/factusol-recargo-equivalencia/" class="text-zinc-400 hover:text-white transition">Recargo de Equivalencia</a></li>
+          <li><a href="/factusol-api-rest/" class="text-zinc-400 hover:text-white transition">Factusol API REST</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Recursos & Plataforma -->
+      <div class="col-span-2 md:col-span-1">
+        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-300 mb-3 font-mono">Recursos</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="/alternativa-delsol-conecta/" class="text-zinc-400 hover:text-white transition">Alternativa DELSOL Conecta</a></li>
+          <li><a href="/comparativa-conector-windows-vs-plugin-wordpress/" class="text-zinc-400 hover:text-white transition">Windows vs Plugins PHP</a></li>
+          <li><a href="/factusol-verifactu-woocommerce/" class="text-zinc-400 hover:text-white transition">Guía VeriFactu</a></li>
+          <li><a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition">Cobertura por Ciudades</a></li>
+          <li><a href="/docs/" class="text-zinc-400 hover:text-white transition">Documentación Técnica</a></li>
+          <li><a href="/dashboard" class="text-zinc-400 hover:text-white transition">Panel de Control</a></li>
+        </ul>
       </div>
 
     </div>
-  </footer>
+
+    <!-- Barra Inferior: Copyright & Legal -->
+    <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+      <div class="flex items-center gap-1.5 text-center sm:text-left">
+        <span>© 2026 Bentian ERP Bridge.</span>
+        <span class="hidden sm:inline text-zinc-700">•</span>
+        <span>Todos los derechos reservados.</span>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-500 font-sans">
+        <a href="javascript:void(0)" onclick="abrirModalLegal('aviso')" class="hover:text-zinc-300 transition">Aviso Legal</a>
+        <span class="text-zinc-700">•</span>
+        <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="hover:text-zinc-300 transition">Privacidad (RGPD)</a>
+        <span class="text-zinc-700">•</span>
+        <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="hover:text-zinc-300 transition">Términos</a>
+        <span class="text-zinc-700">•</span>
+        <a href="javascript:void(0)" onclick="abrirModalLegal('cookies')" class="hover:text-zinc-300 transition">Cookies</a>
+        <span class="text-zinc-700">•</span>
+        <a href="/releases/latest.json" class="hover:text-zinc-300 transition font-mono">Manifest</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
