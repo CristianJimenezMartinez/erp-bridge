@@ -25,7 +25,8 @@
     "deploy:web": "node scripts/deploy-web.js",
     "deploy:web:dry-run": "node scripts/deploy-web.js --dry-run",
     "deploy:web:endpoint": "node scripts/deploy-web.js --endpoint-only",
-    "seal:legal": "node scripts/seal-opentimestamps.js"
+    "seal:legal": "node scripts/seal-opentimestamps.js",
+    "gsc:audit": "ts-node scripts/gsc-audit.ts"
   },
   "keywords": [
     "erp",
