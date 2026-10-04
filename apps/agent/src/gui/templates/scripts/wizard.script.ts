@@ -474,10 +474,20 @@ export const wizardScript = `
       }
     }
 
+    const setWizStep = setWizardStep;
+    window.setWizStep = setWizardStep;
+    window.setWizardStep = setWizardStep;
     window.openWizardModal = openWizardModal;
     window.closeWizardModal = closeWizardModal;
-    window.setWizStep = setWizStep;
-    window.setWizOrderSeries = setWizOrderSeries;
+    window.wizNextStep = wizNextStep;
+    window.wizPrevStep = wizPrevStep;
+    window.wizSelectChannel = wizSelectChannel;
+    window.wizPasteAndActivateLicense = wizPasteAndActivateLicense;
+    window.wizTestUniversal = wizTestUniversal;
+    window.wizTestWooCommerce = wizTestWooCommerce;
+    window.wizTestFactusolConnection = wizTestFactusolConnection;
     window.wizTestOrderEmail = wizTestOrderEmail;
+    window.setWizOrderSeries = setWizOrderSeries;
+    window.onWizOrderSeriesInput = onWizOrderSeriesInput;
     window.finishWizardAndStart = finishWizardAndStart;
 `;
