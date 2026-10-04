@@ -22,7 +22,7 @@ El ecosistema de Factusol en España cuenta con más de **130.000 pymes activas*
    - **Quién es:** Dueño de una ferretería, distribuidora de bebidas o tienda de suministros.
    - **Su dolor crítico:** "Doble picado de albaranes" (empleados dedicando 3 horas al día a copiar pedidos de la web a Factusol a mano) y roturas de stock (vender un producto en mostrador y que alguien lo compre por la web 10 minutos después).
    - **Qué busca:** *"sincronizar pedidos web factusol automatico"*, *"actualizar stock factusol woocommerce a tiempo real"*, *"precio conector factusol prestashop"*.
-   - **Gancho Bentian:** Sincronización instantánea (<80ms), cero errores de stock y 14 días de prueba gratuita sin tarjeta.
+   - **Gancho Bentian:** Sincronización instantánea (<80ms), cero errores de stock y 60 días de beta pública gratuita sin tarjeta.
 
 3. **La Agencia de Diseño Web / eCommerce**:
    - **Quién es:** Especialistas en WordPress, WooCommerce o Shopify que desarrollan la tienda online del cliente pero se topan con el "muro" del ERP de escritorio Windows.
@@ -97,7 +97,7 @@ A continuación se definen los 8 pilares de contenido orgánico diseñados para 
 * **Propuesta de Valor & Conversión a Descarga**:
   - Explica exactamente cómo Bentian lee las tablas `F_ART`, `F_TLL` y `F_COL` de Factusol y las transforma en variaciones limpias con atributos nativos en WooCommerce y combinaciones en PrestaShop.
   - Soluciona el error clásico de productos duplicados o rotura de SKUs.
-  - **CTA**: *"Descarga Bentian ERP Bridge y sincroniza tu catálogo de moda en 5 minutos con prueba gratuita de 14 días"*.
+  - **CTA**: *"Descarga Bentian ERP Bridge y sincroniza tu catálogo de moda en 5 minutos con beta pública gratuita de 60 días"*.
 
 ---
 
@@ -202,7 +202,7 @@ flowchart TD
     D --> E["Conversión Directa:<br/>Descarga Bentian-Setup.exe"]
     D --> F["Conversión B2B:<br/>Alta en Programa Partners (25%)"]
     
-    E --> G["Prueba Gratuita 14 Días"]
+    E --> G["Beta Pública Gratuita 60 Días"]
     F --> H["Red de Informáticos Locales<br/>Prescribiendo a sus Clientes"]
     
     G --> I["Suscripción Recurrente Stripe Live (19€/mes o 190€/año)"]
@@ -230,5 +230,5 @@ flowchart TD
 2. **Schema.org Rich Snippets Obligatorios:**
    - Cada página pilar incluirá `SoftwareApplication`, `BreadcrumbList` y `FAQPage` en formato JSON-LD para conseguir fragmentos destacados y preguntas frecuentes en los resultados de Google.
 3. **Optimización de Conversión (CRO):**
-   - Botón flotante siempre visible: *"Descargar Instalador Oficial (Prueba 14 días sin compromiso)"*.
+   - Botón flotante siempre visible: *"Descargar Instalador Oficial (Beta Pública Gratuita 60 días)"*.
    - Sección dedicada al informático local: *"¿Eres consultor o agencia? Gana el 25% recurrente recomendando Bentian"*.

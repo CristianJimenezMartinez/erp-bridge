@@ -53,7 +53,7 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
   - Soporte técnico directo y actualizaciones automáticas.
 - **Plan Base Mensual:** 29,00 € + IVA al mes.
   - Sin compromiso de permanencia.
-- **Prueba Gratuita:** 14 días sin coste ni tarjeta de crédito requerida.
+- **Beta Pública Gratuita:** 60 días completos de acceso sin coste ni tarjeta de crédito requerida (Periodo de Lanzamiento 2026).
 - **Programa de Partners B2B:**
   - Descuento directo del 25% (149,25 € + IVA/año) para empresas de informática, técnicos de mantenimiento y agencias web.
   - Factura mayorista estándar (Modelo 303 de IVA, sin líos de retenciones IRPF ni comisiones a liquidar).
