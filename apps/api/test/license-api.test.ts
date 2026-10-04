@@ -117,6 +117,45 @@ async function run() {
     const postDeactJson = (await postDeactRes.json()) as { data: { activations: any[] } };
     assert.strictEqual(postDeactJson.data.activations.length, 0, 'La lista de activaciones activas debe ser 0 tras desactivar');
 
+    // 6. Test Beta Claim: Reclamación de clave pública (60 días exactos)
+    const betaEmail = `beta_tester_${Date.now()}@empresa-test.es`;
+    const betaClaimRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: betaEmail,
+        companyName: 'Ferretería Industrial Test SL',
+      }),
+    });
+    assert.strictEqual(betaClaimRes.status, 201, 'Beta claim debe retornar 201 Created');
+    const betaClaimJson = (await betaClaimRes.json()) as any;
+    assert.strictEqual(betaClaimJson.success, true);
+    assert(betaClaimJson.data.licenseKey.startsWith('EB-'));
+    assert.strictEqual(betaClaimJson.data.daysRemaining, 60, 'Debe otorgar 60 días');
+    assert(betaClaimJson.data.expiresAt, 'Debe incluir fecha de expiración');
+
+    // 7. Test Anti-Abuso Beta Claim: Si el mismo email vuelve a solicitar, devuelve la misma clave
+    const betaClaimDupRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: betaEmail,
+        companyName: 'Ferretería Industrial Test SL',
+      }),
+    });
+    assert.strictEqual(betaClaimDupRes.status, 200, 'Reintento debe responder 200 OK con clave existente');
+    const betaClaimDupJson = (await betaClaimDupRes.json()) as any;
+    assert.strictEqual(betaClaimDupJson.alreadyClaimed, true);
+    assert.strictEqual(betaClaimDupJson.data.licenseKey, betaClaimJson.data.licenseKey, 'Debe devolver la misma clave original');
+
+    // 8. Test Founder Plan en catálogo de facturación
+    const plansRes = await fetch(`${baseUrl}/api/v1/billing/plans`);
+    assert.strictEqual(plansRes.status, 200);
+    const plansJson = (await plansRes.json()) as any;
+    const founderPlan = plansJson.plans.find((p: any) => p.id === 'founder_annual');
+    assert(founderPlan, 'El catálogo debe contener el Plan Fundador (founder_annual)');
+    assert.strictEqual(founderPlan.promoPriceEur, 139, 'El Plan Fundador debe ser de 139€/año');
+
     console.log('✓ License API E2E Tests Passed');
   } finally {
     server.close();

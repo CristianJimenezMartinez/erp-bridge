@@ -6,8 +6,9 @@ import {
   LicenseActivationRequestSchema,
   LicenseValidationRequestSchema,
 } from '@erp-bridge/shared';
-import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
+import { requireAuth, requireRole, AuthenticatedRequest, computeOrganizationIdFromEmail } from './auth.router';
 import { getLatestInstallerUrl } from '../utils/version.util';
+import { MailerService } from '../services/mailer.service';
 
 export const licensesRouter = Router();
 const licenseService = new LicenseService();
@@ -162,6 +163,132 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
   }
 });
 
+// 0.2.1 Beta Pública: Reclamar clave con caducidad garantizada de 60 días
+licensesRouter.post('/licenses/beta/claim', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, companyName, taxId } = req.body as {
+      email?: string;
+      companyName?: string;
+      taxId?: string;
+    };
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: { message: 'El correo electrónico es obligatorio para solicitar la clave de la Beta.' } });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ error: { message: 'El formato del correo electrónico no es válido.' } });
+    }
+
+    const orgId = computeOrganizationIdFromEmail(normalizedEmail);
+    const cleanTaxId = taxId ? taxId.trim().toUpperCase() : null;
+    const cleanCompanyName = companyName ? companyName.trim() : (normalizedEmail.split('@')[0] || 'Empresa Beta');
+
+    const db = DatabaseService.getInstance();
+
+    // 1. Anti-Abuso e Idempotencia: Comprobar si ya existe una licencia activa emitida para este email/organización
+    let existingLicense: any = null;
+    if (db.isAvailable()) {
+      const resExisting = await db.query(`
+        SELECT l.* 
+        FROM licenses l
+        JOIN organizations o ON l.organization_id = o.id
+        WHERE o.id = $1 OR o.slug = $2
+        ORDER BY l.created_at DESC
+        LIMIT 1
+      `, [orgId, normalizedEmail]).catch(() => ({ rows: [] }));
+
+      if (resExisting && resExisting.rows && resExisting.rows.length > 0) {
+        existingLicense = resExisting.rows[0];
+      }
+    }
+
+    if (!existingLicense) {
+      const orgLicenses = await licenseService.listLicenses(orgId).catch(() => []);
+      if (orgLicenses.length > 0) {
+        existingLicense = orgLicenses[0];
+      }
+    }
+
+    // Si ya existe una licencia, devolvemos la misma clave existente (evita creación ilimitada)
+    if (existingLicense) {
+      const rawExpiresAt = existingLicense.expires_at || existingLicense.expiresAt;
+      const expiresAtDate = rawExpiresAt ? new Date(rawExpiresAt) : null;
+      const daysRemaining = expiresAtDate ? Math.max(0, Math.ceil((expiresAtDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 60;
+
+      return res.json({
+        success: true,
+        alreadyClaimed: true,
+        message: 'Ya dispones de una clave de activación para este correo.',
+        data: {
+          licenseKey: existingLicense.key,
+          expiresAt: expiresAtDate ? expiresAtDate.toISOString() : null,
+          daysRemaining,
+          installerUrl: getLatestInstallerUrl(),
+        },
+      });
+    }
+
+    // 2. Registrar organización en PostgreSQL si está disponible
+    if (db.isAvailable()) {
+      await db.query(`
+        INSERT INTO organizations (id, name, slug, status, plan, tax_id, legal_name, created_at, updated_at)
+        VALUES ($1, $2, $3, 'ACTIVE', 'trial', $4, $5, NOW(), NOW())
+        ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tax_id = COALESCE(organizations.tax_id, $4)
+      `, [orgId, cleanCompanyName, normalizedEmail, cleanTaxId, cleanCompanyName]).catch(() => {});
+    }
+
+    // 3. Crear licencia de 60 días de prueba garantizados
+    const trialDays = 60;
+    const license = await licenseService.createLicense({
+      organizationId: orgId,
+      plan: 'trial',
+      trialDays,
+      alias: `Beta Pública - ${cleanCompanyName}`,
+      maxActivations: 1,
+    });
+
+    const expiresAt = license.expiresAt ? new Date(license.expiresAt) : new Date(Date.now() + trialDays * 86400000);
+
+    // 4. Actualizar metadata en PostgreSQL
+    if (db.isAvailable()) {
+      await db.query(`
+        UPDATE licenses 
+        SET seat_type = 'BASE', tax_id = $1, billing_status = 'TRIAL', expires_at = $2, trial_ends_at = $2
+        WHERE id = $3
+      `, [cleanTaxId, expiresAt, license.id]).catch(() => {});
+    }
+
+    // 5. Enviar email transaccional de bienvenida con la clave al usuario
+    try {
+      await MailerService.sendLicenseWelcomeEmail({
+        customerEmail: normalizedEmail,
+        licenseKey: license.key,
+        planName: 'Beta Pública (60 días de acceso gratuito)',
+        alias: license.alias || `Beta Pública - ${cleanCompanyName}`,
+        companyName: cleanCompanyName,
+      });
+    } catch (_mailErr) {
+      // Si el servicio de correo no está disponible, continuar sin fallar la petición
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: '¡Clave de activación emitida con éxito para la Beta Pública!',
+      data: {
+        licenseKey: license.key,
+        expiresAt: expiresAt.toISOString(),
+        daysRemaining: trialDays,
+        installerUrl: getLatestInstallerUrl(),
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 // 0.3 Cliente Final: Vista de su propia licencia, vencimiento y descarga (con soporte multi-licencia)
 licensesRouter.get('/client/my-license', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
@@ -292,8 +419,15 @@ licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN'
     const taxId = (req.body.taxId as string)?.trim().toUpperCase() || null;
     const parentLicenseId = null;
 
+    // Blindaje anti-claves infinitas: Si no tiene expiración ni trialDays y no proviene de pago Stripe, forzar 30 días
+    const hasExplicitExpiration = Boolean(req.body.expiresAt || req.body.trialDays);
+    const isStripe = Boolean(req.body.isStripeConfirmed || req.body.stripeSessionId);
+    const effectiveTrialDays = hasExplicitExpiration ? req.body.trialDays : (isStripe ? undefined : 30);
+    const effectiveBillingStatus = (isStripe || (!effectiveTrialDays && req.body.expiresAt)) ? 'ACTIVE' : 'TRIAL';
+
     const validated = CreateLicenseDtoSchema.parse({
       ...req.body,
+      trialDays: effectiveTrialDays,
       organizationId: req.body.organizationId || orgId,
     });
     const license = await licenseService.createLicense(validated);
@@ -303,9 +437,9 @@ licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN'
     if (db.isAvailable()) {
       await db.query(`
         UPDATE licenses
-        SET seat_type = $1, parent_license_id = $2, tax_id = $3, billing_status = 'ACTIVE'
-        WHERE id = $4
-      `, [seatType, parentLicenseId, taxId, license.id]).catch(() => {});
+        SET seat_type = $1, parent_license_id = $2, tax_id = $3, billing_status = $4
+        WHERE id = $5
+      `, [seatType, parentLicenseId, taxId, effectiveBillingStatus, license.id]).catch(() => {});
     }
 
     return res.status(201).json({
@@ -314,6 +448,7 @@ licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN'
         seatType,
         parentLicenseId,
         taxId,
+        billingStatus: effectiveBillingStatus,
       },
     });
   } catch (error) {

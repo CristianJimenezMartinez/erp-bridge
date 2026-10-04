@@ -80,6 +80,25 @@ export const CATALOG_PLANS: PlanDefinition[] = [
     ],
   },
   {
+    id: 'founder_annual',
+    name: 'Plan Fundador Beta (Anual -30% Vitalicio)',
+    priceEur: 199,
+    promoPriceEur: 139,
+    billingCycle: 'annual',
+    mode: 'subscription',
+    popular: false,
+    seats: 1,
+    storesIncluded: 1,
+    description: 'Tarifa exclusiva para participantes de la Beta Pública. 139 €/año renovable de por vida.',
+    features: [
+      'Sincronización completa Factusol con WooCommerce o PrestaShop',
+      'Descuento Fundador del 30% vitalicio garantizado (139 € vs 199 €)',
+      '1 ERP ⇄ 1 Tienda Online conectada sin límites de SKUs',
+      'Actualizaciones automáticas y soporte técnico prioritario',
+      'Condiciones blindadas de por vida sin subidas de precio',
+    ],
+  },
+  {
     id: 'partner_reseller_annual',
     name: 'Licencia Cliente Final (Tarifa Distribuidor Partner -25%)',
     priceEur: 186.75,
@@ -209,10 +228,12 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
     const isSubscription = matchedPlan.mode === 'subscription';
     const interval = matchedPlan.billingCycle === 'monthly' ? 'month' : 'year';
 
-    // Determinar precio real (aplicar oferta de lanzamiento Early Bird de 199€ si corresponde)
-    const finalPriceEur = (matchedPlan.id === 'base_annual' && isEarlyBird && matchedPlan.promoPriceEur)
+    // Determinar precio real (aplicar oferta Early Bird de 199€ o tarifa Fundador de 139€ si corresponde)
+    const finalPriceEur = (matchedPlan.id === 'founder_annual' && matchedPlan.promoPriceEur)
       ? matchedPlan.promoPriceEur
-      : matchedPlan.priceEur;
+      : ((matchedPlan.id === 'base_annual' && isEarlyBird && matchedPlan.promoPriceEur)
+        ? matchedPlan.promoPriceEur
+        : matchedPlan.priceEur);
 
     logger.info(`Iniciando Checkout Session: ${matchedPlan.name} para ${email} (${finalPriceEur}€)`);
 

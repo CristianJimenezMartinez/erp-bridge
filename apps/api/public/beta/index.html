@@ -64,9 +64,73 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </a>
         </div>
-        <div class="mt-6 flex flex-col items-center justify-center text-xs text-zinc-500 gap-1">
+        <div class="mt-4 flex flex-col items-center justify-center text-xs text-zinc-500 gap-1">
           <p>Versión <span data-app-version>v0.3.5</span> para Windows 10/11 x64.</p>
           <p>Requiere Factusol instalado y funcionando localmente.</p>
+        </div>
+
+        <!-- Formulario Interactivo de Reclamación de Clave Beta (60 Días) -->
+        <div class="mt-10 max-w-xl mx-auto p-6 md:p-8 rounded-2xl bg-zinc-900/80 border border-white/[0.08] shadow-2xl backdrop-blur text-left">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-white">Solicita tu Clave de Acceso Beta</h3>
+              <p class="text-xs text-zinc-400">Licencia oficial con 60 días de validez completa e inmediata</p>
+            </div>
+          </div>
+
+          <form id="betaClaimForm" class="space-y-4">
+            <div>
+              <label for="betaEmail" class="block text-xs font-medium text-zinc-300 mb-1.5">Correo Electrónico de Empresa *</label>
+              <input type="email" id="betaEmail" name="email" required placeholder="nombre@tuempresa.es" class="w-full px-4 py-2.5 bg-black/40 border border-white/[0.1] rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+            </div>
+            <div>
+              <label for="betaCompany" class="block text-xs font-medium text-zinc-300 mb-1.5">Nombre de la Empresa o Comercio (opcional)</label>
+              <input type="text" id="betaCompany" name="companyName" placeholder="Ej: Suministros Industriales García" class="w-full px-4 py-2.5 bg-black/40 border border-white/[0.1] rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+            </div>
+            <button type="submit" id="btnClaimSubmit" class="w-full py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span id="btnClaimText">Obtener Clave de Activación (60 Días Gratis)</span>
+              <svg id="btnClaimSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+            </button>
+            <div id="betaClaimError" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400"></div>
+          </form>
+
+          <!-- Resultado Exitoso (Oculto inicialmente) -->
+          <div id="betaClaimSuccess" class="hidden space-y-4 pt-2">
+            <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-start gap-2.5">
+              <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <div>
+                <p class="font-semibold text-emerald-300">¡Clave generada y vinculada con éxito!</p>
+                <p class="mt-0.5 text-emerald-400/80">También te hemos enviado una copia por correo electrónico.</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-black/60 border border-white/[0.12] space-y-2">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Tu Clave de Activación (60 Días):</span>
+              <div class="flex items-center justify-between gap-3 bg-zinc-900/90 px-3 py-2 rounded-lg border border-white/[0.08]">
+                <code id="displayLicenseKey" class="font-mono text-base md:text-lg font-bold text-white select-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
+                <button type="button" id="btnCopyKey" onclick="copyBetaKey()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition shrink-0">
+                  Copiar
+                </button>
+              </div>
+              <p class="text-[11px] text-zinc-500 flex items-center justify-between pt-1">
+                <span>Válida durante: <strong class="text-zinc-300" id="displayDaysRemaining">60 días</strong></span>
+                <span id="displayExpiresDate"></span>
+              </p>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row gap-3">
+              <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs text-center transition flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Descargar Instalador
+              </a>
+              <a href="/dashboard/" class="py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 font-medium text-xs text-center transition">
+                Acceder al Panel
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -149,5 +213,72 @@
 
   <!-- Scripts de Sincronización (Versiones SSoT) -->
   <script src="/js/version-sync.js"></script>
+
+  <script>
+    const betaForm = document.getElementById('betaClaimForm');
+    const betaSuccess = document.getElementById('betaClaimSuccess');
+    const betaError = document.getElementById('betaClaimError');
+    const btnSubmit = document.getElementById('btnClaimSubmit');
+    const btnText = document.getElementById('btnClaimText');
+    const btnSpinner = document.getElementById('btnClaimSpinner');
+
+    if (betaForm) {
+      betaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        betaError.classList.add('hidden');
+        btnSubmit.disabled = true;
+        btnText.textContent = 'Generando clave...';
+        btnSpinner.classList.remove('hidden');
+
+        try {
+          const email = document.getElementById('betaEmail').value.trim();
+          const companyName = document.getElementById('betaCompany').value.trim();
+
+          const res = await fetch('/api/v1/licenses/beta/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, companyName })
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error?.message || 'Error al procesar la solicitud.');
+          }
+
+          const lic = data.data;
+          document.getElementById('displayLicenseKey').textContent = lic.licenseKey;
+          document.getElementById('displayDaysRemaining').textContent = `${lic.daysRemaining || 60} días`;
+          if (lic.expiresAt) {
+            const expDate = new Date(lic.expiresAt);
+            document.getElementById('displayExpiresDate').textContent = `(Hasta ${expDate.toLocaleDateString('es-ES')})`;
+          }
+
+          betaForm.classList.add('hidden');
+          betaSuccess.classList.remove('hidden');
+        } catch (err) {
+          betaError.textContent = err.message || 'Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.';
+          betaError.classList.remove('hidden');
+        } finally {
+          btnSubmit.disabled = false;
+          btnText.textContent = 'Obtener Clave de Activación (60 Días Gratis)';
+          btnSpinner.classList.add('hidden');
+        }
+      });
+    }
+
+    function copyBetaKey() {
+      const key = document.getElementById('displayLicenseKey').textContent;
+      navigator.clipboard.writeText(key).then(() => {
+        const btn = document.getElementById('btnCopyKey');
+        const orig = btn.textContent;
+        btn.textContent = '¡Copiada!';
+        btn.classList.replace('text-indigo-300', 'text-emerald-300');
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.classList.replace('text-emerald-300', 'text-indigo-300');
+        }, 2000);
+      });
+    }
+  </script>
 </body>
 </html>
