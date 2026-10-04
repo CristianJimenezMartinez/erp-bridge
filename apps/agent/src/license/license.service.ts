@@ -23,6 +23,7 @@ export class LicenseService {
   private activePlan?: string;
   private licenseCheckTimer: NodeJS.Timeout | null = null;
   private lastSeenTimestamp = 0;
+  private lastOnlineTimestamp = 0;
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -96,7 +97,9 @@ export class LicenseService {
       this.licenseStatus = 'VALID';
       this.activePlan = activation.plan;
       this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, Date.now());
+      this.lastOnlineTimestamp = Date.now();
       await this.secureStore.saveLastSeenTimestamp(this.lastSeenTimestamp, hwid);
+      await this.secureStore.saveLastOnlineTimestamp(this.lastOnlineTimestamp, hwid);
       this.logger.info(`✓ Licencia activada con éxito. Plan: ${activation.plan}, Expira: ${activation.expiresAt}`);
       this.eventBus?.addEvent('success', `✓ Licencia activada (${activation.plan})`);
     }
@@ -187,6 +190,8 @@ export class LicenseService {
         }
         this.licenseStatus = 'VALID';
         this.activePlan = resJson.data.plan;
+        this.lastOnlineTimestamp = Date.now();
+        await this.secureStore.saveLastOnlineTimestamp(this.lastOnlineTimestamp, hwid);
         return { status: 'VALID', plan: resJson.data.plan };
       } else if (response.status === 403 || response.status === 400) {
         this.licenseStatus = 'EXPIRED';
@@ -197,12 +202,45 @@ export class LicenseService {
       // Offline / Network failure -> fallback to local token verification
     }
 
-    if (isLocalTokenValid && localPayload) {
-      this.licenseStatus = 'GRACE_PERIOD';
-      this.activePlan = localPayload.plan;
-      const remainingHours = Math.round((localPayload.expiresAt - now) / 3600000);
-      this.logger.warn(`Operando en período de gracia offline (${remainingHours}h restantes). Plan: ${localPayload.plan}`);
-      return { status: 'GRACE_PERIOD', plan: localPayload.plan };
+    if (localPayload) {
+      // 2.1 Verificación dura de expiración: Si la fecha del token o licencia ya expiró, EXPIRED sin excepciones
+      if (now >= localPayload.expiresAt) {
+        this.licenseStatus = 'EXPIRED';
+        this.activePlan = undefined;
+        const msg = 'El periodo de prueba de la Beta ha finalizado. La sincronización se ha detenido.';
+        this.logger.warn(`Licencia expirada (${new Date(localPayload.expiresAt).toISOString()}). Deteniendo sincronización.`);
+        this.eventBus?.addEvent('error', msg);
+        return { status: 'EXPIRED', message: msg };
+      }
+
+      // 2.2 Límite estricto de desconexión para Beta/Trial (máx 48h offline sin contacto con el servidor)
+      const planStr = String(localPayload.plan || '').toLowerCase();
+      const isBetaOrTrial = planStr.includes('trial') || planStr.includes('beta');
+      if (isBetaOrTrial) {
+        if (this.lastOnlineTimestamp === 0) {
+          this.lastOnlineTimestamp = await this.secureStore.loadLastOnlineTimestamp(hwid);
+        }
+        const lastOnline = this.lastOnlineTimestamp || localPayload.issuedAt;
+        const offlineMs = now - lastOnline;
+        const MAX_BETA_OFFLINE_MS = 48 * 60 * 60 * 1000;
+
+        if (offlineMs > MAX_BETA_OFFLINE_MS) {
+          this.licenseStatus = 'EXPIRED';
+          this.activePlan = undefined;
+          const msg = 'La licencia Beta requiere validación online cada 48 horas. Conecte el equipo a internet para reanudar la sincronización.';
+          this.logger.warn(`Límite offline superado en Beta (>48h sin contacto con el servidor). Bloqueando sincronización.`);
+          this.eventBus?.addEvent('error', msg);
+          return { status: 'EXPIRED', message: msg };
+        }
+      }
+
+      if (isLocalTokenValid) {
+        this.licenseStatus = 'GRACE_PERIOD';
+        this.activePlan = localPayload.plan;
+        const remainingHours = Math.round((localPayload.expiresAt - now) / 3600000);
+        this.logger.warn(`Operando en período de gracia offline (${remainingHours}h restantes). Plan: ${localPayload.plan}`);
+        return { status: 'GRACE_PERIOD', plan: localPayload.plan };
+      }
     }
 
     this.licenseStatus = 'EXPIRED';

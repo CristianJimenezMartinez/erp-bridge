@@ -364,4 +364,114 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/palma/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/palma/" />
   </url>
+
+  <!-- Conector Factusol: Granada (Granada) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/granada/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/granada/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/granada/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/granada/" />
+  </url>
+
+  <!-- Conector Factusol: Toledo (Toledo) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/toledo/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/toledo/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/toledo/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/toledo/" />
+  </url>
+
+  <!-- Conector Factusol: Santander (Cantabria) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/santander/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/santander/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/santander/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/santander/" />
+  </url>
+
+  <!-- Conector Factusol: Gijón (Asturias) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/gijon/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/gijon/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/gijon/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/gijon/" />
+  </url>
+
+  <!-- Conector Factusol: Oviedo (Asturias) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/oviedo/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/oviedo/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/oviedo/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/oviedo/" />
+  </url>
+
+  <!-- Conector Factusol: Pamplona (Navarra) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/pamplona/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/pamplona/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/pamplona/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/pamplona/" />
+  </url>
+
+  <!-- Conector Factusol: Vitoria-Gasteiz (Álava) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/vitoria/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/vitoria/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/vitoria/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/vitoria/" />
+  </url>
+
+  <!-- Conector Factusol: Castellón de la Plana (Castellón) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/castellon/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/castellon/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/castellon/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/castellon/" />
+  </url>
+
+  <!-- Conector Factusol: Burgos (Burgos) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/burgos/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/burgos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/burgos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/burgos/" />
+  </url>
+
+  <!-- Conector Factusol: Salamanca (Salamanca) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/salamanca/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/salamanca/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/salamanca/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/salamanca/" />
+  </url>
 </urlset>

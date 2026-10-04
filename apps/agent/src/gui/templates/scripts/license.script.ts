@@ -46,6 +46,17 @@ export const licenseScript = `
       window.open(url, '_blank');
     }
 
+    function openCloudUpgrade(e) {
+      if (e) e.preventDefault();
+      const key = (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.licenseKey) || 
+                  (document.getElementById('input-lic-key') ? document.getElementById('input-lic-key').value.trim() : '');
+      let url = 'https://bridge.cristianjm.com/dashboard/?action=upgrade&plan=founder_annual';
+      if (key && key.startsWith('EB-')) {
+        url += '&key=' + encodeURIComponent(key);
+      }
+      window.open(url, '_blank');
+    }
+
     async function submitConfigUpdates(updates, successMsg) {
       try {
         const res = await fetch('/api/local/save-full-config', {

@@ -156,11 +156,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         fullLicStatusBadge.textContent = isGood ? 'Licencia Activa' : 'Período Gracia Offline';
         licPlan.textContent = (lic.plan || 'Professional').toUpperCase();
         document.getElementById('lic-plan-name').value = (lic.plan || 'Professional').toUpperCase();
+        const bannerExpired = document.getElementById('lic-expired-banner');
+        if (bannerExpired) bannerExpired.style.display = 'none';
       } else {
+        const isExpired = lic.status === 'EXPIRED';
         licBadge.className = 'tag tag-rose';
-        licBadge.textContent = 'Sin Licencia';
+        licBadge.textContent = isExpired ? 'Beta Finalizada' : 'Sin Licencia';
         fullLicStatusBadge.className = 'tag tag-rose';
-        fullLicStatusBadge.textContent = 'No Activada';
+        fullLicStatusBadge.textContent = isExpired ? 'Beta Finalizada' : 'No Activada';
+        const bannerExpired = document.getElementById('lic-expired-banner');
+        if (bannerExpired) bannerExpired.style.display = isExpired ? 'block' : 'none';
       }
 
       if (data.licenseKey) {

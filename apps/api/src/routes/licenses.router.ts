@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
-import { LicenseService, DatabaseService } from '@erp-bridge/core';
+import { LicenseService, DatabaseService, LicenseTokenManager, LicenseKeyGenerator } from '@erp-bridge/core';
 import {
   CreateLicenseDtoSchema,
   LicenseActivationRequestSchema,
@@ -543,10 +543,34 @@ licensesRouter.post('/licenses/activate', async (req: Request, res: Response, ne
   try {
     const validated = LicenseActivationRequestSchema.parse(req.body);
 
+    // Verificación previa de expiración
+    const keyValidation = LicenseKeyGenerator.validate(validated.licenseKey);
+    if (!keyValidation.valid) {
+      return res.status(400).json({ error: { message: keyValidation.reason || 'Clave de licencia con formato inválido' } });
+    }
+    const lic = await licenseService.getLicenseByKey(validated.licenseKey);
+    if (lic && lic.expiresAt && new Date() > new Date(lic.expiresAt)) {
+      return res.status(403).json({ error: { message: 'El periodo de prueba de la Beta ha finalizado. Actualice al Plan Fundador para activar su equipo.' } });
+    }
+
     const result = await licenseService.activateLicense(validated);
     if (!result.success) {
       return res.status(400).json({ error: { message: result.error } });
     }
+
+    // Blindaje criptográfico: El token firmado NUNCA puede sobrepasar la fecha de expiración de la licencia
+    if (lic && lic.expiresAt && result.licenseToken) {
+      const licExpiresMs = new Date(lic.expiresAt).getTime();
+      const verification = LicenseTokenManager.verifyToken(result.licenseToken);
+      if (verification.valid && verification.payload) {
+        if (verification.payload.expiresAt > licExpiresMs) {
+          verification.payload.expiresAt = licExpiresMs;
+          result.licenseToken = LicenseTokenManager.createToken(verification.payload);
+          result.expiresAt = new Date(licExpiresMs).toISOString();
+        }
+      }
+    }
+
     return res.status(200).json({ data: result });
   } catch (error) {
     return next(error);
@@ -557,10 +581,41 @@ licensesRouter.post('/licenses/activate', async (req: Request, res: Response, ne
 licensesRouter.post('/licenses/validate', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = LicenseValidationRequestSchema.parse(req.body);
+
+    // Verificación previa: Si el token pertenece a una licencia que ya expiró, denegar de inmediato
+    const verification = LicenseTokenManager.verifyToken(validated.licenseToken);
+    if (verification.valid && verification.payload) {
+      const lic = await licenseService.getLicenseById(verification.payload.licenseId);
+      if (lic && lic.expiresAt && new Date() > new Date(lic.expiresAt)) {
+        return res.status(403).json({
+          error: { message: 'El periodo de la Beta ha finalizado. Actualice al Plan Fundador para reanudar la sincronización.' },
+          data: { valid: false, message: 'Licencia expirada' }
+        });
+      }
+    }
+
     const result = await licenseService.validateLicense(validated);
     if (!result.valid) {
       return res.status(403).json({ error: { message: result.message }, data: result });
     }
+
+    // Blindaje criptográfico: El token renovado NUNCA puede sobrepasar la expiración de la licencia
+    if (verification.valid && verification.payload && result.renewedToken) {
+      const lic = await licenseService.getLicenseById(verification.payload.licenseId);
+      if (lic && lic.expiresAt) {
+        const licExpiresMs = new Date(lic.expiresAt).getTime();
+        const renewedVerif = LicenseTokenManager.verifyToken(result.renewedToken);
+        if (renewedVerif.valid && renewedVerif.payload) {
+          if (renewedVerif.payload.expiresAt > licExpiresMs) {
+            renewedVerif.payload.expiresAt = licExpiresMs;
+            result.renewedToken = LicenseTokenManager.createToken(renewedVerif.payload);
+            result.expiresAt = new Date(licExpiresMs).toISOString();
+            result.gracePeriodRemainingSeconds = Math.max(0, Math.floor((licExpiresMs - Date.now()) / 1000));
+          }
+        }
+      }
+    }
+
     return res.status(200).json({ data: result });
   } catch (error) {
     return next(error);

@@ -313,7 +313,7 @@
     "schemaRegion": "ES-VC",
     "coordinates": {
       "lat": 38.3452,
-      "lng": -0.4810
+      "lng": -0.481
     },
     "tagline": "Conector Factusol con WooCommerce para la industria del calzado, textil y comercio en Alicante",
     "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Alicante y Elche | Bentian ERP",
@@ -363,8 +363,8 @@
     "region": "País Vasco",
     "schemaRegion": "ES-PV",
     "coordinates": {
-      "lat": 43.2630,
-      "lng": -2.9350
+      "lat": 43.263,
+      "lng": -2.935
     },
     "tagline": "Conector Factusol Local-First para suministros industriales, ferretería y pymes de Bizkaia",
     "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Bilbao y Bizkaia | Bentian ERP",
@@ -712,6 +712,515 @@
         "a": "Se instala en menos de 5 minutos mediante un instalador estándar de Windows y detecta automáticamente tu base de datos de Factusol."
       }
     ]
+  },
+  {
+    "slug": "granada",
+    "name": "Granada",
+    "province": "Granada",
+    "region": "Andalucía",
+    "schemaRegion": "ES-GR",
+    "coordinates": {
+      "lat": 37.1773,
+      "lng": -3.5986
+    },
+    "tagline": "Sincronización en tiempo real de Factusol con tiendas online para empresas y distribuidores de Granada",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Granada | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Granada. Polígonos Juncaril y Asegra. Sincronización de stock, tarifas B2B y pedidos automáticos sin cuotas mensuales.",
+    "keywords": "conector factusol granada, sincronizar factusol woocommerce juncaril, factusol prestashop asegura granada, enlace factusol tienda online granada",
+    "heroSubtitle": "Automatiza la sincronización de stock y pedidos entre Factusol en tus oficinas de Granada y tu comercio electrónico WooCommerce o PrestaShop.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Juncaril (Albolote / Peligros)",
+        "desc": "El mayor parque empresarial de Granada con más de 700 empresas comerciales, distribución de hostelería, alimentación y suministros."
+      },
+      {
+        "name": "Polígono Industrial Asegra (Peligros)",
+        "desc": "Enclave estratégico de mayoristas de ferretería, repuestos de automoción y materiales de construcción."
+      },
+      {
+        "name": "Área Metropolitana y Parque Tecnológico de la Salud (PTS)",
+        "desc": "Zona de expansión para distribución sanitaria, cosmética y retail especializado."
+      }
+    ],
+    "sectors": [
+      "Distribución y Suministros para Hostelería y Turismo",
+      "Ferretería Industrial y Materiales de Construcción",
+      "Alimentación, Bebidas y Productos Gourmet de la Alpujarra y Vega",
+      "Recambios y Maquinaria Agrícola e Industrial"
+    ],
+    "localContextParagraph": "El tejido empresarial de Granada, con una potente concentración de mayoristas en Juncaril y Asegra que abastecen tanto a la capital como a la Costa Tropical y comarcas agrícolas, necesita una sincronización veloz y fiable. Vender online mientras los comerciales despachan pedidos por teléfono o en el mostrador requiere un conector que actualice el stock al segundo. Bentian ERP Bridge se ejecuta como servicio nativo en Windows, leyendo la base de datos de Factusol en red local y sincronizando directamente con WooCommerce y PrestaShop sin sobrecargar el servidor web.",
+    "faqs": [
+      {
+        "q": "¿Funciona con la base de datos de Factusol compartida en red en naves de Juncaril?",
+        "a": "Sí. Soporta rutas de red UNC (\\\\SERVIDOR\\Factusol) y unidades mapeadas con tolerancia a microcortes."
+      },
+      {
+        "q": "¿Permite tarifas diferenciadas para clientes profesionales y particulares?",
+        "a": "Totalmente. Sincroniza las tarifas F_TAR 1 a 5 de Factusol asignando precios B2B o B2C según el rol de cliente en WooCommerce."
+      },
+      {
+        "q": "¿Cómo empezar a usarlo en Granada?",
+        "a": "Descarga el instalador desde la Beta Pública y en menos de 5 minutos tendrás tu catálogo sincronizado."
+      }
+    ]
+  },
+  {
+    "slug": "toledo",
+    "name": "Toledo",
+    "province": "Toledo",
+    "region": "Castilla-La Mancha",
+    "schemaRegion": "ES-TO",
+    "coordinates": {
+      "lat": 39.8628,
+      "lng": -4.0273
+    },
+    "tagline": "Conector Factusol para plataformas logísticas, suministros y comercio electrónico en Toledo y La Sagra",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Toledo | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Toledo y el Corredor de La Sagra (Illescas, Seseña). Stock en tiempo real y pedidos automáticos sin costes cloud.",
+    "keywords": "conector factusol toledo, sincronizar factusol la sagra illescas, factusol prestashop sesena, enlace factusol woocommerce toledo",
+    "heroSubtitle": "Conecta tu base de datos de Factusol con tu tienda online en el corazón logístico de la Península Ibérica.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial de Toledo (Santa María de Benquerencia)",
+        "desc": "Gran concentración de industrias auxiliares, carpintería metálica, suministros de hostelería y distribución regional."
+      },
+      {
+        "name": "Corredor de La Sagra (Illescas, Seseña, Yeles)",
+        "desc": "El mayor hub logístico y de e-commerce de la zona centro, conectado directamente con la A-42 y la A-4."
+      },
+      {
+        "name": "Área de Torrijos y Fuensalida",
+        "desc": "Polos tradicionales de calzado, confección, cerrajería y distribución multiproducto."
+      }
+    ],
+    "sectors": [
+      "Logística Avanzada y Distribución para Comercio Electrónico",
+      "Cuchillería, Espadería y Artesanía Tradicional y Decorativa",
+      "Suministros de Construcción, Cerrajería y Madera",
+      "Calzado, Textil y Artículos de Piel"
+    ],
+    "localContextParagraph": "Toledo y su comarca de La Sagra se han consolidado como la plataforma logística clave del centro de España. Para las empresas toledanas que gestionan miles de expediciones diarias hacia clientes de toda la península, mantener sincronizado el inventario de Factusol con WooCommerce o PrestaShop es vital para evitar sobreventas. Bentian ERP Bridge procesa variaciones de stock en milisegundos mediante un motor local que prescinde de servidores intermedios y de cuotas recurrentes abusivas.",
+    "faqs": [
+      {
+        "q": "¿Se integra con almacenes de gran volumen en Illescas o Toledo?",
+        "a": "Sí. Bentian maneja inventarios con más de 40.000 referencias con tiempos de sincronización delta de menos de 1 segundo."
+      },
+      {
+        "q": "¿Se importan los pedidos de WooCommerce directamente como pedidos de cliente en Factusol?",
+        "a": "Exacto. Crea los pedidos en F_PCL con desglose de líneas, portes, recargo de equivalencia y datos de facturación sin intervención manual."
+      },
+      {
+        "q": "¿Es compatible con versiones recientes de Factusol?",
+        "a": "Es compatible con todas las versiones de Factusol desde 2018 hasta 2026 en formato Access (.accdb y .mdb)."
+      }
+    ]
+  },
+  {
+    "slug": "santander",
+    "name": "Santander",
+    "province": "Cantabria",
+    "region": "Cantabria",
+    "schemaRegion": "ES-CB",
+    "coordinates": {
+      "lat": 43.4623,
+      "lng": -3.8099
+    },
+    "tagline": "Integración Factusol con WooCommerce y PrestaShop para empresas y comercios de Cantabria",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Santander | Bentian ERP",
+    "metaDescription": "Conecta Factusol con tu eCommerce en Santander y Cantabria. Polígonos Candina, Raos y Guarnizo. Sincronización directa de stock y pedidos sin cuotas mensuales.",
+    "keywords": "conector factusol santander, sincronizar factusol cantabria, factusol poligono raos maliano, conector prestashop candina santander",
+    "heroSubtitle": "Automatización e integración entre Factusol en tus oficinas en Santander y tus plataformas de venta online.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Candina (Santander)",
+        "desc": "El principal centro de distribución comercial, repuestos, suministros industriales y equipamiento de la capital cántabra."
+      },
+      {
+        "name": "Polígono Industrial de Raos (Maliaño / Camargo)",
+        "desc": "Enclave portuario estratégico para importación, exportación, logística marítima y grandes almacenes mayoristas."
+      },
+      {
+        "name": "Polígono de Guarnizo (El Astillero)",
+        "desc": "Centro de construcciones navales, calderería y suministros mecánicos e hidráulicos."
+      }
+    ],
+    "sectors": [
+      "Distribución Naval, Náutica y Equipamiento Portuario",
+      "Suministros Industriales, Mecánicos y Soldadura",
+      "Comercio Mayorista de Alimentación, Conservas y Lácteos",
+      "Material Eléctrico, Climatización y Fontanería"
+    ],
+    "localContextParagraph": "Las empresas distribuidoras e industriales de Santander y la bahía de Cantabria combinan canales comerciales tradicionales con una creciente presencia digital hacia clientes de toda España y Francia. El conector Bentian ERP Bridge garantiza que el stock disponible en los almacenes de Raos o Candina se refleje con exactitud en la tienda online en tiempo real, descargando los pedidos web al ERP para que el personal de almacén los prepare de inmediato.",
+    "faqs": [
+      {
+        "q": "¿Cómo gestiona los pedidos con IVA y portes en Cantabria?",
+        "a": "Calcula con exactitud los impuestos y los costes de transporte asignando las subcuentas contables configuradas en Factusol."
+      },
+      {
+        "q": "¿Funciona si el PC de almacén no tiene IP fija?",
+        "a": "Sí, porque Bentian es local-first y se comunica saliente hacia la tienda online mediante HTTPS estándar."
+      },
+      {
+        "q": "¿Se puede probar gratis en Santander?",
+        "a": "Sí, con la Beta Pública dispones de 60 días sin compromiso."
+      }
+    ]
+  },
+  {
+    "slug": "gijon",
+    "name": "Gijón",
+    "province": "Asturias",
+    "region": "Principado de Asturias",
+    "schemaRegion": "ES-AS",
+    "coordinates": {
+      "lat": 43.5322,
+      "lng": -5.6611
+    },
+    "tagline": "Conexión de Factusol con tiendas online para suministros industriales, siderurgia y comercio en Gijón",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Gijón | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Gijón y El Musel. Polígonos Tremañes, Somonte y Mora Garay. Catálogos industriales y tarifas B2B automáticas.",
+    "keywords": "conector factusol gijon, sincronizar factusol tremanes, factusol somonte asturias, conector prestashop factusol gijon",
+    "heroSubtitle": "El conector local-first para empresas metalmecánicas, suministros de construcción y ferretería industrial de Gijón.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial de Tremañes",
+        "desc": "El eje empresarial más denso de Gijón, con cientos de empresas de suministros, recambios y distribución."
+      },
+      {
+        "name": "Polígono Industrial de Somonte",
+        "desc": "Parque industrial moderno con empresas tecnológicas, maquinaria, química y comercio mayorista."
+      },
+      {
+        "name": "Polígonos de Mora Garay, Roces y Porceyo",
+        "desc": "Enclaves clave a la entrada de Gijón con grandes almacenes de materiales de construcción y bricolaje."
+      }
+    ],
+    "sectors": [
+      "Suministros Industriales, Tornillería y Siderometalurgia",
+      "Recambios y Repuestos para Maquinaria y Automoción",
+      "Materiales de Construcción, Madera y Aislamientos",
+      "Equipamiento de Protección Laboral (EPIs) y Vestuario"
+    ],
+    "localContextParagraph": "Gijón es el motor industrial y logístico de Asturias, con una red de pymes suministradoras que manejan tarifas especiales por volumen y extensos catálogos de miles de referencias. Los plugins tradicionales de WordPress sufren bloqueos al actualizar listas de precios masivas. Bentian ERP Bridge realiza la sincronización delta en menos de un segundo, actualizando precios y existencias directamente desde Factusol hacia WooCommerce o PrestaShop.",
+    "faqs": [
+      {
+        "q": "¿Soporta tarifas escalonadas por volumen de Factusol?",
+        "a": "Sí, mapea las tarifas de Factusol a las matrices de precios de WooCommerce o PrestaShop."
+      },
+      {
+        "q": "¿Funciona con catálogos de más de 30.000 artículos?",
+        "a": "Sí, su motor de procesamiento local en Windows maneja catálogos pesados sin ralentizar la máquina."
+      },
+      {
+        "q": "¿Requiere abrir puertos en el router de la empresa?",
+        "a": "No. Toda la comunicación se realiza por conexiones HTTPS salientes seguras."
+      }
+    ]
+  },
+  {
+    "slug": "oviedo",
+    "name": "Oviedo",
+    "province": "Asturias",
+    "region": "Principado de Asturias",
+    "schemaRegion": "ES-AS",
+    "coordinates": {
+      "lat": 43.3619,
+      "lng": -5.8494
+    },
+    "tagline": "Sincronización fluida de Factusol para distribución, farmacia, alimentación y comercio en Oviedo",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Oviedo | Bentian ERP",
+    "metaDescription": "Conecta Factusol con tu tienda online en Oviedo y Llanera. Polígonos Silvota, Asipo y Espíritu Santo. Automatiza existencias y pedidos sin intermediarios cloud.",
+    "keywords": "conector factusol oviedo, sincronizar factusol silvota, factusol asipo llanera, enlace prestashop factusol oviedo",
+    "heroSubtitle": "Conecta tu base de datos de Factusol con WooCommerce y PrestaShop en los principales parques empresariales del centro de Asturias.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Silvota (Llanera / Oviedo)",
+        "desc": "Uno de los parques empresariales más activos del Principado, con distribución farmacéutica, alimentaria y tecnología."
+      },
+      {
+        "name": "Polígono Industrial Asipo (Llanera)",
+        "desc": "Centro de logística mayorista, suministros gráficos, químicos y servicios técnicos."
+      },
+      {
+        "name": "Polígono de Espíritu Santo y Olloniego",
+        "desc": "Enclaves tradicionales de transporte, paquetería y almacenamiento de mercancías."
+      }
+    ],
+    "sectors": [
+      "Distribución Farmacéutica, Veterinaria y Parafarmacia",
+      "Alimentación Tradicional Asturiana, Embutidos y Quesos",
+      "Papelería, Suministros de Oficina e Informática",
+      "Ferretería y Servicios Técnicos Especializados"
+    ],
+    "localContextParagraph": "El área metropolitana de Oviedo y el concejo de Llanera concentran el centro neurálgico de la distribución en Asturias. Empresas que despachan mercancía a toda la cornisa cantábrica necesitan que las ventas de su comercio electrónico se registren inmediatamente en Factusol sin necesidad de duplicar el trabajo administrativo. Bentian ERP Bridge lee en tiempo real el archivo .accdb o .mdb de Factusol y actualiza el stock online para que las existencias coincidan siempre.",
+    "faqs": [
+      {
+        "q": "¿Es compatible si Factusol está instalado en un servidor local compartido?",
+        "a": "Totalmente. Detecta y se conecta a unidades de red UNC o rutas mapeadas en Windows."
+      },
+      {
+        "q": "¿Importa los datos fiscales del cliente para facturar?",
+        "a": "Sí. NIF/CIF, razón social, dirección y código postal se trasladan a la ficha de cliente en Factusol."
+      },
+      {
+        "q": "¿Hay permanencia?",
+        "a": "Ninguna. Licencia anual transparente sin cuotas mensuales ni comisiones por ventas."
+      }
+    ]
+  },
+  {
+    "slug": "pamplona",
+    "name": "Pamplona",
+    "province": "Navarra",
+    "region": "Comunidad Foral de Navarra",
+    "schemaRegion": "ES-NC",
+    "coordinates": {
+      "lat": 42.8125,
+      "lng": -1.6458
+    },
+    "tagline": "Automatización e integración de Factusol para automoción, energía y distribución técnica en Navarra",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Pamplona | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Pamplona y comarca. Polígonos Landaben, Agustinos y Noáin. Stock y pedidos en tiempo real para pymes navarras.",
+    "keywords": "conector factusol pamplona, sincronizar factusol landaben, factusol agustinos navarra, conector prestashop factusol noain",
+    "heroSubtitle": "El conector de escritorio para empresas industriales, componentes y distribución en la Cuenca de Pamplona.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Landaben (Pamplona)",
+        "desc": "Epicentro industrial de Navarra, con potente tejido de proveedores de componentes, maquinaria y logística."
+      },
+      {
+        "name": "Polígono Industrial Agustinos",
+        "desc": "Enclave comercial con distribuidores de fontanería, electricidad, ferretería y herramientas profesionales."
+      },
+      {
+        "name": "Polígonos de Noáin-Esquíroz, Areta (Huarte) y Berroa",
+        "desc": "Parques de almacenamiento y distribución rápida para comercio nacional e internacional."
+      }
+    ],
+    "sectors": [
+      "Componentes Mecánicos, Hidráulicos y Auxiliares de Automoción",
+      "Equipos Eléctricos, Renovables e Iluminación Industrial",
+      "Suministros de Bricolaje, Jardinería y Construcción",
+      "Distribución Agroalimentaria de Calidad de Navarra"
+    ],
+    "localContextParagraph": "Navarra cuenta con uno de los tejidos industriales más exigentes y productivos de España. Sus pymes y empresas distribuidoras en Landaben y Agustinos requieren soluciones de software robustas que no fallen ni dependan de conexiones cloud lentas. Bentian ERP Bridge ofrece un enlace directo entre la base de datos de Factusol y las tiendas WooCommerce y PrestaShop, ejecutándose en segundo plano con consumo mínimo de recursos de CPU y memoria RAM.",
+    "faqs": [
+      {
+        "q": "¿Soporta la normativa fiscal de Navarra?",
+        "a": "Sí, procesa los impuestos correspondientes (IVA navarro / foral) y asegura el cuadre contable exacto."
+      },
+      {
+        "q": "¿Funciona en redes locales corporativas con cortafuegos estrictos?",
+        "a": "Sí. Solo requiere conexión HTTPS saliente hacia la tienda online, sin necesidad de puertos de entrada."
+      },
+      {
+        "q": "¿Cuánto tarda la sincronización de stock?",
+        "a": "Las modificaciones de stock se trasladan en menos de un segundo gracias al algoritmo de detección delta."
+      }
+    ]
+  },
+  {
+    "slug": "vitoria",
+    "name": "Vitoria-Gasteiz",
+    "province": "Álava",
+    "region": "País Vasco",
+    "schemaRegion": "ES-PV",
+    "coordinates": {
+      "lat": 42.8469,
+      "lng": -2.6716
+    },
+    "tagline": "Conector Factusol para logística, manufactura y comercio online en el corazón de Euskadi",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Vitoria-Gasteiz | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Vitoria-Gasteiz. Polígonos Júndiz, Betoño y Gamarra. Sincronización continua de inventario y pedidos para empresas alavesas.",
+    "keywords": "conector factusol vitoria gasteiz, sincronizar factusol jundiz alava, factusol gamarra euskadi, conector factusol prestashop vitoria",
+    "heroSubtitle": "Sincronización automatizada entre Factusol en tus instalaciones de Álava y tu catálogo eCommerce en WooCommerce o PrestaShop.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial de Júndiz (Vitoria)",
+        "desc": "El mayor parque empresarial del País Vasco con más de 6 millones de m² y un nudo logístico intermodal de primer nivel."
+      },
+      {
+        "name": "Polígonos de Gamarra y Betoño",
+        "desc": "Tradición industrial en siderometalurgia, estampación, valvulería y suministros de mantenimiento."
+      },
+      {
+        "name": "Parque Tecnológico de Álava (Miñano)",
+        "desc": "Empresas de base tecnológica, ingeniería y comercio electrónico avanzado."
+      }
+    ],
+    "sectors": [
+      "Logística, Transporte y Distribución Internacional",
+      "Maquinaria, Matricería, Troquelería y Mecanizado",
+      "Suministros Industriales, Protección y Ferretería Técnica",
+      "Bebidas y Alimentación de la Rioja Alavesa y Llanada"
+    ],
+    "localContextParagraph": "Vitoria-Gasteiz es un enclave logístico estratégico que conecta la Península Ibérica con el resto de Europa. En Júndiz y los polígonos del norte de la ciudad, empresas con alto volumen de rotación de producto no pueden permitirse descuidos en el inventario. Bentian ERP Bridge garantiza que cualquier salida de almacén registrada en Factusol se descuente inmediatamente del stock visible en la tienda online, evitando cancelaciones de pedidos y fricción con los clientes.",
+    "faqs": [
+      {
+        "q": "¿Es compatible con TicketBAI en Factusol?",
+        "a": "Bentian trabaja directamente sobre las tablas de Factusol respetando la integridad de las facturas y pedidos compatibles con TicketBAI."
+      },
+      {
+        "q": "¿Qué ocurre si hay un corte de red con el NAS de la empresa?",
+        "a": "El agente mantiene la ruta configurada en reposo y reanuda la sincronización automáticamente tan pronto como la red vuelve a estar disponible."
+      },
+      {
+        "q": "¿Se pueden sincronizar fotos de productos?",
+        "a": "Sí, sube y asocia automáticamente las fotografías de Factusol a los productos correspondientes en la tienda online."
+      }
+    ]
+  },
+  {
+    "slug": "castellon",
+    "name": "Castellón de la Plana",
+    "province": "Castellón",
+    "region": "Comunidad Valenciana",
+    "schemaRegion": "ES-VC",
+    "coordinates": {
+      "lat": 39.9864,
+      "lng": -0.0513
+    },
+    "tagline": "Conector Factusol para cerámica, suministros técnicos y distribución mayorista en Castellón",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Castellón | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Castellón, Vila-real y Almassora. Polígonos Ciudad del Transporte y Mijares. Stock y tarifas en tiempo real.",
+    "keywords": "conector factusol castellon, sincronizar factusol almassora vila-real, factusol ciudad del transporte castellon, conector prestashop factusol ceramica",
+    "heroSubtitle": "Conecta tu base de datos de Factusol con WooCommerce y PrestaShop en el corazón del clúster cerámico e industrial de Castellón.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Ciudad del Transporte (Castellón)",
+        "desc": "Gran concentración de operadores logísticos, mayoristas de recambios y suministros de construcción."
+      },
+      {
+        "name": "Polígono Industrial Mijares (Almassora / Vila-real)",
+        "desc": "Centro del triángulo cerámico con distribuidores de azulejos, baños, pavimentos y maquinaria."
+      },
+      {
+        "name": "Polígonos Acceso Sur y El Serrallo",
+        "desc": "Área petroquímica, portuaria y de grandes naves de distribución industrial."
+      }
+    ],
+    "sectors": [
+      "Cerámica, Pavimentos, Azulejos y Sanitarios de Baño",
+      "Esmaltes, Fritas, Productos Químicos y Pigmentos",
+      "Suministros Industriales, Tuberías y Grifería",
+      "Cítricos, Productos Agrícolas y Envases"
+    ],
+    "localContextParagraph": "El clúster industrial de Castellón, Vila-real y Almassora gestiona catálogos con infinitas referencias, variaciones de medidas, calidades y acabados. Conectar estos artículos a WooCommerce o PrestaShop mediante métodos estándar suele causar sobrecarga en el servidor y descuadres en el stock. Bentian ERP Bridge resuelve este problema ejecutándose de forma nativa en Windows: procesa los cambios directamente desde el archivo de Factusol y actualiza la tienda online al instante.",
+    "faqs": [
+      {
+        "q": "¿Maneja variaciones complejas de medidas y acabados cerámicos?",
+        "a": "Sí, vincula las variaciones de Factusol con atributos padre-hijo de WooCommerce y combinaciones de PrestaShop."
+      },
+      {
+        "q": "¿Permite tarifas profesionales B2B para instaladores y distribuidores?",
+        "a": "Totalmente. Gestiona hasta 5 tarifas de Factusol asignándolas a los grupos de clientes de tu eCommerce."
+      },
+      {
+        "q": "¿Se instala fácilmente en un ordenador de oficina en Castellón?",
+        "a": "Sí, el asistente de configuración detecta la base de datos de Factusol en pocos pasos guiados."
+      }
+    ]
+  },
+  {
+    "slug": "burgos",
+    "name": "Burgos",
+    "province": "Burgos",
+    "region": "Castilla y León",
+    "schemaRegion": "ES-CL",
+    "coordinates": {
+      "lat": 42.344,
+      "lng": -3.6969
+    },
+    "tagline": "Integración fiable de Factusol con comercio electrónico para la potente industria y distribución de Burgos",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Burgos | Bentian ERP",
+    "metaDescription": "Conecta Factusol con tu tienda online en Burgos. Polígonos Villalonquéjar y Gamonal. Stock en tiempo real, tarifas B2B y pedidos automáticos sin cuotas mensuales.",
+    "keywords": "conector factusol burgos, sincronizar factusol villalonquejar, factusol gamonal pentasa burgos, conector prestashop factusol burgos",
+    "heroSubtitle": "Sincronización robusta para empresas industriales, componentes mecánicos y distribución alimentaria en el nudo logístico de Burgos.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial Villalonquéjar (Burgos)",
+        "desc": "El parque industrial más extenso de Castilla y León con más de 1.000 hectáreas e intensa actividad fabril y comercial."
+      },
+      {
+        "name": "Polígono Industrial Gamonal-Pentasa",
+        "desc": "Histórico polo industrial con almacenes de distribución, ferreterías, automoción y servicios técnicos."
+      },
+      {
+        "name": "Áreas Industriales de Miranda de Ebro y Aranda de Duero",
+        "desc": "Centros neurálgicos de logística ferroviaria, enología y maquinaria auxiliar."
+      }
+    ],
+    "sectors": [
+      "Automoción, Estampación y Maquinaria Pesada",
+      "Distribución Alimentaria, Cárnicas y Vinos de la Ribera del Duero",
+      "Ferretería Industrial, Herramienta y Construcción",
+      "Química, Plásticos y Embalajes Industriales"
+    ],
+    "localContextParagraph": "Burgos es uno de los principales nudos industriales y de comunicaciones del norte de España. Las empresas burguesas de Villalonquéjar y Gamonal destacan por su rigor operativo y su necesidad de software fiable que no interrumpa el trabajo diario. Bentian ERP Bridge se instala en Windows como un conector de alto rendimiento: sincroniza existencias, listas de precios y pedidos entre Factusol y plataformas online como WooCommerce o PrestaShop sin requerir servidores intermedios.",
+    "faqs": [
+      {
+        "q": "¿Funciona con bases de datos Factusol en red corporativa de Villalonquéjar?",
+        "a": "Sí, soporta entornos monopuesto y multipuesto en red local o servidor NAS de almacenamiento centralizado."
+      },
+      {
+        "q": "¿Cómo evita la venta de productos sin existencias?",
+        "a": "Sincroniza el stock disponible real (DISSTO) descontando pedidos pendientes de servir en almacén."
+      },
+      {
+        "q": "¿Se puede configurar la frecuencia de sincronización?",
+        "a": "El agente monitoriza cambios en segundo plano y los traslada de manera continua o programada."
+      }
+    ]
+  },
+  {
+    "slug": "salamanca",
+    "name": "Salamanca",
+    "province": "Salamanca",
+    "region": "Castilla y León",
+    "schemaRegion": "ES-CL",
+    "coordinates": {
+      "lat": 40.9701,
+      "lng": -5.6635
+    },
+    "tagline": "Conexión de Factusol con tiendas online para el comercio, alimentación y distribución de Salamanca",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Salamanca | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Salamanca. Polígonos El Montalvo y Los Villares. Gestión automática de stock, pedidos e ibéricos sin cuotas cloud.",
+    "keywords": "conector factusol salamanca, sincronizar factusol el montalvo, factusol los villares salamanca, conector prestashop factusol ibericos salamanca",
+    "heroSubtitle": "Automatiza el enlace entre Factusol en tus oficinas de Salamanca y tu tienda online WooCommerce o PrestaShop.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Industrial El Montalvo (I, II y III)",
+        "desc": "El mayor centro empresarial y comercial de Salamanca, con almacenes de distribución, hostelería y suministros."
+      },
+      {
+        "name": "Polígono Industrial Los Villares (Villares de la Reina)",
+        "desc": "Polo especializado en recambios, maquinaria agrícola, climatización y comercio minorista y mayorista."
+      },
+      {
+        "name": "Enclave de Guijuelo",
+        "desc": "Referente internacional en la industria cárnica e ibérica con cientos de secaderos y fábricas que venden online."
+      }
+    ],
+    "sectors": [
+      "Jamones, Embutidos Ibéricos y Productos Gourmet Salmantinos",
+      "Maquinaria Agrícola, Ganadera y Suministros Rurales",
+      "Hostelería, Equipamiento Comercial y Menaje Profesional",
+      "Ferretería, Materiales Eléctricos y Construcción"
+    ],
+    "localContextParagraph": "El tejido empresarial de Salamanca y comarcas como Guijuelo cuenta con un volumen enorme de venta directa y distribución de productos ibéricos, hostelería y suministros agrícolas a nivel nacional e internacional. Gestionar los pedidos de las tiendas online manualmente en Factusol provoca retrasos y errores en las facturas. Bentian ERP Bridge conecta Factusol directamente con WooCommerce y PrestaShop, importando pedidos al segundo y actualizando el inventario para evitar vender piezas agotadas.",
+    "faqs": [
+      {
+        "q": "¿Sirve para tiendas online de ibéricos y productos gourmet con Factusol?",
+        "a": "Sí. Gestiona referencias con pesos, lotes y precios especiales garantizando que el stock se descuente con exactitud."
+      },
+      {
+        "q": "¿Importa pedidos con recargo de equivalencia?",
+        "a": "Totalmente. Calcula y desglosa el IVA y el recargo de equivalencia (5,2%) cuadrando al céntimo en Factusol."
+      },
+      {
+        "q": "¿Es compatible con el nuevo instalador de la Beta Pública?",
+        "a": "Sí, puedes descargarlo y probarlo gratis durante 60 días sin coste inicial ni tarjeta de crédito."
+      }
+    ]
   }
 ]
-
