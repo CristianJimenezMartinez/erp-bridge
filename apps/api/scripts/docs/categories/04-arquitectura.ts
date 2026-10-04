@@ -56,87 +56,163 @@ export const arquitecturaArticles: DocArticle[] = [
     slug: 'arquitectura/cola-store-and-forward',
     categorySlug: 'arquitectura',
     title: 'Cola Desacoplada Store-and-Forward (SQLite)',
-    subtitle: 'Protección de pedidos frente a caídas de conexión, apagado del PC o indisponibilidad temporal de Factusol.',
-    badge: 'Tolerancia a Fallos',
-    readingTime: '5 min de lectura',
-    metaTitle: 'Cola SQLite Store-and-Forward para Factusol | Bentian ERP',
-    metaDescription: 'Cómo funciona la cola local Store-and-Forward de Bentian. Protección contra apagados de PC y cortes de fibra sin perder pedidos online.',
-    keywords: 'store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, pedidos offline factusol',
+    subtitle: 'Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia SQLite (WAL) e inyección en Factusol.',
+    badge: 'Resiliencia Transaccional',
+    readingTime: '6 min de lectura',
+    metaTitle: 'Cola SQLite Store-and-Forward para Factusol | Bentian ERP Bridge',
+    metaDescription: 'Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia SQLite (WAL) e inyección en Factusol.',
+    keywords: 'store and forward factusol, cola sqlite pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, wal sqlite factusol',
     toc: [
-      { id: 'el-problema-del-pc-apagado', label: '1. El Problema del PC del Almacén Apagado', level: 2 },
-      { id: 'como-funciona-store-and-forward', label: '2. Principio de Operación Store-and-Forward', level: 2 },
-      { id: 'persistencia-sqlite', label: '3. Almacenamiento Local en SQLite Transaccional', level: 2 },
-      { id: 'reintentos-exponenciales', label: '4. Reintentos Exponenciales y Garantía de Entrega', level: 2 },
-      { id: 'recuperacion-automatica', label: '5. Proceso de Recuperación al Volver la Conexión', level: 2 },
+      { id: 'el-problema-del-pc-apagado', label: '1. La Realidad Operativa: El PC del Almacén se Apaga', level: 2 },
+      { id: 'delimitacion-4-fases', label: '2. Delimitación Rigurosa del Ciclo de Vida en 4 Fases', level: 2 },
+      { id: 'fase-1-tienda-online', label: '3. Fase 1: Retención Inmutable en la Tienda Online (PC Apagado)', level: 2 },
+      { id: 'fase-2-descarga-agente', label: '4. Fase 2: Recuperación Automática por el Agente (Arranque y Polling)', level: 2 },
+      { id: 'fase-3-custodia-sqlite', label: '5. Fase 3: Custodia en Cola Local SQLite (Modo WAL)', level: 2 },
+      { id: 'fase-4-inyeccion-factusol', label: '6. Fase 4: Inyección Atómica en Factusol y Confirmación ACK', level: 2 },
+      { id: 'tolerancia-bloqueos', label: '7. Tolerancia a Bloqueos (.laccdb) y Reintentos Exponenciales', level: 2 },
+      { id: 'garantia-idempotencia', label: '8. Garantía de Entrega e Idempotencia Extremo a Extremo', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        En una empresa real, los ordenadores se apagan por la noche, los fines de semana se va la luz en el polígono industrial y los operadores de fibra sufren microcortes. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> con base de datos local SQLite es el mecanismo de resiliencia diseñado para retener y proteger los pedidos frente a cortes de red, apagados del equipo del almacén o bloqueos temporales de la base de datos.
+        En un entorno empresarial real, los ordenadores del almacén o de administración se apagan al terminar la jornada (19:00 PM), los fines de semana se interrumpe el suministro eléctrico en el polígono industrial y las líneas de fibra sufren microcortes transitorios. La arquitectura <strong>Store-and-Forward (Almacenar y Reenviar)</strong> de Bentian ERP Bridge es el patrón de ingeniería distribuida diseñado para garantizar que <strong>ningún pedido web se pierda jamás</strong>, independientemente del estado físico del hardware local.
       </p>
 
-      <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Problema del PC del Almacén Apagado</h2>
+      <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 leading-relaxed mb-6">
+        <strong class="text-white font-semibold block mb-1">Aclaración Mandataria de Arquitectura:</strong>
+        Si el ordenador del almacén está físicamente apagado, ningún software local puede ejecutar instrucciones ni capturar datos directamente. La promesa técnica de Bentian radica en una <strong>arquitectura de custodia desacoplada en dos niveles</strong>: los pedidos permanecen disponibles y seguros en la base de datos de la tienda online mientras el PC permanezca inactivo; en el instante en que el agente vuelve a estar operativo, recupera los pedidos automáticamente y los custodia en su cola local SQLite transaccional, blindando su posterior inyección en Factusol aunque la base de datos esté temporalmente bloqueada o la tienda web sufra una caída posterior.
+      </div>
+
+      <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. La Realidad Operativa: El PC del Almacén se Apaga</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Los conectores síncronos sencillos intentan escribir directamente en Factusol en el mismo milisegundo en que el cliente pulsa <em>"Pagar"</em> en la web. Si en ese momento:
+        Los conectores síncronos tradicionales cometen el error crítico de intentar escribir directamente en el ERP en el mismo milisegundo en que el cliente pulsa <em>"Finalizar compra"</em> en el checkout web. Si en ese instante:
       </p>
       <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
-        <li>El ordenador del almacén está apagado por ser domingo por la tarde,</li>
-        <li>Un operario ha reiniciado el switch de red local, o</li>
-        <li>El router tiene una avería temporal de fibra,</li>
+        <li>El ordenador del almacén está apagado por ser domingo por la tarde o festivo,</li>
+        <li>Un operario ha reiniciado el switch o router de la red de área local (LAN), o</li>
+        <li>La línea de Internet del almacén sufre un microcorte transitorio de DNS o fibra óptica,</li>
       </ul>
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        el conector falla con un error de red y el pedido se queda en el limbo, obligando al departamento de administración a buscar manualmente qué pedidos no se registraron en Factusol.
+        el webhook síncrono del conector tradicional arroja un error <code>504 Gateway Timeout</code> o <code>Connection Refused</code>. Como resultado, el pedido queda huérfano en la tienda online sin registrarse en Factusol, obligando a los administrativos a revisar albarán por albarán cada lunes por la mañana.
       </p>
 
-      <h2 id="como-funciona-store-and-forward" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Principio de Operación Store-and-Forward</h2>
+      <h2 id="delimitacion-4-fases" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Delimitación Rigurosa del Ciclo de Vida en 4 Fases</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian desacopla por completo la <strong>recepción</strong> del pedido de su <strong>inyección</strong> en Factusol:
+        Para solucionar este problema de raíz, Bentian divide el ciclo de vida del pedido en cuatro fases estrictamente delimitadas e independientes:
       </p>
+
       <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
-          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
+          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08] font-sans">
             <tr>
-              <th class="px-4 py-2.5 font-semibold">Paso</th>
-              <th class="px-4 py-2.5 font-semibold">Acción</th>
-              <th class="px-4 py-2.5 font-semibold">Garantía</th>
+              <th class="px-4 py-2.5 font-semibold">Fase</th>
+              <th class="px-4 py-2.5 font-semibold">Ubicación del Dato</th>
+              <th class="px-4 py-2.5 font-semibold">Estado del Pedido</th>
+              <th class="px-4 py-2.5 font-semibold">Garantía Operativa</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/[0.06] text-zinc-400">
             <tr>
-              <td class="px-4 py-2 font-mono text-emerald-400 font-bold">1. Captura</td>
-              <td class="px-4 py-2 text-zinc-300">El pedido se descarga y se guarda de inmediato en la cola SQLite local en el disco.</td>
-              <td class="px-4 py-2">Persistencia inmediata en disco duro con WAL mode (Write-Ahead Logging).</td>
+              <td class="px-4 py-2 text-white font-bold font-sans">Fase 1: Tienda Online</td>
+              <td class="px-4 py-2 text-indigo-300">Base de Datos Web (Cloud / Hosting)</td>
+              <td class="px-4 py-2 text-amber-400">PENDING (En espera)</td>
+              <td class="px-4 py-2 font-sans text-zinc-300">Retención inmutable en servidor web. Seguro aunque el PC esté apagado.</td>
             </tr>
             <tr>
-              <td class="px-4 py-2 font-mono text-emerald-400 font-bold">2. Encolado</td>
-              <td class="px-4 py-2 text-zinc-300">Si Factusol está disponible, se inyecta en <code class="font-mono">F_PCL</code> en &lt; 50 ms.</td>
-              <td class="px-4 py-2">Transacción relacional atómica.</td>
+              <td class="px-4 py-2 text-white font-bold font-sans">Fase 2: Descarga Agente</td>
+              <td class="px-4 py-2 text-indigo-300">Canal Seguro HTTPS (TLS 1.3)</td>
+              <td class="px-4 py-2 text-cyan-400">DOWNLOADING</td>
+              <td class="px-4 py-2 font-sans text-zinc-300">Descarga automática al encender el PC o en ciclo programado de polling.</td>
             </tr>
             <tr>
-              <td class="px-4 py-2 font-mono text-amber-400 font-bold">3. Reintento</td>
-              <td class="px-4 py-2 text-zinc-300">Si la base de datos está bloqueada o apagada, el pedido permanece seguro en la cola local.</td>
-              <td class="px-4 py-2 text-emerald-400">Cero pérdida de datos. Reintento automático en cuanto el sistema vuelve.</td>
+              <td class="px-4 py-2 text-white font-bold font-sans">Fase 3: Custodia SQLite</td>
+              <td class="px-4 py-2 text-indigo-300">%APPDATA%\\Bentian Agent\\queue.db</td>
+              <td class="px-4 py-2 text-emerald-400 font-bold">QUEUED (Custodiado)</td>
+              <td class="px-4 py-2 font-sans text-zinc-300">Persistencia local con WAL mode. Cero pérdida ante caídas de red o bloqueos.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2 text-white font-bold font-sans">Fase 4: Inyección ERP</td>
+              <td class="px-4 py-2 text-indigo-300">Factusol OLEDB (F_PCL / F_LPC)</td>
+              <td class="px-4 py-2 text-emerald-300">SYNCED (Confirmado)</td>
+              <td class="px-4 py-2 font-sans text-zinc-300">Transacción relacional atómica y confirmación ACK bidireccional a la web.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h2 id="persistencia-sqlite" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Almacenamiento Local en SQLite Transaccional</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        La cola de pedidos se gestiona mediante un motor SQLite integrado compilado en el agente (<code class="text-indigo-300 font-mono">%APPDATA%\\Bentian Agent\\queue.db</code>). Este archivo dispone de índices por ID de pedido web y estado de sincronización (<code class="text-zinc-200">PENDING</code>, <code class="text-zinc-200">SYNCED</code>, <code class="text-zinc-200">FAILED</code>), evitando procesar pedidos duplicados gracias a claves de <strong>idempotencia</strong>.
-      </p>
-
-      <h2 id="reintentos-exponenciales" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Reintentos Exponenciales y Garantía de Entrega</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Ante cualquier fallo temporal (por ejemplo, otro usuario de Factusol abriendo la tabla en modo exclusivo durante un balance), el agente no colapsa: aplica un <strong>retroceso exponencial (*exponential backoff*)</strong>:
-      </p>
-      <div class="p-3 rounded-lg bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-400 mb-6">
-        Reintento 1: 5 seg ──▶ Reintento 2: 15 seg ──▶ Reintento 3: 45 seg ──▶ Reintento 4: 2 min...
+      <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6">
+        [ Fase 1: Web Hosting ] ──(HTTPS Poll / Fase 2)──▶ [ Fase 3: SQLite WAL Local ] ──(Transacción OLEDB)──▶ [ Fase 4: Factusol F_PCL ]
+        <div class="text-[10px] text-emerald-400 mt-2">▲ Retención en Web (PC Apagado) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Blindaje Local Offline en Disco &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Inyección & Flujo ACK</div>
       </div>
 
-      <h2 id="recuperacion-automatica" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Proceso de Recuperación al Volver la Conexión</h2>
+      <h2 id="fase-1-tienda-online" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Fase 1: Retención Inmutable en la Tienda Online (PC Apagado)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        El lunes a las 08:00 AM, cuando el primer empleado enciende el ordenador del almacén, Bentian se inicia automáticamente con Windows, detecta los pedidos acumulados durante el fin de semana y los inserta de forma secuencial y ordenada en Factusol en cuestión de segundos.
+        Durante la noche o durante el fin de semana, los clientes realizan compras en WooCommerce, PrestaShop o tu tienda personalizada. La tienda web procesa los pagos con tarjeta o transferencia y registra el pedido en su propia base de datos (tablas <code>wp_posts</code> / HPOS <code>_wc_orders</code> en WordPress, <code>ps_orders</code> en PrestaShop, o <code>eb_orders</code> en el Endpoint Universal) marcando su estado como <strong>PENDING</strong> o <strong>processing</strong>.
       </p>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        En este punto, la tienda web actúa como el primer buffer de retención. No requiere que el ordenador del almacén esté encendido ni que la base de datos de Factusol esté accesible. La información del pedido, las direcciones de envío y los totales fiscales están perfectamente seguros en el servidor web.
+      </p>
+
+      <h2 id="fase-2-descarga-agente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Fase 2: Recuperación Automática por el Agente (Arranque y Polling)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Cuando el personal del almacén enciende el ordenador o el servidor local, el agente de Bentian se inicia automáticamente como servicio o proceso en segundo plano con Windows. Inmediatamente ejecuta su ciclo de sondeo (*polling*) saliente mediante peticiones HTTPS autenticadas:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li><strong>Detección secuencial:</strong> Consulta la API de la tienda solicitando todos los pedidos con estado <code>PENDING</code>.</li>
+        <li><strong>Descarga en bloques seguros:</strong> Recupera los pedidos en lotes controlados (de 50 en 50, máx. 200) para no sobrecargar el servidor web ni la memoria local.</li>
+        <li><strong>Validación sintáctica:</strong> Verifica la integridad del JSON entrante (cabecera, cliente, NIF/CIF y líneas con precios sin IVA y tipos impositivos).</li>
+      </ul>
+
+      <h2 id="fase-3-custodia-sqlite" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Fase 3: Custodia en Cola Local SQLite (Modo WAL)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        En cuanto los pedidos se descargan por HTTPS, el agente <strong>NO</strong> intenta grabarlos directamente en Factusol. Los inserta de inmediato en su motor local transaccional SQLite:
+      </p>
+      <div class="p-3 rounded-lg bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 mb-4">
+        Ruta inmutable: %APPDATA%\\Bentian Agent\\queue.db
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Este almacenamiento se configura en modo <strong>Write-Ahead Logging (WAL)</strong> (<code>PRAGMA journal_mode=WAL</code>; <code>PRAGMA synchronous=NORMAL</code>), garantizando:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Inmunidad ante caídas de Internet:</strong> Si la fibra óptica se corta un segundo después de descargar el pedido, el dato ya reside en el disco NVMe/SSD local. No se perderá aunque el almacén quede incomunicado.</li>
+        <li><strong>Inmunidad ante caídas de la tienda web:</strong> Si el servidor de la tienda online sufre un reinicio o mantenimiento en la nube, el agente puede seguir trabajando con los pedidos ya custodiados.</li>
+        <li><strong>Concurrencia libre de bloqueos:</strong> El modo WAL permite lecturas continuas desde la interfaz gráfica del agente mientras el motor de sincronización escribe pedidos en disco sin cuellos de botella.</li>
+      </ul>
+
+      <h2 id="fase-4-inyeccion-factusol" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Fase 4: Inyección Atómica en Factusol y Confirmación ACK</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Con el pedido custodiado en SQLite, el motor <code>LocalSyncEngine</code> procede a su inyección en la base de datos de Factusol (<code>.accdb</code>):
+      </p>
+      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+        <li><strong>Apertura de Transacción OLEDB:</strong> Se inicia una transacción atómica agrupada (<code>BeginTrans</code>) en el motor OLEDB de 32 bits de Microsoft ACE.</li>
+        <li><strong>Resolución de Cliente:</strong> Se busca la ficha del cliente por CIF/NIF en <code>F_CLI</code>. Si no existe, se crea automáticamente una nueva ficha con su código de provincia, tarifa y datos de contacto.</li>
+        <li><strong>Inserción de Cabecera (F_PCL):</strong> Se obtiene el siguiente número correlativo disponible para la serie seleccionada (ej. serie <em>"1"</em> o <em>"W"</em>) y se inserta el registro del pedido con sus totales netos, brutos y fecha.</li>
+        <li><strong>Inserción de Líneas (F_LPC):</strong> Se insertan secuencialmente todas las líneas de productos con sus códigos de artículo (<code>ARTLPC</code>), descripción, cantidad, precio unitario sin IVA y porcentaje de recargo si procede.</li>
+        <li><strong>Commit Transaccional:</strong> Si todas las líneas se escriben correctamente, se ejecuta <code>CommitTrans</code>. Si ocurriera cualquier error, se ejecuta <code>RollbackTrans</code>, dejando Factusol intacto.</li>
+        <li><strong>Confirmación ACK a la Tienda Online:</strong> Tras el commit exitoso, el agente envía una llamada de confirmación (flujo ACK) a la tienda web, informando del número de pedido asignado por Factusol y marcando el pedido web como <strong>SYNCED</strong>.</li>
+      </ol>
+
+      <h2 id="tolerancia-bloqueos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Tolerancia a Bloqueos (.laccdb) y Reintentos Exponenciales</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        ¿Qué ocurre si un operario del almacén está realizando un balance contable, una regeneración de stock o una copia de seguridad en Factusol y bloquea la tabla en modo exclusivo (error <code>3045 / Could not use; file already in use</code>)?
+      </p>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Un conector síncrono colapsaría. Bentian, en cambio, mantiene el pedido en estado <code>PENDING_INJECTION</code> en su cola SQLite y aplica un algoritmo de <strong>retroceso exponencial (*exponential backoff*) con jitter aleatorio</strong>:
+      </p>
+      <div class="p-3 rounded-lg bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-400 mb-6">
+        Intento 1: Inmediato ──▶ Intento 2: 5 seg ──▶ Intento 3: 15 seg ──▶ Intento 4: 45 seg ──▶ Intento 5: 2 min...
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        En cuanto el operario termina su tarea en Factusol y el archivo <code>.laccdb</code> se desbloquea, el agente inserta los pedidos de la cola de forma ordenada y cronológica en cuestión de milisegundos.
+      </p>
+
+      <h2 id="garantia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">8. Garantía de Entrega e Idempotencia Extremo a Extremo</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        La cola SQLite local incorpora una restricción de unicidad primaria sobre el identificador original del pedido web (<code>web_order_id</code>). Esta salvaguarda garantiza la propiedad de <strong>idempotencia estricta</strong>:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Fallo de red durante el ACK:</strong> Si el agente inyecta el pedido en Factusol pero la llamada de confirmación ACK a la tienda online falla por un timeout de red, la tienda web mantendrá el pedido como <code>PENDING</code>. En el siguiente ciclo de polling, la tienda volverá a enviar el mismo pedido al agente.</li>
+        <li><strong>Detección de duplicado en SQLite:</strong> El agente detecta que el <code>web_order_id</code> ya existe en su cola local en estado <code>SYNCED</code> con su número de Factusol asignado. <strong>El agente jamás reinserta el pedido en Factusol</strong>, evitando duplicaciones de albarán o descuadres de inventario. En su lugar, reenvía inmediatamente la confirmación ACK a la tienda web para sincronizar su estado.</li>
+      </ul>
     `,
   },
   {

@@ -295,9 +295,9 @@
                       </a>
                     </li>
                   
-                    <li data-title="endpoint universal: conecta cualquier tienda personalizada" data-keywords="api universal factusol, endpoint json factusol, conectar php factusol, conectar laravel factusol, sincronizar tienda a medida factusol">
+                    <li data-title="endpoint universal: especificación técnica y protocolo bidireccional" data-keywords="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos sqlite, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
                       <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Endpoint Universal: Conecta Cualquier Tienda Personalizada
+                        Endpoint Universal: Especificación Técnica y Protocolo Bidireccional
                       </a>
                     </li>
                   
@@ -318,7 +318,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, pedidos offline factusol">
+                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, wal sqlite factusol">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Cola Desacoplada Store-and-Forward (SQLite)
                       </a>
@@ -405,7 +405,7 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, bitdefender factusol, seguridad edr conector factusol">
+                    <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, sentinelone factusol, bitdefender factusol, seguridad edr conector factusol">
                       <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
                       </a>
@@ -506,32 +506,50 @@
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        Al descargar y ejecutar una versión recién publicada de <code class="text-zinc-200">Bentian-Setup.exe</code> en Windows 10 o Windows 11, es posible que el sistema muestre la pantalla azul de aviso: <em>"Windows protegió su PC (Microsoft Defender SmartScreen impidió el inicio de una aplicación no reconocida)"</em>.
+        Al descargar e iniciar por primera vez el instalador oficial <code class="text-zinc-200">Bentian-Setup.exe</code> en Windows 10, Windows 11 o Windows Server, es posible que el sistema muestre la pantalla azul preventiva: <em>"Windows protegió su PC (Microsoft Defender SmartScreen evitó el inicio de una aplicación no reconocida)"</em>.
       </p>
 
       <h2 id="que-es-smartscreen" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. ¿Qué es Microsoft Defender SmartScreen?</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        SmartScreen es un sistema de reputación basado en la nube de Microsoft. Cuando un desarrollador publica un archivo ejecutable nuevo, dicho archivo carece de un historial previo de millones de descargas en los servidores de Microsoft. Hasta que un número suficiente de usuarios de todo el mundo lo descarga y ejecuta con éxito, SmartScreen muestra esta advertencia preventiva por defecto a cualquier software independiente.
+        SmartScreen es un sistema de reputación basado en la nube de Microsoft. Cuando un desarrollador publica una nueva versión o actualización menor, dicho archivo ejecutable carece inicialmente de un historial acumulado de millones de ejecuciones en los servidores centrales de Microsoft. Hasta que un número representativo de usuarios lo ejecuta sin incidentes, SmartScreen muestra esta pantalla informativa por defecto.
+      </p>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Esta advertencia <strong>no indica la presencia de malware</strong>, sino únicamente que el binario es de reciente compilación y está ganando reputación en los sistemas de Microsoft.
       </p>
 
       <h2 id="como-autorizar" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Procedimiento de Autorización en 2 Clics</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Para continuar con la instalación de forma segura y autorizar el programa:
+        Para continuar con la instalación oficial de Bentian ERP Bridge de manera directa:
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>En la ventana azul de SmartScreen, haz clic en el enlace <strong class="text-indigo-400 underline">Más información</strong> (situado debajo del texto explicativo).</li>
-        <li>Aparecerá un botón adicional en la parte inferior: haz clic en <strong class="text-emerald-400 font-bold">Ejecutar de todas formas</strong>.</li>
-        <li>El instalador de Bentian se iniciará con normalidad y no volverá a solicitar confirmación para esta versión.</li>
+        <li>En la ventana azul de SmartScreen, haz clic sobre el texto subrayado <strong class="text-indigo-400 underline">Más información</strong> (*"More info"*).</li>
+        <li>La ventana se expandirá mostrando el nombre del ejecutable (<code class="text-zinc-200">Bentian-Setup.exe</code>) y el autor verificado.</li>
+        <li>Haz clic en el botón <strong class="text-emerald-400 font-bold">Ejecutar de todas formas</strong> (*"Run anyway"*). El asistente se iniciará con normalidad.</li>
       </ol>
 
-      <h2 id="verificacion-virustotal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Verificación de Seguridad en VirusTotal (0/70)</h2>
+      <h2 id="desbloqueo-powershell" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Desbloqueo Específico vía PowerShell (Zone.Identifier)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Cada release oficial de Bentian ERP Bridge se somete a un escaneo criptográfico exhaustivo en <strong>VirusTotal</strong>, obteniendo una calificación de <strong>0 / 70 detecciones</strong> de antivirus (completamente libre de virus, troyanos, spyware o adware).
+        En entornos administrados por IT o en Windows 11 con <em>Smart App Control (SAC)</em> activo, los administradores pueden desbloquear el archivo descargado sin debilitar las políticas del sistema operativo:
       </p>
 
-      <h2 id="reputacion-acumulada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Reputación de Nuevas Versiones en Windows</h2>
+      <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 mb-4 overflow-x-auto">
+        <div class="text-zinc-500 mb-1"># Elimina la marca de origen web (Zone.Identifier) ÚNICAMENTE del instalador legítimo</div>
+        <div class="text-emerald-400">Unblock-File -Path "$env:USERPROFILE\Downloads\Bentian-Setup*.exe"</div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 mb-6 leading-relaxed">
+        <strong class="text-amber-200 block mb-1">Principio de Mínimo Privilegio en SmartScreen:</strong>
+        Queda terminantemente desaconsejado desactivar SmartScreen a nivel global en Windows (mediante registro o directivas de grupo). El desbloqueo debe realizarse exclusivamente sobre el archivo ejecutable específico descargado.
+      </div>
+
+      <h2 id="verificacion-virustotal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Verificación de Seguridad en VirusTotal (0/70)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Cada release oficial de Bentian ERP Bridge es sometida a escaneos rigurosos y públicos en <strong>VirusTotal</strong>, obteniendo de forma consistente una calificación limpia de <strong>0 / 70 detecciones</strong> de antivirus, confirmando la ausencia absoluta de virus, troyanos o adware.
+      </p>
+
+      <h2 id="reputacion-acumulada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Reputación de Nuevas Versiones y Mínimo Privilegio</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        Cada vez que se publica una actualización menor de Bentian, el hash SHA-256 del nuevo ejecutable es enviado de forma proactiva a Microsoft Security Intelligence para acelerar la validación de reputación global en los sistemas Defender de Windows.
+        Cada nueva entrega oficial se publica acompañada de su hash criptográfico SHA-256 y firma asimétrica <strong>Ed25519</strong> en el manifiesto oficial de versiones. Los administradores corporativos pueden validar la integridad del paquete antes de distribuirlo a los terminales de facturación de la empresa.
       </p>
     
         </article>
@@ -583,14 +601,20 @@
             </li>
           
             <li>
+              <a href="#desbloqueo-powershell" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="desbloqueo-powershell">
+                3. Desbloqueo Específico vía PowerShell (Zone.Identifier)
+              </a>
+            </li>
+          
+            <li>
               <a href="#verificacion-virustotal" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="verificacion-virustotal">
-                3. Verificación de Seguridad en VirusTotal (0/70)
+                4. Verificación de Seguridad en VirusTotal (0/70)
               </a>
             </li>
           
             <li>
               <a href="#reputacion-acumulada" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="reputacion-acumulada">
-                4. Reputación de Nuevas Versiones en Windows
+                5. Reputación de Nuevas Versiones y Mínimo Privilegio
               </a>
             </li>
           
