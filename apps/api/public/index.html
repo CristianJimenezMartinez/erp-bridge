@@ -1,3 +1,12 @@
+<!-- ========================================================================================= -->
+<!-- ⚠️ AVISO: ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR DIRECTAMENTE                      -->
+<!-- Este archivo es el bundle pre-renderizado compilado mediante: `npm run build:landing`     -->
+<!-- El código fuente modular y editable reside en:                                            -->
+<!--   • apps/api/public/sections/ (01-header.html a 14-footer.html)                          -->
+<!--   • apps/api/public/layout/   (base.html, schema-org.html)                               -->
+<!--   • apps/api/public/modals/   (modal-checkout.html, modal-legal.html)                     -->
+<!--   • apps/api/public/js/       (legal-modal.js, smooth-scroll.js, ...)                     -->
+<!-- ========================================================================================= -->
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
 <head>
@@ -32,7 +41,7 @@
   <link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/">
   <link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/">
 
-  <!-- Open Graph / Redes Sociales (Imágenes Ráster PNG de Alta Resolución) -->
+  <!-- Open Graph / Redes Sociales -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bridge.cristianjm.com/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
@@ -54,175 +63,13 @@
   <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta name="twitter:image:alt" content="Bentian ERP Bridge — Conector Factusol WooCommerce">
 
+  <!-- GEO IA & Rich Snippets Schema.org -->
   <!-- ========================================================================= -->
-  <!-- GEO IA & RICH SNIPPETS: ESTRUCTURAS JSON-LD SCHEMA.ORG PARA MOTORES IA     -->
-  <!-- ========================================================================= -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://bridge.cristianjm.com/#software",
-        "name": "Bentian ERP Bridge",
-        "operatingSystem": "Windows 10, Windows 11, Windows Server 2019, Windows Server 2022, Windows Server 2025",
-        "applicationCategory": "BusinessApplication",
-        "applicationSubCategory": "ERP Integration Software",
-        "description": "Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP y plataformas eCommerce (WooCommerce, PrestaShop) con arquitectura Zero-Knowledge y Edge Processing.",
-        "url": "https://bridge.cristianjm.com",
-        "softwareVersion": "0.3.5",
-        "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
-        "offers": [
-          {
-            "@type": "Offer",
-            "name": "Plan Base Anual (1 Conexión ERP)",
-            "price": "199.00",
-            "priceCurrency": "EUR",
-            "priceValidUntil": "2027-12-31",
-            "availability": "https://schema.org/InStock",
-            "description": "Suscripción anual completa para 1 ERP Factusol y 1 Tienda Online."
-          },
-          {
-            "@type": "Offer",
-            "name": "Plan Base Mensual (1 Conexión ERP)",
-            "price": "29.00",
-            "priceCurrency": "EUR",
-            "priceValidUntil": "2027-12-31",
-            "availability": "https://schema.org/InStock",
-            "description": "Suscripción mensual flexible para 1 ERP Factusol y 1 Tienda Online."
-          }
-        ],
-        "featureList": [
-          "Sincronización reactiva de stock con dirty-checking",
-          "Ingesta atómica de pedidos a Factusol (F_PCL y F_LPC)",
-          "Compatibilidad nativa con Recargo de Equivalencia (R.E.) y fiscalidad española",
-          "Detección automática de bases de datos Access (.accdb)",
-          "Auto-actualizador silencioso atómico con firmas Ed25519",
-          "Arquitectura Zero-Knowledge: cero almacenamiento de datos en la nube"
-        ],
-        "author": {
-          "@type": "Person",
-          "name": "Cristian Jiménez Martínez",
-          "url": "https://cristianjm.com"
-        },
-        "publisher": {
-          "@id": "https://bridge.cristianjm.com/#organization"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://bridge.cristianjm.com/#organization",
-        "name": "Bentian",
-        "legalName": "Bentian ERP Bridge",
-        "url": "https://bridge.cristianjm.com",
-        "logo": "https://bridge.cristianjm.com/assets/icon.png",
-        "founder": {
-          "@type": "Person",
-          "name": "Cristian Jiménez Martínez",
-          "url": "https://cristianjm.com"
-        },
-        "sameAs": [
-          "https://cristianjm.com"
-        ],
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "email": "soporte@cristianjm.com",
-          "contactType": "customer service",
-          "areaServed": "ES",
-          "availableLanguage": "Spanish"
-        }
-      },
-      {
-        "@type": "WebSite",
-        "@id": "https://bridge.cristianjm.com/#website",
-        "url": "https://bridge.cristianjm.com",
-        "name": "Bentian ERP Bridge",
-        "publisher": {
-          "@id": "https://bridge.cristianjm.com/#organization"
-        },
-        "inLanguage": "es-ES"
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://bridge.cristianjm.com/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "¿Tengo que cambiar o modificar mi versión actual de Factusol?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No. El agente se conecta a tu base de datos existente de Factusol mediante lectura OLEDB estándar sin alterar la estructura de tus tablas ni obligarte a cambiar de versión. Es compatible con versiones 2024, 2025 y 2026."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Dónde se almacenan los datos de mis clientes y facturas?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Tus datos se quedan en tu propio equipo. La plataforma sigue una arquitectura Zero-Knowledge y Local-First: los ficheros de Factusol nunca se suben ni se replican en servidores cloud externos; solo se transmite el delta necesario cifrado punto a punto hacia tu tienda online."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Qué ocurre si el ordenador del almacén se apaga o se corta la conexión?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No se pierde ningún dato. Los pedidos que tus clientes hagan en la tienda online se retienen de forma segura en la cola de Store-and-Forward. En cuanto el ordenador vuelve a encenderse o se recupera la red, el agente descarga y genera los pedidos en Factusol automáticamente."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Tengo que abrir puertos en el router o configurar una IP fija?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "No. El agente realiza conexiones salientes seguras HTTPS por el puerto 443 estándar. No necesitas abrir puertos en tu router, ni configurar DMZ, ni disponer de una IP fija en tu empresa."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Soporta Recargo de Equivalencia (R.E.) y múltiples tarifas?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sí. Está específicamente desarrollado para el mercado español. Gestiona clientes con y sin Recargo de Equivalencia y te permite elegir qué tarifa de precios de Factusol (Tarifa 1, 2, etc.) debe publicarse en tu tienda online."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿En cuántos ordenadores debo instalar el conector?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Cómo se actualiza el agente?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Es normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en 'Más información' y luego en 'Ejecutar de todas formas'."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "¿Puedo cancelar la suscripción si no la necesito?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Por supuesto. Puedes cancelar desde tu panel de usuario de Stripe en cualquier momento con un solo clic. Sin permanencias, sin penalizaciones y sin preguntas."
-            }
-          }
-        ]
-      }
-    ]
-  }
-  </script>
+<!-- GEO IA & RICH SNIPPETS: ESTRUCTURAS JSON-LD SCHEMA.ORG PARA MOTORES IA     -->
+<!-- ========================================================================= -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","@id":"https://bridge.cristianjm.com/#software","name":"Bentian ERP Bridge","operatingSystem":"Windows 10, Windows 11, Windows Server 2019, Windows Server 2022, Windows Server 2025","applicationCategory":"BusinessApplication","applicationSubCategory":"ERP Integration Software","description":"Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP y plataformas eCommerce (WooCommerce, PrestaShop) con arquitectura Zero-Knowledge y Edge Processing.","url":"https://bridge.cristianjm.com","softwareVersion": "0.3.5","downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe","offers":[{"@type":"Offer","name":"Plan Base Anual (1 Conexión ERP)","price":"199.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","availability":"https://schema.org/InStock","description":"Suscripción anual completa para 1 ERP Factusol y 1 Tienda Online."},{"@type":"Offer","name":"Plan Base Mensual (1 Conexión ERP)","price":"29.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","availability":"https://schema.org/InStock","description":"Suscripción mensual flexible para 1 ERP Factusol y 1 Tienda Online."}],"featureList":["Sincronización reactiva de stock con dirty-checking","Ingesta atómica de pedidos a Factusol (F_PCL y F_LPC)","Compatibilidad nativa con Recargo de Equivalencia (R.E.) y fiscalidad española","Detección automática de bases de datos Access (.accdb)","Auto-actualizador silencioso atómico con firmas Ed25519","Modo Offline con cola persistente Store-and-Forward"]},{"@type":"Organization","@id":"https://bridge.cristianjm.com/#organization","name":"Bentian","url":"https://bridge.cristianjm.com","logo":"https://bridge.cristianjm.com/assets/icon.png","founder":{"@type":"Person","name":"Cristian Jiménez Martínez","jobTitle":"Lead Software Architect","url":"https://cristianjm.com"},"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"soporte@cristianjm.com","availableLanguage":["Spanish","English"]}},{"@type":"WebSite","@id":"https://bridge.cristianjm.com/#website","url":"https://bridge.cristianjm.com","name":"Bentian ERP Bridge","publisher":{"@id":"https://bridge.cristianjm.com/#organization"},"inLanguage":"es-ES"},{"@type":"FAQPage","@id":"https://bridge.cristianjm.com/#faq","mainEntity":[{"@type":"Question","name":"¿Tengo que cambiar o modificar mi versión actual de Factusol?","acceptedAnswer":{"@type":"Answer","text":"No. El agente se conecta a tu base de datos existente de Factusol mediante lectura OLEDB estándar sin alterar la estructura de tus tablas ni obligarte a cambiar de versión. Es compatible con versiones 2024, 2025 y 2026."}},{"@type":"Question","name":"¿Dónde se almacenan los datos de mis clientes y facturas?","acceptedAnswer":{"@type":"Answer","text":"Tus datos se quedan en tu propio equipo. La plataforma sigue una arquitectura Zero-Knowledge y Local-First: los ficheros de Factusol nunca se suben ni se replican en servidores cloud externos; solo se transmite el delta necesario cifrado punto a punto hacia tu tienda online."}},{"@type":"Question","name":"¿Qué ocurre si el ordenador del almacén se apaga o se corta la conexión?","acceptedAnswer":{"@type":"Answer","text":"No se pierde ningún dato. Los pedidos que tus clientes hagan en la tienda online se retienen de forma segura en la cola de Store-and-Forward. En cuanto el ordenador vuelve a encenderse o se recupera la red, el agente descarga y genera los pedidos en Factusol automáticamente."}},{"@type":"Question","name":"¿Tengo que abrir puertos en el router o configurar una IP fija?","acceptedAnswer":{"@type":"Answer","text":"No. El agente realiza conexiones salientes seguras HTTPS por el puerto 443 estándar. No necesitas abrir puertos en tu router, ni configurar DMZ, ni disponer de una IP fija en tu empresa."}},{"@type":"Question","name":"¿Soporta Recargo de Equivalencia (R.E.) y múltiples tarifas?","acceptedAnswer":{"@type":"Answer","text":"Sí. Está específicamente desarrollado para el mercado español. Gestiona clientes con y sin Recargo de Equivalencia y te permite elegir qué tarifa de precios de Factusol (Tarifa 1, 2, etc.) debe publicarse en tu tienda online."}},{"@type":"Question","name":"¿En cuántos ordenadores debo instalar el conector?","acceptedAnswer":{"@type":"Answer","text":"Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano."}},{"@type":"Question","name":"¿Cómo se actualiza el agente?","acceptedAnswer":{"@type":"Answer","text":"El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales."}},{"@type":"Question","name":"¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?","acceptedAnswer":{"@type":"Answer","text":"Es normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en 'Más información' y luego en 'Ejecutar de todas formas'."}},{"@type":"Question","name":"¿Puedo cancelar la suscripción si no la necesito?","acceptedAnswer":{"@type":"Answer","text":"Por supuesto. Puedes cancelar desde tu panel de usuario de Stripe en cualquier momento con un solo clic. Sin permanencias, sin penalizaciones y sin preguntas."}}]}]}
+</script>
 
   <!-- Tipografía: Inter (Editorial) + JetBrains Mono (Datos Técnicos) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -314,7 +161,6 @@
       </div>
     </div>
   </header>
-
 
   <main class="flex-1">
     <!-- 2. HERO EDITORIAL & DYNAMIC SYSTEM FLOW                                   -->
@@ -516,7 +362,6 @@
 
     <!-- ========================================================================= -->
 
-
   <!-- 3. SECCIÓN EL PROBLEMA: LA FRAGMENTACIÓN OCULTA                           -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06]">
@@ -569,7 +414,6 @@
 
     <!-- ========================================================================= -->
 
-
   <!-- 4. SECCIÓN LA SOLUCIÓN: CAPA DE INFRAESTRUCTURA CANÓNICA                  -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="arquitectura">
@@ -619,7 +463,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 5. SECCIÓN ESPECIAL: NO CAMBIES TU ERP (KEEP WHAT WORKS)                 -->
     <!-- ========================================================================= -->
@@ -690,7 +533,6 @@
 
     <!-- ========================================================================= -->
 
-
   <!-- 6. SECCIÓN CÓMO FUNCIONA (CONNECT, SYNC, RECONCILE)                       -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="como-funciona">
@@ -751,7 +593,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 7. DEMOSTRACIÓN DE DATOS EN VUELO (DATA IN FLIGHT)                       -->
     <!-- ========================================================================= -->
@@ -815,7 +656,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
     <!-- ========================================================================= -->
@@ -939,7 +779,6 @@
 
     <!-- ========================================================================= -->
 
-
   <!-- 9. SECCIÓN OBSERVABILIDAD Y REGISTRO DE AUDITORÍA                         -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="observabilidad">
@@ -992,7 +831,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 10. SECCIÓN CONECTORES (DISPONIBLES HOY VS EXPANSIÓN)                    -->
     <!-- ========================================================================= -->
@@ -1088,7 +926,6 @@
 
     <!-- ========================================================================= -->
 
-
   <!-- 11. SECCIÓN SEGURIDAD Y CRIPTOGRAFÍA                                      -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="seguridad">
@@ -1140,7 +977,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 12. TARIFAS TRANSPARENTES (PRICING MODULAR)                               -->
     <!-- ========================================================================= -->
@@ -1278,7 +1114,6 @@
     </section>
 
     <!-- ========================================================================= -->
-
 
   <!-- 13. PREGUNTAS FRECUENTES (FAQ PARA OBJECIONES REALES)                     -->
     <!-- ========================================================================= -->
@@ -1479,304 +1314,234 @@
   </div>
 </footer>
 
-
   <!-- MODAL CHECKOUT STRIPE ELEGANTE & SEGURO -->
-  <div id="modal-checkout-landing" onclick="if(event.target === this) cerrarCheckoutModal()" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="relative w-full max-w-md bg-[#121215] border border-white/[0.1] rounded-2xl p-6 sm:p-7 shadow-2xl shadow-indigo-950/40">
-      <!-- Botón cerrar -->
-      <button onclick="cerrarCheckoutModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white transition p-1 rounded-lg hover:bg-white/[0.05]">
+<div id="modal-checkout-landing" onclick="if(event.target === this) cerrarCheckoutModal()" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+  <div class="relative w-full max-w-md bg-[#121215] border border-white/[0.1] rounded-2xl p-6 sm:p-7 shadow-2xl shadow-indigo-950/40">
+    <!-- Botón cerrar -->
+    <button onclick="cerrarCheckoutModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white transition p-1 rounded-lg hover:bg-white/[0.05]">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Encabezado con branding -->
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white leading-tight">Activar Licencia</h3>
+        <p class="text-xs text-zinc-400 mt-0.5">Bentian ERP Bridge — Conexión Factusol</p>
+      </div>
+    </div>
+
+    <!-- Tarjeta resumen del plan -->
+    <div class="p-3.5 rounded-xl bg-[#18181b] border border-white/[0.08] mb-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <span id="checkout-plan-name" class="font-semibold text-sm text-white">Plan Base Anual</span>
+          <p id="checkout-plan-desc" class="text-xs text-zinc-400 mt-0.5">Activación inmediata en 60s. Sin permanencia.</p>
+        </div>
+        <div class="text-right">
+          <span id="checkout-plan-price" class="text-lg font-mono font-bold text-white">199 €</span>
+          <span id="checkout-plan-cycle" class="text-[11px] text-zinc-400 block">/ año + IVA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de email con validación -->
+    <form id="form-checkout-landing" onsubmit="procesarCheckoutModal(event)" class="space-y-4">
+      <div>
+        <label for="checkout-email-input" class="block text-xs font-medium text-zinc-300 mb-1.5">
+          Correo Electrónico de Facturación y Licencia:
+        </label>
+        <div class="relative">
+          <input 
+            type="email" 
+            id="checkout-email-input" 
+            required 
+            placeholder="admin@tuempresa.es" 
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#09090b] border border-white/[0.1] text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+          />
+        </div>
+        <p class="text-[11px] text-zinc-400 mt-1.5 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Tu clave de activación y el acceso a tu panel quedarán vinculados a este correo.
+        </p>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div id="checkout-error-msg" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300"></div>
+
+      <!-- Consentimiento Legal Obligatorio (LSSI-CE & RGPD) -->
+      <div class="pt-1">
+        <label class="flex items-start gap-2.5 text-[11px] text-zinc-400 cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            id="checkout-legal-consent" 
+            required 
+            class="mt-0.5 rounded bg-[#09090b] border border-white/[0.2] text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer shrink-0"
+          />
+          <span class="leading-relaxed">
+            He leído y acepto los 
+            <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="text-indigo-400 underline hover:text-indigo-300">Términos de Contratación</a> 
+            y la 
+            <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="text-indigo-400 underline hover:text-indigo-300">Política de Privacidad</a> 
+            (RGPD / LSSI-CE).
+          </span>
+        </label>
+      </div>
+
+      <!-- Botón de Envío -->
+      <button 
+        type="submit" 
+        id="btn-submit-checkout" 
+        class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span id="btn-submit-text">Continuar al Pago Seguro con Stripe</span>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </button>
+
+      <!-- Garantía de Seguridad -->
+      <div class="flex items-center justify-center gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
+        <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Procesamiento encriptado AES-256 vía Stripe SSL</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- ========================================================================= -->
+<!-- MODAL LEGAL UNIFICADO (LSSI-CE, RGPD, TÉRMINOS Y COOKIES)                  -->
+<!-- ========================================================================= -->
+<div id="modal-legal" onclick="if(event.target === this) cerrarModalLegal()" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+  <div class="relative w-full max-w-2xl bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
+    <!-- Encabezado con pestañas -->
+    <div class="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#18181b]/50 shrink-0">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Información Legal y Regulatoria</h3>
+          <p class="text-[11px] text-zinc-400">Bentian ERP Bridge — Cumplimiento UE</p>
+        </div>
+      </div>
+      <button onclick="cerrarModalLegal()" class="text-zinc-400 hover:text-white transition p-1.5 rounded-lg hover:bg-white/[0.05]">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-
-      <!-- Encabezado con branding -->
-      <div class="flex items-center gap-3 mb-5">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-lg font-bold text-white leading-tight">Activar Licencia</h3>
-          <p class="text-xs text-zinc-400 mt-0.5">Bentian ERP Bridge — Conexión Factusol</p>
-        </div>
-      </div>
-
-      <!-- Tarjeta resumen del plan -->
-      <div class="p-3.5 rounded-xl bg-[#18181b] border border-white/[0.08] mb-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <span id="checkout-plan-name" class="font-semibold text-sm text-white">Plan Base Anual</span>
-            <p id="checkout-plan-desc" class="text-xs text-zinc-400 mt-0.5">Activación inmediata en 60s. Sin permanencia.</p>
-          </div>
-          <div class="text-right">
-            <span id="checkout-plan-price" class="text-lg font-mono font-bold text-white">199 €</span>
-            <span id="checkout-plan-cycle" class="text-[11px] text-zinc-400 block">/ año + IVA</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Formulario de email con validación -->
-      <form id="form-checkout-landing" onsubmit="procesarCheckoutModal(event)" class="space-y-4">
-        <div>
-          <label for="checkout-email-input" class="block text-xs font-medium text-zinc-300 mb-1.5">
-            Correo Electrónico de Facturación y Licencia:
-          </label>
-          <div class="relative">
-            <input 
-              type="email" 
-              id="checkout-email-input" 
-              required 
-              placeholder="admin@tuempresa.es" 
-              class="w-full px-3.5 py-2.5 rounded-xl bg-[#09090b] border border-white/[0.1] text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
-            />
-          </div>
-          <p class="text-[11px] text-zinc-400 mt-1.5 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Tu clave de activación y el acceso a tu panel quedarán vinculados a este correo.
-          </p>
-        </div>
-
-        <!-- Mensaje de error -->
-        <div id="checkout-error-msg" class="hidden p-3 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300"></div>
-
-        <!-- Consentimiento Legal Obligatorio (LSSI-CE & RGPD) -->
-        <div class="pt-1">
-          <label class="flex items-start gap-2.5 text-[11px] text-zinc-400 cursor-pointer select-none">
-            <input 
-              type="checkbox" 
-              id="checkout-legal-consent" 
-              required 
-              class="mt-0.5 rounded bg-[#09090b] border border-white/[0.2] text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer shrink-0"
-            />
-            <span class="leading-relaxed">
-              He leído y acepto los 
-              <a href="javascript:void(0)" onclick="abrirModalLegal('terminos')" class="text-indigo-400 underline hover:text-indigo-300">Términos de Contratación</a> 
-              y la 
-              <a href="javascript:void(0)" onclick="abrirModalLegal('privacidad')" class="text-indigo-400 underline hover:text-indigo-300">Política de Privacidad</a> 
-              (RGPD / LSSI-CE).
-            </span>
-          </label>
-        </div>
-
-        <!-- Botón de Envío -->
-        <button 
-          type="submit" 
-          id="btn-submit-checkout" 
-          class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span id="btn-submit-text">Continuar al Pago Seguro con Stripe</span>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
-
-        <!-- Garantía de Seguridad -->
-        <div class="flex items-center justify-center gap-2 pt-1 text-[11px] text-zinc-400 font-mono">
-          <svg class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-          <span>Procesamiento encriptado AES-256 vía Stripe SSL</span>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL LEGAL UNIFICADO (LSSI-CE, RGPD, TÉRMINOS Y COOKIES)                  -->
-  <!-- ========================================================================= -->
-  <div id="modal-legal" onclick="if(event.target === this) cerrarModalLegal()" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="relative w-full max-w-2xl bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl flex flex-col max-h-[88vh] overflow-hidden">
-      <!-- Encabezado con pestañas -->
-      <div class="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#18181b]/50 shrink-0">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-white">Información Legal y Regulatoria</h3>
-            <p class="text-[11px] text-zinc-400">Bentian ERP Bridge — Cumplimiento UE</p>
-          </div>
-        </div>
-        <button onclick="cerrarModalLegal()" class="text-zinc-400 hover:text-white transition p-1.5 rounded-lg hover:bg-white/[0.05]">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <!-- Barra de pestañas -->
+    <div class="flex border-b border-white/[0.08] px-6 bg-[#0e0e11] text-xs font-medium overflow-x-auto gap-2 shrink-0">
+      <button onclick="cambiarPestanaLegal('aviso')" id="tab-legal-aviso" class="py-3 px-3 border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap transition-colors font-semibold">Aviso Legal</button>
+      <button onclick="cambiarPestanaLegal('privacidad')" id="tab-legal-privacidad" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Privacidad (RGPD)</button>
+      <button onclick="cambiarPestanaLegal('terminos')" id="tab-legal-terminos" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Términos del Servicio</button>
+      <button onclick="cambiarPestanaLegal('cookies')" id="tab-legal-cookies" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Cookies</button>
+    </div>
+
+    <!-- Contenedor scrolleable de textos legales -->
+    <div class="p-6 overflow-y-auto text-xs text-zinc-300 space-y-4 leading-relaxed custom-scrollbar">
+      <!-- 1. Aviso Legal -->
+      <div id="content-legal-aviso" class="space-y-3">
+        <h4 class="text-sm font-semibold text-white">1. Datos Identificativos del Titular (LSSI-CE art. 10)</h4>
+        <p>
+          En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de que el titular y responsable de esta plataforma es:
+        </p>
+        <ul class="list-disc pl-5 space-y-1 text-zinc-400 font-mono text-[11px]">
+          <li>Denominación comercial: Bentian ERP Bridge</li>
+          <li>Titular: Cristian Jiménez Martínez</li>
+          <li>Dominio web: bridge.cristianjm.com</li>
+          <li>Correo electrónico de contacto: soporte@cristianjm.com</li>
+          <li>Actividad: Servicios de software de integración y sincronización de datos empresariales.</li>
+        </ul>
+        <h4 class="text-sm font-semibold text-white pt-2">2. Propiedad Intelectual e Industrial</h4>
+        <p>
+          Todos los contenidos, diseños, código fuente, algoritmos, manuales y elementos gráficos de Bentian ERP Bridge están protegidos por los derechos de propiedad intelectual e industrial aplicables en España y la Unión Europea. Queda prohibida la reproducción, descompilación, ingeniería inversa o distribución no autorizada de los binarios ejecutables sin la preceptiva licencia de uso.
+        </p>
       </div>
 
-      <!-- Barra de pestañas -->
-      <div class="flex border-b border-white/[0.08] px-6 bg-[#0e0e11] text-xs font-medium overflow-x-auto gap-2 shrink-0">
-        <button onclick="cambiarPestanaLegal('aviso')" id="tab-legal-aviso" class="py-3 px-3 border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap transition-colors">Aviso Legal</button>
-        <button onclick="cambiarPestanaLegal('privacidad')" id="tab-legal-privacidad" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Privacidad (RGPD)</button>
-        <button onclick="cambiarPestanaLegal('terminos')" id="tab-legal-terminos" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Términos del Servicio</button>
-        <button onclick="cambiarPestanaLegal('cookies')" id="tab-legal-cookies" class="py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors">Cookies</button>
+      <!-- 2. Privacidad (RGPD) -->
+      <div id="content-legal-privacidad" class="hidden space-y-3">
+        <h4 class="text-sm font-semibold text-white">Política de Privacidad y Protección de Datos (RGPD)</h4>
+        <p>
+          Conforme al Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), te informamos del tratamiento de tus datos personales:
+        </p>
+        <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
+          <li><strong class="text-zinc-200">Responsable del Tratamiento:</strong> Bentian (Cristian Jiménez Martínez).</li>
+          <li><strong class="text-zinc-200">Finalidad:</strong> Gestión y activación de licencias de software, cobro y facturación de suscripciones, soporte técnico e incidencias.</li>
+          <li><strong class="text-zinc-200">Principio Zero-Knowledge:</strong> El agente local de Bentian procesa las bases de datos de Factusol en local en tu propio equipo. La API central de Bentian NUNCA almacena ni inspecciona tus clientes, facturas, tarifas ni secretos comerciales.</li>
+          <li><strong class="text-zinc-200">Legitimación:</strong> Ejecución de la relación contractual de suscripción y consentimiento del usuario.</li>
+          <li><strong class="text-zinc-200">Destinatarios:</strong> Plataforma de cobro seguro Stripe Inc. (proveedor certificado PCI-DSS) y servicios de envío de notificaciones por email. En ningún caso se ceden datos personales a terceras empresas con fines comerciales.</li>
+          <li><strong class="text-zinc-200">Tus Derechos:</strong> Puedes ejercer tus derechos de acceso, rectificación, supresión, limitación y portabilidad enviando un correo a <span class="text-indigo-400">soporte@cristianjm.com</span>.</li>
+        </ul>
       </div>
 
-      <!-- Contenedor scrolleable de textos legales -->
-      <div class="p-6 overflow-y-auto text-xs text-zinc-300 space-y-4 leading-relaxed custom-scrollbar">
-        <!-- 1. Aviso Legal -->
-        <div id="content-legal-aviso" class="space-y-3">
-          <h4 class="text-sm font-semibold text-white">1. Datos Identificativos del Titular (LSSI-CE art. 10)</h4>
-          <p>
-            En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de que el titular y responsable de esta plataforma es:
-          </p>
-          <ul class="list-disc pl-5 space-y-1 text-zinc-400 font-mono text-[11px]">
-            <li>Denominación comercial: Bentian ERP Bridge</li>
-            <li>Titular: Cristian Jiménez Martínez</li>
-            <li>Dominio web: bridge.cristianjm.com</li>
-            <li>Correo electrónico de contacto: soporte@cristianjm.com</li>
-            <li>Actividad: Servicios de software de integración y sincronización de datos empresariales.</li>
-          </ul>
-          <h4 class="text-sm font-semibold text-white pt-2">2. Propiedad Intelectual e Industrial</h4>
-          <p>
-            Todos los contenidos, diseños, código fuente, algoritmos, manuales y elementos gráficos de Bentian ERP Bridge están protegidos por los derechos de propiedad intelectual e industrial aplicables en España y la Unión Europea. Queda prohibida la reproducción, descompilación, ingeniería inversa o distribución no autorizada de los binarios ejecutables sin la preceptiva licencia de uso.
-          </p>
-        </div>
-
-        <!-- 2. Privacidad (RGPD) -->
-        <div id="content-legal-privacidad" class="hidden space-y-3">
-          <h4 class="text-sm font-semibold text-white">Política de Privacidad y Protección de Datos (RGPD)</h4>
-          <p>
-            Conforme al Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), te informamos del tratamiento de tus datos personales:
-          </p>
-          <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
-            <li><strong class="text-zinc-200">Responsable del Tratamiento:</strong> Bentian (Cristian Jiménez Martínez).</li>
-            <li><strong class="text-zinc-200">Finalidad:</strong> Gestión y activación de licencias de software, cobro y facturación de suscripciones, soporte técnico e incidencias.</li>
-            <li><strong class="text-zinc-200">Principio Zero-Knowledge:</strong> El agente local de Bentian procesa las bases de datos de Factusol en local en tu propio equipo. La API central de Bentian NUNCA almacena ni inspecciona tus clientes, facturas, tarifas ni secretos comerciales.</li>
-            <li><strong class="text-zinc-200">Legitimación:</strong> Ejecución de la relación contractual de suscripción y consentimiento del usuario.</li>
-            <li><strong class="text-zinc-200">Destinatarios:</strong> Plataforma de cobro seguro Stripe Inc. (proveedor certificado PCI-DSS) y servicios de envío de notificaciones por email. En ningún caso se ceden datos personales a terceras empresas con fines comerciales.</li>
-            <li><strong class="text-zinc-200">Tus Derechos:</strong> Puedes ejercer tus derechos de acceso, rectificación, supresión, limitación y portabilidad enviando un correo a <span class="text-indigo-400">soporte@cristianjm.com</span>.</li>
-          </ul>
-        </div>
-
-        <!-- 3. Términos del Servicio -->
-        <div id="content-legal-terminos" class="hidden space-y-3">
-          <h4 class="text-sm font-semibold text-white">Condiciones Generales de Contratación y Licenciamiento</h4>
-          <p>
-            El acceso, descarga y uso de Bentian ERP Bridge se rige por las siguientes condiciones mercantiles (B2B):
-          </p>
-          <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
-            <li><strong class="text-zinc-200">Objeto:</strong> Concesión de una licencia de uso de software mercantil, no exclusiva, intransferible y sujeta a suscripción activa, para conectar bases de datos de Factusol con tiendas electrónicas.</li>
-            <li><strong class="text-zinc-200">Modelo de Puestos (HWID):</strong> La Licencia Base autoriza la sincronización de 1 empresa ERP en 1 equipo servidor vinculado criptográficamente por HWID. Puestos o empresas adicionales requieren complementos autorizados.</li>
-            <li><strong class="text-zinc-200">Obligación Ineludible de Backups y Exoneración de Responsabilidad:</strong> El Cliente declara conocer que las bases de datos de Factusol operan sobre tecnología Microsoft Access (.accdb / .mdb). Es obligación exclusiva del Cliente mantener copias de seguridad (backups) diarias e independientes. Bentian no responderá por corrupción de archivos, caídas de red, problemas de hardware o manipulaciones de bases de datos en los sistemas locales del Cliente.</li>
-            <li><strong class="text-zinc-200">Cumplimiento de la Ley Antifraude y Veri*Factu:</strong> Conforme a la Ley 11/2021 y el RD 1007/2023, el Software actúa como mero conector logístico de catálogo y pedidos de clientes (F_PCL) y NO constituye un software de facturación de doble uso. El Cliente es el único responsable legal y tributario de emitir sus facturas con huella Veri*Factu en su ERP Factusol.</li>
-            <li><strong class="text-zinc-200">Límite Cuantitativo de Responsabilidad:</strong> La responsabilidad económica máxima total acumulada de Bentian frente al Cliente por cualquier concepto quedará limitada al importe efectivamente satisfecho por el Cliente en los tres (3) meses anteriores al hecho causante.</li>
-            <li><strong class="text-zinc-200">Facturación y Cancelación:</strong> Las suscripciones se gestionan mediante Stripe y se renuevan automáticamente (anual o mensual). El Cliente puede cancelar la renovación automática de su suscripción en cualquier momento desde el portal de autoservicio de Stripe con un solo clic, manteniendo el servicio plenamente activo hasta el vencimiento del periodo ya pagado.</li>
-            <li><strong class="text-zinc-200">Contratación B2B, Ejecución Inmediata y Política de No Reembolso:</strong> Al tratarse de una contratación exclusivamente mercantil entre profesionales y empresas (B2B) con suministro de contenido digital no prestado en soporte material y clave de activación de ejecución y entrega inmediata, de conformidad con el artículo 103, letra m) del Real Decreto Legislativo 1/2007 (TRLGDCU) y la Directiva 2011/83/UE, el Cliente reconoce y consiente expresamente que una vez emitida la clave y comenzada la sincronización de datos con Factusol o la tienda online, el servicio se considera consumido y ejecutado en su totalidad, no admitiéndose derecho de desistimiento, devolución ni reembolso de importes abonados.</li>
-            <li><strong class="text-zinc-200">Ley Aplicable y Fuero:</strong> Legislación española. Ambas partes se someten a los Juzgados y Tribunales de la ciudad de Murcia (España).</li>
-          </ul>
-        </div>
-
-        <!-- 4. Cookies -->
-        <div id="content-legal-cookies" class="hidden space-y-3">
-          <h4 class="text-sm font-semibold text-white">Política de Cookies Técnicas</h4>
-          <p>
-            Bentian ERP Bridge respeta al máximo la privacidad de sus usuarios.
-          </p>
-          <p class="text-zinc-400 text-[11px]">
-            Este sitio web <strong class="text-zinc-200">NO utiliza cookies de publicidad comportamental, ni rastreadores de marketing de terceros</strong>.
-          </p>
-          <p class="text-zinc-400 text-[11px]">
-            Únicamente se emplean cookies técnicas estrictamente necesarias y almacenamiento local (<code class="text-indigo-400">localStorage</code>) con las siguientes finalidades esenciales:
-          </p>
-          <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11px]">
-            <li>Mantener segura la sesión autenticada en el panel de control.</li>
-            <li>Garantizar la protección contra fraudes y ataques CSRF en la pasarela de pagos segura de Stripe.</li>
-          </ul>
-        </div>
+      <!-- 3. Términos del Servicio -->
+      <div id="content-legal-terminos" class="hidden space-y-3">
+        <h4 class="text-sm font-semibold text-white">Condiciones Generales de Contratación y Licenciamiento</h4>
+        <p>
+          El acceso, descarga y uso de Bentian ERP Bridge se rige por las siguientes condiciones mercantiles (B2B):
+        </p>
+        <ul class="list-disc pl-5 space-y-1.5 text-zinc-400 text-[11px]">
+          <li><strong class="text-zinc-200">Objeto:</strong> Concesión de una licencia de uso de software mercantil, no exclusiva, intransferible y sujeta a suscripción activa, para conectar bases de datos de Factusol con tiendas electrónicas.</li>
+          <li><strong class="text-zinc-200">Modelo de Puestos (HWID):</strong> La Licencia Base autoriza la sincronización de 1 empresa ERP en 1 equipo servidor vinculado criptográficamente por HWID. Puestos o empresas adicionales requieren complementos autorizados.</li>
+          <li><strong class="text-zinc-200">Obligación Ineludible de Backups y Exoneración de Responsabilidad:</strong> El Cliente declara conocer que las bases de datos de Factusol operan sobre tecnología Microsoft Access (.accdb / .mdb). Es obligación exclusiva del Cliente mantener copias de seguridad (backups) diarias e independientes. Bentian no responderá por corrupción de archivos, caídas de red, problemas de hardware o manipulaciones de bases de datos en los sistemas locales del Cliente.</li>
+          <li><strong class="text-zinc-200">Cumplimiento de la Ley Antifraude y Veri*Factu:</strong> Conforme a la Ley 11/2021 y el RD 1007/2023, el Software actúa como mero conector logístico de catálogo y pedidos de clientes (F_PCL) y NO constituye un software de facturación de doble uso. El Cliente es el único responsable legal y tributario de emitir sus facturas con huella Veri*Factu en su ERP Factusol.</li>
+          <li><strong class="text-zinc-200">Límite Cuantitativo de Responsabilidad:</strong> La responsabilidad económica máxima total acumulada de Bentian frente al Cliente por cualquier concepto quedará limitada al importe efectivamente satisfecho por el Cliente en los tres (3) meses anteriores al hecho causante.</li>
+          <li><strong class="text-zinc-200">Facturación y Cancelación:</strong> Las suscripciones se gestionan mediante Stripe y se renuevan automáticamente (anual o mensual). El Cliente puede cancelar la renovación automática de su suscripción en cualquier momento desde el portal de autoservicio de Stripe con un solo clic, manteniendo el servicio plenamente activo hasta el vencimiento del periodo ya pagado.</li>
+          <li><strong class="text-zinc-200">Contratación B2B, Ejecución Inmediata y Política de No Reembolso:</strong> Al tratarse de una contratación exclusivamente mercantil entre profesionales y empresas (B2B) con suministro de contenido digital no prestado en soporte material y clave de activación de ejecución y entrega inmediata, de conformidad con el artículo 103, letra m) del Real Decreto Legislativo 1/2007 (TRLGDCU) y la Directiva 2011/83/UE, el Cliente reconoce y consiente expresamente que una vez emitida la clave y comenzada la sincronización de datos con Factusol o la tienda online, el servicio se considera consumido y ejecutado en su totalidad, no admitiéndose derecho de desistimiento, devolución ni reembolso de importes abonados.</li>
+          <li><strong class="text-zinc-200">Ley Aplicable y Fuero:</strong> Legislación española. Ambas partes se someten a los Juzgados y Tribunales de la ciudad de Murcia (España).</li>
+        </ul>
       </div>
 
-      <!-- Pie del modal -->
-      <div class="border-t border-white/[0.08] px-6 py-3.5 bg-[#18181b]/40 flex justify-end shrink-0">
-        <button onclick="cerrarModalLegal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium transition">
-          Entendido y Cerrar
-        </button>
+      <!-- 4. Cookies -->
+      <div id="content-legal-cookies" class="hidden space-y-3">
+        <h4 class="text-sm font-semibold text-white">Política de Cookies Técnicas</h4>
+        <p>
+          Bentian ERP Bridge respeta al máximo la privacidad de sus usuarios.
+        </p>
+        <p class="text-zinc-400 text-[11px]">
+          Este sitio web <strong class="text-zinc-200">NO utiliza cookies de publicidad comportamental, ni rastreadores de marketing de terceros</strong>.
+        </p>
+        <p class="text-zinc-400 text-[11px]">
+          Únicamente se emplean cookies técnicas estrictamente necesarias y almacenamiento local (<code class="text-indigo-400">localStorage</code>) con las siguientes finalidades esenciales:
+        </p>
+        <ul class="list-disc pl-5 space-y-1 text-zinc-400 text-[11px]">
+          <li>Mantener segura la sesión autenticada en el panel de control.</li>
+          <li>Garantizar la protección contra fraudes y ataques CSRF en la pasarela de pagos segura de Stripe.</li>
+        </ul>
       </div>
     </div>
+
+    <!-- Pie del modal -->
+    <div class="border-t border-white/[0.08] px-6 py-3.5 bg-[#18181b]/40 flex justify-end shrink-0">
+      <button onclick="cerrarModalLegal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium transition">
+        Entendido y Cerrar
+      </button>
+    </div>
   </div>
+</div>
 
-  <script>
-    function abrirModalLegal(tab) {
-      const modal = document.getElementById('modal-legal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        cambiarPestanaLegal(tab || 'aviso');
-      }
-    }
-
-    function cerrarModalLegal() {
-      const modal = document.getElementById('modal-legal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function cambiarPestanaLegal(tab) {
-      const tabs = ['aviso', 'privacidad', 'terminos', 'cookies'];
-      tabs.forEach(t => {
-        const btn = document.getElementById('tab-legal-' + t);
-        const content = document.getElementById('content-legal-' + t);
-        if (btn) {
-          if (t === tab) {
-            btn.className = 'py-3 px-3 border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap transition-colors font-semibold';
-          } else {
-            btn.className = 'py-3 px-3 border-b-2 border-transparent text-zinc-400 hover:text-white whitespace-nowrap transition-colors';
-          }
-        }
-        if (content) {
-          if (t === tab) content.classList.remove('hidden');
-          else content.classList.add('hidden');
-        }
-      });
-    }
-
-    window.abrirModalLegal = abrirModalLegal;
-    window.cerrarModalLegal = cerrarModalLegal;
-    window.cambiarPestanaLegal = cambiarPestanaLegal;
-  </script>
-
-  <!-- Scripts Funcionales Modulares: Stripe Checkout, Releases y Simulador -->
+  <!-- Scripts Modulares -->
+  <script src="/js/legal-modal.js"></script>
   <script src="/js/checkout.js"></script>
   <script src="/js/version-sync.js"></script>
   <script src="/js/releases.js"></script>
   <script src="/js/simulator.js"></script>
-
-  <!-- Control de desplazamiento suave y compensación precisa de píxeles para el header sticky -->
-  <script>
-    (function initSmoothScrollCompensation() {
-      document.addEventListener('click', function(e) {
-        var anchor = e.target.closest('a[href^="#"]');
-        if (!anchor) return;
-        var href = anchor.getAttribute('href');
-        if (!href || href === '#' || href.length < 2) return;
-
-        var targetId = href.substring(1);
-        var targetEl = document.getElementById(targetId);
-        if (!targetEl) return;
-
-        e.preventDefault();
-        var headerHeight = 64; // Altura fija de header sticky h-16
-        var paddingOffset = 20; // Espaciado visual de respiro superior
-        var elementPosition = targetEl.getBoundingClientRect().top;
-        var offsetPosition = elementPosition + window.pageYOffset - (headerHeight + paddingOffset);
-
-        window.scrollTo({
-          top: Math.max(0, offsetPosition),
-          behavior: 'smooth'
-        });
-
-        if (window.history && window.history.pushState) {
-          window.history.pushState(null, null, href);
-        } else {
-          window.location.hash = href;
-        }
-      });
-    })();
-  </script>
+  <script src="/js/smooth-scroll.js"></script>
 
 </body>
 </html>

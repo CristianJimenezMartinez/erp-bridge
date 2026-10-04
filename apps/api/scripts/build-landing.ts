@@ -3,7 +3,9 @@ import * as path from 'path';
 
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const LAYOUT_FILE = path.join(PUBLIC_DIR, 'layout/base.html');
+const SCHEMA_FILE = path.join(PUBLIC_DIR, 'layout/schema-org.html');
 const SECTIONS_DIR = path.join(PUBLIC_DIR, 'sections');
+const MODALS_DIR = path.join(PUBLIC_DIR, 'modals');
 const OUTPUT_FILE = path.join(PUBLIC_DIR, 'index.html');
 
 const CONTENT_SECTIONS = [
@@ -59,11 +61,25 @@ export function assembleLandingPage(): string {
 
   const baseLayout = fs.readFileSync(LAYOUT_FILE, 'utf8');
 
-  // 1. Header
+  // 1. Schema.org JSON-LD (compactado)
+  let schemaHtml = '';
+  if (fs.existsSync(SCHEMA_FILE)) {
+    const rawSchema = fs.readFileSync(SCHEMA_FILE, 'utf8');
+    schemaHtml = rawSchema.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g, (_m, json) => {
+      try {
+        const minifiedJson = JSON.stringify(JSON.parse(json));
+        return `<script type="application/ld+json">\n${minifiedJson}\n</script>`;
+      } catch {
+        return _m;
+      }
+    });
+  }
+
+  // 2. Header
   const headerFile = path.join(SECTIONS_DIR, '01-header.html');
   const headerHtml = fs.existsSync(headerFile) ? fs.readFileSync(headerFile, 'utf8') : '';
 
-  // 2. Body content sections
+  // 3. Body content sections
   const contentHtml = CONTENT_SECTIONS.map((secName) => {
     const secPath = path.join(SECTIONS_DIR, secName);
     if (!fs.existsSync(secPath)) {
@@ -72,17 +88,26 @@ export function assembleLandingPage(): string {
     return fs.readFileSync(secPath, 'utf8');
   }).join('\n\n  ');
 
-  // 3. Footer
+  // 4. Footer
   const footerFile = path.join(SECTIONS_DIR, '14-footer.html');
   const footerHtml = fs.existsSync(footerFile) ? fs.readFileSync(footerFile, 'utf8') : '';
 
-  // 4. Assemble
+  // 5. Modals
+  const modalFiles = ['modal-checkout.html', 'modal-legal.html'];
+  const modalsHtml = modalFiles.map((mName) => {
+    const mPath = path.join(MODALS_DIR, mName);
+    return fs.existsSync(mPath) ? fs.readFileSync(mPath, 'utf8') : '';
+  }).filter(Boolean).join('\n\n  ');
+
+  // 6. Assemble
   let assembled = baseLayout
+    .replace('<!-- {{SCHEMA_ORG}} -->', schemaHtml)
     .replace('<!-- {{HEADER}} -->', headerHtml)
     .replace('<!-- {{CONTENT}} -->', contentHtml)
-    .replace('<!-- {{FOOTER}} -->', footerHtml);
+    .replace('<!-- {{FOOTER}} -->', footerHtml)
+    .replace('<!-- {{MODALS}} -->', modalsHtml);
 
-  // 5. Inyectar versión canónica centralizada
+  // 7. Inyectar versión canónica centralizada
   const currentVersion = getCanonicalVersion();
 
   // Inyectar en Schema.org LD+JSON
@@ -125,8 +150,24 @@ export function assembleLandingPage(): string {
     'href="/releases/latest/BentianAgent-Portable.zip"'
   );
 
-  // 6. Normalizar saltos de línea consistentes
+  // 8. Normalizar saltos de línea consistentes y colapsar líneas en blanco consecutivas
   assembled = assembled.replace(/\r\n/g, '\n');
+  assembled = assembled.replace(/\n{3,}/g, '\n\n');
+
+  // 9. Inyectar banner explicativo en la cabecera del archivo generado
+  const buildBanner = [
+    '<!-- ========================================================================================= -->',
+    '<!-- ⚠️ AVISO: ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR DIRECTAMENTE                      -->',
+    '<!-- Este archivo es el bundle pre-renderizado compilado mediante: `npm run build:landing`     -->',
+    '<!-- El código fuente modular y editable reside en:                                            -->',
+    '<!--   • apps/api/public/sections/ (01-header.html a 14-footer.html)                          -->',
+    '<!--   • apps/api/public/layout/   (base.html, schema-org.html)                               -->',
+    '<!--   • apps/api/public/modals/   (modal-checkout.html, modal-legal.html)                     -->',
+    '<!--   • apps/api/public/js/       (legal-modal.js, smooth-scroll.js, ...)                     -->',
+    '<!-- ========================================================================================= -->\n'
+  ].join('\n');
+
+  assembled = buildBanner + assembled;
 
   return assembled;
 }
