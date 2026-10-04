@@ -35,6 +35,61 @@ export const errorHumanizerScript = `
         helpUrl: 'https://bridge.cristianjm.com/docs/factusol-locking/'
       },
       {
+        code: 'ERR_FACTUSOL_CORRUPTED',
+        pattern: /unrecognized database format|formato de base de datos no reconocido|database is in an inconsistent state|archivo de base de datos dañado|needs to be repaired|base de datos dañada/i,
+        title: 'Base de datos Factusol dañada o incoherente',
+        message: 'Microsoft Access indica que el archivo de base de datos de Factusol tiene una incoherencia interna o necesita ser reparado.',
+        suggestion: 'Abre Factusol, ve a Archivo > Mantenimiento > "Compactar y Reparar base de datos", o restaura una copia de seguridad reciente.',
+        actionLabel: 'Comprobar archivo de Factusol',
+        targetTab: 'factusol',
+        targetInputId: 'input-factusol-db',
+        helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
+      },
+      {
+        code: 'ERR_FACTUSOL_TABLE_MISSING',
+        pattern: /F_ART|F_PCL|F_LPC|tabla no encontrada|could not find table|el objeto no se encontró|no se encuentra el objeto.*F_/i,
+        title: 'El archivo seleccionado no es una empresa de Factusol',
+        message: 'La base de datos seleccionada no contiene las tablas de artículos (F_ART) o pedidos (F_PCL) de Factusol. Es posible que pertenezca a Contasol o Nominasol.',
+        suggestion: 'Asegúrate de seleccionar el archivo de datos comerciales de Factusol dentro de la carpeta "DATOS" (por ejemplo: DATOS\\\\1A.FDB o similar).',
+        actionLabel: 'Buscar empresa en Factusol',
+        targetTab: 'factusol',
+        targetInputId: 'btn-browse-native',
+        helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
+      },
+      {
+        code: 'ERR_FACTUSOL_READONLY_FILE',
+        pattern: /read[- ]only|solo lectura.*archivo|cannot update.*database or object is read-only|permiso de escritura denegado|EACCES|EPERM.*\\.accdb/i,
+        title: 'Archivo de Factusol en modo "Solo Lectura"',
+        message: 'El archivo de base de datos tiene activo el atributo de solo lectura en Windows o la carpeta compartida no te concede permisos de escritura.',
+        suggestion: 'Haz clic derecho sobre el archivo .accdb > Propiedades > Desmarca la casilla "Solo lectura". Si está en un NAS o servidor, pide permisos de escritura en la red.',
+        actionLabel: 'Ver ruta de Factusol',
+        targetTab: 'factusol',
+        targetInputId: 'input-factusol-db',
+        helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
+      },
+      {
+        code: 'ERR_FACTUSOL_NAS_TIMEOUT',
+        pattern: /0x80070035|network path was not found|nombre de red ya no está disponible|network name no longer available|unidad de red desconectada|NAS.*timeout|recurso de red no responde/i,
+        title: 'Unidad de red o NAS temporalmente inaccesible',
+        message: 'Windows no puede acceder a la carpeta compartida o servidor NAS donde está Factusol. Es posible que haya un corte de red local o Wi-Fi.',
+        suggestion: 'Comprueba que el servidor o NAS está encendido y accesible desde el Explorador de Windows. Bentian mantendrá la ruta y reconectará en cuanto vuelva la red.',
+        actionLabel: 'Revisar conexión con Factusol',
+        targetTab: 'factusol',
+        targetInputId: 'input-factusol-db',
+        helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
+      },
+      {
+        code: 'ERR_TARIFF_NOT_FOUND',
+        pattern: /tarifa no encontrada|código de tarifa no válido|F_TAR.*no existe|tariff.*invalid/i,
+        title: 'Código de tarifa no encontrado en Factusol',
+        message: 'La tarifa configurada para tu tienda online no existe en la tabla de tarifas (F_TAR) de tu Factusol.',
+        suggestion: 'Ve a Factusol > Comercial > Tarifas para comprobar tus códigos de tarifa (ejemplo: 1, 2, 3 o TAR1) y selecciónalo en el menú desplegable.',
+        actionLabel: 'Configurar tarifas de Factusol',
+        targetTab: 'factusol',
+        targetInputId: 'select-factusol-tariff',
+        helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
+      },
+      {
         code: 'ERR_WEB_AUTH_BLOCKED',
         pattern: /401|unauthorized|cabeceras? de autorización bloqueadas|no autorizado|claves? inválidas?|signature_invalid/i,
         title: 'Cabeceras de autorización bloqueadas en tu servidor web',
@@ -58,6 +113,50 @@ export const errorHumanizerScript = `
         helpUrl: 'https://bridge.cristianjm.com/docs/woocommerce-api-keys/'
       },
       {
+        code: 'ERR_WOO_PERMALINKS',
+        pattern: /rest_no_route|no route was found matching the url|enlaces permanentes|plain permalinks|no se encontró ninguna ruta que coincida/i,
+        title: 'Enlaces permanentes de WordPress sin activar',
+        message: 'La API REST de WooCommerce requiere que WordPress tenga activados los enlaces permanentes bonitos para responder en "/wp-json/wc/v3/...".',
+        suggestion: 'En tu panel de WordPress, ve a Ajustes > Enlaces permanentes, selecciona "Nombre de la entrada" (/%postname%/) y pulsa Guardar cambios.',
+        actionLabel: 'Revisar dirección de WooCommerce',
+        targetTab: 'channel',
+        targetInputId: 'input-wc-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/woocommerce-api-keys/'
+      },
+      {
+        code: 'ERR_WEB_JSON_PARSE',
+        pattern: /JSON\\.parse|unexpected token <|Unexpected token '<'|doctype html|no es json válido|respuesta no válida del servidor web/i,
+        title: 'La web devolvió HTML en lugar de datos JSON',
+        message: 'Al consultar la tienda, tu servidor devolvió una página web de error PHP, una pantalla de mantenimiento o un aviso de tu hosting en vez de datos.',
+        suggestion: 'Abre la dirección de tu tienda en el navegador para comprobar si muestra errores de PHP, o desactiva temporalmente el modo mantenimiento de WordPress.',
+        actionLabel: 'Comprobar dirección de la web',
+        targetTab: 'channel',
+        targetInputId: 'input-wc-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/'
+      },
+      {
+        code: 'ERR_WEB_CLOUDFLARE_BLOCK',
+        pattern: /Cloudflare|ray id|cf-ray|managed challenge|bot fight|waf.*block|1020|1015/i,
+        title: 'Conexión bloqueada por el cortafuegos de Cloudflare',
+        message: 'El cortafuegos WAF o el modo "Bot Fight Mode" de Cloudflare en tu tienda web está interceptando las peticiones del Agente y exigiendo resolver un captcha.',
+        suggestion: 'En el panel de Cloudflare de tu dominio, ve a Security > WAF y crea una regla para omitir la inspección en las rutas "/wp-json/wc/" o "/erp-bridge-endpoint.php".',
+        actionLabel: 'Revisar canal web',
+        targetTab: 'channel',
+        targetInputId: 'input-wc-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/'
+      },
+      {
+        code: 'ERR_WEB_TIMEOUT',
+        pattern: /504|Gateway Timeout|execution time of \\d+ seconds exceeded|memory size.*exhausted|timeout de ejecución en el servidor web|502 Bad Gateway/i,
+        title: 'El servidor de tu web agotó el tiempo de espera',
+        message: 'Tu servidor de hosting tardó más de 30 segundos en procesar los artículos o se quedó sin memoria PHP (Memory Limit).',
+        suggestion: 'Aumenta "max_execution_time" a 120s y "memory_limit" a 256M o 512M en el panel de tu hosting (cPanel/Plesk), o amplía el intervalo entre ciclos.',
+        actionLabel: 'Ajustar reglas de sincronización',
+        targetTab: 'sync',
+        targetInputId: 'input-sync-interval',
+        helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/'
+      },
+      {
         code: 'ERR_WEB_CONNECTION_FAILED',
         pattern: /ECONNREFUSED|ETIMEDOUT|no se pudo conectar|ENOTFOUND|getaddrinfo|Failed to fetch|NetworkError|host no alcanzable|timeout/i,
         title: 'No se pudo conectar con la tienda web',
@@ -67,6 +166,28 @@ export const errorHumanizerScript = `
         targetTab: 'channel',
         targetInputId: 'input-wc-url',
         helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/'
+      },
+      {
+        code: 'ERR_ENDPOINT_NOT_FOUND',
+        pattern: /404|erp-bridge-endpoint\\.php|endpoint no encontrado|archivo conector no encontrado/i,
+        title: 'Archivo erp-bridge-endpoint.php no detectado en tu web',
+        message: 'El servidor web devolvió un error 404. El archivo del conector no está subido a la carpeta raíz de tu tienda online o la URL no es correcta.',
+        suggestion: 'Descarga "erp-bridge-endpoint.php" desde la pestaña Canal Web y súbelo a la carpeta pública de tu hosting (por ejemplo public_html o httpdocs).',
+        actionLabel: 'Configurar Canal Web Universal',
+        targetTab: 'channel',
+        targetInputId: 'input-universal-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/universal-bridge-install/'
+      },
+      {
+        code: 'ERR_SSL_INVALID',
+        pattern: /SSL|CERT_|self[- ]signed|DEPTH_ZERO_SELF_SIGNED_CERT|certificado no válido/i,
+        title: 'Certificado de seguridad SSL de la tienda no válido',
+        message: 'No se pudo establecer una conexión HTTPS cifrada de confianza porque el certificado SSL de tu web ha caducado o no está configurado.',
+        suggestion: 'Comprueba y renueva el certificado SSL gratuito (Let\'s Encrypt o cPanel) en el panel de control de tu proveedor de hosting.',
+        actionLabel: 'Revisar dirección de la web',
+        targetTab: 'channel',
+        targetInputId: 'input-universal-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/ssl-setup/'
       },
       {
         code: 'ERR_LICENSE_EXPIRED',
@@ -102,26 +223,26 @@ export const errorHumanizerScript = `
         helpUrl: 'https://bridge.cristianjm.com/docs/antivirus-exclusions/'
       },
       {
-        code: 'ERR_ENDPOINT_NOT_FOUND',
-        pattern: /404|erp-bridge-endpoint\\.php|endpoint no encontrado|archivo conector no encontrado/i,
-        title: 'Archivo erp-bridge-endpoint.php no detectado en tu web',
-        message: 'El servidor web devolvió un error 404. El archivo del conector no está subido a la carpeta raíz de tu tienda online o la URL no es correcta.',
-        suggestion: 'Descarga "erp-bridge-endpoint.php" desde la pestaña Canal Web y súbelo a la carpeta pública de tu hosting (por ejemplo public_html o httpdocs).',
-        actionLabel: 'Configurar Canal Web Universal',
-        targetTab: 'channel',
-        targetInputId: 'input-universal-url',
-        helpUrl: 'https://bridge.cristianjm.com/docs/universal-bridge-install/'
+        code: 'ERR_CLOCK_DESYNC',
+        pattern: /clock drift|diferencia horaria|desfase del reloj|clock_skew|ntp desincronizado|hora del sistema desfasada/i,
+        title: 'El reloj de Windows está desfasado',
+        message: 'El reloj interno de tu equipo tiene una diferencia superior a 3 minutos con respecto a la hora oficial de Internet, lo que invalida las firmas criptográficas.',
+        suggestion: 'En Windows, ve a Configuración > Hora e idioma > Fecha y hora, y pulsa en "Sincronizar ahora".',
+        actionLabel: 'Ver comprobación del sistema',
+        targetTab: 'overview',
+        targetInputId: 'pf-clock-badge',
+        helpUrl: 'https://bridge.cristianjm.com/docs/system-clock-ntp/'
       },
       {
-        code: 'ERR_SSL_INVALID',
-        pattern: /SSL|CERT_|self[- ]signed|DEPTH_ZERO_SELF_SIGNED_CERT|certificado no válido/i,
-        title: 'Certificado de seguridad SSL de la tienda no válido',
-        message: 'No se pudo establecer una conexión HTTPS cifrada de confianza porque el certificado SSL de tu web ha caducado o no está configurado.',
-        suggestion: 'Comprueba y renueva el certificado SSL gratuito (Let\\'s Encrypt o cPanel) en el panel de control de tu proveedor de hosting.',
-        actionLabel: 'Revisar dirección de la web',
-        targetTab: 'channel',
-        targetInputId: 'input-universal-url',
-        helpUrl: 'https://bridge.cristianjm.com/docs/ssl-setup/'
+        code: 'ERR_DISK_SPACE_LOW',
+        pattern: /ENOSPC|no space left on device|espacio en disco insuficiente|disco lleno|sin espacio/i,
+        title: 'Espacio en disco insuficiente en Windows',
+        message: 'La unidad C: de Windows tiene menos de 500 MB libres, lo que impide guardar los registros locales y las colas de sincronización.',
+        suggestion: 'Libera espacio en el disco C: de tu equipo eliminando archivos temporales o usando el Liberador de espacio en disco de Windows.',
+        actionLabel: 'Ver estado general',
+        targetTab: 'overview',
+        targetInputId: 'card-f-path',
+        helpUrl: 'https://bridge.cristianjm.com/docs/system-requirements/'
       }
     ];
 

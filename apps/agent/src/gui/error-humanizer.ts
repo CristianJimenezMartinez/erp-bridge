@@ -79,7 +79,87 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 4. Web Channel 401 Unauthorized / Authorization Headers Blocked
+  // 4. Factusol Corrupted / Repair Needed
+  {
+    code: 'ERR_FACTUSOL_CORRUPTED',
+    pattern: /unrecognized database format|formato de base de datos no reconocido|database is in an inconsistent state|archivo de base de datos dañado|needs to be repaired|base de datos dañada/i,
+    build: () => ({
+      code: 'ERR_FACTUSOL_CORRUPTED',
+      title: 'Base de datos Factusol dañada o incoherente',
+      message: 'Microsoft Access indica que el archivo de base de datos de Factusol tiene una incoherencia interna o necesita ser reparado.',
+      suggestion: 'Abre Factusol, ve a Archivo > Mantenimiento > "Compactar y Reparar base de datos", o restaura una copia de seguridad reciente.',
+      actionLabel: 'Comprobar archivo de Factusol',
+      targetTab: 'factusol',
+      targetInputId: 'input-factusol-db',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
+    }),
+  },
+
+  // 5. Factusol Table Missing / Wrong Program File
+  {
+    code: 'ERR_FACTUSOL_TABLE_MISSING',
+    pattern: /F_ART|F_PCL|F_LPC|tabla no encontrada|could not find table|el objeto no se encontró|no se encuentra el objeto.*F_/i,
+    build: () => ({
+      code: 'ERR_FACTUSOL_TABLE_MISSING',
+      title: 'El archivo seleccionado no es una empresa de Factusol',
+      message: 'La base de datos seleccionada no contiene las tablas de artículos (F_ART) o pedidos (F_PCL) de Factusol. Es posible que pertenezca a Contasol o Nominasol.',
+      suggestion: 'Asegúrate de seleccionar el archivo de datos comerciales de Factusol dentro de la carpeta "DATOS" (por ejemplo: DATOS\\1A.FDB o similar).',
+      actionLabel: 'Buscar empresa en Factusol',
+      targetTab: 'factusol',
+      targetInputId: 'btn-browse-native',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
+    }),
+  },
+
+  // 6. Factusol File Read-Only in Windows
+  {
+    code: 'ERR_FACTUSOL_READONLY_FILE',
+    pattern: /read[- ]only|solo lectura.*archivo|cannot update.*database or object is read-only|permiso de escritura denegado|EACCES|EPERM.*\.accdb/i,
+    build: () => ({
+      code: 'ERR_FACTUSOL_READONLY_FILE',
+      title: 'Archivo de Factusol en modo "Solo Lectura"',
+      message: 'El archivo de base de datos tiene activo el atributo de solo lectura en Windows o la carpeta compartida no te concede permisos de escritura.',
+      suggestion: 'Haz clic derecho sobre el archivo .accdb > Propiedades > Desmarca la casilla "Solo lectura". Si está en un NAS o servidor, pide permisos de escritura en la red.',
+      actionLabel: 'Ver ruta de Factusol',
+      targetTab: 'factusol',
+      targetInputId: 'input-factusol-db',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
+    }),
+  },
+
+  // 7. Factusol NAS / Network Drive Timeout
+  {
+    code: 'ERR_FACTUSOL_NAS_TIMEOUT',
+    pattern: /0x80070035|network path was not found|nombre de red ya no está disponible|network name no longer available|unidad de red desconectada|NAS.*timeout|recurso de red no responde/i,
+    build: () => ({
+      code: 'ERR_FACTUSOL_NAS_TIMEOUT',
+      title: 'Unidad de red o NAS temporalmente inaccesible',
+      message: 'Windows no puede acceder a la carpeta compartida o servidor NAS donde está Factusol. Es posible que haya un corte de red local o Wi-Fi.',
+      suggestion: 'Comprueba que el servidor o NAS está encendido y accesible desde el Explorador de Windows. Bentian mantendrá la ruta y reconectará en cuanto vuelva la red.',
+      actionLabel: 'Revisar conexión con Factusol',
+      targetTab: 'factusol',
+      targetInputId: 'input-factusol-db',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
+    }),
+  },
+
+  // 8. Factusol Tariff Not Found
+  {
+    code: 'ERR_TARIFF_NOT_FOUND',
+    pattern: /tarifa no encontrada|código de tarifa no válido|F_TAR.*no existe|tariff.*invalid/i,
+    build: () => ({
+      code: 'ERR_TARIFF_NOT_FOUND',
+      title: 'Código de tarifa no encontrado en Factusol',
+      message: 'La tarifa configurada para tu tienda online no existe en la tabla de tarifas (F_TAR) de tu Factusol.',
+      suggestion: 'Ve a Factusol > Comercial > Tarifas para comprobar tus códigos de tarifa (ejemplo: 1, 2, 3 o TAR1) y selecciónalo en el menú desplegable.',
+      actionLabel: 'Configurar tarifas de Factusol',
+      targetTab: 'factusol',
+      targetInputId: 'select-factusol-tariff',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
+    }),
+  },
+
+  // 9. Web Channel 401 Unauthorized / Authorization Headers Blocked
   {
     code: 'ERR_WEB_AUTH_BLOCKED',
     pattern: /401|unauthorized|cabeceras? de autorización bloqueadas|no autorizado|claves? inválidas?|signature_invalid/i,
@@ -96,7 +176,7 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 5. WooCommerce 403 Forbidden / Read-Only Keys
+  // 10. WooCommerce 403 Forbidden / Read-Only Keys
   {
     code: 'ERR_WOO_PERMISSIONS',
     pattern: /403|forbidden|claves? de solo lectura|permisos insuficientes|woocommerce_rest_cannot_edit|read-only/i,
@@ -112,7 +192,71 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 6. Network Connection Failed / Refused / Timeout
+  // 11. WooCommerce Pretty Permalinks Required (rest_no_route)
+  {
+    code: 'ERR_WOO_PERMALINKS',
+    pattern: /rest_no_route|no route was found matching the url|enlaces permanentes|plain permalinks|no se encontró ninguna ruta que coincida/i,
+    build: () => ({
+      code: 'ERR_WOO_PERMALINKS',
+      title: 'Enlaces permanentes de WordPress sin activar',
+      message: 'La API REST de WooCommerce requiere que WordPress tenga activados los enlaces permanentes bonitos para responder en "/wp-json/wc/v3/...".',
+      suggestion: 'En tu panel de WordPress, ve a Ajustes > Enlaces permanentes, selecciona "Nombre de la entrada" (/%postname%/) y pulsa Guardar cambios.',
+      actionLabel: 'Revisar dirección de WooCommerce',
+      targetTab: 'channel',
+      targetInputId: 'input-wc-url',
+      helpUrl: 'https://bridge.cristianjm.com/docs/woocommerce-api-keys/',
+    }),
+  },
+
+  // 12. Web Response HTML instead of JSON
+  {
+    code: 'ERR_WEB_JSON_PARSE',
+    pattern: /JSON\.parse|unexpected token <|Unexpected token '<'|doctype html|no es json válido|respuesta no válida del servidor web/i,
+    build: () => ({
+      code: 'ERR_WEB_JSON_PARSE',
+      title: 'La web devolvió HTML en lugar de datos JSON',
+      message: 'Al consultar la tienda, tu servidor devolvió una página web de error PHP, una pantalla de mantenimiento o un aviso de tu hosting en vez de datos.',
+      suggestion: 'Abre la dirección de tu tienda en el navegador para comprobar si muestra errores de PHP, o desactiva temporalmente el modo mantenimiento de WordPress.',
+      actionLabel: 'Comprobar dirección de la web',
+      targetTab: 'channel',
+      targetInputId: 'input-wc-url',
+      helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
+    }),
+  },
+
+  // 13. Cloudflare WAF or Anti-bot Challenge Blocking
+  {
+    code: 'ERR_WEB_CLOUDFLARE_BLOCK',
+    pattern: /Cloudflare|ray id|cf-ray|managed challenge|bot fight|waf.*block|1020|1015/i,
+    build: () => ({
+      code: 'ERR_WEB_CLOUDFLARE_BLOCK',
+      title: 'Conexión bloqueada por el cortafuegos de Cloudflare',
+      message: 'El cortafuegos WAF o el modo "Bot Fight Mode" de Cloudflare en tu tienda web está interceptando las peticiones del Agente y exigiendo resolver un captcha.',
+      suggestion: 'En el panel de Cloudflare de tu dominio, ve a Security > WAF y crea una regla para omitir la inspección en las rutas "/wp-json/wc/" o "/erp-bridge-endpoint.php".',
+      actionLabel: 'Revisar canal web',
+      targetTab: 'channel',
+      targetInputId: 'input-wc-url',
+      helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
+    }),
+  },
+
+  // 14. Web Server Timeout / PHP Memory Exhausted
+  {
+    code: 'ERR_WEB_TIMEOUT',
+    pattern: /504|Gateway Timeout|execution time of \d+ seconds exceeded|memory size.*exhausted|timeout de ejecución en el servidor web|502 Bad Gateway/i,
+    build: () => ({
+      code: 'ERR_WEB_TIMEOUT',
+      title: 'El servidor de tu web agotó el tiempo de espera',
+      message: 'Tu servidor de hosting tardó más de 30 segundos en procesar los artículos o se quedó sin memoria PHP (Memory Limit).',
+      suggestion: 'Aumenta "max_execution_time" a 120s y "memory_limit" a 256M o 512M en el panel de tu hosting (cPanel/Plesk), o amplía el intervalo entre ciclos.',
+      actionLabel: 'Ajustar reglas de sincronización',
+      targetTab: 'sync',
+      targetInputId: 'input-sync-interval',
+      helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
+    }),
+  },
+
+  // 15. Network Connection Failed / Refused / Host Unreachable
   {
     code: 'ERR_WEB_CONNECTION_FAILED',
     pattern: /ECONNREFUSED|ETIMEDOUT|no se pudo conectar|ENOTFOUND|getaddrinfo|Failed to fetch|NetworkError|host no alcanzable|timeout/i,
@@ -128,55 +272,7 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 7. License Expired / Trial Concluded
-  {
-    code: 'ERR_LICENSE_EXPIRED',
-    pattern: /EXPIRED|periodo de prueba finalizado|beta finalizada|licencia caducada|trial expired|periodo de evaluación/i,
-    build: () => ({
-      code: 'ERR_LICENSE_EXPIRED',
-      title: 'Periodo de prueba de 60 días concluido',
-      message: '¡Gracias por probar Bentian! El periodo de evaluación gratuita de la beta pública ha concluido en este ordenador.',
-      suggestion: 'Para seguir sincronizando tu Factusol con tu tienda web de forma desatendida, activa tu Plan Fundador con descuento vitalicio del 30%.',
-      actionLabel: 'Ir a activar o renovar licencia',
-      targetTab: 'license',
-      targetInputId: 'input-lic-key',
-      helpUrl: 'https://bridge.cristianjm.com/dashboard/?action=upgrade&plan=founder_annual',
-    }),
-  },
-
-  // 8. License Invalid Key
-  {
-    code: 'ERR_LICENSE_INVALID',
-    pattern: /INVALID_KEY|clave no encontrada|clave no válida|formato de clave|invalid license|clave no reconocida/i,
-    build: () => ({
-      code: 'ERR_LICENSE_INVALID',
-      title: 'Clave de licencia no reconocida',
-      message: 'La clave de licencia introducida no tiene el formato estándar o contiene caracteres incorrectos.',
-      suggestion: 'Las claves oficiales de Bentian comienzan con "EB-" (ejemplo: EB-PRO-XXXXX) y no deben incluir espacios en blanco.',
-      actionLabel: 'Introducir clave de licencia',
-      targetTab: 'license',
-      targetInputId: 'input-lic-key',
-      helpUrl: 'https://bridge.cristianjm.com/beta/',
-    }),
-  },
-
-  // 9. Windows Script Host / cscript.exe Blocked by EDR / Antivirus
-  {
-    code: 'ERR_CSCRIPT_BLOCKED',
-    pattern: /cscript(\.exe)?|windows script host|antivirus|EDR|WScript\.Shell|bloqueado por directiva/i,
-    build: () => ({
-      code: 'ERR_CSCRIPT_BLOCKED',
-      title: 'Windows Script Host (cscript.exe) bloqueado por antivirus o EDR',
-      message: 'El sistema de seguridad de Windows o tu antivirus ha bloqueado el intérprete local "cscript.exe" necesario para la lectura OLEDB de Factusol.',
-      suggestion: 'Añade el ejecutable Bentian Agent o el proceso "cscript.exe" a las exclusiones de tu antivirus (Windows Defender, Kaspersky, SentinelOne, etc.).',
-      actionLabel: 'Ver diagnóstico del sistema',
-      targetTab: 'overview',
-      targetInputId: 'pf-alert-box',
-      helpUrl: 'https://bridge.cristianjm.com/docs/antivirus-exclusions/',
-    }),
-  },
-
-  // 10. Universal Bridge Endpoint Not Found (404)
+  // 16. Universal Bridge Endpoint Not Found (404)
   {
     code: 'ERR_ENDPOINT_NOT_FOUND',
     pattern: /404|erp-bridge-endpoint\.php|endpoint no encontrado|archivo conector no encontrado/i,
@@ -192,7 +288,7 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 11. SSL Certificate Error
+  // 17. SSL Certificate Error
   {
     code: 'ERR_SSL_INVALID',
     pattern: /SSL|CERT_|self[- ]signed|DEPTH_ZERO_SELF_SIGNED_CERT|certificado no válido/i,
@@ -205,6 +301,86 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       targetTab: 'channel',
       targetInputId: 'input-universal-url',
       helpUrl: 'https://bridge.cristianjm.com/docs/ssl-setup/',
+    }),
+  },
+
+  // 18. License Expired / Trial Concluded
+  {
+    code: 'ERR_LICENSE_EXPIRED',
+    pattern: /EXPIRED|periodo de prueba finalizado|beta finalizada|licencia caducada|trial expired|periodo de evaluación/i,
+    build: () => ({
+      code: 'ERR_LICENSE_EXPIRED',
+      title: 'Periodo de prueba de 60 días concluido',
+      message: '¡Gracias por probar Bentian! El periodo de evaluación gratuita de la beta pública ha concluido en este ordenador.',
+      suggestion: 'Para seguir sincronizando tu Factusol con tu tienda web de forma desatendida, activa tu Plan Fundador con descuento vitalicio del 30%.',
+      actionLabel: 'Ir a activar o renovar licencia',
+      targetTab: 'license',
+      targetInputId: 'input-lic-key',
+      helpUrl: 'https://bridge.cristianjm.com/dashboard/?action=upgrade&plan=founder_annual',
+    }),
+  },
+
+  // 19. License Invalid Key
+  {
+    code: 'ERR_LICENSE_INVALID',
+    pattern: /INVALID_KEY|clave no encontrada|clave no válida|formato de clave|invalid license|clave no reconocida/i,
+    build: () => ({
+      code: 'ERR_LICENSE_INVALID',
+      title: 'Clave de licencia no reconocida',
+      message: 'La clave de licencia introducida no tiene el formato estándar o contiene caracteres incorrectos.',
+      suggestion: 'Las claves oficiales de Bentian comienzan con "EB-" (ejemplo: EB-PRO-XXXXX) y no deben incluir espacios en blanco.',
+      actionLabel: 'Introducir clave de licencia',
+      targetTab: 'license',
+      targetInputId: 'input-lic-key',
+      helpUrl: 'https://bridge.cristianjm.com/beta/',
+    }),
+  },
+
+  // 20. Windows Script Host / cscript.exe Blocked by EDR / Antivirus
+  {
+    code: 'ERR_CSCRIPT_BLOCKED',
+    pattern: /cscript(\.exe)?|windows script host|antivirus|EDR|WScript\.Shell|bloqueado por directiva/i,
+    build: () => ({
+      code: 'ERR_CSCRIPT_BLOCKED',
+      title: 'Windows Script Host (cscript.exe) bloqueado por antivirus o EDR',
+      message: 'El sistema de seguridad de Windows o tu antivirus ha bloqueado el intérprete local "cscript.exe" necesario para la lectura OLEDB de Factusol.',
+      suggestion: 'Añade el ejecutable Bentian Agent o el proceso "cscript.exe" a las exclusiones de tu antivirus (Windows Defender, Kaspersky, SentinelOne, etc.).',
+      actionLabel: 'Ver diagnóstico del sistema',
+      targetTab: 'overview',
+      targetInputId: 'pf-alert-box',
+      helpUrl: 'https://bridge.cristianjm.com/docs/antivirus-exclusions/',
+    }),
+  },
+
+  // 21. Clock Drift / NTP Desynchronization
+  {
+    code: 'ERR_CLOCK_DESYNC',
+    pattern: /clock drift|diferencia horaria|desfase del reloj|clock_skew|ntp desincronizado|hora del sistema desfasada/i,
+    build: () => ({
+      code: 'ERR_CLOCK_DESYNC',
+      title: 'El reloj de Windows está desfasado',
+      message: 'El reloj interno de tu equipo tiene una diferencia superior a 3 minutos con respecto a la hora oficial de Internet, lo que invalida las firmas criptográficas.',
+      suggestion: 'En Windows, ve a Configuración > Hora e idioma > Fecha y hora, y pulsa en "Sincronizar ahora".',
+      actionLabel: 'Ver comprobación del sistema',
+      targetTab: 'overview',
+      targetInputId: 'pf-clock-badge',
+      helpUrl: 'https://bridge.cristianjm.com/docs/system-clock-ntp/',
+    }),
+  },
+
+  // 22. Disk Space Low
+  {
+    code: 'ERR_DISK_SPACE_LOW',
+    pattern: /ENOSPC|no space left on device|espacio en disco insuficiente|disco lleno|sin espacio/i,
+    build: () => ({
+      code: 'ERR_DISK_SPACE_LOW',
+      title: 'Espacio en disco insuficiente en Windows',
+      message: 'La unidad C: de Windows tiene menos de 500 MB libres, lo que impide guardar los registros locales y las colas de sincronización.',
+      suggestion: 'Libera espacio en el disco C: de tu equipo eliminando archivos temporales o usando el Liberador de espacio en disco de Windows.',
+      actionLabel: 'Ver estado general',
+      targetTab: 'overview',
+      targetInputId: 'card-f-path',
+      helpUrl: 'https://bridge.cristianjm.com/docs/system-requirements/',
     }),
   },
 ];
