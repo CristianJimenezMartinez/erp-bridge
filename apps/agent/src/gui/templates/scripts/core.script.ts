@@ -1,4 +1,33 @@
 export const coreScript = `
+    // Catálogo Centralizado de Iconos SVG Minimalistas Sobrios (Lucide style)
+    const ICONS = {
+      check: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      error: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      close: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      warn: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      info: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+      tip: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+      search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+      folder: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
+      refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>',
+      edit: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
+      key: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>',
+      lock: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+      download: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+      box: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+      mail: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+      star: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      arrowRight: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>'
+    };
+    window.ICONS = ICONS;
+
+    function renderIcon(name, extraStyle) {
+      const svg = ICONS[name] || ICONS.info;
+      const style = 'display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;vertical-align:middle;' + (extraStyle || '');
+      return '<span style="' + style + '">' + svg + '</span>';
+    }
+    window.renderIcon = renderIcon;
+
     let currentStatus = null;
     let allArticles = [];
     let allLogs = [];
@@ -83,7 +112,25 @@ export const coreScript = `
 
       toast.className = 'toast-' + type;
       if (toastIcon) {
-        toastIcon.textContent = type === 'success' ? '✓' : (type === 'warn' ? '⚠️' : (type === 'info' ? 'ℹ️' : '✕'));
+        toastIcon.style.display = 'inline-flex';
+        toastIcon.style.alignItems = 'center';
+        toastIcon.style.justifyContent = 'center';
+        toastIcon.style.width = '18px';
+        toastIcon.style.height = '18px';
+        toastIcon.style.flexShrink = '0';
+        if (type === 'success') {
+          toastIcon.innerHTML = ICONS.check;
+          toastIcon.style.color = '#34d399';
+        } else if (type === 'warn') {
+          toastIcon.innerHTML = ICONS.warn;
+          toastIcon.style.color = '#fbbf24';
+        } else if (type === 'info') {
+          toastIcon.innerHTML = ICONS.info;
+          toastIcon.style.color = '#a5b4fc';
+        } else {
+          toastIcon.innerHTML = ICONS.error;
+          toastIcon.style.color = '#f87171';
+        }
       }
       if (toastTitle) {
         if (cleanTitle) {
@@ -559,10 +606,10 @@ export const coreScript = `
             '<span class="spotlight-badge">' + step.badge + '</span>' +
             '<span style="font-size:11px;color:var(--text-muted);">' + (index + 1) + ' de ' + _spotlightSteps.length + '</span>' +
           '</div>' +
-          '<button type="button" onclick="closeSpotlightTour()" style="background:none;border:none;color:var(--text-subtle);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1;" title="Cerrar recorrido">✕</button>' +
+          '<button type="button" onclick="closeSpotlightTour()" style="background:none;border:none;color:var(--text-subtle);display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;cursor:pointer;padding:0;line-height:1;" title="Cerrar recorrido">' + ICONS.close + '</button>' +
         '</div>' +
         '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px;">' +
-          '<span>✨</span><span>' + step.title + '</span>' +
+          '<span>' + step.title + '</span>' +
         '</div>' +
         '<p style="font-size:12.5px;color:#cbd5e1;line-height:1.5;margin:0 0 16px 0;">' +
           step.description +
@@ -576,7 +623,7 @@ export const coreScript = `
           '<div style="display:flex;align-items:center;gap:8px;">' +
             (index > 0 ? '<button type="button" onclick="prevSpotlightStep()" class="btn btn-secondary btn-sm" style="padding:4px 10px;font-size:11.5px;">← Anterior</button>' : '') +
             (isLast 
-              ? '<button type="button" onclick="finishSpotlightTour()" class="btn btn-primary btn-sm" style="padding:5px 14px;font-weight:700;font-size:12px;background:linear-gradient(135deg, #10b981, #059669);border:none;box-shadow:0 0 15px rgba(16,185,129,0.4);"><span>Entendido, ¡a trabajar!</span> 🚀</button>'
+              ? '<button type="button" onclick="finishSpotlightTour()" class="btn btn-primary btn-sm" style="padding:5px 14px;font-weight:700;font-size:12px;background:linear-gradient(135deg, #10b981, #059669);border:none;box-shadow:0 0 15px rgba(16,185,129,0.4);"><span>Entendido, finalizar</span></button>'
               : '<button type="button" onclick="nextSpotlightStep()" class="btn btn-primary btn-sm" style="padding:4px 12px;font-size:11.5px;">Siguiente Paso →</button>'
             ) +
           '</div>' +
@@ -650,7 +697,7 @@ export const coreScript = `
       localStorage.setItem('bentian_spotlight_completed', 'true');
       removeSpotlightDom();
       if (typeof showToast === 'function') {
-        showToast('✓ ¡Recorrido completado! Bentian Agent está activo.', 'success');
+        showToast('¡Recorrido completado! Bentian Agent está activo.', 'success');
       }
     }
 

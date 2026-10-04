@@ -83,6 +83,44 @@
     ]
   }
   </script>
+  <style>
+    /* Minimalist Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    #docs-sidebar::-webkit-scrollbar,
+    aside::-webkit-scrollbar {
+      width: 5px;
+    }
+    #docs-sidebar::-webkit-scrollbar-track,
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb,
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb:hover,
+    aside::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    html, body, #docs-sidebar, aside {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -122,11 +160,16 @@
     </header>
   
   
-    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+    <aside id="docs-sidebar" class="fixed top-16 bottom-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-4 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
       <!-- Direct Hub Link -->
       <div class="mb-4 pb-3 border-b border-white/[0.06]">
-        <a href="/docs/" class="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition text-zinc-300 hover:text-white hover:bg-white/[0.03]">
-          <span class="text-sm">📖</span>
+        <a href="/docs/" class="group flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition text-zinc-300 hover:text-white hover:bg-white/[0.03]">
+          <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </span>
           <span>Inicio Documentación</span>
         </a>
       </div>
@@ -145,8 +188,8 @@
       <nav class="space-y-6" id="docs-nav-tree">
         
             <div class="category-group" data-category="primeros-pasos">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🚀</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span>
                 <span>Primeros Pasos</span>
                 
               </div>
@@ -180,8 +223,8 @@
             </div>
           
             <div class="category-group" data-category="factusol">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🗄️</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></span>
                 <span>Factusol ERP</span>
                 
               </div>
@@ -227,8 +270,8 @@
             </div>
           
             <div class="category-group" data-category="canales">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-indigo-400">
-                <span>🛒</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-indigo-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-indigo-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
                 <span>Canales eCommerce</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
               </div>
@@ -262,8 +305,8 @@
             </div>
           
             <div class="category-group" data-category="arquitectura">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>⚡</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
                 <span>Arquitectura & Sincronización</span>
                 
               </div>
@@ -291,8 +334,8 @@
             </div>
           
             <div class="category-group" data-category="fiscalidad">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🧾</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span>
                 <span>Fiscalidad & Facturación</span>
                 
               </div>
@@ -320,8 +363,8 @@
             </div>
           
             <div class="category-group" data-category="troubleshooting">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🔧</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
                 <span>Resolución de Incidencias</span>
                 
               </div>
@@ -355,8 +398,8 @@
             </div>
           
             <div class="category-group" data-category="seguridad">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🛡️</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span>
                 <span>Seguridad & Redes</span>
                 
               </div>
@@ -384,8 +427,8 @@
             </div>
           
             <div class="category-group" data-category="api">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>📡</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
                 <span>API REST & Esquemas</span>
                 
               </div>
@@ -418,7 +461,7 @@
       </div>
     </aside>
     <!-- Overlay for mobile -->
-    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+    <div id="sidebar-overlay" class="fixed top-16 inset-x-0 bottom-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
   
 
   <!-- Main Layout Container (Sidebar width: lg:pl-72, Right TOC width: xl:pr-64) -->

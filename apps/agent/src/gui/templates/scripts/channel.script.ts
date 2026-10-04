@@ -49,7 +49,7 @@ export const channelScript = `
           const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
-              '<span>✓</span>' +
+              (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
               '<span>' + cleanMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
@@ -62,13 +62,13 @@ export const channelScript = `
           const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           let extraActions = '';
           if (!url.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-universal-url&quot;); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-universal-url&quot;); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
           }
-          extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn"><span>⬇️ Descargar erp-bridge-endpoint.php</span></button>';
-          extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
+          extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('download') : '') + '<span>Descargar erp-bridge-endpoint.php</span></button>';
+          extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar comprobación</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + cleanTitle + '</span></div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
                 '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
                 '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
@@ -88,9 +88,9 @@ export const channelScript = `
         const errInfo = humanizeErrorMessage(err, 'channel');
         alertBox.innerHTML = 
           '<div class="smart-error-card">' +
-            '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + errInfo.title + '</span></div>' +
             '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
-            '<div class="smart-error-actions"><button type="button" onclick="testUniversalConnection()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button></div>' +
+            '<div class="smart-error-actions"><button type="button" onclick="testUniversalConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
           '</div>';
         showSmartToast({
           title: errInfo.title,
@@ -141,7 +141,7 @@ export const channelScript = `
           const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
-              '<span>✓</span>' +
+              (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
               '<span>' + cleanMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
@@ -154,12 +154,12 @@ export const channelScript = `
           const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-wc-url&quot;); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-wc-url&quot;); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
           }
-          extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn"><span>🔄 Reintentar conexión</span></button>';
+          extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + cleanTitle + '</span></div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
                 '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
                 '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
@@ -179,9 +179,9 @@ export const channelScript = `
         const errInfo = humanizeErrorMessage(err, 'channel');
         alertBox.innerHTML = 
           '<div class="smart-error-card">' +
-            '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + errInfo.title + '</span></div>' +
             '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
-            '<div class="smart-error-actions"><button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button></div>' +
+            '<div class="smart-error-actions"><button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
           '</div>';
         showSmartToast({
           title: errInfo.title,
@@ -254,7 +254,7 @@ export const channelScript = `
         });
         const data = await res.json();
         if (data.success) {
-          showToast(enabled ? '✓ Auto-arranque con Windows activado' : 'Auto-arranque desactivado', 'info');
+          showToast(enabled ? 'Auto-arranque con Windows activado' : 'Auto-arranque desactivado', 'info');
         } else {
           showToast('No se pudo cambiar el auto-arranque', 'warn');
         }

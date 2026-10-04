@@ -97,10 +97,13 @@ export function renderSyncTab(): string {
         </div>
 
         <!-- ================= AVISOS DE PEDIDOS POR EMAIL ================= -->
-        <div class="form-section" style="margin-top: 20px; border: 1px solid rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.02);">
+        <div class="form-section" style="margin-top: 20px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03);">
           <div class="section-header">
             <div>
-              <div class="section-title" style="color: #34d399;">📧 Avisos de Nuevos Pedidos por Email</div>
+              <div class="section-title" style="display: flex; align-items: center; gap: 8px; color: #fff;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span>Avisos de Nuevos Pedidos por Email</span>
+              </div>
               <div class="section-desc">Recibe un correo electrónico automático cada vez que un cliente compra en la web y el pedido entra en Factusol (con su serie y número asignado).</div>
             </div>
           </div>
@@ -121,8 +124,9 @@ export function renderSyncTab(): string {
             </div>
 
             <details style="margin-top: 14px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 10px 14px;">
-              <summary style="font-size: 12px; font-weight: 600; color: #a5b4fc; cursor: pointer;">
-                ⚙️ Configuración del Servidor de Correo (SMTP Propio - Opcional)
+              <summary style="font-size: 12px; font-weight: 600; color: #e4e4e7; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Configuración del Servidor de Correo (SMTP Propio - Opcional)</span>
               </summary>
               <div style="font-size: 11px; color: var(--text-subtle); margin: 6px 0 12px 0;">
                 Si lo dejas en blanco, el agente utilizará el servicio de notificaciones seguro de Bentian. Si prefieres enviar desde tu propio correo (Plesk, Gmail, cPanel), completa estos datos:
@@ -169,10 +173,13 @@ export function renderSyncTab(): string {
           </div>
         </div>
 
-        <div class="form-section" style="margin-top: 20px; border: 1px solid rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.03);">
+        <div class="form-section" style="margin-top: 20px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03);">
           <div class="section-header">
             <div>
-              <div class="section-title" style="color: #60a5fa;">📦 Subida Inicial de Catálogo (Factusol ➔ Tienda Online)</div>
+              <div class="section-title" style="display: flex; align-items: center; gap: 8px; color: #fff;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                <span>Subida Inicial de Catálogo (Factusol → Tienda Online)</span>
+              </div>
               <div class="section-desc">¿Tu tienda online está recién creada o vacía? Esta función lee los artículos de Factusol y da de alta automáticamente los productos que aún no existan en tu web.</div>
             </div>
           </div>

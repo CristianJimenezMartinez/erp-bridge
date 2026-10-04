@@ -18,7 +18,10 @@ export const licenseScript = `
         alertBox.style.display = 'block';
         if (data.success) {
           alertBox.style.color = '#34d399';
-          alertBox.textContent = '✓ Licencia activada con éxito.';
+          alertBox.style.display = 'inline-flex';
+          alertBox.style.alignItems = 'center';
+          alertBox.style.gap = '6px';
+          alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') + '<span>Licencia activada con éxito.</span>';
           showToast('Licencia vinculada a este equipo con éxito');
           fetchStatus();
         } else {
@@ -26,7 +29,10 @@ export const licenseScript = `
             renderHumanizedAlert(alertBox, data.error || 'No se pudo activar la clave');
           } else {
             alertBox.style.color = '#f87171';
-            alertBox.textContent = '✕ Error: ' + (data.error || 'No se pudo activar la clave');
+            alertBox.style.display = 'inline-flex';
+            alertBox.style.alignItems = 'center';
+            alertBox.style.gap = '6px';
+            alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>Error: ' + (data.error || 'No se pudo activar la clave') + '</span>';
           }
           showToast(data.error || 'Error al activar clave', 'error');
         }
@@ -36,7 +42,10 @@ export const licenseScript = `
           renderHumanizedAlert(alertBox, err.message || 'Error de red al activar licencia');
         } else {
           alertBox.style.color = '#f87171';
-          alertBox.textContent = 'Error de red al activar licencia';
+          alertBox.style.display = 'inline-flex';
+          alertBox.style.alignItems = 'center';
+          alertBox.style.gap = '6px';
+          alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>Error de red al activar licencia</span>';
         }
       } finally {
         btn.disabled = false;

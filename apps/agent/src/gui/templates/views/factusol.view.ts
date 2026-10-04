@@ -14,7 +14,7 @@ export function renderFactusolTab(): string {
               </button>
               <button onclick="openNativeWindowsDialog()" id="btn-browse-native" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows donde aparece el equipo, la Red y el NAS">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
-                <span>📁 Examinar en Windows (Local / Red / NAS)</span>
+                <span>Examinar en Windows (Local / Red / NAS)</span>
               </button>
             </div>
           </div>
@@ -27,7 +27,10 @@ export function renderFactusolTab(): string {
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
               <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta de Factusol):</label>
-              <span style="font-size: 11px; color: #818cf8; cursor: pointer;" onclick="document.getElementById('input-factusol-db').focus()" title="Puedes escribir o pegar cualquier ruta directamente">✍️ Escribir o pegar directamente</span>
+              <span style="font-size: 11px; color: #818cf8; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('input-factusol-db').focus()" title="Puedes escribir o pegar cualquier ruta directamente">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                <span>Escribir o pegar directamente</span>
+              </span>
             </div>
             <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
               Introduce la ruta del archivo <code>.accdb</code> o la carpeta de datos. Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\2262026.accdb</code> o <code>\\\\192.168.1.50\\Datos\\FS\\...</code>), pégala directamente aquí y pulsa en <strong>Guardar Ajustes Factusol</strong>.
@@ -40,7 +43,10 @@ export function renderFactusolTab(): string {
               </button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-              <span style="font-size: 11px; color: var(--text-subtle);">💡 Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
+              <span style="font-size: 11px; color: var(--text-subtle); display: inline-flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
+              </span>
             </div>
             <div id="fact-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
@@ -70,7 +76,10 @@ export function renderFactusolTab(): string {
             <div class="form-group">
               <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
                 <span>Serie para Pedidos Web:</span>
-                <span class="tag tag-indigo" style="font-size: 10px; padding: 1px 6px;">⭐ Recomendado: 1</span>
+                <span class="tag" style="font-size: 10px; padding: 2px 7px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); color: #e4e4e7; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span>Recomendado: 1</span>
+                </span>
               </label>
               <input type="text" id="input-factusol-order-series" class="form-control" value="1" maxlength="1" placeholder="1" style="text-transform: uppercase; font-weight: 700; width: 64px;">
               <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">

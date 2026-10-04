@@ -7,7 +7,9 @@ export function renderWizardModal(): string {
           <svg width="20" height="20" fill="none" stroke="#818cf8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>
           <span style="font-weight: 700; font-size: 15px; color: #fff;">Asistente de Configuración Rápida</span>
         </div>
-        <button onclick="closeWizardModal()" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">✕</button>
+        <button onclick="closeWizardModal()" class="btn btn-secondary btn-sm" style="padding: 0; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;" title="Cerrar asistente">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
 
       <div class="modal-body">
@@ -28,8 +30,9 @@ export function renderWizardModal(): string {
             <label class="form-label">Clave de Licencia (EB-XXXXX):</label>
             <div class="input-with-button">
               <input type="text" id="wiz-input-lic" class="form-control" style="font-family: monospace; font-size: 14px;" placeholder="EB-XXXXX-XXXXX-XXXXX-XXXXX">
-              <button onclick="wizPasteAndActivateLicense()" id="wiz-btn-activate" class="btn btn-primary">
-                <span>📋 Pegar y Activar</span>
+              <button onclick="wizPasteAndActivateLicense()" id="wiz-btn-activate" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Pegar y Activar</span>
               </button>
             </div>
             <div id="wiz-lic-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
@@ -42,13 +45,13 @@ export function renderWizardModal(): string {
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Selecciona la base de datos de tu empresa. El conector la detectará automáticamente.</p>
           
           <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-secondary" style="flex: 1;">
+            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-secondary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <span>🔍 Auto-detectar Factusol</span>
+              <span>Auto-detectar Factusol</span>
             </button>
-            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
+            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
-              <span>📁 Examinar en Windows (Local / Red / NAS)</span>
+              <span>Examinar en Windows (Local / Red / NAS)</span>
             </button>
           </div>
 
@@ -59,13 +62,19 @@ export function renderWizardModal(): string {
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
               <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta):</label>
-              <span style="font-size: 11px; color: #818cf8; cursor: pointer;" onclick="document.getElementById('wiz-input-fact-path').focus()">✍️ Escribir o pegar directamente</span>
+              <span style="font-size: 11px; color: #818cf8; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('wiz-input-fact-path').focus()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                <span>Escribir o pegar directamente</span>
+              </span>
             </div>
             <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
               Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\...</code> o <code>\\\\NAS\\Datos\\...</code>), puedes pegarla directamente aquí.
             </div>
             <input type="text" id="wiz-input-fact-path" oninput="cleanPathInput(this)" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb  o  X:\\\\...  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
-            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">💡 Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</div>
+            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px; display: inline-flex; align-items: center; gap: 5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
+            </div>
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
 
@@ -75,7 +84,10 @@ export function renderWizardModal(): string {
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;">
                   <span>Serie para Pedidos Web en Factusol</span>
-                  <span style="font-size: 10px; background: rgba(99, 102, 241, 0.25); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.4); padding: 1px 7px; border-radius: 999px; font-weight: 600;">Recomendado: Serie 1 Directo</span>
+                  <span style="font-size: 10px; background: rgba(255, 255, 255, 0.08); color: #e4e4e7; border: 1px solid rgba(255, 255, 255, 0.12); padding: 2px 7px; border-radius: 999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Recomendado: Serie 1 Directo</span>
+                  </span>
                 </div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
                   Define en qué serie de Factusol se registrarán las ventas de tu tienda online.
@@ -91,7 +103,10 @@ export function renderWizardModal(): string {
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
               <button type="button" id="wiz-btn-series-1" onclick="setWizOrderSeries('1')" class="btn" style="text-align: left; padding: 10px 12px; background: rgba(99, 102, 241, 0.18); border: 2px solid #6366f1; border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <span style="font-weight: 700; font-size: 12px; color: #a5b4fc;">⭐ Serie 1 (Directo a Bandeja Principal)</span>
+                  <span style="font-weight: 700; font-size: 12px; color: #e4e4e7; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Serie 1 (Directo a Bandeja Principal)</span>
+                  </span>
                   <span id="wiz-badge-series-1" style="font-size: 10px; background: #6366f1; color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: 600;">Recomendado</span>
                 </div>
                 <span style="font-size: 11px; color: #cbd5e1; line-height: 1.3;">Entran en la bandeja principal. Abres Factusol y el pedido está el primero a la vista. Cero despistes.</span>
@@ -107,9 +122,10 @@ export function renderWizardModal(): string {
             </div>
 
             <!-- Card visual pedagógico: ¿Por qué recomendamos la Serie 1? -->
-            <div style="padding: 12px 14px; background: rgba(30, 27, 75, 0.45); border: 1px solid rgba(129, 140, 248, 0.28); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
-              <div style="font-weight: 700; color: #a5b4fc; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-                <span>💡 ¿Por qué recomendamos la Serie 1?</span>
+            <div style="padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
+              <div style="font-weight: 700; color: #e4e4e7; margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>¿Por qué recomendamos la Serie 1?</span>
               </div>
               <p style="margin: 0 0 6px 0; color: #cbd5e1; font-size: 11.5px;">
                 En Factusol, cada documento tiene una Serie. La pantalla de <strong>Comercial → Pedidos de cliente</strong> suele abrirse por defecto filtrada en la <strong>Serie 1</strong>:
@@ -146,10 +162,13 @@ export function renderWizardModal(): string {
           </div>
 
           <div id="wiz-panel-univ">
-            <div style="padding: 12px; background: rgba(99,102,241,0.08); border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted);">
-              <strong>Paso rápido:</strong> 1. Descarga el archivo <code>erp-bridge-endpoint.php</code> ➡️ 2. Súbelo a la carpeta pública de tu web ➡️ 3. Pega tu web abajo.
+            <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted);">
+              <strong>Paso rápido:</strong> 1. Descarga el archivo <code>erp-bridge-endpoint.php</code> <span style="display:inline-flex;align-items:center;vertical-align:middle;margin:0 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> 2. Súbelo a la carpeta pública de tu web <span style="display:inline-flex;align-items:center;vertical-align:middle;margin:0 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> 3. Pega tu web abajo.
               <div style="margin-top: 8px;">
-                <button onclick="downloadUniversalCompanion()" class="btn btn-secondary btn-sm">⬇️ Descargar erp-bridge-endpoint.php</button>
+                <button onclick="downloadUniversalCompanion()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  <span>Descargar erp-bridge-endpoint.php</span>
+                </button>
               </div>
             </div>
             <div class="form-group">
@@ -215,8 +234,8 @@ export function renderWizardModal(): string {
           </div>
 
           <!-- Card pedagógico relay DKIM -->
-          <div style="padding: 12px 14px; background: rgba(30, 27, 75, 0.45); border: 1px solid rgba(129, 140, 248, 0.28); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
-            <div style="font-weight: 700; color: #a5b4fc; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+          <div style="padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
+            <div style="font-weight: 700; color: #e4e4e7; margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
               <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               <span>Seguridad y Entrega Garantizada (Bentian Relay)</span>
             </div>
@@ -236,8 +255,9 @@ export function renderWizardModal(): string {
             <p style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto 24px;">
               Tu equipo ha quedado configurado con éxito. El agente comenzará a vigilar Factusol y a procesar los pedidos de tu web de forma 100% autónoma.
             </p>
-            <button onclick="finishWizardAndStart()" class="btn btn-primary btn-lg" style="width: 100%; max-width: 320px; box-shadow: 0 4px 20px var(--primary-glow);">
-              <span>🚀 Comenzar a Trabajar</span>
+            <button onclick="finishWizardAndStart()" class="btn btn-primary btn-lg" style="width: 100%; max-width: 320px; box-shadow: 0 4px 20px var(--primary-glow); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Comenzar a Trabajar</span>
             </button>
           </div>
         </div>

@@ -30,7 +30,7 @@ export function renderChannelTab(): string {
 
           <!-- OPCIÓN A: CONECTOR WEB UNIVERSAL (HTTPS 443) -->
           <div id="panel-universal-bridge">
-            <div style="padding: 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; margin-bottom: 20px;">
+            <div style="padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 20px;">
               <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 Paso a Paso: Cómo enlazar tu web en 2 minutos (Cero Puertos, Cero Riesgos)
@@ -41,9 +41,9 @@ export function renderChannelTab(): string {
                 3. Pega la dirección de tu web y pulsa <strong>Comprobar Conexión</strong>.
               </div>
               <div style="margin-top: 12px;">
-                <button onclick="downloadUniversalCompanion()" class="btn btn-primary btn-sm">
+                <button onclick="downloadUniversalCompanion()" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
                   <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                  <span>⬇️ Descargar conector erp-bridge-endpoint.php</span>
+                  <span>Descargar conector erp-bridge-endpoint.php</span>
                 </button>
               </div>
             </div>

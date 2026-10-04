@@ -22,7 +22,7 @@ export interface DocArticle {
 export interface DocCategory {
   slug: string;
   title: string;
-  icon: string;
+  icon: string; // SVG markup limpio, minimalista estilo Lucide (viewBox 0 0 24 24, stroke-width 1.75/2, currentColor)
   description: string;
   order: number;
 }

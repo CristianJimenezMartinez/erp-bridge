@@ -23,6 +23,44 @@
   <meta property="og:locale" content="es_ES">
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Minimalist Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    #docs-sidebar::-webkit-scrollbar,
+    aside::-webkit-scrollbar {
+      width: 5px;
+    }
+    #docs-sidebar::-webkit-scrollbar-track,
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb,
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb:hover,
+    aside::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    html, body, #docs-sidebar, aside {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -62,11 +100,16 @@
     </header>
   
   
-    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+    <aside id="docs-sidebar" class="fixed top-16 bottom-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-4 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
       <!-- Direct Hub Link -->
       <div class="mb-4 pb-3 border-b border-white/[0.06]">
-        <a href="/docs/" class="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition bg-indigo-500/10 text-indigo-300 border-l-2 border-indigo-500 pl-2">
-          <span class="text-sm">📖</span>
+        <a href="/docs/" class="group flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition bg-indigo-500/10 text-indigo-300 border-l-2 border-indigo-500 pl-2">
+          <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </span>
           <span>Inicio Documentación</span>
         </a>
       </div>
@@ -85,8 +128,8 @@
       <nav class="space-y-6" id="docs-nav-tree">
         
             <div class="category-group" data-category="primeros-pasos">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🚀</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span>
                 <span>Primeros Pasos</span>
                 
               </div>
@@ -120,8 +163,8 @@
             </div>
           
             <div class="category-group" data-category="factusol">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🗄️</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></span>
                 <span>Factusol ERP</span>
                 
               </div>
@@ -167,8 +210,8 @@
             </div>
           
             <div class="category-group" data-category="canales">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🛒</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
                 <span>Canales eCommerce</span>
                 
               </div>
@@ -202,8 +245,8 @@
             </div>
           
             <div class="category-group" data-category="arquitectura">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>⚡</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
                 <span>Arquitectura & Sincronización</span>
                 
               </div>
@@ -231,8 +274,8 @@
             </div>
           
             <div class="category-group" data-category="fiscalidad">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🧾</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span>
                 <span>Fiscalidad & Facturación</span>
                 
               </div>
@@ -260,8 +303,8 @@
             </div>
           
             <div class="category-group" data-category="troubleshooting">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🔧</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
                 <span>Resolución de Incidencias</span>
                 
               </div>
@@ -295,8 +338,8 @@
             </div>
           
             <div class="category-group" data-category="seguridad">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>🛡️</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span>
                 <span>Seguridad & Redes</span>
                 
               </div>
@@ -324,8 +367,8 @@
             </div>
           
             <div class="category-group" data-category="api">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                <span>📡</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
                 <span>API REST & Esquemas</span>
                 
               </div>
@@ -358,7 +401,7 @@
       </div>
     </aside>
     <!-- Overlay for mobile -->
-    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+    <div id="sidebar-overlay" class="fixed top-16 inset-x-0 bottom-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
   
 
   <!-- Main Layout Container (Sidebar width: lg:pl-72, Right TOC width: xl:pr-64) -->
@@ -392,7 +435,14 @@
         <div id="inicio-rapido" class="mb-12">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>🚀</span>
+              <span class="w-5 h-5 inline-flex items-center justify-center shrink-0 text-zinc-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                  <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                </svg>
+              </span>
               <span>Puesta en Marcha Rápida (3 Pasos)</span>
             </h2>
             <span class="text-xs text-zinc-500 font-mono">De 0 a sincronización en &lt;5 min</span>
@@ -432,7 +482,13 @@
         <div id="categorias" class="mb-12">
           <div class="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.08]">
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>📚</span>
+              <span class="w-5 h-5 inline-flex items-center justify-center shrink-0 text-zinc-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                  <path d="M6 6h10"/>
+                  <path d="M6 10h10"/>
+                </svg>
+              </span>
               <span>Manuales por Categoría (8)</span>
             </h2>
             <span class="text-xs text-zinc-500">29 artículos disponibles</span>
@@ -440,42 +496,40 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🚀</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Primeros Pasos</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Instalación del agente en Windows, requisitos de hardware y activación de licencias.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Primeros Pasos</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Instalación del agente en Windows, requisitos de hardware y activación de licencias.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Requisitos del Sistema y Entorno Operativo</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Instalación y Despliegue del Agente en Windows</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/primeros-pasos/activacion-de-licencias/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/primeros-pasos/activacion-de-licencias/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Activación de Licencias, Beta de 60 Días y Plan Fundador</span>
                           </a>
                         </li>
                       
                       
                         <li class="pt-0.5">
-                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition">
                             + 1 artículos más en Primeros Pasos &rarr;
                           </a>
                         </li>
@@ -484,42 +538,40 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🗄️</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Factusol ERP</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Conexión con la base de datos .accdb, rutas de red NAS, controladores OLEDB y stock.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Factusol ERP</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Conexión con la base de datos .accdb, rutas de red NAS, controladores OLEDB y stock.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Localización de la Base de Datos de Factusol (.accdb y .mdb)</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Rutas de Red, Servidores NAS y Protección Anti-Wiping</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/factusol/controladores-oledb-ace/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/factusol/controladores-oledb-ace/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Controladores Microsoft ACE OLEDB vs ODBC</span>
                           </a>
                         </li>
                       
                       
                         <li class="pt-0.5">
-                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition">
                             + 3 artículos más en Factusol ERP &rarr;
                           </a>
                         </li>
@@ -528,42 +580,40 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🛒</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Canales eCommerce</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Sincronización con WooCommerce (HPOS), PrestaShop, Shopify y Endpoint Universal.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Canales eCommerce</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Sincronización con WooCommerce (HPOS), PrestaShop, Shopify y Endpoint Universal.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/canales/woocommerce/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/canales/woocommerce/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Conexión con WooCommerce y Compatibilidad HPOS</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/canales/prestashop/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/canales/prestashop/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/canales/shopify/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/canales/shopify/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Conexión con Shopify mediante Admin REST y GraphQL</span>
                           </a>
                         </li>
                       
                       
                         <li class="pt-0.5">
-                          <a href="/docs/canales/woocommerce/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                          <a href="/docs/canales/woocommerce/" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition">
                             + 1 artículos más en Canales eCommerce &rarr;
                           </a>
                         </li>
@@ -572,35 +622,33 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">⚡</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Arquitectura & Sincronización</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Filosofía Local-First, cola SQLite Store-and-Forward y monitoreo en tiempo real.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Arquitectura & Sincronización</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Filosofía Local-First, cola SQLite Store-and-Forward y monitoreo en tiempo real.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/arquitectura/arquitectura-local-first/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/arquitectura/arquitectura-local-first/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Arquitectura Local-First y Privacidad de Datos</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/arquitectura/cola-store-and-forward/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/arquitectura/cola-store-and-forward/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Cola Desacoplada Store-and-Forward (SQLite)</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/arquitectura/deteccion-tiempo-real/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/arquitectura/deteccion-tiempo-real/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">FileWatcher en Tiempo Real y Ciclos Incrementales</span>
                           </a>
                         </li>
@@ -610,35 +658,33 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🧾</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Fiscalidad & Facturación</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Fiscalidad & Facturación</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Cuadre de IVA al Céntimo y Prevención de Descuadres</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Recargo de Equivalencia en WooCommerce y PrestaShop</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Veri*Factu, Ley Antifraude y la Facturación en Factusol</span>
                           </a>
                         </li>
@@ -648,42 +694,40 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🔧</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Resolución de Incidencias</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Resolución de Incidencias</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Catálogo de Errores Humanizados y Resolución en 1 Clic</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Error de Proveedor OLEDB Microsoft.ACE no Registrado</span>
                           </a>
                         </li>
                       
                       
                         <li class="pt-0.5">
-                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition">
                             + 1 artículos más en Resolución de Incidencias &rarr;
                           </a>
                         </li>
@@ -692,35 +736,33 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">🛡️</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">Seguridad & Redes</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">Seguridad & Redes</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/seguridad/windows-smartscreen/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/seguridad/windows-smartscreen/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Windows SmartScreen: Autorización y Reputación de Binarios</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Criptografía Asimétrica Ed25519 y Actualización Atómica</span>
                           </a>
                         </li>
@@ -730,28 +772,26 @@
                   </div>
                 </div>
               
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">📡</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">API REST & Esquemas</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">API REST & Esquemas</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       
                         <li>
-                          <a href="/docs/api/api-rest-local/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/api/api-rest-local/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Referencia de la API REST Local del Agente (39281)</span>
                           </a>
                         </li>
                       
                         <li>
-                          <a href="/docs/api/esquema-pedidos-json/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/api/esquema-pedidos-json/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">Esquema JSON de Pedidos (OrderPayload) y Validación Zod</span>
                           </a>
                         </li>

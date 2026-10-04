@@ -149,15 +149,18 @@ export const factusolScript = `
               await testFactusolConnection('input-factusol-db', 'fact-test-alert');
             }
           }
-          showToast('✓ Se encontraron ' + data.instances.length + ' bases de datos Factusol', 'success');
+          showToast('Se encontraron ' + data.instances.length + ' bases de datos Factusol', 'success');
         } else {
           if (label) label.textContent = 'Resultado del escaneo:';
           list.innerHTML = 
-            '<div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.3); padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #fde047; line-height: 1.5;">' +
-              '<strong>⚠️ No se detectó Factusol en las carpetas por defecto:</strong>' +
+            '<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #e4e4e7; line-height: 1.5;">' +
+              '<div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#fbbf24;margin-bottom:4px;">' +
+                (typeof renderIcon === 'function' ? renderIcon('warn') : '') +
+                '<span>No se detectó Factusol en las carpetas por defecto:</span>' +
+              '</div>' +
               '<div style="color: var(--text-muted); margin-top: 4px;">' +
                 'Se buscaron archivos en las carpetas habituales (<code>C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\...</code>), pero no se detectaron instalaciones estándar.<br>' +
-                'Si tienes tu empresa en otra carpeta, disco de red o pendrive, pulsa en <strong>📁 Examinar en Windows</strong> para seleccionarla directamente.' +
+                'Si tienes tu empresa en otra carpeta, disco de red o pendrive, pulsa en <strong>Examinar en Windows</strong> para seleccionarla directamente.' +
               '</div>' +
             '</div>';
           showToast('No se encontró Factusol en rutas habituales. Usa "Examinar en Windows".', 'warn');
@@ -234,7 +237,7 @@ export const factusolScript = `
             const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
             alertBox.innerHTML = 
               '<div class="smart-success-card">' +
-                '<span>✓</span>' +
+                (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
                 '<span>' + cleanMsg + timeSuffix + '</span>' +
               '</div>';
             showSmartToast({
@@ -251,7 +254,7 @@ export const factusolScript = `
             alertBox.innerHTML = 
               '<div class="smart-error-card">' +
                 '<div class="smart-error-header">' +
-                  '<span>💡</span>' +
+                  (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') +
                   '<span>' + cleanTitle + '</span>' +
                 '</div>' +
                 '<div class="smart-error-cause">' +
@@ -259,9 +262,9 @@ export const factusolScript = `
                   '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
                 '</div>' +
                 '<div class="smart-error-actions">' +
-                  '<button type="button" onclick="detectFactusol(' + isWizard + ')" class="smart-error-btn smart-error-btn-primary"><span>🔍 Auto-detectar Factusol</span></button>' +
-                  '<button type="button" onclick="openNativeWindowsDialog(' + isWizard + ')" class="smart-error-btn"><span>📁 Examinar en Windows</span></button>' +
-                  '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn"><span>🔄 Reintentar</span></button>' +
+                  '<button type="button" onclick="detectFactusol(' + isWizard + ')" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('search') : '') + '<span>Auto-detectar Factusol</span></button>' +
+                  '<button type="button" onclick="openNativeWindowsDialog(' + isWizard + ')" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('folder') : '') + '<span>Examinar en Windows</span></button>' +
+                  '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>' +
                 '</div>' +
               '</div>';
             showSmartToast({
@@ -281,10 +284,10 @@ export const factusolScript = `
           alertBox.style.display = 'block';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header"><span>💡</span><span>' + cleanCatchTitle + '</span></div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanCatchTitle + '</span></div>' +
               '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
               '<div class="smart-error-actions">' +
-                '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>' +
+                '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>' +
               '</div>' +
             '</div>';
         }

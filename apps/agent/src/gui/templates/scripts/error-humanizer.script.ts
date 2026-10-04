@@ -17,7 +17,7 @@ export const errorHumanizerScript = `
         pattern: /archivo no encontrado|ruta no válida|no existe el archivo|ENOENT|no se encontró la base de datos|fichero no existe|no se detectó factusol/i,
         title: 'Base de datos de Factusol no encontrada',
         message: 'No se pudo localizar el archivo de base de datos en la ruta indicada. Es posible que el archivo haya sido movido o el disco/NAS no esté accesible.',
-        suggestion: 'Pulsa en "📁 Examinar en Windows" para buscar y seleccionar directamente tu archivo .accdb o .mdb en tu equipo o unidad de red.',
+        suggestion: 'Pulsa en "Examinar en Windows" para buscar y seleccionar directamente tu archivo .accdb o .mdb en tu equipo o unidad de red.',
         actionLabel: 'Seleccionar base de datos de Factusol',
         targetTab: 'factusol',
         targetInputId: 'input-factusol-db',
@@ -378,7 +378,7 @@ export const errorHumanizerScript = `
       }
 
       if (actionBtn && actionText) {
-        actionText.textContent = err.actionLabel + ' ➔';
+        actionText.textContent = err.actionLabel + ' →';
         actionBtn.onclick = function() {
           resolveHumanizedError(err);
         };
@@ -420,13 +420,13 @@ export const errorHumanizerScript = `
           '</div>' +
           '<div class="human-alert-body">' + err.message + '</div>' +
           '<div class="human-alert-suggestion">' +
-            '<strong>💡 ¿Cómo solucionarlo?:</strong> ' + err.suggestion +
+            '<strong>¿Cómo solucionarlo?:</strong> ' + err.suggestion +
           '</div>' +
           '<div class="human-alert-actions">' +
             '<button type="button" class="btn btn-primary btn-sm" data-err-code="' + err.code + '" onclick="resolveHumanizedError(window._lastHumanizedErrors[this.getAttribute(&quot;data-err-code&quot;)])">' +
-              '<span>' + err.actionLabel + ' ➔</span>' +
+              '<span>' + err.actionLabel + ' →</span>' +
             '</button>' +
-            (err.helpUrl ? ('<a href="' + err.helpUrl + '" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;"><span>📖 Guía de ayuda ↗</span></a>') : '') +
+            (err.helpUrl ? ('<a href="' + err.helpUrl + '" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">' + (typeof renderIcon === 'function' ? renderIcon('info') : '') + '<span>Guía de ayuda ↗</span></a>') : '') +
           '</div>' +
         '</div>';
     }

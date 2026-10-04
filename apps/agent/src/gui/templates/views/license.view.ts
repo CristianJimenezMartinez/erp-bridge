@@ -10,17 +10,20 @@ export function renderLicenseTab(): string {
             <span id="lic-status-badge" class="tag tag-green">Activa</span>
           </div>
 
-          <div id="lic-expired-banner" style="display:none;margin-bottom:18px;padding:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;">
+          <div id="lic-expired-banner" style="display:none;margin-bottom:18px;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
               <div>
-                <div style="font-weight:600;font-size:14px;color:#f87171;display:flex;align-items:center;gap:6px;">
+                <div style="font-weight:600;font-size:14px;color:#fff;display:flex;align-items:center;gap:6px;">
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                   <span>Periodo de Beta Pública Finalizado</span>
                 </div>
-                <div style="font-size:12px;color:#fca5a5;margin-top:4px;">Tu periodo de evaluación de 60 días ha concluido. La sincronización se ha detenido de forma segura. Tus rutas y credenciales siguen guardadas intactas en este equipo.</div>
-                <div style="font-size:11px;color:#fca5a5;margin-top:2px;">⚠️ Tarifa Fundador con -30% vitalicio (139 €/año) limitada estrictamente a las primeras 25 plazas. Agotadas las 25 plazas, regirá la tarifa oficial de 199 €/año.</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Tu periodo de evaluación de 60 días ha concluido. La sincronización se ha detenido de forma segura. Tus rutas y credenciales siguen guardadas intactas en este equipo.</div>
+                <div style="font-size:11px;color:#e4e4e7;margin-top:4px;display:inline-flex;align-items:center;gap:5px;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  <span>Tarifa Fundador con -30% vitalicio (139 €/año) limitada estrictamente a las primeras 25 plazas. Agotadas las 25 plazas, regirá la tarifa oficial de 199 €/año.</span>
+                </div>
               </div>
-              <button onclick="openCloudUpgrade(event)" class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;white-space:nowrap;">
+              <button onclick="openCloudUpgrade(event)" class="btn btn-primary" style="background:#27272a;border:1px solid rgba(255,255,255,0.18);color:#fff;white-space:nowrap;">
                 Activar Plan Fundador (139 €/año - Solo 25 plazas) ↗
               </button>
             </div>

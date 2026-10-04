@@ -55,7 +55,7 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       code: 'ERR_FACTUSOL_FILE_NOT_FOUND',
       title: 'Base de datos de Factusol no encontrada',
       message: 'No se pudo localizar el archivo de base de datos en la ruta indicada. Es posible que el archivo haya sido movido o el disco/NAS no esté accesible.',
-      suggestion: 'Pulsa en "📁 Examinar en Windows" para buscar y seleccionar directamente tu archivo .accdb o .mdb en tu equipo o unidad de red.',
+      suggestion: 'Pulsa en "Examinar en Windows" para buscar y seleccionar directamente tu archivo .accdb o .mdb en tu equipo o unidad de red.',
       actionLabel: 'Seleccionar base de datos de Factusol',
       targetTab: 'factusol',
       targetInputId: 'input-factusol-db',

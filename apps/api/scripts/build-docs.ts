@@ -29,11 +29,16 @@ function getCanonicalVersion(): string {
 function renderSidebar(currentSlug?: string): string {
   const isHubActive = currentSlug === 'hub' || !currentSlug;
   return `
-    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+    <aside id="docs-sidebar" class="fixed top-16 bottom-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-4 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
       <!-- Direct Hub Link -->
       <div class="mb-4 pb-3 border-b border-white/[0.06]">
-        <a href="/docs/" class="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition ${isHubActive ? 'bg-indigo-500/10 text-indigo-300 border-l-2 border-indigo-500 pl-2' : 'text-zinc-300 hover:text-white hover:bg-white/[0.03]'}">
-          <span class="text-sm">📖</span>
+        <a href="/docs/" class="group flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition ${isHubActive ? 'bg-indigo-500/10 text-indigo-300 border-l-2 border-indigo-500 pl-2' : 'text-zinc-300 hover:text-white hover:bg-white/[0.03]'}">
+          <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </span>
           <span>Inicio Documentación</span>
         </a>
       </div>
@@ -56,8 +61,8 @@ function renderSidebar(currentSlug?: string): string {
           const headerBadge = isCategoryActive ? `<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>` : '';
           return `
             <div class="category-group" data-category="${cat.slug}">
-              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider ${isCategoryActive ? 'text-indigo-400' : 'text-zinc-400'}">
-                <span>${cat.icon}</span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none ${isCategoryActive ? 'text-indigo-400' : 'text-zinc-400'}">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 ${isCategoryActive ? 'text-indigo-400' : 'text-zinc-400'} group-hover:text-white transition">${cat.icon}</span>
                 <span>${cat.title}</span>
                 ${headerBadge}
               </div>
@@ -91,7 +96,7 @@ function renderSidebar(currentSlug?: string): string {
       </div>
     </aside>
     <!-- Overlay for mobile -->
-    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+    <div id="sidebar-overlay" class="fixed top-16 inset-x-0 bottom-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
   `;
 }
 
@@ -230,6 +235,44 @@ function renderDocArticlePage(article: DocArticle): string {
     ]
   }
   </script>
+  <style>
+    /* Minimalist Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    #docs-sidebar::-webkit-scrollbar,
+    aside::-webkit-scrollbar {
+      width: 5px;
+    }
+    #docs-sidebar::-webkit-scrollbar-track,
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb,
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb:hover,
+    aside::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    html, body, #docs-sidebar, aside {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -442,6 +485,44 @@ function renderDocsHub(): string {
   <meta property="og:locale" content="es_ES">
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Minimalist Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    #docs-sidebar::-webkit-scrollbar,
+    aside::-webkit-scrollbar {
+      width: 5px;
+    }
+    #docs-sidebar::-webkit-scrollbar-track,
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb,
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    #docs-sidebar::-webkit-scrollbar-thumb:hover,
+    aside::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    html, body, #docs-sidebar, aside {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
@@ -479,7 +560,14 @@ function renderDocsHub(): string {
         <div id="inicio-rapido" class="mb-12">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>🚀</span>
+              <span class="w-5 h-5 inline-flex items-center justify-center shrink-0 text-zinc-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                  <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+                  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+                  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+                </svg>
+              </span>
               <span>Puesta en Marcha Rápida (3 Pasos)</span>
             </h2>
             <span class="text-xs text-zinc-500 font-mono">De 0 a sincronización en &lt;5 min</span>
@@ -519,7 +607,13 @@ function renderDocsHub(): string {
         <div id="categorias" class="mb-12">
           <div class="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.08]">
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <span>📚</span>
+              <span class="w-5 h-5 inline-flex items-center justify-center shrink-0 text-zinc-400">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                  <path d="M6 6h10"/>
+                  <path d="M6 10h10"/>
+                </svg>
+              </span>
               <span>Manuales por Categoría (${DOC_CATEGORIES.length})</span>
             </h2>
             <span class="text-xs text-zinc-500">${DOC_ARTICLES.length} artículos disponibles</span>
@@ -529,28 +623,26 @@ function renderDocsHub(): string {
             ${DOC_CATEGORIES.map((cat) => {
               const articles = getArticlesByCategory(cat.slug);
               return `
-                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
                   <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                      <span class="text-xl">${cat.icon}</span>
-                      <div>
-                        <h3 class="text-xs font-bold text-white">${cat.title}</h3>
-                        <p class="text-[10px] text-zinc-400 leading-snug">${cat.description}</p>
-                      </div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition">${cat.icon}</span>
+                      <h3 class="text-xs font-bold text-white group-hover:text-zinc-100 transition">${cat.title}</h3>
                     </div>
+                    <p class="text-[11px] text-zinc-400 leading-relaxed mb-3">${cat.description}</p>
 
                     <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
                       ${articles.slice(0, 3).map((art) => `
                         <li>
-                          <a href="/docs/${art.slug}/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
-                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                          <a href="/docs/${art.slug}/" class="text-[11px] text-zinc-300 hover:text-white transition flex items-center gap-1.5 group/item">
+                            <span class="text-zinc-600 group-hover/item:text-zinc-400 transition">&rarr;</span>
                             <span class="truncate">${art.title}</span>
                           </a>
                         </li>
                       `).join('')}
                       ${articles.length > 3 && articles[0] ? `
                         <li class="pt-0.5">
-                          <a href="/docs/${articles[0].slug}/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                          <a href="/docs/${articles[0].slug}/" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition">
                             + ${articles.length - 3} artículos más en ${cat.title} &rarr;
                           </a>
                         </li>

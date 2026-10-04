@@ -2,34 +2,34 @@ export function renderOverviewTab(): string {
   return `      <!-- ================= TAB 1: ESTADO GENERAL (VISTA ZEN) ================= -->
       <section id="tab-overview" class="tab-pane active">
         <!-- Banner de Actualización Disponible -->
-        <div id="overview-update-banner" style="display:none;margin-bottom:1.5rem;padding:1.1rem 1.4rem;background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(217,119,6,0.08));border:1px solid rgba(245,158,11,0.35);border-radius:12px;align-items:center;justify-content:space-between;gap:1rem;">
+        <div id="overview-update-banner" style="display:none;margin-bottom:1.5rem;padding:1.1rem 1.4rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;align-items:center;justify-content:space-between;gap:1rem;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.18);display:flex;align-items:center;justify-content:center;color:#f59e0b;flex-shrink:0;">
-              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#e4e4e7;flex-shrink:0;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             </div>
             <div>
-              <div style="font-weight:600;font-size:14px;color:#f59e0b;" id="update-banner-title">Nueva versión disponible</div>
+              <div style="font-weight:600;font-size:14px;color:#fff;" id="update-banner-title">Nueva versión disponible</div>
               <div style="font-size:12px;color:var(--text-secondary,#94a3b8);margin-top:2px;" id="update-banner-desc">Hay una actualización lista para instalarse.</div>
             </div>
           </div>
-          <button onclick="triggerRestartUpdate()" id="btn-update-banner-action" class="btn" style="background:linear-gradient(135deg, #f59e0b, #d97706);color:#fff;border:none;box-shadow:0 0 12px rgba(245,158,11,0.35);font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+          <button onclick="triggerRestartUpdate()" id="btn-update-banner-action" class="btn" style="background:#27272a;border:1px solid rgba(255,255,255,0.18);color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
             <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             <span id="btn-update-banner-text">Reiniciar para Actualizar</span>
           </button>
         </div>
 
         <!-- Banner de Incidencia y Resolución Rápida -->
-        <div id="zen-alert-banner" class="zen-alert-banner" style="display:none;background:linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08));border:1px solid rgba(239,68,68,0.35);">
+        <div id="zen-alert-banner" class="zen-alert-banner" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
           <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
-            <div id="zen-alert-icon-box" style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.18);display:flex;align-items:center;justify-content:center;color:#f87171;flex-shrink:0;">
-              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <div id="zen-alert-icon-box" style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#e4e4e7;flex-shrink:0;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
             <div style="min-width:0;">
-              <div style="font-weight:700;font-size:14px;color:#fecaca;" id="zen-alert-title">Atención requerida</div>
-              <div style="font-size:12px;color:#e2e8f0;margin-top:2px;line-height:1.4;" id="zen-alert-desc">Se requiere intervención para sincronizar.</div>
+              <div style="font-weight:700;font-size:14px;color:#fff;" id="zen-alert-title">Atención requerida</div>
+              <div style="font-size:12px;color:var(--text-muted,#a1a1aa);margin-top:2px;line-height:1.4;" id="zen-alert-desc">Se requiere intervención para sincronizar.</div>
             </div>
           </div>
-          <button id="zen-alert-btn" onclick="handleZenAlertClick()" class="btn" style="background:linear-gradient(135deg, #ef4444, #dc2626);color:#fff;border:none;box-shadow:0 0 14px rgba(239,68,68,0.35);font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+          <button id="zen-alert-btn" onclick="handleZenAlertClick()" class="btn" style="background:#27272a;border:1px solid rgba(255,255,255,0.18);color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
             <span id="zen-alert-btn-text">Resolver incidencia →</span>
           </button>
         </div>
@@ -175,9 +175,9 @@ export function renderOverviewTab(): string {
           </div>
 
           <!-- Alerta de Recomendación Pre-Flight si algo falla -->
-          <div id="pf-alert-box" style="display:none;margin-top:1rem;padding:0.9rem 1.2rem;border-radius:8px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);font-size:12px;color:#fca5a5;line-height:1.5;">
-            <div style="font-weight:600;margin-bottom:4px;" id="pf-alert-title">Acción recomendada requerida:</div>
-            <div id="pf-alert-message"></div>
+          <div id="pf-alert-box" style="display:none;margin-top:1rem;padding:0.9rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);font-size:12px;color:#e4e4e7;line-height:1.5;">
+            <div style="font-weight:600;margin-bottom:4px;color:#fff;" id="pf-alert-title">Acción recomendada requerida:</div>
+            <div id="pf-alert-message" style="color:var(--text-muted,#a1a1aa);"></div>
           </div>
         </div>
 

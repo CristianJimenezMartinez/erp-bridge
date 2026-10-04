@@ -149,7 +149,7 @@ export const wizardScript = `
       alertEl.innerHTML = 
         '<div class="smart-error-card">' +
           '<div class="smart-error-header">' +
-            '<span>💡</span>' +
+            (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') +
             '<span>' + cleanTitle + '</span>' +
           '</div>' +
           '<div class="smart-error-cause">' +
@@ -166,7 +166,7 @@ export const wizardScript = `
       alertEl.style.display = 'block';
       alertEl.innerHTML = 
         '<div class="smart-success-card">' +
-          '<span>✓</span>' +
+          (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
           '<span>' + cleanMsg + '</span>' +
         '</div>';
     }
@@ -186,12 +186,12 @@ export const wizardScript = `
           title: 'Clave de licencia requerida',
           cause: 'No has introducido ninguna clave en el formulario.',
           suggestion: 'Pega la clave que comienza por EB-... recibida por correo electrónico.'
-        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir clave</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('edit') : '') + '<span>Escribir clave</span></button>');
         return;
       }
 
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Activando clave en la nube...</div>';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Activando clave en la nube...</div>';
 
       try {
         const res = await fetch('/api/local/activate-license', {
@@ -211,8 +211,8 @@ export const wizardScript = `
         } else {
           const errInfo = humanizeErrorMessage(data.error || 'Clave no válida', 'license');
           renderWizardErrorCard(alertBox, errInfo, 
-            '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✏️ Corregir clave</span></button>' +
-            '<button type="button" onclick="window.open(&quot;https://bridge.cristianjm.com/&quot;, &quot;_blank&quot;)" class="smart-error-btn"><span>🔑 Obtener nueva clave</span></button>'
+            '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('edit') : '') + '<span>Corregir clave</span></button>' +
+            '<button type="button" onclick="window.open(&quot;https://bridge.cristianjm.com/&quot;, &quot;_blank&quot;)" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('key') : '') + '<span>Obtener nueva clave</span></button>'
           );
           showSmartToast({
             title: 'Error de Activación',
@@ -223,7 +223,7 @@ export const wizardScript = `
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'license');
         renderWizardErrorCard(alertBox, errInfo, 
-          '<button type="button" onclick="wizPasteAndActivateLicense()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar activación</span></button>'
+          '<button type="button" onclick="wizPasteAndActivateLicense()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar activación</span></button>'
         );
       }
     }
@@ -257,12 +257,12 @@ export const wizardScript = `
           title: 'Dirección web requerida',
           cause: 'No has introducido la dirección de tu tienda online.',
           suggestion: 'Escribe la dirección web donde vendes por internet (ejemplo: https://mitienda.com).'
-        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-univ-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir dirección</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-univ-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('edit') : '') + '<span>Escribir dirección</span></button>');
         return;
       }
 
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión con tu web...</div>';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Comprobando conexión con tu web...</div>';
 
       try {
         const res = await fetch('/api/local/test-universal-bridge', {
@@ -282,10 +282,10 @@ export const wizardScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!url.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-univ-url&quot;); wizTestUniversal();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-univ-url&quot;); wizTestUniversal();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
           }
-          extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn"><span>⬇️ Descargar erp-bridge-endpoint.php</span></button>';
-          extraActions += '<button type="button" onclick="wizTestUniversal()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
+          extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('download') : '') + '<span>Descargar erp-bridge-endpoint.php</span></button>';
+          extraActions += '<button type="button" onclick="wizTestUniversal()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar comprobación</span></button>';
           renderWizardErrorCard(alertBox, errInfo, extraActions);
           showSmartToast({
             title: errInfo.title,
@@ -296,7 +296,7 @@ export const wizardScript = `
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'channel');
         renderWizardErrorCard(alertBox, errInfo, 
-          '<button type="button" onclick="wizTestUniversal()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar conexión</span></button>'
+          '<button type="button" onclick="wizTestUniversal()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>'
         );
       }
     }
@@ -314,13 +314,13 @@ export const wizardScript = `
           title: 'Credenciales de WooCommerce incompletas',
           cause: 'Se requiere la URL de la tienda, Consumer Key (ck_...) y Consumer Secret (cs_...).',
           suggestion: 'Copia las credenciales desde WooCommerce > Ajustes > Avanzado > REST API con permisos de Lectura/Escritura.'
-        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-wc-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Completar credenciales</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-wc-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('edit') : '') + '<span>Completar credenciales</span></button>');
         return;
       }
 
       if (btn) btn.disabled = true;
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión REST API...</div>';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Comprobando conexión REST API...</div>';
 
       try {
         const res = await fetch('/api/local/test-woocommerce', {
@@ -340,9 +340,9 @@ export const wizardScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-wc-url&quot;); wizTestWooCommerce();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-wc-url&quot;); wizTestWooCommerce();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
           }
-          extraActions += '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn"><span>🔄 Reintentar conexión REST API</span></button>';
+          extraActions += '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión REST API</span></button>';
           renderWizardErrorCard(alertBox, errInfo, extraActions);
           showSmartToast({
             title: errInfo.title,
@@ -353,7 +353,7 @@ export const wizardScript = `
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'channel');
         renderWizardErrorCard(alertBox, errInfo, 
-          '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>'
+          '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>'
         );
       } finally {
         if (btn) btn.disabled = false;
@@ -377,16 +377,16 @@ export const wizardScript = `
           title: 'Correo de destino requerido',
           cause: 'No has especificado ninguna dirección de email para recibir las notificaciones.',
           suggestion: 'Introduce la dirección de correo corporativa donde deseas recibir los avisos de pedidos.'
-        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-notif-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir correo</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-notif-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('mail') : '') + '<span>Escribir correo</span></button>');
         return;
       }
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span class="spin">⏳</span> Enviando prueba...';
+        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Enviando prueba...';
       }
       alertBox.style.display = 'block';
-      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Enviando correo de prueba a ' + email + ' a través de Bentian Relay...</div>';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Enviando correo de prueba a ' + email + ' a través de Bentian Relay...</div>';
 
       try {
         const res = await fetch('/api/local/test-email', {
@@ -408,7 +408,7 @@ export const wizardScript = `
         } else {
           const errInfo = humanizeErrorMessage(data.message || 'No se pudo enviar el correo', 'channel');
           renderWizardErrorCard(alertBox, errInfo, 
-            '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar envío</span></button>'
+            '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar envío</span></button>'
           );
           showSmartToast({
             title: 'Aviso en Envío de Email',
@@ -419,7 +419,7 @@ export const wizardScript = `
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'channel');
         renderWizardErrorCard(alertBox, errInfo, 
-          '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>'
+          '<button type="button" onclick="wizTestOrderEmail()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>'
         );
       } finally {
         if (btn) {

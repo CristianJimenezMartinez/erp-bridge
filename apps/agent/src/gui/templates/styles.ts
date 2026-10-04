@@ -166,8 +166,13 @@ export const dashboardStyles = `
 
     .toast-action-btn { background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.45); color: #c7d2fe; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
     .toast-action-btn:hover { background: rgba(99, 102, 241, 0.35); border-color: rgba(99, 102, 241, 0.7); color: #fff; transform: translateY(-1px); }
-    .toast-close-btn { background: transparent; border: none; color: var(--text-subtle); font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 1; flex-shrink: 0; transition: color 0.15s; }
+    .toast-close-btn { background: transparent; border: none; color: var(--text-subtle); cursor: pointer; padding: 0; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex-shrink: 0; transition: color 0.15s, background 0.15s; }
     .toast-close-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+    /* Icon Utilities */
+    .icon-box, .icon-container { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; flex-shrink: 0; vertical-align: middle; }
+    .icon-box-sm, .icon-container-sm { width: 14px; height: 14px; }
+    .icon-box-lg, .icon-container-lg { width: 20px; height: 20px; }
 
     /* Deep Link Target Glow Animation */
     @keyframes deepLinkGlow {
@@ -198,10 +203,10 @@ export const dashboardStyles = `
     .smart-error-card {
       margin-top: 12px;
       padding: 14px 16px;
-      background: rgba(239, 68, 68, 0.09);
-      border: 1px solid rgba(239, 68, 68, 0.32);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      color: #fca5a5;
+      color: #e4e4e7;
       font-size: 13px;
       line-height: 1.5;
       animation: fadeIn 0.2s ease-out;
@@ -211,12 +216,12 @@ export const dashboardStyles = `
       align-items: center;
       gap: 8px;
       font-weight: 600;
-      color: #f87171;
+      color: #fff;
       margin-bottom: 6px;
       font-size: 13px;
     }
     .smart-error-cause {
-      color: #e2e8f0;
+      color: var(--text-muted);
       margin-bottom: 10px;
       font-size: 12px;
       line-height: 1.5;
@@ -228,11 +233,11 @@ export const dashboardStyles = `
       margin-top: 10px;
     }
     .smart-error-btn {
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       color: #fff;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
@@ -242,8 +247,8 @@ export const dashboardStyles = `
       gap: 6px;
     }
     .smart-error-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.28);
       transform: translateY(-1px);
     }
     .smart-error-btn-primary {
@@ -256,10 +261,10 @@ export const dashboardStyles = `
     .smart-success-card {
       margin-top: 12px;
       padding: 12px 16px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      color: #34d399;
+      color: #e4e4e7;
       font-size: 13px;
       line-height: 1.5;
       animation: fadeIn 0.2s ease-out;

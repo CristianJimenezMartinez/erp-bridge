@@ -54,7 +54,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           _consecutiveFailures = 0;
           hideConnectionBanner();
           if (typeof showToast === 'function') {
-            showToast('✓ Enlace con el motor local restablecido.', 'success');
+            showToast('Enlace con el motor local restablecido.', 'success');
           }
         }
         _consecutiveFailures = 0;
@@ -311,13 +311,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (isFactOffline) {
         if (banner) {
           banner.style.display = 'flex';
-          banner.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(245,158,11,0.08))';
-          banner.style.borderColor = 'rgba(239,68,68,0.35)';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con Factusol ERP';
           if (bannerDesc) bannerDesc.textContent = 'La ruta está registrada pero la base de datos no responde. Comprueba si la unidad de red o NAS está encendida y accesible.';
           if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en Factusol ERP →';
           if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(239,68,68,0.2)';
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#f87171';
           }
           _currentZenAlertAction = function() {
@@ -326,16 +326,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         if (heroCard) {
-          heroCard.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08))';
-          heroCard.style.borderColor = 'rgba(239,68,68,0.35)';
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
         }
         if (badge) {
-          badge.style.background = 'rgba(239,68,68,0.15)';
-          badge.style.borderColor = 'rgba(239,68,68,0.35)';
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
           badge.style.color = '#f87171';
         }
         if (badgeDot) badgeDot.style.background = '#f87171';
-        if (badgeText) badgeText.textContent = '⚠️ Factusol Desconectado';
+        if (badgeText) badgeText.textContent = 'Factusol Desconectado';
         if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de Factusol';
         if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo .accdb. Revisa la ruta o reconecta tu unidad de red para continuar.';
         if (primaryBtn) {
@@ -355,13 +355,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (isFactMissing) {
         if (banner) {
           banner.style.display = 'flex';
-          banner.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.14), rgba(217,119,6,0.08))';
-          banner.style.borderColor = 'rgba(245,158,11,0.35)';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Factusol ERP pendiente de configurar';
           if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (.accdb) para que el agente empiece a trabajar.';
           if (bannerBtnText) bannerBtnText.textContent = 'Configurar Factusol ERP →';
           if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(245,158,11,0.2)';
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#fbbf24';
           }
           _currentZenAlertAction = function() {
@@ -370,16 +370,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         if (heroCard) {
-          heroCard.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(99,102,241,0.08))';
-          heroCard.style.borderColor = 'rgba(245,158,11,0.35)';
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
         }
         if (badge) {
-          badge.style.background = 'rgba(245,158,11,0.15)';
-          badge.style.borderColor = 'rgba(245,158,11,0.35)';
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
           badge.style.color = '#fbbf24';
         }
         if (badgeDot) badgeDot.style.background = '#fbbf24';
-        if (badgeText) badgeText.textContent = 'ℹ️ Configuración Inicial';
+        if (badgeText) badgeText.textContent = 'Configuración Inicial';
         if (zenTitle) zenTitle.textContent = 'Conecta tu Factusol para comenzar a sincronizar';
         if (zenSub) zenSub.textContent = 'Selecciona tu archivo de Factusol con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
         if (primaryBtn) {
@@ -400,13 +400,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const targetInput = chType === 'woocommerce' ? 'input-wc-url' : 'input-universal-url';
         if (banner) {
           banner.style.display = 'flex';
-          banner.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.14), rgba(99,102,241,0.08))';
-          banner.style.borderColor = 'rgba(59,130,246,0.35)';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
           if (bannerDesc) bannerDesc.textContent = 'Factusol está preparado con ' + (fact.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
           if (bannerBtnText) bannerBtnText.textContent = 'Revisar Tienda Online →';
           if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(59,130,246,0.2)';
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#60a5fa';
           }
           _currentZenAlertAction = function() {
@@ -415,16 +415,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         if (heroCard) {
-          heroCard.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))';
-          heroCard.style.borderColor = 'rgba(59,130,246,0.35)';
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
         }
         if (badge) {
-          badge.style.background = 'rgba(59,130,246,0.15)';
-          badge.style.borderColor = 'rgba(59,130,246,0.35)';
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
           badge.style.color = '#60a5fa';
         }
         if (badgeDot) badgeDot.style.background = '#60a5fa';
-        if (badgeText) badgeText.textContent = '⚠️ Tienda Online sin vincular';
+        if (badgeText) badgeText.textContent = 'Tienda Online sin vincular';
         if (zenTitle) zenTitle.textContent = 'Enlaza tu tienda web para publicar tu catálogo';
         if (zenSub) zenSub.textContent = 'Tu Factusol está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
         if (primaryBtn) {
@@ -444,13 +444,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (!isLicenseActive) {
         if (banner) {
           banner.style.display = 'flex';
-          banner.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(245,158,11,0.08))';
-          banner.style.borderColor = 'rgba(239,68,68,0.35)';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Licencia del puesto requerida';
           if (bannerDesc) bannerDesc.textContent = 'Introduce tu clave de suscripción para activar la sincronización desatendida y el control de existencias.';
           if (bannerBtnText) bannerBtnText.textContent = 'Activar Licencia →';
           if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(239,68,68,0.2)';
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#f87171';
           }
           _currentZenAlertAction = function() {
@@ -459,16 +459,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
 
         if (heroCard) {
-          heroCard.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08))';
-          heroCard.style.borderColor = 'rgba(239,68,68,0.35)';
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
         }
         if (badge) {
-          badge.style.background = 'rgba(239,68,68,0.15)';
-          badge.style.borderColor = 'rgba(239,68,68,0.35)';
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
           badge.style.color = '#f87171';
         }
         if (badgeDot) badgeDot.style.background = '#f87171';
-        if (badgeText) badgeText.textContent = '⚠️ Licencia Pendiente';
+        if (badgeText) badgeText.textContent = 'Licencia Pendiente';
         if (zenTitle) zenTitle.textContent = 'Activa la licencia de este equipo';
         if (zenSub) zenSub.textContent = 'Introduce la clave de tu suscripción para desbloquear el motor autónomo de sincronización en tiempo real.';
         if (primaryBtn) {
@@ -491,12 +491,12 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       }
 
       if (heroCard) {
-        heroCard.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.08))';
-        heroCard.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+        heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+        heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
       }
       if (badge) {
-        badge.style.background = 'rgba(16, 185, 129, 0.15)';
-        badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        badge.style.background = 'rgba(16, 185, 129, 0.1)';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.2)';
         badge.style.color = '#34d399';
       }
       if (badgeDot) badgeDot.style.background = '#34d399';
@@ -796,7 +796,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         if (res.ok) {
           const pf = await res.json();
           renderPreflight(pf);
-          showToast('✓ Diagnóstico Pre-Flight actualizado', 'success');
+          showToast('Diagnóstico Pre-Flight actualizado', 'success');
         }
       } catch (err) {
         showToast('Error al ejecutar diagnóstico preflight: ' + err.message, 'error');

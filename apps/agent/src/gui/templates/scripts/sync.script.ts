@@ -106,10 +106,13 @@ export const syncScript = `
         if (data.success) {
           showToast(data.message);
           if (feedback) {
-            feedback.style.background = 'rgba(16, 185, 129, 0.1)';
-            feedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-            feedback.style.color = '#6ee7b7';
-            feedback.innerHTML = '✓ ' + data.message;
+            feedback.style.background = 'rgba(255, 255, 255, 0.03)';
+            feedback.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            feedback.style.color = '#34d399';
+            feedback.style.display = 'inline-flex';
+            feedback.style.alignItems = 'center';
+            feedback.style.gap = '8px';
+            feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') + '<span>' + data.message + '</span>';
           }
           fetchStatus();
           loadSyncHistory();
@@ -124,10 +127,14 @@ export const syncScript = `
             type: 'warn'
           });
           if (feedback) {
-            feedback.style.background = 'rgba(239, 68, 68, 0.1)';
-            feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-            feedback.style.color = '#fca5a5';
-            feedback.innerHTML = '❌ ' + (errInfo.cause ? ('<strong>' + errInfo.cause + '</strong><br>' + errInfo.suggestion) : data.message);
+            feedback.style.background = 'rgba(255, 255, 255, 0.03)';
+            feedback.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            feedback.style.color = '#f87171';
+            feedback.style.display = 'inline-flex';
+            feedback.style.alignItems = 'center';
+            feedback.style.gap = '8px';
+            const textContent = errInfo.cause ? ('<strong>' + errInfo.cause + '</strong><br>' + errInfo.suggestion) : data.message;
+            feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>' + textContent + '</span>';
           }
         }
       } catch (err) {
@@ -140,10 +147,13 @@ export const syncScript = `
           type: 'error'
         });
         if (feedback) {
-          feedback.style.background = 'rgba(239, 68, 68, 0.1)';
-          feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-          feedback.style.color = '#fca5a5';
-          feedback.innerHTML = '❌ ' + errInfo.message;
+          feedback.style.background = 'rgba(255, 255, 255, 0.03)';
+          feedback.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+          feedback.style.color = '#f87171';
+          feedback.style.display = 'inline-flex';
+          feedback.style.alignItems = 'center';
+          feedback.style.gap = '8px';
+          feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>' + errInfo.message + '</span>';
         }
       } finally {
         if (btn) {
