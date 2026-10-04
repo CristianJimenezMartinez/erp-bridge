@@ -71,6 +71,36 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/beta/" />
   </url>
 
+  <!-- Página Pilar: Adaptar WooCommerce a VeriFactu con Factusol -->
+  <url>
+    <loc>https://bridge.cristianjm.com/factusol-verifactu-woocommerce/</loc>
+    <lastmod>2026-10-04T10:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/factusol-verifactu-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/factusol-verifactu-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/factusol-verifactu-woocommerce/" />
+  </url>
+
+  <!-- Página Pilar: Factusol API REST para Desarrolladores y Agencias -->
+  <url>
+    <loc>https://bridge.cristianjm.com/factusol-api-rest/</loc>
+    <lastmod>2026-10-04T10:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/factusol-api-rest/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/factusol-api-rest/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/factusol-api-rest/" />
+  </url>
+
+  <!-- Guía Técnica: Solución Error Base de Datos Bloqueada (.laccdb) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html</loc>
+    <lastmod>2026-10-04T10:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 
   <!-- Hub Nacional: Conector Factusol por Ciudades -->
   <url>
@@ -114,5 +144,60 @@
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/valencia/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/valencia/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/valencia/" />
+  </url>
+
+  <!-- Conector Factusol: Sevilla (Sevilla) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/sevilla/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/sevilla/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/sevilla/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/sevilla/" />
+  </url>
+
+  <!-- Conector Factusol: Zaragoza (Zaragoza) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/zaragoza/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/zaragoza/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/zaragoza/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/zaragoza/" />
+  </url>
+
+  <!-- Conector Factusol: Málaga (Málaga) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/malaga/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/malaga/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/malaga/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/malaga/" />
+  </url>
+
+  <!-- Conector Factusol: Alicante (Alicante) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/alicante/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/alicante/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/alicante/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/alicante/" />
+  </url>
+
+  <!-- Conector Factusol: Bilbao (Bizkaia) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-factusol/bilbao/</loc>
+    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/bilbao/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/bilbao/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/bilbao/" />
   </url>
 </urlset>

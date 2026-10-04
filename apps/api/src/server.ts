@@ -215,6 +215,14 @@ export async function bootstrapApp(): Promise<Express> {
     res.redirect(301, '/conector-factusol/');
   });
 
+  app.get('/factusol-verifactu-woocommerce', (_req, res) => {
+    res.redirect(301, '/factusol-verifactu-woocommerce/');
+  });
+
+  app.get('/factusol-api-rest', (_req, res) => {
+    res.redirect(301, '/factusol-api-rest/');
+  });
+
   // Servir Dashboard Cloud Multi-Tenant
   const dashboardDir = path.join(publicDir, 'dashboard');
   app.use('/dashboard', express.static(dashboardDir, {

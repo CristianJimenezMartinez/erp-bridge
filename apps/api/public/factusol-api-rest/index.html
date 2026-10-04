@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factusol API REST — Conecta tu ERP con Node, PHP o Python | Bentian</title>
+  <meta name="description" content="API REST local y ultrarrápida para Factusol. Conecta tu base de datos Access (.accdb) con cualquier tienda online, app web o ERP personalizado mediante JSON en <50ms.">
+  <meta name="keywords" content="factusol api rest, api factusol nodejs, api factusol python, conectar factusol php, gateway rest factusol, factusol oledb json">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-api-rest/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-api-rest/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Factusol API REST Local — Para Desarrolladores y Agencias">
+  <meta property="og:description" content="Accede a Factusol mediante endpoints REST JSON locales. Sincroniza stock, catálogo y pedidos sin cuotas cloud ni latencia.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Factusol API REST Local para Desarrolladores">
+  <meta name="twitter:description" content="La forma más rápida y segura de conectar Factusol con aplicaciones web y eCommerce mediante REST API estándar.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://bridge.cristianjm.com/factusol-api-rest/#techarticle",
+        "headline": "Especificación de API REST Local para Microsoft Factusol con Bentian ERP Bridge",
+        "description": "Guía técnica para programadores y agencias: cómo consultar y escribir datos en Factusol mediante endpoints REST locales en JSON.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge — REST Gateway",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "url": "https://bridge.cristianjm.com/#pricing"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Tiene Factusol una API REST nativa oficial?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Factusol en su versión de escritorio tradicional (.accdb) no incluye una API REST web nativa. Software DELSOL ofrece una API en la nube atada a sus planes cloud de pago. Bentian ERP Bridge actúa como un Gateway REST local de alto rendimiento que expone tu base de datos de Factusol en endpoints HTTP estándar sin cuotas adicionales."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿En qué puerto escucha la API local de Bentian?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "La API local de Bentian escucha de forma inmutable y fija en el puerto 39281 (http://127.0.0.1:39281) en la máquina donde está instalado el agente."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Permite integrar tiendas hechas a medida en React, Vue o Laravel?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Puedes consumir los endpoints JSON desde cualquier backend en Node.js, PHP, Python, Go o Ruby para consultar stock, registrar pedidos de venta y sincronizar clientes en tiempo real."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| API REST</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/conector-factusol/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Ciudades</a>
+        <a href="/factusol-verifactu-woocommerce/" class="text-sm text-emerald-400 hover:text-emerald-300 transition">VeriFactu</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar SDK</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-xs font-mono mb-6">
+      <span>GET http://127.0.0.1:39281 • REST API Gateway</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      La <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-400">API REST Local para Factusol</span> que los Desarrolladores Necesitan
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Conecta tu base de datos de Factusol con tiendas online hechas a medida, sistemas POS, plataformas de almacén o eCommerce (WooCommerce, PrestaShop, Shopify) mediante <strong>endpoints HTTP REST estándar en JSON</strong> con latencia inferior a 50 milisegundos.
+    </p>
+
+    <div class="flex flex-wrap gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Descargar Agente / Gateway (<span data-app-version>v0.3.5</span>)
+      </a>
+      <a href="/dashboard" class="border border-white/[0.1] hover:border-white/[0.2] bg-white/[0.03] text-zinc-300 hover:text-white font-semibold text-sm px-6 py-3 rounded-xl transition">
+        Ver Panel de Control B2B
+      </a>
+    </div>
+
+    <!-- Ejemplo de Código Interactivo -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl overflow-hidden mb-16 shadow-2xl">
+      <div class="p-4 border-b border-white/[0.08] bg-white/[0.02] flex items-center justify-between">
+        <div class="flex items-center gap-2 font-mono text-xs text-zinc-400">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+          <span class="ml-2 text-zinc-300 font-semibold">Ejemplo: Consulta de Stock Disponible (DISSTO)</span>
+        </div>
+        <span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">JSON • 200 OK</span>
+      </div>
+      <div class="p-6 font-mono text-xs text-zinc-300 overflow-x-auto leading-relaxed bg-[#0d0d10]">
+<pre><span class="text-zinc-500">// GET http://127.0.0.1:39281/api/local/status</span>
+<span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> fetch(<span class="text-emerald-300">'http://127.0.0.1:39281/api/local/status'</span>);
+<span class="text-purple-400">const</span> status = <span class="text-purple-400">await</span> response.json();
+
+<span class="text-zinc-500">// Respuesta en tiempo real (<35ms):</span>
+{
+  <span class="text-blue-300">"agent"</span>: {
+    <span class="text-blue-300">"status"</span>: <span class="text-emerald-300">"ONLINE"</span>,
+    <span class="text-blue-300">"version"</span>: <span class="text-emerald-300">"0.3.5"</span>,
+    <span class="text-blue-300">"mode"</span>: <span class="text-emerald-300">"LOCAL_FIRST"</span>
+  },
+  <span class="text-blue-300">"factusol"</span>: {
+    <span class="text-blue-300">"connected"</span>: <span class="text-emerald-400">true</span>,
+    <span class="text-blue-300">"database"</span>: <span class="text-emerald-300">"X:\\Datos\\FS\\2262026.accdb"</span>,
+    <span class="text-blue-300">"driver"</span>: <span class="text-emerald-300">"Microsoft.ACE.OLEDB.12.0"</span>,
+    <span class="text-blue-300">"totalArticles"</span>: <span class="text-amber-300">5420</span>,
+    <span class="text-blue-300">"lastSyncDurationMs"</span>: <span class="text-amber-300">84</span>
+  }
+}</pre>
+      </div>
+    </div>
+
+    <!-- Las 3 Ventajas para Desarrolladores -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold">
+          01
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Lectura Directa en Memoria</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Consulta catálogos masivos de Factusol en menos de 100 ms usando el motor Microsoft ACE OLEDB de Windows sin bloquear la base de datos a los usuarios de la oficina.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold">
+          02
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Zero-Knowledge & Privacidad</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Tus datos empresariales, costes de compra y márgenes nunca se suben a la nube. La API REST se ejecuta estrictamente en la red interna del cliente.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold">
+          03
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Sin Apertura de Puertos</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Cero riesgos de ciberseguridad. No requiere abrir puertos en el router del cliente (NAT/PAT) ni configurar IPs fijas. El agente utiliza llamadas HTTPS salientes estándar.
+        </p>
+      </div>
+    </div>
+
+    <!-- Comparativa con API Cloud DELSOL -->
+    <div class="border border-white/[0.08] rounded-2xl overflow-hidden bg-[#121215] mb-16 shadow-2xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.02]">
+        <h2 class="text-xl font-bold text-white">Comparativa: Bentian REST Gateway vs API Cloud Oficial</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.01] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4 sm:p-5">Parámetro Técnico</th>
+              <th class="p-4 sm:p-5 text-indigo-400 font-bold bg-indigo-500/[0.05]">Bentian REST Gateway</th>
+              <th class="p-4 sm:p-5 text-zinc-400">API DELSOL Cloud Oficial</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Latencia Media</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-indigo-500/[0.05]">< 50 ms (Local Loopback)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">400 ms – 1.800 ms (Rutas Cloud)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Límites de Peticiones (Rate Limits)</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">Ilimitadas (Sin cuota de peticiones)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Limitado por plan contratado</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Obligación de Subir Datos a la Nube</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">No (Tu Access local se queda en tu PC)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Sí (Exige migrar o replicar en cloud)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Formato de Respuesta</td>
+              <td class="p-4 sm:p-5 text-zinc-300 font-mono text-xs bg-indigo-500/[0.05]">JSON REST Estándar</td>
+              <td class="p-4 sm:p-5 text-zinc-400 font-mono text-xs">Proprietario / XML-JSON</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Coste para la Agencia</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-indigo-500/[0.05]">149,25 € / año (Tarifa Partner -25%)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">+500 € / año por cliente</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre la API de Factusol</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Puedo integrar Factusol con aplicaciones móviles o tablets de almacén?</span>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
+            Sí. Puedes desplegar el agente en un equipo Windows de la red local y consultar la API desde cualquier dispositivo móvil o terminal de mano conectado a la misma red Wi-Fi de la empresa.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Soporta creación de pedidos de venta (F_PCL) y clientes (F_CLI)?</span>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
+            Totalmente. La API incluye endpoints POST para registrar pedidos completos con cabecera y líneas detalladas, aplicando tarifas por cliente, condiciones de pago y tipos de IVA oficiales.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- CTA Final -->
+    <div class="border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent rounded-2xl p-8 sm:p-12 text-center">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">Empieza a Desarrollar con Factusol Hoy Mismo</h2>
+      <p class="text-zinc-400 max-w-2xl mx-auto mb-8 text-sm sm:text-base leading-relaxed">
+        Descarga el agente de Bentian ERP Bridge y dispón de una API REST completa para Factusol en menos de dos minutos. Sin cuotas de alta ni compromisos.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25 flex items-center gap-2">
+          <span>Descargar Bentian-Setup.exe</span>
+          <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+        </a>
+        <a href="/beta/" class="text-sm text-zinc-400 hover:text-white transition px-4 py-3">
+          Ver Programa de Beta Pública →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • REST API Gateway para Microsoft Factusol</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+        <span>•</span>
+        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
+        <span>•</span>
+        <a href="/factusol-woocommerce/" class="hover:text-white transition">WooCommerce</a>
+        <span>•</span>
+        <a href="/beta/" class="hover:text-white transition">Beta Pública</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cómo Adaptar tu WooCommerce a VeriFactu con Factusol | Bentian ERP</title>
+  <meta name="description" content="Cumple la normativa VeriFactu y la Ley Crea y Crece en tu tienda WooCommerce conectándola con Factusol. Evita multas de la AEAT y factura legalmente con QR y hash.">
+  <meta name="keywords" content="verifactu woocommerce, factusol verifactu, ley crea y crece tienda online, factura electronica woocommerce factusol, multas software autofactura wordpress">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-verifactu-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-verifactu-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Adaptar tu WooCommerce a VeriFactu con Factusol — Bentian">
+  <meta property="og:description" content="Evita multas de hasta 50.000 €. Conecta WooCommerce con Factusol para emitir facturas legales VeriFactu con encadenamiento criptográfico y QR de la AEAT.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WooCommerce y la Ley VeriFactu: Solución Legal con Factusol">
+  <meta name="twitter:description" content="Descubre por qué los plugins PDF de WordPress son ilegales bajo VeriFactu y cómo solucionarlo conectando Factusol.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://bridge.cristianjm.com/factusol-verifactu-woocommerce/#article",
+        "headline": "Cómo adaptar tu tienda WooCommerce a la Ley VeriFactu conectándola con Factusol",
+        "description": "Guía técnica y fiscal para cumplir el Reglamento VeriFactu (RD 1007/2023) en comercio electrónico mediante la integración de Factusol.",
+        "inLanguage": "es-ES",
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com",
+          "logo": "https://bridge.cristianjm.com/assets/icon.svg"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://bridge.cristianjm.com/#software",
+        "name": "Bentian ERP Bridge",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "url": "https://bridge.cristianjm.com/#pricing"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Son legales los plugins de facturas PDF en WooCommerce bajo la normativa VeriFactu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. La mayoría de los plugins de facturación en PDF para WooCommerce no cumplen los requisitos de inmutabilidad, encadenamiento de registros (hash criptográfico), registro de eventos del sistema ni generación de códigos QR conforme a las especificaciones técnicas de la Agencia Tributaria (AEAT)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo resuelve Bentian ERP Bridge la exigencia de VeriFactu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian establece una arquitectura en la que WooCommerce actúa exclusivamente como pasarela de venta (capturando pedidos en F_PCL), y transfiere los datos a Factusol. Factusol, como software de facturación profesional homologado por la AEAT, es el encargado de generar la factura legal definitiva (F_FAC) con su QR y hash correspondiente."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué sanciones existen por utilizar software de facturación no adaptado?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "La Ley 11/2021 de Medidas de Prevención y Lucha contra el Fraude Fiscal establece sanciones de hasta 50.000 € por ejercicio fiscal para las empresas que utilicen programas de facturación que permitan la alteración o no cumplan con los estándares de trazabilidad de VeriFactu."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| VeriFactu</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/conector-factusol/" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Ciudades</a>
+        <a href="/beta/" class="text-sm text-indigo-400 hover:text-indigo-300 transition">Beta Pública</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>Normativa Fiscal Española 2026/2027 • Ley Antifraude RD 1007/2023</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Adaptar tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400">WooCommerce a VeriFactu</span> Conectándolo con Factusol
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Los plugins genéricos de WordPress que generan facturas en PDF pasarán a ser <strong>ilegales en España</strong> si no cuentan con encadenamiento criptográfico, registro de eventos ni código QR de la Agencia Tributaria. Descubre cómo la arquitectura de <strong>Bentian ERP Bridge + Factusol</strong> blinda tu negocio ante multas de hasta 50.000 €.
+    </p>
+
+    <div class="flex flex-wrap gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Descargar Agente para Windows (<span data-app-version>v0.3.5</span>)
+      </a>
+      <a href="/beta/" class="border border-white/[0.1] hover:border-white/[0.2] bg-white/[0.03] text-zinc-300 hover:text-white font-semibold text-sm px-6 py-3 rounded-xl transition">
+        Ver Condiciones de la Beta Gratuita
+      </a>
+    </div>
+
+    <!-- Bloque de Advertencia Legal -->
+    <div class="border border-amber-500/30 bg-amber-500/5 rounded-2xl p-6 sm:p-8 mb-16">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-400">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-white mb-2">¿Por qué los plugins de WooCommerce no cumplen VeriFactu?</h2>
+          <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+            El <strong>Reglamento VeriFactu (Real Decreto 1007/2023)</strong> exige que todo sistema de facturación garantice la <em>integridad, inalterabilidad, trazabilidad e inaccesibilidad</em> de los registros. Exige calcular un hash criptográfico encadenado al registro anterior y estampar un código QR normalizado que permita al comprador cotejar la factura directamente en la sede electrónica de la AEAT.
+          </p>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            WordPress y WooCommerce están diseñados como plataformas abiertas sobre MySQL donde cualquier administrador o plugin puede editar o borrar un pedido de la base de datos con un clic. Esta vulnerabilidad estructural convierte a los plugins de facturación en PDF en <strong>sistemas no conformes</strong> susceptibles de inspección.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- La Solución Arquitectónica -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8">
+        <div class="text-xs font-mono text-red-400 uppercase tracking-wider mb-3">La Arquitectura Ilegal (Riesgo Sancionador)</div>
+        <h3 class="text-xl font-bold text-white mb-4">Plugin de Facturas en WordPress</h3>
+        <ul class="space-y-3 text-sm text-zinc-400">
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">✕</span>
+            <span>Permite modificar números de factura o borrar pedidos desde el panel de wp-admin.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">✕</span>
+            <span>No cuenta con libro de registro de eventos firmado digitalmente exigido por la AEAT.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">✕</span>
+            <span>Riesgo de sanción económica de hasta 50.000 € por software no conforme (Ley 11/2021).</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-400 font-bold">✕</span>
+            <span>Duplica la contabilidad: una en la tienda online y otra en el programa de oficina.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8">
+        <div class="text-xs font-mono text-emerald-400 uppercase tracking-wider mb-3">La Arquitectura Homologada (Bentian + Factusol)</div>
+        <h3 class="text-xl font-bold text-white mb-4">Facturación Oficial en ERP Centralizado</h3>
+        <ul class="space-y-3 text-sm text-zinc-300">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>WooCommerce solo vende:</strong> Recoge el pedido de venta como albarán previo (<code>F_PCL</code>).</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Factusol emite:</strong> El ERP certificado genera la factura legal inmutable con código QR y hash.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Sincronización silenciosa:</strong> Bentian traslada clientes, NIF/CIF, desglose de IVA y Recargo de Equivalencia en segundos.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 font-bold">✓</span>
+            <span><strong>Cero cuotas cloud:</strong> Funciona con tu Factusol local sin pagar costosos servicios SaaS de facturación electrónica.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tabla Comparativa -->
+    <div class="border border-white/[0.08] rounded-2xl overflow-hidden bg-[#121215] mb-16 shadow-2xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.02]">
+        <h2 class="text-xl font-bold text-white">Comparativa: Métodos para Cumplir VeriFactu en Comercio Electrónico</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.01] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4 sm:p-5">Criterio</th>
+              <th class="p-4 sm:p-5 text-indigo-400 font-bold bg-indigo-500/[0.05]">Bentian + Factusol Local</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Plataformas SaaS Cloud (ej: Quaderno)</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Plugins PDF de WordPress</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Coste Anual</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-indigo-500/[0.05]">199 € / año fijo</td>
+              <td class="p-4 sm:p-5 text-zinc-400">350 € – 1.200 € / año (por volumen)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Gratis o 50 € (pero no conforme)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Cumplimiento Legal AEAT</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">100% Homologado por Factusol</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold">100% Homologado</td>
+              <td class="p-4 sm:p-5 text-red-400 font-bold">Riesgo Alto de Sanción</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Unificación Contable</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">Total (Todo en tu Factusol)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Parcial (Requiere exportar a ERP)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Nula (Contabilidad separada)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Soporte Recargo de Equivalencia</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">Nativo en líneas F_LPC</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Complejo de configurar</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Requiere plugins de terceros</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Privacidad de Clientes</td>
+              <td class="p-4 sm:p-5 bg-indigo-500/[0.05]">100% en tu PC (Zero-Knowledge)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Alojado en servidores cloud externos</td>
+              <td class="p-4 sm:p-5 text-zinc-400">En base de datos WordPress</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Preguntas Frecuentes -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre VeriFactu y Factusol</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Cuándo entra en vigor de forma obligatoria VeriFactu para comercios online?</span>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
+            El Real Decreto 1007/2023 fija la obligatoriedad general a partir de 2026/2027 para todas las empresas y autónomos que emitan facturas en España. Esperar al último momento suele provocar cuellos de botella técnicos en las agencias informáticas.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Puedo seguir usando WooCommerce como pasarela de pago y catálogo?</span>
+            <summary class="hidden"></summary>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
+            Sí, por supuesto. WooCommerce sigue siendo tu escaparate comercial, carrito de compra y pasarela de cobro (Redsýs, Stripe, PayPal). La única diferencia es que el documento fiscal oficial de compra lo emite Factusol de forma automática al recibir el pedido vía Bentian ERP Bridge.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] bg-[#121215] rounded-xl p-5 cursor-pointer">
+          <summary class="font-semibold text-white flex items-center justify-between">
+            <span>¿Qué versiones de Factusol están preparadas para VeriFactu?</span>
+            <span class="text-zinc-500 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
+            Software DELSOL ha adaptado sus versiones recientes (Factusol 2024, 2025 y 2026) a los requisitos técnicos de la Agencia Tributaria. Bentian ERP Bridge es compatible con todas estas versiones tanto en mono-puesto como en red local.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- CTA Final -->
+    <div class="border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent rounded-2xl p-8 sm:p-12 text-center">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">Blinda tu Tienda Online ante las Multas de VeriFactu</h2>
+      <p class="text-zinc-400 max-w-2xl mx-auto mb-8 text-sm sm:text-base leading-relaxed">
+        Descarga el agente oficial de Bentian ERP Bridge durante la Beta Pública y conecta tu Factusol local con tu tienda WooCommerce en menos de 5 minutos sin permanencias ni tarjeta de crédito.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25 flex items-center gap-2">
+          <span>Descargar Bentian-Setup.exe</span>
+          <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+        </a>
+        <a href="/factusol-woocommerce/" class="text-sm text-zinc-400 hover:text-white transition px-4 py-3">
+          Ver Características Técnicas de WooCommerce →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Software de Sincronización Local-First</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+        <span>•</span>
+        <a href="/factusol-woocommerce/" class="hover:text-white transition">WooCommerce</a>
+        <span>•</span>
+        <a href="/factusol-prestashop/" class="hover:text-white transition">PrestaShop</a>
+        <span>•</span>
+        <a href="/beta/" class="hover:text-white transition">Beta Pública</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

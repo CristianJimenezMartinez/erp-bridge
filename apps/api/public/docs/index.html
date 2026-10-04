@@ -1,11 +1,100 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=/docs/windows-antivirus-smartscreen-guide.html">
-  <title>Bentian ERP Bridge — Documentación</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentación Técnica y Guías de Soporte | Bentian ERP Bridge</title>
+  <meta name="description" content="Centro de documentación técnica oficial de Bentian ERP Bridge. Guías de instalación, resolución de Windows SmartScreen y solución a bloqueos de Factusol en red.">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="background-color: #09090b; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-  <p>Redirigiendo a la <a href="/docs/windows-antivirus-smartscreen-guide.html" style="color: #818cf8;">Guía de Resolución de Windows SmartScreen y Antivirus</a>...</p>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-16 flex-grow">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Manuales y Recursos de Soporte</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-4">Documentación Oficial de Bentian ERP Bridge</h1>
+    <p class="text-zinc-400 text-base mb-10 max-w-2xl">
+      Consulta las guías oficiales para desplegar el agente en Windows, configurar la sincronización con WooCommerce o PrestaShop y solucionar incidencias con Factusol.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-16">
+      <a href="/docs/windows-antivirus-smartscreen-guide.html" class="block border border-white/[0.08] hover:border-indigo-500/40 bg-[#121215] hover:bg-[#16161b] rounded-2xl p-6 transition group">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <h2 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition">Guía de Instalación y Windows SmartScreen</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Instrucciones para autorizar el instalador en Windows 10/11 y añadir exclusiones en Windows Defender o antivirus de terceros.
+        </p>
+      </a>
+
+      <a href="/docs/error-base-datos-bloqueada-factusol-laccdb.html" class="block border border-white/[0.08] hover:border-indigo-500/40 bg-[#121215] hover:bg-[#16161b] rounded-2xl p-6 transition group">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h2 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition">Error de Base de Datos Bloqueada (.laccdb)</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Manual técnico para resolver el Error 3045, desbloquear archivos .laccdb huérfanos y trabajar en red local o servidores NAS sin bloqueos.
+        </p>
+      </a>
+
+      <a href="/factusol-verifactu-woocommerce/" class="block border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] rounded-2xl p-6 transition group">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <h2 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-300 transition">Adaptación de WooCommerce a VeriFactu</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Cómo emitir facturas legales con encadenamiento hash y código QR de la AEAT conectando WooCommerce con Factusol.
+        </p>
+      </a>
+
+      <a href="/factusol-api-rest/" class="block border border-white/[0.08] hover:border-blue-500/40 bg-[#121215] hover:bg-[#16161b] rounded-2xl p-6 transition group">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+        </div>
+        <h2 class="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition">Especificación Factusol API REST</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">
+          Guía técnica para programadores: integración de Factusol mediante endpoints HTTP REST en JSON sin servicios cloud.
+        </p>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Soporte y Documentación</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+        <span>•</span>
+        <a href="/beta/" class="hover:text-white transition">Beta</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
 </body>
 </html>

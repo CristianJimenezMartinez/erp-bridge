@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solución al Error de Base de Datos Bloqueada en Factusol (.laccdb) | Bentian</title>
+  <meta name="description" content="Guía paso a paso para solucionar el error de base de datos bloqueada, archivo en uso (Error 3045) y fichero .laccdb huérfano en Factusol al trabajar en red local o NAS.">
+  <meta name="keywords" content="error base de datos bloqueada factusol, factusol archivo en uso, borrar laccdb factusol, error 3045 access factusol, factusol red nas bloqueo">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Cómo Solucionar el Error de Base de Datos Bloqueada (.laccdb) en Factusol">
+  <meta property="og:description" content="Solución técnica para desbloquear archivos .laccdb y evitar bloqueos en red local y servidores NAS con Factusol.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Cómo solucionar el error de base de datos bloqueada (.laccdb) en Factusol al trabajar en red",
+    "description": "Manual de resolución técnica para administradores de sistemas y usuarios de Factusol ante bloqueos por concurrencia y archivos .laccdb huérfanos.",
+    "inLanguage": "es-ES",
+    "author": {
+      "@type": "Person",
+      "name": "Cristian Jiménez Martínez",
+      "url": "https://cristianjm.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Bentian",
+      "url": "https://bridge.cristianjm.com"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Guía Antivirus</a>
+        <a href="/releases/latest/Bentian-Setup.exe" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">Descargar Agente</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-4xl mx-auto px-6 py-12 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Soporte Técnico Factusol • Microsoft Access Database Engine</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Cómo Solucionar el Error de Base de Datos Bloqueada (<code class="text-indigo-400 text-2xl sm:text-3xl">.laccdb</code>) en Factusol
+    </h1>
+
+    <p class="text-base sm:text-lg text-zinc-400 mb-8 leading-relaxed">
+      Uno de los problemas más habituales al trabajar con <strong>Factusol en red local o en un servidor NAS (Synology, QNAP, Windows Server)</strong> es el bloqueo imprevisto de la base de datos (Error 3045: <em>"El archivo ya está en uso por otro proceso o usuario"</em>). En esta guía técnica explicamos por qué ocurre y cómo resolverlo sin peligro de corrupción.
+    </p>
+
+    <!-- Explicación Técnica -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-10">
+      <h2 class="text-xl font-bold text-white mb-3">1. ¿Qué es el archivo .laccdb (o .ldb)?</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-4">
+        Factusol utiliza como motor relacional <strong>Microsoft Access (ACE / Jet OLEDB)</strong>. Cada vez que un usuario abre una empresa en Factusol (ej: <code>2262026.accdb</code>), el motor de base de datos crea de forma automática en la misma carpeta un archivo complementario con el mismo nombre y extensión <code>.laccdb</code> (o <code>.ldb</code> en versiones antiguas).
+      </p>
+      <p class="text-sm text-zinc-400 leading-relaxed">
+        Este archivo registra qué ordenador de la red está conectado para coordinar los bloqueos de registro. Si un equipo se apaga bruscamente, entra en suspensión, sufre un microcorte de Wi-Fi o un conector externo se cierra de forma inesperada, <strong>el archivo .laccdb queda huérfano</strong> y Windows sigue marcando la base de datos como "ocupada exclusivamente", impidiendo que nadie pueda entrar.
+      </p>
+    </div>
+
+    <!-- Pasos de Resolución -->
+    <div class="space-y-6 mb-12">
+      <h2 class="text-2xl font-bold text-white mb-4">2. Pasos para Desbloquear la Base de Datos</h2>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">1</span>
+          <h3 class="font-bold text-white text-base">Cerrar Factusol en todos los puestos de la oficina</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Pide a todos los usuarios de la red local que cierren completamente el programa Factusol. Comprueba en el Administrador de Tareas (Ctrl + Mayús + Esc) que ningún proceso huérfano (<code>FACTUSOL.exe</code> o <code>cscript.exe</code>) continúe ejecutándose en segundo plano.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">2</span>
+          <h3 class="font-bold text-white text-base">Liberar archivos abiertos en el Servidor o NAS</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed mb-3">
+          Si la base de datos reside en un servidor Windows o en un NAS:
+        </p>
+        <ul class="text-sm text-zinc-400 list-disc list-inside space-y-1">
+          <li><strong>En Windows Server:</strong> Abre <code>compmgmt.msc</code> (Administración de equipos) → Carpetas compartidas → Archivos abiertos. Busca el archivo <code>.laccdb</code>, haz clic derecho y selecciona <em>Cerrar archivo abierto</em>.</li>
+          <li><strong>En Synology / QNAP:</strong> En el Panel de Control → Servicios de archivo → Administrador de conexiones SMB, desconecta la sesión residual del equipo cliente.</li>
+        </ul>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">3</span>
+          <h3 class="font-bold text-white text-base">Eliminar el archivo de bloqueo huérfano (.laccdb)</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Una vez verificado que ningún equipo tiene el programa abierto, accede a la carpeta de datos de Factusol (ej: <code>\\NAS\Datos\FS\</code>) y elimina manualmente el archivo con extensión <code>.laccdb</code> (o <code>.ldb</code>). <strong>ATENCIÓN:</strong> Elimina ÚNICAMENTE el archivo <code>.laccdb</code> de pocos kilobytes, jamás el archivo principal <code>.accdb</code>.
+        </p>
+      </div>
+
+      <div class="border border-white/[0.08] bg-[#121215] rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 font-bold flex items-center justify-center text-sm">4</span>
+          <h3 class="font-bold text-white text-base">Revisar permisos de red de la carpeta compartida</h3>
+        </div>
+        <p class="text-sm text-zinc-400 leading-relaxed">
+          Para que Factusol pueda crear y destruir el archivo <code>.laccdb</code> sin errores, todos los usuarios de la red necesitan permisos completos de <strong>Lectura, Escritura, Modificación y Eliminación</strong> en la carpeta compartida. Si un usuario carece de permiso de eliminación, el archivo de bloqueo no se borra al salir y causa bloqueos recurrentes.
+        </p>
+      </div>
+    </div>
+
+    <!-- Cómo lo previene Bentian -->
+    <div class="border border-emerald-500/30 bg-emerald-500/[0.03] rounded-2xl p-6 sm:p-8 mb-12">
+      <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-xs font-semibold mb-3">
+        TECNOLOGÍA BENTIAN ZERO-LOCK
+      </div>
+      <h2 class="text-xl font-bold text-white mb-3">¿Cómo evita Bentian ERP Bridge los bloqueos de base de datos?</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-3">
+        Muchos conectores y scripts caseros abren la base de datos de Factusol en modo exclusivo o realizan consultas SQL de escritura sin cerrar la conexión, provocando el bloqueo del ERP para los comerciales y administrativos de la oficina.
+      </p>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        <strong>Bentian ERP Bridge</strong> utiliza una cadena de conexión OLEDB blindada con el parámetro <code>Mode=Share Deny None;Jet OLEDB:Database Locking Mode=1;</code>. Esto garantiza que las lecturas de stock y catálogo para tu tienda online se ejecuten en milisegundos <strong>en modo lectura compartida no bloqueante</strong>, permitiendo que tus empleados sigan facturando y creando albaranes simultáneamente sin sufrir cuelgues ni errores de archivo en uso.
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-8 text-center">
+      <h3 class="text-xl font-bold text-white mb-3">¿Buscas un conector Factusol que no bloquee tu red?</h3>
+      <p class="text-sm text-zinc-400 max-w-xl mx-auto mb-6">
+        Prueba Bentian ERP Bridge durante la Beta Pública gratuita. Se integra con tu Factusol local en red o NAS en 2 minutos sin interferir en el trabajo de tu empresa.
+      </p>
+      <a href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-6 py-3 rounded-xl transition shadow-xl shadow-indigo-600/25">
+        <span>Descargar Bentian-Setup.exe</span>
+        <span class="text-xs bg-indigo-700/60 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.3.5</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500 text-center">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge • Guías Técnicas y Soporte de Factusol</div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <span>•</span>
+        <a href="/docs/windows-antivirus-smartscreen-guide.html" class="hover:text-white transition">Antivirus</a>
+        <span>•</span>
+        <a href="/factusol-verifactu-woocommerce/" class="hover:text-white transition">VeriFactu</a>
+        <span>•</span>
+        <a href="/conector-factusol/" class="hover:text-white transition">Ciudades</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

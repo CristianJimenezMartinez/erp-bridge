@@ -151,5 +151,261 @@
         "a": "Sí, es 100% compatible con todas las versiones de Factusol desde Factusol 2018 hasta las versiones más recientes en formato .accdb y .mdb."
       }
     ]
+  },
+  {
+    "slug": "sevilla",
+    "name": "Sevilla",
+    "province": "Sevilla",
+    "region": "Andalucía",
+    "schemaRegion": "ES-AN",
+    "coordinates": {
+      "lat": 37.3891,
+      "lng": -5.9845
+    },
+    "tagline": "Conector Factusol con WooCommerce y PrestaShop para distribución y comercio en Sevilla",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Sevilla | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con tu tienda online en Sevilla, Alcalá de Guadaíra y Dos Hermanas. Control de stock en tiempo real y pedidos automáticos en Carretera Amarilla y La Isla.",
+    "keywords": "conector factusol woocommerce sevilla, sincronizar factusol prestashop andalucia, factusol poligono carretera amarilla sevilla, factusol la isla dos hermanas",
+    "heroSubtitle": "Diseñado para almacenes mayoristas, suministros agrícolas, ferretería y comercio en el Polígono Carretera Amarilla, La Isla y Alcalá de Guadaíra.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Carretera Amarilla y Polígono Store (Sevilla)",
+        "desc": "El corazón comercial y mayorista de Sevilla capital con centenares de almacenes de repuestos, climatización, textil y fontanería."
+      },
+      {
+        "name": "Polígono La Isla y Ciudad Blanca (Dos Hermanas)",
+        "desc": "El mayor polo industrial y logístico de Andalucía, ideal para la sincronización masiva de catálogos y expediciones intermodales."
+      },
+      {
+        "name": "Alcalá de Guadaíra (Polígono La Red y Cuchipanda)",
+        "desc": "Núcleo de gran tradición manufacturera, distribución alimentaria, envases y metal donde Factusol es el ERP de referencia."
+      }
+    ],
+    "sectors": [
+      "Distribución Mayorista B2B y Alimentación",
+      "Suministros Agrícolas, Riego y Maquinaria",
+      "Ferretería Industrial, Climatización y Fontanería",
+      "Moda, Calzado y Comercio Minorista Andaluz"
+    ],
+    "localContextParagraph": "En el área metropolitana de Sevilla, la venta combinada en mostrador y en plataforma digital (WooCommerce o PrestaShop) es vital para mantener la competitividad de mayoristas y distribuidores. Si tu almacén en Carretera Amarilla o La Isla despacha cientos de albaranes diarios en Factusol, los plugins PHP convencionales provocan sobreventas al no actualizar el stock con la inmediatez necesaria. Bentian ERP Bridge se instala en tu propio ordenador o servidor Windows local, conectando directamente con tu base de datos de Factusol mediante OLEDB. Detecta cualquier cambio de inventario en milisegundos y lo refleja en tu eCommerce de inmediato, protegiendo tus márgenes y evitando cancelaciones por falta de stock.",
+    "faqs": [
+      {
+        "q": "¿Puedo sincronizar tarifas de precios especiales para clientes B2B de Andalucía?",
+        "a": "Sí. Bentian permite mapear las distintas tarifas de Factusol (Tarifa 1, Tarifa 2, etc.) y asignarlas por grupo de cliente en WooCommerce o PrestaShop, garantizando precios mayoristas personalizados."
+      },
+      {
+        "q": "¿Funciona con conexiones de red lentas o Wi-Fi en naves industriales de Sevilla?",
+        "a": "Bentian lee la base de datos localmente en tu red de área local (LAN) en menos de 100 ms y solo envía a internet pequeños paquetes JSON comprimidos con los artículos modificados, funcionando de forma impecable incluso con conexiones de ancho de banda moderado."
+      },
+      {
+        "q": "¿Se generan los pedidos de la web como pedidos de cliente (F_PCL) en Factusol?",
+        "a": "Exacto. Cada compra realizada en tu tienda online se importa automáticamente como pedido de cliente en Factusol, con desglose de IVA, recargo de equivalencia y datos de facturación listos para emitir albarán o factura."
+      }
+    ]
+  },
+  {
+    "slug": "zaragoza",
+    "name": "Zaragoza",
+    "province": "Zaragoza",
+    "region": "Aragón",
+    "schemaRegion": "ES-AR",
+    "coordinates": {
+      "lat": 41.6488,
+      "lng": -0.8891
+    },
+    "tagline": "Conexión Local-First entre Factusol y eCommerce para el gran nudo logístico de Zaragoza",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Zaragoza | Bentian ERP",
+    "metaDescription": "Conecta Factusol con tu tienda online en Zaragoza y PLAZA. Sincronización continua de inventario y pedidos en el mayor centro intermodal de España sin cuotas cloud mensuales.",
+    "keywords": "conector factusol zaragoza, sincronizar factusol woocommerce plaza zaragoza, factusol malpica zaragoza, conector prestashop factusol aragon",
+    "heroSubtitle": "Optimizado para los centros de distribución, operadores logísticos y manufactura en PLAZA, Polígono Malpica, Centrovía y Empresarium.",
+    "industrialHubs": [
+      {
+        "name": "PLAZA (Plataforma Logística de Zaragoza)",
+        "desc": "El enclave logístico intermodal más grande del continente europeo. Sincronización de alta cadencia para almacenes con rotación intensiva."
+      },
+      {
+        "name": "Polígono Malpica y Santa Fe",
+        "desc": "Parques industriales de referencia en metalmecánica, componentes de automoción, envases y suministros técnicos."
+      },
+      {
+        "name": "Polígono Centrovía (La Muela) y El Portazgo",
+        "desc": "Eje estratégico conectado a la A-2 hacia Madrid y Barcelona, clave para distribuidores con envíos en 24 horas a toda la península."
+      }
+    ],
+    "sectors": [
+      "Logística, Almacenaje y Transporte Intermodal",
+      "Automoción, Componentes y Maquinaria Industrial",
+      "Papel, Envases y Artes Gráficas",
+      "Distribución Técnica B2B y Ferretería"
+    ],
+    "localContextParagraph": "Zaragoza se ha consolidado como el epicentro logístico de España y el sur de Europa. En plataformas como PLAZA o polígonos como Malpica, las empresas no pueden tolerar retrasos ni desajustes entre el stock real de sus estanterías y lo que su catálogo web muestra al cliente final. A diferencia de las soluciones basadas en la nube que cobran costosas tarifas por volumen o exigen complejas migraciones, Bentian ERP Bridge adopta un enfoque Local-First: corre directamente en Windows en tus instalaciones, accede a Factusol con lecturas OLEDB ultrarrápidas y actualiza tu tienda online de forma continua, segura y sin comisiones por pedido.",
+    "faqs": [
+      {
+        "q": "¿Cómo evita Bentian vender material que ya está comprometido en el almacén de Zaragoza?",
+        "a": "Bentian calcula el stock disponible real utilizando la fórmula canónica de Factusol: DISSTO = ACTSTO - PENENT + PENREC. Así, cualquier mercancía reservada en pedidos pendientes no se publica como disponible en la tienda online."
+      },
+      {
+        "q": "¿Es compatible con catálogos industriales de más de 20.000 referencias?",
+        "a": "Sí. Mediante un sistema de dirty-checking con hashes SHA-256 en memoria local, Bentian evalúa 20.000 artículos en menos de 300 ms y solo envía a la API de WooCommerce o PrestaShop los registros que hayan sufrido variaciones de stock o precio."
+      },
+      {
+        "q": "¿Requiere abrir puertos en el cortafuegos de la empresa en Zaragoza?",
+        "a": "No. Bentian solo realiza conexiones seguras salientes por HTTPS (puerto 443). Cumple con los más estrictos estándares de ciberseguridad industrial sin necesidad de abrir puertos ni exponer tu base de datos a internet."
+      }
+    ]
+  },
+  {
+    "slug": "malaga",
+    "name": "Málaga",
+    "province": "Málaga",
+    "region": "Andalucía",
+    "schemaRegion": "ES-AN",
+    "coordinates": {
+      "lat": 36.7213,
+      "lng": -4.4214
+    },
+    "tagline": "Sincronización Factusol en tiempo real para empresas, hostelería y eCommerce en Málaga",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Málaga | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con WooCommerce y PrestaShop en Málaga, Polígono Guadalhorce y Marbella. Stock disponible en tiempo real y pedidos automáticos para la Costa del Sol.",
+    "keywords": "conector factusol woocommerce malaga, sincronizar factusol prestashop costa del sol, factusol poligono guadalhorce, integrar factusol pta malaga",
+    "heroSubtitle": "Pensado para distribuidores de hostelería, alimentación gourmet, construcción y tiendas online en Polígono Guadalhorce, Málaga TechPark y la Costa del Sol.",
+    "industrialHubs": [
+      {
+        "name": "Polígono Guadalhorce y San Luis (Málaga)",
+        "desc": "El núcleo mayorista y distribuidor más activo de la Costa del Sol, con empresas de suministros de hostelería, bebidas y equipamiento."
+      },
+      {
+        "name": "Málaga TechPark (PTA)",
+        "desc": "Polo de innovación tecnológica donde agencias de desarrollo y empresas de software buscan herramientas modernas para conectar Factusol."
+      },
+      {
+        "name": "Eje Costa del Sol (Marbella, Fuengirola, Antequera)",
+        "desc": "Distribución prémium para hostelería y retail, junto al gran nudo logístico central de Antequera."
+      }
+    ],
+    "sectors": [
+      "Hostelería, Bebidas y Suministros para Restauración",
+      "Material Eléctrico, Climatización y Construcción",
+      "Retail Prémium, Mobiliario y Decoración",
+      "Agencias de Desarrollo Web y Comercio Electrónico"
+    ],
+    "localContextParagraph": "La economía de Málaga y la Costa del Sol combina una demanda turística y hostelera de altísima rotación con uno de los ecosistemas tecnológicos de mayor crecimiento en Europa. Los comercios y almacenes malagueños que gestionan su facturación y stock en Factusol requieren que su tienda online (WooCommerce o PrestaShop) esté sincronizada al minuto, especialmente en temporadas de pico comercial. Bentian ERP Bridge ofrece la solución ideal: un agente nativo de Windows que se ejecuta silenciosamente en segundo plano, sincronizando precios, tarifas para hostelería y pedidos web de forma instantánea sin costes ocultos ni cuotas mensuales abusivas.",
+    "faqs": [
+      {
+        "q": "¿Permite gestionar clientes profesionales con recargo de equivalencia en la Costa del Sol?",
+        "a": "Totalmente. Bentian identifica automáticamente a los clientes con Recargo de Equivalencia y traslada el desglose de IVA y RE exacto a las líneas del pedido en Factusol."
+      },
+      {
+        "q": "¿Qué ocurre si la tienda online recibe pedidos por la noche o durante el fin de semana?",
+        "a": "Los pedidos quedan almacenados con seguridad en la tienda web y, tan pronto como se enciende el ordenador del almacén en Málaga, el agente los descarga y genera en Factusol en segundos."
+      },
+      {
+        "q": "¿Ofrecéis condiciones especiales para agencias de desarrollo web en Málaga?",
+        "a": "Sí. Disponemos del Programa de Partners con un 25% de descuento mayorista directo (149,25 €/año) para agencias y técnicos informáticos que gestionen tiendas de clientes."
+      }
+    ]
+  },
+  {
+    "slug": "alicante",
+    "name": "Alicante",
+    "province": "Alicante",
+    "region": "Comunidad Valenciana",
+    "schemaRegion": "ES-VC",
+    "coordinates": {
+      "lat": 38.3452,
+      "lng": -0.4810
+    },
+    "tagline": "Conector Factusol con WooCommerce para la industria del calzado, textil y comercio en Alicante",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Alicante y Elche | Bentian ERP",
+    "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Alicante, Elche, Elda e Ibi. Sincronización experta de tallas, colores y pedidos B2B sin cuotas por producto.",
+    "keywords": "conector factusol alicante, sincronizar factusol elche parque empresarial, factusol tallas colores calzado elda, conectar factusol prestashop ibi",
+    "heroSubtitle": "Especializado en la gestión de tallas y colores para fabricantes y mayoristas de calzado, marroquinería, juguete y plástico en Elche, Elda, Ibi y Alicante.",
+    "industrialHubs": [
+      {
+        "name": "Elche Parque Empresarial (Torrellano)",
+        "desc": "La capital europea del calzado y la confección. Gestión experta de matrices de tallas, colores y códigos EAN-13 hacia el canal online."
+      },
+      {
+        "name": "Valle del Vinalopó (Elda, Petrer y Villena)",
+        "desc": "Cuna del calzado de señora de alta gama y marroquinería con distribución internacional y marcas propias con venta directa al consumidor."
+      },
+      {
+        "name": "Polígono Las Atalayas (Alicante) y Foia de Castalla (Ibi)",
+        "desc": "Grandes centros de distribución comercial, packaging, inyección de plástico y juguetería técnica."
+      }
+    ],
+    "sectors": [
+      "Calzado, Marroquinería, Textil y Complementos de Moda",
+      "Juguetes, Puericultura y Transformación de Plásticos",
+      "Materiales de Construcción, Mármol y Piedra Natural (Novelda)",
+      "Distribución Mayorista B2B y Comercio Alimentario"
+    ],
+    "localContextParagraph": "La provincia de Alicante cuenta con uno de los tejidos manufactureros y exportadores más dinámicos de España, con especial protagonismo del calzado en Elche y Elda y la industria del juguete y plástico en la Foia de Castalla. Para estas empresas, la mayor dificultad al conectar Factusol con WooCommerce o PrestaShop radica en la sincronización de productos variables: gestionar una referencia con 8 tallas y 4 colores (`F_ART` y `F_STC`) suele desbordar a los conectores web tradicionales. Bentian ERP Bridge resuelve este reto mediante procesamiento por lotes atómicos en local, actualizando de forma individual las combinaciones con stock modificado sin provocar caídas del servidor web.",
+    "faqs": [
+      {
+        "q": "¿Cómo gestiona Bentian las combinaciones de tallas y colores de Factusol?",
+        "a": "Bentian lee las tablas de tallas y colores de Factusol y las mapea de forma inteligente con los atributos y variaciones de WooCommerce o PrestaShop, actualizando el stock de cada combinación exacta sin duplicar fichas de producto."
+      },
+      {
+        "q": "¿Permite sincronizar múltiples almacenes en fábricas de calzado o textil?",
+        "a": "Sí. Puedes configurar qué almacén de Factusol (por ejemplo, Almacén Web frente a Almacén Fábrica o Tienda Física) es el que provee el stock disponible para la tienda online."
+      },
+      {
+        "q": "¿Hay límite de artículos o de pedidos que se puedan sincronizar en Alicante?",
+        "a": "Ninguno. La licencia de Bentian ofrece sincronizaciones ilimitadas de artículos, clientes, tarifas y pedidos sin tarifas variables por venta."
+      }
+    ]
+  },
+  {
+    "slug": "bilbao",
+    "name": "Bilbao",
+    "province": "Bizkaia",
+    "region": "País Vasco",
+    "schemaRegion": "ES-PV",
+    "coordinates": {
+      "lat": 43.2630,
+      "lng": -2.9350
+    },
+    "tagline": "Conector Factusol Local-First para suministros industriales, ferretería y pymes de Bizkaia",
+    "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Bilbao y Bizkaia | Bentian ERP",
+    "metaDescription": "Sincroniza Factusol con tu tienda online en Bilbao, Valle de Asúa y Durangaldea. Control de stock OLEDB de alta velocidad para suministros industriales y comercio vasco.",
+    "keywords": "conector factusol bilbao, sincronizar factusol bizkaia, factusol poligono valle de asua, conector prestashop factusol pais vasco",
+    "heroSubtitle": "Diseñado para suministros industriales, tornillería técnica, maquinaria, metal y ferretería en el Valle de Asúa, Durangaldea y el Gran Bilbao.",
+    "industrialHubs": [
+      {
+        "name": "Valle de Asúa (Sondika, Derio, Zamudio y Erandio)",
+        "desc": "Enclave clave adyacente al Parque Tecnológico y el aeropuerto, con alta densidad de distribuidores de maquinaria, herramienta y recambios."
+      },
+      {
+        "name": "Durangaldea y Amorebieta (Durango, Iurreta)",
+        "desc": "El corazón de la matricería, estampación, tornillería técnica y ferretería industrial de precisión en Bizkaia."
+      },
+      {
+        "name": "Gran Bilbao y Área Portuaria (Barakaldo, Santurtzi, Basauri)",
+        "desc": "Distribución de materiales pesados, suministros para construcción, naval y logística de exportación."
+      }
+    ],
+    "sectors": [
+      "Suministros Industriales, Mecanizado y Soldadura",
+      "Ferretería Profesional, Tornillería y Herramienta de Corte",
+      "Material Eléctrico, Automatismos y Neumática",
+      "Distribución Técnica Mayorista B2B"
+    ],
+    "localContextParagraph": "El tejido empresarial de Bizkaia y el País Vasco se caracteriza por su rigor técnico, la precisión de su industria auxiliar y una estricta cultura de seguridad informática y privacidad corporativa. En empresas de suministros industriales o ferretería técnica con catálogos de miles de referencias, subir la base de datos de Factusol a servidores cloud de terceros o abrir puertos en los cortafuegos de la red no es una opción aceptable. Bentian ERP Bridge responde exactamente a estas exigencias: es un software de escritorio 100% Local-First que lee la base de datos local en milisegundos sin salir de la red interna y traslada a WooCommerce o PrestaShop únicamente los cambios de stock y precio mediante cifrado HTTPS saliente estándar.",
+    "faqs": [
+      {
+        "q": "¿Cumple Bentian con las exigencias de privacidad de datos de empresas industriales vascas?",
+        "a": "Totalmente. Bentian opera bajo el principio Zero-Knowledge: tus datos comerciales, costes y márgenes nunca se almacenan en la nube ni en servidores de terceros. Todo el procesado de datos se ejecuta en tu propia infraestructura local."
+      },
+      {
+        "q": "¿Soporta bases de datos de Factusol alojadas en servidores de red o NAS en Bizkaia?",
+        "a": "Sí. Soporta rutas de red UNC y unidades mapeadas con flags OLEDB de lectura no bloqueante (Share Deny None), permitiendo que el resto de puestos de la oficina sigan trabajando en Factusol sin interrupciones."
+      },
+      {
+        "q": "¿Es compatible con la facturación y los tipos impositivos aplicables en el País Vasco?",
+        "a": "Sí. Bentian traslada de forma íntegra los tipos de IVA, recargos y NIF/CIF de cada cliente a los pedidos de Factusol, facilitando la posterior emisión y registro contable oficial."
+      }
+    ]
   }
 ]
+
