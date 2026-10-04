@@ -159,6 +159,47 @@ export async function bootstrapApp(): Promise<Express> {
   // Servir documentación técnica oficial y guías de soporte
   const publicDir = path.resolve(__dirname, '../public');
   const docsDir = path.join(publicDir, 'docs');
+
+  // Acceso directo al markdown crudo de la guía para agentes de IA / crawlers LLM
+  app.get('/docs/windows-antivirus-smartscreen-guide.md', (_req, res) => {
+    const mdPath = path.join(docsDir, 'windows-antivirus-smartscreen-guide.md');
+    if (fs.existsSync(mdPath)) {
+      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      return res.sendFile(mdPath);
+    }
+    return res.status(404).send('Markdown guide not found');
+  });
+
+  // Redirecciones 301 canónicas permanentes para URLs legacy de documentación técnica
+  const legacyDocsMap: Record<string, string> = {
+    'windows-antivirus-smartscreen-guide': '/docs/seguridad/antivirus-edr-smartscreen/',
+    'error-base-datos-bloqueada-factusol-laccdb': '/docs/troubleshooting/error-3045-base-datos-bloqueada/',
+    'matriz-compatibilidad-factusol': '/docs/factusol/matriz-compatibilidad/',
+    'protocolo-beta-precios-fundador': '/docs/primeros-pasos/activacion-de-licencias/',
+    'error-proveedor-oledb-factusol-microsoft-ace': '/docs/troubleshooting/error-oledb-no-registrado/',
+    'sincronizar-pedidos-woocommerce-factusol': '/docs/canales/woocommerce/',
+    'evitar-roturas-stock-factusol-dissto': '/docs/factusol/calculo-stock-disponible/',
+  };
+
+  for (const [legacySlug, canonicalTarget] of Object.entries(legacyDocsMap)) {
+    const legacyRoutes = [
+      `/docs/${legacySlug}`,
+      `/docs/${legacySlug}/`,
+      `/docs/${legacySlug}.html`,
+    ];
+    app.get(legacyRoutes, (req, res) => {
+      // Mantener acceso a lectura de markdown si se solicita explícitamente vía cabecera Accept
+      if (legacySlug === 'windows-antivirus-smartscreen-guide' && req.headers.accept?.includes('text/markdown')) {
+        const mdPath = path.join(docsDir, 'windows-antivirus-smartscreen-guide.md');
+        if (fs.existsSync(mdPath)) {
+          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+          return res.sendFile(mdPath);
+        }
+      }
+      return res.redirect(301, canonicalTarget);
+    });
+  }
+
   app.use('/docs', express.static(docsDir, {
     dotfiles: 'ignore',
     index: ['index.html'],
@@ -257,9 +298,6 @@ export async function bootstrapApp(): Promise<Express> {
   });
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
-  });
-  app.get('/docs/matriz-compatibilidad-factusol', (_req, res) => {
-    res.redirect(301, '/docs/matriz-compatibilidad-factusol/');
   });
   app.get('/guias/conectar-factusol-local-con-woocommerce', (_req, res) => {
     res.redirect(301, '/guias/conectar-factusol-local-con-woocommerce/');

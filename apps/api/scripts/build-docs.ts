@@ -810,7 +810,33 @@ function updateSitemap(articles: DocArticle[]) {
   }
   let sitemap = fs.readFileSync(SITEMAP_FILE, 'utf8');
 
-  // Asegurar entrada del Hub central
+  // 1. Eliminar espacio de nombres y etiquetas de imagen del sitemap principal
+  sitemap = sitemap.replace(/\s*xmlns:image="[^"]*"/g, '');
+  sitemap = sitemap.replace(/\s*<image:image>[\s\S]*?<\/image:image>/gi, '');
+
+  // 2. Eliminar URLs legacy no canónicas para evitar contenido duplicado
+  const legacyUrlsToRemove = new Set([
+    'https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html',
+    'https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html',
+    'https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/',
+    'https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol',
+    'https://bridge.cristianjm.com/docs/protocolo-beta-precios-fundador.html',
+    'https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html',
+    'https://bridge.cristianjm.com/docs/sincronizar-pedidos-woocommerce-factusol.html',
+    'https://bridge.cristianjm.com/docs/evitar-roturas-stock-factusol-dissto.html',
+  ]);
+
+  // Procesar cada bloque <url>...</url> de forma estrictamente aislada
+  sitemap = sitemap.replace(/(?:\s*<!--[^\n]*?-->)?\s*<url>([\s\S]*?)<\/url>/gi, (match, inner) => {
+    const locMatch = /<loc>\s*(.*?)\s*<\/loc>/i.exec(inner);
+    const loc = locMatch?.[1]?.trim();
+    if (loc && legacyUrlsToRemove.has(loc)) {
+      return '';
+    }
+    return match;
+  });
+
+  // 3. Asegurar entrada del Hub central
   const hubUrl = 'https://bridge.cristianjm.com/docs/';
   if (!sitemap.includes(hubUrl)) {
     const hubEntry = `
@@ -828,7 +854,7 @@ function updateSitemap(articles: DocArticle[]) {
     sitemap = sitemap.replace('</urlset>', `${hubEntry}</urlset>`);
   }
 
-  // Asegurar cada uno de los 29 artículos
+  // 4. Asegurar cada uno de los artículos canónicos
   for (const art of articles) {
     const docUrl = `https://bridge.cristianjm.com/docs/${art.slug}/`;
     if (!sitemap.includes(docUrl)) {
@@ -848,8 +874,24 @@ function updateSitemap(articles: DocArticle[]) {
     }
   }
 
+  // 5. Deduplicación estricta de cualquier <loc> repetido
+  const seenLocs = new Set<string>();
+  sitemap = sitemap.replace(/(?:\s*<!--[^\n]*?-->)?\s*<url>([\s\S]*?)<\/url>/gi, (match, inner) => {
+    const locMatch = /<loc>\s*(.*?)\s*<\/loc>/i.exec(inner);
+    const loc = locMatch?.[1]?.trim();
+    if (!loc) return match;
+    if (seenLocs.has(loc)) {
+      return '';
+    }
+    seenLocs.add(loc);
+    return match;
+  });
+
+  // Normalizar saltos de línea sobrantes
+  sitemap = sitemap.replace(/\n\s*\n\s*\n/g, '\n\n');
+
   fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
-  console.log(`✓ [sitemap] Sitemap actualizado con los ${articles.length} artículos de documentación.`);
+  console.log(`✓ [sitemap] Sitemap actualizado y sanitizado (100% URLs canónicas, 0 legacy, 0 duplicados, 0 imágenes).`);
 }
 
 function updateLlmsTxt(articles: DocArticle[]) {
@@ -907,28 +949,29 @@ export function buildDocs() {
   // 4. Actualizar llms.txt
   updateLlmsTxt(DOC_ARTICLES);
 
-  // 5. Unificar páginas legacy para que presenten siempre el layout oficial de 3 columnas
-  const legacyMappings: Array<{ legacyPath: string; targetSlug: string }> = [
-    { legacyPath: 'windows-antivirus-smartscreen-guide.html', targetSlug: 'seguridad/antivirus-edr-smartscreen' },
-    { legacyPath: 'matriz-compatibilidad-factusol/index.html', targetSlug: 'factusol/matriz-compatibilidad' },
-    { legacyPath: 'error-base-datos-bloqueada-factusol-laccdb.html', targetSlug: 'troubleshooting/error-3045-base-datos-bloqueada' },
-    { legacyPath: 'error-proveedor-oledb-factusol-microsoft-ace.html', targetSlug: 'troubleshooting/error-oledb-no-registrado' },
-    { legacyPath: 'evitar-roturas-stock-factusol-dissto.html', targetSlug: 'factusol/calculo-stock-disponible' },
-    { legacyPath: 'sincronizar-pedidos-woocommerce-factusol.html', targetSlug: 'canales/woocommerce' },
-    { legacyPath: 'protocolo-beta-precios-fundador.html', targetSlug: 'primeros-pasos/licencias-beta-fundador' },
+  // 5. Limpieza de artefactos HTML legacy para delegar a redirecciones 301 canónicas
+  // Nota: 'windows-antivirus-smartscreen-guide.md' se preserva intacto para descarga/lectura cruda
+  const legacyArtifactsToPurge = [
+    'windows-antivirus-smartscreen-guide.html',
+    'error-base-datos-bloqueada-factusol-laccdb.html',
+    'error-proveedor-oledb-factusol-microsoft-ace.html',
+    'evitar-roturas-stock-factusol-dissto.html',
+    'sincronizar-pedidos-woocommerce-factusol.html',
+    'protocolo-beta-precios-fundador.html',
+    'matriz-compatibilidad-factusol',
   ];
 
-  for (const mapping of legacyMappings) {
-    const targetArticle = DOC_ARTICLES.find((a) => a.slug === mapping.targetSlug);
-    if (targetArticle) {
-      const legacyFile = path.join(DOCS_OUTPUT_ROOT, mapping.legacyPath);
-      const legacyDir = path.dirname(legacyFile);
-      if (!fs.existsSync(legacyDir)) {
-        fs.mkdirSync(legacyDir, { recursive: true });
+  for (const item of legacyArtifactsToPurge) {
+    const fullPath = path.join(DOCS_OUTPUT_ROOT, item);
+    if (fs.existsSync(fullPath)) {
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        fs.rmSync(fullPath, { recursive: true, force: true });
+        console.log(`✓ [cleanup legacy folder] Eliminada carpeta legacy /docs/${item} (gestionada por 301)`);
+      } else {
+        fs.unlinkSync(fullPath);
+        console.log(`✓ [cleanup legacy html] Eliminado archivo legacy /docs/${item} (gestionado por 301)`);
       }
-      const threeColHtml = renderDocArticlePage(targetArticle);
-      fs.writeFileSync(legacyFile, threeColHtml, 'utf8');
-      console.log(`✓ [legacy 3-col unified] /docs/${mapping.legacyPath} -> layout 3 columnas sincronizado`);
     }
   }
 

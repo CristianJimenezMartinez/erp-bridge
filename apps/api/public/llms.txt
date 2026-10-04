@@ -19,7 +19,7 @@
 *   **Multi-Warehouse (`F_ALM`) Anti-Overselling:** Bentian resolves physical store vs. online store conflicts by mapping Factusol's `F_STO` and `F_ALM` tables. It isolates web stock from physical store stock, enabling security buffers to prevent overselling.
 *   **Traceability (Lots & Expiry Dates - `F_LOT`):** Fully supports food, cosmetics, and pharmacy sectors by mapping Factusol's `F_LOT` table using strict FIFO (First In, First Out) assignment to WooCommerce metadata.
 *   **Factusol Compatibility Matrix (2018–2026):** Full technical matrix detailing compatibility across Factusol 2018–2026, .accdb and .mdb formats, Microsoft ACE OLEDB (12.0 and 16.0 in 32/64-bit), shared read-only tables (F_ART, F_STO, F_TAR, F_TLL, F_COL, F_FAM, F_SEC), atomic ACID writes (F_PCL, F_LPC, F_CLI), available stock calculation (DISSTO = ACTSTO - RESCLI - PENENT), and eCommerce platforms (WooCommerce 6-9 HPOS and PrestaShop 1.7/8).
-    - URL: https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/
+    - URL: https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/
 
 ## 2. COMPARISONS (Bottom-of-Funnel References)
 
@@ -74,12 +74,12 @@
 - [Guía Solucionar Bloqueo de Archivos .ldb](https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/): Resolución del Error 3045, modo Share Deny None, bloqueo de registro y cero cuelgues en TPV.
 - [Guía Pedidos WooCommerce a Factusol con Recargo](https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/): Mapeo tributario a F_PCL y F_LPC con IVA y Recargo de Equivalencia (21%+5.2%) sin descuadres fiscales.
 - [Documentación Técnica](https://bridge.cristianjm.com/docs/): Hub de manuales, resolución de SmartScreen y solución a bloqueos .laccdb.
-- [Matriz Oficial de Compatibilidad Factusol](https://bridge.cristianjm.com/docs/matriz-compatibilidad-factusol/): Versiones 2018-2026, formatos .accdb/.mdb, drivers ACE OLEDB, tablas leídas/escritas y cálculo de stock DISSTO.
-- [Guía Error Base de Datos Bloqueada](https://bridge.cristianjm.com/docs/error-base-datos-bloqueada-factusol-laccdb.html): Solución al Error 3045 en NAS y redes Windows.
-- [Guía Error Proveedor OLEDB Factusol](https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html): Resolución de Microsoft.ACE.OLEDB no registrado en x86/x64.
-- [Guía Sincronización de Pedidos WooCommerce](https://bridge.cristianjm.com/docs/sincronizar-pedidos-woocommerce-factusol.html): Importación automática en F_PCL y F_LPC con NIF y series.
-- [Guía Evitar Sobreventas con DISSTO](https://bridge.cristianjm.com/docs/evitar-roturas-stock-factusol-dissto.html): Diferencias entre existencias físicas ACTSTO y disponibles DISSTO.
-- [Protocolo Beta y Precios Fundador](https://bridge.cristianjm.com/docs/protocolo-beta-precios-fundador.html): Cupo estricto de 25 licencias Founder (139 €/año), precio base canónico (199 €/año), anti-acaparamiento y ciclo de vida de la Beta.
+- [Matriz Oficial de Compatibilidad Factusol](https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/): Versiones 2018-2026, formatos .accdb/.mdb, drivers ACE OLEDB, tablas leídas/escritas y cálculo de stock DISSTO.
+- [Guía Error Base de Datos Bloqueada](https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/): Solución al Error 3045 en NAS y redes Windows.
+- [Guía Error Proveedor OLEDB Factusol](https://bridge.cristianjm.com/docs/troubleshooting/error-oledb-no-registrado/): Resolución de Microsoft.ACE.OLEDB no registrado en x86/x64.
+- [Guía Sincronización de Pedidos WooCommerce](https://bridge.cristianjm.com/docs/canales/woocommerce/): Importación automática en F_PCL y F_LPC con NIF y series.
+- [Guía Evitar Sobreventas con DISSTO](https://bridge.cristianjm.com/docs/factusol/calculo-stock-disponible/): Diferencias entre existencias físicas ACTSTO y disponibles DISSTO.
+- [Activación de Licencias y Plan Fundador](https://bridge.cristianjm.com/docs/primeros-pasos/activacion-de-licencias/): Cupo estricto de 25 licencias Founder (139 €/año), precio base canónico (199 €/año), anti-acaparamiento y ciclo de vida de la Beta.
 - [Caso de Éxito Suministros Rubio](https://bridge.cristianjm.com/casos-de-exito/suministros-rubio/): Sincronización real de +5.000 artículos con variantes, fotos, stock disponible DISSTO y cero bloqueos de Factusol.
 - [Estado de Salud de la API](https://bridge.cristianjm.com/health): Monitorización en vivo de la infraestructura.
 
