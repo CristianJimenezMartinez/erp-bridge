@@ -1,0 +1,61 @@
+name: Continuous Deployment (Hetzner Production)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy-hetzner.yml'
+
+jobs:
+  deploy:
+    name: Build, Quality Gate & Deploy to Hetzner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Quality Gate Audit (7 Gates)
+        run: pnpm run quality:check
+
+      - name: Deploy to Hetzner Production Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 178.105.87.40
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            echo "🚀 Sincronizando repositorio en /opt/bentian/erp-bridge..."
+            cd /opt/bentian/erp-bridge
+            git pull origin main
+            echo "🔄 Reiniciando contenedor bentian-api-prod..."
+            docker restart bentian-api-prod
+            echo "✅ Despliegue completado con éxito."
+
+      - name: Live Health Check
+        run: |
+          sleep 5
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bridge.cristianjm.com/health)
+          echo "Health Check HTTP Status: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "❌ Falló el health check en producción"
+            exit 1
+          fi
+          echo "✅ Servidor respondiendo 200 OK en bridge.cristianjm.com"

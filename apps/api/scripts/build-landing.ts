@@ -101,7 +101,9 @@ export function assembleLandingPage(): string {
   }).filter(Boolean).join('\n\n  ');
 
   // 6. Assemble
-  let assembled = baseLayout
+  const banner = `<!-- ========================================================================= -->\n<!-- BENTIAN ERP BRIDGE — BUNDLE PÚBLICO COMPILADO AUTOMÁTICAMENTE            -->\n<!-- NO EDITAR DIRECTAMENTE ESTE ARCHIVO (apps/api/public/index.html)          -->\n<!-- El código fuente está 100% modularizado en apps/api/public/sections/     -->\n<!-- Para regenerar tras editar secciones, ejecuta: npm run build:landing      -->\n<!-- ========================================================================= -->\n\n`;
+
+  let assembled = banner + baseLayout
     .replace('<!-- {{SCHEMA_ORG}} -->', schemaHtml)
     .replace('<!-- {{HEADER}} -->', headerHtml)
     .replace('<!-- {{CONTENT}} -->', contentHtml)

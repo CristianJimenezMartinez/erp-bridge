@@ -28,23 +28,32 @@
 
   
     <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3 sm:gap-4">
         <!-- Mobile hamburger toggle -->
         <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition" aria-label="Abrir navegación">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
-        <a href="/" class="flex items-center gap-3">
+        <a href="/docs/" class="flex items-center gap-3">
           <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7">
           <span class="font-bold text-base text-white tracking-tight">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
         </a>
       </div>
 
-      <div class="flex items-center gap-3 sm:gap-4">
-        <a href="/docs/" class="text-xs text-zinc-300 hover:text-white transition hidden sm:inline-block">Índice General</a>
-        <a href="https://github.com/CristianJimenezMartinez/Bentian" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-white transition p-1.5 hidden md:inline-block" title="GitHub">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Botón directo para regresar a la web principal -->
+        <a href="/" class="text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition flex items-center gap-1.5" title="Volver a la portada principal de Bentian">
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <span class="hidden sm:inline">Web Principal</span>
         </a>
+
+        <!-- Acceso directo al Dashboard de Clientes -->
+        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] transition hidden md:flex items-center gap-1.5" title="Acceso a panel de clientes y licencias">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Clientes</span>
+        </a>
+
+        <!-- Botón canónico de descarga oficial -->
         <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
           <span>Descargar</span>
           <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.3.6</span>
@@ -52,448 +61,851 @@
       </div>
     </header>
   
+  
+    <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <!-- Direct Hub Link -->
+      <div class="mb-4 pb-3 border-b border-white/[0.06]">
+        <a href="/docs/" class="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition bg-indigo-500/10 text-indigo-300 border-l-2 border-indigo-500 pl-2">
+          <span class="text-sm">📖</span>
+          <span>Inicio Documentación</span>
+        </a>
+      </div>
 
-  <!-- Hero Section -->
-  <section class="pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
-      <span>Portal Oficial de Ingeniería y Soporte B2B</span>
-    </div>
-
-    <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-      Documentación Oficial de Bentian ERP Bridge
-    </h1>
-    <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-      Todo lo que necesitas para desplegar el conector en Windows, vincular Factusol con tu tienda online y garantizar transacciones atómicas con cuadre exacto de IVA.
-    </p>
-
-    <!-- Search Bar in Hero -->
-    <div class="max-w-xl mx-auto relative mb-12">
-      <input type="text" id="hub-search" placeholder="Buscar por tema, error, tabla de Factusol o plataforma... (Ctrl+K)"
-        class="w-full bg-[#121215] border border-white/[0.12] rounded-2xl px-5 py-3.5 pl-12 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 shadow-2xl transition">
-      <svg class="w-5 h-5 text-zinc-500 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-    </div>
-
-    <!-- Quick Start Paths (3 Cards) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto text-left mb-16">
-      <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group">
-        <div class="text-2xl mb-2">🚀</div>
-        <div class="text-xs font-mono text-indigo-400 mb-1">Paso 1</div>
-        <h3 class="text-sm font-bold text-white group-hover:text-indigo-300 transition mb-1">Instalación en Windows</h3>
-        <p class="text-xs text-zinc-400">Despliegue silencioso del agente y modo Edge App en 2 minutos.</p>
-      </a>
-
-      <a href="/docs/factusol/localizacion-base-datos/" class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group">
-        <div class="text-2xl mb-2">🗄️</div>
-        <div class="text-xs font-mono text-indigo-400 mb-1">Paso 2</div>
-        <h3 class="text-sm font-bold text-white group-hover:text-indigo-300 transition mb-1">Conexión con Factusol</h3>
-        <p class="text-xs text-zinc-400">Rutas locales vs NAS (Anti-Wiping) y elección de Serie 1.</p>
-      </a>
-
-      <a href="/docs/canales/woocommerce/" class="p-5 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group">
-        <div class="text-2xl mb-2">🛒</div>
-        <div class="text-xs font-mono text-indigo-400 mb-1">Paso 3</div>
-        <h3 class="text-sm font-bold text-white group-hover:text-indigo-300 transition mb-1">Vincular Tienda Web</h3>
-        <p class="text-xs text-zinc-400">REST API en WooCommerce con soporte nativo HPOS.</p>
-      </a>
-    </div>
-  </section>
-
-  <!-- Categories Grid -->
-  <section class="pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between mb-8 pb-3 border-b border-white/[0.08]">
-      <h2 class="text-xl font-bold text-white">Categorías de Documentación (8)</h2>
-      <span class="text-xs text-zinc-500">29 artículos técnicos disponibles</span>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="hub-category-grid">
-      
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="primeros pasos" data-category-desc="instalación del agente en windows, requisitos de hardware y activación de licencias.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🚀</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Primeros Pasos</h3>
-                  <p class="text-xs text-zinc-400">Instalación del agente en Windows, requisitos de hardware y activación de licencias.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Requisitos del Sistema y Entorno Operativo</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Instalación y Despliegue del Agente en Windows</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/primeros-pasos/activacion-de-licencias/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Activación de Licencias, Beta de 60 Días y Plan Fundador</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Guía del Asistente de Configuración (Onboarding Wizard)</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="factusol erp" data-category-desc="conexión con la base de datos .accdb, rutas de red nas, controladores oledb y stock.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🗄️</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Factusol ERP</h3>
-                  <p class="text-xs text-zinc-400">Conexión con la base de datos .accdb, rutas de red NAS, controladores OLEDB y stock.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/factusol/localizacion-base-datos/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Localización de la Base de Datos de Factusol (.accdb y .mdb)</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Rutas de Red, Servidores NAS y Protección Anti-Wiping</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/factusol/controladores-oledb-ace/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Controladores Microsoft ACE OLEDB vs ODBC</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/factusol/series-de-pedidos/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Series de Pedidos en Factusol: Serie 1 Directa vs Serie W</span>
-                    </a>
-                  </li>
-                
-                
-                  <li class="pt-1">
-                    <a href="/docs/factusol/localizacion-base-datos/" class="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
-                      + 2 artículos más en Factusol ERP →
-                    </a>
-                  </li>
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="canales ecommerce" data-category-desc="sincronización con woocommerce (hpos), prestashop, shopify y endpoint universal.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🛒</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Canales eCommerce</h3>
-                  <p class="text-xs text-zinc-400">Sincronización con WooCommerce (HPOS), PrestaShop, Shopify y Endpoint Universal.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/canales/woocommerce/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Conexión con WooCommerce y Compatibilidad HPOS</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/canales/prestashop/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/canales/shopify/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Conexión con Shopify mediante Admin REST y GraphQL</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/canales/endpoint-universal/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Endpoint Universal: Conecta Cualquier Tienda Personalizada</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="arquitectura & sincronización" data-category-desc="filosofía local-first, cola sqlite store-and-forward y monitoreo en tiempo real.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">⚡</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Arquitectura & Sincronización</h3>
-                  <p class="text-xs text-zinc-400">Filosofía Local-First, cola SQLite Store-and-Forward y monitoreo en tiempo real.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/arquitectura/arquitectura-local-first/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Arquitectura Local-First y Privacidad de Datos</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/arquitectura/cola-store-and-forward/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Cola Desacoplada Store-and-Forward (SQLite)</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/arquitectura/deteccion-tiempo-real/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>FileWatcher en Tiempo Real y Ciclos Incrementales</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="fiscalidad & facturación" data-category-desc="cuadre de iva al céntimo, recargo de equivalencia y compatibilidad veri*factu.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🧾</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Fiscalidad & Facturación</h3>
-                  <p class="text-xs text-zinc-400">Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Cuadre de IVA al Céntimo y Prevención de Descuadres</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Recargo de Equivalencia en WooCommerce y PrestaShop</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Veri*Factu, Ley Antifraude y la Facturación en Factusol</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="resolución de incidencias" data-category-desc="solución a bases de datos bloqueadas (.laccdb), oledb no registrado y errores 401.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🔧</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Resolución de Incidencias</h3>
-                  <p class="text-xs text-zinc-400">Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/troubleshooting/errores-humanizados/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Catálogo de Errores Humanizados y Resolución en 1 Clic</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Error de Proveedor OLEDB Microsoft.ACE no Registrado</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/troubleshooting/error-401-autorizacion-hosting/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Error 401 Unauthorized en WooCommerce (.htaccess)</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="seguridad & redes" data-category-desc="configuración de antivirus/edr, windows smartscreen y criptografía ed25519.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">🛡️</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">Seguridad & Redes</h3>
-                  <p class="text-xs text-zinc-400">Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/seguridad/windows-smartscreen/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Windows SmartScreen: Autorización y Reputación de Binarios</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Criptografía Asimétrica Ed25519 y Actualización Atómica</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-          <div class="category-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between" data-category-title="api rest & esquemas" data-category-desc="endpoints http locales (39281), esquemas json validados y webhooks transaccionales.">
-            <div>
-              <div class="flex items-center gap-3 mb-3">
-                <span class="text-2xl">📡</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">API REST & Esquemas</h3>
-                  <p class="text-xs text-zinc-400">Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.</p>
-                </div>
-              </div>
-
-              <ul class="space-y-2 mt-4 pt-4 border-t border-white/[0.06]">
-                
-                  <li>
-                    <a href="/docs/api/api-rest-local/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Referencia de la API REST Local del Agente (39281)</span>
-                    </a>
-                  </li>
-                
-                  <li>
-                    <a href="/docs/api/esquema-pedidos-json/" class="text-xs text-zinc-300 hover:text-indigo-300 transition flex items-center gap-2 group">
-                      <span class="text-zinc-600 group-hover:text-indigo-400 transition">→</span>
-                      <span>Esquema JSON de Pedidos (OrderPayload) y Validación Zod</span>
-                    </a>
-                  </li>
-                
-                
-              </ul>
-            </div>
-          </div>
-        
-    </div>
-  </section>
-
-  <!-- Technical Manifesto Banner -->
-  <section class="pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-    <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-[#14141c] to-[#121215] border border-indigo-500/30">
-      <div class="max-w-2xl">
-        <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 mb-3 inline-block">Calidad de Código Blindada</span>
-        <h3 class="text-xl sm:text-2xl font-extrabold text-white mb-2">Diseñado para los fallos que otros conectores ignoran</h3>
-        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6">
-          Bentian resuelve la parte crítica y fea de la gestión: caídas de red local, microcortes de Internet, números correlativos en mostrador, archivos de bloqueo .laccdb y el encuadre exacto del IVA al céntimo.
-        </p>
-        <div class="flex items-center gap-4 flex-wrap">
-          <a href="/docs/matriz-compatibilidad-factusol/" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition">
-            Consultar Matriz Oficial Factusol
-          </a>
-          <a href="/docs/troubleshooting/errores-humanizados/" class="px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-zinc-300 hover:text-white transition">
-            Ver Catálogo de Errores Humanizados
-          </a>
+      <!-- Search Input in Sidebar -->
+      <div class="mb-6">
+        <label for="sidebar-search" class="sr-only">Buscar documentación</label>
+        <div class="relative">
+          <input type="text" id="sidebar-search" placeholder="Buscar... (Ctrl+K)" 
+            class="w-full bg-[#121215] border border-white/[0.1] rounded-xl px-3.5 py-2 pl-9 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+          <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Footer -->
-  <footer class="border-t border-white/[0.08] bg-[#09090b] py-12 text-xs text-zinc-500">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-zinc-300">Bentian ERP Bridge</span>
-        <span>— Documentación Técnica Oficial v0.3.6</span>
+      <!-- Navigation Hierarchy -->
+      <nav class="space-y-6" id="docs-nav-tree">
+        
+            <div class="category-group" data-category="primeros-pasos">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🚀</span>
+                <span>Primeros Pasos</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian">
+                      <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Requisitos del Sistema y Entorno Operativo
+                      </a>
+                    </li>
+                  
+                    <li data-title="instalación y despliegue del agente en windows" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, desplegar conector factusol, bentian tray windows">
+                      <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Instalación y Despliegue del Agente en Windows
+                      </a>
+                    </li>
+                  
+                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian, plan fundador bentian, licenciamiento erp bridge">
+                      <a href="/docs/primeros-pasos/activacion-de-licencias/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Activación de Licencias, Beta de 60 Días y Plan Fundador
+                      </a>
+                    </li>
+                  
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil">
+                      <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Guía del Asistente de Configuración (Onboarding Wizard)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="factusol">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🗄️</span>
+                <span>Factusol ERP</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="localización de la base de datos de factusol (.accdb y .mdb)" data-keywords="donde esta base datos factusol, ruta base de datos factusol, accdb factusol, software delsol datos fs, estructura base datos factusol">
+                      <a href="/docs/factusol/localizacion-base-datos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Localización de la Base de Datos de Factusol (.accdb y .mdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="rutas de red, servidores nas y protección anti-wiping" data-keywords="factusol en red, factusol nas, factusol synology qnap, ruta unc factusol, anti wiping bentian, desconexion red factusol">
+                      <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Rutas de Red, Servidores NAS y Protección Anti-Wiping
+                      </a>
+                    </li>
+                  
+                    <li data-title="controladores microsoft ace oledb vs odbc" data-keywords="oledb factusol, microsoft ace oledb 12.0 16.0, oledb vs odbc factusol, access database engine factusol, conexion rapida factusol">
+                      <a href="/docs/factusol/controladores-oledb-ace/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Controladores Microsoft ACE OLEDB vs ODBC
+                      </a>
+                    </li>
+                  
+                    <li data-title="series de pedidos en factusol: serie 1 directa vs serie w" data-keywords="series factusol pedidos, serie 1 factusol, serie w pedidos web factusol, pedidos no aparecen factusol, f_pcl factusol serie">
+                      <a href="/docs/factusol/series-de-pedidos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Series de Pedidos en Factusol: Serie 1 Directa vs Serie W
+                      </a>
+                    </li>
+                  
+                    <li data-title="cálculo de stock disponible (dissto) vs stock real (actsto)" data-keywords="dissto factusol, actsto factusol, calcular stock disponible factusol, sobreventas woocommerce factusol, reservas clientes factusol f_sto">
+                      <a href="/docs/factusol/calculo-stock-disponible/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO)
+                      </a>
+                    </li>
+                  
+                    <li data-title="matriz oficial de compatibilidad de factusol (2018–2026)" data-keywords="matriz compatibilidad factusol, tablas factusol, factusol 2026 2025 2024, formato accdb factusol, f_art f_pcl factusol">
+                      <a href="/docs/factusol/matriz-compatibilidad/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Matriz Oficial de Compatibilidad de Factusol (2018–2026)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="canales">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛒</span>
+                <span>Canales eCommerce</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="conexión con woocommerce y compatibilidad hpos" data-keywords="conectar factusol woocommerce, rest api woocommerce factusol, hpos factusol, consumer key woocommerce, sincronizar pedidos woocommerce factusol">
+                      <a href="/docs/canales/woocommerce/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con WooCommerce y Compatibilidad HPOS
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+                      </a>
+                    </li>
+                  
+                    <li data-title="conexión con shopify mediante admin rest y graphql" data-keywords="conectar factusol shopify, shopify factusol sin intermediarios, conector shopify factusol, custom app shopify factusol, inventario shopify factusol">
+                      <a href="/docs/canales/shopify/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Conexión con Shopify mediante Admin REST y GraphQL
+                      </a>
+                    </li>
+                  
+                    <li data-title="endpoint universal: conecta cualquier tienda personalizada" data-keywords="api universal factusol, endpoint json factusol, conectar php factusol, conectar laravel factusol, sincronizar tienda a medida factusol">
+                      <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Endpoint Universal: Conecta Cualquier Tienda Personalizada
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="arquitectura">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>⚡</span>
+                <span>Arquitectura & Sincronización</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce">
+                      <a href="/docs/arquitectura/arquitectura-local-first/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Arquitectura Local-First y Privacidad de Datos
+                      </a>
+                    </li>
+                  
+                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, tolerancia caida internet factusol, pc almacen apagado pedidos web, cero perdidas pedidos">
+                      <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cola Desacoplada Store-and-Forward (SQLite)
+                      </a>
+                    </li>
+                  
+                    <li data-title="filewatcher en tiempo real y ciclos incrementales" data-keywords="filewatcher factusol, cambios tiempo real factusol, debounce factusol bentian, sincronizacion incremental factusol, consumo cpu conector factusol">
+                      <a href="/docs/arquitectura/deteccion-tiempo-real/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        FileWatcher en Tiempo Real y Ciclos Incrementales
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="fiscalidad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🧾</span>
+                <span>Fiscalidad & Facturación</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="cuadre de iva al céntimo y prevención de descuadres" data-keywords="descuadre iva factusol woocommerce, cuadre centimo factusol, base imponible pedido factusol, f_pcl f_lpc iva factusol, calcular iva exacto factusol">
+                      <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cuadre de IVA al Céntimo y Prevención de Descuadres
+                      </a>
+                    </li>
+                  
+                    <li data-title="recargo de equivalencia en woocommerce y prestashop" data-keywords="recargo de equivalencia factusol, recargo equivalencia woocommerce, factusol f_pcl recargo, minoristas 5.2 recargo factusol, impuestos espanoles factusol">
+                      <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Recargo de Equivalencia en WooCommerce y PrestaShop
+                      </a>
+                    </li>
+                  
+                    <li data-title="veri*factu, ley antifraude y la facturación en factusol" data-keywords="verifactu factusol, ley antifraude factusol woocommerce, cadena criptografica trzfac, multas verifactu conectores, facturacion legal factusol">
+                      <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Veri*Factu, Ley Antifraude y la Facturación en Factusol
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="troubleshooting">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🔧</span>
+                <span>Resolución de Incidencias</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="catálogo de errores humanizados y resolución en 1 clic" data-keywords="errores factusol, solucionar error conector factusol, errores humanizados bentian, mensajes claros factusol, soporte tecnico factusol">
+                      <a href="/docs/troubleshooting/errores-humanizados/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Catálogo de Errores Humanizados y Resolución en 1 Clic
+                      </a>
+                    </li>
+                  
+                    <li data-title="cómo solucionar el error 3045: base de datos bloqueada (.laccdb)" data-keywords="error 3045 factusol, desbloquear laccdb factusol, base de datos en uso exclusivo factusol, archivo ldb bloqueado factusol, colapso factusol red">
+                      <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)
+                      </a>
+                    </li>
+                  
+                    <li data-title="error de proveedor oledb microsoft.ace no registrado" data-keywords="microsoft ace oledb no esta registrado, descargar access database engine 64 bits, error oledb factusol 0x80004005, instalar oledb windows 11">
+                      <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error de Proveedor OLEDB Microsoft.ACE no Registrado
+                      </a>
+                    </li>
+                  
+                    <li data-title="error 401 unauthorized en woocommerce (.htaccess)" data-keywords="error 401 woocommerce rest api, cabecera authorization bloqueada htaccess, raiola webempresa woocommerce 401, conector factusol woocommerce 401">
+                      <a href="/docs/troubleshooting/error-401-autorizacion-hosting/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Error 401 Unauthorized en WooCommerce (.htaccess)
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="seguridad">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>🛡️</span>
+                <span>Seguridad & Redes</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, bitdefender factusol, seguridad edr conector factusol">
+                      <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
+                      </a>
+                    </li>
+                  
+                    <li data-title="windows smartscreen: autorización y reputación de binarios" data-keywords="windows smartscreen bentian, windows protegio su pc factusol, desbloquear ejecutable windows defender, smartscreen bentian setup exe">
+                      <a href="/docs/seguridad/windows-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Windows SmartScreen: Autorización y Reputación de Binarios
+                      </a>
+                    </li>
+                  
+                    <li data-title="criptografía asimétrica ed25519 y actualización atómica" data-keywords="firmas ed25519 bentian, update swapper windows, actualizacion atomica factusol, seguridad ejecutable bentian, rollback automatico bentian">
+                      <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Criptografía Asimétrica Ed25519 y Actualización Atómica
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+            <div class="category-group" data-category="api">
+              <div class="flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <span>📡</span>
+                <span>API REST & Esquemas</span>
+                
+              </div>
+              <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
+                
+                    <li data-title="referencia de la api rest local del agente (39281)" data-keywords="api rest factusol local, endpoints bentian 39281, api local conector factusol, json factusol local, telemetria conector factusol">
+                      <a href="/docs/api/api-rest-local/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Referencia de la API REST Local del Agente (39281)
+                      </a>
+                    </li>
+                  
+                    <li data-title="esquema json de pedidos (orderpayload) y validación zod" data-keywords="json pedidos factusol, order payload factusol, esquema json woocommerce factusol, zod pedidos erp bridge, api pedidos f_pcl">
+                      <a href="/docs/api/esquema-pedidos-json/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Esquema JSON de Pedidos (OrderPayload) y Validación Zod
+                      </a>
+                    </li>
+                  
+              </ul>
+            </div>
+          
+      </nav>
+
+      <!-- Sidebar Footer Badge -->
+      <div class="mt-8 pt-4 border-t border-white/[0.08] px-2 text-[11px] text-zinc-500 flex items-center justify-between">
+        <span>Agente <span data-app-version>v0.3.6</span></span>
+        <span class="inline-flex items-center gap-1 text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>100% Local-First</span>
+        </span>
       </div>
-      <div>
-        <span>© 2026 Bentian. Desarrollado por Cristian Jiménez Martínez.</span>
-      </div>
+    </aside>
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"></div>
+  
+
+  <!-- Main Layout Container (Sidebar width: lg:pl-72, Right TOC width: xl:pr-64) -->
+  <div class="pt-16 lg:pl-72">
+    <div class="max-w-7xl mx-auto flex">
+      
+      <!-- Center Content Column -->
+      <main class="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-10 max-w-4xl">
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-6">
+          <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+          <span>/</span>
+          <span class="text-indigo-400 font-medium">Documentación Oficial</span>
+        </nav>
+
+        <!-- Hub Hero Header -->
+        <div class="mb-10 pb-6 border-b border-white/[0.08]">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-3">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Manuales Oficiales de Ingeniería y Soporte B2B</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+            Documentación Técnica de Bentian ERP Bridge
+          </h1>
+          <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+            Arquitectura de sincronización local-first, conexión punto a punto con Factusol en Windows y mapeo de pedidos, existencias e impuestos en tiempo real.
+          </p>
+        </div>
+
+        <!-- Section 1: Inicio Rápido en 3 Pasos -->
+        <div id="inicio-rapido" class="mb-12">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🚀</span>
+              <span>Puesta en Marcha Rápida (3 Pasos)</span>
+            </h2>
+            <span class="text-xs text-zinc-500 font-mono">De 0 a sincronización en &lt;5 min</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-mono text-indigo-400 font-semibold mb-1">Paso 1</div>
+                <h3 class="text-xs font-bold text-white group-hover:text-indigo-300 transition mb-1">Instalación Agente</h3>
+                <p class="text-[11px] text-zinc-400 leading-snug">Modo Edge App y servicio silencioso.</p>
+              </div>
+              <span class="text-[10px] text-indigo-400 mt-3 font-semibold group-hover:underline">Leer guía &rarr;</span>
+            </a>
+
+            <a href="/docs/factusol/localizacion-base-datos/" class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-mono text-indigo-400 font-semibold mb-1">Paso 2</div>
+                <h3 class="text-xs font-bold text-white group-hover:text-indigo-300 transition mb-1">Conectar Factusol</h3>
+                <p class="text-[11px] text-zinc-400 leading-snug">Rutas locales vs NAS y Serie 1.</p>
+              </div>
+              <span class="text-[10px] text-indigo-400 mt-3 font-semibold group-hover:underline">Leer guía &rarr;</span>
+            </a>
+
+            <a href="/docs/canales/woocommerce/" class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-mono text-indigo-400 font-semibold mb-1">Paso 3</div>
+                <h3 class="text-xs font-bold text-white group-hover:text-indigo-300 transition mb-1">Vincular Tienda</h3>
+                <p class="text-[11px] text-zinc-400 leading-snug">REST API WooCommerce / PrestaShop.</p>
+              </div>
+              <span class="text-[10px] text-indigo-400 mt-3 font-semibold group-hover:underline">Leer guía &rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Section 2: Mapa de Categorías y Artículos -->
+        <div id="categorias" class="mb-12">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.08]">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>📚</span>
+              <span>Manuales por Categoría (8)</span>
+            </h2>
+            <span class="text-xs text-zinc-500">29 artículos disponibles</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🚀</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Primeros Pasos</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Instalación del agente en Windows, requisitos de hardware y activación de licencias.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Requisitos del Sistema y Entorno Operativo</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Instalación y Despliegue del Agente en Windows</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/primeros-pasos/activacion-de-licencias/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Activación de Licencias, Beta de 60 Días y Plan Fundador</span>
+                          </a>
+                        </li>
+                      
+                      
+                        <li class="pt-0.5">
+                          <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                            + 1 artículos más en Primeros Pasos &rarr;
+                          </a>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🗄️</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Factusol ERP</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Conexión con la base de datos .accdb, rutas de red NAS, controladores OLEDB y stock.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Localización de la Base de Datos de Factusol (.accdb y .mdb)</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Rutas de Red, Servidores NAS y Protección Anti-Wiping</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/factusol/controladores-oledb-ace/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Controladores Microsoft ACE OLEDB vs ODBC</span>
+                          </a>
+                        </li>
+                      
+                      
+                        <li class="pt-0.5">
+                          <a href="/docs/factusol/localizacion-base-datos/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                            + 3 artículos más en Factusol ERP &rarr;
+                          </a>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🛒</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Canales eCommerce</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Sincronización con WooCommerce (HPOS), PrestaShop, Shopify y Endpoint Universal.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/canales/woocommerce/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Conexión con WooCommerce y Compatibilidad HPOS</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/canales/prestashop/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/canales/shopify/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Conexión con Shopify mediante Admin REST y GraphQL</span>
+                          </a>
+                        </li>
+                      
+                      
+                        <li class="pt-0.5">
+                          <a href="/docs/canales/woocommerce/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                            + 1 artículos más en Canales eCommerce &rarr;
+                          </a>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">⚡</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Arquitectura & Sincronización</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Filosofía Local-First, cola SQLite Store-and-Forward y monitoreo en tiempo real.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/arquitectura/arquitectura-local-first/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Arquitectura Local-First y Privacidad de Datos</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/arquitectura/cola-store-and-forward/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Cola Desacoplada Store-and-Forward (SQLite)</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/arquitectura/deteccion-tiempo-real/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">FileWatcher en Tiempo Real y Ciclos Incrementales</span>
+                          </a>
+                        </li>
+                      
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🧾</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Fiscalidad & Facturación</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Cuadre de IVA al Céntimo y Prevención de Descuadres</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Recargo de Equivalencia en WooCommerce y PrestaShop</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Veri*Factu, Ley Antifraude y la Facturación en Factusol</span>
+                          </a>
+                        </li>
+                      
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🔧</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Resolución de Incidencias</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Catálogo de Errores Humanizados y Resolución en 1 Clic</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/troubleshooting/error-3045-base-datos-bloqueada/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb)</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Error de Proveedor OLEDB Microsoft.ACE no Registrado</span>
+                          </a>
+                        </li>
+                      
+                      
+                        <li class="pt-0.5">
+                          <a href="/docs/troubleshooting/errores-humanizados/" class="text-[10px] font-semibold text-indigo-400 hover:text-indigo-300 transition">
+                            + 1 artículos más en Resolución de Incidencias &rarr;
+                          </a>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">🛡️</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">Seguridad & Redes</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/seguridad/windows-smartscreen/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Windows SmartScreen: Autorización y Reputación de Binarios</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/seguridad/criptografia-y-actualizaciones/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Criptografía Asimétrica Ed25519 y Actualización Atómica</span>
+                          </a>
+                        </li>
+                      
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+                <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/30 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                      <span class="text-xl">📡</span>
+                      <div>
+                        <h3 class="text-xs font-bold text-white">API REST & Esquemas</h3>
+                        <p class="text-[10px] text-zinc-400 leading-snug">Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.</p>
+                      </div>
+                    </div>
+
+                    <ul class="space-y-1.5 mt-3 pt-3 border-t border-white/[0.06]">
+                      
+                        <li>
+                          <a href="/docs/api/api-rest-local/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Referencia de la API REST Local del Agente (39281)</span>
+                          </a>
+                        </li>
+                      
+                        <li>
+                          <a href="/docs/api/esquema-pedidos-json/" class="text-[11px] text-zinc-300 hover:text-indigo-300 transition flex items-center gap-1.5 group">
+                            <span class="text-zinc-600 group-hover:text-indigo-400 transition">&rarr;</span>
+                            <span class="truncate">Esquema JSON de Pedidos (OrderPayload) y Validación Zod</span>
+                          </a>
+                        </li>
+                      
+                      
+                    </ul>
+                  </div>
+                </div>
+              
+          </div>
+        </div>
+
+        <!-- Section 3: Salvaguardas Operativas -->
+        <div id="salvaguardas" class="mb-12 p-6 rounded-2xl bg-gradient-to-br from-indigo-950/30 via-[#14141c] to-[#121215] border border-indigo-500/20">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 mb-2 inline-block">Calidad de Código Blindada</span>
+          <h2 class="text-base sm:text-lg font-bold text-white mb-2">Diseñado para los fallos que otros conectores ignoran</h2>
+          <p class="text-xs text-zinc-300 leading-relaxed mb-4">
+            Bentian resuelve la parte crítica y fea de la gestión: caídas de red local, microcortes de Internet, números correlativos en mostrador, archivos de bloqueo .laccdb y el encuadre exacto del IVA al céntimo.
+          </p>
+          <div class="flex items-center gap-3 flex-wrap">
+            <a href="/docs/factusol/matriz-compatibilidad/" class="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition">
+              Consultar Matriz Oficial Factusol
+            </a>
+            <a href="/docs/troubleshooting/errores-humanizados/" class="px-3.5 py-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-zinc-300 hover:text-white transition">
+              Ver Catálogo de Errores Humanizados
+            </a>
+          </div>
+        </div>
+
+        <!-- Section 4: Asistencia Técnica -->
+        <div id="asistencia" class="p-5 rounded-xl bg-[#121215] border border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xs font-bold text-white mb-0.5">¿Necesitas soporte técnico con tu instalación?</h3>
+            <p class="text-[11px] text-zinc-400">Atención personalizada y validación asistida en tu servidor de Factusol.</p>
+          </div>
+          <a href="mailto:soporte@cristianjm.com" class="px-3.5 py-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-zinc-200 hover:text-white transition whitespace-nowrap">
+            Contactar con Soporte &rarr;
+          </a>
+        </div>
+      </main>
+
+      <!-- Right Table of Contents Column (Sticky) -->
+      <aside class="hidden xl:block w-64 shrink-0 px-6 py-10 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+        <div class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">En esta página</div>
+        <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
+          <li>
+            <a href="#inicio-rapido" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="inicio-rapido">
+              1. Inicio Rápido (3 Pasos)
+            </a>
+          </li>
+          <li>
+            <a href="#categorias" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="categorias">
+              2. Manuales por Categoría
+            </a>
+          </li>
+          <li>
+            <a href="#salvaguardas" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="salvaguardas">
+              3. Salvaguardas Operativas
+            </a>
+          </li>
+          <li>
+            <a href="#asistencia" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="asistencia">
+              4. Asistencia Técnica
+            </a>
+          </li>
+        </ul>
+
+        <!-- Action Card -->
+        <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+          <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition">
+            Descargar v0.3.6
+          </a>
+        </div>
+      </aside>
+
     </div>
-  </footer>
+  </div>
 
   <script src="/js/version-sync.js" defer></script>
   <script>
-    const hubSearch = document.getElementById('hub-search');
-    if (hubSearch) {
-      hubSearch.addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        const cards = document.querySelectorAll('.category-card');
-        cards.forEach((card) => {
-          const text = card.innerText.toLowerCase();
-          card.style.display = text.includes(q) ? '' : 'none';
+    // 1. Mobile Menu Toggle
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('docs-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    if (mobileBtn && sidebar && overlay) {
+      const toggleSidebar = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+      };
+      mobileBtn.addEventListener('click', toggleSidebar);
+      overlay.addEventListener('click', toggleSidebar);
+    }
+
+    // 2. Client-side Search in Sidebar
+    const searchInput = document.getElementById('sidebar-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const items = document.querySelectorAll('#docs-nav-tree li');
+        const groups = document.querySelectorAll('#docs-nav-tree .category-group');
+
+        items.forEach((li) => {
+          const title = li.getAttribute('data-title') || '';
+          const keywords = li.getAttribute('data-keywords') || '';
+          const matches = title.includes(query) || keywords.includes(query);
+          li.style.display = matches ? '' : 'none';
+        });
+
+        groups.forEach((group) => {
+          const visibleItems = group.querySelectorAll('li:not([style*="display: none"])');
+          group.style.display = visibleItems.length > 0 ? '' : 'none';
         });
       });
 
+      // Shortcut: Ctrl+K / Cmd+K to focus search
       window.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
           e.preventDefault();
-          hubSearch.focus();
+          searchInput.focus();
         }
       });
+    }
+
+    // 3. Scrollspy for Table of Contents
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const headings = Array.from(document.querySelectorAll('#inicio-rapido, #categorias, #salvaguardas, #asistencia'));
+
+    if (tocLinks.length > 0 && headings.length > 0) {
+      window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 100;
+        let currentHeading = null;
+        for (const h of headings) {
+          if (h.offsetTop <= scrollPos) {
+            currentHeading = h;
+          } else {
+            break;
+          }
+        }
+        if (currentHeading) {
+          const currentId = currentHeading.id;
+          tocLinks.forEach((link) => {
+            if (link.getAttribute('data-id') === currentId) {
+              link.classList.add('text-indigo-400', 'font-semibold');
+              link.classList.remove('text-zinc-400');
+            } else {
+              link.classList.remove('text-indigo-400', 'font-semibold');
+              link.classList.add('text-zinc-400');
+            }
+          });
+        }
+      }, { passive: true });
     }
   </script>
 </body>

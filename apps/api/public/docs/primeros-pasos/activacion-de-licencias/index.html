@@ -88,23 +88,32 @@
 
   
     <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3 sm:gap-4">
         <!-- Mobile hamburger toggle -->
         <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition" aria-label="Abrir navegación">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
-        <a href="/" class="flex items-center gap-3">
+        <a href="/docs/" class="flex items-center gap-3">
           <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7">
           <span class="font-bold text-base text-white tracking-tight">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
         </a>
       </div>
 
-      <div class="flex items-center gap-3 sm:gap-4">
-        <a href="/docs/" class="text-xs text-zinc-300 hover:text-white transition hidden sm:inline-block">Índice General</a>
-        <a href="https://github.com/CristianJimenezMartinez/Bentian" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-white transition p-1.5 hidden md:inline-block" title="GitHub">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Botón directo para regresar a la web principal -->
+        <a href="/" class="text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition flex items-center gap-1.5" title="Volver a la portada principal de Bentian">
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <span class="hidden sm:inline">Web Principal</span>
         </a>
+
+        <!-- Acceso directo al Dashboard de Clientes -->
+        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] transition hidden md:flex items-center gap-1.5" title="Acceso a panel de clientes y licencias">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Clientes</span>
+        </a>
+
+        <!-- Botón canónico de descarga oficial -->
         <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
           <span>Descargar</span>
           <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.3.6</span>
@@ -114,6 +123,14 @@
   
   
     <aside id="docs-sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-[#09090b] border-r border-white/[0.08] pt-20 pb-8 px-4 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <!-- Direct Hub Link -->
+      <div class="mb-4 pb-3 border-b border-white/[0.06]">
+        <a href="/docs/" class="flex items-center gap-2 px-2.5 py-2 text-xs font-semibold rounded-md transition text-zinc-300 hover:text-white hover:bg-white/[0.03]">
+          <span class="text-sm">📖</span>
+          <span>Inicio Documentación</span>
+        </a>
+      </div>
+
       <!-- Search Input in Sidebar -->
       <div class="mb-6">
         <label for="sidebar-search" class="sr-only">Buscar documentación</label>
