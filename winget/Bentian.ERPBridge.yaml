@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.singleton.1.6.0.schema.json
+PackageIdentifier: Bentian.ERPBridge
+PackageVersion: 0.3.5
+PackageLocale: es-ES
+PackageName: Bentian Agent
+Publisher: Bentian ERP Bridge
+PublisherUrl: https://bridge.cristianjm.com
+PublisherSupportUrl: https://bridge.cristianjm.com
+Author: Cristian Jimenez Martinez
+License: Proprietary
+LicenseUrl: https://bridge.cristianjm.com/terminos
+Copyright: Copyright (c) 2026 Cristian Jimenez Martinez. Todos los derechos reservados.
+ShortDescription: Conector universal y sincronizador local-first de Factusol con tiendas online.
+Description: Bentian ERP Bridge es una capa de conectividad universal de alto rendimiento que conecta Factusol con plataformas de comercio electrónico mediante arquitectura local-first, preservando la integridad transaccional de datos y ofreciendo sincronización bidireccional en tiempo real.
+Moniker: bentian
+Tags:
+  - erp
+  - factusol
+  - woocommerce
+  - prestashop
+  - sync
+  - ecommerce
+  - local-first
+ReleaseDate: 2026-10-01
+Installers:
+  - Architecture: x64
+    InstallerType: inno
+    InstallerUrl: https://bridge.cristianjm.com/releases/v0.3.5/Bentian-Setup-v0.3.5.exe
+    InstallerSha256: b68ba9b3e3c5b62322ae8164384c301d51a8700fee44ef15ebb87d7d4d77d282
+    Scope: machine
+    InstallerLocale: es-ES
+    UpgradeBehavior: install
+    ProductCode: '{8B23F40E-3F15-4D1E-97C5-C36B286E9559}_is1'
+    AppsAndFeaturesEntries:
+      - DisplayName: Bentian Agent v0.3.5
+        Publisher: Bentian ERP Bridge
+        DisplayVersion: 0.3.5
+        ProductCode: '{8B23F40E-3F15-4D1E-97C5-C36B286E9559}_is1'
+ManifestType: singleton
+ManifestVersion: 1.6.0

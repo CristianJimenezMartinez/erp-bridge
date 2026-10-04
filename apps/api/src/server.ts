@@ -252,6 +252,9 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/casos-de-exito/suministros-rubio', (_req, res) => {
     res.redirect(301, '/casos-de-exito/suministros-rubio/');
   });
+  app.get('/terminos', (_req, res) => {
+    res.redirect(301, '/terminos/');
+  });
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
   });
