@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Factusol con Shopify en Windows (Local-First) | Bentian ERP</title>
+  <meta name="description" content="Conecta Factusol con Shopify directamente desde Windows. Sincronización bidireccional en tiempo real de stock, precios y pedidos con la API de Shopify Admin sin cuotas cloud mensuales abusivas.">
+  <meta name="keywords" content="conector factusol shopify, sincronizar factusol con shopify, integrar shopify factusol delsol, pedidos shopify en factusol, factusol shopify windows, conector factusol api graphql">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-shopify/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-shopify/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol con Shopify en Windows (Local-First) | Bentian ERP">
+  <meta property="og:description" content="Conecta tu ERP Factusol local con Shopify. Stock en tiempo real, pedidos automáticos a F_PCL y sincronización directa con Shopify Admin API sin intermediarios cloud de 100€+/mes.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Factusol con Shopify en Windows (Local-First) | Bentian ERP">
+  <meta name="twitter:description" content="Sincroniza Factusol y Shopify en tiempo real desde Windows. Tarifa plana de 199 €/año sin cuotas por pedido.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tailwind Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector Factusol Shopify", "item": "https://bridge.cristianjm.com/factusol-shopify/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge — Conector Factusol Shopify",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/factusol-shopify/",
+        "description": "Conector Local-First de alta velocidad entre Factusol ERP y Shopify Admin GraphQL/REST API.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo se conecta Bentian con Shopify desde mi ordenador Windows?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian se ejecuta como un agente local en tu ordenador o servidor Windows. Lee directamente la base de datos de Factusol (.accdb / .mdb) y se comunica de forma segura mediante HTTPS con la API oficial de Shopify Admin (GraphQL y REST). No necesitas abrir puertos en tu router ni alojar servidores intermedios."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cobráis comisiones por pedido o cuotas mensuales caras como otros conectores?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Otros conectores SaaS cobran entre 99 € y 250 € al mes más comisiones por cada pedido procesado. Bentian funciona con una tarifa plana anual de 199 €/año (o 29 €/mes) con pedidos y sincronizaciones de stock ilimitadas."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Se descargan los pedidos de Shopify automáticamente en Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. En cuanto entra un pedido en Shopify, Bentian lo descarga y genera automáticamente el pedido de cliente en Factusol (tabla F_PCL) con sus líneas correspondientes (F_LPC), desglosando impuestos de IVA español (21%, 10%, 4%), portes y datos de entrega del cliente."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Se actualiza el stock en Shopify si vendo algo en mi tienda física con Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Bentian monitoriza continuamente los cambios en Factusol y actualiza el inventario en Shopify (InventoryLevels) en menos de un segundo, garantizando que el stock disponible en la web refleje de inmediato las ventas del mostrador físico o almacén."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Shopify Bridge</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Gratis (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span>Factusol 2024 / 2025 / 2026 ↔ Shopify Admin API (GraphQL & REST)</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector Factusol con <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400">Shopify</span> en Windows (Local-First)
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Conecta tu base de datos local de Factusol con tu tienda Shopify sin intermediarios cloud mensuales abusivos de 100 € a 300 €/mes. Sincronización bidireccional en tiempo real de stock disponible, precios, variantes y volcado automático de pedidos a <code class="text-indigo-300 font-mono">F_PCL</code>.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar Instalador (Windows)
+      </a>
+      <a href="/#pricing" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Planes (199 €/año)
+      </a>
+    </div>
+
+    <!-- Problemas de los Conectores SaaS vs Bentian -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> Los Conectores SaaS Tradicionales
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Cuotas mensuales abusivas (de 99 € a 250 €/mes) más costes de alta de hasta 800 €.</li>
+          <li>• Recargos o costes variables por cada pedido adicional procesado.</li>
+          <li>• Exigen subir tu base de datos comercial a servidores cloud de terceros.</li>
+          <li>• Requieren complejas recetas en Make, Zapier o herramientas intermedias propensas a fallos.</li>
+          <li>• Retardos de 15 a 45 minutos en actualizar el stock de Shopify tras vender en tienda física.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> La Solución Local-First Bentian
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• <strong>Tarifa plana real:</strong> Solo <strong>199 €/año</strong> (o 29 €/mes). Cero comisiones por pedido.</li>
+          <li>• <strong>Local-First:</strong> Se ejecuta en tu ordenador o servidor Windows junto a Factusol. Tus datos nunca salen a servidores desconocidos.</li>
+          <li>• <strong>Shopify Admin GraphQL directo:</strong> Conexión directa y segura vía API oficial de Shopify.</li>
+          <li>• <strong>Tiempo real (&lt; 1 segundo):</strong> Sincronización instantánea de stock disponible (<code class="text-emerald-300 font-mono">DISSTO</code>).</li>
+          <li>• <strong>Cero configuración de router:</strong> Conexión saliente segura por HTTPS; no requiere abrir puertos ni IPs fijas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Flujo Bidireccional de Integración -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-semibold">ARQUITECTURA DE DATOS</span>
+        <h2 class="text-2xl font-bold text-white">Flujo Bidireccional Inteligente Factusol ↔ Shopify</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        
+        <!-- Sentido Factusol -> Shopify -->
+        <div class="p-6 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="flex items-center gap-2 text-indigo-400 font-semibold text-sm mb-3">
+            <span class="p-1 rounded bg-indigo-500/10 border border-indigo-500/20">📤 Factusol &rarr; Shopify</span>
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <div><strong>Stock disponible real (<code>DISSTO</code>):</strong> Resta de inmediato las ventas de mostrador y pedidos pendientes para evitar ventas de artículos agotados.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <div><strong>Precios con IVA o sin IVA:</strong> Mapeo exacto de la tarifa elegida (Tarifa 1, Tarifa 2...) con redondeo fiscal de dos decimales.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <div><strong>Artículos y Variantes:</strong> Sincronización de descripción, referencia/SKU, código de barras (EAN-13) y peso para cálculo de envíos.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">•</span>
+              <div><strong>Actualización de Tracking:</strong> Al emitir el albarán en Factusol con la agencia de transporte, notifica el fulfillment en Shopify con el número de seguimiento.</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Sentido Shopify -> Factusol -->
+        <div class="p-6 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="flex items-center gap-2 text-emerald-400 font-semibold text-sm mb-3">
+            <span class="p-1 rounded bg-emerald-500/10 border border-emerald-500/20">📥 Shopify &rarr; Factusol</span>
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-indigo-400 font-bold">•</span>
+              <div><strong>Pedidos en <code>F_PCL</code> y <code>F_LPC</code>:</strong> Inyección atómica con desglose de artículos, cantidades, precios y descuentos aplicados.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-indigo-400 font-bold">•</span>
+              <div><strong>Desglose de Impuestos:</strong> Cuadre de cuotas de IVA (21%, 10%, 4%) y tratamiento de gastos de envío como línea de servicio.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-indigo-400 font-bold">•</span>
+              <div><strong>Gestión de Clientes (<code>F_CLI</code>):</strong> Asignación a cliente genérico web B2C o alta automática de ficha de cliente con NIF/CIF y dirección fiscal.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-indigo-400 font-bold">•</span>
+              <div><strong>Cola Store-and-Forward:</strong> Si el ordenador del almacén está apagado por la noche, los pedidos se acumulan y se inyectan en cuanto se enciende Windows.</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="p-5 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-xs text-zinc-300 flex items-start gap-3">
+        <span class="text-emerald-400 text-base">🛡️</span>
+        <div>
+          <strong class="text-emerald-300">Cumplimiento Legal VeriFactu y Ley Crea y Crece:</strong>
+          A diferencia de los plugins que intentan generar facturas en plataformas web de terceros, con Bentian los pedidos entran en Factusol para que tu ERP oficial sea el emisor legal de la factura encadenada con QR de la AEAT, protegiéndote de sanciones fiscales.
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparativa Económica -->
+    <div class="border border-white/[0.08] rounded-2xl overflow-hidden bg-[#121215] mb-16 shadow-2xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.02]">
+        <h2 class="text-xl font-bold text-white">Comparativa Económica: Bentian vs Plataformas SaaS</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.01] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4 sm:p-5">Concepto</th>
+              <th class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/[0.05]">Bentian ERP Bridge</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Conectores SaaS Típicos</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Zapier / Make + Scripts</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Precio Anual</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-emerald-500/[0.05]">199 € / año (Fijo)</td>
+              <td class="p-4 sm:p-5 text-red-400">1.200 € a 2.800 € / año</td>
+              <td class="p-4 sm:p-5 text-zinc-400">600 € a 1.500 € / año (en operaciones)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Coste por Pedido</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/[0.05]">0 € (Ilimitados)</td>
+              <td class="p-4 sm:p-5 text-red-400">0,10 € a 0,35 € por pedido extra</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Coste por task / ejecución</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Coste de Setup / Alta</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-emerald-500/[0.05]">0 € (Instalación autónoma en 5 min)</td>
+              <td class="p-4 sm:p-5 text-red-400">300 € a 800 € de consultoría</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Horas de programador externo</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Velocidad de Sincronización</td>
+              <td class="p-4 sm:p-5 bg-emerald-500/[0.05]">&lt; 1 segundo (Local-First OLEDB)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Polling cada 15-30 minutos</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Retardo de 5 a 15 minutos</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Privacidad de Datos</td>
+              <td class="p-4 sm:p-5 bg-emerald-500/[0.05]">100% en tu PC / Servidor Windows</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Copia de datos en nube ajena</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Tráfico por servidores de terceros</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Factusol y Shopify</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Necesito una app personalizada de Shopify (Custom App)?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí, pero se crea en menos de 2 minutos desde el panel de Shopify. Solo debes crear una aplicación personalizada en <em>Configuración &rarr; Aplicaciones y canales de venta &rarr; Desarrollar aplicaciones</em>, otorgar permisos de lectura y escritura para productos y pedidos, y pegar el token de acceso en Bentian. Dispones de una guía paso a paso con capturas de pantalla.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Qué ocurre si tengo variantes de productos en Shopify?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian vincula las variantes de Shopify con Factusol a través de la referencia (SKU) o del código de barras (EAN-13). Si usas la gestión de tallas y colores de Factusol, se asigna cada combinación directamente a la variante correspondiente en Shopify.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Funciona con Factusol instalado en red local o NAS?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Totalmente. Bentian admite rutas locales (<code class="text-zinc-300">C:\Factusol\Datos\...</code>) y rutas de red UNC (<code class="text-zinc-300">\\NAS\Factusol\...</code>). Dispone de un mecanismo de bloqueo OLEDB optimizado que evita los errores 3045 ("El archivo ya está en uso") aunque haya varios puestos de trabajo abiertos a la vez en la empresa.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo probarlo antes de pagar?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Dispones de 14 días de prueba completa sin compromiso ni necesidad de introducir tarjeta de crédito. Descarga el instalador, conéctalo a tu tienda de prueba o de producción de Shopify y verifica la velocidad de sincronización.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-900/40 via-indigo-600/20 to-violet-900/40 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Conecta Factusol y Shopify Hoy Mismo</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Olvídate de pagar 100 € cada mes en plataformas intermedias. Conecta tu ERP directamente desde Windows con control total de tus datos.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador Oficial (Prueba 14 Días)
+        </a>
+        <a href="/factusol-woocommerce/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Conector WooCommerce &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/factusol-shopify/" class="hover:text-zinc-300 transition">Shopify</a>
+        <a href="/factusol-tallas-colores/" class="hover:text-zinc-300 transition">Tallas y Colores</a>
+        <a href="/factusol-ferreterias-suministros/" class="hover:text-zinc-300 transition">Ferreterías</a>
+        <a href="/factusol-recargo-equivalencia/" class="hover:text-zinc-300 transition">Recargo Equivalencia</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

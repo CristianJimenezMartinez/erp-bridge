@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Factusol para Ferreterías y Suministros Industriales | Bentian ERP</title>
+  <meta name="description" content="Sincroniza catálogos masivos de 20.000 a 50.000 referencias entre Factusol y tu eCommerce en segundos. Tarifas B2B (F_TAR 1 a 5), descuentos escalonados y cero caídas de servidor.">
+  <meta name="keywords" content="conector factusol ferreterias, factusol suministros industriales, sincronizar catalogo masivo factusol, factusol 50000 referencias, tarifas b2b factusol woocommerce, F_TAR factusol prestashop">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-ferreterias-suministros/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-ferreterias-suministros/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol para Ferreterías y Suministros Industriales | Bentian ERP">
+  <meta property="og:description" content="Catálogos masivos de 20.000 a 50.000 artículos y Tarifas B2B de Factusol sincronizados a máxima velocidad sin colapsar el hosting web.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Factusol para Ferreterías y Suministros Industriales | Bentian ERP">
+  <meta name="twitter:description" content="Sincronización masiva de 20.000 a 50.000 referencias y tarifas B2B de Factusol en segundos.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tailwind Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Ferreterías y Suministros", "item": "https://bridge.cristianjm.com/factusol-ferreterias-suministros/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge — Ferreterías y Suministros Industriales",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/factusol-ferreterias-suministros/",
+        "description": "Conector de alto rendimiento para sincronizar catálogos de 20.000 a 50.000 artículos y tarifas B2B de Factusol con eCommerce.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Por qué los plugins PHP colapsan con catálogos de ferretería y suministros?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Los plugins PHP tradicionales intentan recorrer miles de artículos directamente dentro del servidor web de WordPress o PrestaShop. Al superar los 1.000 o 2.000 artículos, agotan el límite de memoria PHP (Memory Size Exhausted) y provocan errores 504 Gateway Timeout, ralentizando o tumbando la tienda online."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo logra Bentian sincronizar catálogos de 20.000 a 50.000 referencias en segundos?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian corre en la máquina local Windows donde reside Factusol. Lee la base de datos por bloques optimizados en RAM y calcula un hash diferencial de cada fila. Compara 50.000 artículos en menos de 150 milisegundos en tu PC y envía a la tienda web únicamente las 20 o 40 referencias que han variado de stock o precio, logrando un impacto de CPU nulo en tu servidor web."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Soporta las 5 tarifas de precios de Factusol para clientes profesionales B2B?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Bentian sincroniza de forma nativa las 5 tarifas de Factusol (F_TAR 1 a 5), asignando cada tarifa a su respectivo rol de cliente en WooCommerce (mediante plugins B2B como B2BKing, Wholesale Prices) o grupos de clientes en PrestaShop."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Permite gestionar múltiples almacenes en Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Totalmente. Puedes aislar el stock del almacén web o sumar el stock de varios almacenes (F_ALM / F_STO) aplicando márgenes de seguridad para protegerte contra roturas de existencias en tienda física."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">Ferreterías & Suministros</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Gratis (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400 text-xs font-medium mb-6">
+      <span>Ferretería Industrial • Suministros • Construcción • Fontanería • Electricidad B2B</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector Factusol para <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-indigo-400">Ferreterías y Suministros Industriales</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Sincroniza catálogos masivos de <strong>20.000 a 50.000 referencias</strong>, tarifas B2B escalonadas (<code class="text-amber-300 font-mono">F_TAR 1 a 5</code>) y múltiples almacenes sin colapsar la memoria de tu hosting ni provocar caídas de servidor por <em>timeout</em>.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar Instalador (Windows)
+      </a>
+      <a href="/#pricing" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Planes (199 €/año)
+      </a>
+    </div>
+
+    <!-- Problemas de los Catálogos Masivos vs Bentian -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> El Colapso de los Plugins PHP en Catálogos Grandes
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• <strong>Errores 504 Gateway Timeout:</strong> El servidor web se congela intentando procesar miles de filas a la vez.</li>
+          <li>• <strong>Allowed memory size exhausted:</strong> PHP supera el límite de memoria del hosting (256MB/512MB) y aborta la sincronización.</li>
+          <li>• Bloqueo de las tablas MySQL: Durante la sincronización la tienda web se vuelve lenta para los compradores.</li>
+          <li>• Ignoran las tarifas mayoristas B2B, volcando un único precio para todos los clientes.</li>
+          <li>• Falta de soporte para códigos de equivalencia y referencias del fabricante (OEM).</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> La Solución de Alto Rendimiento Bentian
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• <strong>Comparación en RAM local en &lt; 150 ms:</strong> Tu PC Windows procesa las 50.000 referencias sin tocar los recursos del hosting.</li>
+          <li>• <strong>Algoritmo Diferencial Criptográfico:</strong> Solo se transmiten a la web las 20-30 referencias que han variado de precio o stock.</li>
+          <li>• <strong>Soporte para 5 Tarifas (<code class="text-amber-300">F_TAR</code>):</strong> Precios específicos para instaladores, distribuidores, empresas y particulares.</li>
+          <li>• <strong>Multi-almacén (<code class="text-amber-300">F_ALM</code> / <code class="text-amber-300">F_STO</code>):</strong> Reserva de stock físico y stock para venta online.</li>
+          <li>• <strong>Caso Real en Producción:</strong> Suministros Rubio procesa +5.000 artículos en apenas 3 segundos.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Benchmarks Reales de Rendimiento -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">BENCHMARKS DE RENDIMIENTO</span>
+        <h2 class="text-2xl font-bold text-white">Pruebas Reales con Catálogos de Ferretería</h2>
+      </div>
+
+      <p class="text-sm text-zinc-400 mb-8 leading-relaxed">
+        Los catálogos de suministros industriales presentan desafíos únicos: gran densidad de referencias con rotación discontinua, múltiples tarifas y variaciones de empaque. Bentian procesa estas cargas en su propio hilo de ejecución en Windows:
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div class="p-5 rounded-xl bg-zinc-900/80 border border-white/[0.06] text-center">
+          <div class="text-3xl font-extrabold text-amber-400 mb-1">5.000 refs</div>
+          <div class="text-xs text-zinc-400 mb-3">Catálogo Mediano</div>
+          <div class="text-sm font-semibold text-white">Sincronización en 3 seg</div>
+          <div class="text-[11px] text-zinc-500 mt-1">Caso real: Suministros Rubio</div>
+        </div>
+
+        <div class="p-5 rounded-xl bg-zinc-900/80 border border-white/[0.06] text-center">
+          <div class="text-3xl font-extrabold text-indigo-400 mb-1">20.000 refs</div>
+          <div class="text-xs text-zinc-400 mb-3">Ferretería General</div>
+          <div class="text-sm font-semibold text-white">Comparación en 80 ms</div>
+          <div class="text-[11px] text-zinc-500 mt-1">Cero sobrecarga de CPU en hosting</div>
+        </div>
+
+        <div class="p-5 rounded-xl bg-zinc-900/80 border border-white/[0.06] text-center">
+          <div class="text-3xl font-extrabold text-emerald-400 mb-1">50.000 refs</div>
+          <div class="text-xs text-zinc-400 mb-3">Distribuidor Mayorista</div>
+          <div class="text-sm font-semibold text-white">Cero Timeouts (504)</div>
+          <div class="text-[11px] text-zinc-500 mt-1">Batching asíncrono y hash SHA-256</div>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl bg-zinc-900 border border-white/[0.06] text-xs text-zinc-300">
+        <strong class="text-white">¿Por qué nunca se cae la tienda online?</strong>
+        A diferencia de los scripts PHP que ejecutan <code class="text-amber-300">SELECT * FROM wp_posts</code> en el hosting compartido, Bentian lee la base de datos de Factusol en local por OLEDB en Windows. Compara el estado anterior mediante firmas criptográficas en RAM. Si de 40.000 tornillos, tuercas y herramientas solo 15 artículos cambiaron de stock o precio hoy, Bentian envía un único payload JSON de 4 KB con esas 15 modificaciones exactas.
+      </div>
+    </div>
+
+    <!-- Funcionalidades B2B Específicas -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-8">Soluciones Específicas para el Comercio B2B</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">1</div>
+          <h4 class="font-semibold text-white mb-2">5 Tarifas B2B (F_TAR)</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Sincroniza hasta 5 tarifas de precios diferentes de Factusol y asígnalas a roles en tu tienda (PVP particular, instalador profesional, gremios o distribuidores mayoristas).</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">2</div>
+          <h4 class="font-semibold text-white mb-2">Descuentos por Escalados</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Soporta los descuentos por volumen y escalados de Factusol (F_LIP) para que tus clientes B2B obtengan mejor precio por caja completa o compra de palets.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">3</div>
+          <h4 class="font-semibold text-white mb-2">Gestión Multi-Almacén</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Mapea existencias de almacenes específicos (F_ALM) para separar el stock reservado para obras o tienda física del stock disponible para la tienda online.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">4</div>
+          <h4 class="font-semibold text-white mb-2">Referencias OEM y Códigos</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Sincroniza la referencia interna de Factusol, el código de barras EAN-13 y el código del fabricante para que los profesionales encuentren fácilmente el recambio exacto.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">5</div>
+          <h4 class="font-semibold text-white mb-2">Cálculo de Pesos y Portes</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Pasa el peso de cada artículo desde Factusol a la tienda web para calcular de forma milimétrica los costes de envío por agencia de transporte pesado o paquetería.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4">6</div>
+          <h4 class="font-semibold text-white mb-2">Pedidos Directos a F_PCL</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Los pedidos B2B se insertan en Factusol con los precios pactados del cliente, listos para emitir el albarán de entrega y preparar el albarán de almacén.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Ferreterías y Catálogos Masivos</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Funciona si mi base de datos de Factusol está en un servidor NAS en red?
+            <span class="text-amber-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Es la configuración estándar de la mayoría de ferreterías. Bentian soporta rutas UNC de red (<code class="text-zinc-300">\\SERVIDOR\Factusol\Datos\...</code>) y aplica bloqueos OLEDB no exclusivos (Share Deny None), lo que permite que todos los puestos de venta de mostrador sigan trabajando a máxima velocidad sin bloqueos ni errores 3045.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Qué ocurre si tengo artículos descatalogados o sin stock en Factusol?
+            <span class="text-amber-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Puedes configurar filtros en Bentian para sincronizar únicamente los artículos activos con stock disponible, o bien mantener el artículo visible en la tienda online marcado como "Agotado" para preservar el posicionamiento SEO en Google.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Es compatible con plugins B2B de WooCommerce?
+            <span class="text-amber-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Totalmente compatible con plugins estándar como B2BKing, Wholesale Suite, B2B for WooCommerce y roles nativos de WordPress, así como con los grupos de clientes y descuentos por categoría de PrestaShop.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo probar la velocidad con mi catálogo antes de pagar?
+            <span class="text-amber-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Tienes 14 días de prueba con todas las funciones activadas. Instala Bentian en tu servidor o PC, conecta tu base de datos de Factusol y comprueba en persona cómo sincroniza miles de referencias en pocos segundos.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-amber-950/40 via-indigo-600/20 to-orange-950/40 border border-amber-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Sincroniza Tu Catálogo Masivo Sin Cuelgues</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descubre por qué ferreterías y suministros industriales líderes confían en Bentian para gestionar más de 50.000 referencias con tarifas B2B automáticas.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador Oficial (Prueba 14 Días)
+        </a>
+        <a href="/factusol-woocommerce/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Conector WooCommerce &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/factusol-shopify/" class="hover:text-zinc-300 transition">Shopify</a>
+        <a href="/factusol-tallas-colores/" class="hover:text-zinc-300 transition">Tallas y Colores</a>
+        <a href="/factusol-recargo-equivalencia/" class="hover:text-zinc-300 transition">Recargo Equivalencia</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

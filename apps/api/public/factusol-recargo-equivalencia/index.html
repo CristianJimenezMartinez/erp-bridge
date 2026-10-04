@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factusol y Recargo de Equivalencia en WooCommerce y PrestaShop | Bentian ERP</title>
+  <meta name="description" content="Solución definitiva para el Recargo de Equivalencia (IVA 21% + R.E. 5.2%) en tiendas online conectadas a Factusol. Cuadre contable exacto sin descuadres con la Agencia Tributaria.">
+  <meta name="keywords" content="recargo de equivalencia factusol woocommerce, factusol recargo equivalencia prestashop, iva y recargo equivalencia tienda online, conector factusol impuestos, cuadre contable factusol recargo equivalencia">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-recargo-equivalencia/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-recargo-equivalencia/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Factusol y Recargo de Equivalencia en WooCommerce y PrestaShop | Bentian ERP">
+  <meta property="og:description" content="Gestión perfecta del Recargo de Equivalencia en eCommerce. Cuadre exacto de IVA 21% + 5.2% R.E., 10% + 1.4% y 4% + 0.5% en pedidos web y facturas de Factusol.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Factusol y Recargo de Equivalencia en WooCommerce y PrestaShop | Bentian ERP">
+  <meta name="twitter:description" content="Cuadre contable y fiscal exacto para minoristas con Recargo de Equivalencia en Factusol y eCommerce.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tailwind Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Recargo de Equivalencia Factusol", "item": "https://bridge.cristianjm.com/factusol-recargo-equivalencia/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge — Integración Fiscal Recargo de Equivalencia",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/factusol-recargo-equivalencia/",
+        "description": "Módulo de cuadre fiscal exacto para el régimen especial de Recargo de Equivalencia en WooCommerce, PrestaShop y Factusol.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Por qué las tiendas online suelen fallar con el Recargo de Equivalencia?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Plataformas como WooCommerce o Shopify fueron concebidas para el mercado anglosajón, donde no existe el concepto español del Recargo de Equivalencia. Al intentar forzarlo mediante plugins genéricos, se producen descuadres de céntimos en el redondeo de las líneas de pedido y no se traslada correctamente la información a los libros contables del ERP."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo garantiza Bentian el cuadre contable exacto en Factusol?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian verifica si el cliente tiene marcado el flag de Recargo de Equivalencia en su ficha de Factusol (F_CLI). Al volcar el pedido a F_PCL y F_LPC, calcula las cuotas de IVA y R.E. con los algoritmos nativos de Factusol, garantizando que bases, tipos (21%+5.2%, 10%+1.4%, 4%+0.5%) y totales cuadren al céntimo tanto en la web como en la factura legal."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cumple con la normativa VeriFactu y la Ley Crea y Crece?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Con Bentian, la tienda online actúa exclusivamente como canal de captación de pedidos, mientras que Factusol es el emisor fiscal legal de la factura inalterable y encadenada criptográficamente con el código QR exigido por la Agencia Tributaria."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué tipos de Recargo de Equivalencia soporta?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Soporta todos los tipos vigentes en la legislación española: General (IVA 21% + R.E. 5.2%), Reducido (IVA 10% + R.E. 1.4%) y Superreducido (IVA 4% + R.E. 0.5%), así como tipos impositivos transitorios especiales fijados por el Ministerio de Hacienda."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">Fiscal & R.E.</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Gratis (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/20 bg-rose-500/10 text-rose-400 text-xs font-medium mb-6">
+      <span>Régimen Especial de Recargo de Equivalencia • Agencia Tributaria (AEAT)</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Factusol y <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-indigo-400">Recargo de Equivalencia</span> en eCommerce
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      La solución definitiva para vender online a comerciantes minoristas en España. Sincroniza pedidos web con Factusol aplicando automáticamente el <strong>IVA + Recargo de Equivalencia (21% + 5.2%, 10% + 1.4%, 4% + 0.5%)</strong> con cuadre contable milimétrico y sin descuadres con Hacienda.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar Instalador (Windows)
+      </a>
+      <a href="/#pricing" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Planes (199 €/año)
+      </a>
+    </div>
+
+    <!-- Problemas Fiscales Tradicionales vs Bentian -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> El Gran Quebradero de Cabeza Fiscal
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• WooCommerce y Shopify no disponen de recargo condicional nativo por tipo de cliente.</li>
+          <li>• Descuadres de céntimos (0,01 € - 0,05 €) en el redondeo de impuestos de las líneas.</li>
+          <li>• Las asesorías rechazan las facturas web por no desglosar la cuota de recargo exigida por la AEAT.</li>
+          <li>• Peligro de multas tributarias de hasta 50.000 € bajo la nueva normativa antifraude y VeriFactu.</li>
+          <li>• Horas perdidas por los administrativos corrigiendo a mano las facturas en Factusol.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> La Solución Blindada Bentian ERP Bridge
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• <strong>Detección automática en ficha de cliente:</strong> Lee el flag de R.E. en Factusol (<code class="text-emerald-300">F_CLI</code>) o el campo CIF del checkout.</li>
+          <li>• <strong>Cuadre contable exacto:</strong> Aplica las fórmulas matemáticas oficiales de Factusol con precisión al céntimo.</li>
+          <li>• <strong>Desglose completo en factura:</strong> Base imponible + Cuota de IVA + Cuota de Recargo de Equivalencia diferenciadas.</li>
+          <li>• <strong>Integración con ContaSol y Modelo 303:</strong> Datos listos para la liquidación trimestral de impuestos sin errores.</li>
+          <li>• <strong>Emisión legal en el ERP:</strong> Tu Factusol emite la factura válida con QR legal según el Real Decreto 1007/2023.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tabla Oficial de Tipos Impositivos en España -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-2.5 py-1 rounded bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-mono font-semibold">LEGISLACIÓN TRIBUTARIA ESPAÑOLA</span>
+        <h2 class="text-2xl font-bold text-white">Tipos de IVA y Recargo de Equivalencia Soportados</h2>
+      </div>
+
+      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
+        Bentian calcula con precisión matemática cada tramo impositivo según la normativa de la Agencia Estatal de Administración Tributaria (AEAT):
+      </p>
+
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.02] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4">Régimen Impositivo</th>
+              <th class="p-4">Tipo de IVA</th>
+              <th class="p-4 text-rose-400 font-semibold">Tipo Recargo (R.E.)</th>
+              <th class="p-4">Tipo Total Aplicado</th>
+              <th class="p-4">Sectores Habituales</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 font-semibold text-white">General</td>
+              <td class="p-4 font-mono">21,00 %</td>
+              <td class="p-4 font-mono text-rose-400 font-bold">5,20 %</td>
+              <td class="p-4 font-mono font-semibold text-emerald-400">26,20 %</td>
+              <td class="p-4 text-xs text-zinc-400">Ferretería, calzado, moda, tecnología, suministros</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Reducido</td>
+              <td class="p-4 font-mono">10,00 %</td>
+              <td class="p-4 font-mono text-rose-400 font-bold">1,40 %</td>
+              <td class="p-4 font-mono font-semibold text-emerald-400">11,40 %</td>
+              <td class="p-4 text-xs text-zinc-400">Alimentación envasada, agua, productos agrícolas</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Superreducido</td>
+              <td class="p-4 font-mono">4,00 %</td>
+              <td class="p-4 font-mono text-rose-400 font-bold">0,50 %</td>
+              <td class="p-4 font-mono font-semibold text-emerald-400">4,50 %</td>
+              <td class="p-4 text-xs text-zinc-400">Pan, leche, frutas, medicamentos, libros y prensa</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold text-white">Exento / No Sujeto</td>
+              <td class="p-4 font-mono">0,00 %</td>
+              <td class="p-4 font-mono text-rose-400 font-bold">0,00 %</td>
+              <td class="p-4 font-mono font-semibold text-zinc-400">0,00 %</td>
+              <td class="p-4 text-xs text-zinc-400">Envíos a Canarias (IGIC), Ceuta, Melilla e intracomunitarios</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-5 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs text-zinc-300 flex items-start gap-3">
+        <span class="text-rose-400 text-base">⚖️</span>
+        <div>
+          <strong class="text-rose-300">Evita la manipulación de facturas:</strong>
+          Si una tienda online emite un PDF por su cuenta y difiere en un céntimo de la base registrada en Factusol, se incurre en una infracción tributaria. Con Bentian, el pedido web se inyecta como borrador de pedido de cliente (<code class="text-zinc-300">F_PCL</code>) y es Factusol el que genera la factura oficial inmutable (<code class="text-zinc-300">F_FAC</code>).
+        </div>
+      </div>
+    </div>
+
+    <!-- Cómo Funciona el Flujo de Compra con R.E. -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-8">El Flujo de Compra Perfecto Paso a Paso</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">1</div>
+          <h4 class="font-semibold text-white mb-2">Identificación del Cliente</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">El cliente minorista se registra o introduce su NIF/CIF en el checkout marcando la casilla de "Estoy acogido al Régimen de Recargo de Equivalencia".</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">2</div>
+          <h4 class="font-semibold text-white mb-2">Cálculo Transparente</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">El carrito desglosa en tiempo real el importe neto, el IVA correspondiente al artículo y la cuota de Recargo de Equivalencia de forma transparente antes del pago.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">3</div>
+          <h4 class="font-semibold text-white mb-2">Inyección Atómica en Factusol</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Bentian descarga el pedido y lo inserta en Factusol en <code class="text-zinc-300">F_PCL</code> con las marcas fiscales exactas en cada línea de artículo (<code class="text-zinc-300">F_LPC</code>).</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">4</div>
+          <h4 class="font-semibold text-white mb-2">Alta o Vinculación de Cliente</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Si es un cliente nuevo, se crea su ficha en Factusol (<code class="text-zinc-300">F_CLI</code>) con el flag de Recargo activado para futuras compras presenciales o telefónicas.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">5</div>
+          <h4 class="font-semibold text-white mb-2">Facturación Legal Automática</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Factusol genera la factura definitiva (<code class="text-zinc-300">F_FAC</code>) con las tres columnas fiscales oficiales: Base, % IVA y % Recargo de Equivalencia.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 font-bold mb-4">6</div>
+          <h4 class="font-semibold text-white mb-2">Tranquilidad Contable Total</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Los datos se traspasan directamente a ContaSol o a tu programa contable sin un solo descuadre en los libros de registro de IVA repercutido.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Recargo de Equivalencia</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Es obligatorio aplicar Recargo de Equivalencia si vendo a minoristas autónomos?
+            <span class="text-rose-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. En España, los mayoristas o distribuidores que venden a comerciantes minoristas personas físicas que tributan en este régimen están legalmente obligados a repercutir el IVA y el Recargo de Equivalencia correspondiente. No hacerlo constituye una infracción tributaria.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cómo se configuran los productos con diferentes tipos de IVA (21%, 10%, 4%)?
+            <span class="text-rose-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian lee el tipo de IVA asignado a cada artículo en Factusol y le asocia automáticamente el porcentaje de recargo que le corresponde por ley (al artículo con 21% le aplica 5.2%; al de 10%, 1.4%; y al de 4%, 0.5%), incluso si un mismo pedido contiene artículos de tipos fiscales mixtos.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Funciona tanto en WooCommerce como en PrestaShop?
+            <span class="text-rose-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. En WooCommerce se integra con los módulos de recargo de equivalencia más populares o mediante cálculo condicional de impuestos, y en PrestaShop aprovecha el sistema de impuestos y grupos de clientes nativos de la plataforma.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo probar la integración con pedidos reales durante 14 días?
+            <span class="text-rose-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Tienes 14 días de prueba completa y sin coste. Puedes generar pedidos de prueba con clientes en recargo de equivalencia y clientes en régimen general, y verificar cómo Factusol genera las facturas con cuadre contable perfecto.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-rose-950/40 via-indigo-600/20 to-purple-950/40 border border-rose-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Elimina los Descuadres Fiscales para Siempre</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga Bentian ERP Bridge y asegura el cumplimiento tributario estricto de tus ventas online con Factusol.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador Oficial (Prueba 14 Días)
+        </a>
+        <a href="/factusol-woocommerce/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Conector WooCommerce &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/factusol-shopify/" class="hover:text-zinc-300 transition">Shopify</a>
+        <a href="/factusol-tallas-colores/" class="hover:text-zinc-300 transition">Tallas y Colores</a>
+        <a href="/factusol-ferreterias-suministros/" class="hover:text-zinc-300 transition">Ferreterías</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

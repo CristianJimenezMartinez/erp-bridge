@@ -215,6 +215,7 @@ export async function bootstrapApp(): Promise<Express> {
     res.redirect(301, '/conector-factusol/');
   });
 
+<<<<<<< HEAD
   app.get('/factusol-verifactu-woocommerce', (_req, res) => {
     res.redirect(301, '/factusol-verifactu-woocommerce/');
   });
@@ -233,6 +234,29 @@ export async function bootstrapApp(): Promise<Express> {
 
   app.get('/docs', (_req, res) => {
     res.redirect(301, '/docs/');
+=======
+  // Redirecciones canónicas 301 para páginas pilar SEO
+  app.get('/factusol-woocommerce', (_req, res) => {
+    res.redirect(301, '/factusol-woocommerce/');
+  });
+  app.get('/factusol-prestashop', (_req, res) => {
+    res.redirect(301, '/factusol-prestashop/');
+  });
+  app.get('/alternativa-delsol-conecta', (_req, res) => {
+    res.redirect(301, '/alternativa-delsol-conecta/');
+  });
+  app.get('/factusol-tallas-colores', (_req, res) => {
+    res.redirect(301, '/factusol-tallas-colores/');
+  });
+  app.get('/factusol-shopify', (_req, res) => {
+    res.redirect(301, '/factusol-shopify/');
+  });
+  app.get('/factusol-ferreterias-suministros', (_req, res) => {
+    res.redirect(301, '/factusol-ferreterias-suministros/');
+  });
+  app.get('/factusol-recargo-equivalencia', (_req, res) => {
+    res.redirect(301, '/factusol-recargo-equivalencia/');
+>>>>>>> af62ed8 (feat(seo): add 4 high-value pillar landing pages (tallas-colores, shopify, ferreterias, recargo-equivalencia))
   });
 
   // Servir Dashboard Cloud Multi-Tenant

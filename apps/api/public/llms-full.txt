@@ -30,6 +30,7 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
 ### Plataformas de Comercio Electrónico Soportadas:
 - **WooCommerce**: Versiones 8.x, 9.x y superiores sobre WordPress 6.x. Compatible con High-Performance Order Storage (HPOS).
 - **PrestaShop**: Versiones 1.7.x y 8.x.
+- **Shopify**: Sincronización bidireccional directa vía Shopify Admin GraphQL & REST API desde Windows.
 - **Endpoint Web Universal Bentian**: Archivo PHP desacoplado (`erp-bridge-endpoint.php`) para tiendas a medida o servidores Plesk/cPanel con MariaDB/MySQL.
 
 ## 3. Problemas que Resuelve y Diferenciación Competitiva
@@ -57,9 +58,16 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
   - Descuento directo del 25% (149,25 € + IVA/año) para empresas de informática, técnicos de mantenimiento y agencias web.
   - Factura mayorista estándar (Modelo 303 de IVA, sin líos de retenciones IRPF ni comisiones a liquidar).
 
-## 5. Contacto y Recursos
+## 5. Contacto y Recursos Canónicos
 
 - **Portal Web:** https://bridge.cristianjm.com
+- **Factusol WooCommerce:** https://bridge.cristianjm.com/factusol-woocommerce/
+- **Factusol PrestaShop:** https://bridge.cristianjm.com/factusol-prestashop/
+- **Factusol Shopify:** https://bridge.cristianjm.com/factusol-shopify/
+- **Factusol Tallas y Colores:** https://bridge.cristianjm.com/factusol-tallas-colores/
+- **Ferreterías y Suministros Industriales:** https://bridge.cristianjm.com/factusol-ferreterias-suministros/
+- **Factusol y Recargo de Equivalencia:** https://bridge.cristianjm.com/factusol-recargo-equivalencia/
+- **Alternativa a DELSOL Conecta:** https://bridge.cristianjm.com/alternativa-delsol-conecta/
 - **Dashboard de Gestión:** https://bridge.cristianjm.com/dashboard/
 - **Correo de Soporte Oficial:** soporte@cristianjm.com
 - **Contacto del Desarrollador:** Cristian Jiménez Martínez (contacto@cristianjm.com)

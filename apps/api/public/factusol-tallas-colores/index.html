@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Factusol Tallas y Colores (Moda y Calzado) | Bentian ERP</title>
+  <meta name="description" content="Conecta la matriz de tallas y colores de Factusol con WooCommerce y PrestaShop en tiempo real. Mapeo nativo de F_ART, F_TLL, F_COL y F_STC sin duplicar productos ni errores de stock.">
+  <meta name="keywords" content="factusol tallas y colores, conector factusol moda, sincronizar tallas factusol woocommerce, factusol calzado prestashop, variaciones factusol woocommerce, F_STC factusol">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/factusol-tallas-colores/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/factusol-tallas-colores/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol Tallas y Colores (Moda y Calzado) | Bentian ERP">
+  <meta property="og:description" content="Sincroniza la matriz de tallas y colores de Factusol con WooCommerce y PrestaShop. Control de stock por combinación, EAN-13 individual y cero duplicados.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Factusol Tallas y Colores (Moda y Calzado) | Bentian ERP">
+  <meta name="twitter:description" content="Sincroniza variaciones de moda y calzado de Factusol con tu tienda online sin plugins lentos.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tailwind Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#6366f1', 600: '#4f46e5' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector Factusol Tallas y Colores", "item": "https://bridge.cristianjm.com/factusol-tallas-colores/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian ERP Bridge — Conector Factusol Tallas y Colores",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/factusol-tallas-colores/",
+        "description": "Middleware Local-First para sincronizar matrices de tallas, colores y combinaciones de Factusol con tiendas online WooCommerce y PrestaShop.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo mapea Bentian las tablas de tallas y colores de Factusol a WooCommerce?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian lee la tabla maestra de artículos (F_ART) junto con las tablas de definición de tallas (F_TLL), colores (F_COL) y combinaciones de stock (F_STC). En WooCommerce, genera automáticamente un producto padre de tipo variable con atributos globales de taxonomía y asocia cada fila de F_STC como una variación nativa (product_variation) con su stock disponible y código de barras EAN-13 independiente."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Evita que se creen productos simples duplicados en la tienda online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Los conectores convencionales suelen volcar cada combinación como si fuera un producto independiente ('Pantalón Azul 38', 'Pantalón Azul 40'), llenando el catálogo de artículos repetidos. Bentian agrupa todas las opciones bajo una única ficha de producto con selectores limpios de talla y color para el cliente final."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Se actualiza únicamente la talla o color que ha cambiado de stock?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Exacto. Gracias a su algoritmo de dirty-checking en memoria RAM local mediante hash SHA-256 de fila, si vendes una talla 42 en tu tienda física, Bentian actualiza únicamente esa variación concreta en menos de 50 ms en la API web, evitando regenerar la matriz completa y previniendo caídas por timeout."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Soporta códigos de barras EAN-13 diferentes para cada talla y color?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Totalmente. Factusol asigna un código EAN específico a cada registro de la tabla F_EAN / F_STC. Bentian sincroniza ese código de barras directamente en el campo SKU o código de barras de cada variación en WooCommerce y PrestaShop."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-lg text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">Tallas y Colores</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition hidden sm:inline">Precios</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-indigo-600/20">
+          Descargar Gratis (<span data-app-version>v0.3.5</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+      <span>Moda • Calzado • Textil • Deporte • Factusol 2024 / 2025 / 2026</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector Factusol <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">Tallas y Colores</span> para eCommerce
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Sincroniza la compleja matriz de tallas, colores y combinaciones de Factusol con WooCommerce y PrestaShop en tiempo real. Cero productos duplicados, control de stock disponible por variación (<code class="text-indigo-300 font-mono">F_STC</code>), códigos EAN-13 individuales y actualización ultrarrápida sin sobrecargar tu servidor web.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar Instalador Oficial (Windows)
+      </a>
+      <a href="/#pricing" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Planes (199 €/año)
+      </a>
+    </div>
+
+    <!-- Problemas de los Conectores Genéricos vs Bentian -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> El Caos de los Conectores Antiguos
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Duplican el catálogo creando un producto simple por cada talla ("Camiseta S", "Camiseta M", "Camiseta L" repetidas).</li>
+          <li>• Rompen el selector visual de tallas y colores en la tienda online.</li>
+          <li>• Saturan la memoria de WordPress con errores <code>504 Gateway Timeout</code> al enviar cientos de variaciones.</li>
+          <li>• Mezclan los códigos de barras EAN-13 entre tallas provocando errores de picking en el almacén.</li>
+          <li>• Sobrevenden existencias por no restar los pedidos reservados en mostrador.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> La Solución Especializada Bentian
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• <strong>Mapeo nativo de matriz:</strong> Agrupa bajo un único producto padre variable con selectores de talla y color limpios.</li>
+          <li>• <strong>Sincronización por delta:</strong> Si se vende la talla 42 en tienda, solo se actualiza esa fila en menos de 50 ms.</li>
+          <li>• <strong>EAN-13 independiente:</strong> Asocia el código de barras exacto a cada variación para trazabilidad total.</li>
+          <li>• <strong>Stock disponible real (<code>DISSTO</code>):</strong> Resta reservas físicas y pedidos web pendientes automáticamente.</li>
+          <li>• <strong>Local-First:</strong> Conexión directa OLEDB a tu base de datos de Factusol sin intermediarios cloud costosos.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Arquitectura Técnica: Mapeo de Tablas de Factusol -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16 shadow-2xl">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-2.5 py-1 rounded bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-semibold">ARQUITECTURA RELACIONAL</span>
+        <h2 class="text-2xl font-bold text-white">Cómo Mapea Bentian las Tablas de Factusol a Tu Tienda</h2>
+      </div>
+
+      <p class="text-sm text-zinc-400 mb-8 leading-relaxed">
+        En las empresas de moda, calzado y textil, Factusol estructura la información mediante un esquema relacional específico. Bentian interpreta estas relaciones directamente a nivel de base de datos sin alterar tu configuración existente:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="font-mono text-xs text-indigo-400 font-bold mb-1">F_ART</div>
+          <div class="text-sm font-semibold text-white mb-2">Artículo Padre</div>
+          <p class="text-xs text-zinc-400">Modelo, referencia principal, descripción, familia, sección y precio base.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="font-mono text-xs text-indigo-400 font-bold mb-1">F_TLL & F_COL</div>
+          <div class="text-sm font-semibold text-white mb-2">Tallas y Colores</div>
+          <p class="text-xs text-zinc-400">Diccionarios de tallas (S, M, L, 39, 40, 41...) y cartas de colores asociadas al artículo.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="font-mono text-xs text-indigo-400 font-bold mb-1">F_STC</div>
+          <div class="text-sm font-semibold text-white mb-2">Stock Combinado</div>
+          <p class="text-xs text-zinc-400">Existencias exactas, reservas y stock disponible para cada cruce talla-color.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-zinc-900/80 border border-white/[0.06]">
+          <div class="font-mono text-xs text-indigo-400 font-bold mb-1">F_EAN</div>
+          <div class="text-sm font-semibold text-white mb-2">Códigos de Barras</div>
+          <p class="text-xs text-zinc-400">Código EAN-13 único por cada variante para lectores de almacén y logística.</p>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-xs text-zinc-300 flex items-start gap-3">
+        <span class="text-indigo-400 text-base">⚡</span>
+        <div>
+          <strong class="text-indigo-300">Rendimiento diferencial sin sobrecarga:</strong>
+          Cuando Factusol registra una venta por TPV o un albarán de entrada, Bentian detecta en milisegundos qué registro de <code class="text-indigo-300">F_STC</code> ha variado y envía a la API REST de WooCommerce o PrestaShop únicamente el cambio de esa variación concreta, evitando llamadas masivas que agotan la memoria del hosting.
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Funcionalidades Específicas -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-8">Características Diseñadas para el Sector Textil y Calzado</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">1</div>
+          <h4 class="font-semibold text-white mb-2">Variaciones Nativas Limpias</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Crea atributos globales estándar (<code class="text-zinc-300">pa_talla</code>, <code class="text-zinc-300">pa_color</code>). Totalmente compatible con selectores visuales por botones, círculos de color o desplegables de cualquier plantilla.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">2</div>
+          <h4 class="font-semibold text-white mb-2">EAN-13 Individual por Talla</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Sincroniza el código de barras correspondiente a cada talla y color. Cuando preparas el pedido con pistola lectora, el código coincide al 100% con la etiqueta física del producto.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">3</div>
+          <h4 class="font-semibold text-white mb-2">Control de Stock Disponible Real</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Calcula automáticamente el stock neto restando reservas físicas de tienda y pedidos pendientes de servir. Si te queda solo 1 par del número 41, no permitirás sobreventas en la web.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">4</div>
+          <h4 class="font-semibold text-white mb-2">Tarifas y Descuentos Especiales</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Sincroniza la tarifa que desees (Tarifa 1 PVP, Tarifa 2 Mayorista...) e incluso recargos de precio específicos para tallas especiales si tu configuración de Factusol lo contempla.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">5</div>
+          <h4 class="font-semibold text-white mb-2">Inyección Atómica de Pedidos</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Cuando entra una compra web, el pedido se inyecta en <code class="text-zinc-300">F_PCL</code> con sus líneas detalladas (<code class="text-zinc-300">F_LPC</code>) indicando la talla y el color exactos que tu equipo debe preparar.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-zinc-900/50 border border-white/[0.06]">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold mb-4">6</div>
+          <h4 class="font-semibold text-white mb-2">Resiliencia y Modo Offline</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Si el ordenador de la tienda o almacén se apaga durante la noche, los pedidos quedan en cola segura y se descargan en Factusol en cuanto se inicia Windows por la mañana.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Comparativa con Conectores Convencionales -->
+    <div class="border border-white/[0.08] rounded-2xl overflow-hidden bg-[#121215] mb-16 shadow-2xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.02]">
+        <h2 class="text-xl font-bold text-white">Comparativa en Gestión de Variaciones</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-white/[0.01] text-zinc-400 text-xs uppercase tracking-wider">
+              <th class="p-4 sm:p-5">Aspecto</th>
+              <th class="p-4 sm:p-5 text-indigo-400 font-bold bg-indigo-500/[0.05]">Bentian ERP Bridge</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Plugins PHP / Conectores Tradicionales</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Estructura en la Tienda</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">Producto Padre Variable con Selectores Limpios</td>
+              <td class="p-4 sm:p-5 text-red-400">Suelen crear productos simples duplicados</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Velocidad con +500 Variantes</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.05]">&lt; 100 ms (Actualización diferencial en RAM)</td>
+              <td class="p-4 sm:p-5 text-red-400">Cuelgues y 504 Timeout por regeneración total</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">EAN-13 por Combinación</td>
+              <td class="p-4 sm:p-5 bg-indigo-500/[0.05]">Sincronización exacta desde F_STC / F_EAN</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Solo código padre o ignorado</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Compatibilidad WooCommerce & PrestaShop</td>
+              <td class="p-4 sm:p-5 bg-indigo-500/[0.05]">WooCommerce 8.x/9.x (HPOS) y PrestaShop 1.7/8.x</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Incompatibilidades frecuentes con nuevas versiones</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Coste de la Licencia</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-indigo-500/[0.05]">199 € / año (Tarifa Plana Sin Comisiones)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">+500 € / año o cuotas cloud obligatorias</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Tallas y Colores</h2>
+      <div class="space-y-4">
+        
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Qué ocurre si añado una nueva talla o color en Factusol?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Bentian detecta automáticamente la nueva combinación en la tabla <code class="text-zinc-300">F_STC</code> y la crea como una nueva variación bajo el producto padre correspondiente en WooCommerce o PrestaShop, asignándole sus existencias iniciales y su código de barras.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo asociar imágenes distintas para cada color?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. WooCommerce y PrestaShop permiten asignar imágenes a cada variación. Bentian preserva las imágenes asignadas en tu tienda web y las vincula con la variación correspondiente al color de Factusol, de modo que al seleccionar el color "Rojo" se muestre la fotografía de la prenda roja.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Necesito tener la base de datos de Factusol en la nube?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            No. Bentian funciona directamente con tu base de datos local de Factusol (.accdb / .mdb), ya esté en tu ordenador principal, en un servidor de oficina o en una unidad de red compartida (NAS). No requiere contratar ningún servicio cloud de DELSOL.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Se pueden probar las variaciones antes de comprar?
+            <span class="text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Por supuesto. Dispones de 14 días de prueba completa con todas las funcionalidades activas. Puedes descargar el agente de Windows, conectarlo con tu Factusol y tu tienda online, y verificar que tus tallas y colores se sincronizan a la perfección.
+          </p>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-900/40 via-indigo-600/20 to-violet-900/40 border border-indigo-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Sincroniza Tu Catálogo de Moda en Menos de 5 Minutos</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga el agente para Windows, selecciona tu archivo de Factusol y comprueba cómo tus artículos con tallas y colores se sincronizan sin duplicados ni errores.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          Descargar Instalador Oficial (Prueba 14 Días)
+        </a>
+        <a href="/factusol-woocommerce/" class="text-xs text-zinc-400 hover:text-white transition">
+          Ver Conector WooCommerce &rarr;
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/factusol-shopify/" class="hover:text-zinc-300 transition">Shopify</a>
+        <a href="/factusol-ferreterias-suministros/" class="hover:text-zinc-300 transition">Ferreterías</a>
+        <a href="/factusol-recargo-equivalencia/" class="hover:text-zinc-300 transition">Recargo Equivalencia</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>
