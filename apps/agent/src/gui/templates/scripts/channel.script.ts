@@ -60,7 +60,7 @@ export const channelScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!url.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="document.getElementById(\\'input-universal-url\\').value=\\'https://\\' + document.getElementById(\\'input-universal-url\\').value.replace(/^http:\\/\\//, \\'\\'); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-universal-url&quot;); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
           }
           extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn"><span>⬇️ Descargar erp-bridge-endpoint.php</span></button>';
           extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
@@ -150,7 +150,7 @@ export const channelScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="document.getElementById(\\'input-wc-url\\').value=\\'https://\\' + document.getElementById(\\'input-wc-url\\').value.replace(/^http:\\/\\//, \\'\\'); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-wc-url&quot;); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
           }
           extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn"><span>🔄 Reintentar conexión</span></button>';
           alertBox.innerHTML = 

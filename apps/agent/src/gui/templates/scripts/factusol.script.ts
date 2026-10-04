@@ -128,10 +128,10 @@ export const factusolScript = `
         if (data.instances && data.instances.length > 0) {
           if (label) label.textContent = 'Bases de datos encontradas (' + data.instances.length + '):';
           list.innerHTML = data.instances.map(function(inst) {
-            const safePath = inst.databasePath.replace(/\\\\/g, '\\\\\\\\');
+            const cleanPath = String(inst.databasePath).split('"').join('&quot;');
             const labelText = inst.companyCode ? ('Empresa ' + inst.companyCode + (inst.year ? ' (' + inst.year + ')' : '')) : 'Factusol';
             const sizeMb = inst.fileSizeBytes ? ' • ' + (inst.fileSizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '';
-            return '<div onclick="selectFactusolInstance(\\'' + safePath + '\\', ' + isWizard + ')" style="background: #1e1e26; border: 1px solid var(--card-border); padding: 9px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor=\\'#6366f1\\'" onmouseout="this.style.borderColor=\\'var(--card-border)\\'">' +
+            return '<div data-db-path="' + cleanPath + '" data-is-wiz="' + isWizard + '" onclick="selectFactusolInstance(this.getAttribute(&quot;data-db-path&quot;), this.getAttribute(&quot;data-is-wiz&quot;) === &quot;true&quot;)" style="background: #1e1e26; border: 1px solid var(--card-border); padding: 9px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor=&quot;#6366f1&quot;" onmouseout="this.style.borderColor=&quot;var(--card-border)&quot;">' +
               '<div><strong>' + labelText + '</strong>' + sizeMb + '<div style="color: var(--text-subtle); font-family: monospace; font-size: 11px; margin-top: 2px;">' + inst.databasePath + '</div></div>' +
               '<span class="tag tag-blue" style="margin-left: 8px;">Usar esta</span>' +
             '</div>';
@@ -259,7 +259,7 @@ export const factusolScript = `
                 '<div class="smart-error-actions">' +
                   '<button type="button" onclick="detectFactusol(' + isWizard + ')" class="smart-error-btn smart-error-btn-primary"><span>🔍 Auto-detectar Factusol</span></button>' +
                   '<button type="button" onclick="openNativeWindowsDialog(' + isWizard + ')" class="smart-error-btn"><span>📁 Examinar en Windows</span></button>' +
-                  '<button type="button" onclick="testFactusolConnection(\\'' + inputId + '\\', \\'' + alertId + '\\')" class="smart-error-btn"><span>🔄 Reintentar</span></button>' +
+                  '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn"><span>🔄 Reintentar</span></button>' +
                 '</div>' +
               '</div>';
             showSmartToast({
@@ -281,7 +281,7 @@ export const factusolScript = `
               '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
               '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
               '<div class="smart-error-actions">' +
-                '<button type="button" onclick="testFactusolConnection(\\'' + inputId + '\\', \\'' + alertId + '\\')" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>' +
+                '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>' +
               '</div>' +
             '</div>';
         }

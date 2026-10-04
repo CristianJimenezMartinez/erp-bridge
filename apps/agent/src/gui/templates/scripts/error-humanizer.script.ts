@@ -183,7 +183,7 @@ export const errorHumanizerScript = `
         pattern: /SSL|CERT_|self[- ]signed|DEPTH_ZERO_SELF_SIGNED_CERT|certificado no válido/i,
         title: 'Certificado de seguridad SSL de la tienda no válido',
         message: 'No se pudo establecer una conexión HTTPS cifrada de confianza porque el certificado SSL de tu web ha caducado o no está configurado.',
-        suggestion: 'Comprueba y renueva el certificado SSL gratuito (Let\'s Encrypt o cPanel) en el panel de control de tu proveedor de hosting.',
+        suggestion: "Comprueba y renueva el certificado SSL gratuito (Let's Encrypt o cPanel) en el panel de control de tu proveedor de hosting.",
         actionLabel: 'Revisar dirección de la web',
         targetTab: 'channel',
         targetInputId: 'input-universal-url',
@@ -405,7 +405,8 @@ export const errorHumanizerScript = `
       if (!el) return;
 
       const err = humanizeError(rawMessage);
-      const safeErrJson = JSON.stringify(err).replace(/"/g, '&quot;');
+      window._lastHumanizedErrors = window._lastHumanizedErrors || {};
+      window._lastHumanizedErrors[err.code] = err;
 
       el.style.display = 'block';
       el.innerHTML =
@@ -422,7 +423,7 @@ export const errorHumanizerScript = `
             '<strong>💡 ¿Cómo solucionarlo?:</strong> ' + err.suggestion +
           '</div>' +
           '<div class="human-alert-actions">' +
-            '<button type="button" class="btn btn-primary btn-sm" onclick="resolveHumanizedError(' + safeErrJson + ')">' +
+            '<button type="button" class="btn btn-primary btn-sm" data-err-code="' + err.code + '" onclick="resolveHumanizedError(window._lastHumanizedErrors[this.getAttribute(&quot;data-err-code&quot;)])">' +
               '<span>' + err.actionLabel + ' ➔</span>' +
             '</button>' +
             (err.helpUrl ? ('<a href="' + err.helpUrl + '" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;"><span>📖 Guía de ayuda ↗</span></a>') : '') +

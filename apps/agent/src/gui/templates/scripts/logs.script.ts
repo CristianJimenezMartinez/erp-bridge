@@ -11,10 +11,13 @@ export const logsScript = `
       });
 
       function escapeLogAttr(str) {
-        return (str || '')
-          .replace(/\\/g, '\\\\')
-          .replace(/'/g, "\\'")
-          .replace(/"/g, '&quot;');
+        if (!str) return '';
+        return String(str)
+          .split('&').join('&amp;')
+          .split('<').join('&lt;')
+          .split('>').join('&gt;')
+          .split('"').join('&quot;')
+          .split("'").join('&#39;');
       }
 
       function buildHtml(list) {
@@ -25,16 +28,16 @@ export const logsScript = `
           const isProblem = e.level === 'error' || e.level === 'warn';
           const safeMsg = escapeLogAttr(e.message);
           const solveBtn = isProblem
-            ? '<button type="button" class="log-solve-btn" onclick="event.stopPropagation(); if (typeof openErrorResolverModal === \\'function\\') openErrorResolverModal(\\'' + safeMsg + '\\');" title="Ver solución recomendada">' +
+            ? '<button type="button" class="log-solve-btn" onclick="event.stopPropagation(); if (window.openErrorResolverModal) window.openErrorResolverModal(this.parentElement.getAttribute(&quot;data-raw-msg&quot;));" title="Ver solución recomendada">' +
                 '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>' +
                 '<span>Resolver</span>' +
               '</button>'
             : '';
           const clickAttr = isProblem
-            ? (' onclick="if (typeof openErrorResolverModal === \\'function\\') openErrorResolverModal(\\'' + safeMsg + '\\');" title="Clic para ver cómo solucionar este problema"')
+            ? ' onclick="if (window.openErrorResolverModal) window.openErrorResolverModal(this.getAttribute(&quot;data-raw-msg&quot;));" title="Clic para ver cómo solucionar este problema"'
             : '';
 
-          return '<div class="log-line log-' + (e.level || 'info') + '"' + clickAttr + '>' +
+          return '<div class="log-line log-' + (e.level || 'info') + '" data-raw-msg="' + safeMsg + '"' + clickAttr + '>' +
             '<span class="log-time">' + e.timestamp + '</span>' +
             '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">' + e.message + '</span>' +
             solveBtn +

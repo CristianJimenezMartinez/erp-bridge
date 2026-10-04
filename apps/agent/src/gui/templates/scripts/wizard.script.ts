@@ -183,7 +183,7 @@ export const wizardScript = `
           title: 'Clave de licencia requerida',
           cause: 'No has introducido ninguna clave en el formulario.',
           suggestion: 'Pega la clave que comienza por EB-... recibida por correo electrónico.'
-        }, '<button type="button" onclick="document.getElementById(\\'wiz-input-lic\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir clave</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir clave</span></button>');
         return;
       }
 
@@ -208,8 +208,8 @@ export const wizardScript = `
         } else {
           const errInfo = humanizeErrorMessage(data.error || 'Clave no válida', 'license');
           renderWizardErrorCard(alertBox, errInfo, 
-            '<button type="button" onclick="document.getElementById(\\'wiz-input-lic\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✏️ Corregir clave</span></button>' +
-            '<button type="button" onclick="window.open(\\'https://bridge.cristianjm.com/\\', \\'_blank\\')" class="smart-error-btn"><span>🔑 Obtener nueva clave</span></button>'
+            '<button type="button" onclick="document.getElementById(&quot;wiz-input-lic&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✏️ Corregir clave</span></button>' +
+            '<button type="button" onclick="window.open(&quot;https://bridge.cristianjm.com/&quot;, &quot;_blank&quot;)" class="smart-error-btn"><span>🔑 Obtener nueva clave</span></button>'
           );
           showSmartToast({
             title: 'Error de Activación',
@@ -254,7 +254,7 @@ export const wizardScript = `
           title: 'Dirección web requerida',
           cause: 'No has introducido la dirección de tu tienda online.',
           suggestion: 'Escribe la dirección web donde vendes por internet (ejemplo: https://mitienda.com).'
-        }, '<button type="button" onclick="document.getElementById(\\'wiz-input-univ-url\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir dirección</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-univ-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir dirección</span></button>');
         return;
       }
 
@@ -279,7 +279,7 @@ export const wizardScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!url.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="document.getElementById(\\'wiz-input-univ-url\\').value=\\'https://\\' + document.getElementById(\\'wiz-input-univ-url\\').value.replace(/^http:\\/\\//, \\'\\'); wizTestUniversal();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-univ-url&quot;); wizTestUniversal();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
           }
           extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn"><span>⬇️ Descargar erp-bridge-endpoint.php</span></button>';
           extraActions += '<button type="button" onclick="wizTestUniversal()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
@@ -311,7 +311,7 @@ export const wizardScript = `
           title: 'Credenciales de WooCommerce incompletas',
           cause: 'Se requiere la URL de la tienda, Consumer Key (ck_...) y Consumer Secret (cs_...).',
           suggestion: 'Copia las credenciales desde WooCommerce > Ajustes > Avanzado > REST API con permisos de Lectura/Escritura.'
-        }, '<button type="button" onclick="document.getElementById(\\'wiz-input-wc-url\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Completar credenciales</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-wc-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Completar credenciales</span></button>');
         return;
       }
 
@@ -337,7 +337,7 @@ export const wizardScript = `
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
-            extraActions += '<button type="button" onclick="document.getElementById(\\'wiz-input-wc-url\\').value=\\'https://\\' + document.getElementById(\\'wiz-input-wc-url\\').value.replace(/^http:\\/\\//, \\'\\'); wizTestWooCommerce();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;wiz-input-wc-url&quot;); wizTestWooCommerce();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
           }
           extraActions += '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn"><span>🔄 Reintentar conexión REST API</span></button>';
           renderWizardErrorCard(alertBox, errInfo, extraActions);
@@ -374,7 +374,7 @@ export const wizardScript = `
           title: 'Correo de destino requerido',
           cause: 'No has especificado ninguna dirección de email para recibir las notificaciones.',
           suggestion: 'Introduce la dirección de correo corporativa donde deseas recibir los avisos de pedidos.'
-        }, '<button type="button" onclick="document.getElementById(\\'wiz-input-notif-email\\').focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir correo</span></button>');
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-notif-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary"><span>✍️ Escribir correo</span></button>');
         return;
       }
 
@@ -470,4 +470,11 @@ export const wizardScript = `
         }, 500);
       }
     }
+
+    window.openWizardModal = openWizardModal;
+    window.closeWizardModal = closeWizardModal;
+    window.setWizStep = setWizStep;
+    window.setWizOrderSeries = setWizOrderSeries;
+    window.wizTestOrderEmail = wizTestOrderEmail;
+    window.finishWizardAndStart = finishWizardAndStart;
 `;

@@ -288,7 +288,10 @@ export const coreScript = `
       if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
         clean = 'https://' + clean;
       }
-      return clean.replace(/\\/+$/, '');
+      while (clean.endsWith('/')) {
+        clean = clean.slice(0, -1);
+      }
+      return clean;
     }
 
     function sanitizeUrlInput(inputId) {
@@ -301,6 +304,21 @@ export const coreScript = `
         }
       }
     }
+
+    function fixInputHttps(inputId) {
+      const el = document.getElementById(inputId);
+      if (el && el.value) {
+        let val = el.value.trim();
+        while (val.toLowerCase().startsWith('http://')) {
+          val = val.substring(7);
+        }
+        while (val.toLowerCase().startsWith('https://')) {
+          val = val.substring(8);
+        }
+        el.value = 'https://' + val;
+      }
+    }
+    window.fixInputHttps = fixInputHttps;
 
     // Auto-sanitización de rutas de Windows (eliminar comillas de 'Copiar como ruta de acceso')
     function cleanPathValue(val) {
@@ -362,6 +380,7 @@ export const coreScript = `
         loadSyncHistory();
       }
     }
+    window.switchTab = switchTab;
 
     // Navegación asistida directa con foco y animación de resplandor visual (Deep-Linking)
     function navigateToResolution(tabId, inputId) {
@@ -624,4 +643,10 @@ export const coreScript = `
       const card = document.getElementById('bentian-spotlight-card');
       if (card) card.remove();
     }
+
+    window.startSpotlightTour = startSpotlightTour;
+    window.nextSpotlightStep = nextSpotlightStep;
+    window.prevSpotlightStep = prevSpotlightStep;
+    window.finishSpotlightTour = finishSpotlightTour;
+    window.closeSpotlightTour = closeSpotlightTour;
 `;
