@@ -26,9 +26,14 @@
 ## Enlaces Canónicos y Recursos
 
 - [Página Principal](https://bridge.cristianjm.com/): Presentación, características y descarga.
-- [Integración Factusol WooCommerce](https://bridge.cristianjm.com/factusol-woocommerce): Conector específico para WordPress y WooCommerce.
-- [Integración Factusol PrestaShop](https://bridge.cristianjm.com/factusol-prestashop): Conector para comercios en PrestaShop.
-- [Comparativa vs DELSOL Conecta](https://bridge.cristianjm.com/alternativa-delsol-conecta): Diferencias técnicas, de costes y de rendimiento.
+- [Beta Pública Abierta](https://bridge.cristianjm.com/beta/): Acceso anticipado gratuito para empresas y comercios con Factusol.
+- [Integración Factusol WooCommerce](https://bridge.cristianjm.com/factusol-woocommerce/): Conector específico para WordPress y WooCommerce.
+- [Integración Factusol PrestaShop](https://bridge.cristianjm.com/factusol-prestashop/): Conector para comercios en PrestaShop.
+- [Comparativa vs DELSOL Conecta](https://bridge.cristianjm.com/alternativa-delsol-conecta/): Diferencias técnicas, de costes y de rendimiento.
+- [Cobertura por Ciudades en España](https://bridge.cristianjm.com/conector-factusol/): Directorio de soporte regional para polígonos y almacenes.
+- [Conector Factusol Madrid](https://bridge.cristianjm.com/conector-factusol/madrid/): Especializado para empresas de Cobo Calleja, Coslada y San Fernando.
+- [Conector Factusol Barcelona](https://bridge.cristianjm.com/conector-factusol/barcelona/): Especializado para empresas de Zona Franca y el Vallès.
+- [Conector Factusol Valencia](https://bridge.cristianjm.com/conector-factusol/valencia/): Especializado para empresas de Fuente del Jarro y Ribarroja.
 - [Descarga del Instalador Oficial](https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe): Instalador para Windows x64.
 - [Documentación Técnica](https://bridge.cristianjm.com/docs/): Guías de despliegue, resolución de SmartScreen y API local.
 - [Estado de Salud de la API](https://bridge.cristianjm.com/health): Monitorización en vivo de la infraestructura.

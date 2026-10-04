@@ -5,6 +5,10 @@
     "province": "Madrid",
     "region": "Comunidad de Madrid",
     "schemaRegion": "ES-MD",
+    "coordinates": {
+      "lat": 40.4168,
+      "lng": -3.7038
+    },
     "tagline": "Sincronización en tiempo real para pymes, distribuidores y mayoristas de Madrid",
     "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Madrid | Bentian ERP",
     "metaDescription": "Conecta Factusol con WooCommerce y PrestaShop en Madrid. Almacenes en Cobo Calleja, Coslada y San Fernando. Stock en tiempo real y pedidos automáticos sin cuotas mensuales.",
@@ -52,6 +56,10 @@
     "province": "Barcelona",
     "region": "Cataluña",
     "schemaRegion": "ES-CT",
+    "coordinates": {
+      "lat": 41.3879,
+      "lng": 2.1699
+    },
     "tagline": "Conexión Local-First entre Factusol y eCommerce para empresas y comercios de Barcelona",
     "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP",
     "metaDescription": "Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.",
@@ -99,6 +107,10 @@
     "province": "Valencia",
     "region": "Comunidad Valenciana",
     "schemaRegion": "ES-VC",
+    "coordinates": {
+      "lat": 39.4699,
+      "lng": -0.3763
+    },
     "tagline": "Integración Factusol con WooCommerce para el comercio, la industria y distribución valenciana",
     "metaTitle": "Conector Factusol WooCommerce y PrestaShop en Valencia | Bentian ERP",
     "metaDescription": "Conecta tu Factusol con WooCommerce y PrestaShop en Valencia, Paterna, Ribarroja y Almussafes. Stock disponible en tiempo real, tarifas B2B y pedidos automáticos sin cuotas mensuales.",

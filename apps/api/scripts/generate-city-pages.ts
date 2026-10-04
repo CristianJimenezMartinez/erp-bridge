@@ -11,12 +11,18 @@ interface FaqItem {
   a: string;
 }
 
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 interface CityData {
   slug: string;
   name: string;
   province: string;
   region: string;
   schemaRegion: string;
+  coordinates: Coordinates;
   tagline: string;
   metaTitle: string;
   metaDescription: string;
@@ -33,7 +39,25 @@ const DATA_FILE = path.resolve(__dirname, '../data/cities.json');
 const SITEMAP_FILE = path.resolve(PUBLIC_DIR, 'sitemap.xml');
 const CITIES_OUTPUT_ROOT = path.resolve(PUBLIC_DIR, 'conector-factusol');
 
-function renderCityPage(city: CityData): string {
+function getCanonicalVersion(): string {
+  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
+  if (fs.existsSync(latestJsonPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
+      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
+    } catch {}
+  }
+  const rootPkgPath = path.resolve(__dirname, '../../../package.json');
+  if (fs.existsSync(rootPkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8'));
+      if (pkg.version) return String(pkg.version).replace(/^v/, '').trim();
+    } catch {}
+  }
+  return '0.3.5';
+}
+
+function renderCityPage(city: CityData, currentVersion: string): string {
   const hubsHtml = city.industrialHubs
     .map(
       (hub) => `
@@ -92,18 +116,33 @@ function renderCityPage(city: CityData): string {
   <meta name="author" content="Bentian">
   <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/${city.slug}/">
 
+  <!-- GEO Meta Tags (W3C Standard & Local SEO / GEO) -->
+  <meta name="geo.region" content="${city.schemaRegion}">
+  <meta name="geo.placename" content="${city.name}">
+  <meta name="geo.position" content="${city.coordinates.lat};${city.coordinates.lng}">
+  <meta name="ICBM" content="${city.coordinates.lat}, ${city.coordinates.lng}">
+
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
   <link rel="apple-touch-icon" href="/assets/icon.png">
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  
+  <!-- Open Graph / Redes Sociales -->
+  <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/${city.slug}/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="${city.metaTitle}">
   <meta property="og:description" content="${city.metaDescription}">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${city.metaTitle}">
+  <meta name="twitter:description" content="${city.metaDescription}">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
 
   <!-- TailwindCSS y Config -->
   <link rel="stylesheet" href="/css/styles.css">
@@ -115,7 +154,7 @@ function renderCityPage(city: CityData): string {
   <meta name="application-name" content="Bentian ERP Bridge">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- Schema.org JSON-LD Localizado -->
+  <!-- Schema.org JSON-LD Localizado con GEO y Entidades -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -139,9 +178,17 @@ function renderCityPage(city: CityData): string {
           "url": "https://bridge.cristianjm.com/"
         },
         "areaServed": {
-          "@type": "AdministrativeArea",
-          "name": "${city.province}, ${city.region}",
-          "addressCountry": "ES"
+          "@type": "City",
+          "name": "${city.name}",
+          "containedInPlace": {
+            "@type": "AdministrativeArea",
+            "name": "${city.province}, ${city.region}"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": ${city.coordinates.lat},
+            "longitude": ${city.coordinates.lng}
+          }
         }
       },
       {
@@ -149,6 +196,8 @@ function renderCityPage(city: CityData): string {
         "name": "Bentian ERP Bridge - ${city.name}",
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
+        "softwareVersion": "${currentVersion}",
+        "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
         "image": "https://bridge.cristianjm.com/assets/og-preview.png",
         "url": "https://bridge.cristianjm.com/conector-factusol/${city.slug}/",
         "offers": {
@@ -226,7 +275,7 @@ ${schemaFaqs}
             Ver Condiciones de la Beta Gratuita
           </a>
         </div>
-        <p class="mt-4 text-xs text-zinc-500 font-mono">Compatible con Factusol 2018-2026 • WooCommerce y PrestaShop • Sin cuotas cloud</p>
+        <p class="mt-4 text-xs text-zinc-500 font-mono">Release oficial <span data-app-version>v${currentVersion}</span> para Windows x64 • Compatible Factusol 2018-2026</p>
       </div>
     </section>
 
@@ -363,6 +412,16 @@ function renderHubPage(cities: CityData[]): string {
   <meta name="description" content="Cobertura regional de Bentian ERP Bridge en España. Conecta tu Factusol local con WooCommerce y PrestaShop en las principales áreas industriales y comerciales del país.">
   <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/">
 
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Factusol por Ciudades y Provincias de España | Bentian ERP Bridge">
+  <meta property="og:description" content="Sincronización en tiempo real entre Factusol y eCommerce en las principales áreas industriales de España.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
@@ -483,6 +542,7 @@ export function generateCityPages() {
 
   const raw = fs.readFileSync(DATA_FILE, 'utf8');
   const cities: CityData[] = JSON.parse(raw);
+  const currentVersion = getCanonicalVersion();
 
   if (!fs.existsSync(CITIES_OUTPUT_ROOT)) {
     fs.mkdirSync(CITIES_OUTPUT_ROOT, { recursive: true });
@@ -494,7 +554,7 @@ export function generateCityPages() {
     if (!fs.existsSync(cityDir)) {
       fs.mkdirSync(cityDir, { recursive: true });
     }
-    const html = renderCityPage(city);
+    const html = renderCityPage(city, currentVersion);
     const outFile = path.join(cityDir, 'index.html');
     fs.writeFileSync(outFile, html, 'utf8');
     console.log(`✓ [cities] Generada página para ${city.name} -> ${outFile}`);
@@ -512,7 +572,6 @@ export function generateCityPages() {
   console.log(`[cities] Generación completada con éxito. ${cities.length} ciudades generadas.`);
 }
 
-// Ejecutar directamente si se invoca desde CLI
 if (require.main === module) {
   generateCityPages();
 }

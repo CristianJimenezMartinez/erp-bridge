@@ -9,18 +9,33 @@
   <meta name="author" content="Bentian">
   <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/barcelona/">
 
+  <!-- GEO Meta Tags (W3C Standard & Local SEO / GEO) -->
+  <meta name="geo.region" content="ES-CT">
+  <meta name="geo.placename" content="Barcelona">
+  <meta name="geo.position" content="41.3879;2.1699">
+  <meta name="ICBM" content="41.3879, 2.1699">
+
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
   <link rel="apple-touch-icon" href="/assets/icon.png">
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  
+  <!-- Open Graph / Redes Sociales -->
+  <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/barcelona/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP">
   <meta property="og:description" content="Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Factusol WooCommerce y PrestaShop en Barcelona | Bentian ERP">
+  <meta name="twitter:description" content="Sincroniza Factusol con tu tienda online en Barcelona, Baix Llobregat y el Vallès. Automatiza stock y pedidos entre tu almacén local y WooCommerce o PrestaShop con máxima velocidad.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
 
   <!-- TailwindCSS y Config -->
   <link rel="stylesheet" href="/css/styles.css">
@@ -32,7 +47,7 @@
   <meta name="application-name" content="Bentian ERP Bridge">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- Schema.org JSON-LD Localizado -->
+  <!-- Schema.org JSON-LD Localizado con GEO y Entidades -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -56,9 +71,17 @@
           "url": "https://bridge.cristianjm.com/"
         },
         "areaServed": {
-          "@type": "AdministrativeArea",
-          "name": "Barcelona, Cataluña",
-          "addressCountry": "ES"
+          "@type": "City",
+          "name": "Barcelona",
+          "containedInPlace": {
+            "@type": "AdministrativeArea",
+            "name": "Barcelona, Cataluña"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 41.3879,
+            "longitude": 2.1699
+          }
         }
       },
       {
@@ -66,6 +89,8 @@
         "name": "Bentian ERP Bridge - Barcelona",
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
+        "softwareVersion": "0.3.5",
+        "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
         "image": "https://bridge.cristianjm.com/assets/og-preview.png",
         "url": "https://bridge.cristianjm.com/conector-factusol/barcelona/",
         "offers": {
@@ -169,7 +194,7 @@
             Ver Condiciones de la Beta Gratuita
           </a>
         </div>
-        <p class="mt-4 text-xs text-zinc-500 font-mono">Compatible con Factusol 2018-2026 • WooCommerce y PrestaShop • Sin cuotas cloud</p>
+        <p class="mt-4 text-xs text-zinc-500 font-mono">Release oficial <span data-app-version>v0.3.5</span> para Windows x64 • Compatible Factusol 2018-2026</p>
       </div>
     </section>
 
