@@ -153,6 +153,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Protocolo de Precios y Cupo Fundador (25 Claves) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/protocolo-beta-precios-fundador.html</loc>
+    <lastmod>2026-10-04T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Guía Técnica: Error Proveedor OLEDB Microsoft.ACE -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html</loc>

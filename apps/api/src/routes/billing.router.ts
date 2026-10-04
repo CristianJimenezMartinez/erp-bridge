@@ -14,6 +14,24 @@ const logger = new Logger('BillingRouter');
 const STRIPE_SECRET_KEY = process.env['STRIPE_SECRET_KEY'] || '';
 const DEFAULT_DASHBOARD_URL = process.env['DASHBOARD_URL'] || 'https://bridge.cristianjm.com/dashboard/';
 
+const inFlightSessionLocks = new Map<string, Promise<any>>();
+
+export async function acquireSessionLock<T>(sessionId: string, fn: () => Promise<T>): Promise<T> {
+  if (!sessionId) return fn();
+  while (inFlightSessionLocks.has(sessionId)) {
+    try {
+      await inFlightSessionLocks.get(sessionId);
+    } catch {}
+  }
+  const promise = fn();
+  inFlightSessionLocks.set(sessionId, promise);
+  try {
+    return await promise;
+  } finally {
+    inFlightSessionLocks.delete(sessionId);
+  }
+}
+
 export function computeOrganizationIdFromEmail(email: string): string {
   const normalized = (email || '').toLowerCase().trim();
   const hash = crypto.createHash('sha256').update(normalized).digest('hex').substring(0, 16);
@@ -252,11 +270,13 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
 
     // Blindaje estricto: El Plan Fundador (139 €/año) está limitado exclusivamente a 25 plazas para los participantes de la Beta
     const MAX_FOUNDER_KEYS = 25;
+    const isAuthed = !!(req as any).user;
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const orgId = (isAuthed && customOrgId) ? customOrgId : computeOrganizationIdFromEmail(normalizedEmail);
+    const providedKey = String(req.body.licenseKey || req.body.key || req.query['key'] || '').trim().toUpperCase();
+
     if (matchedPlan.id === 'founder_annual') {
       const db = DatabaseService.getInstance();
-      const normalizedEmail = (email || '').trim().toLowerCase();
-      const orgId = customOrgId || computeOrganizationIdFromEmail(normalizedEmail);
-      const providedKey = String(req.body.licenseKey || req.body.key || req.query['key'] || '').trim().toUpperCase();
 
       if (db.isAvailable()) {
         // Regla 1 (Anti-Acaparamiento): Máximo 1 sola Licencia Fundador por cliente / correo / organización
@@ -295,6 +315,26 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
           });
         }
 
+        // Regla 2.1 (Anti-Reuso de Clave Beta): Comprobar si esta clave Beta ya fue utilizada para una plaza Fundador
+        if (providedKey) {
+          const alreadyUpgraded = await db.query(
+            `SELECT l.id, l.key FROM licenses l 
+             WHERE (l.upgraded_from_key = $1 OR l.key = $1) 
+               AND (l.plan = 'founder_annual' OR l.plan = 'founder' OR l.alias ILIKE '%Fundador%')
+               AND l.billing_status = 'ACTIVE'`,
+            [providedKey]
+          ).catch(() => ({ rows: [] }));
+
+          if (alreadyUpgraded.rows.length > 0) {
+            return res.status(400).json({
+              error: {
+                message: 'Esta clave Beta ya ha sido utilizada previamente para canjear una plaza del Plan Fundador. Cada clave de la Beta solo puede ser mejorada una única vez.',
+                code: 'FOUNDER_BETA_KEY_ALREADY_UPGRADED',
+              },
+            });
+          }
+        }
+
         // Regla 3 (Cupo Global): Máximo 25 plazas en total
         const resCount = await db.query(
           `SELECT COUNT(*)::int as count FROM licenses WHERE (plan = 'founder_annual' OR plan = 'founder' OR alias ILIKE '%Fundador%') AND billing_status = 'ACTIVE'`
@@ -312,7 +352,6 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       }
     }
 
-    const orgId = customOrgId || computeOrganizationIdFromEmail(email);
     const isSubscription = matchedPlan.mode === 'subscription';
     const interval = matchedPlan.billingCycle === 'monthly' ? 'month' : 'year';
 
@@ -340,6 +379,13 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       params.append('metadata[maxActivations]', String(safeActivations));
       params.append('metadata[storesIncluded]', String(matchedPlan.storesIncluded || 1));
 
+      if (matchedPlan.id === 'founder_annual') {
+        params.append('expires_at', String(Math.floor(Date.now() / 1000) + 1800)); // Caducidad 30 min para proteger el cupo
+        if (providedKey) {
+          params.append('metadata[upgradedFromKey]', providedKey);
+        }
+      }
+
       const partnerCode = (req.body.partnerCode || req.body.ref || req.query['ref'] || '') as string;
       if (partnerCode) {
         params.append('metadata[resellerId]', String(partnerCode).trim().toUpperCase());
@@ -349,6 +395,9 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
         params.append('subscription_data[metadata][organizationId]', orgId);
         params.append('subscription_data[metadata][planId]', matchedPlan.id);
         params.append('subscription_data[metadata][maxActivations]', String(safeActivations));
+        if (matchedPlan.id === 'founder_annual' && providedKey) {
+          params.append('subscription_data[metadata][upgradedFromKey]', providedKey);
+        }
         if (partnerCode) {
           params.append('subscription_data[metadata][resellerId]', String(partnerCode).trim().toUpperCase());
         }
@@ -639,7 +688,9 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         const alias = session.metadata?.alias || 'Servidor Factusol Principal';
         const sessionId = (session.id || '') as string;
         const customerId = (session.customer || '') as string;
+        const subscriptionId = (session.subscription || '') as string;
         const resellerId = session.metadata?.resellerId || null;
+        const upgradedFromKey = session.metadata?.upgradedFromKey || null;
 
         logger.info(`[Stripe Webhook] checkout.session.completed para ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId})...`);
 
@@ -648,44 +699,75 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 
         let license: any = null;
 
-        // Idempotencia precisa: verificar si esta sesión de Stripe ya emitió una clave previamente
-        if (sessionId && db.isAvailable()) {
-          const sessionRow = await db.query(
-            `SELECT * FROM licenses WHERE stripe_session_id = $1`,
-            [sessionId]
-          ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
+        await acquireSessionLock(sessionId, async () => {
+          // Idempotencia precisa: verificar si esta sesión de Stripe ya emitió una clave previamente
+          if (sessionId && db.isAvailable()) {
+            const sessionRow = await db.query(
+              `SELECT * FROM licenses WHERE stripe_session_id = $1`,
+              [sessionId]
+            ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
 
-          if (sessionRow) {
-            license = sessionRow;
-            logger.info(`✓ [Stripe Webhook] Licencia ${license.key} ya existente para la sesión Stripe ${sessionId}. Reutilizando.`);
+            if (sessionRow) {
+              license = sessionRow;
+              logger.info(`✓ [Stripe Webhook] Licencia ${license.key} ya existente para la sesión Stripe ${sessionId}. Reutilizando.`);
+            }
           }
-        }
+
+          if (!license) {
+            if (planId.startsWith('addon_')) {
+              logger.warn(`Alerta de seguridad: Intento de generar licencia base mediante add-on huérfano (${planId}) para ${customerEmail}. Operación bloqueada.`);
+              return;
+            }
+
+            const existingCount = (await licenseService.listLicenses(organizationId)).length;
+            const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
+              ? alias
+              : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
+
+            const isFounder = planId === 'founder_annual';
+            const targetPlan = isFounder ? 'founder_annual' : 'professional';
+            const targetAlias = isFounder 
+              ? (alias && alias !== 'Servidor Factusol Principal' ? alias : 'Plan Fundador (Suscripción Anual)')
+              : dynamicAlias;
+
+            license = await licenseService.createLicense({
+              organizationId,
+              plan: 'professional', // Mapeo de compatibilidad con schema DB existente
+              maxActivations,
+              alias: targetAlias,
+            });
+
+            if (db.isAvailable() && sessionId) {
+              await db.query(
+                `UPDATE licenses 
+                 SET stripe_session_id = $1, 
+                     stripe_customer_id = $2, 
+                     stripe_subscription_id = $3, 
+                     billing_status = 'ACTIVE',
+                     plan = $4,
+                     alias = $5,
+                     upgraded_from_key = $6
+                 WHERE id = $7`,
+                [sessionId, customerId || null, subscriptionId || null, targetPlan, targetAlias, upgradedFromKey || null, license.id]
+              ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id a licencia: ${err}`));
+
+              // Si se actualizó desde una clave Beta, revocar la clave Beta antigua para que no siga en circulación
+              if (upgradedFromKey && upgradedFromKey !== license.key) {
+                await db.query(
+                  `UPDATE licenses 
+                   SET status = 'revoked', revoked_reason = 'Actualizado a Plan Fundador', revoked_at = CURRENT_TIMESTAMP 
+                   WHERE key = $1 AND plan = 'trial'`,
+                  [upgradedFromKey]
+                ).catch(() => null);
+                logger.info(`✓ [Stripe Webhook] Clave Beta ${upgradedFromKey} revocada tras migración a Plan Fundador.`);
+              }
+            }
+            logger.info(`✓ [Stripe Webhook] Licencia ${license.key} generada automáticamente para ${customerEmail} [Plan: ${targetPlan}, Alias: ${targetAlias}, Sesión: ${sessionId}]`);
+          }
+        });
 
         if (!license) {
-          if (planId.startsWith('addon_')) {
-            logger.warn(`Alerta de seguridad: Intento de generar licencia base mediante add-on huérfano (${planId}) para ${customerEmail}. Operación bloqueada.`);
-            return res.status(400).json({ error: { message: 'No se permite generar una licencia base a partir de un add-on huérfano.' } });
-          }
-
-          const existingCount = (await licenseService.listLicenses(organizationId)).length;
-          const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
-            ? alias
-            : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
-
-          license = await licenseService.createLicense({
-            organizationId,
-            plan: 'professional', // Mapeo de compatibilidad con schema DB existente
-            maxActivations,
-            alias: dynamicAlias,
-          });
-
-          if (db.isAvailable() && sessionId) {
-            await db.query(
-              `UPDATE licenses SET stripe_session_id = $1, stripe_customer_id = $2, billing_status = 'ACTIVE' WHERE id = $3`,
-              [sessionId, customerId || null, license.id]
-            ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id a licencia: ${err}`));
-          }
-          logger.info(`✓ [Stripe Webhook] Licencia ${license.key} generada automáticamente para ${customerEmail} [Alias: ${dynamicAlias}, Sesión: ${sessionId}]`);
+          return res.status(400).json({ error: { message: 'No se pudo generar la licencia.' } });
         }
 
         // Vincular al Partner si la compra vino referida por código PT-XXXX
@@ -769,11 +851,26 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 
         logger.warn(`Evento de baja de suscripción para ${customerEmail || 'cliente'}: ${reason}`);
 
+        const db = DatabaseService.getInstance();
         if (subscription.metadata?.licenseKey) {
           const lic = await licenseService.getLicenseByKey(subscription.metadata.licenseKey);
           if (lic) {
             await licenseService.revokeLicense(lic.id, reason);
             logger.info(`Licencia ${subscription.metadata.licenseKey} revocada.`);
+          }
+        } else if (db.isAvailable() && (subscription.id || subscription.customer)) {
+          try {
+            const licRow = await db.query(
+              `SELECT id, key FROM licenses WHERE stripe_subscription_id = $1 OR stripe_customer_id = $2 LIMIT 1`,
+              [subscription.id || 'NO_SUB', (subscription.customer as string) || 'NO_CUST']
+            ).then((r: any) => r.rows[0] as { id: string; key: string } | undefined).catch(() => undefined);
+
+            if (licRow) {
+              await licenseService.revokeLicense(licRow.id, reason);
+              logger.info(`Licencia ${licRow.key} revocada automáticamente por ID de suscripción (${subscription.id}).`);
+            }
+          } catch (delErr) {
+            logger.warn(`Error buscando licencia a revocar por suscripción: ${delErr}`);
           }
         }
 
@@ -952,60 +1049,91 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
     // Idempotencia: Verificar si ya existe una licencia para esta sesión específica de Stripe
     let license: any = null;
 
-    if (sessionId && db.isAvailable()) {
-      const sessionRow = await db.query(
-        `SELECT * FROM licenses WHERE stripe_session_id = $1`,
-        [sessionId]
-      ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
+    await acquireSessionLock(sessionId, async () => {
+      if (sessionId && db.isAvailable()) {
+        const sessionRow = await db.query(
+          `SELECT * FROM licenses WHERE stripe_session_id = $1`,
+          [sessionId]
+        ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
 
-      if (sessionRow) {
-        license = sessionRow;
-        logger.info(`✓ [Session-License] Licencia ${license.key} ya existente para sesión ${sessionId}. Reutilizando.`);
+        if (sessionRow) {
+          license = sessionRow;
+          logger.info(`✓ [Session-License] Licencia ${license.key} ya existente para sesión ${sessionId}. Reutilizando.`);
+        }
       }
-    }
+
+      if (!license) {
+        if (planId.startsWith('addon_')) {
+          logger.warn(`Alerta de seguridad: Intento de onboarding post-checkout con add-on huérfano (${planId}) para ${customerEmail}.`);
+          return;
+        }
+
+        const existingCount = (await licenseService.listLicenses(organizationId)).length;
+        const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
+          ? alias
+          : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
+
+        const isFounder = planId === 'founder_annual';
+        const targetPlan = isFounder ? 'founder_annual' : 'professional';
+        const targetAlias = isFounder 
+          ? (alias && alias !== 'Servidor Factusol Principal' ? alias : 'Plan Fundador (Suscripción Anual)')
+          : dynamicAlias;
+        const subscriptionId = (sessionData.subscription || '') as string;
+        const upgradedFromKey = sessionData.metadata?.upgradedFromKey || null;
+
+        logger.info(`Creando licencia on-demand tras validación de sesión ${sessionId} para ${customerEmail}`);
+        license = await licenseService.createLicense({
+          organizationId,
+          plan: 'professional',
+          maxActivations,
+          alias: targetAlias,
+        });
+
+        if (db.isAvailable() && sessionId) {
+          await db.query(
+            `UPDATE licenses 
+             SET stripe_session_id = $1, 
+                 stripe_customer_id = $2, 
+                 stripe_subscription_id = $3, 
+                 billing_status = 'ACTIVE', 
+                 plan = $4, 
+                 alias = $5,
+                 upgraded_from_key = $6
+             WHERE id = $7`,
+            [sessionId, customerId || null, subscriptionId || null, targetPlan, targetAlias, upgradedFromKey || null, license.id]
+          ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id en session-license: ${err}`));
+
+          if (upgradedFromKey && upgradedFromKey !== license.key) {
+            await db.query(
+              `UPDATE licenses 
+               SET status = 'revoked', revoked_reason = 'Actualizado a Plan Fundador', revoked_at = CURRENT_TIMESTAMP 
+               WHERE key = $1 AND plan = 'trial'`,
+              [upgradedFromKey]
+            ).catch(() => null);
+            logger.info(`✓ [Session-License] Clave Beta ${upgradedFromKey} revocada tras migración a Plan Fundador.`);
+          }
+        }
+
+        // Despachar email de bienvenida si no ha sido enviado previamente
+        const dedupKey = sessionId || license.key;
+        if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
+          if (license.key) EmailProtectionService.shouldSendBillingWelcome(license.key);
+          MailerService.sendLicenseWelcomeEmail({
+            customerEmail,
+            licenseKey: license.key,
+            planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
+            alias: license.alias || undefined,
+          }).catch((err) => {
+            logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
+          });
+        }
+      }
+    });
 
     if (!license) {
-      if (planId.startsWith('addon_')) {
-        logger.warn(`Alerta de seguridad: Intento de onboarding post-checkout con add-on huérfano (${planId}) para ${customerEmail}.`);
-        return res.status(400).json({
-          error: { code: 'ORPHAN_ADDON_NOT_ALLOWED', message: 'Un add-on requiere disponer previamente de una Licencia Base activa.' }
-        });
-      }
-
-      const existingCount = (await licenseService.listLicenses(organizationId)).length;
-      const dynamicAlias = alias && alias !== 'Servidor Factusol Principal'
-        ? alias
-        : (existingCount > 0 ? `Servidor Factusol #${existingCount + 1}` : 'Servidor Factusol Principal');
-
-      logger.info(`Creando licencia on-demand tras validación de sesión ${sessionId} para ${customerEmail}`);
-      license = await licenseService.createLicense({
-        organizationId,
-        plan: 'professional',
-        maxActivations,
-        alias: dynamicAlias,
+      return res.status(400).json({
+        error: { code: 'LICENSE_CREATION_FAILED', message: 'No se pudo generar la licencia para la sesión' }
       });
-
-      if (db.isAvailable() && sessionId) {
-        await db.query(
-          `UPDATE licenses SET stripe_session_id = $1, stripe_customer_id = $2, billing_status = 'ACTIVE' WHERE id = $3`,
-          [sessionId, customerId || null, license.id]
-        ).catch((err) => logger.warn(`Aviso al asociar stripe_session_id en session-license: ${err}`));
-      }
-
-      // Despachar email de bienvenida si no ha sido enviado previamente
-      const dedupKey = sessionId || license.key;
-      if (EmailProtectionService.shouldSendBillingWelcome(dedupKey)) {
-        if (license.key) EmailProtectionService.shouldSendBillingWelcome(license.key);
-        MailerService.sendLicenseWelcomeEmail({
-          customerEmail,
-          licenseKey: license.key,
-          planName: planId === 'base_annual' ? 'Plan Base Todo Incluido (Anual)' : (planId === 'base_monthly' ? 'Plan Base Todo Incluido (Mensual)' : planId),
-          alias: license.alias || undefined,
-        }).catch((err) => {
-          logger.warn(`Aviso: Error no bloqueante al enviar email en onboarding on-demand a ${customerEmail}: ${err.message}`);
-        });
-      }
-
     }
 
     const exp = Date.now() + 48 * 60 * 60 * 1000;

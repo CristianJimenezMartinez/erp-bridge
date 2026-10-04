@@ -24,6 +24,7 @@ export class LicenseService {
   private licenseCheckTimer: NodeJS.Timeout | null = null;
   private lastSeenTimestamp = 0;
   private lastOnlineTimestamp = 0;
+  private tokenExpiresAt = 0;
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -41,6 +42,10 @@ export class LicenseService {
   }
 
   public getLicenseStatus(): { status: AgentLicenseStatus; plan?: string } {
+    if (this.tokenExpiresAt > 0 && Date.now() >= this.tokenExpiresAt && (this.licenseStatus === 'VALID' || this.licenseStatus === 'GRACE_PERIOD')) {
+      this.licenseStatus = 'EXPIRED';
+      this.activePlan = undefined;
+    }
     return { status: this.licenseStatus, plan: this.activePlan };
   }
 
@@ -96,6 +101,9 @@ export class LicenseService {
       this.configManager.setLicenseKey(licenseKey);
       this.licenseStatus = 'VALID';
       this.activePlan = activation.plan;
+      if (activation.expiresAt) {
+        this.tokenExpiresAt = new Date(activation.expiresAt).getTime();
+      }
       this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, Date.now());
       this.lastOnlineTimestamp = Date.now();
       await this.secureStore.saveLastSeenTimestamp(this.lastSeenTimestamp, hwid);
@@ -127,6 +135,9 @@ export class LicenseService {
     // 1. Check local token payload with cryptographic verification and HWID binding
     const verification = LicenseTokenManager.verifyToken(token);
     const localPayload: LicenseTokenPayload | null = verification.valid && verification.payload ? verification.payload : null;
+    if (localPayload?.expiresAt) {
+      this.tokenExpiresAt = localPayload.expiresAt;
+    }
     const now = Date.now();
 
     // Detección de manipulación de reloj (Clock Rollback)
@@ -267,6 +278,7 @@ export class LicenseService {
     this.configManager.setLicenseKey(undefined);
     this.licenseStatus = 'UNLICENSED';
     this.activePlan = undefined;
+    this.tokenExpiresAt = 0;
     this.logger.info('Licencia desactivada y credenciales locales eliminadas.');
     this.eventBus?.addEvent('warn', 'Licencia desactivada en este equipo.');
 

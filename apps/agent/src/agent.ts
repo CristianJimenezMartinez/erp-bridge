@@ -524,6 +524,11 @@ export class LocalAgent {
           metadata: { reason, databasePath: cfg.factusolDbPath },
         });
 
+        const lic = this.licenseService.getLicenseStatus();
+        if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+          return;
+        }
+
         if (!this.syncEngine.isBusy()) {
           void this.syncEngine.triggerManualSync();
         }

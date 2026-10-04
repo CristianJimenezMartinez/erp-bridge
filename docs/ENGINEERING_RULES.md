@@ -83,3 +83,21 @@
 - **Directriz:**
   - Toda inserción de pedidos o facturas debe validar la referencia externa (`REFPCL` / `REFFAC`) antes de insertar, retornando el registro existente sin duplicar.
   - Toda prueba que impacte la base de datos física real (`2252025.accdb`) debe incluir rutinas de limpieza transaccional que restituyan el estado prístino de existencias y registros.
+
+---
+
+### Regla 11: Política de Precios Canónica (SSoT) y Anti-Acaparamiento de Licencias Promocionales
+- **Directriz:**
+  - El precio oficial canónico de Bentian ERP Bridge es de **199 €/año** (Plan Base Anual para 1 ERP y 1 Tienda Online).
+  - La tarifa de **Plan Fundador** (**139 €/año** vitalicio, -30%) está estrictamente limitada a un **cupo máximo de 25 claves** para participantes verificados de la Beta Pública.
+  - **Blindaje Anti-Acaparamiento:** Ningún cliente o entidad puede adquirir más de 1 sola Licencia Fundador (`FOUNDER_LIMIT_PER_CUSTOMER_EXCEEDED`).
+  - **Exclusividad Beta:** Los no participantes deben adquirir la Licencia Estándar de 199 €/año (`FOUNDER_BETA_PARTICIPANT_REQUIRED`).
+  - La tarifa de **Partner Mayorista** queda fijada en **149,25 €/año** (-25% margen directo sobre 199 €).
+
+---
+
+### Regla 12: Ciclo de Vida y Expiración Ineludible de la Beta (Time-Bomb & Anti-Bypass)
+- **Directriz:**
+  - Las licencias de evaluación y Beta tienen una caducidad criptográfica garantizada de 60 días sin prórroga desatendida.
+  - El límite de desconexión offline para versiones de prueba es de un máximo de **48 horas**.
+  - Al vencer la licencia, el conector debe **detener de forma inmediata** la sincronización automática y reactiva, sin alterar ni borrar jamás las rutas de Factusol ni la configuración de la tienda del usuario (Reglas Mandatarias 1 y 2).

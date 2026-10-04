@@ -73,4 +73,5 @@
 - [Guía Error Proveedor OLEDB Factusol](https://bridge.cristianjm.com/docs/error-proveedor-oledb-factusol-microsoft-ace.html): Resolución de Microsoft.ACE.OLEDB no registrado en x86/x64.
 - [Guía Sincronización de Pedidos WooCommerce](https://bridge.cristianjm.com/docs/sincronizar-pedidos-woocommerce-factusol.html): Importación automática en F_PCL y F_LPC con NIF y series.
 - [Guía Evitar Sobreventas con DISSTO](https://bridge.cristianjm.com/docs/evitar-roturas-stock-factusol-dissto.html): Diferencias entre existencias físicas ACTSTO y disponibles DISSTO.
+- [Protocolo Beta y Precios Fundador](https://bridge.cristianjm.com/docs/protocolo-beta-precios-fundador.html): Cupo estricto de 25 licencias Founder (139 €/año), precio base canónico (199 €/año), anti-acaparamiento y ciclo de vida de la Beta.
 - [Estado de Salud de la API](https://bridge.cristianjm.com/health): Monitorización en vivo de la infraestructura.
