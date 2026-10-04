@@ -124,6 +124,12 @@ export function renderWizardModal(): string {
                 <input type="password" id="wiz-input-wc-secret" class="form-control" placeholder="cs_...">
               </div>
             </div>
+            <div style="margin-top: 8px;">
+              <button onclick="wizTestWooCommerce()" id="wiz-btn-test-wc" class="btn btn-secondary btn-sm">
+                <span>Comprobar Conexión WooCommerce</span>
+              </button>
+            </div>
+            <div id="wiz-wc-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
         </div>
 

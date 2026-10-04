@@ -196,16 +196,26 @@ export const factusolScript = `
       const dbPath = (typeof cleanPathInput === 'function') ? cleanPathInput(inputEl) : (inputEl ? inputEl.value.trim() : '');
       const alertBox = document.getElementById(alertId);
       const btn = inputId === 'input-factusol-db' ? document.getElementById('btn-test-fact') : null;
+      const isWizard = (inputId === 'wiz-input-fact-path');
+
       if (!dbPath) {
-        showToast('Introduce o selecciona la ruta de tu Factusol', 'warn');
+        showSmartToast({
+          title: 'Ruta no indicada',
+          message: 'Introduce o selecciona la ruta de la base de datos de Factusol.',
+          actionLabel: isWizard ? '' : 'Resolver en Factusol ERP →',
+          targetTab: 'factusol',
+          targetInputId: inputId,
+          type: 'warn'
+        });
         return;
       }
+
       if (btn) btn.disabled = true;
       if (alertBox) {
         alertBox.style.display = 'block';
-        alertBox.style.color = 'var(--text-muted)';
-        alertBox.textContent = 'Comprobando conexión con Factusol...';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión con Factusol...</div>';
       }
+
       try {
         const res = await fetch('/api/local/test-factusol', {
           method: 'POST',
@@ -216,28 +226,73 @@ export const factusolScript = `
         if (data.resolvedPath && inputEl && inputEl.value !== data.resolvedPath) {
           inputEl.value = data.resolvedPath;
         }
+
         if (alertBox) {
           alertBox.style.display = 'block';
           const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
           if (data.success) {
-            alertBox.style.color = '#34d399';
-            alertBox.textContent = '✓ ' + data.message + timeSuffix;
-            showToast('Conexión con Factusol exitosa' + timeSuffix, 'success');
+            alertBox.innerHTML = 
+              '<div class="smart-success-card">' +
+                '<span>✓</span>' +
+                '<span>' + data.message + timeSuffix + '</span>' +
+              '</div>';
+            showSmartToast({
+              title: 'Factusol ERP Conectado',
+              message: 'Conexión verificada con éxito' + timeSuffix,
+              type: 'success'
+            });
             if (typeof loadArticlePreview === 'function') {
               loadArticlePreview();
             }
           } else {
-            alertBox.style.color = '#f87171';
-            alertBox.textContent = '✕ ' + data.message + timeSuffix;
-            showToast('Error conectando con Factusol' + timeSuffix, 'error');
+            const errInfo = humanizeErrorMessage(data.message, 'factusol');
+            alertBox.innerHTML = 
+              '<div class="smart-error-card">' +
+                '<div class="smart-error-header">' +
+                  '<span>💡</span>' +
+                  '<span>' + errInfo.title + '</span>' +
+                '</div>' +
+                '<div class="smart-error-cause">' +
+                  '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
+                  '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+                '</div>' +
+                '<div class="smart-error-actions">' +
+                  '<button type="button" onclick="detectFactusol(' + isWizard + ')" class="smart-error-btn smart-error-btn-primary"><span>🔍 Auto-detectar Factusol</span></button>' +
+                  '<button type="button" onclick="openNativeWindowsDialog(' + isWizard + ')" class="smart-error-btn"><span>📁 Examinar en Windows</span></button>' +
+                  '<button type="button" onclick="testFactusolConnection(\\'' + inputId + '\\', \\'' + alertId + '\\')" class="smart-error-btn"><span>🔄 Reintentar</span></button>' +
+                '</div>' +
+              '</div>';
+            showSmartToast({
+              title: errInfo.title,
+              message: errInfo.message,
+              actionLabel: isWizard ? '' : 'Resolver en Factusol ERP →',
+              targetTab: 'factusol',
+              targetInputId: inputId,
+              type: 'error'
+            });
           }
         }
       } catch (err) {
+        const errInfo = humanizeErrorMessage(err, 'factusol');
         if (alertBox) {
           alertBox.style.display = 'block';
-          alertBox.style.color = '#f87171';
-          alertBox.textContent = 'Error al comunicar con Factusol';
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+              '<div class="smart-error-actions">' +
+                '<button type="button" onclick="testFactusolConnection(\\'' + inputId + '\\', \\'' + alertId + '\\')" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button>' +
+              '</div>' +
+            '</div>';
         }
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: isWizard ? '' : 'Resolver en Factusol ERP →',
+          targetTab: 'factusol',
+          targetInputId: inputId,
+          type: 'error'
+        });
       } finally {
         if (btn) btn.disabled = false;
       }

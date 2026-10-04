@@ -6,17 +6,279 @@ export const coreScript = `
     let currentChannelType = 'universal_bridge';
     let wizardCurrentStep = 1;
 
-    // Toast
-    function showToast(text, type) {
-      type = type || 'success';
+    // Interactive Toast with Smart Deep-Linking Actions
+    let _toastTimer = null;
+    let _currentToastAction = null;
+
+    function hideToast() {
+      const toast = document.getElementById('toast');
+      if (toast) toast.classList.remove('show');
+      if (_toastTimer) {
+        clearTimeout(_toastTimer);
+        _toastTimer = null;
+      }
+      _currentToastAction = null;
+    }
+
+    function handleToastAction() {
+      if (_currentToastAction) {
+        if (typeof _currentToastAction.handler === 'function') {
+          _currentToastAction.handler();
+        } else if (_currentToastAction.targetTab) {
+          navigateToResolution(_currentToastAction.targetTab, _currentToastAction.targetInputId);
+        }
+      }
+      hideToast();
+    }
+
+    function showSmartToast(options) {
+      if (!options) return;
+      if (typeof options === 'string') {
+        const text = options;
+        const type = arguments[1] || 'success';
+        options = { message: text, type: type };
+      }
+
+      const title = options.title || '';
+      const message = options.message || '';
+      const type = options.type || 'info';
+      const actionLabel = options.actionLabel || '';
+      const targetTab = options.targetTab || null;
+      const targetInputId = options.targetInputId || null;
+      const onAction = options.onAction || null;
+      const duration = options.duration || (actionLabel ? 7500 : 3800);
+
       const toast = document.getElementById('toast');
       const toastText = document.getElementById('toast-text');
+      const toastTitle = document.getElementById('toast-title');
       const toastIcon = document.getElementById('toast-icon');
+      const toastAction = document.getElementById('toast-action');
+      const toastActionText = document.getElementById('toast-action-text');
+
+      if (!toast) return;
+
       toast.className = 'toast-' + type;
-      toastText.textContent = text;
-      toastIcon.textContent = type === 'success' ? '✓' : (type === 'warn' ? '⚠️' : '✕');
+      if (toastIcon) {
+        toastIcon.textContent = type === 'success' ? '✓' : (type === 'warn' ? '⚠️' : (type === 'info' ? 'ℹ️' : '✕'));
+      }
+      if (toastTitle) {
+        if (title) {
+          toastTitle.textContent = title;
+          toastTitle.style.display = 'block';
+        } else {
+          toastTitle.style.display = 'none';
+        }
+      }
+      if (toastText) {
+        toastText.textContent = message;
+      }
+
+      if (actionLabel && (targetTab || targetInputId || onAction)) {
+        _currentToastAction = {
+          targetTab: targetTab,
+          targetInputId: targetInputId,
+          handler: onAction
+        };
+        if (toastAction) {
+          toastAction.style.display = 'inline-flex';
+          if (toastActionText) toastActionText.textContent = actionLabel;
+        }
+      } else {
+        _currentToastAction = null;
+        if (toastAction) toastAction.style.display = 'none';
+      }
+
       toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 3500);
+
+      if (_toastTimer) clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(hideToast, duration);
+    }
+
+    function showToast(text, type) {
+      if ((type === 'error' || type === 'warn') && typeof humanizeError === 'function') {
+        const err = humanizeError(text);
+        if (err && err.targetTab) {
+          showSmartToast({
+            title: err.title,
+            message: err.message,
+            type: type,
+            actionLabel: err.actionLabel + ' →',
+            targetTab: err.targetTab,
+            targetInputId: err.targetInputId,
+            onAction: function() {
+              if (typeof resolveHumanizedError === 'function') {
+                resolveHumanizedError(err);
+              } else if (typeof navigateToResolution === 'function') {
+                navigateToResolution(err.targetTab, err.targetInputId);
+              }
+            }
+          });
+          return;
+        }
+      }
+      showSmartToast({ message: text, type: type || 'success' });
+    }
+
+    // Humanizador de Errores con Diagnóstico en Lenguaje Natural y Sugerencia de Resolución
+    function humanizeErrorMessage(raw, context) {
+      if (typeof humanizeError === 'function') {
+        const h = humanizeError(raw);
+        if (h && h.code !== 'ERR_INTERNAL_GENERIC') {
+          return {
+            code: h.code,
+            title: h.title,
+            message: h.message,
+            cause: h.message,
+            suggestion: h.suggestion,
+            actionLabel: h.actionLabel + ' →',
+            targetTab: h.targetTab,
+            targetInputId: h.targetInputId,
+            helpUrl: h.helpUrl,
+            snippet: h.snippet
+          };
+        }
+      }
+
+      if (!raw) {
+        return {
+          title: 'Aviso del Sistema',
+          message: 'Ha ocurrido una incidencia temporal en el sistema.',
+          cause: 'El servicio no pudo completar la operación solicitada.',
+          suggestion: 'Revisa los ajustes o pulsa en reintentar en unos instantes.',
+          actionLabel: 'Ver Registro →',
+          targetTab: 'logs',
+          targetInputId: null
+        };
+      }
+
+      const text = typeof raw === 'string' ? raw : (raw.message || raw.error || JSON.stringify(raw));
+      const lower = text.toLowerCase();
+
+      // Incidencias en Factusol ERP
+      if (context === 'factusol' || lower.includes('.accdb') || lower.includes('.mdb') || lower.includes('factusol') || lower.includes('oledb') || lower.includes('jet') || lower.includes('ace.oledb')) {
+        if (lower.includes('no such file') || lower.includes('no se encuentra') || lower.includes('not found') || lower.includes('no existe') || lower.includes('sin ruta') || lower.includes('ruta no válida')) {
+          return {
+            title: 'Base de datos Factusol no encontrada',
+            message: 'No se ha podido localizar el archivo de Factusol en la ruta indicada.',
+            cause: 'Es posible que el archivo haya cambiado de ubicación, el disco de red o NAS esté desconectado o el nombre del archivo contenga un error tipográfico.',
+            suggestion: 'Comprueba que el archivo .accdb exista o utiliza el botón Auto-detectar Factusol.',
+            actionLabel: 'Resolver en Factusol ERP →',
+            targetTab: 'factusol',
+            targetInputId: 'input-factusol-db'
+          };
+        }
+        if (lower.includes('lock') || lower.includes('bloquead') || lower.includes('in use') || lower.includes('exclusiv')) {
+          return {
+            title: 'Base de datos Factusol en uso exclusivo',
+            message: 'Factusol o un usuario en red tiene bloqueado el archivo de datos temporalmente.',
+            cause: 'Microsoft Access restringe el acceso al archivo mientras se realizan procesos masivos o cierres de ejercicio.',
+            suggestion: 'Espera unos segundos a que finalicen las operaciones en Factusol y vuelve a probar.',
+            actionLabel: 'Revisar Factusol →',
+            targetTab: 'factusol',
+            targetInputId: 'input-factusol-db'
+          };
+        }
+        if (lower.includes('driver') || lower.includes('provider') || lower.includes('clase no registrada') || lower.includes('microsoft.ace')) {
+          return {
+            title: 'Componente Microsoft Access OLEDB requerido',
+            message: 'Windows necesita el componente oficial Microsoft Access Database Engine.',
+            cause: 'El controlador OLEDB del sistema no está registrado para abrir bases de datos .accdb.',
+            suggestion: 'Revisa el semáforo en la pestaña de Diagnóstico Pre-Flight en Estado General.',
+            actionLabel: 'Ver Diagnóstico Pre-Flight →',
+            targetTab: 'overview',
+            targetInputId: 'pf-oledb-badge'
+          };
+        }
+        return {
+          title: 'Incidencia en Factusol ERP',
+          message: text,
+          cause: 'El agente no pudo consultar la información de artículos o pedidos de Factusol.',
+          suggestion: 'Revisa la ruta del archivo y los permisos en la pestaña de Factusol.',
+          actionLabel: 'Resolver en Factusol ERP →',
+          targetTab: 'factusol',
+          targetInputId: 'input-factusol-db'
+        };
+      }
+
+      // Incidencias en Canal Web (Universal / WooCommerce)
+      if (context === 'channel' || lower.includes('endpoint') || lower.includes('curl') || lower.includes('http') || lower.includes('woocommerce') || lower.includes('wordpress')) {
+        if (lower.includes('404') || lower.includes('not found') || lower.includes('no encontrado') || lower.includes('endpointfound') || lower.includes('endpoint')) {
+          return {
+            title: 'Conector web no detectado (Error 404)',
+            message: 'Tu servidor web responde, pero no encuentra el conector "erp-bridge-endpoint.php".',
+            cause: 'El conector PHP aún no ha sido subido a la carpeta raíz de tu hosting (public_html o httpdocs).',
+            suggestion: 'Descarga el conector erp-bridge-endpoint.php y súbelo a la carpeta pública de tu web mediante tu panel de hosting o FTP.',
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-url'
+          };
+        }
+        if (lower.includes('401') || lower.includes('403') || lower.includes('unauthorized') || lower.includes('forbidden') || lower.includes('clave') || lower.includes('token') || lower.includes('secret')) {
+          return {
+            title: 'Clave de seguridad rechazada',
+            message: 'La clave de seguridad no coincide con la configurada en tu tienda online.',
+            cause: 'El token secreto configurado en el agente es diferente al del archivo en tu servidor o las claves REST API son incorrectas.',
+            suggestion: 'Descarga de nuevo el conector con tu clave actual o actualiza la clave en la pestaña Canal Web.',
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-key'
+          };
+        }
+        if (lower.includes('ssl') || lower.includes('cert_') || lower.includes('certificate') || lower.includes('https')) {
+          return {
+            title: 'Certificado de seguridad SSL no válido',
+            message: 'Tu web no tiene un certificado SSL HTTPS seguro y verificado.',
+            cause: 'El agente requiere una conexión cifrada por HTTPS para proteger los datos de tus clientes y pedidos.',
+            suggestion: 'Verifica que tu dominio funcione bajo https:// y que el certificado SSL de tu hosting esté activo.',
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-url'
+          };
+        }
+        if (lower.includes('timeout') || lower.includes('econnrefused') || lower.includes('enotfound') || lower.includes('red') || lower.includes('no responde')) {
+          return {
+            title: 'Tu tienda web no responde',
+            message: 'No pudimos contactar con el servidor de tu tienda en el tiempo esperado.',
+            cause: 'La dirección web podría tener una errata, el hosting estar temporalmente caído o haber una caída en la conexión a Internet.',
+            suggestion: 'Verifica que la dirección de tu tienda abra correctamente en tu navegador.',
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-url'
+          };
+        }
+        return {
+          title: 'Incidencia en tu Canal Web',
+          message: text,
+          cause: 'El agente no pudo comunicarse con tu tienda online.',
+          suggestion: 'Revisa la dirección web y las credenciales en la pestaña Canal Web.',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-universal-url'
+        };
+      }
+
+      // Incidencias en Licencia
+      if (context === 'license' || lower.includes('licenc') || lower.includes('hwid') || lower.includes('expir') || lower.includes('grace')) {
+        return {
+          title: 'Licencia del Puesto requerida',
+          message: text,
+          cause: 'Este equipo no cuenta con una clave de suscripción activa o ha concluido el período de prueba.',
+          suggestion: 'Introduce la clave de tu licencia en la pestaña Licencia para restablecer la sincronización.',
+          actionLabel: 'Ver Licencia →',
+          targetTab: 'license',
+          targetInputId: 'input-lic-key'
+        };
+      }
+
+      return {
+        title: 'Aviso del Sistema',
+        message: text,
+        cause: 'La operación no se pudo completar con éxito.',
+        suggestion: 'Revisa la sección de Registros Técnicos para más detalles.',
+        actionLabel: 'Ver Registro →',
+        targetTab: 'logs',
+        targetInputId: null
+      };
     }
 
     // Auto-sanitización de URLs
@@ -100,6 +362,48 @@ export const coreScript = `
         loadSyncHistory();
       }
     }
+
+    // Navegación asistida directa con foco y animación de resplandor visual (Deep-Linking)
+    function navigateToResolution(tabId, inputId) {
+      if (tabId) {
+        switchTab(tabId);
+      }
+
+      // Si el destino está en el Canal Web, activar la sub-vista correspondiente
+      if (tabId === 'channel' && inputId) {
+        if (inputId.indexOf('wc') !== -1) {
+          if (typeof selectChannelType === 'function') selectChannelType('woocommerce');
+        } else if (inputId.indexOf('univ') !== -1) {
+          if (typeof selectChannelType === 'function') selectChannelType('universal_bridge');
+        }
+      }
+
+      if (inputId) {
+        setTimeout(function() {
+          const el = document.getElementById(inputId);
+          if (el) {
+            try {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (e) {
+              el.scrollIntoView();
+            }
+            el.classList.remove('deep-link-target');
+            void el.offsetWidth; // Forzar reflow para reiniciar la animación
+            el.classList.add('deep-link-target');
+            try {
+              el.focus();
+              if (typeof el.select === 'function' && el.value) {
+                el.select();
+              }
+            } catch (e) {}
+            setTimeout(function() {
+              el.classList.remove('deep-link-target');
+            }, 2600);
+          }
+        }, 200);
+      }
+    }
+
 
     // Channel Switcher
     function selectChannelType(type) {

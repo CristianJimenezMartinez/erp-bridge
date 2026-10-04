@@ -10,14 +10,34 @@ export const logsScript = `
         return true;
       });
 
+      function escapeLogAttr(str) {
+        return (str || '')
+          .replace(/\\/g, '\\\\')
+          .replace(/'/g, "\\'")
+          .replace(/"/g, '&quot;');
+      }
+
       function buildHtml(list) {
         if (!list || list.length === 0) {
           return '<div class="log-line log-info"><span class="log-time">--:--:--</span><span>No hay eventos para mostrar.</span></div>';
         }
         return list.map(function(e) {
-          return '<div class="log-line log-' + (e.level || 'info') + '">' +
+          const isProblem = e.level === 'error' || e.level === 'warn';
+          const safeMsg = escapeLogAttr(e.message);
+          const solveBtn = isProblem
+            ? '<button type="button" class="log-solve-btn" onclick="event.stopPropagation(); if (typeof openErrorResolverModal === \\'function\\') openErrorResolverModal(\\'' + safeMsg + '\\');" title="Ver solución recomendada">' +
+                '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>' +
+                '<span>Resolver</span>' +
+              '</button>'
+            : '';
+          const clickAttr = isProblem
+            ? (' onclick="if (typeof openErrorResolverModal === \\'function\\') openErrorResolverModal(\\'' + safeMsg + '\\');" title="Clic para ver cómo solucionar este problema"')
+            : '';
+
+          return '<div class="log-line log-' + (e.level || 'info') + '"' + clickAttr + '>' +
             '<span class="log-time">' + e.timestamp + '</span>' +
-            '<span>' + e.message + '</span>' +
+            '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">' + e.message + '</span>' +
+            solveBtn +
           '</div>';
         }).join('');
       }

@@ -9,7 +9,14 @@ export const channelScript = `
       const btn = document.getElementById('btn-test-univ');
 
       if (!url) {
-        showToast('Introduce la dirección de tu web', 'warn');
+        showSmartToast({
+          title: 'Dirección web requerida',
+          message: 'Introduce la dirección de tu tienda web (ejemplo: https://mitienda.com).',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-universal-url',
+          type: 'warn'
+        });
         return;
       }
 
@@ -20,8 +27,7 @@ export const channelScript = `
       const cDb = document.getElementById('chk-database');
 
       [cServer, cSsl, cEnd, cDb].forEach(function(el) { el.className = 'checklist-step'; });
-      alertBox.textContent = 'Comprobando tu web en tiempo real...';
-      alertBox.style.color = 'var(--text-muted)';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando tu web en tiempo real...</div>';
       btn.disabled = true;
 
       try {
@@ -39,12 +45,59 @@ export const channelScript = `
         cDb.className = chks.databaseReady ? 'checklist-step ok' : 'checklist-step fail';
 
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
-        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message + timeSuffix;
-        alertBox.style.color = data.success ? '#34d399' : '#f87171';
-        showToast(data.message + timeSuffix, data.success ? 'success' : 'warn');
+        if (data.success) {
+          alertBox.innerHTML = 
+            '<div class="smart-success-card">' +
+              '<span>✓</span>' +
+              '<span>' + data.message + timeSuffix + '</span>' +
+            '</div>';
+          showSmartToast({
+            title: 'Canal Web Conectado',
+            message: 'Tu tienda responde correctamente' + timeSuffix,
+            type: 'success'
+          });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          let extraActions = '';
+          if (!url.startsWith('https://')) {
+            extraActions += '<button type="button" onclick="document.getElementById(\\'input-universal-url\\').value=\\'https://\\' + document.getElementById(\\'input-universal-url\\').value.replace(/^http:\\/\\//, \\'\\'); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+          }
+          extraActions += '<button type="button" onclick="downloadUniversalCompanion()" class="smart-error-btn"><span>⬇️ Descargar erp-bridge-endpoint.php</span></button>';
+          extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn"><span>🔄 Reintentar comprobación</span></button>';
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-cause">' +
+                '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
+                '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+              '</div>' +
+              '<div class="smart-error-actions">' + extraActions + '</div>' +
+            '</div>';
+          showSmartToast({
+            title: errInfo.title,
+            message: errInfo.message,
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-url',
+            type: 'error'
+          });
+        }
       } catch (err) {
-        alertBox.textContent = 'Error de comunicación local al probar conector';
-        alertBox.style.color = '#f87171';
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        alertBox.innerHTML = 
+          '<div class="smart-error-card">' +
+            '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+            '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+            '<div class="smart-error-actions"><button type="button" onclick="testUniversalConnection()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button></div>' +
+          '</div>';
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-universal-url',
+          type: 'error'
+        });
       } finally {
         btn.disabled = false;
       }
@@ -59,11 +112,21 @@ export const channelScript = `
       const btn = document.getElementById('btn-test-wc');
 
       if (!storeUrl || !consumerKey || !consumerSecret) {
-        showToast('Rellena la URL, Consumer Key y Consumer Secret', 'warn');
+        showSmartToast({
+          title: 'Credenciales incompletas',
+          message: 'Rellena la URL de la tienda, Consumer Key y Consumer Secret de WooCommerce.',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-wc-url',
+          type: 'warn'
+        });
         return;
       }
 
       btn.disabled = true;
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión REST API WooCommerce...</div>';
+
       try {
         const res = await fetch('/api/local/test-woocommerce', {
           method: 'POST',
@@ -72,14 +135,58 @@ export const channelScript = `
         });
         const data = await res.json();
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
-        alertBox.style.display = 'block';
-        alertBox.style.color = data.success ? '#34d399' : '#f87171';
-        alertBox.textContent = (data.success ? '✓ ' : '✕ ') + data.message + timeSuffix;
-        showToast(data.message + timeSuffix, data.success ? 'success' : 'error');
+        if (data.success) {
+          alertBox.innerHTML = 
+            '<div class="smart-success-card">' +
+              '<span>✓</span>' +
+              '<span>' + data.message + timeSuffix + '</span>' +
+            '</div>';
+          showSmartToast({
+            title: 'WooCommerce Conectado',
+            message: 'Conexión REST API verificada' + timeSuffix,
+            type: 'success'
+          });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          let extraActions = '';
+          if (!storeUrl.startsWith('https://')) {
+            extraActions += '<button type="button" onclick="document.getElementById(\\'input-wc-url\\').value=\\'https://\\' + document.getElementById(\\'input-wc-url\\').value.replace(/^http:\\/\\//, \\'\\'); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary"><span>🔒 Añadir https://</span></button>';
+          }
+          extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn"><span>🔄 Reintentar conexión</span></button>';
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+              '<div class="smart-error-cause">' +
+                '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
+                '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+              '</div>' +
+              '<div class="smart-error-actions">' + extraActions + '</div>' +
+            '</div>';
+          showSmartToast({
+            title: errInfo.title,
+            message: errInfo.message,
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-wc-url',
+            type: 'error'
+          });
+        }
       } catch (err) {
-        alertBox.style.display = 'block';
-        alertBox.style.color = '#f87171';
-        alertBox.textContent = 'Error de comunicación al probar WooCommerce';
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        alertBox.innerHTML = 
+          '<div class="smart-error-card">' +
+            '<div class="smart-error-header"><span>💡</span><span>' + errInfo.title + '</span></div>' +
+            '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+            '<div class="smart-error-actions"><button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn smart-error-btn-primary"><span>🔄 Reintentar</span></button></div>' +
+          '</div>';
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-wc-url',
+          type: 'error'
+        });
       } finally {
         btn.disabled = false;
       }

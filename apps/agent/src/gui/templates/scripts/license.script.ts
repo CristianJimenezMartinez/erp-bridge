@@ -22,14 +22,22 @@ export const licenseScript = `
           showToast('Licencia vinculada a este equipo con éxito');
           fetchStatus();
         } else {
-          alertBox.style.color = '#f87171';
-          alertBox.textContent = '✕ Error: ' + (data.error || 'No se pudo activar la clave');
-          showToast('Error al activar clave', 'error');
+          if (typeof renderHumanizedAlert === 'function') {
+            renderHumanizedAlert(alertBox, data.error || 'No se pudo activar la clave');
+          } else {
+            alertBox.style.color = '#f87171';
+            alertBox.textContent = '✕ Error: ' + (data.error || 'No se pudo activar la clave');
+          }
+          showToast(data.error || 'Error al activar clave', 'error');
         }
       } catch (err) {
         alertBox.style.display = 'block';
-        alertBox.style.color = '#f87171';
-        alertBox.textContent = 'Error de red al activar licencia';
+        if (typeof renderHumanizedAlert === 'function') {
+          renderHumanizedAlert(alertBox, err.message || 'Error de red al activar licencia');
+        } else {
+          alertBox.style.color = '#f87171';
+          alertBox.textContent = 'Error de red al activar licencia';
+        }
       } finally {
         btn.disabled = false;
       }

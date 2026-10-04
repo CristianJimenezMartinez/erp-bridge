@@ -18,11 +18,27 @@ export function renderOverviewTab(): string {
           </button>
         </div>
 
+        <!-- Banner de Incidencia y Resolución Rápida -->
+        <div id="zen-alert-banner" class="zen-alert-banner" style="display:none;background:linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08));border:1px solid rgba(239,68,68,0.35);">
+          <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+            <div id="zen-alert-icon-box" style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,0.18);display:flex;align-items:center;justify-content:center;color:#f87171;flex-shrink:0;">
+              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div style="min-width:0;">
+              <div style="font-weight:700;font-size:14px;color:#fecaca;" id="zen-alert-title">Atención requerida</div>
+              <div style="font-size:12px;color:#e2e8f0;margin-top:2px;line-height:1.4;" id="zen-alert-desc">Se requiere intervención para sincronizar.</div>
+            </div>
+          </div>
+          <button id="zen-alert-btn" onclick="handleZenAlertClick()" class="btn" style="background:linear-gradient(135deg, #ef4444, #dc2626);color:#fff;border:none;box-shadow:0 0 14px rgba(239,68,68,0.35);font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+            <span id="zen-alert-btn-text">Resolver incidencia →</span>
+          </button>
+        </div>
+
         <!-- Semáforo Zen Central -->
-        <div class="zen-hero">
+        <div class="zen-hero" id="zen-hero-card">
           <div>
             <div class="zen-status-badge" id="zen-badge">
-              <span class="pulse-dot"></span>
+              <span class="pulse-dot" id="zen-badge-dot"></span>
               <span id="zen-badge-text">Sincronización Activa — Todo al día</span>
             </div>
             <h1 class="zen-title" id="zen-title">Tu tienda web y Factusol están sincronizados</h1>
@@ -30,10 +46,10 @@ export function renderOverviewTab(): string {
               El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.
             </p>
           </div>
-          <div style="flex-shrink: 0;">
-            <button onclick="triggerManualSync()" class="btn btn-primary btn-lg" style="box-shadow: 0 4px 20px var(--primary-glow);">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span>Forzar Sincronización Manual</span>
+          <div style="flex-shrink: 0;" id="zen-action-box">
+            <button id="zen-primary-btn" onclick="handleZenPrimaryAction()" class="btn btn-primary btn-lg" style="box-shadow: 0 4px 20px var(--primary-glow);">
+              <span id="zen-primary-btn-icon"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></span>
+              <span id="zen-primary-btn-text">Forzar Sincronización Manual</span>
             </button>
           </div>
         </div>

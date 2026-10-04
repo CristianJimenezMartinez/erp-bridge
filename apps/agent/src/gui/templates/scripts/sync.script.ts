@@ -4,20 +4,39 @@ export const syncScript = `
       const iconH = document.getElementById('sync-icon-header');
       if (btnH) btnH.disabled = true;
       if (iconH) iconH.classList.add('spin');
-      showToast('Iniciando sincronización...');
+      showSmartToast({ message: 'Iniciando sincronización autónoma...', type: 'info' });
       try {
         const res = await fetch('/api/local/sync-now', { method: 'POST' });
         const data = await res.json();
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
-          showToast(data.message + timeSuffix, 'success');
+          showSmartToast({
+            title: 'Sincronización Completada',
+            message: data.message + timeSuffix,
+            type: 'success'
+          });
           fetchStatus();
           loadSyncHistory();
         } else {
-          showToast('Aviso: ' + data.message + timeSuffix, 'warn');
+          const errInfo = humanizeErrorMessage(data.message, 'sync');
+          showSmartToast({
+            title: errInfo.title || 'Aviso en sincronización',
+            message: (errInfo.message || data.message) + timeSuffix,
+            actionLabel: errInfo.actionLabel || 'Ver Registro →',
+            targetTab: errInfo.targetTab || 'logs',
+            targetInputId: errInfo.targetInputId,
+            type: 'warn'
+          });
         }
       } catch (err) {
-        showToast('Error en sincronización manual', 'error');
+        const errInfo = humanizeErrorMessage(err, 'sync');
+        showSmartToast({
+          title: 'Error de Sincronización',
+          message: errInfo.message,
+          actionLabel: errInfo.actionLabel || 'Ver Registro →',
+          targetTab: errInfo.targetTab || 'logs',
+          type: 'error'
+        });
       } finally {
         if (btnH) btnH.disabled = false;
         if (iconH) iconH.classList.remove('spin');
@@ -95,21 +114,36 @@ export const syncScript = `
           fetchStatus();
           loadSyncHistory();
         } else {
-          showToast('Aviso: ' + data.message, 'warn');
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          showSmartToast({
+            title: 'Aviso al subir catálogo',
+            message: errInfo.message,
+            actionLabel: errInfo.actionLabel || 'Corregir en Canal Web →',
+            targetTab: errInfo.targetTab || 'channel',
+            targetInputId: errInfo.targetInputId,
+            type: 'warn'
+          });
           if (feedback) {
             feedback.style.background = 'rgba(239, 68, 68, 0.1)';
             feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
             feedback.style.color = '#fca5a5';
-            feedback.innerHTML = '❌ ' + data.message;
+            feedback.innerHTML = '❌ ' + (errInfo.cause ? ('<strong>' + errInfo.cause + '</strong><br>' + errInfo.suggestion) : data.message);
           }
         }
       } catch (err) {
-        showToast('Error al procesar la subida de catálogo', 'error');
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        showSmartToast({
+          title: 'Error de comunicación',
+          message: errInfo.message,
+          actionLabel: errInfo.actionLabel || 'Corregir en Canal Web →',
+          targetTab: errInfo.targetTab || 'channel',
+          type: 'error'
+        });
         if (feedback) {
           feedback.style.background = 'rgba(239, 68, 68, 0.1)';
           feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
           feedback.style.color = '#fca5a5';
-          feedback.innerHTML = '❌ Error de comunicación con el agente local';
+          feedback.innerHTML = '❌ ' + errInfo.message;
         }
       } finally {
         if (btn) {

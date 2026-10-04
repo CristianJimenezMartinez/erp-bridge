@@ -227,6 +227,268 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (data.preflight) {
         renderPreflight(data.preflight);
       }
+
+      // Zen Hero y Alertas Proactivas en Lenguaje Natural con Deep-Linking
+      renderZenHeroAndAlerts(data);
+    }
+
+    let _currentZenAlertAction = null;
+    let _currentZenPrimaryAction = null;
+
+    function handleZenAlertClick() {
+      if (_currentZenAlertAction && typeof _currentZenAlertAction === 'function') {
+        _currentZenAlertAction();
+      }
+    }
+
+    function handleZenPrimaryAction() {
+      if (_currentZenPrimaryAction && typeof _currentZenPrimaryAction === 'function') {
+        _currentZenPrimaryAction();
+      } else {
+        triggerManualSync();
+      }
+    }
+
+    function renderZenHeroAndAlerts(data) {
+      if (!data) return;
+
+      const fact = data.factusol || {};
+      const chType = data.channelType || 'universal_bridge';
+      const univ = data.universalBridgeSettings || {};
+      const wc = data.woocommerceSettings || {};
+      const lic = data.license || {};
+
+      const banner = document.getElementById('zen-alert-banner');
+      const bannerTitle = document.getElementById('zen-alert-title');
+      const bannerDesc = document.getElementById('zen-alert-desc');
+      const bannerBtnText = document.getElementById('zen-alert-btn-text');
+      const bannerIconBox = document.getElementById('zen-alert-icon-box');
+
+      const heroCard = document.getElementById('zen-hero-card');
+      const badge = document.getElementById('zen-badge');
+      const badgeDot = document.getElementById('zen-badge-dot');
+      const badgeText = document.getElementById('zen-badge-text');
+      const zenTitle = document.getElementById('zen-title');
+      const zenSub = document.getElementById('zen-sub');
+      const primaryBtn = document.getElementById('zen-primary-btn');
+      const primaryBtnText = document.getElementById('zen-primary-btn-text');
+      const primaryBtnIcon = document.getElementById('zen-primary-btn-icon');
+
+      const isFactMissing = !fact.configured;
+      const isFactOffline = fact.configured && !fact.connected;
+
+      const isChannelConfigured = chType === 'universal_bridge' 
+        ? !!(univ.storeUrl && univ.storeUrl.trim())
+        : !!(wc.storeUrl && wc.storeUrl.trim() && wc.consumerKey && wc.consumerKey.trim());
+
+      const isLicenseActive = lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
+
+      // 1. Caso Factusol Desconectado
+      if (isFactOffline) {
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(245,158,11,0.08))';
+          banner.style.borderColor = 'rgba(239,68,68,0.35)';
+          if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con Factusol ERP';
+          if (bannerDesc) bannerDesc.textContent = 'La ruta está registrada pero la base de datos no responde. Comprueba si la unidad de red o NAS está encendida y accesible.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en Factusol ERP →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(239,68,68,0.2)';
+            bannerIconBox.style.color = '#f87171';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('factusol', 'input-factusol-db');
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08))';
+          heroCard.style.borderColor = 'rgba(239,68,68,0.35)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(239,68,68,0.15)';
+          badge.style.borderColor = 'rgba(239,68,68,0.35)';
+          badge.style.color = '#f87171';
+        }
+        if (badgeDot) badgeDot.style.background = '#f87171';
+        if (badgeText) badgeText.textContent = '⚠️ Factusol Desconectado';
+        if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de Factusol';
+        if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo .accdb. Revisa la ruta o reconecta tu unidad de red para continuar.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Solucionar en Factusol ERP →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('factusol', 'input-factusol-db');
+        };
+        return;
+      }
+
+      // 2. Caso Factusol Sin Configurar
+      if (isFactMissing) {
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.14), rgba(217,119,6,0.08))';
+          banner.style.borderColor = 'rgba(245,158,11,0.35)';
+          if (bannerTitle) bannerTitle.textContent = 'Factusol ERP pendiente de configurar';
+          if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (.accdb) para que el agente empiece a trabajar.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Configurar Factusol ERP →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(245,158,11,0.2)';
+            bannerIconBox.style.color = '#fbbf24';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('factusol', 'input-factusol-db');
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(99,102,241,0.08))';
+          heroCard.style.borderColor = 'rgba(245,158,11,0.35)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(245,158,11,0.15)';
+          badge.style.borderColor = 'rgba(245,158,11,0.35)';
+          badge.style.color = '#fbbf24';
+        }
+        if (badgeDot) badgeDot.style.background = '#fbbf24';
+        if (badgeText) badgeText.textContent = 'ℹ️ Configuración Inicial';
+        if (zenTitle) zenTitle.textContent = 'Conecta tu Factusol para comenzar a sincronizar';
+        if (zenSub) zenSub.textContent = 'Selecciona tu archivo de Factusol con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(245,158,11,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Configurar Factusol ERP →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('factusol', 'input-factusol-db');
+        };
+        return;
+      }
+
+      // 3. Caso Canal Web No Configurado
+      if (!isChannelConfigured) {
+        const targetInput = chType === 'woocommerce' ? 'input-wc-url' : 'input-universal-url';
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.14), rgba(99,102,241,0.08))';
+          banner.style.borderColor = 'rgba(59,130,246,0.35)';
+          if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
+          if (bannerDesc) bannerDesc.textContent = 'Factusol está preparado con ' + (fact.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Revisar Tienda Online →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(59,130,246,0.2)';
+            bannerIconBox.style.color = '#60a5fa';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('channel', targetInput);
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.08))';
+          heroCard.style.borderColor = 'rgba(59,130,246,0.35)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(59,130,246,0.15)';
+          badge.style.borderColor = 'rgba(59,130,246,0.35)';
+          badge.style.color = '#60a5fa';
+        }
+        if (badgeDot) badgeDot.style.background = '#60a5fa';
+        if (badgeText) badgeText.textContent = '⚠️ Tienda Online sin vincular';
+        if (zenTitle) zenTitle.textContent = 'Enlaza tu tienda web para publicar tu catálogo';
+        if (zenSub) zenSub.textContent = 'Tu Factusol está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(59,130,246,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Revisar Tienda Online →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('channel', targetInput);
+        };
+        return;
+      }
+
+      // 4. Caso Licencia Pendiente
+      if (!isLicenseActive) {
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.14), rgba(245,158,11,0.08))';
+          banner.style.borderColor = 'rgba(239,68,68,0.35)';
+          if (bannerTitle) bannerTitle.textContent = 'Licencia del puesto requerida';
+          if (bannerDesc) bannerDesc.textContent = 'Introduce tu clave de suscripción para activar la sincronización desatendida y el control de existencias.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Activar Licencia →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(239,68,68,0.2)';
+            bannerIconBox.style.color = '#f87171';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('license', 'input-lic-key');
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(245,158,11,0.08))';
+          heroCard.style.borderColor = 'rgba(239,68,68,0.35)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(239,68,68,0.15)';
+          badge.style.borderColor = 'rgba(239,68,68,0.35)';
+          badge.style.color = '#f87171';
+        }
+        if (badgeDot) badgeDot.style.background = '#f87171';
+        if (badgeText) badgeText.textContent = '⚠️ Licencia Pendiente';
+        if (zenTitle) zenTitle.textContent = 'Activa la licencia de este equipo';
+        if (zenSub) zenSub.textContent = 'Introduce la clave de tu suscripción para desbloquear el motor autónomo de sincronización en tiempo real.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Activar Licencia →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('license', 'input-lic-key');
+        };
+        return;
+      }
+
+      // 5. Todo Óptimo: Estado Zen Pleno
+      if (banner) {
+        banner.style.display = 'none';
+        _currentZenAlertAction = null;
+      }
+
+      if (heroCard) {
+        heroCard.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.08))';
+        heroCard.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+      }
+      if (badge) {
+        badge.style.background = 'rgba(16, 185, 129, 0.15)';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        badge.style.color = '#34d399';
+      }
+      if (badgeDot) badgeDot.style.background = '#34d399';
+      if (badgeText) badgeText.textContent = 'Sincronización Activa — Todo al día';
+      if (zenTitle) zenTitle.textContent = 'Tu tienda web y Factusol están sincronizados';
+      if (zenSub) zenSub.textContent = 'El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.';
+      if (primaryBtn) {
+        primaryBtn.className = 'btn btn-primary btn-lg';
+        primaryBtn.style.background = 'var(--primary)';
+        primaryBtn.style.boxShadow = '0 4px 20px var(--primary-glow)';
+      }
+      if (primaryBtnText) primaryBtnText.textContent = 'Forzar Sincronización Manual';
+      if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>';
+      _currentZenPrimaryAction = function() {
+        triggerManualSync();
+      };
     }
 
     // Inicializar inputs del formulario de forma defensiva para que el sondeo cada 3s no sobreescriba cambios del usuario

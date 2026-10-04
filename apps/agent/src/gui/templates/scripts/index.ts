@@ -1,4 +1,5 @@
 import { coreScript } from './core.script';
+import { errorHumanizerScript } from './error-humanizer.script';
 import { renderStatusScript } from './status.script';
 import { factusolScript } from './factusol.script';
 import { channelScript } from './channel.script';
@@ -11,6 +12,7 @@ export function renderClientScript(agentVersion: string = '0.2.0'): string {
   return [
     '  <!-- ================= SCRIPTS ================= -->',
     '  <script>',
+    errorHumanizerScript,
     coreScript,
     renderStatusScript(agentVersion),
     factusolScript,
