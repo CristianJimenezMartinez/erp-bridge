@@ -24,6 +24,10 @@ services:
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
       # Licenciamiento y Stripe
       - LICENSE_JWT_SECRET=${LICENSE_JWT_SECRET}
+      # Clave PRIVADA Ed25519 que firma la prueba de licencia (el agente solo lleva la pública)
+      - LICENSE_SIGNING_PRIVATE_KEY=${LICENSE_SIGNING_PRIVATE_KEY}
+      # Secreto de acceso para Partners/Resellers (obligatorio; sin él el login de partner se desactiva)
+      - PARTNER_SECRET=${PARTNER_SECRET}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       # Correo Transaccional (Resend API)
