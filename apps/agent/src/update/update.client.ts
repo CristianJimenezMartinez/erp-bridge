@@ -505,6 +505,7 @@ export class UpdateClient {
           newExePath: newBinaryPath,
           timeoutSeconds: 15,
           processNamesToKill: ['BentianAgent', 'BentianTray'],
+          expectedSha256: update.sha256,
           postUpdateArgs: ['start', '--post-update', '--minimized'],
         });
 

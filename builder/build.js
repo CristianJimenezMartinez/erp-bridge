@@ -323,15 +323,25 @@ async function runMasterBuild() {
   fs.writeFileSync(path.resolve(versionReleaseDir, 'checksums.txt'), checksumsContent, 'utf8');
 
   // Firma digital Ed25519 del ejecutable
-  const privateKeyPath = path.resolve(__dirname, 'keys', 'update-private.pem');
+  // Orden de búsqueda de la clave privada (nunca debe vivir en una carpeta sincronizada):
+  // 1) BENTIAN_UPDATE_PRIVATE_KEY_PATH  2) ~/.bentian-secrets/update-private.pem  3) builder/keys/ (legado)
+  const privateKeyCandidates = [
+    process.env.BENTIAN_UPDATE_PRIVATE_KEY_PATH,
+    path.join(require('os').homedir(), '.bentian-secrets', 'update-private.pem'),
+    path.resolve(__dirname, 'keys', 'update-private.pem')
+  ].filter(Boolean);
+  const privateKeyPath = privateKeyCandidates.find(p => fs.existsSync(p));
   let exeSignature = '';
-  if (fs.existsSync(privateKeyPath)) {
+  if (privateKeyPath) {
     const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
     const exeBuffer = fs.readFileSync(targetExe);
     exeSignature = crypto.sign(null, exeBuffer, privateKeyPem).toString('base64');
     console.log('  🔒 Firma digital Ed25519 generada correctamente.');
+  } else if (shouldDeploy) {
+    console.error('  ❌ Clave privada de actualización no encontrada (' + privateKeyCandidates.join(' | ') + '). Se aborta el despliegue: no se publica una release sin firma real.');
+    process.exit(1);
   } else {
-    console.warn('  ⚠️ Clave privada de actualización no encontrada en builder/keys/update-private.pem. Usando fallback.');
+    console.warn('  ⚠️ Clave privada de actualización no encontrada. Usando fallback (solo válido para builds locales, NO publicar).');
     exeSignature = exeHash;
   }
 

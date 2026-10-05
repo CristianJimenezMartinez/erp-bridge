@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { AgentService, UpdateService, DatabaseService } from '@erp-bridge/core';
 import { AgentHeartbeatPayloadSchema, AgentPairingRequestSchema } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
+import { resolveOrgId } from './org-scope';
 
 export const agentsRouter = Router();
 const agentService = new AgentService();
@@ -12,11 +13,7 @@ import { getLatestReleasedVersion } from '../utils/version.util';
 export { getLatestReleasedVersion };
 
 function getOrgId(req: Request): string {
-  const authReq = req as AuthenticatedRequest;
-  if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
-    return authReq.user.organizationId;
-  }
-  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
+  return resolveOrgId(req);
 }
 
 // 1. List agents (Protected - Consulta unificada de máquinas activas por licencia y agentes)

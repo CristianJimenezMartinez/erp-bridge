@@ -92,7 +92,11 @@ async function runTests() {
   // TEST 2: Claves Criptográficas Ed25519 y Detección de Manipulación
   // -------------------------------------------------------------
   console.log('\nTEST 2: Verificación criptográfica Ed25519 de binarios...');
-  const privKeyPath = path.resolve(builderDir, 'keys', 'update-private.pem');
+  const privKeyPath = [
+    process.env.BENTIAN_UPDATE_PRIVATE_KEY_PATH,
+    path.join(require('os').homedir(), '.bentian-secrets', 'update-private.pem'),
+    path.resolve(builderDir, 'keys', 'update-private.pem')
+  ].filter(Boolean).find(p => fs.existsSync(p)) || path.resolve(builderDir, 'keys', 'update-private.pem');
   const pubKeyPath = path.resolve(builderDir, 'keys', 'update-public.pem');
 
   if (!fs.existsSync(privKeyPath) || !fs.existsSync(pubKeyPath)) {

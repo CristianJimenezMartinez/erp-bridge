@@ -98,6 +98,18 @@ async function runTests() {
   assert(fs.existsSync(written.batPath), 'El archivo bentian-apply-update.bat debe existir en disco');
   assert(fs.existsSync(written.ps1Path), 'El archivo bentian-apply-update.ps1 debe existir en disco');
 
+  // 2.1b Anti-TOCTOU: el script reverifica el SHA-256 sobre una copia protegida antes de tocar nada
+  const goodHash = 'a'.repeat(63) + 'B';
+  const ps1Hashed = UpdateSwapper.generatePowerShellScript({ ...swapOptions, expectedSha256: goodHash });
+  assert(ps1Hashed.includes(`$expectedSha256 = '${goodHash.toLowerCase()}'`), 'El script debe incrustar el SHA-256 esperado (normalizado a minúsculas)');
+  assert(ps1Hashed.includes('Get-FileHash'), 'El script debe recalcular el SHA-256 con Get-FileHash');
+  assert(ps1Hashed.includes('exit 3'), 'El script debe abortar (exit 3) si el hash no coincide');
+  assert(ps1Hashed.indexOf('Get-FileHash') < ps1Hashed.indexOf('Stop-Process'), 'La verificación debe ocurrir ANTES de detener procesos');
+  assert(ps1Hashed.indexOf('Get-FileHash') < ps1Hashed.indexOf('Move-Item'), 'La verificación debe ocurrir ANTES de instalar');
+  const ps1Injected = UpdateSwapper.generatePowerShellScript({ ...swapOptions, expectedSha256: "x'; Remove-Item C:\\ -Recurse; '" });
+  assert(ps1Injected.includes("$expectedSha256 = ''"), 'Un hash malformado debe descartarse (sin inyección en el script)');
+  assert(!ps1Injected.includes('Remove-Item C:'), 'No debe filtrarse contenido arbitrario al script');
+
   // 2.2 Swap directo de archivos
   const directSwapResult = await UpdateSwapper.performDirectSwap(currentBin, newBin, backupBin);
   assert.strictEqual(directSwapResult.success, true);

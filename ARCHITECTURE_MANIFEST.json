@@ -67,7 +67,7 @@
       "paths": [
         "apps/agent/src/update/update.swapper.ts"
       ],
-      "integrityTreeHash": "5284ef9d7bc952f0efbaa7fe6fed55523d7d1242459814d1966d9b7e92dfe705",
+      "integrityTreeHash": "5d05ef8008b314f975fb1834b4174418d083342c3ce296953dc11e4f5a497d8b",
       "publicContract": "apps/agent/src/update/update.swapper.ts",
       "testSuites": [
         "apps/agent/test/update-system.test.ts"

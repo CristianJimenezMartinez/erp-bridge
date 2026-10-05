@@ -7,6 +7,8 @@ import {
   LicenseValidationRequestSchema,
 } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest, computeOrganizationIdFromEmail } from './auth.router';
+import { resolveOrgId } from './org-scope';
+import { withKeyedLock } from '../middleware/keyed-mutex';
 import { getLatestInstallerUrl } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
 import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
@@ -34,11 +36,7 @@ function buildLicenseProof(token?: string): { payload: string; signature: string
 }
 
 function getOrgId(req: Request): string {
-  const authReq = req as AuthenticatedRequest;
-  if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
-    return authReq.user.organizationId;
-  }
-  return (req.headers['x-organization-id'] as string) || (req.query['organizationId'] as string) || (authReq.user ? authReq.user.organizationId : 'org_default');
+  return resolveOrgId(req);
 }
 
 // 0. Superadmin Overview: Total de licencias pagadas vs no pagadas y facturación estimada
@@ -619,7 +617,7 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
       return res.status(403).json({ error: { message: 'El periodo de prueba de la Beta ha finalizado. Actualice al Plan Fundador para activar su equipo.' } });
     }
 
-    const result = await licenseService.activateLicense(validated);
+    const result = await withKeyedLock(`activate:${validated.licenseKey}`, () => licenseService.activateLicense(validated));
     if (!result.success) {
       return res.status(400).json({ error: { message: result.error } });
     }

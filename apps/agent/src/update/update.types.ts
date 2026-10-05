@@ -79,6 +79,11 @@ export interface UpdateSwapOptions {
   processNamesToKill?: string[];
   scriptDir?: string;
   postUpdateArgs?: string[];
+  /**
+   * SHA-256 (hex) esperado del binario nuevo. Si se omite, el swapper calcula el hash del
+   * archivo justo antes de lanzar el proceso (el llamador ya lo ha verificado).
+   */
+  expectedSha256?: string;
 }
 
 /**

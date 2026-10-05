@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 import * as path from 'path';
 import * as os from 'os';
 import * as childProcess from 'child_process';
@@ -29,6 +30,9 @@ export class UpdateSwapper {
     const postArgs = options.postUpdateArgs && options.postUpdateArgs.length > 0
       ? options.postUpdateArgs.map((a) => `'${a}'`).join(', ')
       : `'start', '--post-update'`;
+    const expectedSha256 = /^[0-9a-fA-F]{64}$/.test(options.expectedSha256 || '')
+      ? String(options.expectedSha256).toLowerCase()
+      : '';
 
     return `# ==============================================================================
 # BENTIAN ERP BRIDGE - SCRIPT NATIVO DE ACTUALIZACIÓN ATÓMICA Y ROLLBACK DE SEGURIDAD
@@ -53,6 +57,30 @@ function Log-Msg($msg) {
 
 Log-Msg "Iniciando proceso de sustitución binaria silenciosa..."
 
+# 0. Staging protegido y reverificación SHA-256 (cierra la ventana TOCTOU en %TEMP%).
+#    El binario se copia a la carpeta destino (solo escribible por administradores en Program Files)
+#    y se comprueba su hash ANTES de detener nada. Si no coincide, se aborta sin tocar la instalación.
+$expectedSha256 = '${expectedSha256}'
+$installSource = $newExe
+if ($expectedSha256) {
+    $stagedExe = "$targetExe.new"
+    $actualSha256 = ''
+    try {
+        if (Test-Path "$stagedExe") { Remove-Item -Path "$stagedExe" -Force -ErrorAction Stop }
+        Copy-Item -Path "$newExe" -Destination "$stagedExe" -Force -ErrorAction Stop
+        $actualSha256 = (Get-FileHash -Path "$stagedExe" -Algorithm SHA256 -ErrorAction Stop).Hash.ToLower()
+    } catch {
+        Log-Msg "SEGURIDAD: no se pudo preparar el binario nuevo para verificarlo: $($_.Exception.Message)"
+    }
+    if ($actualSha256 -ne $expectedSha256.ToLower()) {
+        Log-Msg "SEGURIDAD: el SHA-256 del binario nuevo NO coincide con el esperado. Actualización abortada sin modificar la instalación."
+        Remove-Item -Path "$stagedExe" -Force -ErrorAction SilentlyContinue
+        exit 3
+    }
+    Log-Msg "Binario nuevo verificado (SHA-256 correcto) en ubicación protegida."
+    $installSource = $stagedExe
+}
+
 # 1. Detener procesos activos de Bentian para liberar bloqueos de archivo
 $procsToKill = @(${procListStr})
 foreach ($pName in $procsToKill) {
@@ -72,8 +100,9 @@ if (Test-Path "$targetExe") {
 }
 
 # 3. Mover el nuevo binario a la ruta objetivo oficial
-Log-Msg "Instalando nuevo binario desde $newExe..."
-Move-Item -Path "$newExe" -Destination "$targetExe" -Force
+Log-Msg "Instalando nuevo binario desde $installSource..."
+Move-Item -Path "$installSource" -Destination "$targetExe" -Force
+if ($installSource -ne $newExe) { Remove-Item -Path "$newExe" -Force -ErrorAction SilentlyContinue }
 
 # 4. Copiar dependencias accesorias (adodb.js) si existen
 $newDir = Split-Path -Parent $newExe
@@ -225,9 +254,26 @@ exit /b 0
   }
 
   /**
+   * SHA-256 (hex) de un archivo, o cadena vacía si no se puede leer.
+   */
+  private static tryComputeSha256(filePath: string): string {
+    try {
+      return crypto.createHash('sha256').update(fs.readFileSync(path.resolve(filePath))).digest('hex');
+    } catch {
+      return '';
+    }
+  }
+
+  /**
    * Lanza el script de actualización desacoplado de Windows para que se ejecute fuera del proceso actual.
    */
-  public static launchAtomicUpdateProcess(options: UpdateSwapOptions): { launched: boolean; batPath: string } {
+  public static launchAtomicUpdateProcess(rawOptions: UpdateSwapOptions): { launched: boolean; batPath: string } {
+    // SEGURIDAD (TOCTOU): se fija el SHA-256 del binario nuevo en el momento de lanzar (el llamador ya
+    // lo verificó contra el manifiesto firmado). El script lo reverifica sobre una copia protegida.
+    const options: UpdateSwapOptions = {
+      ...rawOptions,
+      expectedSha256: rawOptions.expectedSha256 || this.tryComputeSha256(rawOptions.newExePath),
+    };
     const { batPath } = this.writeAtomicScripts(options);
 
     this.logger.info(`Lanzando proceso desacoplado de actualización atómica: ${batPath}`);
@@ -247,6 +293,9 @@ exit /b 0
 
       if (needsElevation) {
         this.logger.info(`Ruta de destino protegida (${targetDir}). Elevando proceso de actualización mediante UAC de Windows...`);
+        // El script viaja en la propia línea de comandos del proceso elevado (-EncodedCommand): no existe
+        // ningún archivo en %TEMP% que pueda ser sustituido entre la petición UAC y su ejecución.
+        const encodedScript = Buffer.from(this.generatePowerShellScript(options), 'utf16le').toString('base64');
         const child = childProcess.spawn(
           'powershell.exe',
           [
@@ -254,7 +303,7 @@ exit /b 0
             '-ExecutionPolicy',
             'Bypass',
             '-Command',
-            `Start-Process -FilePath "cmd.exe" -ArgumentList '/c', '${batPath.replace(/'/g, "''")}' -Verb RunAs -WindowStyle Hidden`,
+            `Start-Process -FilePath 'powershell.exe' -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-EncodedCommand','${encodedScript}' -Verb RunAs -WindowStyle Hidden`,
           ],
           {
             detached: true,
