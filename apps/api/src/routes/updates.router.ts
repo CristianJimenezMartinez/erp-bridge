@@ -8,6 +8,7 @@ import {
   UpdateManifestSchema,
 } from '@erp-bridge/shared';
 import { requireAuth, requireRole } from './auth.router';
+import { rateLimit } from '../middleware/rate-limit';
 
 export const updatesRouter = Router();
 const updateService = new UpdateService();
@@ -58,7 +59,7 @@ updatesRouter.post('/updates/check', async (req: Request, res: Response, next: N
 });
 
 // 2. Agent reports update result (success or rollback)
-updatesRouter.post('/updates/confirm', async (req: Request, res: Response, next: NextFunction) => {
+updatesRouter.post('/updates/confirm', rateLimit({ name: 'updates-confirm', windowMs: 15*60*1000, max: 120 }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = UpdateConfirmRequestSchema.parse(req.body);
     const result = await updateService.recordConfirmation(validated);

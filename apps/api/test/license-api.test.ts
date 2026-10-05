@@ -146,7 +146,8 @@ async function run() {
     assert.strictEqual(betaClaimDupRes.status, 200, 'Reintento debe responder 200 OK con clave existente');
     const betaClaimDupJson = (await betaClaimDupRes.json()) as any;
     assert.strictEqual(betaClaimDupJson.alreadyClaimed, true);
-    assert.strictEqual(betaClaimDupJson.data.licenseKey, betaClaimJson.data.licenseKey, 'Debe devolver la misma clave original');
+    assert.strictEqual(betaClaimDupJson.data.licenseKey, undefined, 'SEGURIDAD: no debe devolver la clave existente en la respuesta HTTP');
+    assert.ok(!JSON.stringify(betaClaimDupJson).includes(betaClaimJson.data.licenseKey), 'La clave no debe aparecer en ningún campo de la respuesta');
 
     // 8. Test Founder Plan y Cupo de 25 plazas en facturación
     const plansRes = await fetch(`${baseUrl}/api/v1/billing/plans`);

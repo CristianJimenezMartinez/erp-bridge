@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { LicenseService } from '@erp-bridge/core';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
+import { rateLimit } from '../middleware/rate-limit';
 import { Logger } from '@erp-bridge/shared';
 
 const logger = new Logger('AuthRouter');
@@ -200,12 +201,42 @@ function pruneLoginAttempts(now: number): void {
   }
 }
 
+/**
+ * IP del cliente basada en req.ip (respeta `trust proxy` de Express).
+ * SEGURIDAD: nunca confiar directamente en la cabecera X-Forwarded-For enviada por el
+ * cliente, ya que rotarla permitiría saltarse el bloqueo por fuerza bruta.
+ */
+export function getClientIp(req: Request): string {
+  return req.ip || req.socket.remoteAddress || '127.0.0.1';
+}
+
+// Lockout independiente para /auth/partner-login (antes no existía)
+export const partnerAttempts = new Map<string, LoginAttemptRecord>();
+
+export function clearPartnerAttempts(): void {
+  partnerAttempts.clear();
+}
+
+function registerPartnerFailure(ip: string, now: number): void {
+  const current = partnerAttempts.get(ip) || { count: 0, firstAttempt: now };
+  if (now - current.firstAttempt > ATTEMPT_WINDOW_MS) {
+    current.count = 1;
+    current.firstAttempt = now;
+    current.blockedUntil = undefined;
+  } else {
+    current.count += 1;
+  }
+  if (current.count >= MAX_LOGIN_ATTEMPTS) {
+    current.blockedUntil = now + LOCKOUT_MS;
+  }
+  partnerAttempts.set(ip, current);
+}
+
 export const authRouter = Router();
 
 // POST /api/v1/auth/login
 authRouter.post('/auth/login', (req: Request, res: Response): void => {
-  const forwarded = req.headers['x-forwarded-for'];
-  const clientIp = (typeof forwarded === 'string' ? forwarded.split(',')[0]?.trim() : null) || req.socket.remoteAddress || req.ip || '127.0.0.1';
+  const clientIp = getClientIp(req);
   const now = Date.now();
   pruneLoginAttempts(now);
 
@@ -328,6 +359,21 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
 
 // POST /api/v1/auth/partner-login (Acceso para Empresas Instaladoras / Partners / Resellers)
 authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
+  const partnerClientIp = getClientIp(req);
+  const now = Date.now();
+  const partnerRecord = partnerAttempts.get(partnerClientIp);
+  if (partnerRecord?.blockedUntil && now < partnerRecord.blockedUntil) {
+    const remainingSeconds = Math.ceil((partnerRecord.blockedUntil - now) / 1000);
+    res.setHeader('Retry-After', String(remainingSeconds));
+    res.status(429).json({
+      error: {
+        code: 'TOO_MANY_ATTEMPTS',
+        message: `Demasiados intentos fallidos. Bloqueo de seguridad activo por ${remainingSeconds} segundos.`,
+      },
+    });
+    return;
+  }
+
   const { partnerCode, partnerSecret, partnerEmail } = req.body as {
     partnerCode?: string;
     partnerSecret?: string;
@@ -356,32 +402,35 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
     return;
   }
 
-  // Validación de clave secreta del Partner (permite PIN oficial 'bentian-partner-2026', PARTNER_SECRET o contraseña de administración)
-  const allowedSecrets = [
-    process.env['PARTNER_SECRET'],
-    'bentian-partner-2026',
-    process.env['ADMIN_PASSWORD'],
-  ].filter((s): s is string => typeof s === 'string' && s.length > 0);
+  // Validación de clave secreta del Partner.
+  // SEGURIDAD: solo se acepta PARTNER_SECRET definido por entorno. Está prohibido aceptar
+  // PINs literales en el código o reutilizar ADMIN_PASSWORD (separación de privilegios).
+  const configuredPartnerSecret = process.env['PARTNER_SECRET'];
+  if (!configuredPartnerSecret || configuredPartnerSecret.length < 12) {
+    res.status(503).json({
+      error: {
+        code: 'PARTNER_ACCESS_DISABLED',
+        message: 'El acceso de partners no está habilitado en este servidor',
+      },
+    });
+    return;
+  }
 
   const providedSecret = typeof partnerSecret === 'string' ? partnerSecret.trim() : '';
 
   let isSecretValid = false;
   try {
     const provBuf = Buffer.from(providedSecret, 'utf8');
-    for (const secret of allowedSecrets) {
-      const secBuf = Buffer.from(secret, 'utf8');
-      if (provBuf.length === secBuf.length && provBuf.length > 0) {
-        if (crypto.timingSafeEqual(provBuf, secBuf)) {
-          isSecretValid = true;
-          break;
-        }
-      }
+    const secBuf = Buffer.from(configuredPartnerSecret, 'utf8');
+    if (provBuf.length === secBuf.length && provBuf.length > 0) {
+      isSecretValid = crypto.timingSafeEqual(provBuf, secBuf);
     }
   } catch {
     isSecretValid = false;
   }
 
   if (!isSecretValid) {
+    registerPartnerFailure(partnerClientIp, now);
     res.status(401).json({
       error: {
         code: 'INVALID_PARTNER_SECRET',
@@ -390,6 +439,7 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
     });
     return;
   }
+  partnerAttempts.delete(partnerClientIp);
 
   const resellerId = `reseller_${crypto.createHash('sha256').update(cleanCode).digest('hex').substring(0, 10)}`;
   const email = partnerEmail ? partnerEmail.trim().toLowerCase() : `${cleanCode.toLowerCase()}@partner.cristianjm.com`;
@@ -429,7 +479,7 @@ authRouter.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res: Respons
 const authLicenseService = new LicenseService();
 
 // POST /api/v1/auth/license-session (Acceso 1-clic y login directo por clave)
-authRouter.post('/auth/license-session', async (req: Request, res: Response): Promise<void> => {
+authRouter.post('/auth/license-session', rateLimit({ name: 'license-session', windowMs: 15*60*1000, max: 30 }), async (req: Request, res: Response): Promise<void> => {
   try {
     const { licenseKey } = req.body as { licenseKey?: string };
     if (!licenseKey || typeof licenseKey !== 'string') {
@@ -652,8 +702,7 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
     }
 
     // Caso 3: No se proporciona OTP ni licenseKey -> Solicitar código OTP por correo
-    const forwarded = req.headers['x-forwarded-for'];
-    const clientIp = (typeof forwarded === 'string' ? forwarded.split(',')[0]?.trim() : null) || req.socket.remoteAddress || req.ip || '127.0.0.1';
+    const clientIp = getClientIp(req);
 
     // A. Comprobar rate limit, cooldown y presupuesto de Resend
     const check = EmailProtectionService.checkOtpAllowed(cleanEmail, clientIp);

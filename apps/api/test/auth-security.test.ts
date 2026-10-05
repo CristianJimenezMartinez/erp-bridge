@@ -2,7 +2,7 @@ import assert from 'assert';
 import http from 'http';
 import crypto from 'crypto';
 import express from 'express';
-import { authRouter, AuthService, clearLoginAttempts, MAX_LOGIN_ATTEMPTS } from '../src/routes/auth.router';
+import { authRouter, AuthService, clearLoginAttempts, clearPartnerAttempts, MAX_LOGIN_ATTEMPTS } from '../src/routes/auth.router';
 import { billingRouter } from '../src/routes/billing.router';
 import { licensesRouter } from '../src/routes/licenses.router';
 
@@ -76,6 +76,14 @@ async function runTests() {
     assert(resBlocked.headers.get('retry-after'), 'Debe incluir cabecera Retry-After');
     console.log('  ✓ Bloqueo por fuerza bruta (429 Too Many Requests) verificado.');
 
+    const resXffBypass = await fetch(`${baseUrl}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '198.51.100.77' },
+      body: JSON.stringify({ email: 'admin@cristianjm.com', password: 'SuperSecurePass123!' }),
+    });
+    assert.strictEqual(resXffBypass.status, 429, 'Rotar X-Forwarded-For NO debe saltarse el bloqueo');
+    console.log('  ✓ Bypass del lockout mediante X-Forwarded-For bloqueado.');
+
     // 4. Verificación estricta de Webhook de Stripe sin excepciones de NODE_ENV
     console.log('4. Probando webhook de Stripe sin STRIPE_WEBHOOK_SECRET configurado...');
     delete process.env['STRIPE_WEBHOOK_SECRET'];
@@ -146,6 +154,46 @@ async function runTests() {
     assert(partnerOkJson.token, 'Debe emitir token JWT de RESELLER');
     console.log('  ✓ Partner login validado con secreto estricto y timingSafeEqual.');
 
+    // 7.1 El PIN histórico y la contraseña de admin ya NO conceden acceso de partner
+    console.log('7.1 Probando que el PIN hardcodeado y ADMIN_PASSWORD no abren acceso de partner...');
+    for (const badSecret of ['bentian-partner-2026', 'SuperSecurePass123!']) {
+      const r = await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ partnerCode: 'PT-ATACANTE', partnerSecret: badSecret }),
+      });
+      assert.strictEqual(r.status, 401, `El secreto "${badSecret}" no debe conceder acceso de partner`);
+    }
+
+    // 7.2 Sin PARTNER_SECRET configurado el acceso queda deshabilitado (fail-closed)
+    const savedPartnerSecret = process.env['PARTNER_SECRET'];
+    delete process.env['PARTNER_SECRET'];
+    const resDisabled = await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ partnerCode: 'PT-ATACANTE', partnerSecret: 'bentian-partner-2026' }),
+    });
+    assert.strictEqual(resDisabled.status, 503, 'Sin PARTNER_SECRET el acceso debe quedar deshabilitado');
+    process.env['PARTNER_SECRET'] = savedPartnerSecret;
+
+    // 7.3 Lockout de partner-login por IP real; rotar X-Forwarded-For no lo evita
+    clearPartnerAttempts();
+    for (let i = 1; i <= MAX_LOGIN_ATTEMPTS; i++) {
+      await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `10.0.0.${i}` },
+        body: JSON.stringify({ partnerCode: 'PT-ATACANTE', partnerSecret: `wrong_${i}` }),
+      });
+    }
+    const resPartnerBlocked = await fetch(`${baseUrl}/api/v1/auth/partner-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '203.0.113.99' },
+      body: JSON.stringify({ partnerCode: 'PT-INFORMATICA', partnerSecret: 'PartnerSecret2026!' }),
+    });
+    assert.strictEqual(resPartnerBlocked.status, 429, 'Tras 5 fallos el partner-login debe bloquearse aunque se rote X-Forwarded-For');
+    clearPartnerAttempts();
+    console.log('  ✓ PIN hardcodeado eliminado, fail-closed y lockout de partner verificados.');
+
     // 8. Control de Acceso Basado en Roles (RBAC) en /licenses
     console.log('8. Probando RBAC: creación y revocación de licencias protegidas contra TENANT_CLIENT...');
     const clientToken = AuthService.createToken({
@@ -175,6 +223,39 @@ async function runTests() {
     });
     assert.strictEqual(resRevokeForbidden.status, 403, 'TENANT_CLIENT no debe poder revocar licencias (403 Forbidden)');
     console.log('  ✓ RBAC verificado: TENANT_CLIENT no puede emitir ni revocar licencias.');
+
+    // 8.1 Un RESELLER no puede fijar plan/caducidad/asientos ni emitir para organizaciones ajenas
+    console.log('8.1 Probando que RESELLER no puede crear licencias perpetuas ni para orgs ajenas...');
+    const resellerToken = partnerOkJson.token as string;
+    const resellerOrg = partnerOkJson.user.organizationId as string;
+
+    const resForeignOrg = await fetch(`${baseUrl}/api/v1/licenses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resellerToken}` },
+      body: JSON.stringify({ organizationId: 'org_ajena_victima', plan: 'starter', expiresAt: '2099-01-01' }),
+    });
+    assert.strictEqual(resForeignOrg.status, 403, 'RESELLER no debe emitir para una organización que no es suya');
+
+    const resEscalate = await fetch(`${baseUrl}/api/v1/licenses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resellerToken}` },
+      body: JSON.stringify({
+        organizationId: resellerOrg,
+        plan: 'starter',
+        expiresAt: '2099-01-01',
+        maxActivations: 99,
+        isStripeConfirmed: true,
+      }),
+    });
+    assert.strictEqual(resEscalate.status, 201, 'RESELLER puede emitir evaluaciones para su org');
+    const escalateJson = (await resEscalate.json()) as any;
+    assert.strictEqual(escalateJson.data.plan, 'trial', 'El plan debe forzarse a trial');
+    assert.strictEqual(escalateJson.data.maxActivations, 1, 'Los asientos deben forzarse a 1');
+    assert.strictEqual(escalateJson.data.billingStatus, 'TRIAL', 'No debe poder marcarse como pagada');
+    assert(escalateJson.data.expiresAt, 'Debe tener caducidad');
+    const daysToExpire = (new Date(escalateJson.data.expiresAt).getTime() - Date.now()) / 86400000;
+    assert(daysToExpire <= 15.5, `Caducidad máxima 15 días para RESELLER (obtenido ${daysToExpire.toFixed(1)})`);
+    console.log('  ✓ RESELLER limitado a evaluaciones de 15 días, 1 asiento, solo para sus organizaciones.');
 
     // 9. Flujo Passwordless OTP en /auth/email-session
     console.log('9. Probando flujo Passwordless OTP en /auth/email-session...');

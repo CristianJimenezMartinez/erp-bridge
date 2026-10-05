@@ -352,6 +352,12 @@
           }
 
           const lic = data.data;
+          if (!lic.licenseKey) {
+            // Clave ya emitida: por seguridad no se muestra en pantalla, se reenvía por email.
+            betaError.textContent = data.message || 'Ya existe una clave para este correo. Te la hemos reenviado por email.';
+            betaError.classList.remove('hidden');
+            return;
+          }
           document.getElementById('displayLicenseKey').textContent = lic.licenseKey;
           document.getElementById('displayDaysRemaining').textContent = `${lic.daysRemaining || 60} días`;
           if (lic.expiresAt) {

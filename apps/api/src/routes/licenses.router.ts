@@ -9,6 +9,7 @@ import {
 import { requireAuth, requireRole, AuthenticatedRequest, computeOrganizationIdFromEmail } from './auth.router';
 import { getLatestInstallerUrl } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
+import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
 
 export const licensesRouter = Router();
 const licenseService = new LicenseService();
@@ -164,7 +165,7 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
 });
 
 // 0.2.1 Beta Pública: Reclamar clave con caducidad garantizada de 60 días
-licensesRouter.post('/licenses/beta/claim', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', windowMs: 60 * 60 * 1000, max: 10, message: 'Demasiadas solicitudes de clave desde esta conexión. Inténtalo más tarde.' }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, companyName, taxId } = req.body as {
       email?: string;
@@ -212,18 +213,33 @@ licensesRouter.post('/licenses/beta/claim', async (req: Request, res: Response, 
       }
     }
 
-    // Si ya existe una licencia, devolvemos la misma clave existente (evita creación ilimitada)
+    // Si ya existe una licencia NO se devuelve la clave en la respuesta HTTP (cualquiera que
+    // conozca el email podría obtenerla). Solo se reenvía al buzón del propietario del email.
     if (existingLicense) {
       const rawExpiresAt = existingLicense.expires_at || existingLicense.expiresAt;
       const expiresAtDate = rawExpiresAt ? new Date(rawExpiresAt) : null;
       const daysRemaining = expiresAtDate ? Math.max(0, Math.ceil((expiresAtDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 60;
 
+      const resend = consumeRateLimit('beta-claim-resend', normalizedEmail, 60 * 60 * 1000, 1);
+      if (resend.allowed && existingLicense.key) {
+        try {
+          await MailerService.sendLicenseWelcomeEmail({
+            customerEmail: normalizedEmail,
+            licenseKey: existingLicense.key,
+            planName: 'Tu clave de activación de Bentian',
+            alias: existingLicense.alias || 'Licencia Bentian',
+            companyName: existingLicense.alias || 'tu empresa',
+          });
+        } catch (_mailErr) {
+          // Si el servicio de correo no está disponible, continuar sin fallar la petición
+        }
+      }
+
       return res.json({
         success: true,
         alreadyClaimed: true,
-        message: 'Ya dispones de una clave de activación para este correo.',
+        message: 'Ya existe una clave de activación para este correo. Te la hemos reenviado por email; revisa tu bandeja de entrada y spam.',
         data: {
-          licenseKey: existingLicense.key,
           expiresAt: expiresAtDate ? expiresAtDate.toISOString() : null,
           daysRemaining,
           installerUrl: getLatestInstallerUrl(),
@@ -414,21 +430,52 @@ licensesRouter.get('/licenses/fleet-overview', requireAuth, async (req: Request,
 // 2. Create a new license (Regla de Oro: 1 ERP ⇄ 1 Tienda = 1 Licencia Base Unificada 199€)
 licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN', 'RESELLER']), async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const authUser = (req as AuthenticatedRequest).user;
+    const isPrivileged = authUser?.role === 'SUPERADMIN' || authUser?.role === 'ADMIN';
     const orgId = getOrgId(req);
     const seatType = 'BASE';
     const taxId = (req.body.taxId as string)?.trim().toUpperCase() || null;
     const parentLicenseId = null;
 
+    // SEGURIDAD: un RESELLER solo puede emitir evaluaciones de hasta 15 días, 1 asiento y para
+    // organizaciones que le pertenecen. No puede fijar plan, caducidad ni confirmar pagos.
+    let body: Record<string, any> = { ...req.body };
+    if (!isPrivileged) {
+      const requestedOrg = (body['organizationId'] as string) || orgId;
+      if (requestedOrg !== authUser?.organizationId) {
+        const db = DatabaseService.getInstance();
+        const resellerCode = authUser?.resellerId || authUser?.sub;
+        const owns = db.isAvailable()
+          ? await db.query(`SELECT 1 FROM organizations WHERE id = $1 AND reseller_id = $2`, [requestedOrg, resellerCode])
+              .then(r => r.rows.length > 0).catch(() => false)
+          : false;
+        if (!owns) {
+          return res.status(403).json({ error: { message: 'No puedes emitir licencias para una organización que no es tuya' } });
+        }
+      }
+      const requestedTrial = Number(body['trialDays']);
+      body = {
+        ...body,
+        organizationId: requestedOrg,
+        plan: 'trial',
+        trialDays: Number.isFinite(requestedTrial) && requestedTrial >= 1 ? Math.min(Math.floor(requestedTrial), 15) : 15,
+        expiresAt: undefined,
+        maxActivations: 1,
+        isStripeConfirmed: false,
+        stripeSessionId: undefined,
+      };
+    }
+
     // Blindaje anti-claves infinitas: Si no tiene expiración ni trialDays y no proviene de pago Stripe, forzar 30 días
-    const hasExplicitExpiration = Boolean(req.body.expiresAt || req.body.trialDays);
-    const isStripe = Boolean(req.body.isStripeConfirmed || req.body.stripeSessionId);
-    const effectiveTrialDays = hasExplicitExpiration ? req.body.trialDays : (isStripe ? undefined : 30);
-    const effectiveBillingStatus = (isStripe || (!effectiveTrialDays && req.body.expiresAt)) ? 'ACTIVE' : 'TRIAL';
+    const hasExplicitExpiration = Boolean(body['expiresAt'] || body['trialDays']);
+    const isStripe = Boolean(body['isStripeConfirmed'] || body['stripeSessionId']);
+    const effectiveTrialDays = hasExplicitExpiration ? body['trialDays'] : (isStripe ? undefined : 30);
+    const effectiveBillingStatus = (isStripe || (!effectiveTrialDays && body['expiresAt'])) ? 'ACTIVE' : 'TRIAL';
 
     const validated = CreateLicenseDtoSchema.parse({
-      ...req.body,
+      ...body,
       trialDays: effectiveTrialDays,
-      organizationId: req.body.organizationId || orgId,
+      organizationId: body['organizationId'] || orgId,
     });
     const license = await licenseService.createLicense(validated);
 
@@ -539,7 +586,7 @@ licensesRouter.get('/licenses/:key', requireAuth, async (req: AuthenticatedReque
 });
 
 // 4. Activate a license from an Agent (Regla de Oro: 1 ERP ⇄ 1 Tienda = 1 Licencia Base Unificada 199€)
-licensesRouter.post('/licenses/activate', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', windowMs: 15*60*1000, max: 60 }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = LicenseActivationRequestSchema.parse(req.body);
 
@@ -623,7 +670,7 @@ licensesRouter.post('/licenses/validate', async (req: Request, res: Response, ne
 });
 
 // 6. Deactivate a machine activation
-licensesRouter.post('/licenses/deactivate', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post('/licenses/deactivate', rateLimit({ name: 'license-deactivate', windowMs: 15*60*1000, max: 30 }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { licenseKey, hwid } = req.body as { licenseKey: string; hwid: string };
     if (!licenseKey || !hwid) {
