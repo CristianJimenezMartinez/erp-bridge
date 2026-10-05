@@ -14,6 +14,14 @@ import { ConfigManager } from '../config/config.manager';
 import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { AgentLicenseStatus, LicenseValidationStatus } from './license.types';
+import { verifyLicenseProof, isSignedLicenseProof, DEFAULT_LICENSE_PROOF_PUBLIC_KEY, VerifiedLicenseProof } from './license-proof';
+
+/**
+ * Si es true, el periodo de gracia OFFLINE solo se concede con una prueba Ed25519 válida emitida
+ * por el servidor. El token HS256 por sí solo no es de fiar en el cliente (su secreto no se puede
+ * custodiar localmente). La validación ONLINE sigue siendo la autoridad y no depende de esto.
+ */
+export const REQUIRE_SIGNED_LICENSE_PROOF = true;
 
 export class LicenseService {
   private readonly logger = new Logger('LicenseService');
@@ -29,9 +37,32 @@ export class LicenseService {
   constructor(
     private readonly configManager: ConfigManager,
     private readonly eventBus?: EventBus,
-    customStoreDir?: string
+    customStoreDir?: string,
+    private readonly proofPublicKeyPem: string = DEFAULT_LICENSE_PROOF_PUBLIC_KEY
   ) {
     this.secureStore = new SecureStore(customStoreDir);
+  }
+
+  /** Verifica y persiste la prueba Ed25519 recibida del servidor (si la hay). */
+  private async persistProofIfValid(rawProof: unknown, hwid: string): Promise<VerifiedLicenseProof | null> {
+    if (!isSignedLicenseProof(rawProof)) return null;
+    const verified = verifyLicenseProof(rawProof, hwid, this.proofPublicKeyPem);
+    if (!verified) {
+      this.logger.warn('Prueba de licencia recibida con firma inválida: se ignora.');
+      return null;
+    }
+    await this.secureStore.saveLicenseProof(JSON.stringify(rawProof), hwid);
+    return verified;
+  }
+
+  private async loadVerifiedProof(hwid: string): Promise<VerifiedLicenseProof | null> {
+    const raw = await this.secureStore.loadLicenseProof(hwid);
+    if (!raw) return null;
+    try {
+      return verifyLicenseProof(JSON.parse(raw), hwid, this.proofPublicKeyPem);
+    } catch {
+      return null;
+    }
   }
 
   public async getHWID(): Promise<string> {
@@ -98,6 +129,10 @@ export class LicenseService {
     const activation = resJson.data;
     if (activation.licenseToken) {
       await this.secureStore.saveLicenseToken(activation.licenseToken, hwid);
+      const activationProofOk = await this.persistProofIfValid((activation as unknown as { licenseProof?: unknown }).licenseProof, hwid);
+      if (!activationProofOk) {
+        await this.secureStore.deleteLicenseProof();
+      }
       this.configManager.setLicenseKey(licenseKey);
       this.licenseStatus = 'VALID';
       this.activePlan = activation.plan;
@@ -199,6 +234,7 @@ export class LicenseService {
         if (resJson.data.renewedToken) {
           await this.secureStore.saveLicenseToken(resJson.data.renewedToken, hwid);
         }
+        await this.persistProofIfValid((resJson.data as unknown as { licenseProof?: unknown }).licenseProof, hwid);
         this.licenseStatus = 'VALID';
         this.activePlan = resJson.data.plan;
         this.lastOnlineTimestamp = Date.now();
@@ -213,25 +249,34 @@ export class LicenseService {
       // Offline / Network failure -> fallback to local token verification
     }
 
-    if (localPayload) {
+    // Fuente de confianza para el modo offline: prueba Ed25519 verificada con la clave pública embebida.
+    // El payload HS256 solo se admite si REQUIRE_SIGNED_LICENSE_PROOF está desactivado (compatibilidad).
+    const proof = await this.loadVerifiedProof(hwid);
+    const gracePayload: { plan: string; issuedAt: number; expiresAt: number } | null =
+      proof ?? (REQUIRE_SIGNED_LICENSE_PROOF ? null : localPayload && isLocalTokenValid ? localPayload : null);
+    if (!proof && REQUIRE_SIGNED_LICENSE_PROOF && localPayload) {
+      this.logger.warn('Sin prueba de licencia Ed25519 válida: no se concede periodo de gracia offline hasta validar online.');
+    }
+
+    if (gracePayload) {
       // 2.1 Verificación dura de expiración: Si la fecha del token o licencia ya expiró, EXPIRED sin excepciones
-      if (now >= localPayload.expiresAt) {
+      if (now >= gracePayload.expiresAt) {
         this.licenseStatus = 'EXPIRED';
         this.activePlan = undefined;
         const msg = 'El periodo de prueba de la Beta ha finalizado. La sincronización se ha detenido.';
-        this.logger.warn(`Licencia expirada (${new Date(localPayload.expiresAt).toISOString()}). Deteniendo sincronización.`);
+        this.logger.warn(`Licencia expirada (${new Date(gracePayload.expiresAt).toISOString()}). Deteniendo sincronización.`);
         this.eventBus?.addEvent('error', msg);
         return { status: 'EXPIRED', message: msg };
       }
 
       // 2.2 Límite estricto de desconexión para Beta/Trial (máx 48h offline sin contacto con el servidor)
-      const planStr = String(localPayload.plan || '').toLowerCase();
+      const planStr = String(gracePayload.plan || '').toLowerCase();
       const isBetaOrTrial = planStr.includes('trial') || planStr.includes('beta');
       if (isBetaOrTrial) {
         if (this.lastOnlineTimestamp === 0) {
           this.lastOnlineTimestamp = await this.secureStore.loadLastOnlineTimestamp(hwid);
         }
-        const lastOnline = this.lastOnlineTimestamp || localPayload.issuedAt;
+        const lastOnline = this.lastOnlineTimestamp || gracePayload.issuedAt;
         const offlineMs = now - lastOnline;
         const MAX_BETA_OFFLINE_MS = 48 * 60 * 60 * 1000;
 
@@ -245,13 +290,12 @@ export class LicenseService {
         }
       }
 
-      if (isLocalTokenValid) {
-        this.licenseStatus = 'GRACE_PERIOD';
-        this.activePlan = localPayload.plan;
-        const remainingHours = Math.round((localPayload.expiresAt - now) / 3600000);
-        this.logger.warn(`Operando en período de gracia offline (${remainingHours}h restantes). Plan: ${localPayload.plan}`);
-        return { status: 'GRACE_PERIOD', plan: localPayload.plan };
-      }
+      this.licenseStatus = 'GRACE_PERIOD';
+      this.activePlan = gracePayload.plan;
+      this.tokenExpiresAt = gracePayload.expiresAt;
+      const remainingHours = Math.round((gracePayload.expiresAt - now) / 3600000);
+      this.logger.warn(`Operando en período de gracia offline (${remainingHours}h restantes). Plan: ${gracePayload.plan}`);
+      return { status: 'GRACE_PERIOD', plan: gracePayload.plan };
     }
 
     this.licenseStatus = 'EXPIRED';
@@ -275,6 +319,7 @@ export class LicenseService {
     }
 
     await this.secureStore.deleteLicenseToken();
+    await this.secureStore.deleteLicenseProof();
     this.configManager.setLicenseKey(undefined);
     this.licenseStatus = 'UNLICENSED';
     this.activePlan = undefined;

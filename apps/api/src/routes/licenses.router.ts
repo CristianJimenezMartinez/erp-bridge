@@ -10,9 +10,28 @@ import { requireAuth, requireRole, AuthenticatedRequest, computeOrganizationIdFr
 import { getLatestInstallerUrl } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
 import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
+import { LicenseProofService } from '../services/license-proof.service';
 
 export const licensesRouter = Router();
 const licenseService = new LicenseService();
+
+/**
+ * Deriva una prueba Ed25519 a partir de un token HS256 ya verificado por el servidor.
+ * Devuelve undefined si el servidor no tiene clave de firma (modo compatible) o el token no es válido.
+ */
+function buildLicenseProof(token?: string): { payload: string; signature: string } | undefined {
+  if (!token || !LicenseProofService.isConfigured()) return undefined;
+  const verification = LicenseTokenManager.verifyToken(token);
+  if (!verification.valid || !verification.payload) return undefined;
+  const p = verification.payload;
+  return LicenseProofService.sign({
+    licenseId: p.licenseId,
+    hwid: p.hwid,
+    plan: String(p.plan),
+    issuedAt: p.issuedAt,
+    expiresAt: p.expiresAt,
+  }) || undefined;
+}
 
 function getOrgId(req: Request): string {
   const authReq = req as AuthenticatedRequest;
@@ -618,6 +637,11 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
       }
     }
 
+    const activationProof = buildLicenseProof(result.licenseToken);
+    if (activationProof) {
+      (result as any).licenseProof = activationProof;
+    }
+
     return res.status(200).json({ data: result });
   } catch (error) {
     return next(error);
@@ -661,6 +685,11 @@ licensesRouter.post('/licenses/validate', async (req: Request, res: Response, ne
           }
         }
       }
+    }
+
+    const validationProof = buildLicenseProof(result.renewedToken || validated.licenseToken);
+    if (validationProof) {
+      (result as any).licenseProof = validationProof;
     }
 
     return res.status(200).json({ data: result });

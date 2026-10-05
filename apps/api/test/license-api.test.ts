@@ -1,10 +1,16 @@
 import assert from 'assert';
 import http from 'http';
+import crypto from 'crypto';
 import { bootstrapApp } from '../src/server';
 import { AuthService } from '../src/routes/auth.router';
 
 async function run() {
   console.log('--- Running License API E2E Tests ---');
+
+  const { publicKey: testPublicKey, privateKey: testPrivateKey } = crypto.generateKeyPairSync('ed25519');
+  process.env['LICENSE_SIGNING_PRIVATE_KEY'] = Buffer.from(
+    testPrivateKey.export({ type: 'pkcs8', format: 'pem' }).toString(),
+  ).toString('base64');
 
   const app = await bootstrapApp();
   const server = http.createServer(app);
@@ -73,6 +79,24 @@ async function run() {
     assert.strictEqual(actJson.data.success, true);
     assert(actJson.data.licenseToken);
 
+    // 2.1 La activación entrega una prueba Ed25519 verificable solo con la clave pública
+    const verifyProof = (proof: { payload: string; signature: string } | undefined) => {
+      assert(proof && proof.payload && proof.signature, 'Debe entregar licenseProof');
+      const ok = crypto.verify(
+        null,
+        Buffer.from('bentian-license-proof-v1\n' + proof.payload, 'utf8'),
+        testPublicKey,
+        Buffer.from(proof.signature, 'base64url'),
+      );
+      assert.strictEqual(ok, true, 'La firma Ed25519 debe verificar con la clave pública');
+      const claims = JSON.parse(Buffer.from(proof.payload, 'base64url').toString('utf8'));
+      assert.strictEqual(claims.v, 1);
+      assert.strictEqual(claims.hwid, hwid);
+      assert.strictEqual(claims.plan, 'starter');
+      assert(claims.expiresAt > Date.now());
+    };
+    verifyProof((actJson.data as any).licenseProof);
+
     // 3. Validate and Renew Token via API
     const valRes = await fetch(`${baseUrl}/api/v1/licenses/validate`, {
       method: 'POST',
@@ -87,6 +111,7 @@ async function run() {
     const valJson = (await valRes.json()) as { data: { valid: boolean; renewedToken: string } };
     assert.strictEqual(valJson.data.valid, true);
     assert(valJson.data.renewedToken);
+    verifyProof((valJson.data as any).licenseProof);
 
     // 4. Get License info with activations (Admin protected)
     const infoRes = await fetch(`${baseUrl}/api/v1/licenses/${licenseKey}`, {

@@ -5,6 +5,14 @@ import os from 'os';
 import { LicenseService } from '../src/license/license.service';
 import { ConfigManager } from '../src/config/config.manager';
 import { LicenseTokenManager } from '@erp-bridge/core';
+import crypto from 'crypto';
+import { LICENSE_PROOF_DOMAIN } from '../src/license/license-proof';
+
+function signProof(privateKey: crypto.KeyObject, claims: Record<string, unknown>) {
+  const payload = Buffer.from(JSON.stringify({ v: 1, ...claims }), 'utf8').toString('base64url');
+  const signature = crypto.sign(null, Buffer.from(LICENSE_PROOF_DOMAIN + payload, 'utf8'), privateKey).toString('base64url');
+  return { payload, signature };
+}
 
 console.log('--- Running Clock Rollback & License Tampering Protection Tests ---');
 
@@ -17,7 +25,9 @@ async function runTests() {
       agentId: 'agent_test_clock',
       apiBaseUrl: 'http://127.0.0.1:59999', // Simula desconexión para probar período de gracia offline
     });
-    const licenseService = new LicenseService(configManager, undefined, tmpDir);
+    const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
+    const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const licenseService = new LicenseService(configManager, undefined, tmpDir, publicKeyPem);
 
     const hwid = await licenseService.getHWID();
     const now = Date.now();
@@ -34,6 +44,15 @@ async function runTests() {
 
     // Guardar token en el almacén seguro del servicio
     await (licenseService as any).secureStore.saveLicenseToken(validToken, hwid);
+    // El periodo de gracia offline exige una prueba Ed25519 emitida por el servidor
+    const validProof = signProof(privateKey, {
+      licenseId: '11111111-2222-3333-4444-555555555555',
+      hwid,
+      plan: 'professional',
+      issuedAt: now - 3600 * 1000,
+      expiresAt: now + 24 * 3600 * 1000,
+    });
+    await (licenseService as any).secureStore.saveLicenseProof(JSON.stringify(validProof), hwid);
 
     // 2. Validar licencia normal (offline grace period)
     console.log('1. Probando validación normal sin manipulación...');

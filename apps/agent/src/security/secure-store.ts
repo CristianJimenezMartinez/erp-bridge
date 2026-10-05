@@ -13,6 +13,7 @@ export class SecureStore {
   private readonly licenseFilePath: string;
   private readonly timestampFilePath: string;
   private readonly onlineTimestampFilePath: string;
+  private readonly licenseProofFilePath: string;
 
   constructor(customDir?: string) {
     if (customDir) {
@@ -24,6 +25,7 @@ export class SecureStore {
     this.licenseFilePath = path.join(this.storageDir, 'license.enc');
     this.timestampFilePath = path.join(this.storageDir, 'clock.enc');
     this.onlineTimestampFilePath = path.join(this.storageDir, 'online.enc');
+    this.licenseProofFilePath = path.join(this.storageDir, 'license-proof.enc');
   }
 
   public getStoragePath(): string {
@@ -184,6 +186,49 @@ export class SecureStore {
       return isNaN(val) ? 0 : val;
     } catch {
       return 0;
+    }
+  }
+
+  /**
+   * Persiste la prueba de licencia Ed25519 (JSON) cifrada y vinculada al HWID.
+   */
+  public async saveLicenseProof(proofJson: string, hwid: string): Promise<void> {
+    try {
+      if (!fs.existsSync(this.storageDir)) {
+        fs.mkdirSync(this.storageDir, { recursive: true });
+      }
+      const key = this.deriveKey(hwid);
+      const iv = crypto.randomBytes(IV_LENGTH);
+      const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+      const ciphertext = Buffer.concat([cipher.update(proofJson, 'utf8'), cipher.final()]);
+      const authTag = cipher.getAuthTag();
+      fs.writeFileSync(this.licenseProofFilePath, Buffer.concat([iv, authTag, ciphertext]));
+    } catch {}
+  }
+
+  public async loadLicenseProof(hwid: string): Promise<string | null> {
+    if (!fs.existsSync(this.licenseProofFilePath)) {
+      return null;
+    }
+    try {
+      const payload = fs.readFileSync(this.licenseProofFilePath);
+      if (payload.length < IV_LENGTH + TAG_LENGTH) return null;
+      const iv = payload.subarray(0, IV_LENGTH);
+      const authTag = payload.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
+      const ciphertext = payload.subarray(IV_LENGTH + TAG_LENGTH);
+      const decipher = crypto.createDecipheriv(ALGORITHM, this.deriveKey(hwid), iv);
+      decipher.setAuthTag(authTag);
+      return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+    } catch {
+      return null;
+    }
+  }
+
+  public async deleteLicenseProof(): Promise<void> {
+    if (fs.existsSync(this.licenseProofFilePath)) {
+      try {
+        fs.unlinkSync(this.licenseProofFilePath);
+      } catch {}
     }
   }
 }
