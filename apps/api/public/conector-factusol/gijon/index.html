@@ -94,17 +94,61 @@
         "name": "Bentian ERP Bridge - Gijón",
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
-        "softwareVersion": "0.3.6",
+        "softwareVersion": "0.3.7",
         "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
         "image": "https://bridge.cristianjm.com/assets/og-preview.png",
-        "url": "https://bridge.cristianjm.com/conector-factusol/gijon/",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-ANNUAL",
+        "mpn": "EB-037",
         "offers": {
           "@type": "Offer",
           "price": "199.00",
           "priceCurrency": "EUR",
           "priceValidUntil": "2027-12-31",
-          "url": "https://bridge.cristianjm.com/#precios",
-          "availability": "https://schema.org/InStock"
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 60,
+            "returnMethod": "https://schema.org/ReturnOnline",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
         }
       },
       {
@@ -169,7 +213,7 @@
         <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden lg:inline">Clientes</a>
         <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
           <span>Descargar Agente</span>
-          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v0.3.6</span>
+          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v0.3.7</span>
         </a>
       </nav>
     </div>
@@ -209,7 +253,7 @@
             Ver Condiciones de la Beta Gratuita
           </a>
         </div>
-        <p class="mt-4 text-xs text-zinc-500 font-mono">Release oficial <span data-app-version>v0.3.6</span> para Windows x64 • Compatible Factusol 2018-2026</p>
+        <p class="mt-4 text-xs text-zinc-500 font-mono">Release oficial <span data-app-version>v0.3.7</span> para Windows x64 • Compatible Factusol 2018-2026</p>
       </div>
     </section>
 

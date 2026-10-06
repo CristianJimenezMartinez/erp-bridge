@@ -236,14 +236,58 @@ function renderCityPage(city: CityData, currentVersion: string): string {
         "softwareVersion": "${currentVersion}",
         "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
         "image": "https://bridge.cristianjm.com/assets/og-preview.png",
-        "url": "https://bridge.cristianjm.com/conector-factusol/${city.slug}/",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-ANNUAL",
+        "mpn": "EB-037",
         "offers": {
           "@type": "Offer",
           "price": "199.00",
           "priceCurrency": "EUR",
           "priceValidUntil": "2027-12-31",
-          "url": "https://bridge.cristianjm.com/#precios",
-          "availability": "https://schema.org/InStock"
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 60,
+            "returnMethod": "https://schema.org/ReturnOnline",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
         }
       },
       {
