@@ -3,6 +3,17 @@
  * Gestión de la vista del cliente final: estado de conexión Factusol, HWID y mudanza de máquina.
  */
 
+function _safeEscapeHtml(str) {
+  if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 let _currentClientPortalLicense = null;
 
 async function loadClientPortal(selectedKeyOrId) {
@@ -44,7 +55,7 @@ async function loadClientPortal(selectedKeyOrId) {
           const alias = l.alias || l.key;
           const host = l.activations?.[0]?.machineInfo?.hostname || 'Sin asignar';
           const isSelected = (selectedKeyOrId && (l.id === selectedKeyOrId || l.key === selectedKeyOrId)) ? 'selected' : '';
-          return `<option value="${l.id}" ${isSelected}>${alias} (${host})</option>`;
+          return `<option value="${_safeEscapeHtml(l.id)}" ${isSelected}>${_safeEscapeHtml(alias)} (${_safeEscapeHtml(host)})</option>`;
         }).join('');
       }
     } else {
@@ -80,7 +91,7 @@ async function loadClientPortal(selectedKeyOrId) {
     if (subStatus) {
       subStatus.innerHTML = isActive
         ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Suscripción al día'
-        : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Estado: ' + target.status;
+        : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Estado: ' + _safeEscapeHtml(target.status);
     }
 
     // Banner de upgrade al Plan Fundador si la licencia es BETA o está EXPIRADA

@@ -525,8 +525,9 @@ licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Authenticat
   try {
     const id = req.params['id']!;
     const { alias } = req.body as { alias: string };
-    if (!alias || typeof alias !== 'string') {
-      return res.status(400).json({ error: { message: 'El alias no puede estar vacío' } });
+    const cleanAlias = typeof alias === 'string' ? alias.trim() : '';
+    if (!cleanAlias || cleanAlias.length > 80 || /[<>"'`]/.test(cleanAlias)) {
+      return res.status(400).json({ error: { message: 'El alias debe tener entre 1 y 80 caracteres y no contener caracteres especiales (<, >, ", \', `)' } });
     }
     const lic = await licenseService.getLicenseById(id);
     if (!lic) {
@@ -536,8 +537,8 @@ licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Authenticat
     if (!isSuperadmin && lic.organizationId !== req.user?.organizationId) {
       return res.status(403).json({ error: { message: 'No tienes permiso para modificar esta licencia' } });
     }
-    await licenseService.updateLicenseAlias(id, alias.trim());
-    return res.json({ success: true, id, alias: alias.trim() });
+    await licenseService.updateLicenseAlias(id, cleanAlias);
+    return res.json({ success: true, id, alias: cleanAlias });
   } catch (error) {
     return next(error);
   }
@@ -548,8 +549,8 @@ licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: Authenticat
   try {
     const id = req.params['id']!;
     const { hwid } = req.body as { hwid: string };
-    if (!hwid) {
-      return res.status(400).json({ error: { message: 'Se requiere el HWID de la máquina a desvincular' } });
+    if (!hwid || typeof hwid !== 'string' || !/^[A-Za-z0-9_-]{16,64}$/.test(hwid)) {
+      return res.status(400).json({ error: { message: 'HWID con formato no válido (debe ser alfanumérico entre 16 y 64 caracteres)' } });
     }
     const lic = await licenseService.getLicenseById(id);
     if (!lic) {
@@ -606,6 +607,12 @@ licensesRouter.get('/licenses/:key', requireAuth, async (req: AuthenticatedReque
 licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', windowMs: 15*60*1000, max: 60 }), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = LicenseActivationRequestSchema.parse(req.body);
+
+    // Sanear machineInfo.hostname para prevenir Stored XSS en dashboards
+    if (validated.machineInfo && typeof (validated.machineInfo as any).hostname === 'string') {
+      const rawHost = String((validated.machineInfo as any).hostname).trim();
+      (validated.machineInfo as any).hostname = rawHost.substring(0, 64).replace(/[<>"'`]/g, '');
+    }
 
     // Verificación previa de expiración
     const keyValidation = LicenseKeyGenerator.validate(validated.licenseKey);

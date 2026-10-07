@@ -10,6 +10,16 @@ async function main() {
   console.log('--- org-scope: aislamiento por organización ---');
   const foreign = { 'x-organization-id': 'org_ajena' };
 
+  assert.throws(
+    () => resolveOrgId(fakeReq(null, foreign)),
+    /Autenticación requerida/,
+    'Sin autenticación debe lanzar error 401 Unauthorized'
+  );
+  assert.throws(
+    () => resolveOrgId(fakeReq(undefined, foreign)),
+    /Autenticación requerida/,
+    'Sin autenticación debe lanzar error 401 Unauthorized'
+  );
   assert.strictEqual(resolveOrgId(fakeReq({ role: 'RESELLER', organizationId: 'org_partner' }, foreign)), 'org_partner',
     'RESELLER no puede cambiar de organización con la cabecera');
   assert.strictEqual(resolveOrgId(fakeReq({ role: 'RESELLER', organizationId: 'org_partner' }, {}, { organizationId: 'org_ajena' })), 'org_partner',
@@ -19,7 +29,7 @@ async function main() {
   assert.strictEqual(resolveOrgId(fakeReq({ role: 'SUPERADMIN', organizationId: 'org_root' }, foreign)), 'org_ajena',
     'SUPERADMIN sí puede operar sobre cualquier organización');
   assert.strictEqual(resolveOrgId(fakeReq({ role: 'ADMIN', organizationId: 'org_root' })), 'org_root');
-  console.log('  ✓ Solo SUPERADMIN/ADMIN pueden apuntar a otra organización.');
+  console.log('  ✓ Sin auth lanza 401; solo SUPERADMIN/ADMIN pueden apuntar a otra organización.');
 
   console.log('--- keyed-mutex: serialización de activaciones ---');
   let active = 0;

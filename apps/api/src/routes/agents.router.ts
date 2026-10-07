@@ -236,16 +236,31 @@ agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, n
         }
       }
 
+      // Proteger asignación: no degradar agentes existentes a org_default
+      if (orgId === 'org_default') {
+        const existing = await db.query(
+          `SELECT organization_id FROM agents WHERE id = $1 LIMIT 1`,
+          [validated.agentId]
+        ).catch(() => ({ rows: [] }));
+        if (existing.rows[0]?.organization_id && existing.rows[0].organization_id !== 'org_default') {
+          orgId = existing.rows[0].organization_id;
+        }
+      }
+
       const agentName = req.body.systemInfo?.hostname || req.body.name || 'Servidor Factusol';
       const version = validated.version || (req.body.version as string) || '0.3.0';
       const platform = req.body.systemInfo?.platform || req.body.platform || 'win32';
-      const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || null;
+      const ip = req.ip || (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || null;
 
       await db.query(
         `INSERT INTO agents (id, organization_id, name, status, version, last_seen_at, ip_address, platform, updated_at)
          VALUES ($1, $2, $3, 'ONLINE', $4, CURRENT_TIMESTAMP, $5, $6, CURRENT_TIMESTAMP)
          ON CONFLICT (id) DO UPDATE
-         SET organization_id = EXCLUDED.organization_id,
+         SET organization_id = CASE
+               WHEN EXCLUDED.organization_id IS NOT NULL AND EXCLUDED.organization_id <> 'org_default'
+               THEN EXCLUDED.organization_id
+               ELSE agents.organization_id
+             END,
              name = EXCLUDED.name,
              status = 'ONLINE',
              version = EXCLUDED.version,

@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AgentMonitorService } from '../services/agent-monitor.service';
 import { requireAuth, AuthenticatedRequest } from './auth.router';
+import { resolveOrgId } from './org-scope';
 
 export const monitoringRouter = Router();
 const agentMonitorService = new AgentMonitorService();
@@ -10,7 +11,7 @@ const agentMonitorService = new AgentMonitorService();
  * Reporte del estado de la flota de agentes (activos, degradados, inactivos).
  * Query params opcionales:
  *  - thresholdHours: Umbral de horas sin latido para considerar a un agente inactivo/caído (default: 24)
- *  - organizationId: Filtrar por ID de organización (opcional)
+ *  - organizationId: Filtrar por ID de organización (opcional, solo SUPERADMIN/ADMIN)
  */
 monitoringRouter.get('/monitoring/agents/health', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -19,13 +20,16 @@ monitoringRouter.get('/monitoring/agents/health', requireAuth, async (req: Reque
       ? Math.max(1, Number(req.query['thresholdHours']) || 24)
       : 24;
 
-    let organizationId =
-      (req.headers['x-organization-id'] as string) ||
-      (req.query['organizationId'] as string) ||
-      undefined;
+    const isSuper = authReq.user?.role === 'SUPERADMIN' || authReq.user?.role === 'ADMIN';
+    let organizationId: string | undefined;
 
-    if (authReq.user && authReq.user.role === 'TENANT_CLIENT') {
-      organizationId = authReq.user.organizationId;
+    if (isSuper) {
+      organizationId =
+        (req.headers['x-organization-id'] as string) ||
+        (req.query['organizationId'] as string) ||
+        undefined;
+    } else {
+      organizationId = resolveOrgId(req);
     }
 
     const report = await agentMonitorService.getFleetHealth(organizationId, thresholdHours);

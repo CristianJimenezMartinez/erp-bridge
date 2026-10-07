@@ -35,7 +35,42 @@ dotenv.config();
 
 const logger = new Logger('Server');
 
+export function assertProductionSecrets(): void {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const requiredSecrets = [
+    { name: 'ADMIN_JWT_SECRET', minLength: 32, disallowed: ['default', 'secret', 'changeme', 'test', 'admin_secret'] },
+    { name: 'LICENSE_JWT_SECRET', minLength: 32, disallowed: ['default', 'secret', 'changeme', 'test', 'license_secret'] },
+    { name: 'LICENSE_SIGNING_PRIVATE_KEY', minLength: 32, disallowed: ['default', 'placeholder', 'changeme'] },
+    { name: 'PARTNER_SECRET', minLength: 16, disallowed: ['default', 'secret', 'changeme', 'partnersecret2026!'] },
+  ];
+
+  const missingOrInvalid: string[] = [];
+
+  for (const item of requiredSecrets) {
+    const val = process.env[item.name];
+    if (!val || !val.trim()) {
+      missingOrInvalid.push(`${item.name} is missing or empty`);
+      continue;
+    }
+    const clean = val.trim();
+    if (item.minLength && clean.length < item.minLength) {
+      missingOrInvalid.push(`${item.name} length is below minimum required (${clean.length} < ${item.minLength})`);
+    }
+    if (item.disallowed.some((d) => clean.toLowerCase().includes(d.toLowerCase()))) {
+      missingOrInvalid.push(`${item.name} contains insecure placeholder value`);
+    }
+  }
+
+  if (missingOrInvalid.length > 0) {
+    const msg = `CRITICAL SECURITY CONFIGURATION ERROR (production):\n  - ${missingOrInvalid.join('\n  - ')}`;
+    logger.error(msg);
+    throw new Error(msg);
+  }
+}
+
 export async function bootstrapApp(): Promise<Express> {
+  assertProductionSecrets();
   const app = express();
 
   // Middleware
@@ -109,39 +144,92 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', monitoringRouter);
   app.use(monitoringRouter);
   app.use('/api/v1', notificationsRouter);
-  app.use(notificationsRouter);
+  // Eliminado app.use(notificationsRouter) sin prefijo para mitigar relé de email abierto (API-007)
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)
   const releasesDir = path.resolve(__dirname, '../../../releases');
-  // Resilient resolver para descargas canónicas /releases/latest/:filename
+  const ALLOWED_RELEASE_FILES = new Set([
+    'Bentian-Setup.exe',
+    'Bentian-Setup.zip',
+    'BentianAgent-Portable.zip',
+    'BentianAgent.exe',
+    'latest.json',
+    'manifest.json',
+    'checksums.txt',
+    'erp-bridge-endpoint.php',
+  ]);
+
+  // Resilient resolver para descargas canónicas /releases/latest/:filename (API-001 / INF-002)
   app.get('/releases/latest/:filename', (req, res) => {
     const filename = req.params.filename;
-    // 1. Si existe en releases/latest/:filename en disco, servir directamente
-    const physicalPath = path.join(releasesDir, 'latest', filename);
-    if (fs.existsSync(physicalPath)) {
-      return res.sendFile(physicalPath);
+    if (!ALLOWED_RELEASE_FILES.has(filename) || filename !== path.basename(filename)) {
+      return res.status(404).end();
+    }
+    const base = path.resolve(releasesDir, 'latest');
+    const target = path.resolve(base, filename);
+    if (!target.startsWith(base + path.sep)) {
+      return res.status(403).end();
+    }
+    if (fs.existsSync(target)) {
+      return res.sendFile(target, { dotfiles: 'deny' });
     }
 
     // 2. Si no existe la carpeta latest física (ej: dev local), resolver desde la versión canónica
     const version = getLatestReleasedVersion();
-    const versionDir = path.join(releasesDir, `v${version}`);
+    const versionBase = path.resolve(releasesDir, `v${version}`);
+    let versionTarget = path.resolve(versionBase, filename);
 
-    let targetFile = path.join(versionDir, filename);
-    if (!fs.existsSync(targetFile)) {
+    if (!fs.existsSync(versionTarget)) {
       if (filename === 'Bentian-Setup.exe') {
-        targetFile = path.join(versionDir, `Bentian-Setup-v${version}.exe`);
+        versionTarget = path.resolve(versionBase, `Bentian-Setup-v${version}.exe`);
       } else if (filename === 'Bentian-Setup.zip') {
-        targetFile = path.join(versionDir, `Bentian-Setup-v${version}.zip`);
+        versionTarget = path.resolve(versionBase, `Bentian-Setup-v${version}.zip`);
       } else if (filename === 'BentianAgent-Portable.zip') {
-        targetFile = path.join(versionDir, `BentianAgent-v${version}-Portable.zip`);
+        versionTarget = path.resolve(versionBase, `BentianAgent-v${version}-Portable.zip`);
       }
     }
 
-    if (fs.existsSync(targetFile)) {
-      return res.sendFile(targetFile);
+    if (versionTarget.startsWith(versionBase + path.sep) && fs.existsSync(versionTarget)) {
+      return res.sendFile(versionTarget, { dotfiles: 'deny' });
     }
 
     return res.status(404).json({ error: { message: `Archivo ${filename} no encontrado para la versión v${version}` } });
+  });
+
+  // Resolver por versión específica /releases/:version/:filename con whitelist y anti-traversal
+  app.get('/releases/:version/:filename', (req, res) => {
+    const { version, filename } = req.params;
+    if (!ALLOWED_RELEASE_FILES.has(filename) || filename !== path.basename(filename)) {
+      return res.status(404).end();
+    }
+    if (!version || version !== path.basename(version) || !/^v?\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
+      return res.status(404).end();
+    }
+
+    const cleanVer = version.startsWith('v') ? version.slice(1) : version;
+    const baseCandidates = [
+      path.resolve(releasesDir, `v${cleanVer}`),
+      path.resolve(releasesDir, cleanVer),
+    ];
+
+    for (const base of baseCandidates) {
+      if (!base.startsWith(releasesDir + path.sep)) continue;
+      let target = path.resolve(base, filename);
+      if (!fs.existsSync(target)) {
+        if (filename === 'Bentian-Setup.exe') {
+          target = path.resolve(base, `Bentian-Setup-v${cleanVer}.exe`);
+        } else if (filename === 'Bentian-Setup.zip') {
+          target = path.resolve(base, `Bentian-Setup-v${cleanVer}.zip`);
+        } else if (filename === 'BentianAgent-Portable.zip') {
+          target = path.resolve(base, `BentianAgent-v${cleanVer}-Portable.zip`);
+        }
+      }
+      if (target.startsWith(base + path.sep) && fs.existsSync(target)) {
+        return res.sendFile(target, { dotfiles: 'deny' });
+      }
+    }
+
+    return res.status(404).json({ error: { message: `Archivo ${filename} no encontrado para la versión ${version}` } });
   });
 
   app.use('/releases', (req, res, next): void => {

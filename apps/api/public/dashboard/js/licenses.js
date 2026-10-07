@@ -104,16 +104,16 @@ function renderLicenses(list) {
         <td class="p-3">
           <div class="flex items-center gap-2">
             <span class="font-semibold text-zinc-100 text-xs">${_safeEscapeHtml(lic.alias || 'Servidor Factusol')}</span>
-            <button onclick="openEditAliasModal('${lic.id}', '${_safeEscapeHtml(lic.alias || '')}')" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
+            <button data-action="edit-alias" data-license-id="${_safeEscapeHtml(lic.id)}" data-alias="${_safeEscapeHtml(lic.alias || '')}" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>
           </div>
-          <span class="text-[10px] text-zinc-500 font-mono">ID: ${lic.id.substring(0, 8)}</span>
+          <span class="text-[10px] text-zinc-500 font-mono">ID: ${_safeEscapeHtml(lic.id.substring(0, 8))}</span>
         </td>
         <td class="p-3 font-mono">
           <div class="flex items-center gap-2">
-            <span class="text-indigo-400 font-semibold text-xs tracking-wider">${lic.key}</span>
-            <button onclick="copyKey('${lic.key}')" title="Copiar Clave" class="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] flex items-center gap-1 transition">
+            <span class="text-indigo-400 font-semibold text-xs tracking-wider">${_safeEscapeHtml(lic.key)}</span>
+            <button data-action="copy-key" data-key="${_safeEscapeHtml(lic.key)}" title="Copiar Clave" class="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] flex items-center gap-1 transition">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
               <span>Copiar</span>
             </button>
@@ -142,12 +142,16 @@ function renderLicenses(list) {
         </td>
         <td class="p-3">
           <div class="text-zinc-200 text-xs font-medium">${_safeEscapeHtml(hostname)}</div>
-          <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${fullHwid}">HWID: ${shortHwid}</div>
+          <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${_safeEscapeHtml(fullHwid)}">HWID: ${_safeEscapeHtml(shortHwid)}</div>
         </td>
         <td class="p-3 text-right">
           ${hasMachine ? `
             <button 
-              onclick="openUnbindModal('${lic.id}', '${_safeEscapeHtml(lic.key)}', '${_safeEscapeHtml(hostname)}', '${act.hwid}')" 
+              data-action="unbind-license"
+              data-license-id="${_safeEscapeHtml(lic.id)}" 
+              data-key="${_safeEscapeHtml(lic.key)}" 
+              data-hostname="${_safeEscapeHtml(hostname)}" 
+              data-hwid="${_safeEscapeHtml(act.hwid || '')}" 
               class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
@@ -160,6 +164,40 @@ function renderLicenses(list) {
       </tr>
     `;
   }).join('');
+
+  if (!tbody._eventsAttached) {
+    tbody.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('[data-action="edit-alias"]');
+      if (editBtn) {
+        const id = editBtn.getAttribute('data-license-id') || '';
+        const alias = editBtn.getAttribute('data-alias') || '';
+        openEditAliasModal(id, alias);
+        return;
+      }
+      const unbindBtn = e.target.closest('[data-action="unbind-license"]');
+      if (unbindBtn) {
+        const id = unbindBtn.getAttribute('data-license-id') || '';
+        const key = unbindBtn.getAttribute('data-key') || '';
+        const hostname = unbindBtn.getAttribute('data-hostname') || '';
+        const hwid = unbindBtn.getAttribute('data-hwid') || '';
+        openUnbindModal(id, key, hostname, hwid);
+        return;
+      }
+      const copyBtn = e.target.closest('[data-action="copy-key"]');
+      if (copyBtn) {
+        const key = copyBtn.getAttribute('data-key') || '';
+        if (typeof window.copyKey === 'function') {
+          window.copyKey(key);
+        } else if (navigator.clipboard) {
+          navigator.clipboard.writeText(key).then(() => {
+            _safeShowToast('✓ Clave copiada al portapapeles', 'success');
+          });
+        }
+        return;
+      }
+    });
+    tbody._eventsAttached = true;
+  }
 }
 
 async function loadFleetOverview() {

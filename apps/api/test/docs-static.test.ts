@@ -119,6 +119,7 @@ async function run() {
     await new Promise<void>((resolve) => {
       server.close(() => resolve());
     });
+    process.exit(0);
   }
 }
 

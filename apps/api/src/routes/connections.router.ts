@@ -5,7 +5,7 @@ import {
   TestConnectionDtoSchema,
   UpdateConnectionDtoSchema,
 } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 import { resolveOrgId } from './org-scope';
 
 export const connectionsRouter = Router();
@@ -32,7 +32,10 @@ connectionsRouter.get('/connections', async (req: Request, res: Response, next: 
 connectionsRouter.post('/connections', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const body = { ...req.body, organizationId: req.body.organizationId || orgId };
+    const authReq = req as AuthenticatedRequest;
+    const isSuper = authReq.user?.role === 'SUPERADMIN' || authReq.user?.role === 'ADMIN';
+    const targetOrgId = isSuper && req.body.organizationId ? req.body.organizationId : orgId;
+    const body = { ...req.body, organizationId: targetOrgId };
     const validated = CreateConnectionDtoSchema.parse(body);
     const conn = await connectionService.create(validated);
     res.status(201).json({ data: conn });
@@ -54,7 +57,13 @@ connectionsRouter.get('/connections/:id', async (req: Request, res: Response, ne
 connectionsRouter.put('/connections/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const validated = UpdateConnectionDtoSchema.parse(req.body);
+    const authReq = req as AuthenticatedRequest;
+    const isSuper = authReq.user?.role === 'SUPERADMIN' || authReq.user?.role === 'ADMIN';
+    const body = { ...req.body };
+    if (!isSuper && 'organizationId' in body) {
+      body.organizationId = orgId;
+    }
+    const validated = UpdateConnectionDtoSchema.parse(body);
     const conn = await connectionService.update(orgId, req.params['id']!, validated);
     res.json({ data: conn });
   } catch (error) {

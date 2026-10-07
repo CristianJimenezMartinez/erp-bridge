@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { SyncScheduler, SyncService } from '@erp-bridge/core';
 import { CreateSyncJobDtoSchema, RunSyncJobDtoSchema } from '@erp-bridge/shared';
-import { requireAuth } from './auth.router';
+import { requireAuth, AuthenticatedRequest } from './auth.router';
 import { resolveOrgId } from './org-scope';
 
 export const syncRouter = Router();
@@ -28,7 +28,10 @@ syncRouter.get('/sync-jobs', async (req: Request, res: Response, next: NextFunct
 syncRouter.post('/sync-jobs', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const body = { ...req.body, organizationId: req.body.organizationId || orgId };
+    const authReq = req as AuthenticatedRequest;
+    const isSuper = authReq.user?.role === 'SUPERADMIN' || authReq.user?.role === 'ADMIN';
+    const targetOrgId = isSuper && req.body.organizationId ? req.body.organizationId : orgId;
+    const body = { ...req.body, organizationId: targetOrgId };
     const validated = CreateSyncJobDtoSchema.parse(body);
     const job = await syncService.createJob(validated);
     if (job.status === 'ACTIVE' && job.schedule && job.schedule !== 'manual') {
@@ -125,7 +128,7 @@ syncRouter.get('/sync-executions/:id', async (req: Request, res: Response, next:
   }
 });
 
-syncRouter.post('/sync/run-reactive', async (req: Request, res: Response, next: NextFunction) => {
+syncRouter.post('/sync/run-reactive', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
     const { agentId, reason, timestamp } = req.body || {};

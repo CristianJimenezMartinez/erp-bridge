@@ -73,7 +73,7 @@ async function loadFleetHealthData() {
                 <span class="w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50' : 'bg-zinc-600'}"></span>
                 <span class="font-semibold text-white text-xs">${_safeEscapeHtml(a.name || 'Servidor Factusol')}</span>
               </div>
-              <div class="text-[10px] text-zinc-500 font-mono mt-0.5">${_safeEscapeHtml(a.platform || 'win32')}${shortHwid ? ' · ' + shortHwid : ''}</div>
+              <div class="text-[10px] text-zinc-500 font-mono mt-0.5">${_safeEscapeHtml(a.platform || 'win32')}${shortHwid ? ' · ' + _safeEscapeHtml(shortHwid) : ''}</div>
             </td>
             <td class="py-3.5 px-4">
               <div class="font-medium text-zinc-200 text-xs">${_safeEscapeHtml(a.organizationName || a.companyName || a.organization_id || 'Cliente')}</div>

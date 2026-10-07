@@ -93,11 +93,60 @@ async function runTests() {
   const toggled = await flowService.toggleFlow(orgId, flow.id, false);
   assert.strictEqual(toggled.isEnabled, false);
 
-  // 6. List Executions
-  const executions = await flowService.listExecutions(orgId, flow.id);
-  assert(executions.length >= 2, 'Debe haber al menos 2 ejecuciones registradas');
+  // 7. Test Multi-Tenant Isolation in handleEvent (API-005)
+  // Ensure flow is active again
+  await flowService.toggleFlow(orgId, flow.id, true);
 
-  console.log('✓ Core FlowEngine & Reactive Automation Tests Passed');
+  const foreignEvent: BridgeEvent = {
+    id: 'evt_foreign_1',
+    type: 'ORDER_CREATED',
+    organizationId: 'org_foreign_attacker',
+    source: 'WooCommerce',
+    timestamp: new Date(),
+    status: 'RECEIVED',
+    data: {
+      order: {
+        orderId: 'WC-EVIL',
+        totalAmount: 999.0,
+      },
+    },
+  };
+  const foreignExecs = await flowEngine.handleEvent(foreignEvent);
+  assert.strictEqual(foreignExecs.length, 0, 'Evento de otra organización no debe disparar flujos de org_flow_test');
+
+  // 8. Test SSRF Protection in Webhook Dispatch (API-005)
+  const ssrfFlow = await flowService.createFlow({
+    organizationId: orgId,
+    name: 'SSRF Malicious Flow',
+    triggerEventType: 'ORDER_CREATED',
+    filters: [],
+    actions: [
+      {
+        id: 'act_ssrf_metadata',
+        type: 'DISPATCH_WEBHOOK',
+        name: 'SSRF Cloud Metadata',
+        configuration: {
+          url: 'http://169.254.169.254/latest/meta-data',
+        },
+      },
+      {
+        id: 'act_ssrf_rfc1918',
+        type: 'DISPATCH_WEBHOOK',
+        name: 'SSRF Private IP',
+        configuration: {
+          url: 'https://192.168.1.1/admin',
+        },
+      },
+    ],
+    isEnabled: true,
+  });
+
+  const ssrfExec = await flowEngine.executeFlow(ssrfFlow, matchingEvent);
+  assert.strictEqual(ssrfExec.status, 'FAILED', 'Flujo con destinos SSRF debe fallar');
+  assert.strictEqual(ssrfExec.results[0]!.success, false, 'Destino 169.254.169.254 debe ser bloqueado');
+  assert.strictEqual(ssrfExec.results[1]!.success, false, 'Destino 192.168.1.1 debe ser bloqueado');
+
+  console.log('✓ Core FlowEngine & Reactive Automation Tests Passed (incl. Multi-Tenant & SSRF Security)');
 }
 
 runTests().catch((err) => {

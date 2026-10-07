@@ -529,23 +529,46 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
  */
 billingRouter.post('/billing/create-portal-session', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    let { email, customerId, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
+    let { returnUrl = DEFAULT_DASHBOARD_URL } = req.body || {};
     const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
 
-    // Aislamiento: si es un cliente normal, forzar su propio email del token verificado
-    if (!isSuperadmin && req.user?.role === 'TENANT_CLIENT') {
-      const userSub = req.user?.sub || '';
-      if (userSub.includes('@')) {
-        email = userSub;
+    // Validar returnUrl para que pertenezca al dominio configurado (o localhost en no-prod)
+    try {
+      const parsedUrl = new URL(returnUrl);
+      const defaultHost = new URL(DEFAULT_DASHBOARD_URL).host;
+      const isDevLocal = process.env.NODE_ENV !== 'production' && (parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1');
+      if (parsedUrl.host !== defaultHost && !isDevLocal) {
+        logger.warn(`returnUrl rechazado por no pertenecer al dominio configurado: ${returnUrl}`);
+        returnUrl = DEFAULT_DASHBOARD_URL;
+      }
+    } catch {
+      returnUrl = DEFAULT_DASHBOARD_URL;
+    }
+
+    // Resolver Stripe Customer ID desde la base de datos para la organización del usuario
+    const db = DatabaseService.getInstance();
+    let effectiveCustomerId: string | null = null;
+    const orgId = isSuperadmin && req.body?.organizationId ? req.body.organizationId : req.user?.organizationId;
+
+    if (isSuperadmin && req.body?.customerId) {
+      effectiveCustomerId = req.body.customerId;
+    } else if (db.isAvailable() && orgId) {
+      const custRow = await db.query(
+        `SELECT stripe_customer_id, customer_email FROM licenses 
+         WHERE organization_id = $1 AND stripe_customer_id IS NOT NULL AND stripe_customer_id <> '' 
+         ORDER BY updated_at DESC LIMIT 1`,
+        [orgId]
+      ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
+
+      if (custRow?.stripe_customer_id) {
+        effectiveCustomerId = custRow.stripe_customer_id;
       }
     }
 
-    logger.info(`Solicitud de Portal de Clientes de Stripe para ${customerId || email || 'desconocido'}`);
-
-    let effectiveCustomerId = customerId;
-    if (!effectiveCustomerId && email && STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
+    // Si aún no se encontró customerId y es superadmin buscando por email
+    if (!effectiveCustomerId && isSuperadmin && req.body?.email && STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
       try {
-        const custRes = await fetch(`https://api.stripe.com/v1/customers?email=${encodeURIComponent(email)}&limit=1`, {
+        const custRes = await fetch(`https://api.stripe.com/v1/customers?email=${encodeURIComponent(req.body.email)}&limit=1`, {
           headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
         });
         if (custRes.ok) {
@@ -558,6 +581,8 @@ billingRouter.post('/billing/create-portal-session', requireAuth, async (req: Au
         logger.warn(`No se pudo buscar cliente por email en Stripe: ${String(err)}`);
       }
     }
+
+    logger.info(`Solicitud de Portal de Clientes de Stripe para ${effectiveCustomerId || orgId || 'desconocido'}`);
 
     if (STRIPE_SECRET_KEY && effectiveCustomerId && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
       const params = new URLSearchParams();
@@ -925,19 +950,20 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
  */
 billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const email = req.query['email'] as string;
-    if (!email) {
-      return res.status(400).json({ error: { message: 'Parámetro email requerido' } });
-    }
-    const cleanEmail = email.toLowerCase().trim();
     const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
-    if (!isSuperadmin && req.user?.role === 'TENANT_CLIENT') {
-      const userSub = (req.user?.sub || '').toLowerCase().trim();
-      if (userSub.includes('@') && userSub !== cleanEmail) {
-        return res.status(403).json({ error: { message: 'No tienes permiso para consultar licencias de otro email' } });
+    let orgId: string;
+
+    if (isSuperadmin) {
+      const email = req.query['email'] as string;
+      if (!email) {
+        return res.status(400).json({ error: { message: 'Parámetro email requerido' } });
       }
+      orgId = computeOrganizationIdFromEmail(email.toLowerCase().trim());
+    } else {
+      // Forzar exclusivamente la organización del usuario autenticado, ignorando el email de la query
+      orgId = req.user?.organizationId || computeOrganizationIdFromEmail((req.user?.sub || '').toLowerCase().trim());
     }
-    const orgId = computeOrganizationIdFromEmail(cleanEmail);
+
     const list = await licenseService.listLicenses(orgId);
     return res.json({ data: list });
   } catch (error) {

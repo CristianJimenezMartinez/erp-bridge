@@ -105,7 +105,7 @@ export interface LicenseActivationRequest {
 
 export const LicenseActivationRequestSchema = z.object({
   licenseKey: z.string().min(1),
-  hwid: z.string().min(16),
+  hwid: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/, 'HWID con formato no válido'),
   agentId: z.string().uuid().optional(),
   machineInfo: z.record(z.unknown()).optional(),
 });
@@ -136,7 +136,7 @@ export interface LicenseValidationRequest {
 
 export const LicenseValidationRequestSchema = z.object({
   licenseToken: z.string().min(1),
-  hwid: z.string().min(16),
+  hwid: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/, 'HWID con formato no válido'),
   agentVersion: z.string().optional(),
 });
 

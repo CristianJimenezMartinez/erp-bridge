@@ -19,7 +19,7 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Bentian-Signature, X-Bentian-Timestamp, X-Bentian-Agent-Version, Idempotency-Key, X-File-Path, X-Product-SKU');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Bridge-Key, X-Bentian-Signature, X-Bentian-Timestamp, X-Bentian-Agent-Version, Idempotency-Key, X-File-Path, X-Product-SKU');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -197,18 +197,19 @@ function getPublicImagesBaseDir() {
 }
 
 // ----------------------------------------------------------------------------
-// 5. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256 / BEARER
+// 5. AUTENTICACIÓN Y SEGURIDAD HMAC-SHA256 / BEARER / X-BRIDGE-KEY
 // ----------------------------------------------------------------------------
 function verifyAuthentication() {
     $secret = EB_SECRET_KEY;
-    if (empty($secret)) {
+    if (empty($secret) || strpos($secret, '%%EB_SECRET_KEY%%') !== false || strlen($secret) < 16) {
         http_response_code(503);
-        echo json_encode(['error' => 'Endpoint no configurado: Clave secreta no establecida (EB_SECRET_KEY)']);
+        echo json_encode(['error' => 'Endpoint no configurado: Clave secreta no establecida o insegura (EB_SECRET_KEY debe configurarse con al menos 16 caracteres)']);
         exit;
     }
 
     $headers = function_exists('getallheaders') ? getallheaders() : [];
     $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : (isset($_SERVER['HTTP_AUTHORIZATION']) ? $_SERVER['HTTP_AUTHORIZATION'] : '');
+    $bridgeKeyHeader = isset($headers['X-Bridge-Key']) ? $headers['X-Bridge-Key'] : (isset($headers['x-bridge-key']) ? $headers['x-bridge-key'] : (isset($_SERVER['HTTP_X_BRIDGE_KEY']) ? $_SERVER['HTTP_X_BRIDGE_KEY'] : ''));
     $signature = isset($headers['X-Bentian-Signature']) ? $headers['X-Bentian-Signature'] : (isset($_SERVER['HTTP_X_BENTIAN_SIGNATURE']) ? $_SERVER['HTTP_X_BENTIAN_SIGNATURE'] : '');
     $timestamp = isset($headers['X-Bentian-Timestamp']) ? intval($headers['X-Bentian-Timestamp']) : (isset($_SERVER['HTTP_X_BENTIAN_TIMESTAMP']) ? intval($_SERVER['HTTP_X_BENTIAN_TIMESTAMP']) : 0);
 
@@ -219,9 +220,8 @@ function verifyAuthentication() {
         }
     }
 
-    // 2. Query param directo (para tests o comprobaciones rápidas)
-    $querySecret = isset($_GET['secret']) ? trim($_GET['secret']) : (isset($_GET['token']) ? trim($_GET['token']) : '');
-    if ($querySecret && hash_equals($secret, $querySecret)) {
+    // 2. Cabecera X-Bridge-Key (alternativa sin prefijo Bearer)
+    if ($bridgeKeyHeader && hash_equals($secret, trim($bridgeKeyHeader))) {
         return true;
     }
 
@@ -240,7 +240,7 @@ function verifyAuthentication() {
     }
 
     http_response_code(401);
-    echo json_encode(['error' => 'Firma o token de autorización no válido']);
+    echo json_encode(['error' => 'Firma o token de autorización no válido. Se requiere cabecera Authorization: Bearer <secret> o X-Bridge-Key: <secret>']);
     exit;
 }
 
@@ -555,10 +555,63 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
     $shipping = $payload['shippingData'] ?? [];
     $orderData = $payload['order'] ?? [];
     $lines = $orderData['lines'] ?? $orderData['lineas'] ?? $payload['lines'] ?? $payload['lineas'] ?? [];
+
+    if (!is_array($lines) || count($lines) === 0) {
+        http_response_code(400);
+        echo json_encode(['error' => 'El pedido debe contener al menos una línea de artículo']);
+        exit;
+    }
+
+    // Límite máximo de líneas de pedido para prevenir DoS en base de datos
+    if (count($lines) > 200) {
+        http_response_code(400);
+        echo json_encode(['error' => 'El pedido supera el límite máximo permitido de 200 líneas']);
+        exit;
+    }
+
     $total = floatval($orderData['total'] ?? $orderData['cabecera']['totpcl'] ?? $payload['total'] ?? 0);
     $subtotal = floatval($orderData['subtotal'] ?? $orderData['cabecera']['net1pcl'] ?? $payload['subtotal'] ?? $total);
     $taxTotal = floatval($orderData['taxTotal'] ?? $orderData['cabecera']['iiva1pcl'] ?? $payload['taxTotal'] ?? 0);
     $shippingCost = floatval($payload['shippingCost'] ?? 0);
+
+    // Validación estricta de importes numéricos positivos y razonables
+    if ($total < 0 || $subtotal < 0 || $taxTotal < 0 || $shippingCost < 0 ||
+        $total > 1000000 || $subtotal > 1000000 || $taxTotal > 500000 || $shippingCost > 10000 ||
+        !is_finite($total) || !is_finite($subtotal) || !is_finite($taxTotal) || !is_finite($shippingCost)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Importes de pedido no válidos o fuera de rango permitido']);
+        exit;
+    }
+
+    // Validación de cantidades y precios en cada línea
+    foreach ($lines as $idx => $line) {
+        if (!is_array($line)) {
+            http_response_code(400);
+            echo json_encode(['error' => "Formato no válido en la línea {$idx} del pedido"]);
+            exit;
+        }
+        $qty = floatval($line['canlpc'] ?? $line['quantity'] ?? $line['qty'] ?? $line['unidades'] ?? 1);
+        if ($qty <= 0 || $qty > 100000 || !is_finite($qty)) {
+            http_response_code(400);
+            echo json_encode(['error' => "Cantidad no válida en la línea {$idx} del pedido"]);
+            exit;
+        }
+        $linePrice = floatval($line['prelpc'] ?? $line['price'] ?? $line['precio'] ?? 0);
+        if ($linePrice < 0 || $linePrice > 1000000 || !is_finite($linePrice)) {
+            http_response_code(400);
+            echo json_encode(['error' => "Precio no válido en la línea {$idx} del pedido"]);
+            exit;
+        }
+    }
+
+    // No confiar ciegamente en paymentStatus: 'COMPLETED' enviado desde el cliente web.
+    // El estado inicial del pedido web debe ser PENDING_PAYMENT salvo que provenga de pasarela verificada.
+    $rawPayStatus = strtoupper(trim(strval($payload['paymentStatus'] ?? '')));
+    $payStatus = 'PENDING_PAYMENT';
+    if ($rawPayStatus === 'PENDING' || $rawPayStatus === 'PENDING_PAYMENT' || $rawPayStatus === 'ON_HOLD') {
+        $payStatus = $rawPayStatus;
+    }
+
     $orderNumber = 'WEB-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
 
     $stmt = $pdo->prepare("
@@ -573,7 +626,7 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
         ':custData' => json_encode($shipping, JSON_UNESCAPED_UNICODE),
         ':linesData' => json_encode($lines, JSON_UNESCAPED_UNICODE),
         ':payMethod' => substr($payload['paymentMethod'] ?? $payload['paymentMethodType'] ?? 'paypal', 0, 50),
-        ':payStatus' => substr($payload['paymentStatus'] ?? 'COMPLETED', 0, 50),
+        ':payStatus' => substr($payStatus, 0, 50),
         ':payRef' => substr($payload['paymentReference'] ?? $payload['paymentMethodId'] ?? '', 0, 100),
         ':subtotal' => $subtotal,
         ':taxTotal' => $taxTotal,
@@ -591,8 +644,13 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
     exit;
 }
 
+// ============================================================================
+// ACCIONES PROTEGIDAS DEL AGENTE LOCAL Y WEBHOOKS AUTENTICADOS (Requieren Secret Key)
+// ============================================================================
+verifyAuthentication();
+
 // ----------------------------------------------------------------------------
-// RUTA PÚBLICA / WEBHOOK: CANCELACIÓN DE PEDIDOS (Frontend / Pasarelas de Pago)
+// ACCIÓN PROTEGIDA / WEBHOOK AUTENTICADO: CANCELACIÓN DE PEDIDOS (Pasarelas / Agente)
 // ----------------------------------------------------------------------------
 if ($mainAction === 'cancel_order' || $mainAction === 'order_cancel' || $mainAction === 'cancel' || $mainAction === 'payment_webhook' || $mainAction === 'webhook') {
     $pdo = getDbConnection();
@@ -680,11 +738,6 @@ if ($mainAction === 'cancel_order' || $mainAction === 'order_cancel' || $mainAct
     exit;
 }
 
-// ============================================================================
-// ACCIONES PROTEGIDAS DEL AGENTE LOCAL (Requieren Secret Key)
-// ============================================================================
-verifyAuthentication();
-
 // ----------------------------------------------------------------------------
 // ACCIÓN PROTEGIDA: CHECK_IMAGES (Dirty-Checking de fotos existentes en hosting)
 // ----------------------------------------------------------------------------
@@ -749,12 +802,12 @@ if ($mainAction === 'upload_image') {
         exit;
     }
 
-    // Validar extensión de imagen
+    // Validar extensión de imagen (solo formatos seguros sin SVG para prevenir XSS)
     $ext = strtolower(pathinfo($targetRelPath, PATHINFO_EXTENSION));
-    $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp'];
+    $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
     if (!in_array($ext, $allowedExts)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Extensión de imagen no permitida: ' . $ext]);
+        echo json_encode(['error' => 'Extensión de imagen no permitida: ' . $ext . '. Solo se permiten formatos seguros (jpg, jpeg, png, webp)']);
         exit;
     }
 
