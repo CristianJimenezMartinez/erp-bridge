@@ -8,10 +8,11 @@ import { syncScript } from './sync.script';
 import { logsScript } from './logs.script';
 import { wizardScript } from './wizard.script';
 
-export function renderClientScript(agentVersion: string = '0.2.0'): string {
+export function renderClientScript(agentVersion: string = '0.2.0', localToken: string = ''): string {
   return [
     '  <!-- ================= SCRIPTS ================= -->',
     '  <script>',
+    `    window.__BENTIAN_TOKEN__ = "${localToken}";`,
     errorHumanizerScript,
     coreScript,
     renderStatusScript(agentVersion),

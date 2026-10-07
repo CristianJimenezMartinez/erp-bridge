@@ -38,8 +38,8 @@ export const logsScript = `
             : '';
 
           return '<div class="log-line log-' + (e.level || 'info') + '" data-raw-msg="' + safeMsg + '"' + clickAttr + '>' +
-            '<span class="log-time">' + e.timestamp + '</span>' +
-            '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">' + e.message + '</span>' +
+            '<span class="log-time">' + escapeLogAttr(e.timestamp) + '</span>' +
+            '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">' + safeMsg + '</span>' +
             solveBtn +
           '</div>';
         }).join('');

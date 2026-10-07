@@ -15,7 +15,7 @@ import {
 } from './views';
 import { renderClientScript } from './scripts';
 
-export function renderDashboardHtml(agentVersion: string = '0.2.0'): string {
+export function renderDashboardHtml(agentVersion: string = '0.2.0', localToken: string = ''): string {
   return [
     '<!DOCTYPE html>',
     '<html lang="es" class="dark">',
@@ -30,6 +30,7 @@ export function renderDashboardHtml(agentVersion: string = '0.2.0'): string {
     '  <meta name="theme-color" content="#0d0d11">',
     '  <meta name="application-name" content="Bentian ERP Bridge">',
     '  <meta name="msapplication-TileColor" content="#0d0d11">',
+    `  <meta name="bentian-token" content="${localToken}">`,
     '  <style>',
     dashboardStyles,
     '  </style>',
@@ -57,7 +58,7 @@ export function renderDashboardHtml(agentVersion: string = '0.2.0'): string {
     renderWizardModal(),
     renderErrorResolverModal(),
     renderToast(),
-    renderClientScript(agentVersion),
+    renderClientScript(agentVersion, localToken),
     '</body>',
     '</html>',
   ].join('\n');

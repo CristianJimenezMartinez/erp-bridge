@@ -20,6 +20,8 @@ export interface AutoUpdaterConfig {
   backupDir?: string;
 }
 
+export const VERSION_REGEX = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
+
 export class AutoUpdater {
   private readonly logger = new Logger('AutoUpdater');
   private readonly tempDir: string;
@@ -133,6 +135,13 @@ export class AutoUpdater {
       }
     }
 
+    if (checkData.available && checkData.version) {
+      if (!VERSION_REGEX.test(checkData.version)) {
+        this.logger.warn(`Versión de actualización sospechosa o no válida recibida: "${checkData.version}". Actualización rechazada.`);
+        checkData = { available: false };
+      }
+    }
+
     return checkData;
   }
 
@@ -140,12 +149,21 @@ export class AutoUpdater {
    * Downloads an update binary into the temporary updates directory.
    */
   public async downloadUpdate(downloadUrl: string, version: string): Promise<string> {
+    if (!version || !VERSION_REGEX.test(version)) {
+      throw new Error(`Versión de actualización no válida o insegura: "${version}"`);
+    }
+
     if (!fs.existsSync(this.tempDir)) {
       fs.mkdirSync(this.tempDir, { recursive: true });
     }
 
+    const safeTempDir = path.resolve(this.tempDir);
     const destFileName = `agent-v${version}.exe`;
-    const destFilePath = path.join(this.tempDir, destFileName);
+    const destFilePath = path.resolve(safeTempDir, destFileName);
+
+    if (!destFilePath.startsWith(safeTempDir + path.sep)) {
+      throw new Error(`Ruta de descarga insegura fuera de tempDir: "${destFilePath}"`);
+    }
 
     const fullUrl = downloadUrl.startsWith('http')
       ? downloadUrl
@@ -153,17 +171,26 @@ export class AutoUpdater {
 
     this.logger.info(`Descargando actualización v${version} desde ${fullUrl}...`);
 
-    const res = await fetch(fullUrl);
-    if (!res.ok) {
-      throw new Error(`Error en la descarga: HTTP ${res.status}`);
+    let fileWritten = false;
+    try {
+      const res = await fetch(fullUrl);
+      if (!res.ok) {
+        throw new Error(`Error en la descarga: HTTP ${res.status}`);
+      }
+
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      fs.writeFileSync(destFilePath, buffer);
+      fileWritten = true;
+
+      this.logger.info(`✓ Actualización descargada exitosamente en: ${destFilePath} (${(buffer.length / 1024 / 1024).toFixed(2)} MB)`);
+      return destFilePath;
+    } catch (err) {
+      if (fileWritten || fs.existsSync(destFilePath)) {
+        try { fs.unlinkSync(destFilePath); } catch {}
+      }
+      throw err;
     }
-
-    const arrayBuffer = await res.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(destFilePath, buffer);
-
-    this.logger.info(`✓ Actualización descargada exitosamente en: ${destFilePath} (${(buffer.length / 1024 / 1024).toFixed(2)} MB)`);
-    return destFilePath;
   }
 
   /**

@@ -61,16 +61,25 @@ export const syncScript = `
         return;
       }
       const newHtml = records.map(function(r) {
+        const esc = window.escapeHtml || function(s) { return s; };
         const statusClass = r.status === 'success' ? 'tag-green' : (r.status === 'warning' ? 'tag-amber' : 'tag-rose');
+        const safeTs = esc(r.timestamp);
+        const safeType = esc((r.type || 'manual').toUpperCase());
+        const safeMode = esc((r.mode || 'full').toUpperCase());
+        const safeStatus = esc((r.status || 'OK').toUpperCase());
+        const safeUpdated = Number(r.itemsUpdated) || 0;
+        const safeOrders = Number(r.ordersImported) || 0;
+        const safeDuration = Number(r.durationSeconds) || 0;
+        const safeMsg = esc(r.message || '');
         return '<tr>' +
-          '<td style="font-family: monospace;">' + r.timestamp + '</td>' +
-          '<td><span class="tag tag-blue">' + (r.type || 'manual').toUpperCase() + '</span></td>' +
-          '<td><span class="tag tag-amber">' + (r.mode || 'full').toUpperCase() + '</span></td>' +
-          '<td><span class="tag ' + statusClass + '">' + (r.status || 'OK').toUpperCase() + '</span></td>' +
-          '<td style="text-align: right; font-weight: 600;">' + (r.itemsUpdated || 0) + '</td>' +
-          '<td style="text-align: right; font-weight: 600;">' + (r.ordersImported || 0) + '</td>' +
-          '<td style="text-align: right; font-family: monospace;">' + r.durationSeconds + 's</td>' +
-          '<td style="color: var(--text-muted);">' + r.message + '</td>' +
+          '<td style="font-family: monospace;">' + safeTs + '</td>' +
+          '<td><span class="tag tag-blue">' + safeType + '</span></td>' +
+          '<td><span class="tag tag-amber">' + safeMode + '</span></td>' +
+          '<td><span class="tag ' + statusClass + '">' + safeStatus + '</span></td>' +
+          '<td style="text-align: right; font-weight: 600;">' + safeUpdated + '</td>' +
+          '<td style="text-align: right; font-weight: 600;">' + safeOrders + '</td>' +
+          '<td style="text-align: right; font-family: monospace;">' + safeDuration + 's</td>' +
+          '<td style="color: var(--text-muted);">' + safeMsg + '</td>' +
         '</tr>';
       }).join('');
       if (tbody.innerHTML !== newHtml) tbody.innerHTML = newHtml;
@@ -103,6 +112,7 @@ export const syncScript = `
           body: JSON.stringify({ onlyMissing: true }),
         });
         const data = await res.json();
+        const esc = window.escapeHtml || function(s) { return s; };
         if (data.success) {
           showToast(data.message);
           if (feedback) {
@@ -112,7 +122,7 @@ export const syncScript = `
             feedback.style.display = 'inline-flex';
             feedback.style.alignItems = 'center';
             feedback.style.gap = '8px';
-            feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') + '<span>' + data.message + '</span>';
+            feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') + '<span>' + esc(data.message) + '</span>';
           }
           fetchStatus();
           loadSyncHistory();
@@ -133,11 +143,12 @@ export const syncScript = `
             feedback.style.display = 'inline-flex';
             feedback.style.alignItems = 'center';
             feedback.style.gap = '8px';
-            const textContent = errInfo.cause ? ('<strong>' + errInfo.cause + '</strong><br>' + errInfo.suggestion) : data.message;
+            const textContent = errInfo.cause ? ('<strong>' + esc(errInfo.cause) + '</strong><br>' + esc(errInfo.suggestion)) : esc(data.message);
             feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>' + textContent + '</span>';
           }
         }
       } catch (err) {
+        const esc = window.escapeHtml || function(s) { return s; };
         const errInfo = humanizeErrorMessage(err, 'channel');
         showSmartToast({
           title: 'Error de comunicación',
@@ -153,7 +164,7 @@ export const syncScript = `
           feedback.style.display = 'inline-flex';
           feedback.style.alignItems = 'center';
           feedback.style.gap = '8px';
-          feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>' + errInfo.message + '</span>';
+          feedback.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>' + esc(errInfo.message) + '</span>';
         }
       } finally {
         if (btn) {

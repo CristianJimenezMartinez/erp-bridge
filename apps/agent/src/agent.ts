@@ -14,6 +14,7 @@ import {
 import { FactusolDetector } from './detector';
 import {
   AutoUpdater,
+  VERSION_REGEX,
   UpdateClient,
   UpdateClientState,
   UpdateOptions,
@@ -52,6 +53,13 @@ export * from './system';
 export interface AgentGuiServer {
   stop(): Promise<void>;
   getUrl?(): string;
+}
+
+export const SECRET_MASK = '••••••••';
+export function isSecretMaskedOrEmpty(val: unknown): boolean {
+  if (val === undefined || val === null || val === '') return true;
+  const str = String(val).trim();
+  return str === SECRET_MASK || /^[•*]{4,}$/.test(str);
 }
 
 export class LocalAgent {
@@ -154,10 +162,22 @@ export class LocalAgent {
       }
     }
     if (updates.woocommerce) {
+      const existingSecret = cfg.woocommerce?.consumerSecret;
       cfg.woocommerce = { ...(cfg.woocommerce || {}), ...updates.woocommerce };
+      if (isSecretMaskedOrEmpty(updates.woocommerce.consumerSecret) && existingSecret) {
+        cfg.woocommerce.consumerSecret = existingSecret;
+      }
     }
     if (updates.universalBridge) {
+      const existingSecretKey = cfg.universalBridge?.secretKey;
+      const existingDbPass = cfg.universalBridge?.dbPass;
       cfg.universalBridge = { ...(cfg.universalBridge || {}), ...updates.universalBridge };
+      if (isSecretMaskedOrEmpty(updates.universalBridge.secretKey) && existingSecretKey) {
+        cfg.universalBridge.secretKey = existingSecretKey;
+      }
+      if (isSecretMaskedOrEmpty(updates.universalBridge.dbPass) && existingDbPass) {
+        cfg.universalBridge.dbPass = existingDbPass;
+      }
     }
     if (updates.channelType) {
       cfg.channelType = updates.channelType;
@@ -166,11 +186,15 @@ export class LocalAgent {
       cfg.syncRules = { ...(cfg.syncRules || {}), ...updates.syncRules };
     }
     if (updates.notifications) {
+      const existingSmtpPass = cfg.notifications?.smtpPass;
       cfg.notifications = { ...(cfg.notifications || {}), ...updates.notifications };
+      if (isSecretMaskedOrEmpty(updates.notifications.smtpPass) && existingSmtpPass) {
+        cfg.notifications.smtpPass = existingSmtpPass;
+      }
     }
 
     let licenseMsg = '';
-    if (updates.licenseKey && updates.licenseKey !== cfg.licenseKey) {
+    if (updates.licenseKey && updates.licenseKey !== cfg.licenseKey && !isSecretMaskedOrEmpty(updates.licenseKey)) {
       const licRes = await this.licenseService.activateLicense(updates.licenseKey);
       if (!licRes.success) {
         licenseMsg = ` (Aviso en licencia: ${licRes.error})`;
@@ -320,6 +344,22 @@ export class LocalAgent {
       }
     }
 
+    const safeWoo = cfg.woocommerce ? {
+      ...cfg.woocommerce,
+      consumerSecret: cfg.woocommerce.consumerSecret ? SECRET_MASK : '',
+    } : cfg.woocommerce;
+
+    const safeUniv = cfg.universalBridge ? {
+      ...cfg.universalBridge,
+      secretKey: cfg.universalBridge.secretKey ? SECRET_MASK : '',
+      dbPass: cfg.universalBridge.dbPass ? SECRET_MASK : '',
+    } : cfg.universalBridge;
+
+    const safeNotif = cfg.notifications ? {
+      ...cfg.notifications,
+      smtpPass: cfg.notifications.smtpPass ? SECRET_MASK : '',
+    } : cfg.notifications;
+
     return {
       agentName: cfg.agentName || 'Bentian Agent',
       agentVersion: this.configManager.getVersion(),
@@ -339,11 +379,11 @@ export class LocalAgent {
         statusMessage,
       },
       factusolSettings: cfg.factusol,
-      woocommerceSettings: cfg.woocommerce,
-      universalBridgeSettings: cfg.universalBridge,
+      woocommerceSettings: safeWoo,
+      universalBridgeSettings: safeUniv,
       channelType: cfg.channelType || 'woocommerce',
       syncRules: cfg.syncRules,
-      notifications: cfg.notifications,
+      notifications: safeNotif,
       syncHistory: this.historyManager.getSyncHistory(),
       system: SystemInfoService.getSystemInfo(),
       recentEvents: this.eventBus.getRecentEvents(),
@@ -354,7 +394,10 @@ export class LocalAgent {
 
   public async testEmailNotification(customSettings?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
     const cfg = this.configManager.get();
-    const settings = customSettings || cfg.notifications || {};
+    let settings = customSettings || cfg.notifications || {};
+    if (customSettings && isSecretMaskedOrEmpty(customSettings.smtpPass) && cfg.notifications?.smtpPass) {
+      settings = { ...settings, smtpPass: cfg.notifications.smtpPass };
+    }
     return OrderNotifierService.sendTestEmail(settings, cfg.apiBaseUrl, cfg.licenseKey);
   }
 
@@ -409,11 +452,21 @@ export class LocalAgent {
 
   // --- Métodos de Canales Web ---
   public async testWooCommerceConnection(settings: { storeUrl: string; consumerKey: string; consumerSecret: string }): Promise<WooCommerceTestResult> {
-    return WooCommerceTester.test(settings);
+    const cfg = this.configManager.get();
+    let finalSecret = settings.consumerSecret;
+    if (isSecretMaskedOrEmpty(finalSecret) && cfg.woocommerce?.consumerSecret) {
+      finalSecret = cfg.woocommerce.consumerSecret;
+    }
+    return WooCommerceTester.test({ ...settings, consumerSecret: finalSecret });
   }
 
   public async testUniversalBridge(settings: { storeUrl: string; secretKey?: string }): Promise<UniversalBridgeTestResult> {
-    return UniversalBridgeTester.test(settings);
+    const cfg = this.configManager.get();
+    let finalKey = settings.secretKey;
+    if (isSecretMaskedOrEmpty(finalKey) && cfg.universalBridge?.secretKey) {
+      finalKey = cfg.universalBridge.secretKey;
+    }
+    return UniversalBridgeTester.test({ ...settings, secretKey: finalKey });
   }
 
   // --- Métodos de Sincronización ---
@@ -683,6 +736,13 @@ export class LocalAgent {
     this.isUpdating = true;
     const tUpdateStart = performance.now();
 
+    if (!info.version || !VERSION_REGEX.test(info.version)) {
+      this.logger.error(`Versión de actualización sospechosa o no válida: "${info.version}". Rechazando actualización.`);
+      this.isUpdating = false;
+      return;
+    }
+
+    let downloadedFile: string | null = null;
     try {
       let { downloadUrl, sha256, signature } = info;
       if (!downloadUrl || !sha256 || !signature) {
@@ -698,7 +758,7 @@ export class LocalAgent {
 
       this.logger.info(`Iniciando auto-actualización silenciosa hacia v${info.version}...`);
       const tDownloadStart = performance.now();
-      const downloadedFile = await this.autoUpdater.downloadUpdate(downloadUrl, info.version);
+      downloadedFile = await this.autoUpdater.downloadUpdate(downloadUrl, info.version);
       const downloadMs = Math.round(performance.now() - tDownloadStart);
 
       const tVerifyStart = performance.now();
@@ -706,6 +766,9 @@ export class LocalAgent {
       const verifyMs = Math.round(performance.now() - tVerifyStart);
 
       if (!isValid) {
+        if (downloadedFile && fs.existsSync(downloadedFile)) {
+          try { fs.unlinkSync(downloadedFile); } catch {}
+        }
         this.logger.error(`Firma o integridad inválida para v${info.version}. Actualización rechazada de forma segura.`);
         await this.autoUpdater.reportStatus(info.version, 'failed', 'Fallo de verificación criptográfica Ed25519');
         AgentDiskLogger.getInstance().log({
@@ -732,6 +795,9 @@ export class LocalAgent {
       });
       await this.autoUpdater.applyUpdate(downloadedFile);
     } catch (err) {
+      if (downloadedFile && fs.existsSync(downloadedFile)) {
+        try { fs.unlinkSync(downloadedFile); } catch {}
+      }
       this.logger.error(`Error durante el ciclo de actualización automática: ${String(err)}`);
       await this.autoUpdater.reportStatus(info.version, 'failed', String(err));
       this.isUpdating = false;

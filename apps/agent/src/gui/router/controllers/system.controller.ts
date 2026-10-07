@@ -12,10 +12,11 @@ import {
 const logger = new Logger('SystemController');
 
 export class SystemController {
-  public static renderIndex(agent: LocalAgent): RouteHandler {
+  public static renderIndex(agent: LocalAgent, getToken?: () => string): RouteHandler {
     return (_req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(renderDashboardHtml(agent.getVersion()));
+      const token = getToken ? getToken() : '';
+      res.end(renderDashboardHtml(agent.getVersion(), token));
     };
   }
 

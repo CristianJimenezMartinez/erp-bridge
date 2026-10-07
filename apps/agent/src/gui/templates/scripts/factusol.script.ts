@@ -127,12 +127,13 @@ export const factusolScript = `
 
         if (data.instances && data.instances.length > 0) {
           if (label) label.textContent = 'Bases de datos encontradas (' + data.instances.length + '):';
+          const esc = window.escapeHtml || function(s) { return s; };
           list.innerHTML = data.instances.map(function(inst) {
             const cleanPath = String(inst.databasePath).split('"').join('&quot;');
             const labelText = inst.companyCode ? ('Empresa ' + inst.companyCode + (inst.year ? ' (' + inst.year + ')' : '')) : 'Factusol';
             const sizeMb = inst.fileSizeBytes ? ' • ' + (inst.fileSizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '';
             return '<div data-db-path="' + cleanPath + '" data-is-wiz="' + isWizard + '" onclick="selectFactusolInstance(this.getAttribute(&quot;data-db-path&quot;), this.getAttribute(&quot;data-is-wiz&quot;) === &quot;true&quot;)" style="background: #1e1e26; border: 1px solid var(--card-border); padding: 9px 12px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor=&quot;#6366f1&quot;" onmouseout="this.style.borderColor=&quot;var(--card-border)&quot;">' +
-              '<div><strong>' + labelText + '</strong>' + sizeMb + '<div style="color: var(--text-subtle); font-family: monospace; font-size: 11px; margin-top: 2px;">' + inst.databasePath + '</div></div>' +
+              '<div><strong>' + esc(labelText) + '</strong>' + sizeMb + '<div style="color: var(--text-subtle); font-family: monospace; font-size: 11px; margin-top: 2px;">' + esc(inst.databasePath) + '</div></div>' +
               '<span class="tag tag-blue" style="margin-left: 8px;">Usar esta</span>' +
             '</div>';
           }).join('');
@@ -232,13 +233,14 @@ export const factusolScript = `
 
         if (alertBox) {
           alertBox.style.display = 'block';
+          const esc = window.escapeHtml || function(s) { return s; };
           const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
           if (data.success) {
             const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
             alertBox.innerHTML = 
               '<div class="smart-success-card">' +
                 (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
-                '<span>' + cleanMsg + timeSuffix + '</span>' +
+                '<span>' + esc(cleanMsg) + timeSuffix + '</span>' +
               '</div>';
             showSmartToast({
               title: 'Factusol ERP Conectado',
@@ -255,11 +257,11 @@ export const factusolScript = `
               '<div class="smart-error-card">' +
                 '<div class="smart-error-header">' +
                   (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') +
-                  '<span>' + cleanTitle + '</span>' +
+                  '<span>' + esc(cleanTitle) + '</span>' +
                 '</div>' +
                 '<div class="smart-error-cause">' +
-                  '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
-                  '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+                  '<strong>Causa:</strong> ' + esc(errInfo.cause) + '<br>' +
+                  '<strong>Solución recomendada:</strong> ' + esc(errInfo.suggestion) +
                 '</div>' +
                 '<div class="smart-error-actions">' +
                   '<button type="button" onclick="detectFactusol(' + isWizard + ')" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('search') : '') + '<span>Auto-detectar Factusol</span></button>' +
@@ -278,14 +280,15 @@ export const factusolScript = `
           }
         }
       } catch (err) {
+        const esc = window.escapeHtml || function(s) { return s; };
         const errInfo = humanizeErrorMessage(err, 'factusol');
         if (alertBox) {
           const cleanCatchTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           alertBox.style.display = 'block';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanCatchTitle + '</span></div>' +
-              '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + esc(cleanCatchTitle) + '</span></div>' +
+              '<div class="smart-error-cause">' + esc(errInfo.cause) + '</div>' +
               '<div class="smart-error-actions">' +
                 '<button type="button" data-input-id="' + inputId + '" data-alert-id="' + alertId + '" onclick="testFactusolConnection(this.getAttribute(&quot;data-input-id&quot;), this.getAttribute(&quot;data-alert-id&quot;))" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>' +
               '</div>' +
@@ -339,16 +342,17 @@ export const factusolScript = `
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No se encontraron artículos en la base de datos.</td></tr>';
         return;
       }
+      const esc = window.escapeHtml || function(s) { return s; };
       tbody.innerHTML = articles.map(function(a) {
         const stockColor = a.stock > 0 ? '#34d399' : '#f87171';
         const displayPrice = (a.salePrice !== undefined && a.salePrice > 0) ? a.salePrice : a.costPrice;
         return '<tr>' +
-          '<td><span class="tag tag-blue">' + a.code + '</span></td>' +
-          '<td style="font-weight: 500;">' + (a.description || 'Sin descripción') + '</td>' +
-          '<td><span class="tag tag-amber">' + (a.family || 'GEN') + '</span></td>' +
-          '<td style="text-align: right; font-weight: 700; color: ' + stockColor + '">' + a.stock + '</td>' +
-          '<td style="text-align: right; font-family: monospace; font-weight: 600; color: #fff;">' + Number(displayPrice).toFixed(2) + ' €</td>' +
-          '<td style="color: var(--text-subtle); font-family: monospace;">' + (a.ean || '---') + '</td>' +
+          '<td><span class="tag tag-blue">' + esc(a.code) + '</span></td>' +
+          '<td style="font-weight: 500;">' + esc(a.description || 'Sin descripción') + '</td>' +
+          '<td><span class="tag tag-amber">' + esc(a.family || 'GEN') + '</span></td>' +
+          '<td style="text-align: right; font-weight: 700; color: ' + stockColor + '">' + Number(a.stock || 0) + '</td>' +
+          '<td style="text-align: right; font-family: monospace; font-weight: 600; color: #fff;">' + Number(displayPrice || 0).toFixed(2) + ' €</td>' +
+          '<td style="color: var(--text-subtle); font-family: monospace;">' + esc(a.ean || '---') + '</td>' +
         '</tr>';
       }).join('');
     }
@@ -368,18 +372,19 @@ export const factusolScript = `
         const res = await fetch('/api/local/factusol/metadata');
         if (!res.ok) return;
         const data = await res.json();
+        const esc = window.escapeHtml || function(s) { return s; };
         if (data.tariffs && data.tariffs.length > 0) {
           const sel = document.getElementById('select-factusol-tariff');
           if (sel) {
             const currentTariff = sel.value;
-            sel.innerHTML = data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+            sel.innerHTML = data.tariffs.map(function(t) { return '<option value="' + esc(t.code) + '">' + esc(t.name) + '</option>'; }).join('');
             if (currentTariff) sel.value = currentTariff;
           }
           const saleSel = document.getElementById('select-factusol-sale-tariff');
           if (saleSel) {
             const currentVal = saleSel.value;
             saleSel.innerHTML = '<option value="">-- Ninguna (Sin precio tachado) --</option>' +
-              data.tariffs.map(function(t) { return '<option value="' + t.code + '">' + t.name + '</option>'; }).join('');
+              data.tariffs.map(function(t) { return '<option value="' + esc(t.code) + '">' + esc(t.name) + '</option>'; }).join('');
             saleSel.value = currentVal;
           }
         }
@@ -387,7 +392,7 @@ export const factusolScript = `
           const sel = document.getElementById('select-factusol-warehouse');
           if (sel) {
             const currentWh = sel.value;
-            sel.innerHTML = data.warehouses.map(function(w) { return '<option value="' + w.code + '">' + w.name + '</option>'; }).join('');
+            sel.innerHTML = data.warehouses.map(function(w) { return '<option value="' + esc(w.code) + '">' + esc(w.name) + '</option>'; }).join('');
             if (currentWh) sel.value = currentWh;
           }
         }

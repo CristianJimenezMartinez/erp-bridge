@@ -1,4 +1,5 @@
 import http from 'http';
+import crypto from 'crypto';
 import { Socket } from 'net';
 import { Logger } from '@erp-bridge/shared';
 import { LocalAgent } from '../agent';
@@ -19,22 +20,28 @@ export class LocalGuiServer {
   private activePort: number;
   private router: MiniRouter;
   private readonly sockets = new Set<Socket>();
+  private readonly localToken: string;
 
   constructor(
     private readonly agent: LocalAgent,
     private readonly defaultPort: number = 39281
   ) {
+    this.localToken = crypto.randomBytes(32).toString('hex');
     this.activePort = this.defaultPort;
     this.router = this.buildRouter();
     this.agent.setGuiServer(this);
   }
 
+  public getLocalToken(): string {
+    return this.localToken;
+  }
+
   private buildRouter(): MiniRouter {
-    const router = new MiniRouter();
+    const router = new MiniRouter(this.localToken);
 
     // 1. UI Entrypoint
-    router.get('/', SystemController.renderIndex(this.agent));
-    router.get('/index.html', SystemController.renderIndex(this.agent));
+    router.get('/', SystemController.renderIndex(this.agent, () => this.localToken));
+    router.get('/index.html', SystemController.renderIndex(this.agent, () => this.localToken));
 
     // 2. Status & Logs
     router.get('/api/local/status', StatusController.getStatus(this.agent));

@@ -85,6 +85,22 @@ async function run() {
   assert.strictEqual(isUnhealthy, false);
   assert.strictEqual(rollbackExecuted, true, 'Supervisor must trigger rollback on health failure');
 
+  // 4. Test AGT-001: Path traversal & version regex validation
+  console.log('4. Testing AGT-001: Path traversal & version regex validation...');
+  await assert.rejects(
+    async () => {
+      await updater.downloadUpdate('http://localhost:3000/bad', '../../malicious');
+    },
+    /Versión de actualización no válida o insegura/
+  );
+
+  await assert.rejects(
+    async () => {
+      await updater.downloadUpdate('http://localhost:3000/bad', '1.2.3/../../../evil');
+    },
+    /Versión de actualización no válida o insegura/
+  );
+
   // Cleanup
   if (fs.existsSync(testDir)) {
     fs.rmSync(testDir, { recursive: true, force: true });

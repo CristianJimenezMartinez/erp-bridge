@@ -17,6 +17,8 @@ export class MiniRouter {
   private readonly logger = new Logger('MiniRouter');
   private routes: Array<{ method: string; path: string; handler: RouteHandler }> = [];
 
+  constructor(private readonly localToken?: string) {}
+
   public get(path: string, handler: RouteHandler): void {
     this.routes.push({ method: 'GET', path, handler });
   }
@@ -32,11 +34,12 @@ export class MiniRouter {
   }
 
   public async handle(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
-    const parsedUrl = new URL(req.url || '/', `http://${req.headers.host || '127.0.0.1'}`);
-    const pathname = parsedUrl.pathname;
-    const method = req.method || 'GET';
+    // 0. Cabeceras de seguridad HTTP básicas
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
 
     // 1. Host Validation: debe ser estrictamente 127.0.0.1 o localhost (con o sin puerto)
+    // Se valida ANTES de procesar URLs para evitar excepciones no controladas
     const host = req.headers.host || '';
     const loopbackHostRegex = /^(127\.0\.0\.1|localhost)(:\d+)?$/;
     if (!loopbackHostRegex.test(host)) {
@@ -46,7 +49,28 @@ export class MiniRouter {
       return;
     }
 
-    // 2. Anti-CSRF: Validación estricta de Origin y Referer para orígenes loopback
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(req.url || '/', `http://${host}`);
+    } catch {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'URL malformada' }));
+      return;
+    }
+
+    const pathname = parsedUrl.pathname;
+    const method = req.method || 'GET';
+
+    // 2. Validación de Sec-Fetch-Site: si está presente y su valor es cross-site, bloquear con 403 Forbidden
+    const secFetchSite = req.headers['sec-fetch-site'];
+    if (secFetchSite === 'cross-site') {
+      this.logger.warn(`Acceso bloqueado: Sec-Fetch-Site no permitido (${secFetchSite})`);
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Acceso denegado: cross-site fetch no permitido' }));
+      return;
+    }
+
+    // 3. Anti-CSRF: Validación estricta de Origin y Referer para orígenes loopback
     const loopbackOriginRegex = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
     const origin = req.headers.origin;
     if (origin) {
@@ -76,16 +100,44 @@ export class MiniRouter {
       }
     }
 
-    // 3. Cabeceras CORS restrictivas para loopback
+    // 4. Para peticiones POST con Origin definido, exigir Content-Type: application/json
+    if (origin && (method === 'POST' || method === 'PUT')) {
+      const contentType = (req.headers['content-type'] || '').toLowerCase();
+      if (!contentType.includes('application/json')) {
+        this.logger.warn(`Acceso bloqueado: POST con Origin requiere Content-Type application/json: "${contentType}"`);
+        res.writeHead(415, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Content-Type debe ser application/json' }));
+        return;
+      }
+    }
+
+    // 5. Cabeceras CORS restrictivas para loopback
     const allowedOrigin = origin || `http://${host || '127.0.0.1'}`;
     res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Bentian-Token, X-Local-Token');
 
     if (method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
       return;
+    }
+
+    // 6. Validación de Token de sesión local (X-Bentian-Token)
+    // MANDATORIO CRÍTICO: BentianTray.cs llama a la API local sin Origin ni Sec-Fetch-Site y sin token.
+    // Las peticiones locales sin Origin y sin Sec-Fetch-Site procedentes de 127.0.0.1 siguen permitidas.
+    const isBrowserRequest = Boolean(origin || secFetchSite);
+    const isApiRoute = pathname.startsWith('/api/local/') || pathname.startsWith('/v1/');
+    const isPublicAsset = pathname === '/api/local/icon' || pathname === '/api/local/health' || pathname === '/health';
+
+    if (this.localToken && isBrowserRequest && isApiRoute && !isPublicAsset) {
+      const receivedToken = req.headers['x-bentian-token'] || req.headers['x-local-token'];
+      if (receivedToken !== this.localToken) {
+        this.logger.warn(`Acceso bloqueado: Token de sesión local inválido o ausente en ${method} ${pathname}`);
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Acceso denegado: Token de sesión local no válido' }));
+        return;
+      }
     }
 
     const matchMethod = method === 'HEAD' ? 'GET' : method;
@@ -98,7 +150,18 @@ export class MiniRouter {
 
     let body: any = {};
     if (method === 'POST' || method === 'PUT') {
-      body = await this.readRequestBody(req);
+      try {
+        body = await this.readRequestBody(req);
+      } catch (err: any) {
+        if (err?.statusCode === 413) {
+          res.writeHead(413, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Payload demasiado grande (límite 1 MB)' }));
+          return;
+        }
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Error al procesar el cuerpo de la petición' }));
+        return;
+      }
     }
 
     const ctx: RequestContext = {
@@ -148,18 +211,35 @@ export class MiniRouter {
   }
 
   private readRequestBody(req: http.IncomingMessage): Promise<any> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let data = '';
-      req.on('data', (chunk) => {
+      let bytes = 0;
+      const MAX_BODY_SIZE = 1024 * 1024; // Límite estricto de 1 MB
+
+      const onData = (chunk: Buffer | string) => {
+        bytes += typeof chunk === 'string' ? Buffer.byteLength(chunk) : chunk.length;
+        if (bytes > MAX_BODY_SIZE) {
+          req.removeListener('data', onData);
+          req.removeListener('end', onEnd);
+          const err = new Error('Payload too large: límite de 1 MB excedido');
+          (err as any).statusCode = 413;
+          reject(err);
+          return;
+        }
         data += chunk;
-      });
-      req.on('end', () => {
+      };
+
+      const onEnd = () => {
         try {
           resolve(data ? JSON.parse(data) : {});
         } catch {
           resolve({});
         }
-      });
+      };
+
+      req.on('data', onData);
+      req.on('end', onEnd);
+      req.on('error', (err) => reject(err));
     });
   }
 }

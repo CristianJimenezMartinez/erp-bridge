@@ -47,10 +47,11 @@ export const channelScript = `
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
           const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
+          const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
               (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
-              '<span>' + cleanMsg + timeSuffix + '</span>' +
+              '<span>' + safeMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
             title: 'Canal Web Conectado',
@@ -60,6 +61,9 @@ export const channelScript = `
         } else {
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
+          const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
+          const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+          const safeSuggestion = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.suggestion) : errInfo.suggestion;
           let extraActions = '';
           if (!url.startsWith('https://')) {
             extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-universal-url&quot;); testUniversalConnection();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
@@ -68,10 +72,10 @@ export const channelScript = `
           extraActions += '<button type="button" onclick="testUniversalConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar comprobación</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanTitle + '</span></div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
-                '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
-                '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+                '<strong>Causa:</strong> ' + safeCause + '<br>' +
+                '<strong>Solución recomendada:</strong> ' + safeSuggestion +
               '</div>' +
               '<div class="smart-error-actions">' + extraActions + '</div>' +
             '</div>';
@@ -86,10 +90,12 @@ export const channelScript = `
         }
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'channel');
+        const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.title) : errInfo.title;
+        const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
         alertBox.innerHTML = 
           '<div class="smart-error-card">' +
-            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + errInfo.title + '</span></div>' +
-            '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+            '<div class="smart-error-cause">' + safeCause + '</div>' +
             '<div class="smart-error-actions"><button type="button" onclick="testUniversalConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
           '</div>';
         showSmartToast({
@@ -139,10 +145,11 @@ export const channelScript = `
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
           const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
+          const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
           alertBox.innerHTML = 
             '<div class="smart-success-card">' +
               (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
-              '<span>' + cleanMsg + timeSuffix + '</span>' +
+              '<span>' + safeMsg + timeSuffix + '</span>' +
             '</div>';
           showSmartToast({
             title: 'WooCommerce Conectado',
@@ -152,6 +159,9 @@ export const channelScript = `
         } else {
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
+          const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
+          const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+          const safeSuggestion = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.suggestion) : errInfo.suggestion;
           let extraActions = '';
           if (!storeUrl.startsWith('https://')) {
             extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-wc-url&quot;); testWooCommerceConnection();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
@@ -159,10 +169,10 @@ export const channelScript = `
           extraActions += '<button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>';
           alertBox.innerHTML = 
             '<div class="smart-error-card">' +
-              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + cleanTitle + '</span></div>' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
               '<div class="smart-error-cause">' +
-                '<strong>Causa:</strong> ' + errInfo.cause + '<br>' +
-                '<strong>Solución recomendada:</strong> ' + errInfo.suggestion +
+                '<strong>Causa:</strong> ' + safeCause + '<br>' +
+                '<strong>Solución recomendada:</strong> ' + safeSuggestion +
               '</div>' +
               '<div class="smart-error-actions">' + extraActions + '</div>' +
             '</div>';
@@ -177,10 +187,12 @@ export const channelScript = `
         }
       } catch (err) {
         const errInfo = humanizeErrorMessage(err, 'channel');
+        const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.title) : errInfo.title;
+        const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
         alertBox.innerHTML = 
           '<div class="smart-error-card">' +
-            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + errInfo.title + '</span></div>' +
-            '<div class="smart-error-cause">' + errInfo.cause + '</div>' +
+            '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+            '<div class="smart-error-cause">' + safeCause + '</div>' +
             '<div class="smart-error-actions"><button type="button" onclick="testWooCommerceConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
           '</div>';
         showSmartToast({

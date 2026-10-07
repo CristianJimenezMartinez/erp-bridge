@@ -130,20 +130,20 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 | Tarea | Hallazgos | Estado | Commit | Notas |
 |---|---|---|---|---|
 | P0-1 | INF-001 | ABIERTO | — | Requiere decisión y claves del propietario |
-| P0-2 | API-001, INF-002 | ABIERTO | — | Producción devolvió 400 al `%2F`; parchear igualmente |
-| P0-3 | API-002 | ABIERTO | — | |
-| P0-4 | API-007 | ABIERTO | — | Adaptar el agente si cambia el contrato |
-| P0-5 | AGT-001 | ABIERTO | — | |
-| P0-6 | INF-010, 011, 013 | ABIERTO | — | Sincronizar generador y docs |
-| P1-1 | API-003, 004 | ABIERTO | — | |
-| P1-2 | API-005 | ABIERTO | — | |
-| P1-3 | API-006, INF-009 | ABIERTO | — | |
-| P1-4 | API-009 | ABIERTO | — | |
-| P1-5 | API-010, 012 | ABIERTO | — | |
-| P1-6 | API-008, 027 | ABIERTO | — | Verificar `.env` de producción antes de desplegar |
-| P1-7 | AGT-003 | ABIERTO | — | No romper el tray |
-| P1-8 | AGT-002 | ABIERTO | — | |
-| P1-9 | AGT-004 | ABIERTO | — | FROZEN: solo capa superior |
+| P0-2 | API-001, INF-002 | HECHO | — | Whitelist estricta (ALLOWED_RELEASE_FILES), basename, validación de prefijo con path.resolve y dotfiles: deny en /releases/latest/:filename y /releases/:version/:filename |
+| P0-3 | API-002 | HECHO | — | requireAuth aplicado a POST /sync/run-reactive y resolveOrgId lanza 401 Unauthorized (BridgeError) si no hay req.user |
+| P0-4 | API-007 | HECHO | — | POST /notifications/order exige auth o x-license-key válida en formato y BD; rechazo de CRLF en to/subject; restricción a emails registrados; rate limiting |
+| P0-5 | AGT-001 | HECHO | — | Validación estricta SemVer (VERSION_REGEX), confinamiento de ruta en tempDir y borrado atómico garantizado en fallo de descarga o firma Ed25519 |
+| P0-6 | INF-010, 011, 013, 014 | HECHO | — | Endpoint PHP blindado: cancel_order/webhook autenticados, create_order limitado (200 líneas) con PENDING_PAYMENT, detección de secreto <16 / placeholder (503), fin de secrets en URL, upload_image sin SVG. Template sincronizada |
+| P1-1 | API-003, 004 | HECHO | — | licenses-by-email fuerza req.user.organizationId ignorando query param para no-superadmin; create-portal-session resuelve stripe_customer_id desde BD y valida returnUrl |
+| P1-2 | API-005 | HECHO | — | flow.engine.ts handleEvent filtra flow.organizationId === event.organizationId; DISPATCH_WEBHOOK valida HTTPS, anti-SSRF (RFC1918, link-local, cloud metadata) y timeout 5s |
+| P1-3 | API-006, INF-009 | HECHO | — | Handlers inline onclick eliminados en licenses.js sustituidos por data-* y delegación en tbody; HWID/hostname/alias escapados en licenses.js, fleet.js y client-portal.js; validación Zod y servidor para alias y HWID |
+| P1-4 | API-009 | HECHO | — | agents.router.ts heartbeat previene degradación/reasignación a org_default en agentes existentes y sanitiza req.ip |
+| P1-5 | API-010, 012 | HECHO | — | connections.router.ts y sync.router.ts fuerzan organizationId desde token; monitoring.router.ts aplica resolveOrgId para aislar flota de RESELLER y OPERATOR |
+| P1-6 | API-008, 027 | HECHO | — | assertProductionSecrets() en server.ts aborta arranque en producción si faltan o son placeholders ADMIN_JWT_SECRET, LICENSE_JWT_SECRET, LICENSE_SIGNING_PRIVATE_KEY o PARTNER_SECRET |
+| P1-7 | AGT-003 | HECHO | — | MiniRouter endurecido: validación Host previo a parseo, rechazo Sec-Fetch-Site cross-site, X-Frame-Options: DENY, nosniff, límite 1 MB, Content-Type obligatorio en POST con Origin, X-Bentian-Token para navegador con compatibilidad nativa para tray/CLI sin Origin, bloqueo de UNC en GET /open-file-dialog (Anti-NTLM leak) |
+| P1-8 | AGT-002 | HECHO | — | Sanitización y escapeHtml universal de datos dinámicos en templates y scripts GUI (logs, channel, license, sync, factusol) antes de inserción en innerHTML |
+| P1-9 | AGT-004 | HECHO | — | Enmascaramiento de secretos (••••••••) en getStatusDetails(); preservación de secretos existentes en saveFullConfig() y métodos de test de conexión al recibir valores enmascarados |
 | P2-1 … P2-12 | ver §4 | ABIERTO | — | |
 | P3-1 … P3-9 | ver §5 | ABIERTO | — | |
 

@@ -1,11 +1,19 @@
 import assert from 'assert';
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 import { LocalAgent } from '../src/agent';
 import { LocalGuiServer } from '../src/gui/gui-server';
 
 console.log('--- Running Local GUI Server & Router Tests ---');
 
 async function testGuiServer() {
+  const testDir = path.join(os.tmpdir(), `bentian-gui-test-${Date.now()}`);
+  fs.mkdirSync(testDir, { recursive: true });
+  process.env.BENTIAN_DATA_DIR = testDir;
+  process.env.BENTIAN_CONFIG_PATH = path.join(testDir, 'agent-config.json');
+
   const agent = new LocalAgent();
   const server = new LocalGuiServer(agent, 39876);
 
@@ -152,8 +160,93 @@ async function testGuiServer() {
     assert(!phpBody.includes('%%EB_SECRET_KEY%%'), 'No deben quedar marcadores de posición sin reemplazar');
     console.log(`  ✓ GET /api/local/download-companion respondió 200 OK con ${phpBody.length} bytes de PHP personalizado.`);
 
+    // 15. Test Security Headers (AGT-003)
+    console.log('15. Probando cabeceras de seguridad (X-Frame-Options, X-Content-Type-Options)...');
+    assert.strictEqual(resRoot.headers.get('x-frame-options'), 'DENY');
+    assert.strictEqual(resRoot.headers.get('x-content-type-options'), 'nosniff');
+    console.log('  ✓ Cabeceras X-Frame-Options: DENY y X-Content-Type-Options: nosniff verificadas.');
+
+    // 16. Test Sec-Fetch-Site: cross-site -> 403 Forbidden
+    console.log('16. Probando rechazo de Sec-Fetch-Site: cross-site...');
+    const resCrossSite = await fetch(`${url}/api/local/status`, {
+      headers: { 'Sec-Fetch-Site': 'cross-site' },
+    });
+    assert.strictEqual(resCrossSite.status, 403);
+    console.log('  ✓ Sec-Fetch-Site: cross-site rechazado con 403 Forbidden.');
+
+    // 17. Content-Type enforcement on POST with Origin
+    console.log('17. Probando Content-Type enforcement en POST con Origin...');
+    const resBadType = await fetch(`${url}/api/local/autostart`, {
+      method: 'POST',
+      headers: {
+        Origin: 'http://127.0.0.1:39281',
+        'Content-Type': 'text/plain',
+      },
+      body: 'enabled=true',
+    });
+    assert.strictEqual(resBadType.status, 415);
+    console.log('  ✓ POST con Origin y Content-Type inválido rechazado con 415.');
+
+    // 18. Token extraction & validation for browser requests (AGT-003)
+    console.log('18. Probando autenticación por token para peticiones de navegador con Origin...');
+    const tokenMatch = html.match(/<meta\s+name="bentian-token"\s+content="([^"]+)"/);
+    assert(tokenMatch && tokenMatch[1], 'El HTML debe contener la meta etiqueta con el bentian-token');
+    const token = tokenMatch[1];
+
+    // Petición con Origin sin token debe fallar
+    const resNoToken = await fetch(`${url}/api/local/status`, {
+      headers: { Origin: 'http://127.0.0.1:39281' },
+    });
+    assert.strictEqual(resNoToken.status, 403);
+
+    // Petición con Origin y token válido debe tener éxito
+    const resWithToken = await fetch(`${url}/api/local/status`, {
+      headers: {
+        Origin: 'http://127.0.0.1:39281',
+        'X-Bentian-Token': token,
+      },
+    });
+    assert.strictEqual(resWithToken.status, 200);
+    console.log('  ✓ Token de sesión local (X-Bentian-Token) validado correctamente.');
+
+    // 19. Anti-NTLM Leak on GET /api/local/open-file-dialog with UNC path (AGT-003)
+    console.log('19. Probando bloqueo de rutas UNC en GET /api/local/open-file-dialog (Anti-NTLM leak)...');
+    const resUncGet = await fetch(`${url}/api/local/open-file-dialog?currentPath=\\\\evil-nas\\share\\db.accdb`);
+    assert.strictEqual(resUncGet.status, 400);
+    const uncJson = (await resUncGet.json()) as any;
+    assert(uncJson.message.includes('UNC'));
+    console.log('  ✓ Ruta UNC en GET /open-file-dialog bloqueada con 400 Bad Request.');
+
+    // 20. Secret Masking & Preservation (AGT-004)
+    console.log('20. Probando enmascaramiento y preservación de credenciales (AGT-004)...');
+    await agent.saveFullConfig({
+      woocommerce: {
+        storeUrl: 'https://test-store.local',
+        consumerKey: 'ck_real_123',
+        consumerSecret: 'cs_real_secret_456',
+      },
+    });
+    const statusBefore = await agent.getStatusDetails();
+    assert.strictEqual(statusBefore.woocommerceSettings?.consumerSecret, '••••••••', 'El secret debe estar enmascarado en status');
+    assert.strictEqual(statusBefore.woocommerceSettings?.consumerKey, 'ck_real_123', 'El key no debe estar enmascarado');
+
+    // Simular que el frontend devuelve el valor enmascarado sin cambiarlo
+    await agent.saveFullConfig({
+      woocommerce: {
+        storeUrl: 'https://test-store.local',
+        consumerKey: 'ck_real_123',
+        consumerSecret: '••••••••',
+      },
+    });
+    const secretInConfig = agent.getConfig().woocommerce?.consumerSecret;
+    assert.strictEqual(secretInConfig, 'cs_real_secret_456', 'El valor real del secret no debe haberse sobrescrito');
+    console.log('  ✓ Enmascaramiento y preservación de credenciales verificado exitosamente.');
+
   } finally {
     await server.stop();
+    delete process.env.BENTIAN_DATA_DIR;
+    delete process.env.BENTIAN_CONFIG_PATH;
+    try { fs.rmSync(testDir, { recursive: true, force: true }); } catch {}
     console.log('✓ LocalGuiServer detenido limpiamente.');
   }
 

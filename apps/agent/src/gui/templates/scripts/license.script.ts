@@ -32,7 +32,8 @@ export const licenseScript = `
             alertBox.style.display = 'inline-flex';
             alertBox.style.alignItems = 'center';
             alertBox.style.gap = '6px';
-            alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>Error: ' + (data.error || 'No se pudo activar la clave') + '</span>';
+            const safeErr = typeof escapeHtml === 'function' ? escapeHtml(data.error || 'No se pudo activar la clave') : (data.error || 'No se pudo activar la clave');
+            alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('error', 'color:#f87171;') : '') + '<span>Error: ' + safeErr + '</span>';
           }
           showToast(data.error || 'Error al activar clave', 'error');
         }

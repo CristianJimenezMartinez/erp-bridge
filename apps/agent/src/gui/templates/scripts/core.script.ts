@@ -1,4 +1,40 @@
 export const coreScript = `
+    // Interceptor global para inyectar token de sesión local en peticiones a la API
+    (function() {
+      const origFetch = window.fetch;
+      window.fetch = function(input, init) {
+        init = init || {};
+        const url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+        if (typeof url === 'string' && (url.startsWith('/api/local/') || url.startsWith('/v1/'))) {
+          const metaEl = document.querySelector('meta[name="bentian-token"]');
+          const token = window.__BENTIAN_TOKEN__ || (metaEl ? metaEl.getAttribute('content') : '');
+          if (token) {
+            init.headers = init.headers || {};
+            if (typeof Headers !== 'undefined' && init.headers instanceof Headers) {
+              if (!init.headers.has('X-Bentian-Token')) init.headers.set('X-Bentian-Token', token);
+            } else if (Array.isArray(init.headers)) {
+              init.headers.push(['X-Bentian-Token', token]);
+            } else {
+              init.headers['X-Bentian-Token'] = token;
+            }
+          }
+        }
+        return origFetch.call(this, input, init);
+      };
+    })();
+
+    // Helper canónico global anti-XSS
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .split('&').join('&amp;')
+        .split('<').join('&lt;')
+        .split('>').join('&gt;')
+        .split('"').join('&quot;')
+        .split("'").join('&#39;');
+    }
+    window.escapeHtml = escapeHtml;
+
     // Catálogo Centralizado de Iconos SVG Minimalistas Sobrios (Lucide style)
     const ICONS = {
       check: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',

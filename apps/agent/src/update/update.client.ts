@@ -19,6 +19,7 @@ import {
 } from './update.types';
 import { UpdateVerifier } from './update.verifier';
 import { UpdateSwapper } from './update.swapper';
+import { VERSION_REGEX } from './auto-updater';
 
 export class UpdateClient {
   private readonly logger = new Logger('UpdateClient');
@@ -261,6 +262,13 @@ export class UpdateClient {
         },
       });
 
+      if (checkData.available && checkData.version) {
+        if (!VERSION_REGEX.test(checkData.version)) {
+          this.logger.warn(`Versión de actualización sospechosa o no válida recibida: "${checkData.version}". Actualización rechazada.`);
+          checkData = { available: false };
+        }
+      }
+
       if (checkData.available && checkData.version && checkData.downloadUrl && checkData.sha256 && checkData.signature) {
         const pending: PendingUpdate = {
           version: checkData.version,
@@ -330,8 +338,20 @@ export class UpdateClient {
     this.state.status = 'downloading';
     this.lastReportedPercent = -1;
 
+    if (!update.version || !VERSION_REGEX.test(update.version)) {
+      this.isDownloading = false;
+      this.state.status = 'failed';
+      throw new Error(`Versión de actualización no válida o insegura: "${update.version}"`);
+    }
+
+    const safeTempDir = path.resolve(this.tempDir);
     const destFileName = `BentianAgent-v${update.version}.new.exe`;
-    const destFilePath = path.join(this.tempDir, destFileName);
+    const destFilePath = path.resolve(safeTempDir, destFileName);
+    if (!destFilePath.startsWith(safeTempDir + path.sep)) {
+      this.isDownloading = false;
+      this.state.status = 'failed';
+      throw new Error(`Ruta de descarga insegura fuera de tempDir: "${destFilePath}"`);
+    }
     const partFilePath = `${destFilePath}.part`;
 
     const fullUrl = update.downloadUrl.startsWith('http')
@@ -450,6 +470,12 @@ export class UpdateClient {
 
       return destFilePath;
     } catch (err: any) {
+      if (fs.existsSync(partFilePath)) {
+        try { fs.unlinkSync(partFilePath); } catch {}
+      }
+      if (fs.existsSync(destFilePath)) {
+        try { fs.unlinkSync(destFilePath); } catch {}
+      }
       const errorMsg = String(err?.message || err);
       this.state.status = 'failed';
       this.state.lastError = errorMsg;

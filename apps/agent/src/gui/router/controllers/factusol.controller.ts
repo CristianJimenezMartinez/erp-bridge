@@ -10,9 +10,27 @@ const logger = new Logger('FactusolController');
 export class FactusolController {
 
   public static openNativeFileDialog(agent?: LocalAgent): RouteHandler {
-    return async (_req, res, ctx) => {
+    return async (req, res, ctx) => {
       try {
         let initialPath = (ctx?.body && ctx.body.currentPath) || ctx?.parsedUrl?.searchParams?.get('currentPath') || undefined;
+
+        if (initialPath) {
+          const trimmed = String(initialPath).trim();
+          const isUnc = /^\\\\|^\/\//.test(trimmed);
+          if (isUnc && req.method === 'GET') {
+            logger.warn(`Intento de fuga NTLM bloqueado en GET /open-file-dialog: "${trimmed}"`);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Rutas UNC de red no permitidas en peticiones GET' }));
+            return;
+          }
+          if (/[\x00-\x1f<>"|?*]/.test(trimmed)) {
+            logger.warn(`Caracteres de control no válidos en ruta open-file-dialog: "${trimmed}"`);
+            initialPath = undefined;
+          } else {
+            initialPath = trimmed;
+          }
+        }
+
         if (!initialPath && agent) {
           initialPath = agent.configManager?.get()?.factusolDbPath;
         }
@@ -55,8 +73,14 @@ export class FactusolController {
 
   public static testFactusol(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const dbPath = ctx.body?.databasePath || '';
+      if (/[\x00-\x1f;]/.test(dbPath)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta de base de datos' }));
+        return;
+      }
       const t0 = performance.now();
-      const result = await agent.testFactusolConnection(ctx.body.databasePath || '');
+      const result = await agent.testFactusolConnection(dbPath);
       const durationMs = Math.round((performance.now() - t0) * 10) / 10;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ...result, durationMs }));
@@ -81,7 +105,13 @@ export class FactusolController {
 
   public static resolvePath(agent: LocalAgent): RouteHandler {
     return (_req, res, ctx) => {
-      const result = agent.resolveFactusolPath(ctx.body.path || '');
+      const inputPath = ctx.body?.path || '';
+      if (/[\x00-\x1f]/.test(inputPath)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta' }));
+        return;
+      }
+      const result = agent.resolveFactusolPath(inputPath);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result));
     };
