@@ -42,6 +42,10 @@ Allow: /
 
 # 3. Ubicación del Sitemap Canónico y Ficheros LLMs
 Sitemap: https://bridge.cristianjm.com/sitemap.xml
+Sitemap: https://bridge.cristianjm.com/sitemap-index.xml
+Sitemap: https://bridge.cristianjm.com/sitemap-main.xml
+Sitemap: https://bridge.cristianjm.com/sitemap-docs.xml
+Sitemap: https://bridge.cristianjm.com/sitemap-ciudades.xml
 Host: bridge.cristianjm.com
 
 # 4. Descubrimiento para Modelos de Inteligencia Artificial (GEO)

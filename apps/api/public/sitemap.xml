@@ -790,4 +790,15 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/api/esquema-pedidos-json/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/api/esquema-pedidos-json/" />
   </url>
+
+  <!-- Términos de Servicio y Licencia (EULA) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/terminos/</loc>
+    <lastmod>2026-10-07T00:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/terminos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/terminos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/terminos/" />
+  </url>
 </urlset>
