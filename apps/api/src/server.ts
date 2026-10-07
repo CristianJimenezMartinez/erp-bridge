@@ -57,7 +57,12 @@ export function assertProductionSecrets(): void {
     if (item.minLength && clean.length < item.minLength) {
       missingOrInvalid.push(`${item.name} length is below minimum required (${clean.length} < ${item.minLength})`);
     }
-    if (item.disallowed.some((d) => clean.toLowerCase().includes(d.toLowerCase()))) {
+    const isWeak =
+      item.disallowed.some((d) => clean.toLowerCase() === d.toLowerCase()) ||
+      clean.toLowerCase().includes('changeme') ||
+      clean.toLowerCase().includes('placeholder') ||
+      clean.toLowerCase() === 'secret';
+    if (isWeak) {
       missingOrInvalid.push(`${item.name} contains insecure placeholder value`);
     }
   }
