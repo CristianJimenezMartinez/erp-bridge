@@ -1192,5 +1192,50 @@ if ($mainAction === 'ack_cancelled_orders') {
     exit;
 }
 
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: CLEAN_TEST_DATA (Eliminación de artículos y pedidos de prueba)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'clean_test_data' || $mainAction === 'delete_test_data') {
+    $pdo = getDbConnection();
+    ensureTablesExist($pdo);
+
+    $delProd = $pdo->exec("DELETE FROM `eb_products` WHERE `code` = '000001' OR `name` LIKE '%Taladro Percutor%' OR `code` LIKE 'TEST%'");
+    $delStock = $pdo->exec("DELETE FROM `eb_stock` WHERE `code` = '000001' OR `code` LIKE 'TEST%'");
+    $delOrders = $pdo->exec("DELETE FROM `eb_orders` WHERE `order_number` LIKE '%PRUEBA%' OR `order_number` LIKE '%TEST%' OR `customer_data` LIKE '%test@test.com%'");
+
+    echo json_encode([
+        'success' => true,
+        'deletedProducts' => intval($delProd),
+        'deletedStock' => intval($delStock),
+        'deletedOrders' => intval($delOrders),
+        'message' => 'Datos de prueba eliminados correctamente de la base de datos de la tienda online',
+    ]);
+    exit;
+}
+
+// ----------------------------------------------------------------------------
+// ACCIÓN PROTEGIDA: DELETE_PRODUCT (Eliminación de artículo individual por código)
+// ----------------------------------------------------------------------------
+if ($mainAction === 'delete_product' || $mainAction === 'delete_article') {
+    $code = trim($_GET['code'] ?? $data['code'] ?? $data['codart'] ?? '');
+    if (empty($code)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Código de artículo no especificado (parámetro code)']);
+        exit;
+    }
+    $pdo = getDbConnection();
+    ensureTablesExist($pdo);
+    $stmt1 = $pdo->prepare("DELETE FROM `eb_products` WHERE `code` = :code");
+    $stmt1->execute([':code' => $code]);
+    $stmt2 = $pdo->prepare("DELETE FROM `eb_stock` WHERE `code` = :code");
+    $stmt2->execute([':code' => $code]);
+    echo json_encode([
+        'success' => true,
+        'code' => $code,
+        'message' => "Artículo {$code} eliminado correctamente de la tienda web",
+    ]);
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['error' => 'Acción no válida: ' . htmlspecialchars($mainAction)]);

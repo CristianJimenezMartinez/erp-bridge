@@ -1,0 +1,79 @@
+{
+  "shippingData": {
+    "fullName": "Pablo Rubio",
+    "email": "info@suministrosrubio.com",
+    "address": "C/ Suministros Rubio",
+    "city": "Tomelloso",
+    "province": "Ciudad Real",
+    "postalCode": "13700",
+    "country": "España",
+    "phone": ""
+  },
+  "customer": {
+    "fullName": "Pablo Rubio",
+    "email": "info@suministrosrubio.com",
+    "address": "C/ Suministros Rubio",
+    "city": "Tomelloso",
+    "province": "Ciudad Real",
+    "postalCode": "13700",
+    "country": "España",
+    "phone": ""
+  },
+  "paymentMethod": "paypal",
+  "paymentStatus": "COMPLETED",
+  "paymentReference": "PAYPAL-PABLO-RUBIO-062",
+  "subtotal": 0.51,
+  "taxTotal": 0.11,
+  "shippingCost": 0.00,
+  "total": 0.62,
+  "order": {
+    "subtotal": 0.51,
+    "taxTotal": 0.11,
+    "shippingCost": 0.00,
+    "total": 0.62,
+    "lines": [
+      {
+        "artlpc": "67466",
+        "code": "67466",
+        "sku": "67466",
+        "deslpc": "PRUEBAS",
+        "name": "PRUEBAS",
+        "description": "PRUEBAS",
+        "canlpc": 1,
+        "quantity": 1,
+        "prelpc": 0.51,
+        "price": 0.51,
+        "unitPrice": 0.51,
+        "ivaplc": 21,
+        "ivalpc": 0.11,
+        "vatRate": 21,
+        "vatPercent": 21,
+        "tivart": 21,
+        "totlpc": 0.62,
+        "total": 0.62
+      }
+    ]
+  },
+  "lines": [
+    {
+      "artlpc": "67466",
+      "code": "67466",
+      "sku": "67466",
+      "deslpc": "PRUEBAS",
+      "name": "PRUEBAS",
+      "description": "PRUEBAS",
+      "canlpc": 1,
+      "quantity": 1,
+      "prelpc": 0.51,
+      "price": 0.51,
+      "unitPrice": 0.51,
+      "ivaplc": 21,
+      "ivalpc": 0.11,
+      "vatRate": 21,
+      "vatPercent": 21,
+      "tivart": 21,
+      "totlpc": 0.62,
+      "total": 0.62
+    }
+  ]
+}

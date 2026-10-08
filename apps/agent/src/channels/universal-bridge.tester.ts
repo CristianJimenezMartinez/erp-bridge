@@ -98,6 +98,8 @@ export class UniversalBridgeTester {
         } catch {}
 
         if (json && (json.status === 'ok' || json.success === true || json.service)) {
+          checks.serverOnline = true;
+          if (cleanBaseUrl.startsWith('https://')) checks.sslValid = true;
           checks.endpointFound = true;
           serverDetails.endpointUrl = ep;
           serverDetails.version = json.version || '1.0.0';
