@@ -224,14 +224,14 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 13. Cloudflare WAF or Anti-bot Challenge Blocking
+  // 13. Cloudflare WAF Blocking
   {
     code: 'ERR_WEB_CLOUDFLARE_BLOCK',
-    pattern: /Cloudflare|ray id|cf-ray|managed challenge|bot fight|waf.*block|1020|1015/i,
+    pattern: /cf-ray|bloqueo.*waf|1020|1015|cf-mitigated|waf.*block/i,
     build: () => ({
       code: 'ERR_WEB_CLOUDFLARE_BLOCK',
       title: 'Conexión bloqueada por el cortafuegos de Cloudflare',
-      message: 'El cortafuegos WAF o el modo "Bot Fight Mode" de Cloudflare en tu tienda web está interceptando las peticiones del Agente y exigiendo resolver un captcha.',
+      message: 'El cortafuegos WAF de Cloudflare en tu tienda web está interceptando las peticiones del Agente.',
       suggestion: 'En el panel de Cloudflare de tu dominio, ve a Security > WAF y crea una regla para omitir la inspección en las rutas "/wp-json/wc/" o "/erp-bridge-endpoint.php".',
       actionLabel: 'Revisar canal web',
       targetTab: 'channel',

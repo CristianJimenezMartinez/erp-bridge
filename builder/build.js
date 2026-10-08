@@ -39,16 +39,22 @@ function findInnoCompiler() {
 
 function createZipArchive(files, outputZip) {
   if (fs.existsSync(outputZip)) {
-    fs.unlinkSync(outputZip);
+    try { fs.unlinkSync(outputZip); } catch {}
+  }
+  const tempZip = path.resolve(require('os').tmpdir(), `bentian_zip_${Date.now()}_${path.basename(outputZip)}`);
+  if (fs.existsSync(tempZip)) {
+    try { fs.unlinkSync(tempZip); } catch {}
   }
   const fileArgs = files.map(f => `'${f.replace(/'/g, "''")}'`).join(',');
-  const psScript = `Compress-Archive -Path ${fileArgs} -DestinationPath '${outputZip.replace(/'/g, "''")}' -Force`;
+  const psScript = `Compress-Archive -Path ${fileArgs} -DestinationPath '${tempZip.replace(/'/g, "''")}' -Force`;
   const res = childProcess.spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', psScript], {
     stdio: 'inherit'
   });
-  if (res.status !== 0 || !fs.existsSync(outputZip)) {
+  if (res.status !== 0 || !fs.existsSync(tempZip)) {
     throw new Error(`Fallo al generar archivo ZIP: ${outputZip}`);
   }
+  fs.copyFileSync(tempZip, outputZip);
+  try { fs.unlinkSync(tempZip); } catch {}
 }
 
 function updateLandingHtml(rootDir, version, hashes) {
@@ -162,7 +168,10 @@ async function runMasterBuild() {
     }
   }
 
-  const distDir = path.resolve(builderDir, 'dist');
+  const distDir = path.resolve(process.env.LOCALAPPDATA || require('os').tmpdir(), 'bentian-build-dist');
+  if (!fs.existsSync(distDir)) {
+    fs.mkdirSync(distDir, { recursive: true });
+  }
   const releasesDir = path.resolve(rootDir, 'releases');
   const versionReleaseDir = path.resolve(releasesDir, `v${version}`);
 
@@ -180,7 +189,7 @@ async function runMasterBuild() {
 
   // 2. Native Windows Executable
   console.log('>>> [2/6] Generando Ejecutable Nativo BentianAgent.exe...');
-  const exeResult = await buildExecutable({ distDir, forceRebuild: true });
+  const exeResult = await buildExecutable({ distDir, forceRebuild: true, skipBundle: true });
   console.log('    [UAC Shield] Binario compilado y protegido con nivel requireAdministrator.');
 
   // Firma Authenticode de ejecutables base antes de empaquetar
@@ -201,11 +210,13 @@ async function runMasterBuild() {
     console.log(`    Plantilla: ${issFile}`);
     console.log(`    Destino: ${versionReleaseDir}`);
 
-    const isccCmd = `"${isccPath}" /Qp /DAppVersion="${version}" /DSourceDir="${distDir}" /DOutputDir="${versionReleaseDir}" "${issFile}"`;
+    const isccCmd = `"${isccPath}" /Qp /DAppVersion="${version}" /DSourceDir="${distDir}" /DOutputDir="${distDir}" "${issFile}"`;
     childProcess.execSync(isccCmd, { stdio: 'inherit' });
 
+    const localInstaller = path.resolve(distDir, `Bentian-Setup-v${version}.exe`);
     installerPath = path.resolve(versionReleaseDir, `Bentian-Setup-v${version}.exe`);
-    if (fs.existsSync(installerPath)) {
+    if (fs.existsSync(localInstaller)) {
+      fs.copyFileSync(localInstaller, installerPath);
       const instStats = fs.statSync(installerPath);
       console.log(`    ✓ Instalador generado: ${installerPath} (${(instStats.size / (1024 * 1024)).toFixed(2)} MB)`);
       // Firma Authenticode del instalador final

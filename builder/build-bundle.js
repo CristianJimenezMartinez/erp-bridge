@@ -20,6 +20,9 @@ async function buildAgentBundle(options = {}) {
 
   const entryFile = path.resolve(rootDir, 'apps/agent/src/cli.ts');
   const outBundle = path.resolve(outDir, 'bentian-agent.bundle.cjs');
+  if (fs.existsSync(outBundle)) {
+    try { fs.unlinkSync(outBundle); } catch {}
+  }
   const adodbSource = path.resolve(rootDir, 'packages/connectors/factusol/src/adodb.js');
   const adodbDest = path.resolve(outDir, 'adodb.js');
 
@@ -56,13 +59,15 @@ async function buildAgentBundle(options = {}) {
   console.log(`[3/4] Compilando y empaquetando con esbuild (Minify: ${shouldMinify}, Sourcemap: ${shouldSourcemap})...`);
   const result = await esbuild.build({
     entryPoints: [entryFile],
-    outfile: outBundle,
+    write: false,
     bundle: true,
     platform: 'node',
     target: 'node20',
     format: 'cjs',
     sourcemap: shouldSourcemap,
-    minify: shouldMinify,
+    minifyWhitespace: shouldMinify,
+    minifySyntax: shouldMinify,
+    minifyIdentifiers: false,
     legalComments: 'none',
     banner: {
       js: `/**
@@ -87,6 +92,11 @@ async function buildAgentBundle(options = {}) {
   if (result.errors && result.errors.length > 0) {
     console.error('ERRORES EN EL BUNDLE:', result.errors);
     throw new Error('Fallo al empaquetar el agente');
+  }
+
+  // Escribir bundle en disco usando fs nativo de Node.js (compatibilidad con discos virtuales)
+  if (result.outputFiles && result.outputFiles[0]) {
+    fs.writeFileSync(outBundle, result.outputFiles[0].contents);
   }
 
   // Copiar los archivos auxiliares adodb.js e icon.ico junto al bundle

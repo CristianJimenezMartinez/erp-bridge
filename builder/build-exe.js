@@ -19,8 +19,12 @@ async function buildExecutable(options = {}) {
   const adodbSource = path.resolve(builderDir, '../packages/connectors/factusol/src/adodb.js');
   const adodbDest = path.resolve(distDir, 'adodb.js');
 
-  console.log('[1/5] Compilando bundle JS actualizado...');
-  await buildAgentBundle({ outDir: distDir });
+  if (!options.skipBundle) {
+    console.log('[1/5] Compilando bundle JS actualizado...');
+    await buildAgentBundle({ outDir: distDir });
+  } else {
+    console.log('[1/5] Usando bundle JS precompilado...');
+  }
 
   console.log('[2/5] Generando configuración Single Executable Application (SEA)...');
   const seaConfig = {
