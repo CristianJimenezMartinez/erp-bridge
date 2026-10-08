@@ -192,20 +192,24 @@ export const errorHumanizerScript = `
       {
         code: 'ERR_LICENSE_EXPIRED',
         pattern: /EXPIRED|periodo de prueba finalizado|beta finalizada|licencia caducada|trial expired|periodo de evaluación/i,
-        title: 'Periodo de prueba de 60 días concluido',
-        message: '¡Gracias por probar Bentian! El periodo de evaluación gratuita de la beta pública ha concluido en este ordenador.',
-        suggestion: 'Para seguir sincronizando tu Factusol con tu tienda web de forma desatendida, activa tu Plan Fundador con descuento vitalicio del 30%.',
-        actionLabel: 'Ir a activar o renovar licencia',
+        title: (Date.now() <= new Date('2026-12-31T23:59:59Z').getTime()) ? 'Licencia caducada — Beta Gratuita Disponible' : 'Periodo de prueba concluido',
+        message: (Date.now() <= new Date('2026-12-31T23:59:59Z').getTime())
+          ? 'La clave actual ha caducado. Puedes solicitar una clave gratuita para la Beta Pública 2026 en solo 10 segundos.'
+          : '¡Gracias por probar Bentian! El periodo de evaluación gratuita de la beta pública ha concluido en este ordenador.',
+        suggestion: (Date.now() <= new Date('2026-12-31T23:59:59Z').getTime())
+          ? 'Consigue tu clave gratuita de la Beta Pública hasta el 31 de Diciembre de 2026 en bridge.cristianjm.com/beta/'
+          : 'Para seguir sincronizando tu Factusol con tu tienda web de forma desatendida, activa tu Plan Fundador con descuento vitalicio del 30%.',
+        actionLabel: (Date.now() <= new Date('2026-12-31T23:59:59Z').getTime()) ? 'Pedir Clave Beta Gratis ↗' : 'Ir a activar o renovar licencia',
         targetTab: 'license',
         targetInputId: 'input-lic-key',
-        helpUrl: 'https://bridge.cristianjm.com/dashboard/?action=upgrade&plan=founder_annual'
+        helpUrl: (Date.now() <= new Date('2026-12-31T23:59:59Z').getTime()) ? 'https://bridge.cristianjm.com/beta/' : 'https://bridge.cristianjm.com/dashboard/?action=upgrade&plan=founder_annual'
       },
       {
         code: 'ERR_LICENSE_INVALID',
         pattern: /INVALID_KEY|clave no encontrada|clave no válida|formato de clave|invalid license|clave no reconocida/i,
         title: 'Clave de licencia no reconocida',
         message: 'La clave de licencia introducida no tiene el formato estándar o contiene caracteres incorrectos.',
-        suggestion: 'Las claves oficiales de Bentian comienzan con "EB-" (ejemplo: EB-PRO-XXXXX) y no deben incluir espacios en blanco.',
+        suggestion: 'Las claves oficiales de Bentian comienzan con "EB-" (ejemplo: EB-XXXXX-XXXXX...). Si no dispones de una, puedes solicitar tu clave gratuita de la Beta Pública hasta el 31 de Diciembre en bridge.cristianjm.com/beta/',
         actionLabel: 'Introducir clave de licencia',
         targetTab: 'license',
         targetInputId: 'input-lic-key',

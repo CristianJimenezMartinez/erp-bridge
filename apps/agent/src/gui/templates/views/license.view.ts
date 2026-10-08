@@ -50,8 +50,19 @@ export function renderLicenseTab(): string {
               </button>
             </div>
             <div id="lic-activate-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
-            <div style="margin-top: 6px; font-size: 11px; color: var(--text-subtle);">
-              ¿Aún no tienes tu clave? <a href="https://bridge.cristianjm.com/beta/" target="_blank" style="color: #818cf8; text-decoration: underline;">Consigue tu clave de activación de la Beta (60 días gratis) ↗</a>
+            <div id="lic-beta-promo-box" style="margin-top: 14px; padding: 14px 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+              <div>
+                <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 6px;">
+                  <span>🎁 ¿Aún no tienes clave de activación?</span>
+                  <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 1px 6px; border-radius: 999px; font-weight: 700;">BETA GRATUITA</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                  Solicita tu clave oficial de la Beta Pública con acceso ilimitado hasta el <strong>31 de Diciembre de 2026</strong>.
+                </div>
+              </div>
+              <a href="https://bridge.cristianjm.com/beta/" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap;">
+                <span>Pedir Clave Beta Gratis ↗</span>
+              </a>
             </div>
           </div>
 

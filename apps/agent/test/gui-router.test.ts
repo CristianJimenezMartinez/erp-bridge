@@ -251,6 +251,7 @@ async function testGuiServer() {
   }
 
   console.log('ALL LOCAL GUI & ROUTER TESTS PASSED SUCCESSFULLY!');
+  process.exit(0);
 }
 
 testGuiServer().catch((err) => {

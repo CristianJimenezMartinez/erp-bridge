@@ -37,6 +37,21 @@ export function renderWizardModal(): string {
             </div>
             <div id="wiz-lic-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
           </div>
+
+          <div id="wiz-beta-promo-box" style="margin-top: 16px; padding: 14px 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 6px;">
+                <span>🎁 ¿Aún no tienes clave?</span>
+                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 1px 6px; border-radius: 999px; font-weight: 700;">BETA GRATUITA</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+                Consigue tu clave instantánea con acceso completo hasta el <strong>31 de Diciembre de 2026</strong>.
+              </div>
+            </div>
+            <a href="https://bridge.cristianjm.com/beta/" target="_blank" class="btn btn-secondary btn-sm" style="color: #c7d2fe; border-color: rgba(99, 102, 241, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+              <span>Obtener Clave Beta ↗</span>
+            </a>
+          </div>
         </div>
 
         <!-- PASO 2: FACTUSOL -->

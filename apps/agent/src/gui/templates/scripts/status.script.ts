@@ -442,13 +442,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       // 4. Caso Licencia Pendiente
       if (!isLicenseActive) {
+        const isBetaOpen = Date.now() <= new Date('2026-12-31T23:59:59Z').getTime();
         if (banner) {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(255, 255, 255, 0.03)';
           banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = 'Licencia del puesto requerida';
-          if (bannerDesc) bannerDesc.textContent = 'Introduce tu clave de suscripción para activar la sincronización desatendida y el control de existencias.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Activar Licencia →';
+          if (bannerTitle) bannerTitle.textContent = isBetaOpen ? 'Licencia requerida — Beta Pública Gratuita' : 'Licencia del puesto requerida';
+          if (bannerDesc) bannerDesc.textContent = isBetaOpen
+            ? 'Introduce tu clave o solicita tu clave gratuita de la Beta Pública (válida hasta el 31 de Diciembre) en bridge.cristianjm.com/beta/'
+            : 'Introduce tu clave de suscripción para activar la sincronización desatendida y el control de existencias.';
+          if (bannerBtnText) bannerBtnText.textContent = isBetaOpen ? 'Activar / Pedir Clave Beta →' : 'Activar Licencia →';
           if (bannerIconBox) {
             bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#f87171';
@@ -468,15 +471,17 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           badge.style.color = '#f87171';
         }
         if (badgeDot) badgeDot.style.background = '#f87171';
-        if (badgeText) badgeText.textContent = 'Licencia Pendiente';
-        if (zenTitle) zenTitle.textContent = 'Activa la licencia de este equipo';
-        if (zenSub) zenSub.textContent = 'Introduce la clave de tu suscripción para desbloquear el motor autónomo de sincronización en tiempo real.';
+        if (badgeText) badgeText.textContent = isBetaOpen ? 'Beta Pública Gratuita Disponible' : 'Licencia Pendiente';
+        if (zenTitle) zenTitle.textContent = isBetaOpen ? 'Prueba Bentian gratis con la Beta Pública 2026' : 'Activa la licencia de este equipo';
+        if (zenSub) zenSub.textContent = isBetaOpen
+          ? 'Introduce tu clave o consigue al instante una clave gratuita de la Beta Pública (válida hasta el 31 de Diciembre de 2026) para sincronizar sin coste.'
+          : 'Introduce la clave de tu suscripción para desbloquear el motor autónomo de sincronización en tiempo real.';
         if (primaryBtn) {
           primaryBtn.className = 'btn btn-primary btn-lg';
-          primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-          primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+          primaryBtn.style.background = isBetaOpen ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'linear-gradient(135deg, #ef4444, #dc2626)';
+          primaryBtn.style.boxShadow = isBetaOpen ? '0 4px 20px rgba(99,102,241,0.35)' : '0 4px 20px rgba(239,68,68,0.35)';
         }
-        if (primaryBtnText) primaryBtnText.textContent = 'Activar Licencia →';
+        if (primaryBtnText) primaryBtnText.textContent = isBetaOpen ? 'Activar o Conseguir Clave Beta →' : 'Activar Licencia →';
         if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/></svg>';
         _currentZenPrimaryAction = function() {
           navigateToResolution('license', 'input-lic-key');
@@ -667,6 +672,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inLicKey = document.getElementById('input-lic-key');
         if (inLicKey && data.licenseKey && (force || !inLicKey.value || document.activeElement !== inLicKey)) {
           inLicKey.value = data.licenseKey;
+        }
+
+        if (Date.now() > new Date('2026-12-31T23:59:59Z').getTime()) {
+          const wizBetaBox = document.getElementById('wiz-beta-promo-box');
+          if (wizBetaBox) wizBetaBox.style.display = 'none';
+          const licBetaBox = document.getElementById('lic-beta-promo-box');
+          if (licBetaBox) licBetaBox.style.display = 'none';
         }
 
         window.__formInputsInitialized = true;
