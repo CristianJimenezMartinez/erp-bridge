@@ -5,6 +5,7 @@ import { factusolScript } from './factusol.script';
 import { channelScript } from './channel.script';
 import { licenseScript } from './license.script';
 import { syncScript } from './sync.script';
+import { salesHistoryScript } from './sales-history.script';
 import { logsScript } from './logs.script';
 import { wizardScript } from './wizard.script';
 
@@ -20,6 +21,7 @@ export function renderClientScript(agentVersion: string = '0.2.0', localToken: s
     channelScript,
     licenseScript,
     syncScript,
+    salesHistoryScript,
     logsScript,
     wizardScript,
     '    // Inicializar sondeo con protección de timer único',

@@ -484,7 +484,8 @@ export const coreScript = `
         loadArticlePreview();
         loadFactusolMetadata();
       } else if (tabId === 'history') {
-        loadSyncHistory();
+        if (typeof loadSalesOrders === 'function') loadSalesOrders();
+        if (typeof loadSyncHistory === 'function') loadSyncHistory();
       }
     }
     window.switchTab = switchTab;

@@ -12,6 +12,7 @@ import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
 import { CatalogUploadHelper } from './catalog-upload.helper';
 import { OrderNotifierService } from '../notifications/order-notifier.service';
+import { SalesLedgerManager } from '../orders/sales-ledger.manager';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -24,7 +25,8 @@ export class LocalSyncEngine {
     private readonly factusolService: FactusolService,
     private readonly historyManager: HistoryManager,
     private readonly eventBus: EventBus,
-    private readonly licenseCheckFn?: () => { status: string; plan?: string }
+    private readonly licenseCheckFn?: () => { status: string; plan?: string },
+    private readonly salesLedgerManager?: SalesLedgerManager
   ) {}
 
   public isBusy(): boolean {
@@ -397,6 +399,12 @@ export class LocalSyncEngine {
                 }).catch(() => null);
 
                 ordersImported++;
+                this.recordSalesOrder(
+                  'woocommerce', String(wcOrder.id), String(wcOrder.number || wcOrder.id),
+                  wcOrder.date_created, series, canonicalOrder, 'synced', assignedNum, undefined,
+                  parseFloat(String(wcOrder.total || canonicalOrder.totalAmount || 0)), wcOrder.currency,
+                  canonicalOrder.paymentMethod || wcOrder.payment_method_title
+                );
                 AgentDiskLogger.getInstance().log({
                   level: 'SUCCESS',
                   component: 'SyncEngine',
@@ -424,6 +432,13 @@ export class LocalSyncEngine {
                   this.logger.warn(`Aviso al despachar email de pedido #${wcOrder.id}: ${String(err)}`);
                 });
               } else {
+                this.recordSalesOrder(
+                  'woocommerce', String(wcOrder.id), String(wcOrder.number || wcOrder.id),
+                  wcOrder.date_created, series, canonicalOrder, 'failed', undefined,
+                  orderRes.error || 'No se pudo importar pedido a Factusol',
+                  parseFloat(String(wcOrder.total || canonicalOrder.totalAmount || 0)), wcOrder.currency,
+                  canonicalOrder.paymentMethod || wcOrder.payment_method_title
+                );
                 AgentDiskLogger.getInstance().log({
                   level: 'ERROR',
                   component: 'SyncEngine',
@@ -876,6 +891,14 @@ export class LocalSyncEngine {
                 factusolSeries: series,
               });
 
+              this.recordSalesOrder(
+                'universal_bridge', String(po.id), String(po.order_number || canonicalOrder.orderNumber || po.id),
+                po.created_at || po.date || (canonicalOrder.date instanceof Date ? canonicalOrder.date.toISOString() : ''),
+                series, canonicalOrder, 'synced', String(factNum || mutRes.externalId), undefined,
+                parseFloat(String(canonicalOrder.totalAmount || po.total || po.total_amount || 0)), po.currency,
+                canonicalOrder.paymentMethod || po.payment_method
+              );
+
               AgentDiskLogger.getInstance().log({
                 level: 'SUCCESS',
                 component: 'SyncEngine',
@@ -903,6 +926,14 @@ export class LocalSyncEngine {
                 this.logger.warn(`Aviso al despachar email de pedido ${canonicalOrder.reference}: ${String(err)}`);
               });
             } else {
+              this.recordSalesOrder(
+                'universal_bridge', String(po.id), String(po.order_number || canonicalOrder.orderNumber || po.id),
+                po.created_at || po.date || (canonicalOrder.date instanceof Date ? canonicalOrder.date.toISOString() : ''),
+                series, canonicalOrder, 'failed', undefined, mutRes.error || 'No se pudo registrar pedido en Factusol',
+                parseFloat(String(canonicalOrder.totalAmount || po.total || po.total_amount || 0)), po.currency,
+                canonicalOrder.paymentMethod || po.payment_method
+              );
+
               AgentDiskLogger.getInstance().log({
                 level: 'ERROR',
                 component: 'SyncEngine',
@@ -921,6 +952,22 @@ export class LocalSyncEngine {
             }
           } catch (ordErr) {
             this.logger.error(`Error al procesar pedido web #${numId}:`, ordErr);
+            if (this.salesLedgerManager && po) {
+              try {
+                this.salesLedgerManager.recordOrder({
+                  channel: 'universal_bridge',
+                  webOrderId: String(po.id || numId),
+                  orderNumber: String(po.order_number || numId),
+                  date: po.created_at || po.date || new Date().toISOString(),
+                  customerName: po.customer?.fullName || po.customer?.name || 'Cliente Web',
+                  totalAmount: parseFloat(String(po.total || po.total_amount || 0)),
+                  currency: po.currency || 'EUR',
+                  status: 'failed',
+                  error: ordErr instanceof Error ? ordErr.message : String(ordErr),
+                  lines: [],
+                });
+              } catch {}
+            }
           }
         }
 
@@ -1050,5 +1097,55 @@ export class LocalSyncEngine {
       config,
       options
     );
+  }
+
+  private recordSalesOrder(
+    channel: 'woocommerce' | 'universal_bridge',
+    webOrderId: string,
+    orderNumber: string,
+    date: string,
+    series: string,
+    canonicalOrder: any,
+    status: 'synced' | 'pending' | 'failed',
+    assignedNum?: string,
+    error?: string,
+    totalAmount?: number,
+    currency?: string,
+    paymentMethod?: string
+  ): void {
+    if (!this.salesLedgerManager) return;
+    try {
+      this.salesLedgerManager.recordOrder({
+        channel,
+        webOrderId,
+        orderNumber,
+        date: date || new Date().toISOString(),
+        factusolSeries: series,
+        factusolOrderNumber: assignedNum,
+        customerName: canonicalOrder.customer?.fiscalName || canonicalOrder.customer?.name || 'Cliente Web',
+        customerEmail: canonicalOrder.customer?.email,
+        customerPhone: canonicalOrder.customer?.phone,
+        totalAmount: Number(totalAmount ?? canonicalOrder.totalAmount ?? 0),
+        currency: currency || canonicalOrder.currency || 'EUR',
+        status,
+        error,
+        lines: (canonicalOrder.lines || []).map((l: any) => ({
+          sku: l.sku || '',
+          name: l.name || '',
+          quantity: Number(l.quantity) || 1,
+          unitPrice: Number(l.unitPrice) || 0,
+          total: Number(l.total) || 0,
+        })),
+        shippingAddress: [
+          canonicalOrder.shippingAddress?.street,
+          canonicalOrder.shippingAddress?.city,
+          canonicalOrder.shippingAddress?.postalCode,
+          canonicalOrder.shippingAddress?.state,
+        ].filter(Boolean).join(', '),
+        paymentMethod: paymentMethod || canonicalOrder.paymentMethod,
+      });
+    } catch (err) {
+      this.logger.warn(`Aviso al registrar pedido en libro de ventas: ${String(err)}`);
+    }
   }
 }

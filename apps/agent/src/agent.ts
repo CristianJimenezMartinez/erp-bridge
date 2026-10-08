@@ -38,10 +38,17 @@ import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, Un
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 import { AutoStartService } from './system';
 import { OrderNotifierService } from './notifications/order-notifier.service';
+import {
+  SalesLedgerManager,
+  GetSalesOrdersOptions,
+  PaginatedSalesOrdersResult,
+  SalesOrderRecord,
+} from './orders';
 
 // Re-exportar tipos para 100% de compatibilidad externa
 export * from './config';
 export * from './history';
+export * from './orders';
 export * from './diagnostics';
 export * from './license';
 export * from './factusol';
@@ -68,6 +75,7 @@ export class LocalAgent {
   // Subservicios de dominio
   public readonly configManager: ConfigManager;
   public readonly historyManager: HistoryManager;
+  public readonly salesLedgerManager: SalesLedgerManager;
   public readonly eventBus: EventBus;
   public readonly licenseService: LicenseService;
   public readonly factusolService: FactusolService;
@@ -87,7 +95,9 @@ export class LocalAgent {
 
   constructor(customConfig?: Partial<AgentConfigFile>, customStoreDir?: string) {
     this.configManager = new ConfigManager(customConfig);
-    this.historyManager = new HistoryManager(this.configManager.getAppDir());
+    const storeDir = customStoreDir || this.configManager.getAppDir();
+    this.historyManager = new HistoryManager(storeDir);
+    this.salesLedgerManager = new SalesLedgerManager(storeDir);
     this.eventBus = new EventBus(80);
     this.licenseService = new LicenseService(this.configManager, this.eventBus, customStoreDir);
     this.factusolService = new FactusolService(this.configManager, this.eventBus);
@@ -97,7 +107,8 @@ export class LocalAgent {
       this.factusolService,
       this.historyManager,
       this.eventBus,
-      () => this.licenseService.getLicenseStatus()
+      () => this.licenseService.getLicenseStatus(),
+      this.salesLedgerManager
     );
     this.autoStartService = new AutoStartService();
 
@@ -247,6 +258,134 @@ export class LocalAgent {
 
   public addSyncHistoryRecord(record: Omit<SyncHistoryRecord, 'id' | 'timestamp'>): void {
     this.historyManager.addSyncHistoryRecord(record);
+  }
+
+  // --- Métodos de Libro de Ventas (Sales Ledger) ---
+  public getSalesOrders(options?: GetSalesOrdersOptions): PaginatedSalesOrdersResult {
+    return this.salesLedgerManager.getOrders(options);
+  }
+
+  public getSalesOrderById(id: string): SalesOrderRecord | null {
+    return this.salesLedgerManager.getOrderById(id);
+  }
+
+  public async retrySalesOrder(id: string): Promise<{ success: boolean; message: string; order?: SalesOrderRecord }> {
+    const order = this.salesLedgerManager.getOrderById(id);
+    if (!order) {
+      return { success: false, message: 'Pedido no encontrado en el registro local.' };
+    }
+    if (order.status === 'synced') {
+      return {
+        success: false,
+        message: `El pedido #${order.orderNumber} ya se encuentra sincronizado en Factusol (Nº ${order.factusolOrderNumber || '-'}).`,
+      };
+    }
+
+    const config = this.configManager.get();
+    const series = order.factusolSeries || config.factusol?.orderSeries || '1';
+    const warehouse = config.factusol?.warehouseCode || 'GEN';
+
+    const canonicalOrder = {
+      id: order.webOrderId,
+      orderNumber: order.orderNumber,
+      reference: order.orderNumber,
+      orderDate: order.date || new Date().toISOString(),
+      status: 'processing',
+      customer: {
+        id: order.webOrderId,
+        name: order.customerName,
+        email: order.customerEmail || 'cliente@tienda.com',
+        phone: order.customerPhone || '',
+      },
+      shippingAddress: {
+        firstName: order.customerName.split(' ')[0] || 'Cliente',
+        lastName: order.customerName.split(' ').slice(1).join(' ') || '',
+        street: order.shippingAddress || '',
+        city: '',
+        postalCode: '',
+        country: 'ES',
+        phone: order.customerPhone || '',
+        email: order.customerEmail || '',
+      },
+      billingAddress: {
+        firstName: order.customerName.split(' ')[0] || 'Cliente',
+        lastName: order.customerName.split(' ').slice(1).join(' ') || '',
+        street: order.shippingAddress || '',
+        city: '',
+        postalCode: '',
+        country: 'ES',
+        phone: order.customerPhone || '',
+        email: order.customerEmail || '',
+      },
+      lines: (order.lines || []).map((l, idx) => ({
+        id: `line-${idx + 1}`,
+        sku: l.sku,
+        name: l.name,
+        quantity: l.quantity,
+        unitPrice: l.unitPrice,
+        total: l.total,
+        taxRate: 21,
+        taxAmount: Math.round(l.total * 0.21 * 100) / 100,
+      })),
+      totals: {
+        subtotal: Math.round((order.totalAmount / 1.21) * 100) / 100,
+        tax: Math.round((order.totalAmount - order.totalAmount / 1.21) * 100) / 100,
+        total: order.totalAmount,
+        discount: 0,
+        shipping: 0,
+      },
+      paymentMethod: order.paymentMethod || 'Web',
+      currency: order.currency || 'EUR',
+      series,
+      warehouse,
+    };
+
+    let connector = this.factusolService.getConnector();
+    if (!connector) {
+      const connected = await this.factusolService.connect();
+      if (!connected) {
+        const err = 'No se pudo conectar con la base de datos de Factusol.';
+        this.salesLedgerManager.markOrderRetried(id, 'failed', err);
+        return { success: false, message: err };
+      }
+      connector = this.factusolService.getConnector();
+    }
+    if (!connector) {
+      const err = 'Driver OLEDB de Factusol no inicializado.';
+      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
+      return { success: false, message: err };
+    }
+
+    try {
+      const res = await connector.createOrder(canonicalOrder as any);
+      if (res.success) {
+        const assignedNum = String(res.externalId || res.orderNumber || order.webOrderId);
+        const updated = this.salesLedgerManager.markOrderRetried(id, 'synced', undefined, assignedNum, series);
+        this.addEvent('success', `✓ Reintento exitoso: Pedido #${order.orderNumber} registrado en Factusol (Nº ${assignedNum}).`);
+        AgentDiskLogger.getInstance().log({
+          level: 'SUCCESS',
+          component: 'SalesLedger',
+          action: 'retry_sales_order',
+          status: 'SUCCESS',
+          message: `Reintento exitoso: Pedido #${order.orderNumber} -> Factusol Nº ${assignedNum}`,
+          metadata: { orderId: id, factusolOrderNumber: assignedNum, series },
+        });
+        return {
+          success: true,
+          message: `Pedido #${order.orderNumber} insertado correctamente en Factusol (Serie ${series}, Pedido #${assignedNum}).`,
+          order: updated || undefined,
+        };
+      } else {
+        const errMsg = res.error || 'Error desconocido al registrar pedido en Factusol';
+        this.salesLedgerManager.markOrderRetried(id, 'failed', errMsg);
+        this.addEvent('warn', `Aviso en reintento de pedido #${order.orderNumber}: ${errMsg}`);
+        return { success: false, message: `No se pudo registrar en Factusol: ${errMsg}` };
+      }
+    } catch (retryErr) {
+      const msg = retryErr instanceof Error ? retryErr.message : String(retryErr);
+      this.salesLedgerManager.markOrderRetried(id, 'failed', msg);
+      return { success: false, message: `Error durante el reintento: ${msg}` };
+    }
   }
 
   public getSystemInfo(): AgentSystemInfo {

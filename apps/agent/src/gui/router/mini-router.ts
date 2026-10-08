@@ -5,6 +5,7 @@ export interface RequestContext {
   parsedUrl: URL;
   pathname: string;
   body: any;
+  params?: Record<string, string>;
 }
 
 export type RouteHandler = (
@@ -141,7 +142,22 @@ export class MiniRouter {
     }
 
     const matchMethod = method === 'HEAD' ? 'GET' : method;
-    const route = this.routes.find((r) => r.method === matchMethod && r.path === pathname);
+    let route = this.routes.find((r) => r.method === matchMethod && r.path === pathname);
+    let routeParams: Record<string, string> = {};
+
+    if (!route) {
+      for (const r of this.routes) {
+        if (r.method === matchMethod && r.path.includes(':')) {
+          const match = MiniRouter.matchParameterizedPath(r.path, pathname);
+          if (match) {
+            route = r;
+            routeParams = match;
+            break;
+          }
+        }
+      }
+    }
+
     if (!route) {
       res.writeHead(404, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Endpoint no encontrado' }));
@@ -168,6 +184,7 @@ export class MiniRouter {
       parsedUrl,
       pathname,
       body,
+      params: routeParams,
     };
 
     const start = performance.now();
@@ -241,5 +258,24 @@ export class MiniRouter {
       req.on('end', onEnd);
       req.on('error', (err) => reject(err));
     });
+  }
+
+  public static matchParameterizedPath(pattern: string, pathname: string): Record<string, string> | null {
+    const pSegments = pattern.split('/').filter(Boolean);
+    const aSegments = pathname.split('/').filter(Boolean);
+    if (pSegments.length !== aSegments.length) return null;
+
+    const params: Record<string, string> = {};
+    for (let i = 0; i < pSegments.length; i++) {
+      const p = pSegments[i];
+      const a = aSegments[i];
+      if (typeof p !== 'string' || typeof a !== 'string') return null;
+      if (p.startsWith(':')) {
+        params[p.slice(1)] = decodeURIComponent(a);
+      } else if (p !== a) {
+        return null;
+      }
+    }
+    return params;
   }
 }

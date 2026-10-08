@@ -11,6 +11,7 @@ import {
   SyncController,
   LicenseController,
   SystemController,
+  SalesOrdersController,
 } from './router/controllers';
 
 const logger = new Logger('LocalGuiServer');
@@ -84,6 +85,9 @@ export class LocalGuiServer {
     router.get('/api/local/history', SyncController.getHistory(this.agent));
     router.post('/api/local/sync-now', SyncController.syncNow(this.agent));
     router.post('/api/local/upload-catalog', SyncController.uploadCatalog(this.agent));
+    router.get('/api/local/sales-orders', SalesOrdersController.getOrders(this.agent));
+    router.get('/api/local/sales-orders/:id', SalesOrdersController.getOrderById(this.agent));
+    router.post('/api/local/sales-orders/:id/retry', SalesOrdersController.retryOrder(this.agent));
 
     // 6. License
     router.post('/api/local/activate-license', LicenseController.activateLicense(this.agent));
