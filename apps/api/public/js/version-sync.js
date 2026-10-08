@@ -139,6 +139,17 @@
     if (healthKpiVersion && !healthKpiVersion.hasAttribute('data-app-version')) {
       healthKpiVersion.textContent = state.version;
     }
+
+    // 3. Control de campaña Beta Pública 2026 (ocultación automática tras 31/12/2026)
+    if (Date.now() > new Date('2026-12-31T23:59:59Z').getTime()) {
+      var betaSelectors = ['#beta-announcement-bar', '#nav-beta-btn', '#btn-hero-beta', '#card-pricing-beta', '#betaClaimCard'];
+      for (var b = 0; b < betaSelectors.length; b++) {
+        var el = document.querySelector(betaSelectors[b]);
+        if (el) el.style.display = 'none';
+      }
+      var betaClosed = document.getElementById('betaClosedCard');
+      if (betaClosed) betaClosed.classList.remove('hidden');
+    }
   }
 
   function initObserver() {

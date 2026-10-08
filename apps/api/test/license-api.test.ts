@@ -142,7 +142,20 @@ async function run() {
     const postDeactJson = (await postDeactRes.json()) as { data: { activations: any[] } };
     assert.strictEqual(postDeactJson.data.activations.length, 0, 'La lista de activaciones activas debe ser 0 tras desactivar');
 
-    // 6. Test Beta Claim: Reclamación de clave pública (60 días exactos)
+    // 6. Test Beta Claim: Validación de RGPD obligatorio (consentTerms === true)
+    const betaEmailNoConsent = `beta_noconsent_${Date.now()}@empresa-test.es`;
+    const betaNoConsentRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: betaEmailNoConsent,
+        companyName: 'Sin Consentimiento SL',
+        consentTerms: false,
+      }),
+    });
+    assert.strictEqual(betaNoConsentRes.status, 400, 'Debe rechazar con 400 si consentTerms es false o falta');
+
+    // 6.1 Test Beta Claim: Reclamación de clave pública (Hasta 31/12/2026)
     const betaEmail = `beta_tester_${Date.now()}@empresa-test.es`;
     const betaClaimRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
       method: 'POST',
@@ -150,22 +163,27 @@ async function run() {
       body: JSON.stringify({
         email: betaEmail,
         companyName: 'Ferretería Industrial Test SL',
+        consentTerms: true,
+        consentMarketing: true,
       }),
     });
     assert.strictEqual(betaClaimRes.status, 201, 'Beta claim debe retornar 201 Created');
     const betaClaimJson = (await betaClaimRes.json()) as any;
     assert.strictEqual(betaClaimJson.success, true);
     assert(betaClaimJson.data.licenseKey.startsWith('EB-'));
-    assert.strictEqual(betaClaimJson.data.daysRemaining, 60, 'Debe otorgar 60 días');
-    assert(betaClaimJson.data.expiresAt, 'Debe incluir fecha de expiración');
+    assert(betaClaimJson.data.daysRemaining > 0, 'Debe otorgar días restantes hasta 31/12/2026');
+    assert(betaClaimJson.data.expiresAt.startsWith('2026-12-31'), 'Fecha de expiración debe ser el 31 de Diciembre de 2026');
+    assert(Array.isArray(betaClaimJson.data.instructions), 'Debe incluir instrucciones de activación');
 
-    // 7. Test Anti-Abuso Beta Claim: Si el mismo email vuelve a solicitar, devuelve la misma clave
+    // 7. Test Anti-Abuso Beta Claim: Si el mismo email vuelve a solicitar, no filtra la clave
     const betaClaimDupRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: betaEmail,
         companyName: 'Ferretería Industrial Test SL',
+        consentTerms: true,
+        consentMarketing: true,
       }),
     });
     assert.strictEqual(betaClaimDupRes.status, 200, 'Reintento debe responder 200 OK con clave existente');

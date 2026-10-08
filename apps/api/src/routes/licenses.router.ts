@@ -181,13 +181,23 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
   }
 });
 
-// 0.2.1 Beta Pública: Reclamar clave con caducidad garantizada de 60 días
+// 0.2.1 Beta Pública: Reclamar clave con caducidad garantizada hasta el 31 de Diciembre de 2026
 licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', windowMs: 60 * 60 * 1000, max: 10, message: 'Demasiadas solicitudes de clave desde esta conexión. Inténtalo más tarde.' }), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, companyName, taxId } = req.body as {
+    const BETA_END_DATE_ISO = '2026-12-31T23:59:59.999Z';
+    const betaEndTime = new Date(BETA_END_DATE_ISO).getTime();
+
+    // 0. Comprobar fecha límite oficial de la campaña
+    if (Date.now() > betaEndTime) {
+      return res.status(400).json({ error: { message: 'El periodo de Beta Pública Abierta finalizó el 31 de Diciembre de 2026.' } });
+    }
+
+    const { email, companyName, taxId, consentTerms, consentMarketing } = req.body as {
       email?: string;
       companyName?: string;
       taxId?: string;
+      consentTerms?: boolean;
+      consentMarketing?: boolean;
     };
 
     if (!email || typeof email !== 'string') {
@@ -200,13 +210,43 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       return res.status(400).json({ error: { message: 'El formato del correo electrónico no es válido.' } });
     }
 
+    if (consentTerms !== true) {
+      return res.status(400).json({ error: { message: 'Debes aceptar los Términos del Servicio y la Política de Privacidad para solicitar tu clave de la Beta.' } });
+    }
+
+    const isMarketingConsented = Boolean(consentMarketing);
+    const trialDays = Math.max(1, Math.ceil((betaEndTime - Date.now()) / (1000 * 60 * 60 * 24)));
+    const betaExpiresAt = new Date(BETA_END_DATE_ISO);
+
     const orgId = computeOrganizationIdFromEmail(normalizedEmail);
     const cleanTaxId = taxId ? taxId.trim().toUpperCase() : null;
     const cleanCompanyName = companyName ? companyName.trim() : (normalizedEmail.split('@')[0] || 'Empresa Beta');
 
     const db = DatabaseService.getInstance();
 
-    // 1. Anti-Abuso e Idempotencia: Comprobar si ya existe una licencia activa emitida para este email/organización
+    // 1. Asegurar persistencia y trazabilidad de consentimientos RGPD en PostgreSQL (tabla beta_leads)
+    if (db.isAvailable()) {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS beta_leads (
+          id VARCHAR(64) PRIMARY KEY,
+          email VARCHAR(255) NOT NULL,
+          company_name VARCHAR(255),
+          tax_id VARCHAR(64),
+          license_key VARCHAR(128),
+          license_id VARCHAR(64),
+          consent_terms BOOLEAN NOT NULL DEFAULT true,
+          consent_marketing BOOLEAN NOT NULL DEFAULT false,
+          consented_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          ip_address VARCHAR(128),
+          user_agent TEXT
+        )
+      `).catch(() => {});
+    }
+
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || req.ip || null;
+    const clientUserAgent = (req.headers['user-agent'] as string) || null;
+
+    // 2. Anti-Abuso e Idempotencia: Comprobar si ya existe una licencia activa emitida para este email/organización
     let existingLicense: any = null;
     if (db.isAvailable()) {
       const resExisting = await db.query(`
@@ -230,12 +270,32 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       }
     }
 
+    // Registrar o actualizar trazabilidad del lead en beta_leads
+    if (db.isAvailable()) {
+      const leadId = `lead_${crypto.randomUUID()}`;
+      await db.query(`
+        INSERT INTO beta_leads (id, email, company_name, tax_id, license_key, license_id, consent_terms, consent_marketing, consented_at, ip_address, user_agent)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), $9, $10)
+      `, [
+        leadId,
+        normalizedEmail,
+        cleanCompanyName,
+        cleanTaxId,
+        existingLicense ? (existingLicense.key || null) : null,
+        existingLicense ? (existingLicense.id || null) : null,
+        true,
+        isMarketingConsented,
+        clientIp,
+        clientUserAgent,
+      ]).catch(() => {});
+    }
+
     // Si ya existe una licencia NO se devuelve la clave en la respuesta HTTP (cualquiera que
     // conozca el email podría obtenerla). Solo se reenvía al buzón del propietario del email.
     if (existingLicense) {
       const rawExpiresAt = existingLicense.expires_at || existingLicense.expiresAt;
-      const expiresAtDate = rawExpiresAt ? new Date(rawExpiresAt) : null;
-      const daysRemaining = expiresAtDate ? Math.max(0, Math.ceil((expiresAtDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 60;
+      const expiresAtDate = rawExpiresAt ? new Date(rawExpiresAt) : betaExpiresAt;
+      const daysRemaining = Math.max(0, Math.ceil((expiresAtDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 
       const resend = consumeRateLimit('beta-claim-resend', normalizedEmail, 60 * 60 * 1000, 1);
       if (resend.allowed && existingLicense.key) {
@@ -243,9 +303,9 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
           await MailerService.sendLicenseWelcomeEmail({
             customerEmail: normalizedEmail,
             licenseKey: existingLicense.key,
-            planName: 'Tu clave de activación de Bentian',
+            planName: 'Tu clave de activación de Bentian (Beta Pública hasta 31/12/2026)',
             alias: existingLicense.alias || 'Licencia Bentian',
-            companyName: existingLicense.alias || 'tu empresa',
+            companyName: existingLicense.alias || cleanCompanyName,
           });
         } catch (_mailErr) {
           // Si el servicio de correo no está disponible, continuar sin fallar la petición
@@ -257,14 +317,14 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
         alreadyClaimed: true,
         message: 'Ya existe una clave de activación para este correo. Te la hemos reenviado por email; revisa tu bandeja de entrada y spam.',
         data: {
-          expiresAt: expiresAtDate ? expiresAtDate.toISOString() : null,
+          expiresAt: expiresAtDate ? expiresAtDate.toISOString() : betaExpiresAt.toISOString(),
           daysRemaining,
           installerUrl: getLatestInstallerUrl(),
         },
       });
     }
 
-    // 2. Registrar organización en PostgreSQL si está disponible
+    // 3. Registrar organización en PostgreSQL si está disponible
     if (db.isAvailable()) {
       await db.query(`
         INSERT INTO organizations (id, name, slug, status, plan, tax_id, legal_name, created_at, updated_at)
@@ -273,34 +333,38 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       `, [orgId, cleanCompanyName, normalizedEmail, cleanTaxId, cleanCompanyName]).catch(() => {});
     }
 
-    // 3. Crear licencia de 60 días de prueba garantizados
-    const trialDays = 60;
+    // 4. Crear licencia con fecha de expiración fijada al 31 de diciembre de 2026
     const license = await licenseService.createLicense({
       organizationId: orgId,
       plan: 'trial',
       trialDays,
-      alias: `Beta Pública - ${cleanCompanyName}`,
+      alias: `Beta 2026 - ${cleanCompanyName}`,
       maxActivations: 1,
     });
 
-    const expiresAt = license.expiresAt ? new Date(license.expiresAt) : new Date(Date.now() + trialDays * 86400000);
-
-    // 4. Actualizar metadata en PostgreSQL
+    // 5. Actualizar metadata en PostgreSQL
     if (db.isAvailable()) {
       await db.query(`
         UPDATE licenses 
         SET seat_type = 'BASE', tax_id = $1, billing_status = 'TRIAL', expires_at = $2, trial_ends_at = $2
         WHERE id = $3
-      `, [cleanTaxId, expiresAt, license.id]).catch(() => {});
+      `, [cleanTaxId, betaExpiresAt, license.id]).catch(() => {});
+
+      // Actualizar también la clave y el id de licencia en el registro de beta_leads para este lead
+      await db.query(`
+        UPDATE beta_leads
+        SET license_key = $1, license_id = $2
+        WHERE email = $3 AND (license_key IS NULL OR license_key = '')
+      `, [license.key, license.id, normalizedEmail]).catch(() => {});
     }
 
-    // 5. Enviar email transaccional de bienvenida con la clave al usuario
+    // 6. Enviar email transaccional de bienvenida con la clave al usuario
     try {
       await MailerService.sendLicenseWelcomeEmail({
         customerEmail: normalizedEmail,
         licenseKey: license.key,
-        planName: 'Beta Pública (60 días de acceso gratuito)',
-        alias: license.alias || `Beta Pública - ${cleanCompanyName}`,
+        planName: 'Beta Pública Gratuita (Acceso completo hasta el 31 de Diciembre de 2026)',
+        alias: license.alias || `Beta 2026 - ${cleanCompanyName}`,
         companyName: cleanCompanyName,
       });
     } catch (_mailErr) {
@@ -309,12 +373,17 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
 
     return res.status(201).json({
       success: true,
-      message: '¡Clave de activación emitida con éxito para la Beta Pública!',
+      message: '¡Clave de activación emitida con éxito para la Beta Pública Gratuita (Válida hasta el 31/12/2026)!',
       data: {
         licenseKey: license.key,
-        expiresAt: expiresAt.toISOString(),
+        expiresAt: betaExpiresAt.toISOString(),
         daysRemaining: trialDays,
         installerUrl: getLatestInstallerUrl(),
+        instructions: [
+          'Descarga e instala Bentian Agent en el equipo donde esté instalado Factusol.',
+          'Abre el agente y pulsa en "Activar Licencia" o introduce tu clave en la configuración.',
+          'Pega tu clave de activación y conecta tu tienda online (WooCommerce o PrestaShop).'
+        ],
       },
     });
   } catch (error) {

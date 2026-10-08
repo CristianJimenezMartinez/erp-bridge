@@ -86,11 +86,13 @@ async function deploySitemapsAndPublic() {
     'sitemap-docs.xml',
     'robots.txt',
     'index.html',
-    'terminos/index.html'
+    'terminos/index.html',
+    'beta/index.html',
+    'js/version-sync.js'
   ];
 
   console.log(`>>> [3/5] Subiendo ${files.length} archivos clave a ${remotePublicDir}...`);
-  await runSsh(conn, `mkdir -p "${remotePublicDir}/terminos"`);
+  await runSsh(conn, `mkdir -p "${remotePublicDir}/terminos" "${remotePublicDir}/beta" "${remotePublicDir}/js"`);
 
   const sftp = await new Promise((resolve, reject) => {
     conn.sftp((err, s) => err ? reject(err) : resolve(s));
@@ -129,7 +131,8 @@ async function deploySitemapsAndPublic() {
     'https://bridge.cristianjm.com/sitemap-ciudades.xml',
     'https://bridge.cristianjm.com/sitemap-docs.xml',
     'https://bridge.cristianjm.com/robots.txt',
-    'https://bridge.cristianjm.com/terminos/'
+    'https://bridge.cristianjm.com/terminos/',
+    'https://bridge.cristianjm.com/beta/'
   ];
 
   for (const url of urlsToCheck) {

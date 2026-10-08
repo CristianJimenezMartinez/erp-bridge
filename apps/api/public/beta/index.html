@@ -50,14 +50,14 @@
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
           </span>
-          BETA PÚBLICA ABIERTA
+          BETA PÚBLICA GRATUITA 2026
         </div>
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-          Conecta tu Factusol Gratis<br/>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Durante el Lanzamiento</span>
+          Beta Pública Gratuita:<br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Acceso Completo para Todas las Empresas hasta el 31 de Diciembre de 2026</span>
         </h1>
         <p class="text-lg text-zinc-400 mb-8 leading-relaxed">
-          100% autoservicio, sin tarjeta de crédito y sin compromiso. Descarga el agente, conéctalo a tu ERP y empieza a sincronizar tu tienda en minutos.
+          100% autoservicio, sin tarjeta de crédito y sin compromiso. Descarga el agente, conéctalo a tu Factusol y empieza a sincronizar tu catálogo, stock y pedidos sin coste durante todo el año 2026.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition shadow-lg shadow-indigo-500/20 flex items-center gap-2">
@@ -66,19 +66,47 @@
           </a>
         </div>
         <div class="mt-4 flex flex-col items-center justify-center text-xs text-zinc-500 gap-1">
-          <p>Versión <span data-app-version>v0.3.5</span> para Windows 10/11 x64.</p>
+          <p>Versión <span data-app-version>v0.3.7</span> para Windows 10/11 x64.</p>
           <p>Requiere Factusol instalado y funcionando localmente.</p>
         </div>
 
-        <!-- Formulario Interactivo de Reclamación de Clave Beta (60 Días) -->
-        <div class="mt-10 max-w-xl mx-auto p-6 md:p-8 rounded-2xl bg-zinc-900/80 border border-white/[0.08] shadow-2xl backdrop-blur text-left">
+        <!-- Tarjeta Informativa de Cierre (Oculta por defecto; se muestra automáticamente si la fecha actual es posterior al 31/12/2026) -->
+        <div id="betaClosedCard" class="hidden mt-10 max-w-xl mx-auto p-6 md:p-8 rounded-2xl bg-zinc-900/90 border border-amber-500/30 shadow-2xl backdrop-blur text-left space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-white">Periodo de Beta Pública Concluido</h3>
+              <p class="text-xs text-amber-400/90">La Beta Pública Gratuita concluyó el 31 de Diciembre de 2026</p>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            Agradecemos a todas las empresas participantes su confianza y feedback durante este ciclo. Para continuar disfrutando de la sincronización en tiempo real entre Factusol y tu tienda online con soporte técnico oficial, consulta nuestras tarifas oficiales o ponte en contacto con nuestro equipo.
+          </p>
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <a href="/#precios" class="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs text-center transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
+              Ver Tarifas Oficiales
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="mailto:soporte@cristianjm.com" class="py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 font-medium text-xs text-center transition border border-white/[0.08]">
+              Contactar Soporte
+            </a>
+            <a href="/dashboard/" class="py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 font-medium text-xs text-center transition border border-white/[0.08]">
+              Panel de Control
+            </a>
+          </div>
+        </div>
+
+        <!-- Formulario Interactivo de Reclamación de Clave Beta 2026 -->
+        <div id="betaClaimCard" class="mt-10 max-w-xl mx-auto p-6 md:p-8 rounded-2xl bg-zinc-900/80 border border-white/[0.08] shadow-2xl backdrop-blur text-left">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-white">Solicita tu Clave de Acceso Beta</h3>
-              <p class="text-xs text-zinc-400">Licencia oficial con 60 días de validez completa e inmediata</p>
+              <h3 class="text-base font-semibold text-white">Solicita tu Clave de Acceso Beta 2026</h3>
+              <p class="text-xs text-zinc-400">Licencia oficial con acceso completo sin coste hasta el 31 de Diciembre de 2026</p>
             </div>
           </div>
 
@@ -91,45 +119,97 @@
               <label for="betaCompany" class="block text-xs font-medium text-zinc-300 mb-1.5">Nombre de la Empresa o Comercio (opcional)</label>
               <input type="text" id="betaCompany" name="companyName" placeholder="Ej: Suministros Industriales García" class="w-full px-4 py-2.5 bg-black/40 border border-white/[0.1] rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
             </div>
+
+            <!-- Checkboxes Explícitos RGPD -->
+            <div class="space-y-2.5 pt-1">
+              <label class="flex items-start gap-2.5 text-xs text-zinc-300 cursor-pointer select-none">
+                <input type="checkbox" id="betaConsentTerms" name="consentTerms" required class="mt-0.5 w-4 h-4 rounded border-white/20 bg-black/40 text-indigo-600 focus:ring-indigo-500 shrink-0">
+                <span>Acepto los <a href="/terminos/" target="_blank" class="text-indigo-400 underline hover:text-indigo-300">Términos del Servicio</a> y la <a href="/terminos/#privacidad" target="_blank" class="text-indigo-400 underline hover:text-indigo-300">Política de Privacidad</a> para la tramitación de mi clave de la Beta. <span class="text-indigo-400 font-semibold">*</span></span>
+              </label>
+              <label class="flex items-start gap-2.5 text-xs text-zinc-400 cursor-pointer select-none">
+                <input type="checkbox" id="betaConsentMarketing" name="consentMarketing" class="mt-0.5 w-4 h-4 rounded border-white/20 bg-black/40 text-indigo-600 focus:ring-indigo-500 shrink-0">
+                <span>Acepto recibir novedades, actualizaciones técnicas y soporte sobre Bentian ERP Bridge.</span>
+              </label>
+            </div>
+
             <button type="submit" id="btnClaimSubmit" class="w-full py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
-              <span id="btnClaimText">Obtener Clave de Activación (60 Días Gratis)</span>
+              <span id="btnClaimText">Obtener Clave Gratuita hasta el 31 de Diciembre</span>
               <svg id="btnClaimSpinner" class="w-4 h-4 animate-spin hidden" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
             </button>
             <div id="betaClaimError" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400"></div>
+
+            <!-- Primera Capa Informativa RGPD Oficial -->
+            <div class="p-3.5 rounded-xl bg-zinc-950/60 border border-white/[0.06] text-[11px] text-zinc-400 space-y-1.5 leading-relaxed">
+              <div class="font-semibold text-zinc-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Información Básica sobre Protección de Datos (RGPD / LOPDGDD)
+              </div>
+              <p><strong class="text-zinc-300">Responsable:</strong> Cristian Jiménez Martínez (Bentian ERP Bridge).</p>
+              <p><strong class="text-zinc-300">Finalidad:</strong> Emisión y entrega de la clave de licencia de evaluación, soporte técnico del conector y comunicaciones informativas si has otorgado consentimiento.</p>
+              <p><strong class="text-zinc-300">Legitimación:</strong> Ejecución de medidas precontractuales / prestación del servicio de beta (art. 6.1.b RGPD) y consentimiento explícito del interesado (art. 6.1.a RGPD).</p>
+              <p><strong class="text-zinc-300">Destinatarios:</strong> No se ceden datos a terceros ajenos salvo obligación legal o proveedores tecnológicos indispensables con servidores en la Unión Europea.</p>
+              <p><strong class="text-zinc-300">Derechos:</strong> Acceso, rectificación, supresión, limitación y oposición dirigiendo un email a <a href="mailto:soporte@cristianjm.com" class="text-indigo-400 underline hover:text-indigo-300">soporte@cristianjm.com</a>. Más información en nuestra <a href="/terminos/" target="_blank" class="text-indigo-400 underline hover:text-indigo-300">Política de Privacidad</a>.</p>
+            </div>
           </form>
 
-          <!-- Resultado Exitoso (Oculto inicialmente) -->
+          <!-- Resultado Exitoso (Entrega Instantánea) -->
           <div id="betaClaimSuccess" class="hidden space-y-4 pt-2">
             <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-start gap-2.5">
               <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               <div>
-                <p class="font-semibold text-emerald-300">¡Clave generada y vinculada con éxito!</p>
-                <p class="mt-0.5 text-emerald-400/80">También te hemos enviado una copia por correo electrónico.</p>
+                <p class="font-semibold text-emerald-300">¡Clave de activación emitida con éxito!</p>
+                <p class="mt-0.5 text-emerald-400/80">También te hemos enviado una copia de seguridad por correo electrónico.</p>
               </div>
             </div>
 
             <div class="p-4 rounded-xl bg-black/60 border border-white/[0.12] space-y-2">
-              <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Tu Clave de Activación (60 Días):</span>
-              <div class="flex items-center justify-between gap-3 bg-zinc-900/90 px-3 py-2 rounded-lg border border-white/[0.08]">
+              <div class="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                <span>Tu Clave de Activación:</span>
+                <span class="text-emerald-400 font-semibold lowercase">Entrega Instantánea</span>
+              </div>
+              <div class="flex items-center justify-between gap-3 bg-zinc-900/90 px-3 py-2.5 rounded-lg border border-white/[0.08]">
                 <code id="displayLicenseKey" class="font-mono text-base md:text-lg font-bold text-white select-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
-                <button type="button" id="btnCopyKey" onclick="copyBetaKey()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition shrink-0">
-                  Copiar
+                <button type="button" id="btnCopyKey" onclick="copyBetaKey()" class="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-indigo-600/40 text-indigo-200 hover:bg-indigo-600/60 border border-indigo-500/30 transition shrink-0 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  <span id="btnCopyKeyText">Copiar Clave</span>
                 </button>
               </div>
-              <p class="text-[11px] text-zinc-500 flex items-center justify-between pt-1">
-                <span>Válida durante: <strong class="text-zinc-300" id="displayDaysRemaining">60 días</strong></span>
-                <span id="displayExpiresDate"></span>
+              <p class="text-[11px] text-zinc-500 flex items-center justify-between pt-1 font-mono">
+                <span>Válida hasta: <strong class="text-emerald-400" id="displayExpiresDate">31 de Diciembre de 2026</strong></span>
+                <span id="displayDaysRemaining"></span>
               </p>
             </div>
 
-            <div class="pt-2 flex flex-col sm:flex-row gap-3">
-              <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs text-center transition flex items-center justify-center gap-2">
+            <div class="pt-1 flex flex-col sm:flex-row gap-3">
+              <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs text-center transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Descargar Instalador
+                Descargar Instalador (.exe)
               </a>
-              <a href="/dashboard/" class="py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 font-medium text-xs text-center transition">
+              <a href="/dashboard/" class="py-3 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 font-medium text-xs text-center transition border border-white/[0.08]">
                 Acceder al Panel
               </a>
+            </div>
+
+            <!-- Guía de Activación en 3 Pasos -->
+            <div class="pt-3 border-t border-white/[0.08] space-y-2">
+              <span class="text-xs font-semibold text-white uppercase tracking-wider block">Cómo activar en 3 pasos:</span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
+                <div class="p-2.5 rounded-lg bg-black/40 border border-white/[0.05]">
+                  <span class="inline-block w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] text-center font-bold mb-1">1</span>
+                  <p class="text-[11px] text-zinc-300 font-medium">Instala el Agente</p>
+                  <p class="text-[10px] text-zinc-500 leading-tight mt-0.5">Ejecuta el instalador en el PC donde esté tu Factusol.</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-black/40 border border-white/[0.05]">
+                  <span class="inline-block w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] text-center font-bold mb-1">2</span>
+                  <p class="text-[11px] text-zinc-300 font-medium">Pega tu Clave</p>
+                  <p class="text-[10px] text-zinc-500 leading-tight mt-0.5">Abre el agente, pulsa en "Activar" y pega la clave generada.</p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-black/40 border border-white/[0.05]">
+                  <span class="inline-block w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] text-center font-bold mb-1">3</span>
+                  <p class="text-[11px] text-zinc-300 font-medium">Conecta tu Tienda</p>
+                  <p class="text-[10px] text-zinc-500 leading-tight mt-0.5">Selecciona el fichero .accdb y conecta WooCommerce o PrestaShop.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -261,7 +341,7 @@
       <div class="max-w-4xl mx-auto">
         <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-transparent border border-indigo-500/20">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h2 class="text-2xl font-bold text-white">Condiciones Transparentes de la Beta</h2>
+            <h2 class="text-2xl font-bold text-white">Condiciones Transparentes de la Beta 2026</h2>
             <div id="founderSpotsBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-medium text-amber-400">
               <span class="relative flex h-2 w-2">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -271,9 +351,9 @@
             </div>
           </div>
           <div class="space-y-4 text-sm text-zinc-300">
-            <p><strong class="text-white">✅ Gratuita durante la fase de pruebas:</strong> La beta es totalmente funcional y no requiere tarjeta de crédito ni pago inicial.</p>
-            <p><strong class="text-white">✅ Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año):</strong> Cuando finalice la beta pública de 60 días, el precio oficial del conector será de 199 €/año. Los primeros participantes tendrán reservada su plaza en la <strong>Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año)</strong>. Agotadas las 25 plazas, el sistema bloqueará automáticamente la tarifa promocional y regirá el precio oficial estándar de 199 €/año.</p>
-            <p><strong class="text-white">🤝 Soporte:</strong> Atención por email con respuesta en 48-72h laborales. <em>(Por favor, comprende que no ofrecemos asistencia telefónica para no saturar nuestro desarrollo).</em></p>
+            <p><strong class="text-white">✅ Gratuita hasta el 31 de Diciembre de 2026:</strong> La beta pública es 100% funcional, sin límites de catálogo ni de pedidos, y no requiere tarjeta de crédito ni pago inicial.</p>
+            <p><strong class="text-white">✅ Fase 1: Plazas de Fundador con precio bonificado vitalicio de 139 €/año:</strong> Cuando concluya el periodo de beta abierta el 31 de diciembre de 2026, la tarifa comercial estándar será de 199 €/año. Los primeros participantes tendrán reservada su plaza bonificada vitalicia de 139 €/año.</p>
+            <p><strong class="text-white">🤝 Soporte:</strong> Soporte técnico oficial y resolución de dudas por correo electrónico con respuesta en 24-48h laborales.</p>
           </div>
         </div>
       </div>
@@ -288,7 +368,7 @@
           <div class="space-y-4">
             <div class="p-5 rounded-xl bg-zinc-900/30 border border-white/[0.03]">
               <h4 class="font-semibold text-white mb-2">¿Hasta cuándo dura la beta?</h4>
-              <p class="text-sm text-zinc-400">La beta se mantendrá abierta hasta que validemos la estabilidad en suficientes entornos de producción. Avisaremos con al menos 30 días de antelación antes de pasar a la versión comercial.</p>
+              <p class="text-sm text-zinc-400">La Beta Pública Gratuita permanecerá completamente abierta y operativa para todas las empresas registradas hasta el <strong>31 de Diciembre de 2026 a las 23:59:59</strong>. Avisaremos con antelación suficiente sobre las opciones de continuidad para el ejercicio 2027.</p>
             </div>
             <div class="p-5 rounded-xl bg-zinc-900/30 border border-white/[0.03]">
               <h4 class="font-semibold text-white mb-2">¿Es seguro para mis datos?</h4>
@@ -321,6 +401,18 @@
   <script src="/js/version-sync.js"></script>
 
   <script>
+    // 1. Ocultación automática del formulario si la fecha actual es posterior al 31/12/2026
+    const BETA_END_TIME = new Date('2026-12-31T23:59:59Z').getTime();
+    function evaluateBetaStatus() {
+      if (Date.now() > BETA_END_TIME) {
+        const formCard = document.getElementById('betaClaimCard');
+        const closedCard = document.getElementById('betaClosedCard');
+        if (formCard) formCard.classList.add('hidden');
+        if (closedCard) closedCard.classList.remove('hidden');
+      }
+    }
+    evaluateBetaStatus();
+
     const betaForm = document.getElementById('betaClaimForm');
     const betaSuccess = document.getElementById('betaClaimSuccess');
     const betaError = document.getElementById('betaClaimError');
@@ -332,8 +424,18 @@
       betaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         betaError.classList.add('hidden');
+
+        const consentTerms = document.getElementById('betaConsentTerms')?.checked;
+        const consentMarketing = document.getElementById('betaConsentMarketing')?.checked;
+
+        if (!consentTerms) {
+          betaError.textContent = 'Debes aceptar los Términos del Servicio y la Política de Privacidad para tramitar tu clave.';
+          betaError.classList.remove('hidden');
+          return;
+        }
+
         btnSubmit.disabled = true;
-        btnText.textContent = 'Generando clave...';
+        btnText.textContent = 'Generando clave oficial...';
         btnSpinner.classList.remove('hidden');
 
         try {
@@ -343,7 +445,7 @@
           const res = await fetch('/api/v1/licenses/beta/claim', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, companyName })
+            body: JSON.stringify({ email, companyName, consentTerms, consentMarketing })
           });
 
           const data = await res.json();
@@ -352,17 +454,20 @@
           }
 
           const lic = data.data;
-          if (!lic.licenseKey) {
+          if (!lic || !lic.licenseKey) {
             // Clave ya emitida: por seguridad no se muestra en pantalla, se reenvía por email.
             betaError.textContent = data.message || 'Ya existe una clave para este correo. Te la hemos reenviado por email.';
             betaError.classList.remove('hidden');
             return;
           }
+
           document.getElementById('displayLicenseKey').textContent = lic.licenseKey;
-          document.getElementById('displayDaysRemaining').textContent = `${lic.daysRemaining || 60} días`;
           if (lic.expiresAt) {
             const expDate = new Date(lic.expiresAt);
-            document.getElementById('displayExpiresDate').textContent = `(Hasta ${expDate.toLocaleDateString('es-ES')})`;
+            document.getElementById('displayExpiresDate').textContent = expDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+          }
+          if (lic.daysRemaining !== undefined) {
+            document.getElementById('displayDaysRemaining').textContent = `(${lic.daysRemaining} días restantes)`;
           }
 
           betaForm.classList.add('hidden');
@@ -372,7 +477,7 @@
           betaError.classList.remove('hidden');
         } finally {
           btnSubmit.disabled = false;
-          btnText.textContent = 'Obtener Clave de Activación (60 Días Gratis)';
+          btnText.textContent = 'Obtener Clave Gratuita hasta el 31 de Diciembre';
           btnSpinner.classList.add('hidden');
         }
       });
@@ -381,13 +486,11 @@
     function copyBetaKey() {
       const key = document.getElementById('displayLicenseKey').textContent;
       navigator.clipboard.writeText(key).then(() => {
-        const btn = document.getElementById('btnCopyKey');
-        const orig = btn.textContent;
-        btn.textContent = '¡Copiada!';
-        btn.classList.replace('text-indigo-300', 'text-emerald-300');
+        const btnText = document.getElementById('btnCopyKeyText');
+        const orig = btnText ? btnText.textContent : 'Copiar Clave';
+        if (btnText) btnText.textContent = '¡Copiada!';
         setTimeout(() => {
-          btn.textContent = orig;
-          btn.classList.replace('text-emerald-300', 'text-indigo-300');
+          if (btnText) btnText.textContent = orig;
         }, 2000);
       });
     }

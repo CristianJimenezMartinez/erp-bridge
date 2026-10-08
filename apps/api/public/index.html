@@ -100,11 +100,11 @@
     <div class="text-xs sm:text-sm font-medium text-zinc-300 flex items-center gap-2.5 flex-wrap justify-center text-center">
       <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-[11px] font-semibold tracking-wide uppercase text-indigo-300">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        Beta Pública
+        Beta Abierta
       </span>
-      <span>Conecta Factusol con tu tienda online gratis durante el periodo de lanzamiento</span>
+      <span>Beta Abierta: Acceso completo gratuito para todas las empresas hasta el 31 de diciembre.</span>
       <a href="/beta/" class="inline-flex items-center gap-1 bg-indigo-600/80 hover:bg-indigo-600 text-white font-medium text-xs px-2.5 py-1 rounded-md transition shadow-sm ml-1">
-        Acceder a la Beta <span aria-hidden="true">&rarr;</span>
+        Solicitar Clave Gratis <span aria-hidden="true">&rarr;</span>
       </a>
     </div>
     <button type="button" id="close-beta-banner" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-indigo-500 rounded-md text-indigo-100 hover:text-white transition focus:outline-none" aria-label="Dismiss">
@@ -125,6 +125,12 @@
           banner.style.display = 'none';
           localStorage.setItem('hideBetaBanner', 'true');
         });
+      }
+      // Ocultación automática de elementos beta si la fecha es posterior al 31/12/2026
+      if (Date.now() > new Date('2026-12-31T23:59:59Z').getTime()) {
+        if (banner) banner.style.display = 'none';
+        var navBetaBtn = document.getElementById('nav-beta-btn');
+        if (navBetaBtn) navBetaBtn.style.display = 'none';
       }
     })();
   </script>
@@ -147,7 +153,7 @@
       </a>
 
       <!-- Navegación Principal Organizada & Respirada -->
-      <nav class="hidden lg:flex items-center gap-5 xl:gap-7 text-xs text-zinc-400 font-medium">
+      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-xs text-zinc-400 font-medium">
         <a href="#salvaguardas" class="hover:text-white transition">Salvaguardas</a>
         <a href="#como-funciona" class="hover:text-white transition">Cómo Funciona</a>
         <a href="#conectores" class="hover:text-white transition">Conectores</a>
@@ -158,6 +164,10 @@
         </a>
         <a href="#precios" class="hover:text-white transition">Tarifas</a>
         <a href="#faq" class="hover:text-white transition">FAQ</a>
+        <a href="/beta/" id="nav-beta-btn" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 font-semibold transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>🎁 Clave Beta Gratis</span>
+        </a>
       </nav>
 
       <!-- Botones de Acción (Con margen y divisor visual de separación) -->
@@ -213,6 +223,11 @@
             </svg>
             <span>Descargar Agente Windows (.exe)</span>
             <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-black/25 text-zinc-200">Oficial x64</span>
+          </a>
+
+          <a id="btn-hero-beta" href="/beta/" class="px-5 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm flex items-center gap-2 transition shadow-lg shadow-emerald-600/25">
+            <span>🎁 Solicitar Clave Beta (Gratis hasta 31 Dic)</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
 
           <a href="#como-funciona" class="px-5 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-300 hover:text-white border border-white/[0.08] font-medium text-sm transition flex items-center gap-2">
@@ -1408,6 +1423,40 @@
           </p>
         </div>
 
+        <!-- Tarjeta Destacada: Acceso Beta 2026 — 0 € (Válido hasta el 31 de Diciembre) -->
+        <div id="card-pricing-beta" class="max-w-4xl mx-auto mb-10 p-6 md:p-8 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-[#121215] to-indigo-500/10 border-2 border-emerald-500/40 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+          <div class="absolute top-4 right-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider font-mono flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Campaña Gratuita 2026
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+            <div class="lg:col-span-2 space-y-3">
+              <span class="text-xs font-mono text-emerald-400 font-semibold uppercase tracking-wider">Acceso Público Sin Coste</span>
+              <h3 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Acceso Beta 2026 — 0 €</h3>
+              <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                Válido hasta el <strong>31 de Diciembre de 2026</strong>. Acceso 100% completo e ilimitado para todas las empresas durante el año 2026. Sin tarjeta de crédito, sin compromisos y con entrega instantánea de tu clave oficial.
+              </p>
+              <div class="flex flex-wrap gap-4 pt-1 text-xs font-mono text-zinc-300">
+                <span class="flex items-center gap-1.5 text-emerald-400">✓ Catálogo y SKUs Ilimitados</span>
+                <span class="flex items-center gap-1.5 text-emerald-400">✓ Pedidos en Tiempo Real</span>
+                <span class="flex items-center gap-1.5 text-emerald-400">✓ Soporte Oficial Incluido</span>
+              </div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-black/40 border border-white/[0.08] text-center space-y-3">
+              <div class="flex items-baseline justify-center gap-1">
+                <span class="text-4xl font-extrabold text-emerald-400 font-mono">0 €</span>
+                <span class="text-xs text-zinc-400 font-mono">hasta 31/12/2026</span>
+              </div>
+              <p class="text-[11px] text-zinc-400">Entrega 100% automatizada e instantánea</p>
+              <a href="/beta/" class="block w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/25">
+                🎁 Solicitar Clave Beta Gratis →
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Banner Fase 1: Plazas de Fundador -->
         <div class="max-w-4xl mx-auto mb-10 p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-[#121215] border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div class="flex items-center gap-3">
@@ -1417,7 +1466,7 @@
             </span>
             <div>
               <div class="text-sm font-semibold text-white">Fase 1: Primeras 25 plazas de Fundador con precio bonificado vitalicio de 139 €/año (en lugar de 199 €/año)</div>
-              <p class="text-xs text-zinc-400 mt-0.5">Accede a los 60 días de Beta Pública Gratuita y asegura tu tarifa bonificada para siempre antes de que se cubra el cupo inicial.</p>
+              <p class="text-xs text-zinc-400 mt-0.5">Accede a la Beta Pública Gratuita hasta el 31 de Diciembre de 2026 y asegura tu tarifa bonificada para siempre antes de que se cubra el cupo inicial.</p>
             </div>
           </div>
           <a href="/beta/" class="shrink-0 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs transition shadow-lg shadow-amber-500/20 whitespace-nowrap">
@@ -1546,6 +1595,15 @@
         </div>
       </div>
     </section>
+
+    <script>
+      (function() {
+        if (Date.now() > new Date('2026-12-31T23:59:59Z').getTime()) {
+          var card = document.getElementById('card-pricing-beta');
+          if (card) card.style.display = 'none';
+        }
+      })();
+    </script>
 
     <!-- ========================================================================= -->
 
