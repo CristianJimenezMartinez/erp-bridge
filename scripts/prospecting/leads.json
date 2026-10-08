@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Ferretería Industrial Ejemplo",
+    "website": "https://www.ferreteriaejemplo.es",
+    "email": "info@ferreteriaejemplo.es",
+    "phone": "+34 900 000 000",
+    "type": "PYME",
+    "sector": "Ferretería/Suministros",
+    "notes": "Encontrado por automatización de dorks"
+  },
+  {
+    "name": "Agencia Digital WebPro",
+    "website": "https://www.webpro-agencia.es/integraciones",
+    "email": "info@ferreteriaejemplo.es",
+    "phone": "+34 900 000 000",
+    "type": "PYME",
+    "sector": "Ferretería/Suministros",
+    "notes": "Encontrado por automatización de dorks"
+  }
+]
