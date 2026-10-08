@@ -126,6 +126,10 @@ export const dashboardStyles = `
     .log-success { color: #34d399; }
     .log-warn { color: #fbbf24; }
     .log-error { color: #f87171; }
+    .log-mode-btn { background: transparent; color: var(--text-muted); border: none; cursor: pointer; transition: all 0.15s ease; border-radius: 6px; }
+    .log-mode-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+    .log-mode-btn.active { background: rgba(59, 130, 246, 0.25) !important; color: #60a5fa !important; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.4) !important; }
+    .log-filter-btn.active { background: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important; font-weight: 600; border-color: rgba(255, 255, 255, 0.3) !important; }
 
     /* Checklist Box */
     .checklist-container { background: #0d0d12; border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }

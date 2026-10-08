@@ -59,7 +59,7 @@ export class LocalSyncEngine {
     return headers;
   }
 
-  public async triggerManualSync(): Promise<SyncManualResult> {
+  public async triggerManualSync(isManual: boolean = true): Promise<SyncManualResult> {
     if (this.isSyncing) {
       this.logger.warn('Intento de sincronización ignorado: ya existe un ciclo en ejecución.');
       return { success: false, message: 'Ya hay un proceso de sincronización en ejecución.' };
@@ -79,14 +79,18 @@ export class LocalSyncEngine {
     this.isSyncing = true;
     const start = Date.now();
     try {
-      return await this.executeManualSync(start);
+      return await this.executeManualSync(start, isManual);
     } finally {
       this.isSyncing = false;
     }
   }
 
-  private async executeManualSync(start: number): Promise<SyncManualResult> {
-    this.eventBus.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
+  private async executeManualSync(start: number, isManual: boolean = true): Promise<SyncManualResult> {
+    if (isManual) {
+      this.eventBus.addEvent('info', 'Iniciando ciclo de sincronización bidireccional...');
+    } else {
+      this.logger.debug('Iniciando sondeo rutinario de sincronización bidireccional...');
+    }
     let itemsUpdated = 0;
     let ordersImported = 0;
 
@@ -139,7 +143,7 @@ export class LocalSyncEngine {
         this.eventBus.addEvent('error', `❌ ${msg}`);
         return { success: false, message: msg };
       }
-      return this.syncUniversalBridge(dbPath, config, start);
+      return this.syncUniversalBridge(dbPath, config, start, isManual);
     }
 
     try {
@@ -456,7 +460,7 @@ export class LocalSyncEngine {
         try {
           const cancelSeries = config.factusol?.orderSeries || '1';
           const cancelWarehouse = config.factusol?.warehouseCode || 'GEN';
-          this.eventBus.addEvent('info', 'Comprobando pedidos cancelados/reembolsados en WooCommerce...');
+          this.logger.debug('Comprobando pedidos cancelados/reembolsados en WooCommerce...');
           const tCancelStart = performance.now();
           const cancelRes = await CancellationSyncHelper.syncWooCommerceCancellations({
             storeUrl: cleanUrl,
@@ -505,7 +509,12 @@ export class LocalSyncEngine {
       });
 
       const summary = `Sincronización completada (${itemsUpdated} productos, ${ordersImported} pedidos en ${duration}s)`;
-      this.eventBus.addEvent('success', `✓ ${summary}`);
+      const hasActivity = itemsUpdated > 0 || ordersImported > 0;
+      if (isManual || hasActivity) {
+        this.eventBus.addEvent('success', `✓ ${summary}`);
+      } else {
+        this.logger.debug(`Sondeo rutinario completado sin novedades: ${summary}`);
+      }
       AgentDiskLogger.getInstance().log({
         level: 'SUCCESS',
         component: 'SyncEngine',
@@ -566,7 +575,7 @@ export class LocalSyncEngine {
       }
 
       try {
-        await this.triggerManualSync();
+        await this.triggerManualSync(false);
       } catch (err) {
         this.logger.warn(`Aviso en sincronización periódica: ${String(err)}`);
       }
@@ -636,7 +645,8 @@ export class LocalSyncEngine {
   private async syncUniversalBridge(
     dbPath: string,
     config: any,
-    start: number
+    start: number,
+    isManual: boolean = true
   ): Promise<SyncManualResult> {
     let itemsUpdated = 0;
     let ordersImported = 0;
@@ -685,7 +695,7 @@ export class LocalSyncEngine {
 
     // 1. Sincronización de existencias de stock (Factusol -> Universal Bridge)
     try {
-      this.eventBus.addEvent('info', 'Consultando existencias de stock en Factusol...');
+      this.logger.debug('Consultando existencias de stock en Factusol...');
       const tStockQueryStart = performance.now();
       const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
       let stockRows = await driver
@@ -761,7 +771,9 @@ export class LocalSyncEngine {
           message: `Stock sincronizado en Universal Bridge: ${itemsUpdated} referencias actualizadas en ${pushStockDurationMs}ms`,
           metadata: { channel: 'universal_bridge', itemsUpdated },
         });
-        this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+        if (itemsUpdated > 0) {
+          this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+        }
       } else {
         AgentDiskLogger.getInstance().log({
           level: 'WARN',
@@ -782,7 +794,7 @@ export class LocalSyncEngine {
 
     // 2. Sincronización de pedidos (Universal Bridge -> Factusol)
     try {
-      this.eventBus.addEvent('info', 'Comprobando pedidos nuevos en la tienda online...');
+      this.logger.debug('Comprobando pedidos nuevos en la tienda online...');
       const series = config.factusol?.orderSeries || 'W';
       const warehouse = config.factusol?.warehouseCode || 'GEN';
 
@@ -951,7 +963,7 @@ export class LocalSyncEngine {
     // 3. Sincronización inversa de pedidos cancelados (Universal Bridge -> Factusol)
     let ordersCancelled = 0;
     try {
-      this.eventBus.addEvent('info', 'Comprobando pedidos cancelados en la tienda online...');
+      this.logger.debug('Comprobando pedidos cancelados en la tienda online...');
       const tCancelStart = performance.now();
       const cancelRes = await CancellationSyncHelper.syncUniversalBridgeCancellations({
         endpointUrl,
@@ -995,7 +1007,12 @@ export class LocalSyncEngine {
       message: summary,
     });
 
-    this.eventBus.addEvent('success', `✓ ${summary}`);
+    const hasActivity = itemsUpdated > 0 || ordersImported > 0 || ordersCancelled > 0;
+    if (isManual || hasActivity) {
+      this.eventBus.addEvent('success', `✓ ${summary}`);
+    } else {
+      this.logger.debug(`Sondeo rutinario completado sin novedades: ${summary}`);
+    }
     AgentDiskLogger.getInstance().log({
       level: 'SUCCESS',
       component: 'SyncEngine',

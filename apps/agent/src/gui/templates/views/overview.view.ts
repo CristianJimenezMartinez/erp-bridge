@@ -108,90 +108,26 @@ export function renderOverviewTab(): string {
           </div>
         </div>
 
-        <!-- Pre-Flight EDR & Diagnóstico Preventivo de Salud -->
-        <div class="form-section">
-          <div class="section-header">
-            <div>
-              <div class="section-title" style="display:flex;align-items:center;gap:8px;">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                <span>Diagnóstico Preventivo Pre-Flight (Salud del Sistema & EDR)</span>
-              </div>
-              <div class="section-desc">Monitorización proactiva de componentes críticos de Windows para anticipar fallos de sincronización y bloqueos.</div>
-            </div>
-            <button onclick="refreshPreflight()" class="btn btn-secondary btn-sm" id="btn-refresh-preflight">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span>Reanalizar</span>
-            </button>
-          </div>
-
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1rem;margin-top:1rem;">
-            <!-- Semáforo 1: cscript.exe -->
-            <div style="padding:1rem;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;">
-                  <span id="pf-cscript-dot" class="pulse-dot" style="background:#f59e0b;"></span>
-                  Motor Scripting
-                </span>
-                <span id="pf-cscript-badge" class="tag tag-amber">Comprobando</span>
-              </div>
-              <div id="pf-cscript-desc" style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Analizando cscript.exe y JScript...</div>
-            </div>
-
-            <!-- Semáforo 2: OLEDB -->
-            <div style="padding:1rem;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;">
-                  <span id="pf-oledb-dot" class="pulse-dot" style="background:#f59e0b;"></span>
-                  Driver Access OLEDB
-                </span>
-                <span id="pf-oledb-badge" class="tag tag-amber">Comprobando</span>
-              </div>
-              <div id="pf-oledb-desc" style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Verificando Microsoft.ACE/Jet...</div>
-            </div>
-
-            <!-- Semáforo 3: Clock Drift -->
-            <div style="padding:1rem;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;">
-                  <span id="pf-clock-dot" class="pulse-dot" style="background:#f59e0b;"></span>
-                  Reloj & NTP
-                </span>
-                <span id="pf-clock-badge" class="tag tag-amber">Comprobando</span>
-              </div>
-              <div id="pf-clock-desc" style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Validando hora contra servidor...</div>
-            </div>
-
-            <!-- Semáforo 4: Red & Wi-Fi -->
-            <div style="padding:1rem;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px;">
-                  <span id="pf-net-dot" class="pulse-dot" style="background:#f59e0b;"></span>
-                  Almacenamiento & Red
-                </span>
-                <span id="pf-net-badge" class="tag tag-amber">Comprobando</span>
-              </div>
-              <div id="pf-net-desc" style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Comprobando ruta y tipo de conexión...</div>
-            </div>
-          </div>
-
-          <!-- Alerta de Recomendación Pre-Flight si algo falla -->
-          <div id="pf-alert-box" style="display:none;margin-top:1rem;padding:0.9rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);font-size:12px;color:#e4e4e7;line-height:1.5;">
-            <div style="font-weight:600;margin-bottom:4px;color:#fff;" id="pf-alert-title">Acción recomendada requerida:</div>
-            <div id="pf-alert-message" style="color:var(--text-muted,#a1a1aa);"></div>
-          </div>
-        </div>
-
-        <!-- Terminal de Eventos Recientes -->
+        <!-- Última Actividad y Ventas -->
         <div class="form-section" id="overview-recent-activity-section">
           <div class="section-header">
             <div>
-              <div class="section-title">Actividad Reciente del Sistema</div>
-              <div class="section-desc">Eventos de sincronización y pedidos importados en segundo plano.</div>
+              <div class="section-title">Última Actividad y Ventas</div>
+              <div class="section-desc">Eventos recientes de pedidos importados, ventas y sincronizaciones en tiempo real.</div>
             </div>
-            <button onclick="switchTab('logs')" class="btn btn-secondary btn-sm">Ver Registro Completo ↗</button>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="switchTab('history')" class="btn btn-secondary btn-sm" title="Consultar historial detallado de pedidos y ventas">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                <span>Historial de Ventas ↗</span>
+              </button>
+              <button onclick="switchTab('logs')" class="btn btn-secondary btn-sm" title="Ir a diagnóstico técnico y consola">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m14 2-4 4 4 4"/><path d="m10 14 4 4-4 4"/><path d="M4 12h16"/></svg>
+                <span>Diagnóstico y Ayuda ↗</span>
+              </button>
+            </div>
           </div>
           <div id="overview-logs-list" class="logs-panel" style="height: 180px;">
-            <div class="log-line log-info">Cargando eventos...</div>
+            <div class="log-line log-info">Cargando actividad...</div>
           </div>
         </div>
       </section>`;

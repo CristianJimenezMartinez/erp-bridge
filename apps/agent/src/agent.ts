@@ -583,7 +583,7 @@ export class LocalAgent {
         }
 
         if (!this.syncEngine.isBusy()) {
-          void this.syncEngine.triggerManualSync();
+          void this.syncEngine.triggerManualSync(false);
         }
         if (cfg.agentId && cfg.apiBaseUrl) {
           const tNotify = performance.now();
@@ -624,7 +624,7 @@ export class LocalAgent {
     // Filosofía "Install & Plug": disparo inicial tras arranque a los 3s
     setTimeout(() => {
       if (this.isRunning && !this.syncEngine.isBusy()) {
-        void this.syncEngine.triggerManualSync().catch(() => null);
+        void this.syncEngine.triggerManualSync(false).catch(() => null);
       }
     }, 3000);
 
