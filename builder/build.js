@@ -5,7 +5,7 @@ const childProcess = require('child_process');
 const { buildAgentBundle } = require('./build-bundle');
 const { buildExecutable } = require('./build-exe');
 const { signBinary } = require('./sign-authenticode');
-const { getCurrentVersion, calculateNextVersion, applyVersionToAll, checkVersionSync } = require('./version');
+const { getCurrentVersion, calculateNextVersion, applyVersionToAll, checkVersionSync, syncPublicTemplates } = require('./version');
 
 function calculateSha256(filePath) {
   const fileBuffer = fs.readFileSync(filePath);
@@ -58,17 +58,11 @@ function createZipArchive(files, outputZip) {
 }
 
 function updateLandingHtml(rootDir, version, hashes) {
-  // 1. Invocar compilador modular de landing page para Single Source of Truth
+  // 1. Invocar sincronizador global de plantillas públicas y compiladores modulares
   try {
-    const buildLandingScript = path.resolve(rootDir, 'apps/api/scripts/build-landing.ts');
-    if (fs.existsSync(buildLandingScript)) {
-      childProcess.execSync('npx ts-node apps/api/scripts/build-landing.ts', {
-        cwd: rootDir,
-        stdio: 'inherit'
-      });
-    }
+    syncPublicTemplates(version);
   } catch (e) {
-    console.warn('  ⚠️ Aviso compilando landing:', e.message);
+    console.warn('  ⚠️ Aviso sincronizando plantillas públicas:', e.message);
   }
 
   const htmlPath = path.resolve(rootDir, 'apps/api/public/index.html');

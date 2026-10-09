@@ -648,7 +648,7 @@ X-Bentian-Timestamp: 1791189000
             </tr>
             <tr>
               <td class="px-3 py-2 text-indigo-300">X-Bentian-Agent-Version</td>
-              <td class="px-3 py-2">String semver (ej: v0.3.6)</td>
+              <td class="px-3 py-2">String semver (ej: v0.3.8)</td>
               <td class="px-3 py-2 text-zinc-400 font-sans">Informativo</td>
               <td class="px-3 py-2 font-sans text-zinc-300">Permite al servidor web auditar qué versión del agente está conectándose.</td>
             </tr>

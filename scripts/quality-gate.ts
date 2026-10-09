@@ -318,31 +318,130 @@ if (gate5Passed) {
 }
 
 // ============================================================================
-// GATE 6: CONFIG & TOOLCHAIN CONSISTENCY GUARD
+// GATE 6: CONFIG, TOOLCHAIN & STRICT VERSION PARITY GUARD (ANTI-DRIFT)
 // ============================================================================
-console.log('\n▶ [Gate 6/7] Verificando consistencia de configuración y tsconfig...');
+console.log('\n▶ [Gate 6/7] Verificando paridad estricta de versiones y consistencia de toolchain (Anti-Drift)...');
 const rootPkg = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf-8'));
+const currentVersion = rootPkg.version;
 const baseTsConfigExists = fs.existsSync(path.join(repoRoot, 'tsconfig.base.json'));
 
-const gate6Passed = baseTsConfigExists && Boolean(rootPkg.version);
-const gate6Score = gate6Passed ? 10.0 : 6.0;
+let versionParityPassed = true;
+const versionDiscrepancies: string[] = [];
+const versionDetails: string[] = [
+  `tsconfig.base.json existe: ${baseTsConfigExists ? 'SÍ' : 'NO'}`,
+  `Versión central del monorepo: v${currentVersion || 'desconocida'}`,
+];
+
+// 1. Verificar los 12 archivos de package.json del monorepo
+const monorepoPackages = [
+  'package.json',
+  'builder/config.json',
+  'builder/package.json',
+  'apps/agent/package.json',
+  'apps/api/package.json',
+  'packages/shared/package.json',
+  'packages/sdk/package.json',
+  'packages/core/package.json',
+  'packages/connectors/factusol/package.json',
+  'packages/connectors/woocommerce/package.json',
+  'packages/connectors/prestashop/package.json',
+  'packages/connectors/simplygest/package.json',
+];
+
+for (const pkgRel of monorepoPackages) {
+  const p = path.join(repoRoot, pkgRel);
+  if (fs.existsSync(p)) {
+    const json = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    if (json.version !== currentVersion) {
+      versionParityPassed = false;
+      versionDiscrepancies.push(`${pkgRel}: versión '${json.version}' != '${currentVersion}'`);
+    }
+  }
+}
+
+// 2. Verificar fallback en apps/api/public/js/version-sync.js
+const versionSyncPath = path.join(repoRoot, 'apps/api/public/js/version-sync.js');
+if (fs.existsSync(versionSyncPath)) {
+  const c = fs.readFileSync(versionSyncPath, 'utf-8');
+  if (!c.includes(`var DEFAULT_VERSION = '${currentVersion}';`)) {
+    versionParityPassed = false;
+    versionDiscrepancies.push(`version-sync.js no tiene DEFAULT_VERSION = '${currentVersion}'`);
+  }
+}
+
+// 3. Verificar apps/api/public/layout/schema-org.html
+const schemaOrgPath = path.join(repoRoot, 'apps/api/public/layout/schema-org.html');
+if (fs.existsSync(schemaOrgPath)) {
+  const c = fs.readFileSync(schemaOrgPath, 'utf-8');
+  if (!c.includes(`"softwareVersion": "${currentVersion}"`)) {
+    versionParityPassed = false;
+    versionDiscrepancies.push(`schema-org.html no tiene "softwareVersion": "${currentVersion}"`);
+  }
+}
+
+// 4. Verificar presencia de versión canónica en páginas clave
+const keyPagesToCheck = [
+  'apps/api/public/index.html',
+  'apps/api/public/dashboard/index.html',
+  'apps/api/public/docs/index.html'
+];
+for (const kp of keyPagesToCheck) {
+  const kpPath = path.join(repoRoot, kp);
+  if (fs.existsSync(kpPath)) {
+    const c = fs.readFileSync(kpPath, 'utf-8');
+    if (!c.includes(`v${currentVersion}`) && !c.includes(`"${currentVersion}"`)) {
+      versionParityPassed = false;
+      versionDiscrepancies.push(`${kp} no incluye la versión canónica 'v${currentVersion}'`);
+    }
+  }
+}
+
+// 5. Anti-Drift: Auditoría exhaustiva en docs/ contra versiones obsoletas
+const docsDir = path.join(repoRoot, 'apps/api/public/docs');
+if (fs.existsSync(docsDir)) {
+  function scanDirForStaleVersions(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        scanDirForStaleVersions(fullPath);
+      } else if (entry.name.endsWith('.html')) {
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        // Buscar cualquier versión previa (ej: 0.3.7, 0.3.6) en badges o descargas
+        if (content.includes('v0.3.7') || content.includes('Descargar v0.3.7') || content.includes('v0.3.6') && !fullPath.includes('compatibilidad')) {
+          versionParityPassed = false;
+          const rel = path.relative(repoRoot, fullPath);
+          versionDiscrepancies.push(`Versión desactualizada detectada en ${rel}`);
+        }
+      }
+    }
+  }
+  scanDirForStaleVersions(docsDir);
+}
+
+const gate6Passed = baseTsConfigExists && Boolean(currentVersion) && versionParityPassed;
+const gate6Score = gate6Passed ? 10.0 : 0.0;
+
+if (versionDiscrepancies.length > 0) {
+  versionDetails.push(...versionDiscrepancies.map((d) => `❌ ${d}`));
+} else {
+  versionDetails.push(`✓ Paridad 100% verificada en monorepo, schemas y documentación pública (v${currentVersion}).`);
+}
 
 results.push({
-  gateName: '6. Consistencia de Toolchain & Configuración Base',
+  gateName: '6. Consistencia de Toolchain & Paridad Estricta de Versiones (Anti-Drift)',
   passed: gate6Passed,
   score: gate6Score,
   weight: 0.10,
-  details: [
-    `tsconfig.base.json existe: ${baseTsConfigExists ? 'SÍ' : 'NO'}`,
-    `Versión del monorepo: ${rootPkg.version || 'desconocida'}`,
-  ],
+  details: versionDetails,
   warnings: [],
 });
 
 if (gate6Passed) {
-  console.log(`  ✓ Toolchain uniforme. Versión central: ${rootPkg.version}`);
+  console.log(`  ✓ Toolchain uniforme y paridad estricta de versiones validada (v${currentVersion}).`);
 } else {
-  console.error('  ❌ Inconsistencia en la configuración del monorepo.');
+  console.error('  ❌ Fallo en paridad de versiones o toolchain:');
+  versionDiscrepancies.forEach((d) => console.error(`     - ${d}`));
 }
 
 // ============================================================================

@@ -39,7 +39,7 @@ Content-Type: application/json
 
 {
   "running": true,
-  "version": "0.3.6",
+  "version": "0.3.8",
   "uptimeSeconds": 1420,
   "factusol": {
     "connected": true,
