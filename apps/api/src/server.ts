@@ -371,15 +371,27 @@ export async function bootstrapApp(): Promise<Express> {
 
   // Rutas directas para Páginas Legales, Beta Pública y SEO por Ciudades
   app.get(['/privacidad', '/privacidad.html'], (_req, res) => {
-    res.sendFile(path.join(publicDir, 'privacidad', 'index.html'));
+    const filePath = path.join(publicDir, 'privacidad', 'index.html');
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+    return res.status(404).send('Página de privacidad no encontrada');
   });
 
   app.get(['/cookies', '/cookies.html'], (_req, res) => {
-    res.sendFile(path.join(publicDir, 'cookies', 'index.html'));
+    const filePath = path.join(publicDir, 'cookies', 'index.html');
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+    return res.status(404).send('Página de cookies no encontrada');
   });
 
   app.get(['/terminos', '/terminos.html'], (_req, res) => {
-    res.sendFile(path.join(publicDir, 'terminos', 'index.html'));
+    const filePath = path.join(publicDir, 'terminos', 'index.html');
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+    return res.status(404).send('Página de términos no encontrada');
   });
 
   app.get('/beta', (_req, res) => {

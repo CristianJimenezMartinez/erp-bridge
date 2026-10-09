@@ -90,13 +90,21 @@ async function deployDist() {
   sftp.end();
   console.log(`    ✓ ${files.length} archivos compilados transferidos con éxito.`);
 
-  console.log('>>> [3/5] Copiando al contenedor Docker bentian-api-prod...');
+  console.log('>>> [3/5] Sincronizando repositorio git y actualizando contenedor Docker...');
+  try {
+    await runSsh(conn, 'cd /opt/bentian/erp-bridge && git pull origin main');
+    console.log('    ✓ Git pull completado en el servidor.');
+  } catch (e) {
+    console.warn('    ⚠ Aviso en git pull remoto:', e.message);
+  }
+
   const copyCmd = `
     docker cp "${remoteDistDir}/." bentian-api-prod:/app/apps/api/dist/ &&
+    docker cp /opt/bentian/erp-bridge/apps/api/public/. bentian-api-prod:/app/apps/api/public/ &&
     docker restart bentian-api-prod
   `;
   await runSsh(conn, copyCmd);
-  console.log('    ✓ Backend copiado al contenedor y servicio reiniciado.');
+  console.log('    ✓ Backend y assets públicos copiados al contenedor y servicio reiniciado.');
 
   conn.end();
 
