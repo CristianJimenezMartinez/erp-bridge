@@ -31,6 +31,7 @@ import { authRouter } from './routes/auth.router';
 import { monitoringRouter } from './routes/monitoring.router';
 import { notificationsRouter } from './routes/notifications.router';
 import { contactRouter } from './routes/contact.router';
+import { meRouter } from './routes/me.router';
 import { getLatestReleasedVersion } from './utils/version.util';
 
 dotenv.config();
@@ -186,6 +187,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', notificationsRouter);
   app.use('/api/v1', contactRouter);
   app.use(contactRouter);
+  app.use('/api/v1', meRouter);
+  app.use(meRouter);
   // Eliminado app.use(notificationsRouter) sin prefijo para mitigar relé de email abierto (API-007)
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)
@@ -366,7 +369,19 @@ export async function bootstrapApp(): Promise<Express> {
     return res.json({ message: 'Bentian ERP Bridge API', status: 'OK', docs: '/health' });
   });
 
-  // Rutas directas para Beta Pública y SEO por Ciudades
+  // Rutas directas para Páginas Legales, Beta Pública y SEO por Ciudades
+  app.get(['/privacidad', '/privacidad.html'], (_req, res) => {
+    res.sendFile(path.join(publicDir, 'privacidad', 'index.html'));
+  });
+
+  app.get(['/cookies', '/cookies.html'], (_req, res) => {
+    res.sendFile(path.join(publicDir, 'cookies', 'index.html'));
+  });
+
+  app.get(['/terminos', '/terminos.html'], (_req, res) => {
+    res.sendFile(path.join(publicDir, 'terminos', 'index.html'));
+  });
+
   app.get('/beta', (_req, res) => {
     res.redirect(301, '/beta/');
   });

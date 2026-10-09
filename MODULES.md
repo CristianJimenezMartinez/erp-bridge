@@ -45,7 +45,7 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 * **Pruebas de Certificación:** `update-system.test.ts`.
 
 #### 5. `agent.config.persistence` (`apps/agent/src/config/config.manager.ts`)
-* **Propósito:** Persistencia atómica e inmutable en `%APPDATA%\Bentian Agent\agent-config.json` mediante archivos `.tmp` y reemplazo seguro. Implementa la regla Anti-Wiping para preservar rutas NAS (`\\NAS\...`) y unidades mapeadas (`Z:\...`) cuando la red no responde en el inicio.
+* **Propósito:** Persistencia atómica e inmutable en JSON estructurado en `%APPDATA%\Bentian Agent\agent-config.json` mediante archivos `.tmp` y reemplazo atómico seguro con backup defensivo `.bak` (sin motor SQLite). Implementa la regla Anti-Wiping para preservar rutas NAS (`\\NAS\...`) y unidades mapeadas (`Z:\...`) cuando la red no responde en el inicio.
 * **Pruebas de Certificación:** `config-persistence.test.ts`, `nas-dialog-e2e.test.ts`.
 
 #### 6. `agent.gui.native_dialog` (`apps/agent/src/gui/window-launcher.ts` y `apps/agent/src/gui/tray/BentianTray.cs`)
@@ -60,7 +60,7 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 * **`cloud.api` + Dashboard Oficial (`apps/api/src` + `apps/api/public/dashboard`):**  
   Panel web maestro en producción (HTML5 + Tailwind + Vanilla JS) para monitorización en vivo de flota de agentes, resolución de mudanzas de PC (`unbind`), administración de licencias y pasarela de facturación Stripe.
 * **`agent.gui` (`apps/agent/src/gui`):**  
-  Servidor web local (puerto 39281) con interfaz responsive y bandeja nativa C# (`BentianTray.exe`).
+  Servidor web local (puerto fijo 39281) con interfaz responsive y bandeja nativa C# (`BentianTray.exe`), control de instancia única mediante sondeo activo de `/health` y debounce de 2.5s (sin named pipe).
 * **`connectors.woocommerce` (`packages/connectors/woocommerce`):**  
   Conector REST API certificado contra WooCommerce v3.
 

@@ -11,6 +11,10 @@ services:
     image: bentian-api:latest
     container_name: bentian-api-prod
     restart: always
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     ports:
       - "127.0.0.1:3000:3000"
     environment:

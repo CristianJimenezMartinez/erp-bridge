@@ -159,7 +159,10 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 | P3-2 | API-025, 013, 020 | HECHO | 1c9a388 | Pairing token criptográfico de 64 bits de entropía (16 hex chars) sin token en texto claro en logs; rate limiting en /agents/pair (10/15m) y /agents/pairing-token (20/15m) |
 | P3-3 | API-018, 019 | HECHO | 1c9a388 | exp obligatorio en JWTs, jti único (UUID v4) por token, POST /auth/logout implementado con lista negra de jti revocados |
 | P3-4 | API-026 | HECHO | 1c9a388 | Validación Zod estricta en endpoints de auth, agents, licenses, billing, notifications, flows y sync |
-| P3-5 … P3-8 | ver §5 | ABIERTO | — | Tareas de Docker, gobernanza, Quality Gate y documentación pendientes |
+| P3-5 | INF-006, 021, 022 | HECHO | — | Dockerfile endurecido (--frozen-lockfile, sin || true en builds, runner bajo usuario unprivilegiado node) y docker-compose.prod.yml con security_opt no-new-privileges y cap_drop ALL |
+| P3-6 | INF-019, 020 | HECHO | — | Protocolo de respuesta a incidentes con notificación AEPD <72h en docs/INCIDENT_RESPONSE.md, manual de rotación de claves en docs/KEY_ROTATION.md, endpoints RGPD GET /me/export (Art. 20) y DELETE /me (Art. 17), y páginas públicas /privacidad y /cookies |
+| P3-7 | Quality Gate Secret Audit | HECHO | — | Gate 8 (Secret Scanning Guard) implementado en scripts/quality-gate.ts escaneando ficheros git rastreados en busca de claves privadas y tokens vivos (sk_live, whsec, ghp_, AKIA) |
+| P3-8 | AGT-021, 022 | HECHO | — | Honestidad documental certificada en AGENTS.md, GEMINI.md, MODULES.md y docs/CAPABILITIES_MANIFEST.md: persistencia local JSON atómico en AppData (sin SQLite) e instancia única por sondeo de puerto 39281 /health (sin named pipe) |
 | P3-9 | API-022, 028, 029 | HECHO | 1c9a388 | Endpoint /health mínimo (status, version, timestamp) sin fuga de memoria ni detalles internos de BD; respuestas de error 500 genéricas en producción |
 
 ## 7. Checklist por tarea (haz esto siempre)

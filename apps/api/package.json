@@ -11,7 +11,7 @@
     "build": "ts-node scripts/build-landing.ts && ts-node scripts/build-dashboard.ts && ts-node scripts/generate-city-pages.ts && ts-node scripts/build-docs.ts && tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "test": "ts-node test/license-api.test.ts && ts-node test/update-api.test.ts && ts-node test/agent-monitor.test.ts && ts-node test/auth-security.test.ts && ts-node test/org-scope.test.ts && ts-node test/docs-static.test.ts && ts-node test/security-remediation.test.ts && ts-node test/dashboard-and-universal-bridge-security.test.ts"
+    "test": "ts-node test/license-api.test.ts && ts-node test/update-api.test.ts && ts-node test/agent-monitor.test.ts && ts-node test/auth-security.test.ts && ts-node test/org-scope.test.ts && ts-node test/docs-static.test.ts && ts-node test/security-remediation.test.ts && ts-node test/dashboard-and-universal-bridge-security.test.ts && ts-node test/me-gdpr-and-legal.test.ts"
   },
   "dependencies": {
     "@erp-bridge/connector-factusol": "workspace:*",

@@ -6,9 +6,10 @@
 ---
 
 ## 1. Persistencia de Configuración del Agente (Regla de AppData)
-* **Ubicación obligatoria e inmutable:** La configuración del agente (`agent-config.json`) debe guardarse **ÚNICAMENTE** en:
+* **Ubicación obligatoria e inmutable:** La configuración del agente (`agent-config.json`) y el historial local deben guardarse **ÚNICAMENTE** en:
   `%APPDATA%\Bentian Agent\agent-config.json` (o equivalente en `process.env.APPDATA`).
-* **PROHIBICIÓN ESTRICTA:** Queda terminantemente prohibido intentar escribir `agent-config.json` o bases de datos SQLite/JSON en el directorio del ejecutable (`process.execPath`, ej: `C:\Program Files\Bentian Agent\`). En Windows, los usuarios estándar carecen de permisos de escritura allí, lo que genera errores `EPERM` silenciados y pérdida total de datos al reiniciar.
+* **Motor de Almacenamiento Local (JSON Atómico Certificado):** El almacenamiento local del agente se realiza exclusivamente mediante ficheros JSON estructurados con escritura atómica (`.tmp` + `fs.renameSync`) y respaldo defensivo `.bak`. Queda prohibido afirmar la existencia de un motor SQLite local no implementado; la persistencia verificada es JSON atómico en AppData con protección anti-wiping.
+* **PROHIBICIÓN ESTRICTA:** Queda terminantemente prohibido intentar escribir `agent-config.json` ni archivos de estado en el directorio del ejecutable (`process.execPath`, ej: `C:\Program Files\Bentian Agent\`). En Windows, los usuarios estándar carecen de permisos de escritura allí, lo que genera errores `EPERM` silenciados y pérdida total de datos al reiniciar.
 * **Escritura atómica:** Toda escritura en disco debe realizarse escribiendo primero en un fichero temporal (`.tmp`) y realizando un reemplazo atómico (`fs.renameSync`).
 
 ---
@@ -31,7 +32,7 @@
 ---
 
 ## 4. Instancia Única y Proceso de Actualización Silenciosa
-* **Instancia única blindada:** Se utiliza cerrojo `SingleInstanceLock` con named pipe y *debounce* de 2.5 segundos. Prohibido permitir múltiples ventanas al abrir con permisos de Administrador.
+* **Instancia única blindada:** Se utiliza comprobación de proceso y verificación activa del puerto HTTP `39281` (`/health` y `/api/local/open-gui`) con cerrojo de arranque y *debounce* de 2.5 segundos (en lugar de cerrojos hipotéticos por named pipe). Prohibido permitir múltiples procesos en ejecución o bifurcaciones de ventana al abrir con permisos de Administrador.
 * **Actualización atómica externa (`UpdateSwapper`):**
   - Un ejecutable en ejecución en Windows nunca debe intentar sobrescribirse a sí mismo dentro de su propio proceso en `Program Files` (provoca `EPERM`).
   - Las actualizaciones deben delegarse **SIEMPRE** a un proceso desacoplado (`UpdateSwapper`) ejecutado desde `%TEMP%\bentian-updates\`.
@@ -129,3 +130,70 @@
 * **Aislamiento Estricto de Configuración en Tests de Agente:**
   - Toda prueba de testing en `apps/agent` tiene prohibido modificar o ensuciar el archivo de configuración real del usuario en `%APPDATA%\Bentian Agent\agent-config.json`.
   - Se debe utilizar siempre `process.env.BENTIAN_CONFIG_PATH = path.join(tempDir, 'agent-config.json')` y limpiar la variable de entorno en el bloque de teardown (`delete process.env.BENTIAN_CONFIG_PATH`).
+
+---
+
+## 14. Propiedad y Estado Permanente de Google Search Console
+* **Propietario Verificado Oficial:** Cristian Jiménez Martínez es el propietario oficial verificado en Google Search Console para las propiedades `cristianjm.com` (propiedad de dominio) y `https://bridge.cristianjm.com/` (propiedad de URL con icono de Bentian).
+* **Sitemap Oficial Activo:** El sitemap `https://bridge.cristianjm.com/sitemap.xml` ya está enviado, vinculado y en procesamiento por Google Search Console con todas sus URLs canónicas.
+* **PROHIBICIÓN ESTRICTA:** Queda terminantemente prohibido volver a preguntar al usuario si tiene acceso a Google Search Console, si es el propietario o si ha enviado el sitemap. El agente debe asumir siempre que la propiedad está activa, verificada y que el usuario cuenta con los accesos completos de administración.
+
+---
+
+## 15. Arquitectura de Seguridad Criptográfica, Aislamiento de Claves y Protección Multi-Tenant
+* **Aislamiento Estricto de Claves Privadas:**
+  - Las claves privadas de firma (`update-private.pem`, `license-signing-private.pem`) tienen **PROHIBIDO** residir dentro del repositorio o en directorios sincronizados en la nube (Google Drive, OneDrive, etc.).
+  - Deben custodiarse exclusivamente en `%USERPROFILE%\.bentian-secrets\` con permisos restringidos de Windows (`icacls`).
+  - Al ejecutar `builder/build.js --deploy`, el script debe abortar de inmediato si la clave privada no existe; queda terminantemente prohibido publicar releases a producción con firmas fallback simuladas.
+* **Prueba Asimétrica de Licencia Ed25519 (Anti Clock-Rollback):**
+  - El periodo de gracia offline del Agente se valida exclusivamente mediante una prueba criptográfica firmada asimétricamente por la API con Ed25519 (`LicenseProofService`).
+  - El Agente verifica la firma contra la clave pública embebida inmutable (`DEFAULT_LICENSE_PROOF_PUBLIC_KEY`). Queda prohibido depender de comparaciones simples de fecha local para validar licencias en modo offline.
+* **Blindaje Anti-TOCTOU en Actualizaciones (`UpdateSwapper`):**
+  - Todo reemplazo atómico de binarios debe copiar primero el nuevo ejecutable a la carpeta de destino (`.new`) y verificar su suma SHA-256 (`Get-FileHash`) contra el manifiesto firmado antes de detener procesos o modificar archivos existentes.
+  - En elevaciones UAC para carpetas protegidas (`Program Files`), el script PowerShell debe pasarse codificado en Base64 en memoria (`-EncodedCommand`), quedando prohibido depender de archivos `.bat` o `.ps1` ubicados en `%TEMP%` que puedan ser manipulados por procesos locales no privilegiados.
+* **Aislamiento Multi-Tenant Estricto (`resolveOrgId`):**
+  - Solo los roles `SUPERADMIN` y `ADMIN` pueden consultar organizaciones arbitrarias mediante `x-organization-id` o `?organizationId=`.
+  - Para cualquier otro rol (`RESELLER`, `TENANT_CLIENT`, `OPERATOR`), la API debe forzar siempre la organización asignada a su propio token JWT (`resolveOrgId`).
+  - Un `RESELLER` solo puede emitir licencias `trial` de hasta 15 días y 1 asiento, exclusivamente para organizaciones vinculadas a su `reseller_id`.
+* **Cerrojo Concurrente de Activaciones (`withKeyedLock`):**
+  - Toda llamada a `/licenses/activate` debe serializarse mediante exclusión mutua en memoria indexada por clave de licencia para prevenir carreras concurrentes que eludan el límite de `maxActivations`.
+* **Skill Oficial de Seguridad:**
+  - Consulta `.agent/skills/bentian-security-architecture/SKILL.md` para el desglose exhaustivo de arquitectura, runbooks de pruebas y procedimientos de despliegue seguro.
+
+
+---
+
+## 16. Auditoría de Seguridad 2026-10-06 y Playbook de Remediación (LEER ANTES DE TOCAR SEGURIDAD)
+* **Documentos oficiales:** `erp-bridge/docs/security/SECURITY_AUDIT_2026-10-06.md` (hallazgos API-/AGT-/INF-) y `erp-bridge/docs/security/GEMINI_REMEDIATION_PLAYBOOK.md` (tareas P0→P3 con criterios de aceptación y tabla de estado). Todo trabajo de seguridad debe partir del playbook y actualizar su tabla de estado.
+* **Prioridad P0 abierta:** clave privada de actualizaciones expuesta en el historial de un repo público (INF-001), path traversal en `/releases/latest/:filename`, endpoints sin autenticación (`/sync/run-reactive`, `/notifications/order`) y endpoint PHP universal. No ejecutar rotación de claves, force-push ni despliegues a producción sin confirmación expresa del propietario.
+* **Honestidad documental:** Documentación veraz y certificada: el control de instancia única opera mediante comprobación de proceso y verificación activa del puerto HTTP 39281 (`/health`) con debounce de 2.5s (sin named pipe); y el almacenamiento persistente local es JSON atómico en AppData (`%APPDATA%\Bentian Agent\agent-config.json`) con reemplazo seguro anti-wiping y backup (sin motor SQLite). Se prohíbe prometer capacidades arquitectónicas no respaldadas en código.
+* **El Quality Gate no mide seguridad:** una nota ≥ 9,5 no implica ausencia de vulnerabilidades. Los módulos FROZEN solo se mitigan por capa superior.
+
+---
+
+## 17. Ciclo de Vida y Limpieza Obligatoria de Subagentes (Anti-Zombies & Anti-Hang)
+* **Terminación Inmediata Obligatoria:**
+  - Cuando un subagente entrega su informe o concluye la tarea asignada, el agente principal tiene **PROHIBIDO** dejarlo en estado `idle` o `waiting_for_dependents`.
+  - Debe llamar inmediatamente a `manage_subagents` con `Action: 'kill'` (o `Action: 'kill_all'` si completó la ronda de delegación) para destruir el proceso y liberar memoria en el host.
+* **Prohibición de Bloqueos por Tareas en Background en Subagentes:**
+  - Los subagentes tienen prohibido emitir respuestas de cierre mientras tengan tareas de fondo (`task-xxx`) en ejecución o quedar a la espera indefinida de procesos dependientes. Deben monitorizar la finalización de sus comandos de test o compilación antes de enviar su reporte final.
+* **Higiene Operativa del Entorno:**
+  - Siempre que se trabaje con subagentes, el agente principal debe auditar el estado con `manage_subagents(Action: 'list')` y `manage_task(Action: 'list')` al terminar la tarea, garantizando que queden exactamente **0 subagentes huérfanos y 0 tareas colgadas**.
+
+---
+
+## 18. Paridad Estricta de Versiones en Documentación y SSoT Anti-Drift
+* **PROHIBICIÓN ESTRICTA DE DESFASES DE VERSIÓN:**
+  - Queda terminantemente prohibido que existan páginas de documentación (`/docs/*`), hubs de ciudades (`/conector-factusol/*`), metadatos estructurados (`schema-org.html`), landing pages o guías con números de versión desactualizados respecto al `package.json` raíz.
+* **Sincronización y Compilación Automática Obligatoria:**
+  - Toda subida de versión (`node builder/build.js [patch|minor|major]` o `node builder/version.js [patch|minor|major|set]`) y el comando `node builder/version.js sync` ejecutan obligatoria y atómicamente:
+    1. Sincronización de `version-sync.js`, `schema-org.html` (`softwareVersion` y `mpn`), `02-hero.html`, `beta/index.html` y badges `[data-app-version]`.
+    2. Compilación completa de la landing page (`apps/api/scripts/build-landing.ts`).
+    3. Compilación completa del dashboard de clientes (`apps/api/scripts/build-dashboard.ts`).
+    4. Regeneración de todas las páginas de ciudades (`apps/api/scripts/generate-city-pages.ts`).
+    5. Recompilación de todas las páginas y manuales del Centro de Documentación (`apps/api/scripts/build-docs.ts`).
+* **Blindaje en Quality Gate (Gate 6 Anti-Drift):**
+  - El Gate 6 del Quality Gate (`pnpm run quality:check`) audita automáticamente la paridad al 100% entre los 12 archivos `package.json`, `version-sync.js`, `schema-org.html`, `index.html`, `dashboard/index.html`, `docs/index.html` y escanea todo el directorio de documentación pública bloqueando el commit si detecta cualquier versión anterior o desactualizada.
+* **Mantenimiento Dual Mandatario:**
+  - Cualquier actualización a las reglas debe aplicarse de forma estrictamente simultánea en `AGENTS.md` y `GEMINI.md`.
+

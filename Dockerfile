@@ -18,14 +18,14 @@ COPY dashboard.html* ./
 RUN mkdir -p releases
 
 # Install dependencies and build TypeScript packages
-RUN pnpm install --no-frozen-lockfile --ignore-scripts
-RUN pnpm --filter @erp-bridge/shared build || true
-RUN pnpm --filter @erp-bridge/sdk build || true
-RUN pnpm --filter @erp-bridge/connector-factusol build || true
-RUN pnpm --filter @erp-bridge/connector-woocommerce build || true
-RUN pnpm --filter @erp-bridge/connector-simplygest build || true
-RUN pnpm --filter @erp-bridge/core build || true
-RUN pnpm --filter @erp-bridge/api build || true
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm --filter @erp-bridge/shared build
+RUN pnpm --filter @erp-bridge/sdk build
+RUN pnpm --filter @erp-bridge/connector-factusol build
+RUN pnpm --filter @erp-bridge/connector-woocommerce build
+RUN pnpm --filter @erp-bridge/connector-simplygest build
+RUN pnpm --filter @erp-bridge/core build
+RUN pnpm --filter @erp-bridge/api build
 
 # ==========================================================
 # PRODUCTION RUNTIME
@@ -37,8 +37,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Copy built application and packages from builder
-COPY --from=builder /app /app
+# Copy built application and packages from builder as unprivileged user
+COPY --from=builder --chown=node:node /app /app
+
+USER node
 
 EXPOSE 3000
 

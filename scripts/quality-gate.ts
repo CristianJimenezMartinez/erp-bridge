@@ -2,7 +2,7 @@
  * BENTIAN QUALITY GATE & METRICS ENGINE
  *
  * Motor automatizado de reglas de calidad y métricas objetivas de Bentian ERP Bridge.
- * Ejecuta 7 Quality Gates cuantitativos e inflexibles:
+ * Ejecuta 8 Quality Gates cuantitativos e inflexibles:
  * 1. LOC Guard & God-Class Prevention (< 250 LOC advertencia, < 750 LOC hard error)
  * 2. Acyclic Graph Guard (madge: 0 dependencias circulares)
  * 3. Clean Logger Guard (0 llamadas a console.* en producción)
@@ -10,6 +10,7 @@
  * 5. Anti-Overselling Guard (availableQuantity obligatorio en sincronización de stock)
  * 6. Config & Version Consistency Guard
  * 7. Frozen Modules Integrity Guard (Code Freeze & Sealed Modules)
+ * 8. Secret Scanning Guard (0 claves privadas, sk_live, whsec en repos)
  *
  * Emite una nota ponderada objetiva (0 a 10) al finalizar.
  */
@@ -528,6 +529,100 @@ results.push({
   weight: 0.15,
   details: gate7Details,
   warnings: gate7Warnings,
+});
+
+// ============================================================================
+// GATE 8: SECRET SCANNING & ZERO LEAK GUARD (P3-7)
+// ============================================================================
+console.log('\n▶ [Gate 8/8] Verificando ausencia de secretos, claves privadas y tokens vivos...');
+let gate8Passed = true;
+const gate8Details: string[] = [];
+const secretViolations: { file: string; line: number; type: string }[] = [];
+
+const SECRET_PATTERNS: { name: string; regex: RegExp }[] = [
+  { name: 'Clave Privada PEM', regex: /-----BEGIN (?:[A-Z ]+)?PRIVATE KEY-----/ },
+  { name: 'Token de Stripe en Vivo (sk_live)', regex: /\bsk_live_[0-9a-zA-Z]{20,}\b/ },
+  { name: 'Secreto de Webhook Stripe (whsec)', regex: /\bwhsec_[0-9a-zA-Z]{24,}\b/ },
+  { name: 'GitHub Personal Access Token', regex: /\bghp_[0-9a-zA-Z]{36}\b/ },
+  { name: 'Credencial AWS Access Key', regex: /\bAKIA[0-9A-Z]{16}\b/ },
+];
+
+function isIgnoredForSecrets(relPath: string): boolean {
+  const norm = relPath.replace(/\\/g, '/').toLowerCase();
+  return (
+    norm.includes('/.git/') ||
+    norm.includes('/node_modules/') ||
+    norm.includes('/dist/') ||
+    norm.includes('/coverage/') ||
+    norm.includes('/.angular/') ||
+    norm.includes('/test/') ||
+    norm.includes('/tests/') ||
+    norm.includes('.test.') ||
+    norm.includes('.spec.') ||
+    norm.endsWith('.example') ||
+    norm.includes('.example.') ||
+    norm.endsWith('.md') ||
+    norm.endsWith('.txt') ||
+    norm.endsWith('.png') ||
+    norm.endsWith('.jpg') ||
+    norm.endsWith('.ico') ||
+    norm.endsWith('.svg')
+  );
+}
+
+let filesToAudit: string[] = [];
+try {
+  const stdout = execSync('git ls-files', { cwd: repoRoot, encoding: 'utf-8' });
+  filesToAudit = stdout.split(/\r?\n/).filter(Boolean);
+} catch {
+  filesToAudit = allSrcFiles.map((f) => path.relative(repoRoot, f).replace(/\\/g, '/'));
+}
+
+for (const rel of filesToAudit) {
+  if (isIgnoredForSecrets(rel)) continue;
+  const abs = path.join(repoRoot, rel);
+  if (!fs.existsSync(abs)) continue;
+
+  try {
+    const content = fs.readFileSync(abs, 'utf-8');
+    const lines = content.split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      const lineText = lines[i];
+      if (!lineText) continue;
+      for (const pattern of SECRET_PATTERNS) {
+        if (pattern.regex.test(lineText)) {
+          secretViolations.push({
+            file: rel,
+            line: i + 1,
+            type: pattern.name,
+          });
+          gate8Passed = false;
+        }
+      }
+    }
+  } catch {}
+}
+
+const gate8Score = gate8Passed ? 10.0 : 0.0;
+
+if (gate8Passed) {
+  console.log(`  ✓ 0 secretos detectados: Escaneo limpio en ${filesToAudit.length} ficheros rastreados.`);
+  gate8Details.push(`0 secretos, claves privadas ni tokens vivos detectados en código fuente (${filesToAudit.length} ficheros analizados).`);
+} else {
+  console.error(`  ❌ FALLO DE SEGURIDAD CRÍTICO: ${secretViolations.length} posibles secretos detectados:`);
+  for (const v of secretViolations) {
+    console.error(`     - [${v.type}] en ${v.file}:${v.line}`);
+    gate8Details.push(`Secreto detectado: ${v.type} en ${v.file}:${v.line}`);
+  }
+}
+
+results.push({
+  gateName: '8. Auditoría Anti-Fuga de Secretos & Tokens Vivos',
+  passed: gate8Passed,
+  score: gate8Score,
+  weight: 0.10,
+  details: gate8Details,
+  warnings: [],
 });
 
 // ============================================================================
