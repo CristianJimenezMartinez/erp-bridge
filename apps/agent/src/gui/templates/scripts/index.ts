@@ -8,6 +8,7 @@ import { syncScript } from './sync.script';
 import { salesHistoryScript } from './sales-history.script';
 import { logsScript } from './logs.script';
 import { wizardScript } from './wizard.script';
+import { incidentScript } from './incident.script';
 
 export function renderClientScript(agentVersion: string = '0.2.0', localToken: string = ''): string {
   return [
@@ -24,6 +25,7 @@ export function renderClientScript(agentVersion: string = '0.2.0', localToken: s
     salesHistoryScript,
     logsScript,
     wizardScript,
+    incidentScript,
     '    // Inicializar sondeo con protección de timer único',
     '    if (window.__statusPollInterval) clearInterval(window.__statusPollInterval);',
     '    fetchStatus();',

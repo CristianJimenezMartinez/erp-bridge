@@ -46,6 +46,28 @@ export class SystemController {
     };
   }
 
+  public static reportIncident(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      logger.info('Solicitud de reporte de incidencia recibida desde la GUI.');
+      try {
+        const body = ctx.body || {};
+        if (!body.contact || !body.description) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, message: 'El contacto y la descripción son obligatorios.' }));
+          return;
+        }
+
+        const result = await agent.reportIncident(body);
+        res.writeHead(result.success ? 200 : 500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        logger.error(`Error procesando reporte de incidencia: ${String(err)}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: String(err) }));
+      }
+    };
+  }
+
   public static checkUpdate(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
       logger.info('Solicitud de comprobación de actualización recibida desde la GUI.');

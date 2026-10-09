@@ -82,6 +82,10 @@ export function renderLogsTab(): string {
               <div class="section-desc">Acciones rápidas para resolución asistida de incidencias y verificación de conectividad.</div>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button onclick="openIncidentModal()" id="btn-diag-incident" class="btn btn-secondary btn-sm" title="Reportar incidencia técnica asistida a soporte" style="display:inline-flex;align-items:center;gap:6px;border-color:rgba(239,68,68,0.35);color:#fca5a5;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>Reportar Incidencia</span>
+              </button>
               <button onclick="downloadDiagnostics()" id="btn-diag-dl" class="btn btn-primary btn-sm" title="Descargar informe completo (.txt) para soporte técnico">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                 <span>Descargar Informe Técnico (.txt)</span>

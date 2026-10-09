@@ -242,6 +242,31 @@ async function testGuiServer() {
     assert.strictEqual(secretInConfig, 'cs_real_secret_456', 'El valor real del secret no debe haberse sobrescrito');
     console.log('  ✓ Enmascaramiento y preservación de credenciales verificado exitosamente.');
 
+    // 21. Report incident endpoint (POST /api/local/report-incident)
+    console.log('21. Probando reporte de incidencias (POST /api/local/report-incident)...');
+    const resIncMissing = await fetch(`${url}/api/local/report-incident`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    assert.strictEqual(resIncMissing.status, 400, 'Debe requerir contacto y descripción');
+
+    const resIncValid = await fetch(`${url}/api/local/report-incident`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contact: 'soporte-test@empresa.com',
+        category: 'factusol',
+        description: 'Error simulado de prueba para comprobación técnica',
+        includeDiagnostics: true
+      })
+    });
+    assert.strictEqual(resIncValid.status, 200, 'Debe registrar la incidencia con 200 OK');
+    const incJson = (await resIncValid.json()) as any;
+    assert(incJson.success, 'La respuesta debe ser success: true');
+    assert(incJson.ticketId && incJson.ticketId.startsWith('#INC-'), 'Debe generar un ticketId con formato #INC-');
+    console.log(`  ✓ Incidencia registrada exitosamente: ${incJson.ticketId}`);
+
   } finally {
     await server.stop();
     delete process.env.BENTIAN_DATA_DIR;

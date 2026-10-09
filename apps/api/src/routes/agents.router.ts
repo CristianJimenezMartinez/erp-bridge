@@ -9,6 +9,7 @@ const agentService = new AgentService();
 const updateService = new UpdateService();
 
 import { getLatestReleasedVersion } from '../utils/version.util';
+import { MailerService } from '../services/mailer.service';
 
 export { getLatestReleasedVersion };
 
@@ -187,6 +188,78 @@ agentsRouter.post('/fleet/report-error', async (req: Request, res: Response, nex
       ).catch(() => {});
     }
     return res.status(201).json({ success: true });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// 2.3 Report agent incident / support ticket (from Agent GUI)
+agentsRouter.post('/fleet/report-incident', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { ticketId, contact, category, description, diagnostics, agentId, organizationId, appVersion, hwid } = req.body as {
+      ticketId?: string;
+      contact?: string;
+      category?: string;
+      description?: string;
+      diagnostics?: string;
+      agentId?: string;
+      organizationId?: string;
+      appVersion?: string;
+      hwid?: string;
+    };
+
+    if (!ticketId || !description) {
+      return res.status(400).json({ error: { message: 'ticketId y description son obligatorios' } });
+    }
+
+    const db = DatabaseService.getInstance();
+    if (db.isAvailable()) {
+      await db.query(
+        `INSERT INTO fleet_error_events (agent_id, organization_id, error_code, message, details)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          agentId || null,
+          organizationId || 'org_default',
+          `INCIDENT_${(category || 'OTHER').toUpperCase()}`,
+          `[${ticketId}] (${contact || 'Sin contacto'}): ${description.substring(0, 180)}`,
+          JSON.stringify({ ticketId, contact, category, description, diagnostics: diagnostics ? diagnostics.substring(0, 4000) : null, appVersion, hwid })
+        ]
+      ).catch(() => {});
+    }
+
+    // Despacho de email a soporte técnico
+    const supportEmail = process.env.SUPPORT_EMAIL || 'cristianjimeneztrabajo@gmail.com';
+    try {
+      await MailerService.sendEmail({
+        to: supportEmail,
+        subject: `🚨 [Incidencia Bentian] ${ticketId} - ${category || 'General'}`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0f172a; color: #f8fafc; border-radius: 10px;">
+            <h2 style="color: #ef4444; margin-top: 0;">🚨 Nueva Incidencia Técnica: ${ticketId}</h2>
+            <p style="font-size: 14px; color: #94a3b8;">Se ha recibido una nueva incidencia desde la app de escritorio Bentian Agent.</p>
+            <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 16px;">
+              <p style="margin: 4px 0;"><strong>Contacto:</strong> <a href="mailto:${contact}" style="color: #818cf8;">${contact || 'No especificado'}</a></p>
+              <p style="margin: 4px 0;"><strong>Categoría:</strong> ${category || 'General'}</p>
+              <p style="margin: 4px 0;"><strong>Versión Agente:</strong> v${appVersion || 'Desconocida'}</p>
+              <p style="margin: 4px 0;"><strong>HWID:</strong> <code>${hwid || 'N/A'}</code></p>
+              <p style="margin: 4px 0;"><strong>Organización / Agente:</strong> ${organizationId || 'org_default'} / ${agentId || 'ag_local'}</p>
+            </div>
+            <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 16px;">
+              <h4 style="margin-top: 0; color: #f1f5f9;">Descripción del Usuario:</h4>
+              <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: #cbd5e1;">${description}</p>
+            </div>
+            ${diagnostics ? `<div style="background: #090d16; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #94a3b8; max-height: 250px; overflow-y: auto; white-space: pre-wrap;">${diagnostics.substring(0, 3000)}</div>` : ''}
+          </div>
+        `,
+        text: `Nueva Incidencia ${ticketId}\\nContacto: ${contact}\\nCategoría: ${category}\\nVersión: v${appVersion}\\nHWID: ${hwid}\\n\\nDescripción:\\n${description}\\n\\n${diagnostics ? diagnostics.substring(0, 2000) : ''}`
+      }).catch(() => {});
+    } catch {}
+
+    return res.status(201).json({
+      success: true,
+      ticketId,
+      message: `Hemos recibido tu solicitud junto con el diagnóstico del equipo. El equipo de soporte técnico la revisará y te contactará a ${contact} a la mayor brevedad.`
+    });
   } catch (error) {
     return next(error);
   }

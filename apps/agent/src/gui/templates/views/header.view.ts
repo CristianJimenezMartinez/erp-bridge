@@ -10,14 +10,7 @@ export function renderHeader(): string {
 
     <!-- Header -->
     <header class="header">
-      <div class="header-title" id="header-page-title" style="display:flex;align-items:center;gap:10px;">
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:3px 10px 3px 6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;">
-          <img src="/api/local/icon" width="18" height="18" alt="Bentian" style="border-radius:4px;display:block;" />
-          <span style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:#c7d2fe;text-transform:uppercase;">Bentian</span>
-        </div>
-        <span style="color:var(--text-muted);font-weight:400;font-size:13px;">/</span>
-        <span style="font-weight:600;font-size:15px;color:#f3f4f6;">Estado General</span>
-      </div>
+      <h1 class="header-title" id="header-page-title" style="font-size:16px;font-weight:700;color:#f8fafc;margin:0;letter-spacing:-0.2px;">Estado General</h1>
       <div class="header-actions">
         <div id="header-engine-status" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:9999px;font-size:11px;font-weight:500;color:#10b981;transition:all 0.3s ease;">
           <span id="header-engine-dot" style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block;box-shadow:0 0 6px #10b981;"></span>
@@ -30,6 +23,10 @@ export function renderHeader(): string {
         <button onclick="triggerManualSync()" id="btn-sync-header" class="btn btn-primary">
           <svg id="sync-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Sincronizar Ahora</span>
+        </button>
+        <button onclick="openIncidentModal()" id="btn-header-incident" class="btn btn-secondary btn-sm" title="Enviar incidencia o consulta a soporte técnico" style="display:inline-flex;align-items:center;gap:6px;border-color:rgba(239,68,68,0.35);color:#fca5a5;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span>Reportar Incidencia</span>
         </button>
         <button onclick="openCloudDashboard(event)" class="btn btn-secondary btn-sm" title="Gestión de Licencias y Facturación Cloud">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>

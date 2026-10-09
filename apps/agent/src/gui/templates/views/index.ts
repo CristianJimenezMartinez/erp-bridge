@@ -10,3 +10,4 @@ export { renderLicenseTab } from './license.view';
 export { renderWizardModal } from './wizard.view';
 export { renderToast } from './toast.view';
 export { renderErrorResolverModal } from './error-resolver.view';
+export { renderIncidentModal } from './incident.view';

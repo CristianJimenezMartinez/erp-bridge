@@ -97,6 +97,7 @@ export class LocalGuiServer {
     router.post('/api/local/autostart', SystemController.setAutoStart(this.agent));
     router.post('/api/local/save-full-config', SystemController.saveFullConfig(this.agent));
     router.post('/api/local/test-email', SystemController.testEmail(this.agent));
+    router.post('/api/local/report-incident', SystemController.reportIncident(this.agent));
     router.any(['GET', 'POST'], '/api/local/check-update', SystemController.checkUpdate(this.agent));
     router.post('/api/local/apply-update', SystemController.applyUpdate(this.agent));
     router.any(['GET', 'POST'], '/api/local/open-window', SystemController.openWindow(() => this.getUrl()));
