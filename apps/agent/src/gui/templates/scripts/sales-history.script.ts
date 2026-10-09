@@ -7,40 +7,7 @@ export const salesHistoryScript = `
     let _salesOrdersCache = [];
 
     function switchHistorySubTab(subTab) {
-      const salesPane = document.getElementById('history-subtab-sales');
-      const techPane = document.getElementById('history-subtab-technical');
-      const btnSales = document.getElementById('subtab-btn-sales');
-      const btnTech = document.getElementById('subtab-btn-technical');
-
-      if (subTab === 'sales') {
-        if (salesPane) salesPane.style.display = 'block';
-        if (techPane) techPane.style.display = 'none';
-        if (btnSales) {
-          btnSales.style.background = 'rgba(99,102,241,0.15)';
-          btnSales.style.borderColor = 'rgba(99,102,241,0.4)';
-          btnSales.style.color = '#c7d2fe';
-        }
-        if (btnTech) {
-          btnTech.style.background = 'rgba(255,255,255,0.08)';
-          btnTech.style.borderColor = 'var(--card-border)';
-          btnTech.style.color = 'var(--text-muted)';
-        }
-        loadSalesOrders();
-      } else {
-        if (salesPane) salesPane.style.display = 'none';
-        if (techPane) techPane.style.display = 'block';
-        if (btnTech) {
-          btnTech.style.background = 'rgba(99,102,241,0.15)';
-          btnTech.style.borderColor = 'rgba(99,102,241,0.4)';
-          btnTech.style.color = '#c7d2fe';
-        }
-        if (btnSales) {
-          btnSales.style.background = 'rgba(255,255,255,0.08)';
-          btnSales.style.borderColor = 'var(--card-border)';
-          btnSales.style.color = 'var(--text-muted)';
-        }
-        loadSyncHistory();
-      }
+      loadSalesOrders();
     }
 
     function onSalesRangeChange(range) {

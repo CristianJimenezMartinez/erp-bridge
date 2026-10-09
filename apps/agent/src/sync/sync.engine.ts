@@ -11,6 +11,7 @@ import { SyncManualResult, CatalogUploadResult } from './sync.types';
 import { OrderSyncHelper } from './order-sync.helper';
 import { CancellationSyncHelper } from './cancellation-sync.helper';
 import { CatalogUploadHelper } from './catalog-upload.helper';
+import { ProgressiveCatalogHelper, ProgressiveCatalogContext } from './progressive-catalog.helper';
 import { OrderNotifierService } from '../notifications/order-notifier.service';
 import { SalesLedgerManager } from '../orders/sales-ledger.manager';
 
@@ -18,7 +19,7 @@ export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
   private autoSyncTimer: NodeJS.Timeout | null = null;
   private isSyncing = false;
-  private hasAutoUploadedCatalog = false;
+  private lastUniversalBridgeStock: Map<string, number> = new Map();
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -95,6 +96,7 @@ export class LocalSyncEngine {
     }
     let itemsUpdated = 0;
     let ordersImported = 0;
+    let ordersCancelled = 0;
 
     const config = this.configManager.get();
     let dbPath = FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || '');
@@ -154,6 +156,7 @@ export class LocalSyncEngine {
         const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
         const driver = new AccessDriver({ databasePath: dbPath });
         const timings: Record<string, number> = {};
+        let knownWcSkus: Set<string> | undefined;
 
         // 1. SINCRONIZACIÓN DE STOCK (Factusol -> WooCommerce)
         try {
@@ -243,16 +246,7 @@ export class LocalSyncEngine {
             }
             const paginationDurationMs = Math.round(performance.now() - tPaginationStart);
             timings['paginateWcProductsMs'] = paginationDurationMs;
-
-            // Si la tienda WooCommerce está vacía (0 productos), activar Install & Plug
-            if (allWcProducts.length === 0 && !this.hasAutoUploadedCatalog) {
-              this.hasAutoUploadedCatalog = true;
-              this.logger.info('🚀 Tienda WooCommerce vacía detectada (0 productos). Activando "Install & Plug": subiendo catálogo inicial de Factusol automáticamente...');
-              this.eventBus.addEvent('info', '🚀 Tienda WooCommerce vacía. Activando "Install & Plug": subiendo catálogo de Factusol automáticamente...');
-              void this.uploadCatalog().catch((catErr) => {
-                this.logger.warn(`Aviso en subida inicial automática de catálogo a WooCommerce: ${String(catErr)}`);
-              });
-            }
+            knownWcSkus = new Set(allWcProducts.map((p) => (p.sku || '').trim().toUpperCase()).filter(Boolean));
 
             // Dirty-checking: enviar a WooCommerce batch únicamente los artículos gestionados en Factusol cuyo stock haya variado
             const batchUpdates: Array<{ id: number; stock_quantity: number }> = [];
@@ -485,6 +479,7 @@ export class LocalSyncEngine {
             defaultWarehouse: cancelWarehouse,
             eventBus: this.eventBus,
           });
+          ordersCancelled = cancelRes.ordersCancelled;
           const cancelDurationMs = Math.round(performance.now() - tCancelStart);
           timings['cancellationsMs'] = cancelDurationMs;
 
@@ -503,6 +498,16 @@ export class LocalSyncEngine {
         } catch (cancelErr) {
           this.logger.warn(`Aviso en sincronización inversa de cancelaciones de WooCommerce: ${String(cancelErr)}`);
         }
+
+        // 4. Subida Progresiva de Catálogo (Factusol -> WooCommerce)
+        try {
+          await ProgressiveCatalogHelper.processProgressiveUpload(
+            this.createProgressiveContext(),
+            { channel: 'woocommerce', dbPath, knownExistingSkus: knownWcSkus }
+          );
+        } catch (catErr) {
+          this.logger.warn(`Aviso en subida progresiva de catálogo (WooCommerce): ${String(catErr)}`);
+        }
       } else {
         // Modo Standalone sin WooCommerce configurado
         if (dbPath && fs.existsSync(dbPath)) {
@@ -513,15 +518,17 @@ export class LocalSyncEngine {
 
       const cycleDurationMs = Date.now() - start;
       const duration = (cycleDurationMs / 1000).toFixed(1);
-      this.historyManager.addSyncHistoryRecord({
-        type: 'manual',
-        mode: 'full',
-        status: 'success',
-        durationSeconds: parseFloat(duration),
-        itemsUpdated,
-        ordersImported,
-        message: `Sincronización completada: ${itemsUpdated} artículos actualizados, ${ordersImported} pedidos importados.`,
-      });
+      if (isManual || ordersImported > 0 || ordersCancelled > 0) {
+        this.historyManager.addSyncHistoryRecord({
+          type: isManual ? 'manual' : 'periodic',
+          mode: 'full',
+          status: 'success',
+          durationSeconds: parseFloat(duration),
+          itemsUpdated,
+          ordersImported,
+          message: `Sincronización completada: ${itemsUpdated} artículos actualizados, ${ordersImported} pedidos importados.`,
+        });
+      }
 
       const summary = `Sincronización completada (${itemsUpdated} productos, ${ordersImported} pedidos en ${duration}s)`;
       const hasActivity = itemsUpdated > 0 || ordersImported > 0;
@@ -547,7 +554,7 @@ export class LocalSyncEngine {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.historyManager.addSyncHistoryRecord({
-        type: 'manual',
+        type: isManual ? 'manual' : 'periodic',
         mode: 'full',
         status: 'error',
         durationSeconds: parseFloat(((Date.now() - start) / 1000).toFixed(1)),
@@ -674,39 +681,11 @@ export class LocalSyncEngine {
       return { success: false, message: msg };
     }
 
-    const endpointUrl = this.resolveBridgeEndpoint(bridgeSettings.storeUrl);
+    try {
+      const endpointUrl = this.resolveBridgeEndpoint(bridgeSettings.storeUrl);
     const secretKey = bridgeSettings.secretKey;
     const headers = this.getBridgeHeaders(secretKey);
     const driver = new AccessDriver({ databasePath: dbPath });
-
-    // 0. Filosofía "Install & Plug": Comprobación autónoma de catálogo inicial en la web
-    if (!this.hasAutoUploadedCatalog) {
-      try {
-        const pingRes = await fetch(`${endpointUrl}?action=ping`, {
-          method: 'GET',
-          headers,
-          signal: AbortSignal.timeout(10000),
-        }).catch(() => null);
-
-        if (pingRes && pingRes.ok) {
-          const pingJson = (await pingRes.json().catch(() => null)) as { articleCount?: number } | null;
-          if (pingJson && typeof pingJson.articleCount === 'number') {
-            if (pingJson.articleCount === 0) {
-              this.hasAutoUploadedCatalog = true;
-              this.logger.info('🚀 Tienda web vacía detectada (0 artículos). Activando "Install & Plug": subiendo catálogo y fotos desde Factusol automáticamente...');
-              this.eventBus.addEvent('info', '🚀 Tienda web vacía (0 artículos). Activando "Install & Plug": subiendo catálogo y fotos desde Factusol automáticamente...');
-              void this.uploadUniversalBridgeCatalog(dbPath, config).catch((catErr) => {
-                this.logger.warn(`Aviso en subida autónoma inicial de catálogo: ${String(catErr)}`);
-              });
-            } else {
-              this.hasAutoUploadedCatalog = true;
-            }
-          }
-        }
-      } catch (pingErr) {
-        this.logger.warn(`Aviso al comprobar estado inicial de la tienda web: ${String(pingErr)}`);
-      }
-    }
 
     // 1. Sincronización de existencias de stock (Factusol -> Universal Bridge)
     try {
@@ -756,38 +735,63 @@ export class LocalSyncEngine {
           }))
           .filter((u) => u.code);
 
-        const tPushStockStart = performance.now();
-        const STOCK_BATCH = 500;
-        for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
-          const chunk = stockUpdates.slice(i, i + STOCK_BATCH);
-          const res = await fetch(`${endpointUrl}?action=push_stock`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ stockUpdates: chunk }),
-            signal: AbortSignal.timeout(20000),
-          }).catch((err) => {
-            this.logger.warn(`Error al enviar lote de stock a Universal Bridge: ${String(err)}`);
-            return null;
-          });
-
-          if (res && res.ok) {
-            itemsUpdated += chunk.length;
-          }
-        }
-        const pushStockDurationMs = Math.round(performance.now() - tPushStockStart);
-        timings['pushStockMs'] = pushStockDurationMs;
-
-        AgentDiskLogger.getInstance().log({
-          level: 'SUCCESS',
-          component: 'SyncEngine',
-          action: 'push_channel_stock',
-          duration_ms: pushStockDurationMs,
-          status: 'SUCCESS',
-          message: `Stock sincronizado en Universal Bridge: ${itemsUpdated} referencias actualizadas en ${pushStockDurationMs}ms`,
-          metadata: { channel: 'universal_bridge', itemsUpdated },
+        // Dirty-checking en existencias para Universal Bridge:
+        // Si las existencias no han cambiado en Factusol, no envía paquetes repetitivos ni marca itemsUpdated = 1 cada 30 segundos
+        const changedStockUpdates = stockUpdates.filter((u) => {
+          const lastStock = this.lastUniversalBridgeStock.get(u.code);
+          return lastStock === undefined || lastStock !== u.stock;
         });
-        if (itemsUpdated > 0) {
-          this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+
+        const tPushStockStart = performance.now();
+        if (changedStockUpdates.length > 0) {
+          const STOCK_BATCH = 500;
+          for (let i = 0; i < changedStockUpdates.length; i += STOCK_BATCH) {
+            const chunk = changedStockUpdates.slice(i, i + STOCK_BATCH);
+            const res = await fetch(`${endpointUrl}?action=push_stock`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ stockUpdates: chunk }),
+              signal: AbortSignal.timeout(20000),
+            }).catch((err) => {
+              this.logger.warn(`Error al enviar lote de stock a Universal Bridge: ${String(err)}`);
+              return null;
+            });
+
+            if (res && res.ok) {
+              itemsUpdated += chunk.length;
+              for (const u of chunk) {
+                this.lastUniversalBridgeStock.set(u.code, u.stock);
+              }
+            }
+          }
+          const pushStockDurationMs = Math.round(performance.now() - tPushStockStart);
+          timings['pushStockMs'] = pushStockDurationMs;
+
+          AgentDiskLogger.getInstance().log({
+            level: 'SUCCESS',
+            component: 'SyncEngine',
+            action: 'push_channel_stock',
+            duration_ms: pushStockDurationMs,
+            status: 'SUCCESS',
+            message: `Stock sincronizado en Universal Bridge: ${itemsUpdated} referencias actualizadas en ${pushStockDurationMs}ms (dirty-check)`,
+            metadata: { channel: 'universal_bridge', itemsUpdated },
+          });
+          if (itemsUpdated > 0) {
+            this.eventBus.addEvent('info', `✓ Stock sincronizado con la web: ${itemsUpdated} referencias actualizadas.`);
+          }
+        } else {
+          const pushStockDurationMs = Math.round(performance.now() - tPushStockStart);
+          timings['pushStockMs'] = pushStockDurationMs;
+          AgentDiskLogger.getInstance().log({
+            level: 'INFO',
+            component: 'SyncEngine',
+            action: 'push_channel_stock',
+            duration_ms: pushStockDurationMs,
+            status: 'SKIPPED',
+            message: `Dirty-check Universal Bridge: existencias al día en Factusol (0 modificaciones necesarias)`,
+            metadata: { channel: 'universal_bridge', totalTracked: this.lastUniversalBridgeStock.size },
+          });
+          this.logger.debug('Dirty-check: existencias de Universal Bridge al día en Factusol.');
         }
       } else {
         AgentDiskLogger.getInstance().log({
@@ -1039,20 +1043,32 @@ export class LocalSyncEngine {
       this.logger.warn(`Aviso en sincronización inversa de cancelaciones con Universal Bridge: ${String(cancelErr)}`);
     }
 
+    // 4. Subida Progresiva de Catálogo (Factusol -> Universal Bridge)
+    try {
+      await ProgressiveCatalogHelper.processProgressiveUpload(
+        this.createProgressiveContext(),
+        { channel: 'universal_bridge', dbPath }
+      );
+    } catch (catErr) {
+      this.logger.warn(`Aviso en subida progresiva de catálogo (Universal Bridge): ${String(catErr)}`);
+    }
+
     const cycleDurationMs = Date.now() - start;
     const duration = (cycleDurationMs / 1000).toFixed(1);
     const cancelMsg = ordersCancelled > 0 ? `, ${ordersCancelled} pedidos cancelados/repuestos` : '';
     const summary = `Sincronización completada en ${duration}s: ${itemsUpdated} stock actualizado, ${ordersImported} pedidos importados${cancelMsg}.`;
 
-    this.historyManager.addSyncHistoryRecord({
-      type: 'manual',
-      mode: 'full',
-      status: 'success',
-      durationSeconds: parseFloat(duration),
-      itemsUpdated,
-      ordersImported,
-      message: summary,
-    });
+    if (isManual || ordersImported > 0 || ordersCancelled > 0) {
+      this.historyManager.addSyncHistoryRecord({
+        type: isManual ? 'manual' : 'periodic',
+        mode: 'full',
+        status: 'success',
+        durationSeconds: parseFloat(duration),
+        itemsUpdated,
+        ordersImported,
+        message: summary,
+      });
+    }
 
     const hasActivity = itemsUpdated > 0 || ordersImported > 0 || ordersCancelled > 0;
     if (isManual || hasActivity) {
@@ -1060,43 +1076,35 @@ export class LocalSyncEngine {
     } else {
       this.logger.debug(`Sondeo rutinario completado sin novedades: ${summary}`);
     }
-    AgentDiskLogger.getInstance().log({
-      level: 'SUCCESS',
-      component: 'SyncEngine',
-      action: 'sync_cycle_complete',
-      duration_ms: cycleDurationMs,
-      status: 'SUCCESS',
-      message: `Ciclo completo de sincronización Universal Bridge finalizado en ${cycleDurationMs}ms`,
-      metadata: {
-        channel: 'universal_bridge',
-        itemsUpdated,
-        ordersImported,
-        ordersCancelled,
-        timings,
-      },
-    });
-    return { success: true, message: summary };
+      AgentDiskLogger.getInstance().log({
+        level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cycle_complete', duration_ms: cycleDurationMs, status: 'SUCCESS',
+        message: `Ciclo completo de sincronización Universal Bridge finalizado en ${cycleDurationMs}ms`,
+        metadata: { channel: 'universal_bridge', itemsUpdated, ordersImported, ordersCancelled, timings },
+      });
+      return { success: true, message: summary };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const cycleDurationMs = Date.now() - start;
+      const duration = (cycleDurationMs / 1000).toFixed(1);
+      this.historyManager.addSyncHistoryRecord({
+        type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'error',
+        durationSeconds: parseFloat(duration), itemsUpdated: 0, ordersImported: 0,
+        message: `Fallo en sincronización Universal Bridge: ${msg}`,
+      });
+      this.eventBus.addEvent('warn', `Aviso en sincronización Universal Bridge: ${msg}`);
+      return { success: false, message: `Sincronización finalizada con incidencias: ${msg}` };
+    }
   }
 
-  private async uploadUniversalBridgeCatalog(
-    dbPath: string,
-    config: any,
-    options?: { limit?: number; onlyMissing?: boolean }
-  ): Promise<CatalogUploadResult> {
-    return CatalogUploadHelper.uploadUniversalBridgeCatalog(
-      {
-        configManager: this.configManager,
-        factusolService: this.factusolService,
-        historyManager: this.historyManager,
-        eventBus: this.eventBus,
-        logger: this.logger,
-        resolveBridgeEndpoint: (url) => this.resolveBridgeEndpoint(url),
-        getBridgeHeaders: (key) => this.getBridgeHeaders(key),
-      },
-      dbPath,
-      config,
-      options
-    );
+  private createProgressiveContext(): ProgressiveCatalogContext {
+    return {
+      configManager: this.configManager,
+      factusolService: this.factusolService,
+      eventBus: this.eventBus,
+      logger: this.logger,
+      resolveBridgeEndpoint: (url) => this.resolveBridgeEndpoint(url),
+      getBridgeHeaders: (key) => this.getBridgeHeaders(key),
+    };
   }
 
   private recordSalesOrder(
@@ -1130,17 +1138,11 @@ export class LocalSyncEngine {
         status,
         error,
         lines: (canonicalOrder.lines || []).map((l: any) => ({
-          sku: l.sku || '',
-          name: l.name || '',
-          quantity: Number(l.quantity) || 1,
-          unitPrice: Number(l.unitPrice) || 0,
-          total: Number(l.total) || 0,
+          sku: l.sku || '', name: l.name || '', quantity: Number(l.quantity) || 1, unitPrice: Number(l.unitPrice) || 0, total: Number(l.total) || 0,
         })),
         shippingAddress: [
-          canonicalOrder.shippingAddress?.street,
-          canonicalOrder.shippingAddress?.city,
-          canonicalOrder.shippingAddress?.postalCode,
-          canonicalOrder.shippingAddress?.state,
+          canonicalOrder.shippingAddress?.street, canonicalOrder.shippingAddress?.city,
+          canonicalOrder.shippingAddress?.postalCode, canonicalOrder.shippingAddress?.state,
         ].filter(Boolean).join(', '),
         paymentMethod: paymentMethod || canonicalOrder.paymentMethod,
       });

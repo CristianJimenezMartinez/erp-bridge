@@ -40,19 +40,7 @@ export function renderHistoryTab(): string {
           </div>
         </div>
 
-        <!-- Selector de Sub-Pestañas -->
-        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
-          <button id="subtab-btn-sales" class="btn btn-secondary btn-sm" onclick="switchHistorySubTab('sales')" style="background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4); color: #c7d2fe;">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-            <span>Pedidos y Ventas</span>
-          </button>
-          <button id="subtab-btn-technical" class="btn btn-secondary btn-sm" onclick="switchHistorySubTab('technical')" style="color: var(--text-muted);">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            <span>Ciclos Técnicos de Sync</span>
-          </button>
-        </div>
-
-        <!-- SUB-TAB 1: PEDIDOS Y VENTAS -->
+        <!-- PEDIDOS Y VENTAS -->
         <div id="history-subtab-sales">
           <div class="table-container">
             <div class="table-toolbar" style="flex-wrap: wrap; gap: 10px;">
@@ -111,40 +99,6 @@ export function renderHistoryTab(): string {
           </div>
         </div>
 
-        <!-- SUB-TAB 2: CICLOS TÉCNICOS DE SYNC (Retrocompatibilidad) -->
-        <div id="history-subtab-technical" style="display: none;">
-          <div class="table-container">
-            <div class="table-toolbar">
-              <div>
-                <span style="font-size: 14px; font-weight: 600; color: #fff;">Ciclos Técnicos de Sincronización</span>
-                <div style="font-size: 11px; color: var(--text-subtle); margin-top: 2px;">Registro de sondeos de stock, catálogo e intercambios de datos.</div>
-              </div>
-              <button onclick="loadSyncHistory()" class="btn btn-secondary btn-sm">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-                <span>Actualizar Ciclos</span>
-              </button>
-            </div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th style="width: 90px;">Hora</th>
-                  <th style="width: 100px;">Tipo</th>
-                  <th style="width: 90px;">Modo</th>
-                  <th style="width: 100px;">Estado</th>
-                  <th style="width: 90px; text-align: right;">Artículos</th>
-                  <th style="width: 90px; text-align: right;">Pedidos</th>
-                  <th style="width: 80px; text-align: right;">Duración</th>
-                  <th>Resultado / Detalle</th>
-                </tr>
-              </thead>
-              <tbody id="history-table-body">
-                <tr>
-                  <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando historial técnico...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
 
         <!-- MODAL ACCESIBLE DE DETALLE DE PEDIDO -->
         <div id="modal-order-detail" class="modal-overlay" onclick="if(event.target === this) closeOrderDetailModal()">

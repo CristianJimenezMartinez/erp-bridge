@@ -172,27 +172,5 @@ export function renderSyncTab(): string {
             </div>
           </div>
         </div>
-
-        <div class="form-section" style="margin-top: 20px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.03);">
-          <div class="section-header">
-            <div>
-              <div class="section-title" style="display: flex; align-items: center; gap: 8px; color: #fff;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-                <span>Subida Inicial de Catálogo (Factusol → Tienda Online)</span>
-              </div>
-              <div class="section-desc">¿Tu tienda online está recién creada o vacía? Esta función lee los artículos de Factusol y da de alta automáticamente los productos que aún no existan en tu web.</div>
-            </div>
-          </div>
-          <div style="display: flex; gap: 14px; align-items: center; justify-content: space-between; margin-top: 14px; flex-wrap: wrap;">
-            <div style="font-size: 12px; color: var(--text-subtle); max-width: 480px; line-height: 1.5;">
-              Publica los artículos con su SKU, precio según tarifa, stock inicial, descripción y categoría. Si el producto ya existe en WooCommerce, se omite automáticamente para no duplicarlo ni alterar personalizaciones.
-            </div>
-            <button onclick="triggerCatalogUpload()" id="btn-upload-catalog" class="btn btn-primary" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-              <span>Subir Catálogo a la Web</span>
-            </button>
-          </div>
-          <div id="catalog-upload-feedback" style="display: none; margin-top: 14px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.4;"></div>
-        </div>
       </section>`;
 }

@@ -14,7 +14,19 @@ export class HistoryManager {
   public loadSyncHistory(): SyncHistoryRecord[] {
     try {
       if (fs.existsSync(this.historyFilePath)) {
-        return JSON.parse(fs.readFileSync(this.historyFilePath, 'utf8'));
+        const raw = JSON.parse(fs.readFileSync(this.historyFilePath, 'utf8'));
+        if (Array.isArray(raw)) {
+          const cleaned = raw.filter((r: SyncHistoryRecord) => {
+            const isZeroOrdersSpam = r && r.ordersImported === 0 && typeof r.message === 'string' && r.message.includes('0 pedidos importados');
+            return !isZeroOrdersSpam;
+          });
+          if (cleaned.length !== raw.length) {
+            try {
+              fs.writeFileSync(this.historyFilePath, JSON.stringify(cleaned, null, 2), 'utf8');
+            } catch {}
+          }
+          return cleaned;
+        }
       }
     } catch {}
     const nowStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });

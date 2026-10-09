@@ -468,7 +468,7 @@ export const coreScript = `
         factusol: 'Factusol ERP (Acceso Local)',
         channel: 'Canal Web / Tienda Online',
         sync: 'Automatización y Reglas',
-        history: 'Historial de Operaciones',
+        history: 'Historial de Ventas',
         logs: 'Diagnóstico Técnico y Ayuda',
         license: 'Licencia del Equipo'
       };
@@ -482,7 +482,6 @@ export const coreScript = `
         loadFactusolMetadata();
       } else if (tabId === 'history') {
         if (typeof loadSalesOrders === 'function') loadSalesOrders();
-        if (typeof loadSyncHistory === 'function') loadSyncHistory();
       }
     }
     window.switchTab = switchTab;
