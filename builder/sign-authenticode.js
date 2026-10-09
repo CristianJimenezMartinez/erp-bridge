@@ -48,7 +48,7 @@ function signBinary(filePath) {
 
   if (signtool && fs.existsSync(azureDlib) && fs.existsSync(azureMetadata)) {
     console.log(`    🔐 [CodeSign] Firmando con Azure Trusted Signing: ${path.basename(filePath)}...`);
-    const timestampUrl = process.env.TIMESTAMP_URL || 'http://timestamp.acs.microsoft.com';
+    const timestampUrl = process.env.TIMESTAMP_URL || 'https://timestamp.acs.microsoft.com';
     const args = [
       'sign',
       '/v',
@@ -66,6 +66,9 @@ function signBinary(filePath) {
       return true;
     } else {
       console.error(`    ❌ [CodeSign] Error al firmar con Azure Trusted Signing (código ${res.status}).`);
+      if (process.env.DEPLOYING === 'true' || process.env.REQUIRE_AUTHENTICODE === 'true') {
+        throw new Error(`Fallo crítico en firma Authenticode (Azure) de ${path.basename(filePath)}: el despliegue requiere binarios firmados.`);
+      }
       return false;
     }
   }
@@ -78,7 +81,7 @@ function signBinary(filePath) {
 
   if (signtool && (pfxPath || certThumbprint || process.env.USE_CERT_STORE === 'true')) {
     console.log(`    🔐 [CodeSign] Firmando con certificado Authenticode (Certum/Store): ${path.basename(filePath)}...`);
-    const timestampUrl = process.env.TIMESTAMP_URL || 'http://timestamp.digicert.com';
+    const timestampUrl = process.env.TIMESTAMP_URL || 'https://timestamp.digicert.com';
     const args = [
       'sign',
       '/v',
@@ -104,6 +107,9 @@ function signBinary(filePath) {
       return true;
     } else {
       console.error(`    ❌ [CodeSign] Error al firmar con certificado local (código ${res.status}).`);
+      if (process.env.DEPLOYING === 'true' || process.env.REQUIRE_AUTHENTICODE === 'true') {
+        throw new Error(`Fallo crítico en firma Authenticode (Certum/Store) de ${path.basename(filePath)}: el despliegue requiere binarios firmados.`);
+      }
       return false;
     }
   }

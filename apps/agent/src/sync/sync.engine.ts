@@ -14,6 +14,7 @@ import { CatalogUploadHelper } from './catalog-upload.helper';
 import { ProgressiveCatalogHelper, ProgressiveCatalogContext } from './progressive-catalog.helper';
 import { OrderNotifierService } from '../notifications/order-notifier.service';
 import { SalesLedgerManager } from '../orders/sales-ledger.manager';
+import { OrderPlausibilityAdapter } from '../adapters/order-plausibility.adapter';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -373,8 +374,20 @@ export class LocalSyncEngine {
               newOrdersInBatch++;
 
               const canonicalOrder = OrderSyncHelper.wooCommerceToCanonical(wcOrder, series, warehouse);
+              const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
+              if (!plausibility.valid || !plausibility.sanitizedOrder) {
+                this.logger.warn(`Pedido #${wcOrder.id} de WooCommerce rechazado por validación de seguridad: ${plausibility.error}`);
+                this.recordSalesOrder(
+                  'woocommerce', String(wcOrder.id), String(wcOrder.number || wcOrder.id),
+                  wcOrder.date_created, series, canonicalOrder, 'failed', undefined, plausibility.error,
+                  parseFloat(String(wcOrder.total || 0)), wcOrder.currency,
+                  wcOrder.payment_method_title
+                );
+                continue;
+              }
+              const safeOrder = plausibility.sanitizedOrder;
               const tInsertOrder = performance.now();
-              const orderRes = await factusolConnector.createOrder(canonicalOrder);
+              const orderRes = await factusolConnector.createOrder(safeOrder);
               const insertDurationMs = Math.round(performance.now() - tInsertOrder);
               orderInsertTotalMs += insertDurationMs;
 
@@ -879,8 +892,20 @@ export class LocalSyncEngine {
           seenOrderIds.add(numId);
           try {
             const canonicalOrder = OrderSyncHelper.universalBridgeToCanonical(po, series, warehouse);
+            const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
+            if (!plausibility.valid || !plausibility.sanitizedOrder) {
+              this.logger.warn(`Pedido #${numId} de Universal Bridge rechazado por validación de seguridad: ${plausibility.error}`);
+              this.recordSalesOrder(
+                'universal_bridge', String(po.id), String(po.order_number || po.id),
+                po.created_at || po.date || '', series, canonicalOrder, 'failed', undefined,
+                plausibility.error, parseFloat(String(po.total || po.total_amount || 0)), po.currency,
+                po.payment_method
+              );
+              continue;
+            }
+            const safeOrder = plausibility.sanitizedOrder;
             const tInsertOrderStart = performance.now();
-            const mutRes = await factusolConnector.createOrder(canonicalOrder);
+            const mutRes = await factusolConnector.createOrder(safeOrder);
             const insertDurationMs = Math.round(performance.now() - tInsertOrderStart);
             orderInsertTotalMs += insertDurationMs;
 

@@ -22,6 +22,12 @@ export class SystemController {
 
   public static saveFullConfig(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const dbPath = ctx.body?.factusol?.databasePath;
+      if (typeof dbPath === 'string' && /[\x00-\x1f;'"\x60]/.test(dbPath)) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'La ruta de base de datos Factusol contiene caracteres no permitidos (; \' " ` o caracteres de control).' }));
+        return;
+      }
       const result = await agent.saveFullConfig(ctx.body);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result));

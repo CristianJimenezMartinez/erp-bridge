@@ -13,6 +13,15 @@ export interface OrderNotificationPayload {
   config: AgentConfigFile;
 }
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export class OrderNotifierService {
   private static readonly logger = new Logger('OrderNotifier');
   private static readonly notifiedOrders = new Map<string, number>();
@@ -91,18 +100,18 @@ export class OrderNotifierService {
 
     const tableRowsHtml = order.lines.map((l) => `
       <tr style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-        <td style="padding: 10px 8px; font-family: monospace; color: #a5b4fc; font-size: 13px;">${l.sku}</td>
-        <td style="padding: 10px 8px; font-size: 13px; color: #e4e4e7;">${l.name}</td>
-        <td style="padding: 10px 8px; text-align: center; font-weight: 700; color: #ffffff;">${l.quantity}</td>
-        <td style="padding: 10px 8px; text-align: right; font-family: monospace; color: #d4d4d8;">${l.unitPrice.toFixed(2)} €</td>
-        <td style="padding: 10px 8px; text-align: right; font-family: monospace; font-weight: 700; color: #34d399;">${l.total.toFixed(2)} €</td>
+        <td style="padding: 10px 8px; font-family: monospace; color: #a5b4fc; font-size: 13px;">${escapeHtml(l.sku)}</td>
+        <td style="padding: 10px 8px; font-size: 13px; color: #e4e4e7;">${escapeHtml(l.name)}</td>
+        <td style="padding: 10px 8px; text-align: center; font-weight: 700; color: #ffffff;">${Number(l.quantity)}</td>
+        <td style="padding: 10px 8px; text-align: right; font-family: monospace; color: #d4d4d8;">${Number(l.unitPrice).toFixed(2)} €</td>
+        <td style="padding: 10px 8px; text-align: right; font-family: monospace; font-weight: 700; color: #34d399;">${Number(l.total).toFixed(2)} €</td>
       </tr>
     `).join('');
 
     const htmlBody = `
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="utf-8"><title>${subject}</title></head>
+<head><meta charset="utf-8"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;padding:0;background:#09090b;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f4f4f5;">
   <table width="100%" cellspacing="0" cellpadding="0" style="background:#09090b;padding:30px 15px;">
     <tr><td align="center">
@@ -127,20 +136,20 @@ export class OrderNotifierService {
             <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;">
               <div style="font-size:11px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:0.5px;">Nuevo Pedido Inyectado</div>
               <div style="font-size:22px;font-weight:800;color:#ffffff;margin-top:4px;">
-                Serie <span style="color:#818cf8;">${series}</span> &bull; Nº <span style="color:#34d399;">#${factusolOrderNumber}</span>
+                Serie <span style="color:#818cf8;">${escapeHtml(series)}</span> &bull; Nº <span style="color:#34d399;">#${escapeHtml(factusolOrderNumber)}</span>
               </div>
               <div style="font-size:13px;color:#a1a1aa;margin-top:6px;">
-                Tienda: <strong>${channelLabel}</strong> (Ref: #${ref}) &bull; Total: <strong style="color:#34d399;">${totalEur} €</strong>
+                Tienda: <strong>${escapeHtml(channelLabel)}</strong> (Ref: #${escapeHtml(ref)}) &bull; Total: <strong style="color:#34d399;">${escapeHtml(totalEur)} €</strong>
               </div>
             </div>
 
             <div style="background:#18181b;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px 18px;margin-bottom:20px;font-size:13px;line-height:1.6;">
               <div style="font-weight:700;color:#ffffff;margin-bottom:8px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;">👤 Cliente y Entrega</div>
-              <div><strong style="color:#a1a1aa;">Nombre:</strong> ${customerName} ${customerNif ? `(${customerNif})` : ''}</div>
-              ${customerPhone ? `<div><strong style="color:#a1a1aa;">Teléfono:</strong> <a href="tel:${customerPhone}" style="color:#818cf8;">${customerPhone}</a></div>` : ''}
-              ${customerEmail ? `<div><strong style="color:#a1a1aa;">Email:</strong> <a href="mailto:${customerEmail}" style="color:#818cf8;">${customerEmail}</a></div>` : ''}
-              <div><strong style="color:#a1a1aa;">Dirección:</strong> ${addressStr}</div>
-              ${order.notes ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.08);"><strong style="color:#fbbf24;">Notas:</strong> ${order.notes}</div>` : ''}
+              <div><strong style="color:#a1a1aa;">Nombre:</strong> ${escapeHtml(customerName)} ${customerNif ? `(${escapeHtml(customerNif)})` : ''}</div>
+              ${customerPhone ? `<div><strong style="color:#a1a1aa;">Teléfono:</strong> <a href="tel:${encodeURIComponent(customerPhone)}" style="color:#818cf8;">${escapeHtml(customerPhone)}</a></div>` : ''}
+              ${customerEmail ? `<div><strong style="color:#a1a1aa;">Email:</strong> <a href="mailto:${encodeURIComponent(customerEmail)}" style="color:#818cf8;">${escapeHtml(customerEmail)}</a></div>` : ''}
+              <div><strong style="color:#a1a1aa;">Dirección:</strong> ${escapeHtml(addressStr)}</div>
+              ${order.notes ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.08);"><strong style="color:#fbbf24;">Notas:</strong> ${escapeHtml(order.notes)}</div>` : ''}
             </div>
 
             <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:20px;border-collapse:collapse;">
@@ -340,100 +349,131 @@ export class OrderNotifierService {
     text: string;
   }): Promise<void> {
     return new Promise((resolve, reject) => {
+      const cleanTo = config.to.replace(/[\r\n]/g, '').trim();
+      const cleanFrom = config.from.replace(/[\r\n]/g, '').trim();
+      const cleanSubject = config.subject.replace(/[\r\n]/g, ' ').trim();
+      const rejectUnauthorized = process.env.NODE_ENV === 'test' ? false : true;
+
       const isSsl = config.port === 465;
-      const socket = isSsl
-        ? tls.connect({ host: config.host, port: config.port, rejectUnauthorized: false })
+      let activeSocket: net.Socket = isSsl
+        ? tls.connect({ host: config.host, port: config.port, rejectUnauthorized, servername: config.host })
         : net.connect({ host: config.host, port: config.port });
 
       let step = 0;
       let buffer = '';
+      let isUpgradedTls = isSsl;
 
       const timeout = setTimeout(() => {
-        socket.destroy();
+        activeSocket.destroy();
         reject(new Error(`Timeout SMTP tras 15s con ${config.host}:${config.port}`));
       }, 15000);
 
       const send = (cmd: string) => {
-        socket.write(`${cmd}\r\n`);
+        activeSocket.write(`${cmd}\r\n`);
       };
 
-      socket.on('data', (chunk) => {
-        buffer += chunk.toString();
-        const lines = buffer.split('\r\n');
-        buffer = lines.pop() || '';
+      const attachListeners = (s: net.Socket) => {
+        s.on('data', (chunk) => {
+          buffer += chunk.toString();
+          const lines = buffer.split('\r\n');
+          buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          const code = parseInt(line.substring(0, 3), 10);
-          if (isNaN(code) || line.charAt(3) === '-') continue;
+          for (const line of lines) {
+            const code = parseInt(line.substring(0, 3), 10);
+            if (isNaN(code) || line.charAt(3) === '-') continue;
 
-          if (step === 0 && code === 220) {
-            step = 1;
-            send(`EHLO localhost`);
-          } else if (step === 1 && code === 250) {
-            step = 2;
-            send(`AUTH LOGIN`);
-          } else if (step === 2 && code === 334) {
-            step = 3;
-            send(Buffer.from(config.user).toString('base64'));
-          } else if (step === 3 && code === 334) {
-            step = 4;
-            send(Buffer.from(config.pass).toString('base64'));
-          } else if (step === 4 && code === 235) {
-            step = 5;
-            const cleanFrom = config.from.includes('<') ? config.from.replace(/.*<([^>]+)>.*/, '$1') : config.from;
-            send(`MAIL FROM:<${cleanFrom}>`);
-          } else if (step === 5 && code === 250) {
-            step = 6;
-            send(`RCPT TO:<${config.to}>`);
-          } else if (step === 6 && code === 250) {
-            step = 7;
-            send(`DATA`);
-          } else if (step === 7 && code === 354) {
-            step = 8;
-            const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-            const message = [
-              `From: ${config.from}`,
-              `To: ${config.to}`,
-              `Subject: =?UTF-8?B?${Buffer.from(config.subject).toString('base64')}?=`,
-              `MIME-Version: 1.0`,
-              `Content-Type: multipart/alternative; boundary="${boundary}"`,
-              ``,
-              `--${boundary}`,
-              `Content-Type: text/plain; charset=UTF-8`,
-              `Content-Transfer-Encoding: base64`,
-              ``,
-              Buffer.from(config.text).toString('base64'),
-              ``,
-              `--${boundary}`,
-              `Content-Type: text/html; charset=UTF-8`,
-              `Content-Transfer-Encoding: base64`,
-              ``,
-              Buffer.from(config.html).toString('base64'),
-              ``,
-              `--${boundary}--`,
-              `.`,
-            ].join('\r\n');
-            send(message);
-          } else if (step === 8 && code === 250) {
-            step = 9;
-            send(`QUIT`);
-            clearTimeout(timeout);
-            socket.end();
-            resolve();
-            return;
-          } else if (code >= 400) {
-            clearTimeout(timeout);
-            socket.destroy();
-            reject(new Error(`Error SMTP (${code}): ${line}`));
-            return;
+            if (step === 0 && code === 220) {
+              step = 1;
+              send(`EHLO localhost`);
+            } else if (step === 1 && code === 250) {
+              // Si no es SSL directo (ej. puerto 587 o 25) y aún no se ha hecho STARTTLS
+              if (!isUpgradedTls && (config.port === 587 || config.port === 25)) {
+                step = 100; // Estado intermedio para esperar respuesta de STARTTLS
+                send(`STARTTLS`);
+              } else {
+                step = 2;
+                send(`AUTH LOGIN`);
+              }
+            } else if (step === 100 && code === 220) {
+              // Negociar capa TLS sobre el socket abierto
+              activeSocket.removeAllListeners('data');
+              activeSocket.removeAllListeners('error');
+              const tlsSocket = tls.connect({
+                socket: activeSocket,
+                host: config.host,
+                rejectUnauthorized,
+                servername: config.host,
+              });
+              activeSocket = tlsSocket;
+              isUpgradedTls = true;
+              attachListeners(tlsSocket);
+              step = 1;
+              send(`EHLO localhost`);
+            } else if (step === 2 && code === 334) {
+              step = 3;
+              send(Buffer.from(config.user).toString('base64'));
+            } else if (step === 3 && code === 334) {
+              step = 4;
+              send(Buffer.from(config.pass).toString('base64'));
+            } else if (step === 4 && code === 235) {
+              step = 5;
+              const mailFrom = cleanFrom.includes('<') ? cleanFrom.replace(/.*<([^>]+)>.*/, '$1') : cleanFrom;
+              send(`MAIL FROM:<${mailFrom}>`);
+            } else if (step === 5 && code === 250) {
+              step = 6;
+              send(`RCPT TO:<${cleanTo}>`);
+            } else if (step === 6 && code === 250) {
+              step = 7;
+              send(`DATA`);
+            } else if (step === 7 && code === 354) {
+              step = 8;
+              const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+              const message = [
+                `From: ${cleanFrom}`,
+                `To: ${cleanTo}`,
+                `Subject: =?UTF-8?B?${Buffer.from(cleanSubject).toString('base64')}?=`,
+                `MIME-Version: 1.0`,
+                `Content-Type: multipart/alternative; boundary="${boundary}"`,
+                ``,
+                `--${boundary}`,
+                `Content-Type: text/plain; charset=UTF-8`,
+                `Content-Transfer-Encoding: base64`,
+                ``,
+                Buffer.from(config.text).toString('base64'),
+                ``,
+                `--${boundary}`,
+                `Content-Type: text/html; charset=UTF-8`,
+                `Content-Transfer-Encoding: base64`,
+                ``,
+                Buffer.from(config.html).toString('base64'),
+                ``,
+                `--${boundary}--`,
+                `.`,
+              ].join('\r\n');
+              send(message);
+            } else if (step === 8 && code === 250) {
+              step = 9;
+              send(`QUIT`);
+              clearTimeout(timeout);
+              activeSocket.end();
+              resolve();
+              return;
+            } else if (code >= 400) {
+              clearTimeout(timeout);
+              activeSocket.destroy();
+              reject(new Error(`Error SMTP (${code}): ${line}`));
+              return;
+            }
           }
-        }
-      });
+        });
 
-      socket.on('error', (err) => {
-        clearTimeout(timeout);
-        reject(err);
-      });
+        s.on('error', (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        });
+      };
+
+      attachListeners(activeSocket);
     });
   }
 }

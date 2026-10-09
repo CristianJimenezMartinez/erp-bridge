@@ -139,6 +139,9 @@ async function runMasterBuild() {
   const rootDir = path.resolve(builderDir, '..');
 
   const shouldDeploy = args.some(arg => arg === '--deploy' || arg === '-d');
+  if (shouldDeploy) {
+    process.env.DEPLOYING = 'true';
+  }
   const versionArgs = args.filter(arg => !arg.startsWith('-'));
 
   let version = getCurrentVersion();

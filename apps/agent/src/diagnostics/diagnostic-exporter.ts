@@ -27,6 +27,12 @@ export class DiagnosticExporter {
     const rules = config.syncRules || {};
     const maskedKey = woo.consumerKey ? woo.consumerKey.substring(0, 7) + '...' : 'No configurada';
 
+    const maskedLicense = config.licenseKey
+      ? (config.licenseKey.length > 8
+          ? `${config.licenseKey.substring(0, 3)}••••••••${config.licenseKey.slice(-4)}`
+          : '••••••••')
+      : 'Sin clave';
+
     const lines = [
       '==============================================================================',
       '   BENTIAN ERP BRIDGE — INFORME DE DIAGNÓSTICO TÉCNICO LOCAL',
@@ -57,7 +63,7 @@ export class DiagnosticExporter {
       '------------------------------------------------------------------------------',
       `Estado:             ${licenseStatus}`,
       `Plan Activo:        ${activePlan || 'professional'}`,
-      `Clave Licencia:     ${config.licenseKey || 'Sin clave'}`,
+      `Clave Licencia:     ${maskedLicense}`,
       `Servidor Central:   ${config.apiBaseUrl}`,
       '',
       '[3] FACTUSOL ERP (LOCAL ACCESS)',

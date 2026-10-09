@@ -29,6 +29,7 @@ import { billingRouter } from './routes/billing.router';
 import { authRouter } from './routes/auth.router';
 import { monitoringRouter } from './routes/monitoring.router';
 import { notificationsRouter } from './routes/notifications.router';
+import { contactRouter } from './routes/contact.router';
 import { getLatestReleasedVersion } from './utils/version.util';
 
 dotenv.config();
@@ -149,6 +150,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', monitoringRouter);
   app.use(monitoringRouter);
   app.use('/api/v1', notificationsRouter);
+  app.use('/api/v1', contactRouter);
+  app.use(contactRouter);
   // Eliminado app.use(notificationsRouter) sin prefijo para mitigar relé de email abierto (API-007)
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)

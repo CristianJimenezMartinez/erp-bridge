@@ -38,6 +38,7 @@ import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, Un
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 import { AutoStartService } from './system';
 import { OrderNotifierService } from './notifications/order-notifier.service';
+import { OrderPlausibilityAdapter } from './adapters/order-plausibility.adapter';
 import {
   SalesLedgerManager,
   GetSalesOrdersOptions,
@@ -356,8 +357,16 @@ export class LocalAgent {
       return { success: false, message: err };
     }
 
+    const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
+    if (!plausibility.valid || !plausibility.sanitizedOrder) {
+      const err = `Pedido descartado por validación de seguridad: ${plausibility.error}`;
+      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
+      return { success: false, message: err };
+    }
+    const safeOrder = plausibility.sanitizedOrder;
+
     try {
-      const res = await connector.createOrder(canonicalOrder as any);
+      const res = await connector.createOrder(safeOrder as any);
       if (res.success) {
         const assignedNum = String(res.externalId || res.orderNumber || order.webOrderId);
         const updated = this.salesLedgerManager.markOrderRetried(id, 'synced', undefined, assignedNum, series);
@@ -974,6 +983,12 @@ export class LocalAgent {
       return;
     }
 
+    if (!this.autoUpdater.isNewer(info.version, this.configManager.getVersion())) {
+      this.logger.warn(`Versión de actualización v${info.version} no es superior a la versión actual v${this.configManager.getVersion()}. Rechazando posible intento de downgrade.`);
+      this.isUpdating = false;
+      return;
+    }
+
     let downloadedFile: string | null = null;
     try {
       let { downloadUrl, sha256, signature } = info;
@@ -1025,7 +1040,7 @@ export class LocalAgent {
         message: `Actualización a v${info.version} descargada (${downloadMs}ms) y verificada (${verifyMs}ms). Iniciando reemplazo.`,
         metadata: { version: info.version, downloadMs, verifyMs },
       });
-      await this.autoUpdater.applyUpdate(downloadedFile);
+      await this.autoUpdater.applyUpdate(downloadedFile, undefined, true, sha256);
     } catch (err) {
       if (downloadedFile && fs.existsSync(downloadedFile)) {
         try { fs.unlinkSync(downloadedFile); } catch {}

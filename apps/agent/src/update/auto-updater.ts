@@ -36,7 +36,7 @@ export class AutoUpdater {
   /**
    * Compara dos versiones SemVer. Retorna true si remoteVer es estrictamente mayor que localVer.
    */
-  private isNewer(remoteVer: string, localVer: string): boolean {
+  public isNewer(remoteVer: string, localVer: string): boolean {
     const rBase = (remoteVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
     const lBase = (localVer.replace(/^v/, '').split('-')[0] ?? '0.0.0').split('.');
     const cleanR = rBase.map((x) => parseInt(x, 10) || 0);
@@ -169,17 +169,48 @@ export class AutoUpdater {
       ? downloadUrl
       : `${this.config.apiBaseUrl.replace(/\/$/, '')}/${downloadUrl.replace(/^\//, '')}`;
 
+    try {
+      const parsedUrl = new URL(fullUrl);
+      const isLocal = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
+      if (parsedUrl.protocol !== 'https:' && !isLocal) {
+        throw new Error(`Protocolo inseguro para descarga de actualización: ${parsedUrl.protocol}. Se requiere HTTPS.`);
+      }
+
+      const allowedHosts = new Set(['bridge.cristianjm.com']);
+      try {
+        const configuredHost = new URL(this.config.apiBaseUrl).hostname;
+        if (configuredHost) allowedHosts.add(configuredHost);
+      } catch {}
+
+      if (!isLocal && !allowedHosts.has(parsedUrl.hostname)) {
+        throw new Error(`Host de descarga de actualización no autorizado: "${parsedUrl.hostname}".`);
+      }
+    } catch (urlErr: any) {
+      throw new Error(`URL de actualización no válida o insegura: ${urlErr.message}`);
+    }
+
     this.logger.info(`Descargando actualización v${version} desde ${fullUrl}...`);
 
     let fileWritten = false;
     try {
-      const res = await fetch(fullUrl);
+      const res = await fetch(fullUrl, {
+        signal: AbortSignal.timeout(60000),
+      });
       if (!res.ok) {
         throw new Error(`Error en la descarga: HTTP ${res.status}`);
       }
 
+      const contentLength = res.headers.get('content-length');
+      if (contentLength && parseInt(contentLength, 10) > 150 * 1024 * 1024) {
+        throw new Error(`El archivo de actualización supera el límite máximo permitido de 150 MB (${contentLength} bytes)`);
+      }
+
       const arrayBuffer = await res.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      if (buffer.length > 150 * 1024 * 1024) {
+        throw new Error(`El archivo de actualización descargado supera el límite de 150 MB (${buffer.length} bytes)`);
+      }
+
       fs.writeFileSync(destFilePath, buffer);
       fileWritten = true;
 
@@ -228,7 +259,7 @@ export class AutoUpdater {
    * but NTFS permits renaming them on the same volume. We rename to .old,
    * copy the new binary, launch the new version detached, and exit cleanly.
    */
-  public async applyUpdate(newBinaryPath: string, targetBinaryPath?: string, launchNew: boolean = true): Promise<void> {
+  public async applyUpdate(newBinaryPath: string, targetBinaryPath?: string, launchNew: boolean = true, expectedSha256?: string): Promise<void> {
     if (!fs.existsSync(newBinaryPath)) {
       throw new Error(`El archivo de actualización no existe: ${newBinaryPath}`);
     }
@@ -251,6 +282,7 @@ export class AutoUpdater {
           const result = UpdateSwapper.launchAtomicUpdateProcess({
             targetExePath: targetExe,
             newExePath: newBinaryPath,
+            expectedSha256,
             timeoutSeconds: 10,
             processNamesToKill: ['BentianAgent', 'BentianTray'],
             postUpdateArgs: ['start', '--post-update', '--minimized'],

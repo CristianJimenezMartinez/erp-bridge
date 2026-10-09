@@ -277,11 +277,16 @@ if ($mainAction === 'ping' || $mainAction === 'health') {
     $tablesOk = false;
     $articleCount = 0;
     if ($pdo) {
-        $tablesOk = ensureTablesExist($pdo);
         try {
-            $stmt = $pdo->query("SELECT COUNT(*) FROM eb_products");
-            $articleCount = (int)$stmt->fetchColumn();
-        } catch (Exception $e) {}
+            $checkStmt = $pdo->query("SHOW TABLES LIKE 'eb_products'");
+            $tablesOk = ($checkStmt && $checkStmt->rowCount() > 0);
+            if ($tablesOk) {
+                $countStmt = $pdo->query("SELECT COUNT(*) FROM `eb_products`");
+                $articleCount = (int)$countStmt->fetchColumn();
+            }
+        } catch (Exception $e) {
+            $tablesOk = false;
+        }
     }
 
     $baseImgDir = getPublicImagesBaseDir();
@@ -302,10 +307,7 @@ if ($mainAction === 'ping' || $mainAction === 'health') {
             'connected' => ($pdo !== null),
             'tablesReady' => $tablesOk,
             'articleCount' => $articleCount,
-            'database' => EB_DB_NAME,
-            'error' => $dbErr,
         ],
-        'error' => $dbErr,
         'timestamp' => time(),
         'https' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443),
     ]);
@@ -823,6 +825,43 @@ if ($mainAction === 'upload_image') {
             http_response_code(400);
             echo json_encode(['error' => 'Contenido de imagen vacío']);
             exit;
+        }
+    }
+
+    $maxBytes = 10 * 1024 * 1024;
+    $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    if ($tempSource) {
+        if (filesize($tempSource) > $maxBytes) {
+            http_response_code(400);
+            echo json_encode(['error' => 'El tamaño de la imagen supera el límite permitido de 10 MB']);
+            exit;
+        }
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = $finfo ? finfo_file($finfo, $tempSource) : '';
+            if ($finfo) finfo_close($finfo);
+            if (!in_array($mime, $allowedMimes)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Tipo MIME no permitido (' . htmlspecialchars($mime) . '). Solo se permiten imágenes JPEG, PNG o WebP']);
+                exit;
+            }
+        }
+    } else {
+        if (strlen($rawContent) > $maxBytes) {
+            http_response_code(400);
+            echo json_encode(['error' => 'El tamaño de la imagen supera el límite permitido de 10 MB']);
+            exit;
+        }
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = $finfo ? finfo_buffer($finfo, $rawContent) : '';
+            if ($finfo) finfo_close($finfo);
+            if (!in_array($mime, $allowedMimes)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Tipo MIME no permitido (' . htmlspecialchars($mime) . '). Solo se permiten imágenes JPEG, PNG o WebP']);
+                exit;
+            }
         }
     }
 

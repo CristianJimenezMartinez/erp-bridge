@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
-import { LicenseService, DatabaseService } from '@erp-bridge/core';
+import { LicenseService, DatabaseService, PostgresLicenseRepository } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService, requireRole, AuthenticatedRequest } from './auth.router';
 import { MailerService } from '../services/mailer.service';
@@ -12,179 +12,27 @@ const licenseService = new LicenseService();
 const logger = new Logger('BillingRouter');
 
 const STRIPE_SECRET_KEY = process.env['STRIPE_SECRET_KEY'] || '';
-const DEFAULT_DASHBOARD_URL = process.env['DASHBOARD_URL'] || 'https://bridge.cristianjm.com/dashboard/';
+export {
+  DEFAULT_DASHBOARD_URL,
+  ANONYMOUS_BUYABLE_PLANS,
+  sanitizeReturnUrl,
+  acquireSessionLock,
+  computeOrganizationIdFromEmail,
+  ensureOrganizationExists,
+  PlanDefinition,
+  CATALOG_PLANS,
+} from './billing.helpers';
 
-const inFlightSessionLocks = new Map<string, Promise<any>>();
+import {
+  DEFAULT_DASHBOARD_URL,
+  ANONYMOUS_BUYABLE_PLANS,
+  sanitizeReturnUrl,
+  acquireSessionLock,
+  computeOrganizationIdFromEmail,
+  ensureOrganizationExists,
+  CATALOG_PLANS,
+} from './billing.helpers';
 
-export async function acquireSessionLock<T>(sessionId: string, fn: () => Promise<T>): Promise<T> {
-  if (!sessionId) return fn();
-  while (inFlightSessionLocks.has(sessionId)) {
-    try {
-      await inFlightSessionLocks.get(sessionId);
-    } catch {}
-  }
-  const promise = fn();
-  inFlightSessionLocks.set(sessionId, promise);
-  try {
-    return await promise;
-  } finally {
-    inFlightSessionLocks.delete(sessionId);
-  }
-}
-
-export function computeOrganizationIdFromEmail(email: string): string {
-  const normalized = (email || '').toLowerCase().trim();
-  const hash = crypto.createHash('sha256').update(normalized).digest('hex').substring(0, 16);
-  return `org_${hash}`;
-}
-
-export async function ensureOrganizationExists(
-  db: DatabaseService,
-  organizationId: string,
-  customerEmail: string,
-  resellerId?: string | null
-): Promise<void> {
-  if (!db.isAvailable()) return;
-  try {
-    const slug = organizationId.toLowerCase();
-    const name = customerEmail.split('@')[0] || customerEmail;
-    await db.query(
-      `INSERT INTO organizations (id, name, slug, status, plan, reseller_id, created_at, updated_at)
-       VALUES ($1, $2, $3, 'ACTIVE', 'standard', $4, NOW(), NOW())
-       ON CONFLICT (id) DO UPDATE SET reseller_id = COALESCE(EXCLUDED.reseller_id, organizations.reseller_id), updated_at = NOW()`,
-      [organizationId, name, slug, resellerId || null]
-    );
-  } catch (err: any) {
-    logger.warn(`Aviso al asegurar organización ${organizationId}: ${err?.message || err}`);
-  }
-}
-
-export interface PlanDefinition {
-  id: string;
-  name: string;
-  priceEur: number;
-  promoPriceEur?: number;
-  billingCycle: 'annual' | 'monthly' | 'one_off';
-  mode: 'subscription' | 'payment';
-  popular?: boolean;
-  seats: number;
-  storesIncluded: number;
-  description: string;
-  features: string[];
-}
-
-export const CATALOG_PLANS: PlanDefinition[] = [
-  {
-    id: 'base_annual',
-    name: 'Plan Base Todo Incluido (Anual)',
-    priceEur: 199,
-    billingCycle: 'annual',
-    mode: 'subscription',
-    popular: true,
-    seats: 1,
-    storesIncluded: 1,
-    description: 'Sincronización completa sin límites artificiales para 1 ERP y 1 Tienda Online.',
-    features: [
-      'Catálogo ilimitado de productos (sin límites de SKUs)',
-      'Sincronización de pedidos y clientes ilimitada en tiempo real',
-      '1 ERP (Factusol / SimplyGest) ⇄ 1 Tienda Online (WooCommerce / PrestaShop)',
-      '1 Conexión ERP / Servidor (instalación única en el equipo con Factusol)',
-      'Delta Sync por triada de hashes (descarte en local <100ms)',
-      'Blindaje de imágenes por MD5 y Recargo de Equivalencia (R.E.)',
-      'Centro de Control Local nativo y System Tray permanente',
-      'Activación y entrega de clave inmediata',
-      'Actualizaciones continuas y soporte técnico por email',
-    ],
-  },
-  {
-    id: 'founder_annual',
-    name: 'Plan Fundador Beta (Anual -30% Vitalicio - Cupo 25 Plazas)',
-    priceEur: 199,
-    promoPriceEur: 139,
-    billingCycle: 'annual',
-    mode: 'subscription',
-    popular: false,
-    seats: 1,
-    storesIncluded: 1,
-    description: 'Tarifa exclusiva limitada estrictamente a las primeras 25 claves de la Beta. 139 €/año renovable de por vida.',
-    features: [
-      'Sincronización completa Factusol con WooCommerce o PrestaShop',
-      'Descuento Fundador del 30% vitalicio garantizado (139 € vs 199 €)',
-      'Cupo estricto limitado a las primeras 25 empresas',
-      '1 ERP ⇄ 1 Tienda Online conectada sin límites de SKUs',
-      'Actualizaciones automáticas y soporte técnico prioritario',
-      'Condiciones blindadas de por vida sin subidas de precio',
-    ],
-  },
-  {
-    id: 'partner_reseller_annual',
-    name: 'Licencia Cliente Final (Tarifa Distribuidor Partner -25%)',
-    priceEur: 149.25,
-    billingCycle: 'annual',
-    mode: 'subscription',
-    popular: false,
-    seats: 1,
-    storesIncluded: 1,
-    description: 'Tarifa mayorista para agencias y partners B2B acreditados. Margen directo del 25% retenido en origen.',
-    features: [
-      'Licencia Base Completa para 1 cliente final',
-      'Descuento del 25% directo de distribuidor ya aplicado (149,25 € vs 199,00 €)',
-      'Asignación automática a la cartera del partner',
-      'Sincronización ilimitada Factusol ⇄ WooCommerce / PrestaShop',
-      'Soporte técnico prioritario de segundo nivel para el partner',
-    ],
-  },
-  {
-    id: 'base_monthly',
-    name: 'Plan Base Todo Incluido (Mensual)',
-    priceEur: 29,
-    billingCycle: 'monthly',
-    mode: 'subscription',
-    seats: 1,
-    storesIncluded: 1,
-    description: 'Máxima flexibilidad mensual sin compromiso de permanencia.',
-    features: [
-      'Catálogo ilimitado de productos y pedidos',
-      '1 ERP ⇄ 1 Tienda Online conectada',
-      '1 Conexión ERP / Servidor (instalación en el equipo con Factusol)',
-      'Delta Sync y blindaje de imágenes',
-      'Activación y entrega de clave inmediata',
-      'Sin permanencia: cancelable en cualquier momento en 1 clic',
-    ],
-  },
-  {
-    id: 'setup_assisted',
-    name: 'Puesta en Marcha Asistida (Setup One-Off)',
-    priceEur: 99,
-    billingCycle: 'one_off',
-    mode: 'payment',
-    seats: 0,
-    storesIncluded: 0,
-    description: 'Sesión remota guiada de 45 min por AnyDesk con un ingeniero para dejar todo funcionando.',
-    features: [
-      'Instalación del Agente en el equipo con Factusol / SimplyGest',
-      'Vinculación segura de credenciales de WooCommerce / PrestaShop',
-      'Configuración de familias, tarifas y Recargo de Equivalencia',
-      'Prueba de sincronización en vivo de artículos y pedido de test',
-    ],
-  },
-  {
-    id: 'setup_vip',
-    name: 'Implementación Completa & Mapeo VIP',
-    priceEur: 249,
-    billingCycle: 'one_off',
-    mode: 'payment',
-    seats: 0,
-    storesIncluded: 0,
-    description: 'Implantación llave en mano para catálogos complejos con matrices de tallas y tarifas B2B.',
-    features: [
-      'Todo lo incluido en la Puesta en Marcha Asistida',
-      'Mapeo exhaustivo de matrices de tallas y colores',
-      'Configuración de tarifas mayoristas B2B escalonadas',
-      '30 días de soporte prioritario directo por WhatsApp',
-    ],
-  },
-];
 
 /**
  * 1. Catálogo público de planes, add-ons y servicios
@@ -268,9 +116,21 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       matchedPlan = CATALOG_PLANS[0]!;
     }
 
+    const isAuthed = !!(req as any).user;
+    if (!isAuthed && !ANONYMOUS_BUYABLE_PLANS.includes(matchedPlan.id)) {
+      return res.status(403).json({
+        error: {
+          code: 'AUTH_REQUIRED_FOR_PLAN',
+          message: 'La adquisición de este plan requiere autenticación previa como partner o distribuidor acreditado.',
+        }
+      });
+    }
+
+    const effectiveSuccessUrl = sanitizeReturnUrl(successUrl, `${DEFAULT_DASHBOARD_URL}?checkout=success`);
+    const effectiveCancelUrl = sanitizeReturnUrl(cancelUrl, `${DEFAULT_DASHBOARD_URL}?checkout=cancel`);
+
     // Blindaje estricto: El Plan Fundador (139 €/año) está limitado exclusivamente a 25 plazas para los participantes de la Beta
     const MAX_FOUNDER_KEYS = 25;
-    const isAuthed = !!(req as any).user;
     const normalizedEmail = (email || '').trim().toLowerCase();
     const orgId = (isAuthed && customOrgId) ? customOrgId : computeOrganizationIdFromEmail(normalizedEmail);
     const providedKey = String(req.body.licenseKey || req.body.key || req.query['key'] || '').trim().toUpperCase();
@@ -370,8 +230,8 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       params.append('mode', matchedPlan.mode);
       params.append('customer_email', email);
       params.append('allow_promotion_codes', 'true');
-      params.append('success_url', successUrl.includes('{CHECKOUT_SESSION_ID}') ? successUrl : `${successUrl}&session_id={CHECKOUT_SESSION_ID}`);
-      params.append('cancel_url', cancelUrl);
+      params.append('success_url', effectiveSuccessUrl.includes('{CHECKOUT_SESSION_ID}') ? effectiveSuccessUrl : `${effectiveSuccessUrl}&session_id={CHECKOUT_SESSION_ID}`);
+      params.append('cancel_url', effectiveCancelUrl);
       params.append('metadata[organizationId]', orgId);
       params.append('metadata[planId]', matchedPlan.id);
       params.append('metadata[planName]', matchedPlan.name);
@@ -703,10 +563,39 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
     const event = req.body;
     logger.info(`Stripe Webhook recibido y validado: ${event.type || 'unknown'}`);
 
+    const db = DatabaseService.getInstance();
+    if (db.isAvailable() && event.id) {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS stripe_events (
+          event_id VARCHAR(128) PRIMARY KEY,
+          event_type VARCHAR(128) NOT NULL,
+          processed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )
+      `).catch(() => {});
+
+      const ins = await db.query(
+        `INSERT INTO stripe_events (event_id, event_type, processed_at) VALUES ($1, $2, NOW()) ON CONFLICT (event_id) DO NOTHING RETURNING event_id`,
+        [event.id, event.type || 'unknown']
+      ).catch(() => ({ rows: [{ event_id: event.id }] }));
+
+      if (ins.rows.length === 0) {
+        logger.info(`[Stripe Webhook] Evento ${event.id} ya procesado anteriormente. Idempotente.`);
+        return res.json({ received: true, duplicate: true });
+      }
+    }
+
     switch (event.type) {
+      case 'checkout.session.async_payment_succeeded':
       case 'checkout.session.completed': {
         const session = event.data?.object || {};
         const customerEmail = (session.customer_details?.email || session.customer_email || 'cliente@cristianjm.com').toLowerCase().trim();
+
+        // API-014: Verificar obligatoriamente que el cobro ha sido completado
+        if (session.payment_status !== 'paid') {
+          logger.info(`[Stripe Webhook] ${event.type} omitido para ${customerEmail}: payment_status='${session.payment_status}' (no es 'paid').`);
+          return res.json({ received: true, ignored: true, reason: `payment_status is ${session.payment_status}` });
+        }
+
         const organizationId = session.metadata?.organizationId || computeOrganizationIdFromEmail(customerEmail);
         const planId = session.metadata?.planId || session.metadata?.plan || 'base_annual';
         const maxActivations = Number(session.metadata?.maxActivations) || 1;
@@ -717,9 +606,8 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         const resellerId = session.metadata?.resellerId || null;
         const upgradedFromKey = session.metadata?.upgradedFromKey || null;
 
-        logger.info(`[Stripe Webhook] checkout.session.completed para ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId})...`);
+        logger.info(`[Stripe Webhook] ${event.type} para ${customerEmail} (Plan: ${planId}, Sesión: ${sessionId})...`);
 
-        const db = DatabaseService.getInstance();
         await ensureOrganizationExists(db, organizationId, customerEmail, resellerId);
 
         let license: any = null;
@@ -784,6 +672,7 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
                    WHERE key = $1 AND plan = 'trial'`,
                   [upgradedFromKey]
                 ).catch(() => null);
+                (PostgresLicenseRepository as any).invalidateMemory?.(upgradedFromKey);
                 logger.info(`✓ [Stripe Webhook] Clave Beta ${upgradedFromKey} revocada tras migración a Plan Fundador.`);
               }
             }
@@ -795,11 +684,11 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
           return res.status(400).json({ error: { message: 'No se pudo generar la licencia.' } });
         }
 
-        // Vincular al Partner si la compra vino referida por código PT-XXXX
+        // Vincular al Partner si la compra vino referida por código PT-XXXX (sin sobrescribir partner previo)
         if (resellerId && db.isAvailable()) {
           try {
             await db.query(
-              `UPDATE organizations SET reseller_id = $1 WHERE id = $2`,
+              `UPDATE organizations SET reseller_id = $1 WHERE id = $2 AND (reseller_id IS NULL OR reseller_id = '')`,
               [resellerId, organizationId]
             );
             logger.info(`✓ Organización ${organizationId} vinculada al Partner ${resellerId}`);
@@ -853,12 +742,14 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
             const periodEndSec = invoice.lines?.data?.[0]?.period?.end || Math.floor(Date.now() / 1000) + 365 * 24 * 3600;
             const periodEndDate = new Date(periodEndSec * 1000);
 
+            // API-014: Renovación periódica nunca debe reactivar licencias revocadas
             const updateRes = await db.query(
               `UPDATE licenses 
                SET expires_at = $1, billing_status = 'ACTIVE', status = 'active'
-               WHERE stripe_customer_id = $2`,
+               WHERE stripe_customer_id = $2 AND status != 'revoked'`,
               [periodEndDate, customerId]
             );
+            (PostgresLicenseRepository as any).invalidateMemory?.();
 
             logger.info(`✓ Licencia renovada hasta ${periodEndDate.toISOString()} tras ciclo de facturación (${updateRes.rowCount} filas actualizadas).`);
           } catch (renewErr: any) {
@@ -877,10 +768,12 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         logger.warn(`Evento de baja de suscripción para ${customerEmail || 'cliente'}: ${reason}`);
 
         const db = DatabaseService.getInstance();
+        let revokedKey: string | undefined;
         if (subscription.metadata?.licenseKey) {
           const lic = await licenseService.getLicenseByKey(subscription.metadata.licenseKey);
           if (lic) {
             await licenseService.revokeLicense(lic.id, reason);
+            revokedKey = lic.key;
             logger.info(`Licencia ${subscription.metadata.licenseKey} revocada.`);
           }
         } else if (db.isAvailable() && (subscription.id || subscription.customer)) {
@@ -892,11 +785,15 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
 
             if (licRow) {
               await licenseService.revokeLicense(licRow.id, reason);
+              revokedKey = licRow.key;
               logger.info(`Licencia ${licRow.key} revocada automáticamente por ID de suscripción (${subscription.id}).`);
             }
           } catch (delErr) {
             logger.warn(`Error buscando licencia a revocar por suscripción: ${delErr}`);
           }
+        }
+        if (revokedKey) {
+          (PostgresLicenseRepository as any).invalidateMemory?.(revokedKey);
         }
 
         if (customerEmail) {
@@ -912,6 +809,46 @@ billingRouter.post('/billing/webhook', async (req: Request, res: Response, next:
         }
 
         return res.json({ received: true, action: 'canceled', reason });
+      }
+
+      case 'checkout.session.async_payment_failed': {
+        const session = event.data?.object || {};
+        logger.warn(`[Stripe Webhook] Pago diferido falló para sesión ${session.id}: ${session.customer_email || session.customer}`);
+        return res.json({ received: true, action: 'async_payment_failed' });
+      }
+
+      case 'charge.refunded': {
+        const charge = event.data?.object || {};
+        const customerId = (charge.customer || '') as string;
+        const reason = 'Cargo reembolsado en Stripe';
+        logger.warn(`[Stripe Webhook] Reembolso recibido para cliente ${customerId}: ${reason}`);
+        if (db.isAvailable() && customerId) {
+          const resRows = await db.query(
+            `UPDATE licenses SET status = 'revoked', billing_status = 'REFUNDED', revoked_reason = $1, revoked_at = NOW() WHERE stripe_customer_id = $2 RETURNING key`,
+            [reason, customerId]
+          ).catch(() => ({ rows: [] }));
+          for (const row of resRows.rows) {
+            if (row.key) (PostgresLicenseRepository as any).invalidateMemory?.(row.key);
+          }
+        }
+        return res.json({ received: true, action: 'refunded' });
+      }
+
+      case 'charge.dispute.created': {
+        const dispute = event.data?.object || {};
+        const chargeId = (dispute.charge || '') as string;
+        const reason = 'Disputa/Contracargo abierto en Stripe';
+        logger.warn(`[Stripe Webhook] Disputa abierta para cargo ${chargeId}: ${reason}`);
+        if (db.isAvailable() && chargeId) {
+          const resRows = await db.query(
+            `UPDATE licenses SET status = 'revoked', billing_status = 'DISPUTED', revoked_reason = $1, revoked_at = NOW() WHERE stripe_session_id = $2 OR stripe_subscription_id = $2 RETURNING key`,
+            [reason, chargeId]
+          ).catch(() => ({ rows: [] }));
+          for (const row of resRows.rows) {
+            if (row.key) (PostgresLicenseRepository as any).invalidateMemory?.(row.key);
+          }
+        }
+        return res.json({ received: true, action: 'disputed' });
       }
 
       case 'invoice.payment_failed': {

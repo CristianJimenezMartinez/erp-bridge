@@ -287,7 +287,9 @@ export class UpdateClient {
         this.emitUpdateEvent('update:available', pending);
 
         if (this.options.autoDownload) {
-          void this.downloadUpdate(pending);
+          this.downloadUpdate(pending).catch((dlErr: any) => {
+            this.logger.warn(`Error en descarga automática de actualización: ${dlErr?.message || dlErr}`);
+          });
         }
 
         return checkData;
@@ -358,6 +360,14 @@ export class UpdateClient {
       ? update.downloadUrl
       : `${this.options.apiBaseUrl.replace(/\/$/, '')}/${update.downloadUrl.replace(/^\//, '')}`;
 
+    const parsedUrl = new URL(fullUrl);
+    const isLocal = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
+    if (parsedUrl.protocol !== 'https:' && !isLocal) {
+      this.isDownloading = false;
+      this.state.status = 'failed';
+      throw new Error(`Protocolo de descarga inseguro: ${parsedUrl.protocol}. Se exige HTTPS.`);
+    }
+
     try {
       let existingBytes = 0;
       if (fs.existsSync(partFilePath)) {
@@ -372,14 +382,14 @@ export class UpdateClient {
         this.logger.info(`Iniciando descarga de actualización v${update.version} desde ${fullUrl}...`);
       }
 
-      let res = await fetch(fullUrl, { headers });
+      let res = await fetch(fullUrl, { headers, signal: AbortSignal.timeout(60000) });
 
       // Si el servidor devuelve 416 Range Not Satisfiable, reiniciar la descarga desde cero
       if (res.status === 416) {
         this.logger.warn('Rango no válido (416). Reiniciando descarga completa...');
         if (fs.existsSync(partFilePath)) fs.unlinkSync(partFilePath);
         existingBytes = 0;
-        res = await fetch(fullUrl);
+        res = await fetch(fullUrl, { signal: AbortSignal.timeout(60000) });
       }
 
       if (!res.ok) {
@@ -389,6 +399,10 @@ export class UpdateClient {
       const isPartial = res.status === 206;
       const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
       const totalBytes = isPartial ? existingBytes + contentLength : (contentLength || update.fileSize || 0);
+
+      if (totalBytes > 150 * 1024 * 1024) {
+        throw new Error(`Tamaño de descarga excede el límite permitido de 150 MB (${totalBytes} bytes)`);
+      }
 
       let downloadedBytes = isPartial ? existingBytes : 0;
       const writeStream = fs.createWriteStream(partFilePath, { flags: isPartial ? 'a' : 'w' });
@@ -465,7 +479,9 @@ export class UpdateClient {
       });
 
       if (this.options.autoApply && !this.isApplying) {
-        void this.applyUpdate(update);
+        this.applyUpdate(update).catch((applyErr: any) => {
+          this.logger.warn(`Error al aplicar actualización automáticamente: ${applyErr?.message || applyErr}`);
+        });
       }
 
       return destFilePath;

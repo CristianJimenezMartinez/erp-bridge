@@ -247,6 +247,38 @@ export class LiveHealthService {
       endpoint = `${endpoint.replace(/\/+$/, '')}/erp-bridge-endpoint.php?action=ping`;
     }
 
+    try {
+      const parsed = new URL(targetUrl);
+      const isLocal = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+      if (parsed.protocol !== 'https:' && !isLocal) {
+        return {
+          type,
+          url: targetUrl,
+          reachable: false,
+          latencyMs: 0,
+          message: 'Solo se permiten conexiones HTTPS a canales web.',
+        };
+      }
+
+      // Anti-SSRF: bloquear rangos privados y metadatos cloud
+      const h = parsed.hostname.toLowerCase();
+      if (!isLocal) {
+        if (h === '169.254.169.254' || h.endsWith('.internal') || h.endsWith('.local')) {
+          return { type, url: targetUrl, reachable: false, latencyMs: 0, message: 'Acceso a host restringido (Anti-SSRF)' };
+        }
+        const ipMatch = h.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+        if (ipMatch) {
+          const b0 = parseInt(ipMatch[1]!, 10);
+          const b1 = parseInt(ipMatch[2]!, 10);
+          if (b0 === 10 || (b0 === 172 && b1 >= 16 && b1 <= 31) || (b0 === 192 && b1 === 168) || b0 === 127 || b0 === 0 || (b0 === 169 && b1 === 254)) {
+            return { type, url: targetUrl, reachable: false, latencyMs: 0, message: 'Acceso a IP privada restringido (Anti-SSRF)' };
+          }
+        }
+      }
+    } catch {
+      return { type, url: targetUrl, reachable: false, latencyMs: 0, message: 'URL no válida' };
+    }
+
     const t0 = performance.now();
     try {
       const controller = new AbortController();
@@ -261,7 +293,7 @@ export class LiveHealthService {
         method: 'GET',
         headers,
         signal: controller.signal,
-        redirect: 'follow',
+        redirect: 'manual',
       });
       clearTimeout(timeout);
 

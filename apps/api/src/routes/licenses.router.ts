@@ -5,6 +5,7 @@ import {
   CreateLicenseDtoSchema,
   LicenseActivationRequestSchema,
   LicenseValidationRequestSchema,
+  Logger,
 } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest, computeOrganizationIdFromEmail } from './auth.router';
 import { resolveOrgId } from './org-scope';
@@ -15,6 +16,7 @@ import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
 import { LicenseProofService } from '../services/license-proof.service';
 
 export const licensesRouter = Router();
+const logger = new Logger('LicensesRouter');
 const licenseService = new LicenseService();
 
 /**
@@ -133,19 +135,56 @@ licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELL
     }
 
     const cleanTaxId = clientTaxId.trim().toUpperCase();
-    const orgId = `org_${crypto.createHash('md5').update(cleanTaxId).digest('hex').substring(0, 10)}`;
+    const orgId = `org_${crypto.createHash('sha256').update(cleanTaxId).digest('hex').substring(0, 24)}`;
     const resellerCode = req.user?.resellerId || req.user?.sub || 'PT-DIRECT';
+    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
 
     const db = DatabaseService.getInstance();
     if (db.isAvailable()) {
+      // API-011: Prevenir robo de organizaciones entre distribuidores
+      const existingOrg = await db.query(
+        `SELECT id, reseller_id FROM organizations WHERE id = $1 OR tax_id = $2 LIMIT 1`,
+        [orgId, cleanTaxId]
+      ).then(r => r.rows[0] as { id: string; reseller_id?: string } | undefined).catch(() => undefined);
+
+      if (existingOrg && existingOrg.reseller_id && existingOrg.reseller_id !== resellerCode && !isSuperadmin) {
+        return res.status(403).json({
+          error: {
+            message: 'La organización indicada ya está vinculada a otro distribuidor autorizado.',
+            code: 'ORGANIZATION_BELONGS_TO_OTHER_RESELLER',
+          }
+        });
+      }
+
+      // API-011: Cuota máxima de licencias de prueba activas por distribuidor
+      if (!isSuperadmin) {
+        const countRes = await db.query(
+          `SELECT COUNT(*)::int as count FROM licenses WHERE reseller_id = $1 AND plan = 'trial' AND status = 'active'`,
+          [resellerCode]
+        ).catch(() => ({ rows: [{ count: 0 }] }));
+        const activeTrials = countRes.rows[0]?.count || 0;
+        if (activeTrials >= 20) {
+          return res.status(429).json({
+            error: {
+              message: 'Has alcanzado el cupo máximo de 20 licencias de prueba activas simultáneas. Contacta con soporte para ampliar tu cuota.',
+              code: 'TRIAL_QUOTA_EXCEEDED',
+            }
+          });
+        }
+      }
+
       await db.query(`
-        INSERT INTO organizations (id, name, slug, status, plan, tax_id, legal_name, reseller_id)
-        VALUES ($1, $2, $3, 'ACTIVE', 'standard', $4, $5, $6)
-        ON CONFLICT (id) DO UPDATE SET tax_id = $4, legal_name = $5, reseller_id = $6
+        INSERT INTO organizations (id, name, slug, status, plan, tax_id, legal_name, reseller_id, created_at, updated_at)
+        VALUES ($1, $2, $3, 'ACTIVE', 'standard', $4, $5, $6, NOW(), NOW())
+        ON CONFLICT (id) DO UPDATE SET 
+          tax_id = COALESCE(organizations.tax_id, $4), 
+          legal_name = COALESCE(organizations.legal_name, $5), 
+          reseller_id = COALESCE(organizations.reseller_id, $6),
+          updated_at = NOW()
+        WHERE organizations.reseller_id IS NULL OR organizations.reseller_id = $6
       `, [orgId, clientName, cleanTaxId.toLowerCase(), cleanTaxId, clientName, resellerCode]).catch(() => {});
     }
 
-    const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
     const plan = isSuperadmin ? 'starter' : 'trial';
     const trialDays = isSuperadmin ? undefined : 15;
     const billingStatus = isSuperadmin ? 'ACTIVE' : 'TRIAL';
@@ -214,15 +253,16 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       return res.status(400).json({ error: { message: 'Debes aceptar los Términos del Servicio y la Política de Privacidad para solicitar tu clave de la Beta.' } });
     }
 
-    const isMarketingConsented = Boolean(consentMarketing);
-    const trialDays = Math.max(1, Math.ceil((betaEndTime - Date.now()) / (1000 * 60 * 60 * 24)));
-    const betaExpiresAt = new Date(BETA_END_DATE_ISO);
+    return await withKeyedLock(`claim:${normalizedEmail}`, async () => {
+      const isMarketingConsented = Boolean(consentMarketing);
+      const trialDays = Math.max(1, Math.ceil((betaEndTime - Date.now()) / (1000 * 60 * 60 * 24)));
+      const betaExpiresAt = new Date(BETA_END_DATE_ISO);
 
-    const orgId = computeOrganizationIdFromEmail(normalizedEmail);
-    const cleanTaxId = taxId ? taxId.trim().toUpperCase() : null;
-    const cleanCompanyName = companyName ? companyName.trim() : (normalizedEmail.split('@')[0] || 'Empresa Beta');
+      const orgId = computeOrganizationIdFromEmail(normalizedEmail);
+      const cleanTaxId = taxId ? taxId.trim().toUpperCase() : null;
+      const cleanCompanyName = companyName ? companyName.trim() : (normalizedEmail.split('@')[0] || 'Empresa Beta');
 
-    const db = DatabaseService.getInstance();
+      const db = DatabaseService.getInstance();
 
     // 1. Asegurar persistencia y trazabilidad de consentimientos RGPD en PostgreSQL (tabla beta_leads)
     if (db.isAvailable()) {
@@ -367,6 +407,64 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
         alias: license.alias || `Beta 2026 - ${cleanCompanyName}`,
         companyName: cleanCompanyName,
       });
+
+      // 6.1 Notificación urgente al administrador (Cristian Jiménez)
+      const adminBetaAlertHtml = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #f4f4f5; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px;">
+            <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">
+              🎁
+            </div>
+            <div>
+              <h2 style="margin: 0; font-size: 18px; color: #ffffff;">Nueva Solicitud de Beta Gratuita</h2>
+              <span style="font-size: 12px; color: #a1a1aa;">Bentian ERP Bridge · Lead Comercial</span>
+            </div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px 0; color: #a1a1aa; width: 140px;">Empresa / Comercio:</td>
+                <td style="padding: 8px 0; color: #ffffff; font-weight: 600;">${cleanCompanyName || 'No especificada'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #a1a1aa;">Email de Contacto:</td>
+                <td style="padding: 8px 0;"><a href="mailto:${normalizedEmail}" style="color: #818cf8; text-decoration: none; font-weight: 600;">${normalizedEmail}</a></td>
+              </tr>
+              ${cleanTaxId ? `
+              <tr>
+                <td style="padding: 8px 0; color: #a1a1aa;">CIF / NIF:</td>
+                <td style="padding: 8px 0; color: #ffffff; font-family: monospace;">${cleanTaxId}</td>
+              </tr>
+              ` : ''}
+              <tr>
+                <td style="padding: 8px 0; color: #a1a1aa;">Clave Generada:</td>
+                <td style="padding: 8px 0; color: #34d399; font-family: monospace; font-weight: bold;">${license.key}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #a1a1aa;">Validez:</td>
+                <td style="padding: 8px 0; color: #fbbf24;">Hasta 31/12/2026 (${trialDays} días)</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="text-align: center; margin-top: 24px;">
+            <a href="mailto:${normalizedEmail}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%20o%20PrestaShop)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez" 
+               style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;">
+              Contactar con el Cliente Potencial &rarr;
+            </a>
+          </div>
+        </div>
+      `;
+
+      await MailerService.sendEmail({
+        to: 'cristianjimeneztrabajo@gmail.com',
+        subject: `[LEAD BETA ERP] ${cleanCompanyName || normalizedEmail} ha reclamado acceso a Bentian Bridge`,
+        html: adminBetaAlertHtml,
+        text: `Nueva solicitud de Beta Gratuita: Empresa: ${cleanCompanyName || 'N/D'} | Email: ${normalizedEmail} | Clave: ${license.key}`,
+      }).catch((mailErr: any) => {
+        logger.warn('Aviso: No se pudo enviar alerta admin de beta:', mailErr.message);
+      });
     } catch (_mailErr) {
       // Si el servicio de correo no está disponible, continuar sin fallar la petición
     }
@@ -385,6 +483,7 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
           'Pega tu clave de activación y conecta tu tienda online (WooCommerce o PrestaShop).'
         ],
       },
+    });
     });
   } catch (error) {
     return next(error);
@@ -684,16 +783,20 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
     }
 
     // Verificación previa de expiración
-    const keyValidation = LicenseKeyGenerator.validate(validated.licenseKey);
+    const normalizedKey = LicenseKeyGenerator.normalize(validated.licenseKey);
+    const keyValidation = LicenseKeyGenerator.validate(normalizedKey);
     if (!keyValidation.valid) {
       return res.status(400).json({ error: { message: keyValidation.reason || 'Clave de licencia con formato inválido' } });
     }
-    const lic = await licenseService.getLicenseByKey(validated.licenseKey);
+    const lic = await licenseService.getLicenseByKey(normalizedKey);
     if (lic && lic.expiresAt && new Date() > new Date(lic.expiresAt)) {
       return res.status(403).json({ error: { message: 'El periodo de prueba de la Beta ha finalizado. Actualice al Plan Fundador para activar su equipo.' } });
     }
 
-    const result = await withKeyedLock(`activate:${validated.licenseKey}`, () => licenseService.activateLicense(validated));
+    const result = await withKeyedLock(`activate:${normalizedKey}`, () => licenseService.activateLicense({
+      ...validated,
+      licenseKey: normalizedKey,
+    }));
     if (!result.success) {
       return res.status(400).json({ error: { message: result.error } });
     }

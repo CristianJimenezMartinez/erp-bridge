@@ -1,5 +1,22 @@
 import { WooCommerceTestResult } from './channel.types';
 
+function isBlockedSsrf(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  if (h === 'localhost' || h === '127.0.0.1') return false;
+  if (h === '169.254.169.254' || h.endsWith('.internal') || h.endsWith('.local')) return true;
+  const ipMatch = h.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipMatch) {
+    const b0 = parseInt(ipMatch[1]!, 10);
+    const b1 = parseInt(ipMatch[2]!, 10);
+    if (b0 === 10) return true;
+    if (b0 === 172 && b1 >= 16 && b1 <= 31) return true;
+    if (b0 === 192 && b1 === 168) return true;
+    if (b0 === 127 || b0 === 0) return true;
+    if (b0 === 169 && b1 === 254) return true;
+  }
+  return false;
+}
+
 export class WooCommerceTester {
   public static async test(settings: {
     storeUrl: string;
@@ -14,7 +31,28 @@ export class WooCommerceTester {
       return { success: false, message: 'Debe ingresar Consumer Key y Consumer Secret.' };
     }
 
-    const cleanUrl = rawUrl.replace(/\/+$/, '');
+    let parsedUrl = rawUrl;
+    if (!parsedUrl.startsWith('http://') && !parsedUrl.startsWith('https://')) {
+      parsedUrl = 'https://' + parsedUrl;
+    }
+    const cleanUrl = parsedUrl.replace(/\/+$/, '');
+
+    let urlObj: URL;
+    try {
+      urlObj = new URL(cleanUrl);
+    } catch {
+      return { success: false, message: 'La URL de la tienda no es válida.' };
+    }
+
+    const isLocal = urlObj.hostname === 'localhost' || urlObj.hostname === '127.0.0.1';
+    if (urlObj.protocol !== 'https:' && !isLocal) {
+      return { success: false, message: 'La URL de la tienda debe utilizar HTTPS seguro (salvo en pruebas locales con localhost).' };
+    }
+
+    if (isBlockedSsrf(urlObj.hostname)) {
+      return { success: false, message: 'Acceso denegado: el host de la tienda pertenece a una red privada o restringida (Anti-SSRF).' };
+    }
+
     const endpoint = `${cleanUrl}/wp-json/wc/v3/system_status`;
     const authHeader = 'Basic ' + Buffer.from(`${settings.consumerKey.trim()}:${settings.consumerSecret.trim()}`).toString('base64');
     const start = Date.now();
@@ -26,6 +64,7 @@ export class WooCommerceTester {
           Authorization: authHeader,
           'User-Agent': 'Bentian-ERP-Bridge/0.2.0',
         },
+        redirect: 'manual',
         signal: AbortSignal.timeout(8000),
       });
 

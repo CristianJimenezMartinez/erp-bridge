@@ -1,5 +1,22 @@
 import { UniversalBridgeTestResult } from './channel.types';
 
+function isBlockedSsrf(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  if (h === 'localhost' || h === '127.0.0.1') return false;
+  if (h === '169.254.169.254' || h.endsWith('.internal') || h.endsWith('.local')) return true;
+  const ipMatch = h.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipMatch) {
+    const b0 = parseInt(ipMatch[1]!, 10);
+    const b1 = parseInt(ipMatch[2]!, 10);
+    if (b0 === 10) return true;
+    if (b0 === 172 && b1 >= 16 && b1 <= 31) return true;
+    if (b0 === 192 && b1 === 168) return true;
+    if (b0 === 127 || b0 === 0) return true;
+    if (b0 === 169 && b1 === 254) return true;
+  }
+  return false;
+}
+
 export class UniversalBridgeTester {
   public static async test(settings: {
     storeUrl: string;
@@ -29,12 +46,41 @@ export class UniversalBridgeTester {
       databaseReady: false,
     };
 
+    let urlObj: URL;
+    try {
+      urlObj = new URL(cleanBaseUrl);
+    } catch {
+      return {
+        success: false,
+        message: 'La URL ingresada no es válida.',
+        checks,
+      };
+    }
+
+    const isLocal = urlObj.hostname === 'localhost' || urlObj.hostname === '127.0.0.1';
+    if (urlObj.protocol !== 'https:' && !isLocal) {
+      return {
+        success: false,
+        message: 'La URL debe utilizar HTTPS seguro (salvo en pruebas locales con localhost).',
+        checks,
+      };
+    }
+
+    if (isBlockedSsrf(urlObj.hostname)) {
+      return {
+        success: false,
+        message: 'Acceso denegado: la dirección host solicitada pertenece a una red privada o restringida (Anti-SSRF).',
+        checks,
+      };
+    }
+
     let serverDetails: any = { url: cleanBaseUrl };
 
     // 1. Check server online
     try {
       const pingRes = await fetch(cleanBaseUrl, {
         method: 'HEAD',
+        redirect: 'manual',
         signal: AbortSignal.timeout(6000),
       }).catch(() => null);
 
@@ -45,6 +91,7 @@ export class UniversalBridgeTester {
       } else {
         const getRes = await fetch(cleanBaseUrl, {
           method: 'GET',
+          redirect: 'manual',
           signal: AbortSignal.timeout(6000),
         }).catch(() => null);
         if (getRes && getRes.status < 500) {
@@ -59,6 +106,7 @@ export class UniversalBridgeTester {
       try {
         await fetch(cleanBaseUrl, {
           method: 'HEAD',
+          redirect: 'manual',
           signal: AbortSignal.timeout(5000),
         });
         checks.sslValid = true;
@@ -83,9 +131,16 @@ export class UniversalBridgeTester {
 
     for (const ep of endpointCandidates) {
       try {
-        const pingUrl = `${ep}?action=ping${settings.secretKey ? `&secret=${encodeURIComponent(settings.secretKey)}` : ''}`;
+        const pingUrl = `${ep}?action=ping`;
+        const headers: Record<string, string> = {};
+        if (settings.secretKey && settings.secretKey.trim()) {
+          headers['Authorization'] = `Bearer ${settings.secretKey.trim()}`;
+          headers['X-Bridge-Key'] = settings.secretKey.trim();
+        }
         const epRes = await fetch(pingUrl, {
           method: 'GET',
+          headers,
+          redirect: 'manual',
           signal: AbortSignal.timeout(6000),
         });
 

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { z } from 'zod';
-import { LicenseService } from '@erp-bridge/core';
+import { LicenseService, DatabaseService } from '@erp-bridge/core';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
 import { rateLimit } from '../middleware/rate-limit';
@@ -358,7 +358,7 @@ authRouter.post('/auth/login', (req: Request, res: Response): void => {
 });
 
 // POST /api/v1/auth/partner-login (Acceso para Empresas Instaladoras / Partners / Resellers)
-authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
+authRouter.post('/auth/partner-login', async (req: Request, res: Response): Promise<void> => {
   const partnerClientIp = getClientIp(req);
   const now = Date.now();
   const partnerRecord = partnerAttempts.get(partnerClientIp);
@@ -402,31 +402,94 @@ authRouter.post('/auth/partner-login', (req: Request, res: Response): void => {
     return;
   }
 
-  // Validación de clave secreta del Partner.
-  // SEGURIDAD: solo se acepta PARTNER_SECRET definido por entorno. Está prohibido aceptar
-  // PINs literales en el código o reutilizar ADMIN_PASSWORD (separación de privilegios).
-  const configuredPartnerSecret = process.env['PARTNER_SECRET'];
-  if (!configuredPartnerSecret || configuredPartnerSecret.length < 12) {
-    res.status(503).json({
-      error: {
-        code: 'PARTNER_ACCESS_DISABLED',
-        message: 'El acceso de partners no está habilitado en este servidor',
-      },
-    });
-    return;
+  if (partnerEmail) {
+    const trimmedEmail = partnerEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      res.status(400).json({
+        error: {
+          code: 'INVALID_PARTNER_EMAIL',
+          message: 'El correo electrónico proporcionado no tiene un formato válido',
+        },
+      });
+      return;
+    }
   }
 
   const providedSecret = typeof partnerSecret === 'string' ? partnerSecret.trim() : '';
-
   let isSecretValid = false;
-  try {
-    const provBuf = Buffer.from(providedSecret, 'utf8');
-    const secBuf = Buffer.from(configuredPartnerSecret, 'utf8');
-    if (provBuf.length === secBuf.length && provBuf.length > 0) {
-      isSecretValid = crypto.timingSafeEqual(provBuf, secBuf);
+  let partnerFoundInDb = false;
+
+  const db = DatabaseService.getInstance();
+  if (db.isAvailable()) {
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS partners (
+          partner_code VARCHAR(50) PRIMARY KEY,
+          secret_hash VARCHAR(255) NOT NULL,
+          contact_email VARCHAR(255),
+          active BOOLEAN NOT NULL DEFAULT true,
+          quota_trials INT NOT NULL DEFAULT 20,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      const partnerRes = await db.query(
+        `SELECT partner_code, secret_hash, active, contact_email FROM partners WHERE partner_code = $1`,
+        [cleanCode]
+      );
+      if (partnerRes.rows.length > 0 && partnerRes.rows[0]) {
+        partnerFoundInDb = true;
+        const row = partnerRes.rows[0];
+        if (!row.active) {
+          res.status(403).json({
+            error: {
+              code: 'PARTNER_DEACTIVATED',
+              message: 'La cuenta de Partner se encuentra desactivada',
+            },
+          });
+          return;
+        }
+
+        const storedHash: string = row.secret_hash;
+        if (storedHash.startsWith('sha256:')) {
+          const hashExpected = storedHash.substring(7);
+          const hashProvided = crypto.createHash('sha256').update(providedSecret).digest('hex');
+          if (hashExpected.length === hashProvided.length && crypto.timingSafeEqual(Buffer.from(hashExpected), Buffer.from(hashProvided))) {
+            isSecretValid = true;
+          }
+        } else {
+          const provBuf = Buffer.from(providedSecret, 'utf8');
+          const storedBuf = Buffer.from(storedHash, 'utf8');
+          if (provBuf.length === storedBuf.length && provBuf.length > 0 && crypto.timingSafeEqual(provBuf, storedBuf)) {
+            isSecretValid = true;
+          }
+        }
+      }
+    } catch {
+      partnerFoundInDb = false;
     }
-  } catch {
-    isSecretValid = false;
+  }
+
+  if (!partnerFoundInDb) {
+    const configuredPartnerSecret = process.env['PARTNER_SECRET'];
+    if (!configuredPartnerSecret || configuredPartnerSecret.length < 12) {
+      res.status(503).json({
+        error: {
+          code: 'PARTNER_ACCESS_DISABLED',
+          message: 'El acceso de partners no está habilitado en este servidor',
+        },
+      });
+      return;
+    }
+
+    try {
+      const provBuf = Buffer.from(providedSecret, 'utf8');
+      const secBuf = Buffer.from(configuredPartnerSecret, 'utf8');
+      if (provBuf.length === secBuf.length && provBuf.length > 0) {
+        isSecretValid = crypto.timingSafeEqual(provBuf, secBuf);
+      }
+    } catch {
+      isSecretValid = false;
+    }
   }
 
   if (!isSecretValid) {

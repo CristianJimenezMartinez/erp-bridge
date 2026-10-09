@@ -74,9 +74,9 @@ export class FactusolController {
   public static testFactusol(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
       const dbPath = ctx.body?.databasePath || '';
-      if (/[\x00-\x1f;]/.test(dbPath)) {
+      if (/[\x00-\x1f;'"\x60]/.test(dbPath)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta de base de datos' }));
+        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta de base de datos (; \' " ` o caracteres de control)' }));
         return;
       }
       const t0 = performance.now();
@@ -106,9 +106,9 @@ export class FactusolController {
   public static resolvePath(agent: LocalAgent): RouteHandler {
     return (_req, res, ctx) => {
       const inputPath = ctx.body?.path || '';
-      if (/[\x00-\x1f]/.test(inputPath)) {
+      if (/[\x00-\x1f;'"\x60]/.test(inputPath)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta' }));
+        res.end(JSON.stringify({ success: false, message: 'Caracteres no válidos en la ruta (; \' " ` o caracteres de control)' }));
         return;
       }
       const result = agent.resolveFactusolPath(inputPath);

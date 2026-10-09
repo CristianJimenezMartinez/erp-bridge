@@ -66,6 +66,14 @@ function waitForHealthy(url, timeoutMs = 20000) {
   });
 }
 
+function isAllowedUploadFile(filePath) {
+  const base = path.basename(filePath).toLowerCase();
+  if (base.startsWith('.env') || base.endsWith('.pem') || base.endsWith('.key') || base.endsWith('.bak') || base.includes('.git')) {
+    return false;
+  }
+  return true;
+}
+
 function collectFilesRecursively(dir, baseDir = dir) {
   let results = [];
   if (!fs.existsSync(dir)) return results;
@@ -73,8 +81,10 @@ function collectFilesRecursively(dir, baseDir = dir) {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (entry.name === '.git' || entry.name === 'node_modules') continue;
       results = results.concat(collectFilesRecursively(fullPath, baseDir));
     } else if (entry.isFile()) {
+      if (!isAllowedUploadFile(fullPath)) continue;
       const relPath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
       results.push({ fullPath, relPath });
     }
@@ -265,20 +275,38 @@ async function uploadReleases(options = {}) {
             const manifestPath = path.join(versionReleaseDir, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
               const manifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-              const insertScript = `docker exec -w /app/apps/api bentian-api-prod node -e '
+              const manifestB64 = Buffer.from(JSON.stringify(manifestData)).toString('base64');
+              const nodeRunner = `
                 const { DatabaseService } = require("../../packages/core/dist/database/database.service");
                 const crypto = require("crypto");
+                const data = JSON.parse(Buffer.from("${manifestB64}", "base64").toString("utf8"));
                 const db = DatabaseService.getInstance();
                 db.initialize({ connectionString: process.env.DATABASE_URL });
-                db.query(\`
-                  INSERT INTO update_manifests (id, version, channel, platform, download_url, sha256, signature, file_size, release_notes, mandatory, min_version, published_at)
-                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-                  ON CONFLICT (version) DO UPDATE
-                  SET channel = $3, platform = $4, download_url = $5, sha256 = $6, signature = $7, file_size = $8, release_notes = $9, mandatory = $10, min_version = $11, published_at = $12
-                \`, [crypto.randomUUID(), "${manifestData.version}", "${manifestData.channel}", "${manifestData.platform}", "${manifestData.downloadUrl}", "${manifestData.sha256}", "${manifestData.signature}", ${manifestData.fileSize || 'null'}, "${(manifestData.releaseNotes || '').replace(/"/g, '\\"')}", ${Boolean(manifestData.mandatory)}, ${manifestData.minVersion ? `"${manifestData.minVersion}"` : 'null'}, new Date("${manifestData.publishedAt || new Date().toISOString()}")])
+                db.query(
+                  "INSERT INTO update_manifests (id, version, channel, platform, download_url, sha256, signature, file_size, release_notes, mandatory, min_version, published_at) " +
+                  "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) " +
+                  "ON CONFLICT (version) DO UPDATE " +
+                  "SET channel = $3, platform = $4, download_url = $5, sha256 = $6, signature = $7, file_size = $8, release_notes = $9, mandatory = $10, min_version = $11, published_at = $12",
+                  [
+                    crypto.randomUUID(),
+                    data.version,
+                    data.channel,
+                    data.platform,
+                    data.downloadUrl,
+                    data.sha256,
+                    data.signature,
+                    data.fileSize || null,
+                    data.releaseNotes || "",
+                    Boolean(data.mandatory),
+                    data.minVersion || null,
+                    new Date(data.publishedAt || Date.now())
+                  ]
+                )
                 .then(() => { console.log("OK_DB_REGISTERED"); process.exit(0); })
                 .catch(e => { console.error("DB_ERROR:", e.message); process.exit(1); });
-              '`;
+              `.replace(/\n\s*/g, ' ');
+              const runnerB64 = Buffer.from(nodeRunner).toString('base64');
+              const insertScript = `docker exec -w /app/apps/api bentian-api-prod node -e "eval(Buffer.from('${runnerB64}','base64').toString('utf8'))"`;
               try {
                 await runSshCommand(conn, insertScript);
                 console.log(`    ✓ Versión v${manifestData.version} registrada en la base de datos PostgreSQL.`);
@@ -339,7 +367,15 @@ async function uploadReleases(options = {}) {
       username: user,
       privateKey,
       readyTimeout: 60000,
-      keepaliveInterval: 10000
+      keepaliveInterval: 10000,
+      hostVerifier: (hashedKey) => {
+        const expectedFingerprint = process.env.HETZNER_HOST_FINGERPRINT;
+        if (expectedFingerprint && hashedKey !== expectedFingerprint) {
+          console.error(`❌ [Security] La huella digital del host SSH (${hashedKey}) no coincide con la esperada (${expectedFingerprint}).`);
+          return false;
+        }
+        return true;
+      }
     });
   });
 }

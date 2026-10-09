@@ -31,7 +31,7 @@ jobs:
 
       - name: Instalar Dependencias del Dashboard Angular
         working-directory: apps/dashboard
-        run: npm install
+        run: npm ci
 
       - name: Compilar Dashboard Angular a Produccion
         working-directory: apps/dashboard

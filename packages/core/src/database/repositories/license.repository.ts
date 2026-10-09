@@ -51,43 +51,63 @@ export class PostgresLicenseRepository implements ILicenseRepository {
     return license;
   }
 
-  async findLicenseById(id: string): Promise<License | null> {
-    const mem = PostgresLicenseRepository.memoryLicenses.get(id);
-    if (mem) return { ...mem };
-
-    try {
-      const res = await this.db.query(
-        `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
-         FROM licenses
-         WHERE id = $1`,
-        [id]
-      );
-      const row = res.rows[0];
-      if (!row) return null;
-      return this.mapLicenseRow(row as Record<string, unknown>);
-    } catch {
-      return null;
+  public static invalidateMemory(licenseIdOrKey?: string): void {
+    if (!licenseIdOrKey) {
+      PostgresLicenseRepository.memoryLicenses.clear();
+      return;
+    }
+    PostgresLicenseRepository.memoryLicenses.delete(licenseIdOrKey);
+    for (const [id, lic] of PostgresLicenseRepository.memoryLicenses.entries()) {
+      if (lic.key === licenseIdOrKey) {
+        PostgresLicenseRepository.memoryLicenses.delete(id);
+      }
     }
   }
 
+  async findLicenseById(id: string): Promise<License | null> {
+    if (this.db.isAvailable()) {
+      try {
+        const res = await this.db.query(
+          `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
+           FROM licenses
+           WHERE id = $1`,
+          [id]
+        );
+        const row = res.rows[0];
+        if (row) {
+          const lic = this.mapLicenseRow(row as Record<string, unknown>);
+          PostgresLicenseRepository.memoryLicenses.set(lic.id, { ...lic });
+          return lic;
+        }
+      } catch {}
+    }
+
+    const mem = PostgresLicenseRepository.memoryLicenses.get(id);
+    return mem ? { ...mem } : null;
+  }
+
   async findLicenseByKey(key: string): Promise<License | null> {
+    if (this.db.isAvailable()) {
+      try {
+        const res = await this.db.query(
+          `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
+           FROM licenses
+           WHERE key = $1`,
+          [key]
+        );
+        const row = res.rows[0];
+        if (row) {
+          const lic = this.mapLicenseRow(row as Record<string, unknown>);
+          PostgresLicenseRepository.memoryLicenses.set(lic.id, { ...lic });
+          return lic;
+        }
+      } catch {}
+    }
+
     for (const lic of PostgresLicenseRepository.memoryLicenses.values()) {
       if (lic.key === key) return { ...lic };
     }
-
-    try {
-      const res = await this.db.query(
-        `SELECT id, key, organization_id, alias, plan, status, max_activations, current_activations, created_at, expires_at, trial_ends_at, revoked_at, revoked_reason
-         FROM licenses
-         WHERE key = $1`,
-        [key]
-      );
-      const row = res.rows[0];
-      if (!row) return null;
-      return this.mapLicenseRow(row as Record<string, unknown>);
-    } catch {
-      return null;
-    }
+    return null;
   }
 
   async listLicensesByOrganization(organizationId: string): Promise<License[]> {
