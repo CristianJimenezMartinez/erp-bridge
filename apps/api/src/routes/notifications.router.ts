@@ -1,10 +1,20 @@
 import { Router, Request, Response } from 'express';
+import { z } from 'zod';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
 import { DatabaseService, LicenseKeyGenerator } from '@erp-bridge/core';
 import { AuthenticatedRequest, AuthService } from './auth.router';
 import { consumeRateLimit } from '../middleware/rate-limit';
 import { Logger } from '@erp-bridge/shared';
+
+const SendNotificationSchema = z.object({
+  to: z.string().trim().max(200),
+  subject: z.string().trim().max(200),
+  html: z.string().max(100000).optional(),
+  text: z.string().max(50000).optional(),
+  orderReference: z.string().trim().max(100).optional(),
+  licenseKey: z.string().trim().max(100).optional(),
+});
 
 const logger = new Logger('NotificationsRouter');
 export const notificationsRouter = Router();
@@ -65,7 +75,15 @@ notificationsRouter.post('/notifications/order', async (req: Request, res: Respo
       licenseKey = licenseKey || authReq.user?.organizationId || 'auth_user';
     }
 
-    const { to, subject, html, text, orderReference } = req.body || {};
+    const parsed = SendNotificationSchema.safeParse(req.body || {});
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos: to, subject, y al menos html o text',
+      });
+    }
+
+    const { to, subject, html, text, orderReference } = parsed.data;
 
     if (!to || !subject || (!html && !text)) {
       return res.status(400).json({

@@ -1,8 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import { SyncScheduler, SyncService } from '@erp-bridge/core';
 import { CreateSyncJobDtoSchema, RunSyncJobDtoSchema } from '@erp-bridge/shared';
 import { requireAuth, AuthenticatedRequest } from './auth.router';
 import { resolveOrgId } from './org-scope';
+
+const UpdateScheduleSchema = z.object({
+  schedule: z.string().trim().min(1, 'El parámetro schedule es obligatorio').max(100),
+});
 
 export const syncRouter = Router();
 const syncService = new SyncService();
@@ -56,7 +61,7 @@ syncRouter.get('/sync-jobs/:id', async (req: Request, res: Response, next: NextF
 syncRouter.post('/sync-jobs/:id/schedule', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const schedule = req.body.schedule as string;
+    const { schedule } = UpdateScheduleSchema.parse(req.body);
     const job = await syncService.updateJobSchedule(orgId, req.params['id']!, schedule);
     scheduler.scheduleJob(job);
     res.json({ data: job });

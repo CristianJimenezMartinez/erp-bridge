@@ -1,7 +1,25 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import { FlowService } from '@erp-bridge/core';
 import { requireAuth } from './auth.router';
 import { resolveOrgId } from './org-scope';
+
+const CreateFlowSchema = z.object({
+  name: z.string().trim().min(1, 'El nombre del flujo es obligatorio').max(100),
+  description: z.string().trim().max(500).optional(),
+  triggerEventType: z.string().trim().min(1, 'triggerEventType es obligatorio').max(100),
+  filters: z.array(z.any()).optional(),
+  actions: z.array(z.any()).min(1, 'Al menos una acción es obligatoria'),
+  isEnabled: z.boolean().optional(),
+});
+
+const ToggleFlowSchema = z.object({
+  isEnabled: z.boolean(),
+});
+
+const TestFlowSchema = z.object({
+  sampleData: z.record(z.any()).optional(),
+});
 
 export const flowsRouter = Router();
 const flowService = new FlowService();
@@ -47,14 +65,15 @@ flowsRouter.get('/flows/:id', async (req: Request, res: Response, next: NextFunc
 flowsRouter.post('/flows', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
+    const body = CreateFlowSchema.parse(req.body);
     const flow = await flowService.createFlow({
       organizationId: orgId,
-      name: req.body.name,
-      description: req.body.description,
-      triggerEventType: req.body.triggerEventType,
-      filters: req.body.filters,
-      actions: req.body.actions,
-      isEnabled: req.body.isEnabled,
+      name: body.name,
+      description: body.description,
+      triggerEventType: body.triggerEventType as any,
+      filters: body.filters,
+      actions: body.actions,
+      isEnabled: body.isEnabled,
     });
     res.status(201).json({ data: flow });
   } catch (error) {
@@ -65,7 +84,8 @@ flowsRouter.post('/flows', async (req: Request, res: Response, next: NextFunctio
 flowsRouter.put('/flows/:id/toggle', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const flow = await flowService.toggleFlow(orgId, req.params['id']!, req.body.isEnabled);
+    const body = ToggleFlowSchema.parse(req.body);
+    const flow = await flowService.toggleFlow(orgId, req.params['id']!, body.isEnabled);
     res.json({ data: flow });
   } catch (error) {
     next(error);
@@ -75,7 +95,8 @@ flowsRouter.put('/flows/:id/toggle', async (req: Request, res: Response, next: N
 flowsRouter.post('/flows/:id/test', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const result = await flowService.testFlow(orgId, req.params['id']!, req.body.sampleData || {});
+    const body = TestFlowSchema.parse(req.body || {});
+    const result = await flowService.testFlow(orgId, req.params['id']!, body.sampleData || {});
     res.json({ data: result });
   } catch (error) {
     next(error);

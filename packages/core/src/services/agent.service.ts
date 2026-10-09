@@ -31,8 +31,8 @@ export class AgentService {
     organizationId: string,
     createdById?: string
   ): Promise<{ token: string; expiresAt: Date }> {
-    // Generate 6-char alphanumeric pairing code (e.g. 'EB-8742' or 'A9F3X2')
-    const rawToken = crypto.randomBytes(3).toString('hex').toUpperCase();
+    // Generate 16-char hex pairing code (64-bit entropy, e.g. 'EB-A1B2C3D4E5F67890')
+    const rawToken = crypto.randomBytes(8).toString('hex').toUpperCase();
     const token = `EB-${rawToken}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes validity
 
@@ -44,7 +44,7 @@ export class AgentService {
     };
 
     await this.agentRepo.savePairingToken(pairingToken);
-    this.logger.info(`Pairing token generado: ${token} para org ${organizationId}`);
+    this.logger.info(`Pairing token generado para org ${organizationId}`);
 
     return { token, expiresAt };
   }

@@ -25,11 +25,17 @@ export function errorHandler(
       ? 400
       : 500;
 
+    const isProd = process.env.NODE_ENV === 'production';
+    const message = statusCode === 500 && isProd
+      ? 'Ha ocurrido un error interno en el servidor'
+      : err.message;
+    const details = statusCode === 500 && isProd ? undefined : err.details;
+
     res.status(statusCode).json({
       error: {
         code: err.code,
-        message: err.message,
-        details: err.details,
+        message,
+        details,
         retryable: err.retryable,
       },
     });
@@ -67,8 +73,23 @@ export function errorHandler(
     return;
   }
 
-  const message = err instanceof Error ? err.message : 'Error interno del servidor';
-  logger.error(`Error no controlado en ruta ${req.path}: ${message}`, err);
+  // 3. Payload demasiado grande (express.json limit)
+  if ((err as any)?.status === 413 || (err as any)?.statusCode === 413 || (err as any)?.type === 'entity.too.large') {
+    logger.warn(`Payload demasiado grande en ${req.path}`, { path: req.path });
+    res.status(413).json({
+      error: {
+        code: 'PAYLOAD_TOO_LARGE',
+        message: 'El cuerpo de la petición excede el tamaño máximo permitido (100kb)',
+      },
+    });
+    return;
+  }
+
+  const rawMessage = err instanceof Error ? err.message : 'Error interno del servidor';
+  logger.error(`Error no controlado en ruta ${req.path}: ${rawMessage}`, err);
+
+  const isProd = process.env.NODE_ENV === 'production';
+  const message = isProd ? 'Ha ocurrido un error interno en el servidor' : rawMessage;
 
   res.status(500).json({
     error: {

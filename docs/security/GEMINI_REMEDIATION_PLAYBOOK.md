@@ -155,8 +155,12 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 | P2-9 | AGT-009, 011, 013, 014, 015 | HECHO | 98c90ab | OrderPlausibilityAdapter creado como decorador de orden previa al conector Factusol (FROZEN) validando límites numéricos y caracteres de control; enmascaramiento de licenseKey en diagnóstico |
 | P2-10 | INF-012, 014 | HECHO | 98c90ab | Endpoint PHP universal blindado: ping sin DDL con SHOW TABLES LIKE, respuesta genérica sin fuga de nombres de BD ni stacktraces, upload_image con límite 10 MB y MIME estricto (JPEG/PNG/WebP sin SVG). Template embebida sincronizada al 100% |
 | P2-11 | INF-015, API-023 | HECHO | 98c90ab | .env.example actualizado con secretos documentados de producción (ADMIN_JWT_SECRET, LICENSE_JWT_SECRET, etc.); TLS de base de datos verificado |
-| P2-12 | INF-016, 017 | HECHO | 98c90ab | Scripts de despliegue y firma blindados: sign-authenticode.js usa servidores RFC 3161 HTTPS y aborta en fallo si DEPLOYING=true; upload-releases.js elimina interpolación cruda en docker exec con payloads Base64, lista blanca de extensiones permitidas y hostVerifier |
-| P3-1 … P3-9 | ver §5 | ABIERTO | — | |
+| P3-1 | API-021, INF-007, INF-008 | HECHO | 1c9a388 | Cabeceras HSTS con preload, X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy, Permissions-Policy y CSP estricta; CORS con allowlist explícito; límite JSON de 100kb (413 Payload Too Large) |
+| P3-2 | API-025, 013, 020 | HECHO | 1c9a388 | Pairing token criptográfico de 64 bits de entropía (16 hex chars) sin token en texto claro en logs; rate limiting en /agents/pair (10/15m) y /agents/pairing-token (20/15m) |
+| P3-3 | API-018, 019 | HECHO | 1c9a388 | exp obligatorio en JWTs, jti único (UUID v4) por token, POST /auth/logout implementado con lista negra de jti revocados |
+| P3-4 | API-026 | HECHO | 1c9a388 | Validación Zod estricta en endpoints de auth, agents, licenses, billing, notifications, flows y sync |
+| P3-5 … P3-8 | ver §5 | ABIERTO | — | Tareas de Docker, gobernanza, Quality Gate y documentación pendientes |
+| P3-9 | API-022, 028, 029 | HECHO | 1c9a388 | Endpoint /health mínimo (status, version, timestamp) sin fuga de memoria ni detalles internos de BD; respuestas de error 500 genéricas en producción |
 
 ## 7. Checklist por tarea (haz esto siempre)
 

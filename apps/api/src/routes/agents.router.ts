@@ -1,12 +1,52 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import { AgentService, UpdateService, DatabaseService } from '@erp-bridge/core';
 import { AgentHeartbeatPayloadSchema, AgentPairingRequestSchema } from '@erp-bridge/shared';
 import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
 import { resolveOrgId } from './org-scope';
+import { rateLimit } from '../middleware/rate-limit';
 
 export const agentsRouter = Router();
 const agentService = new AgentService();
 const updateService = new UpdateService();
+
+const pairRateLimiter = rateLimit({
+  name: 'agent-pair',
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Demasiados intentos de emparejamiento. Por favor, espere 15 minutos.',
+});
+
+const pairingTokenRateLimiter = rateLimit({
+  name: 'agent-pairing-token',
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: 'Demasiadas solicitudes de generación de tokens de emparejamiento. Por favor, espere.',
+});
+
+const CreatePairingTokenSchema = z.object({
+  createdById: z.string().trim().max(100).optional(),
+});
+
+const FleetReportErrorSchema = z.object({
+  agentId: z.string().trim().max(100).optional(),
+  organizationId: z.string().trim().max(100).optional(),
+  errorCode: z.string().trim().min(1, 'errorCode es requerido').max(100),
+  message: z.string().trim().min(1, 'message es requerido').max(1000),
+  details: z.any().optional(),
+});
+
+const FleetReportIncidentSchema = z.object({
+  ticketId: z.string().trim().min(1, 'ticketId es obligatorio').max(100),
+  contact: z.string().trim().max(200).optional(),
+  category: z.string().trim().max(100).optional(),
+  description: z.string().trim().min(1, 'description es obligatorio').max(5000),
+  diagnostics: z.string().max(20000).optional(),
+  agentId: z.string().trim().max(100).optional(),
+  organizationId: z.string().trim().max(100).optional(),
+  appVersion: z.string().trim().max(50).optional(),
+  hwid: z.string().trim().max(128).optional(),
+});
 
 import { getLatestReleasedVersion } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
@@ -169,16 +209,8 @@ agentsRouter.get('/admin/fleet/errors', requireAuth, requireRole(['SUPERADMIN', 
 // 2.2 Report agent error event (from Agent or local monitor)
 agentsRouter.post('/fleet/report-error', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { agentId, organizationId, errorCode, message, details } = req.body as {
-      agentId?: string;
-      organizationId?: string;
-      errorCode?: string;
-      message?: string;
-      details?: any;
-    };
-    if (!errorCode || !message) {
-      return res.status(400).json({ error: { message: 'errorCode y message son requeridos' } });
-    }
+    const validated = FleetReportErrorSchema.parse(req.body);
+    const { agentId, organizationId, errorCode, message, details } = validated;
     const db = DatabaseService.getInstance();
     if (db.isAvailable()) {
       await db.query(
@@ -196,21 +228,8 @@ agentsRouter.post('/fleet/report-error', async (req: Request, res: Response, nex
 // 2.3 Report agent incident / support ticket (from Agent GUI)
 agentsRouter.post('/fleet/report-incident', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { ticketId, contact, category, description, diagnostics, agentId, organizationId, appVersion, hwid } = req.body as {
-      ticketId?: string;
-      contact?: string;
-      category?: string;
-      description?: string;
-      diagnostics?: string;
-      agentId?: string;
-      organizationId?: string;
-      appVersion?: string;
-      hwid?: string;
-    };
-
-    if (!ticketId || !description) {
-      return res.status(400).json({ error: { message: 'ticketId y description son obligatorios' } });
-    }
+    const validated = FleetReportIncidentSchema.parse(req.body);
+    const { ticketId, contact, category, description, diagnostics, agentId, organizationId, appVersion, hwid } = validated;
 
     const db = DatabaseService.getInstance();
     if (db.isAvailable()) {
@@ -266,17 +285,18 @@ agentsRouter.post('/fleet/report-incident', async (req: Request, res: Response, 
 });
 
 // 3. Generate pairing token (Protected)
-agentsRouter.post('/agents/pairing-token', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+agentsRouter.post('/agents/pairing-token', requireAuth, pairingTokenRateLimiter, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const orgId = getOrgId(req);
-    const tokenData = await agentService.generatePairingToken(orgId, req.body.createdById);
+    const body = CreatePairingTokenSchema.parse(req.body);
+    const tokenData = await agentService.generatePairingToken(orgId, body.createdById);
     return res.status(201).json({ data: tokenData });
   } catch (error) {
     return next(error);
   }
 });
 
-agentsRouter.post('/agents/pair', async (req: Request, res: Response, next: NextFunction) => {
+agentsRouter.post('/agents/pair', pairRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = AgentPairingRequestSchema.parse(req.body);
     const result = await agentService.pairAgent(validated);

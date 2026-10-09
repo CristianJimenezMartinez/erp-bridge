@@ -23,6 +23,7 @@ export interface AdminJwtPayload {
   organizationId: string;
   resellerId?: string;
   exp: number;
+  jti?: string;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -64,6 +65,23 @@ const LoginSchema = z.object({
   password: z.string().min(6),
 });
 
+const PartnerLoginSchema = z.object({
+  partnerCode: z.string().trim().min(1, 'Introduce tu código de Partner o Empresa Instaladora autorizado').max(100),
+  partnerSecret: z.string().trim().max(200).optional(),
+  partnerEmail: z.string().trim().email('El correo electrónico proporcionado no tiene un formato válido').max(200).optional(),
+});
+
+const LicenseSessionSchema = z.object({
+  licenseKey: z.string().trim().min(1, 'Se requiere una clave de licencia válida').max(100),
+});
+
+const EmailSessionSchema = z.object({
+  email: z.string().trim().email('Introduce una dirección de correo electrónico válida').max(200),
+  otp: z.string().trim().max(20).optional(),
+  licenseKey: z.string().trim().max(100).optional(),
+  action: z.string().trim().max(50).optional(),
+});
+
 function base64UrlEncode(data: string | Buffer): string {
   const buf = typeof data === 'string' ? Buffer.from(data, 'utf8') : data;
   return buf.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -81,14 +99,48 @@ export class AuthService {
   private static readonly SECRET =
     process.env['ADMIN_JWT_SECRET'] || (process.env['NODE_ENV'] === 'production' ? crypto.randomBytes(32).toString('hex') : 'bentian-dev-jwt-secret');
 
+  private static readonly revokedJtis = new Set<string>();
+
   public static getSecret(): string {
     return this.SECRET;
   }
 
+  public static revokeToken(jti: string): void {
+    if (jti) {
+      this.revokedJtis.add(jti);
+    }
+  }
+
+  public static isRevoked(jti: string): boolean {
+    return Boolean(jti && this.revokedJtis.has(jti));
+  }
+
+  public static clearRevokedTokens(): void {
+    this.revokedJtis.clear();
+  }
+
+  public static generateToken(payload: Partial<AdminJwtPayload> & { sub: string; role: UserRole; organizationId: string }): string {
+    const jti = payload.jti || crypto.randomUUID();
+    const exp = payload.exp || Math.floor(Date.now() / 1000) + 24 * 3600;
+    return this.createToken({
+      ...payload,
+      jti,
+      exp,
+    });
+  }
+
   public static createToken(payload: AdminJwtPayload): string {
+    const jti = payload.jti || crypto.randomUUID();
+    const exp = payload.exp || Math.floor(Date.now() / 1000) + 24 * 3600;
+    const fullPayload: AdminJwtPayload = {
+      ...payload,
+      jti,
+      exp,
+    };
+
     const header = { alg: 'HS256', typ: 'JWT' };
     const encodedHeader = base64UrlEncode(JSON.stringify(header));
-    const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+    const encodedPayload = base64UrlEncode(JSON.stringify(fullPayload));
     const dataToSign = `${encodedHeader}.${encodedPayload}`;
 
     const signature = crypto.createHmac('sha256', this.SECRET).update(dataToSign).digest();
@@ -125,9 +177,15 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(base64UrlDecode(encodedPayload)) as AdminJwtPayload;
-      const expMs = payload.exp ? (payload.exp > 1e11 ? payload.exp : payload.exp * 1000) : 0;
-      if (expMs && Date.now() > expMs) {
+      if (!payload.exp) {
+        return { valid: false, reason: 'Token sin fecha de expiración' };
+      }
+      const expMs = payload.exp > 1e11 ? payload.exp : payload.exp * 1000;
+      if (Date.now() > expMs) {
         return { valid: false, reason: 'El token ha expirado' };
+      }
+      if (payload.jti && AuthService.isRevoked(payload.jti)) {
+        return { valid: false, reason: 'Token revocado' };
       }
       return { valid: true, payload };
     } catch {
@@ -233,6 +291,14 @@ function registerPartnerFailure(ip: string, now: number): void {
 }
 
 export const authRouter = Router();
+
+// POST /api/v1/auth/logout (Revocación inmediata del token de sesión)
+authRouter.post('/auth/logout', requireAuth, (req: AuthenticatedRequest, res: Response): void => {
+  if (req.user?.jti) {
+    AuthService.revokeToken(req.user.jti);
+  }
+  res.json({ success: true, message: 'Sesión cerrada correctamente' });
+});
 
 // POST /api/v1/auth/login
 authRouter.post('/auth/login', (req: Request, res: Response): void => {
@@ -374,13 +440,8 @@ authRouter.post('/auth/partner-login', async (req: Request, res: Response): Prom
     return;
   }
 
-  const { partnerCode, partnerSecret, partnerEmail } = req.body as {
-    partnerCode?: string;
-    partnerSecret?: string;
-    partnerEmail?: string;
-  };
-
-  if (!partnerCode || typeof partnerCode !== 'string') {
+  const parsed = PartnerLoginSchema.safeParse(req.body);
+  if (!parsed.success) {
     res.status(400).json({
       error: {
         code: 'MISSING_PARTNER_CODE',
@@ -389,6 +450,8 @@ authRouter.post('/auth/partner-login', async (req: Request, res: Response): Prom
     });
     return;
   }
+
+  const { partnerCode, partnerSecret, partnerEmail } = parsed.data;
 
   const cleanCode = partnerCode.trim().toUpperCase();
   // Validar formato partner: código tipo PT-XXXX o reseller asignado
@@ -544,8 +607,8 @@ const authLicenseService = new LicenseService();
 // POST /api/v1/auth/license-session (Acceso 1-clic y login directo por clave)
 authRouter.post('/auth/license-session', rateLimit({ name: 'license-session', windowMs: 15*60*1000, max: 30 }), async (req: Request, res: Response): Promise<void> => {
   try {
-    const { licenseKey } = req.body as { licenseKey?: string };
-    if (!licenseKey || typeof licenseKey !== 'string') {
+    const parsed = LicenseSessionSchema.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({
         error: {
           code: 'MISSING_LICENSE_KEY',
@@ -554,6 +617,8 @@ authRouter.post('/auth/license-session', rateLimit({ name: 'license-session', wi
       });
       return;
     }
+
+    const { licenseKey } = parsed.data;
 
     const trimmedKey = licenseKey.trim();
     const license = await authLicenseService.getLicenseByKey(trimmedKey);
@@ -612,8 +677,8 @@ authRouter.post('/auth/license-session', rateLimit({ name: 'license-session', wi
 // POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe con verificación OTP o Clave)
 authRouter.post('/auth/email-session', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, otp, licenseKey, action } = req.body as { email?: string; otp?: string; licenseKey?: string; action?: string };
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    const parsed = EmailSessionSchema.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({
         error: {
           code: 'INVALID_EMAIL',
@@ -623,6 +688,7 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
       return;
     }
 
+    const { email, otp, licenseKey, action } = parsed.data;
     const cleanEmail = email.toLowerCase().trim();
     const adminEmail = process.env['ADMIN_EMAIL'];
     if (adminEmail && cleanEmail === adminEmail.toLowerCase()) {

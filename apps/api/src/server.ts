@@ -15,6 +15,7 @@ import { FactusolConnector } from '@erp-bridge/connector-factusol';
 import { SimplyGestConnector } from '@erp-bridge/connector-simplygest';
 import { WooCommerceConnector } from '@erp-bridge/connector-woocommerce';
 import { errorHandler } from './middleware/error.middleware';
+import { rateLimit } from './middleware/rate-limit';
 import { healthRouter } from './routes/health.router';
 import { organizationsRouter } from './routes/organizations.router';
 import { connectorsRouter } from './routes/connectors.router';
@@ -83,20 +84,53 @@ export async function bootstrapApp(): Promise<Express> {
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
   app.use((_req, res, next) => {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; frame-ancestors 'self';"
+    );
     next();
   });
-  app.use(cors({ origin: '*' }));
+
+  const ALLOWED_CORS_ORIGINS = new Set([
+    'https://bridge.cristianjm.com',
+    'https://www.suministrosrubio.com',
+    'https://cristianjm.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:39281',
+  ]);
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Permitir solicitudes sin cabecera Origin (CLI, tray, agente de escritorio, tests)
+      if (!origin || ALLOWED_CORS_ORIGINS.has(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+  }));
+
   app.use(express.json({
-    limit: '10mb',
+    limit: '100kb',
     verify: (req: any, _res, buf) => {
       req.rawBody = buf;
     },
   }));
   app.use(express.urlencoded({ extended: true }));
+
+  // Rate Limiting Global: 300 peticiones / 15 minutos por IP (P3-2 / API-025)
+  app.use(rateLimit({
+    name: 'global',
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    message: 'Demasiadas solicitudes al servidor. Por favor, espere antes de reintentar.',
+  }));
 
   // 1. Initialize & Register Connectors in Core Registry
   const registry = ConnectorRegistry.getInstance();

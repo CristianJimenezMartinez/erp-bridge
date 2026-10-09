@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { LicenseService, DatabaseService, LicenseTokenManager, LicenseKeyGenerator } from '@erp-bridge/core';
 import {
   CreateLicenseDtoSchema,
@@ -14,6 +15,36 @@ import { getLatestInstallerUrl } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
 import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
 import { LicenseProofService } from '../services/license-proof.service';
+
+const PartnerIssueLicenseSchema = z.object({
+  clientName: z.string().trim().min(1, 'El nombre de la empresa es obligatorio').max(100),
+  clientTaxId: z.string().trim().min(1, 'El CIF/NIF es obligatorio').max(50),
+  alias: z.string().trim().max(80).optional(),
+});
+
+const BetaClaimSchema = z.object({
+  email: z.string().trim().email('El correo electrónico no es válido').max(200),
+  companyName: z.string().trim().max(100).optional(),
+  taxId: z.string().trim().max(50).optional(),
+  consentTerms: z.boolean().optional(),
+  consentMarketing: z.boolean().optional(),
+});
+
+const UpdateAliasSchema = z.object({
+  alias: z.string().trim().min(1, 'El alias debe tener entre 1 y 80 caracteres').max(80)
+    .refine((val) => !/[<>"'`]/.test(val), {
+      message: 'El alias no debe contener caracteres especiales (<, >, ", \', `)',
+    }),
+});
+
+const UnbindMachineSchema = z.object({
+  hwid: z.string().trim().regex(/^[A-Za-z0-9_-]{16,64}$/, 'HWID con formato no válido (debe ser alfanumérico entre 16 y 64 caracteres)'),
+});
+
+const DeactivateLicenseSchema = z.object({
+  licenseKey: z.string().trim().min(1, 'Se requiere licenseKey'),
+  hwid: z.string().trim().min(1, 'Se requiere hwid'),
+});
 
 export const licensesRouter = Router();
 const logger = new Logger('LicensesRouter');
@@ -125,14 +156,11 @@ licensesRouter.get('/partner/clients', requireAuth, requireRole(['RESELLER', 'SU
 // 0.2 Partner/Reseller: Emisión de Licencia Base para nuevo cliente
 licensesRouter.post('/partner/licenses/issue', requireAuth, requireRole(['RESELLER', 'SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const { clientName, clientTaxId, alias } = req.body as {
-      clientName?: string;
-      clientTaxId?: string;
-      alias?: string;
-    };
-    if (!clientName || !clientTaxId) {
+    const parsed = PartnerIssueLicenseSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: { message: 'El nombre de la empresa y su CIF/NIF son obligatorios' } });
     }
+    const { clientName, clientTaxId, alias } = parsed.data;
 
     const cleanTaxId = clientTaxId.trim().toUpperCase();
     const orgId = `org_${crypto.createHash('sha256').update(cleanTaxId).digest('hex').substring(0, 24)}`;
@@ -231,23 +259,13 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       return res.status(400).json({ error: { message: 'El periodo de Beta Pública Abierta finalizó el 31 de Diciembre de 2026.' } });
     }
 
-    const { email, companyName, taxId, consentTerms, consentMarketing } = req.body as {
-      email?: string;
-      companyName?: string;
-      taxId?: string;
-      consentTerms?: boolean;
-      consentMarketing?: boolean;
-    };
-
-    if (!email || typeof email !== 'string') {
+    const parsed = BetaClaimSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: { message: 'El correo electrónico es obligatorio para solicitar la clave de la Beta.' } });
     }
 
+    const { email, companyName, taxId, consentTerms, consentMarketing } = parsed.data;
     const normalizedEmail = email.trim().toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normalizedEmail)) {
-      return res.status(400).json({ error: { message: 'El formato del correo electrónico no es válido.' } });
-    }
 
     if (consentTerms !== true) {
       return res.status(400).json({ error: { message: 'Debes aceptar los Términos del Servicio y la Política de Privacidad para solicitar tu clave de la Beta.' } });
@@ -692,10 +710,13 @@ licensesRouter.post('/licenses', requireAuth, requireRole(['SUPERADMIN', 'ADMIN'
 licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
-    const { alias } = req.body as { alias: string };
-    const cleanAlias = typeof alias === 'string' ? alias.trim() : '';
-    if (!cleanAlias || cleanAlias.length > 80 || /[<>"'`]/.test(cleanAlias)) {
+    const parsed = UpdateAliasSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: { message: 'El alias debe tener entre 1 y 80 caracteres y no contener caracteres especiales (<, >, ", \', `)' } });
+    }
+    const cleanAlias = parsed.data.alias;
+    if (cleanAlias.length > 80 || /[<>"'`]/.test(cleanAlias)) {
+      return res.status(400).json({ error: { message: 'El alias no puede tener más de 80 caracteres ni caracteres especiales' } });
     }
     const lic = await licenseService.getLicenseById(id);
     if (!lic) {
@@ -716,8 +737,12 @@ licensesRouter.patch('/licenses/:id/alias', requireAuth, async (req: Authenticat
 licensesRouter.post('/licenses/:id/unbind', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const id = req.params['id']!;
-    const { hwid } = req.body as { hwid: string };
-    if (!hwid || typeof hwid !== 'string' || !/^[A-Za-z0-9_-]{16,64}$/.test(hwid)) {
+    const parsed = UnbindMachineSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: { message: 'HWID con formato no válido (debe ser alfanumérico entre 16 y 64 caracteres)' } });
+    }
+    const { hwid } = parsed.data;
+    if (!/^[A-Za-z0-9_-]{16,64}$/.test(hwid)) {
       return res.status(400).json({ error: { message: 'HWID con formato no válido (debe ser alfanumérico entre 16 y 64 caracteres)' } });
     }
     const lic = await licenseService.getLicenseById(id);
@@ -878,10 +903,11 @@ licensesRouter.post('/licenses/validate', async (req: Request, res: Response, ne
 // 6. Deactivate a machine activation
 licensesRouter.post('/licenses/deactivate', rateLimit({ name: 'license-deactivate', windowMs: 15*60*1000, max: 30 }), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { licenseKey, hwid } = req.body as { licenseKey: string; hwid: string };
-    if (!licenseKey || !hwid) {
+    const parsed = DeactivateLicenseSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: { message: 'Se requiere licenseKey y hwid' } });
     }
+    const { licenseKey, hwid } = parsed.data;
     const result = await licenseService.deactivateLicense(licenseKey, hwid);
     if (!result.success) {
       return res.status(400).json({ error: { message: result.message } });

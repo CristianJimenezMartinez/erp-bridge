@@ -1,11 +1,35 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { LicenseService, DatabaseService, PostgresLicenseRepository } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService, requireRole, AuthenticatedRequest } from './auth.router';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
 
+const CreateCheckoutSessionSchema = z.object({
+  plan: z.string().max(100).optional(),
+  email: z.string().trim().email('El parámetro email es obligatorio para generar la suscripción.'),
+  organizationId: z.string().trim().max(100).optional(),
+  billingCycle: z.enum(['annual', 'monthly']).optional(),
+  isEarlyBird: z.boolean().optional(),
+  successUrl: z.string().max(500).optional(),
+  cancelUrl: z.string().max(500).optional(),
+});
+
+const PartnerCheckoutSchema = z.object({
+  clientName: z.string().trim().min(1, 'Razón Social y CIF/NIF del cliente son obligatorios').max(100),
+  clientTaxId: z.string().trim().min(1, 'Razón Social y CIF/NIF del cliente son obligatorios').max(50),
+  clientEmail: z.string().trim().email().max(200).optional(),
+  alias: z.string().trim().max(80).optional(),
+  returnUrl: z.string().max(500).optional(),
+});
+
+const CreatePortalSessionSchema = z.object({
+  returnUrl: z.string().max(500).optional(),
+  organizationId: z.string().trim().max(100).optional(),
+  customerId: z.string().trim().max(100).optional(),
+});
 
 export const billingRouter = Router();
 const licenseService = new LicenseService();
@@ -77,6 +101,20 @@ billingRouter.get('/billing/founder-spots', async (_req: Request, res: Response)
  */
 billingRouter.post('/billing/create-checkout-session', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (req.body?.plan && (String(req.body.plan).startsWith('addon_extra_store') || String(req.body.plan).startsWith('addon_'))) {
+      return res.status(400).json({
+        error: {
+          code: 'ADDON_STORE_DISCONTINUED',
+          message: 'La política oficial de Bentian ERP Bridge establece 1 Licencia Base por cada Tienda Online conectada. Para sincronizar múltiples tiendas o entornos multiempresa, adquiere una Licencia Base adicional o contacta con soporte.'
+        }
+      });
+    }
+
+    const parsed = CreateCheckoutSessionSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: { message: 'El parámetro email es obligatorio para generar la suscripción.' } });
+    }
+
     const {
       plan = 'base_annual',
       email,
@@ -85,21 +123,7 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
       isEarlyBird = true,
       successUrl = `${DEFAULT_DASHBOARD_URL}?checkout=success`,
       cancelUrl = `${DEFAULT_DASHBOARD_URL}?checkout=cancel`,
-    } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ error: { message: 'El parámetro email es obligatorio para generar la suscripción.' } });
-    }
-
-    // Blindaje comercial: El Add-on Tienda Extra fue retirado para evitar arbitraje y subarriendo no autorizado.
-    if (plan && (plan.startsWith('addon_extra_store') || plan.startsWith('addon_'))) {
-      return res.status(400).json({
-        error: {
-          code: 'ADDON_STORE_DISCONTINUED',
-          message: 'La política oficial de Bentian ERP Bridge establece 1 Licencia Base por cada Tienda Online conectada. Para sincronizar múltiples tiendas o entornos multiempresa, adquiere una Licencia Base adicional o contacta con soporte.'
-        }
-      });
-    }
+    } = parsed.data;
 
     // Normalizar identificador de plan
     let matchedPlan = CATALOG_PLANS.find(p => p.id === plan);
@@ -320,10 +344,11 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
  */
 billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESELLER', 'SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const { clientName, clientTaxId, clientEmail, alias, returnUrl = DEFAULT_DASHBOARD_URL } = req.body;
-    if (!clientName || !clientTaxId) {
+    const parsed = PartnerCheckoutSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: { message: 'Razón Social y CIF/NIF del cliente son obligatorios' } });
     }
+    const { clientName, clientTaxId, clientEmail, alias, returnUrl = DEFAULT_DASHBOARD_URL } = parsed.data;
 
     const resellerCode = req.user?.resellerId || req.user?.sub || 'PT-PARTNER';
     const cleanTaxId = clientTaxId.trim().toUpperCase();
@@ -389,7 +414,9 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
  */
 billingRouter.post('/billing/create-portal-session', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    let { returnUrl = DEFAULT_DASHBOARD_URL } = req.body || {};
+    const parsed = CreatePortalSessionSchema.safeParse(req.body || {});
+    let { returnUrl = DEFAULT_DASHBOARD_URL } = parsed.success ? parsed.data : {};
+    returnUrl = returnUrl || DEFAULT_DASHBOARD_URL;
     const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
 
     // Validar returnUrl para que pertenezca al dominio configurado (o localhost en no-prod)
