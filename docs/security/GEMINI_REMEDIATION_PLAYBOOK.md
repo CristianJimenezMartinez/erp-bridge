@@ -143,18 +143,19 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 | P1-6 | API-008, 027 | HECHO | — | assertProductionSecrets() en server.ts aborta arranque en producción si faltan o son placeholders ADMIN_JWT_SECRET, LICENSE_JWT_SECRET, LICENSE_SIGNING_PRIVATE_KEY o PARTNER_SECRET |
 | P1-7 | AGT-003 | HECHO | — | MiniRouter endurecido: validación Host previo a parseo, rechazo Sec-Fetch-Site cross-site, X-Frame-Options: DENY, nosniff, límite 1 MB, Content-Type obligatorio en POST con Origin, X-Bentian-Token para navegador con compatibilidad nativa para tray/CLI sin Origin, bloqueo de UNC en GET /open-file-dialog (Anti-NTLM leak) |
 | P1-8 | AGT-002 | HECHO | — | Sanitización y escapeHtml universal de datos dinámicos en templates y scripts GUI (logs, channel, license, sync, factusol) antes de inserción en innerHTML |
-| P2-1 | INF-003 | HECHO | — | CI y Docker asegurados con pnpm install --frozen-lockfile, pnpm 9.15.4 fijado, --ignore-scripts en CI y npm ci en dashboard |
-| P2-2 | INF-018 | HECHO | — | pnpm.overrides con axios >=1.20.0, proxy-addr >=2.0.8, qs >=6.16.0, uuid >=11.1.1 en root package.json |
-| P2-3 | INF-004, 005 | HECHO | — | Workflows de CI/CD endurecidos: permissions: contents: read, environment: production con protecciones |
-| P2-4 | AGT-005, 006, 007 | HECHO | — | AutoUpdater verifica isNewer y hash SHA-256 esperado antes de invocar swapper; descarga update vía HTTPS con timeout 60s y límite 150 MB |
-| P2-5 | API-014, 030 | HECHO | — | Stripe webhook endurecido contra duplicidad (eventos procesados, sesiones idempotentes); validación de estado paid y planes |
-| P2-6 | API-011 | HECHO | — | Gestión de partners y resellers protegida contra sobrescritura de reseller_id y con validaciones estrictas |
-| P2-7 | API-015, 016, 017 | HECHO | — | Mutex concurrente conKeyedLock en /licenses/activate para serializar activaciones y prevenir carreras; invalidación de caché y control de maxActivations |
-| P2-8 | AGT-016, 017, 018, 020 | HECHO | — | Universal bridge connector con HTTPS obligatorio, validación HMAC, prevención de SSRF (bloqueo IPs privadas) y timeout de 15s |
-| P2-9 | AGT-009, 011, 013, 014, 015 | HECHO | — | OrderPlausibilityAdapter creado como decorador de orden previa al conector Factusol (FROZEN) validando límites numéricos y caracteres de control; enmascaramiento de licenseKey en diagnóstico |
-| P2-10 | INF-012, 014 | HECHO | — | Endpoint PHP universal blindado: ping sin DDL con SHOW TABLES LIKE, respuesta genérica sin fuga de nombres de BD ni stacktraces, upload_image con límite 10 MB y MIME estricto (JPEG/PNG/WebP sin SVG). Template embebida sincronizada al 100% |
-| P2-11 | INF-015, API-023 | HECHO | — | .env.example actualizado con secretos documentados de producción (ADMIN_JWT_SECRET, LICENSE_JWT_SECRET, etc.); TLS de base de datos verificado |
-| P2-12 | INF-016, 017 | HECHO | — | Scripts de despliegue y firma blindados: sign-authenticode.js usa servidores RFC 3161 HTTPS y aborta en fallo si DEPLOYING=true; upload-releases.js elimina interpolación cruda en docker exec con payloads Base64, lista blanca de extensiones permitidas y hostVerifier |
+| P1-9 | AGT-004 | HECHO | — | Enmascaramiento de secretos (••••••••) en getStatusDetails(); preservación de secretos existentes en saveFullConfig() y métodos de test de conexión al recibir valores enmascarados |
+| P2-1 | INF-003 | HECHO | 98c90ab | CI y Docker asegurados con pnpm install --frozen-lockfile, pnpm 9.15.4 fijado, --ignore-scripts en CI y npm ci en dashboard |
+| P2-2 | INF-018 | HECHO | 98c90ab | pnpm.overrides con axios >=1.20.0, proxy-addr >=2.0.8, qs >=6.16.0, uuid >=11.1.1 en root package.json |
+| P2-3 | INF-004, 005 | HECHO | 98c90ab | Workflows de CI/CD endurecidos: permissions: contents: read, environment: production con protecciones |
+| P2-4 | AGT-005, 006, 007 | HECHO | 98c90ab | AutoUpdater verifica isNewer y hash SHA-256 esperado antes de invocar swapper; descarga update vía HTTPS con timeout 60s y límite 150 MB |
+| P2-5 | API-014, 030 | HECHO | 98c90ab | Stripe webhook endurecido contra duplicidad (eventos procesados, sesiones idempotentes); validación de estado paid y planes |
+| P2-6 | API-011 | HECHO | 98c90ab | Gestión de partners y resellers protegida contra sobrescritura de reseller_id y con validaciones estrictas |
+| P2-7 | API-015, 016, 017 | HECHO | 98c90ab | Mutex concurrente conKeyedLock en /licenses/activate para serializar activaciones y prevenir carreras; invalidación de caché y control de maxActivations |
+| P2-8 | AGT-016, 017, 018, 020 | HECHO | 98c90ab | Universal bridge connector con HTTPS obligatorio, validación HMAC, prevención de SSRF (bloqueo IPs privadas) y timeout de 15s |
+| P2-9 | AGT-009, 011, 013, 014, 015 | HECHO | 98c90ab | OrderPlausibilityAdapter creado como decorador de orden previa al conector Factusol (FROZEN) validando límites numéricos y caracteres de control; enmascaramiento de licenseKey en diagnóstico |
+| P2-10 | INF-012, 014 | HECHO | 98c90ab | Endpoint PHP universal blindado: ping sin DDL con SHOW TABLES LIKE, respuesta genérica sin fuga de nombres de BD ni stacktraces, upload_image con límite 10 MB y MIME estricto (JPEG/PNG/WebP sin SVG). Template embebida sincronizada al 100% |
+| P2-11 | INF-015, API-023 | HECHO | 98c90ab | .env.example actualizado con secretos documentados de producción (ADMIN_JWT_SECRET, LICENSE_JWT_SECRET, etc.); TLS de base de datos verificado |
+| P2-12 | INF-016, 017 | HECHO | 98c90ab | Scripts de despliegue y firma blindados: sign-authenticode.js usa servidores RFC 3161 HTTPS y aborta en fallo si DEPLOYING=true; upload-releases.js elimina interpolación cruda en docker exec con payloads Base64, lista blanca de extensiones permitidas y hostVerifier |
 | P3-1 … P3-9 | ver §5 | ABIERTO | — | |
 
 ## 7. Checklist por tarea (haz esto siempre)
