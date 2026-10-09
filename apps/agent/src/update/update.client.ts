@@ -368,6 +368,17 @@ export class UpdateClient {
       throw new Error(`Protocolo de descarga inseguro: ${parsedUrl.protocol}. Se exige HTTPS.`);
     }
 
+    let configuredHost = '';
+    try { configuredHost = new URL(this.options.apiBaseUrl).hostname; } catch {}
+    const allowedHosts = new Set(['bridge.cristianjm.com', 'localhost', '127.0.0.1']);
+    if (configuredHost) allowedHosts.add(configuredHost);
+
+    if (!allowedHosts.has(parsedUrl.hostname)) {
+      this.isDownloading = false;
+      this.state.status = 'failed';
+      throw new Error(`Dominio de descarga no autorizado: "${parsedUrl.hostname}". Descarga bloqueada por seguridad.`);
+    }
+
     try {
       let existingBytes = 0;
       if (fs.existsSync(partFilePath)) {
