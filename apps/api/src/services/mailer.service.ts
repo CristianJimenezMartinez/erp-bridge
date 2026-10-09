@@ -168,6 +168,11 @@ export class MailerService {
   }
 
   public static async sendEmail(options: EmailOptions): Promise<{ success: boolean; provider: string; error?: string }> {
+    if (process.env['NODE_ENV'] === 'test' || process.env['DISABLE_MAILING'] === 'true') {
+      this.logger.info(`[TEST MODE] Email omitido en pruebas a ${options.to}: ${options.subject}`);
+      return { success: true, provider: 'mock' };
+    }
+
     const from = options.from || process.env['MAIL_FROM'] || process.env['SMTP_FROM'] || 'Bentian ERP Bridge <soporte@cristianjm.com>';
 
     // 1. Prioridad: Resend API (Gratis 3.000 emails/mes de por vida)

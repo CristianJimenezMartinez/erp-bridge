@@ -3,9 +3,13 @@ import http from 'http';
 import crypto from 'crypto';
 import { bootstrapApp } from '../src/server';
 import { AuthService } from '../src/routes/auth.router';
+import { DatabaseService } from '@erp-bridge/core';
 
 async function run() {
   console.log('--- Running License API E2E Tests ---');
+
+  process.env['NODE_ENV'] = 'test';
+  process.env['DISABLE_MAILING'] = 'true';
 
   const { publicKey: testPublicKey, privateKey: testPrivateKey } = crypto.generateKeyPairSync('ed25519');
   process.env['LICENSE_SIGNING_PRIVATE_KEY'] = Buffer.from(
@@ -28,13 +32,18 @@ async function run() {
     exp: Math.floor(Date.now() / 1000) + 3600,
   });
 
+  const testOrgId = '11111111-2222-3333-4444-555555555555';
+  let licenseKey = '';
+  let betaEmail = '';
+  let betaEmailNoConsent = '';
+
   try {
     // 0. Verify unauthenticated access returns 401
     const unauthRes = await fetch(`${baseUrl}/api/v1/licenses`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        organizationId: '11111111-2222-3333-4444-555555555555',
+        organizationId: testOrgId,
         plan: 'starter',
         maxActivations: 1,
       }),
@@ -49,7 +58,7 @@ async function run() {
         Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        organizationId: '11111111-2222-3333-4444-555555555555',
+        organizationId: testOrgId,
         plan: 'starter',
         maxActivations: 1,
       }),
@@ -60,7 +69,7 @@ async function run() {
     assert(createdJson.data.key.startsWith('EB-'));
     assert.strictEqual(createdJson.data.plan, 'starter');
 
-    const licenseKey = createdJson.data.key;
+    licenseKey = createdJson.data.key;
 
     // 2. Activate License via API
     const hwid = '1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff';
@@ -143,7 +152,7 @@ async function run() {
     assert.strictEqual(postDeactJson.data.activations.length, 0, 'La lista de activaciones activas debe ser 0 tras desactivar');
 
     // 6. Test Beta Claim: Validación de RGPD obligatorio (consentTerms === true)
-    const betaEmailNoConsent = `beta_noconsent_${Date.now()}@empresa-test.es`;
+    betaEmailNoConsent = `beta_noconsent_${Date.now()}@empresa-test.es`;
     const betaNoConsentRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -156,7 +165,7 @@ async function run() {
     assert.strictEqual(betaNoConsentRes.status, 400, 'Debe rechazar con 400 si consentTerms es false o falta');
 
     // 6.1 Test Beta Claim: Reclamación de clave pública (Hasta 31/12/2026)
-    const betaEmail = `beta_tester_${Date.now()}@empresa-test.es`;
+    betaEmail = `beta_tester_${Date.now()}@empresa-test.es`;
     const betaClaimRes = await fetch(`${baseUrl}/api/v1/licenses/beta/claim`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -214,6 +223,19 @@ async function run() {
 
     console.log('✓ License API E2E Tests Passed (including 25-key founder quota and 199€ pricing)');
   } finally {
+    try {
+      const db = DatabaseService.getInstance();
+      if (db.isAvailable()) {
+        if (betaEmail || betaEmailNoConsent) {
+          await db.query(`DELETE FROM beta_leads WHERE email = $1 OR email = $2`, [betaEmail, betaEmailNoConsent]);
+        }
+        if (licenseKey) {
+          await db.query(`DELETE FROM licenses WHERE key = $1 OR alias LIKE $2`, [licenseKey, `%${betaEmail}%`]);
+        }
+        await db.query(`DELETE FROM licenses WHERE organization_id = $1`, [testOrgId]);
+        await db.query(`DELETE FROM organizations WHERE id = $1 OR slug = $2 OR slug = $3`, [testOrgId, betaEmail, betaEmailNoConsent]);
+      }
+    } catch {}
     server.close();
   }
 }
