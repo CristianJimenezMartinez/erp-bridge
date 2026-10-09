@@ -2,6 +2,7 @@ import assert from 'assert';
 import http from 'http';
 import { bootstrapApp } from '../src/server';
 import { AuthService } from '../src/routes/auth.router';
+import { DatabaseService } from '@erp-bridge/core';
 
 async function run() {
   console.log('--- Running Update API E2E Tests ---');
@@ -22,9 +23,10 @@ async function run() {
     exp: Math.floor(Date.now() / 1000) + 3600,
   });
 
+  const testAgentId = `agent_e2e_${Date.now()}`;
+  const testVersion = '1.2.0';
+
   try {
-    const testAgentId = `agent_e2e_${Date.now()}`;
-    const testVersion = '1.2.0';
 
     // 0. Verify unauthenticated publish returns 401
     const unauthRes = await fetch(`${baseUrl}/api/v1/updates/publish`, {
@@ -110,6 +112,11 @@ async function run() {
 
     console.log('✓ Update API E2E Tests Passed');
   } finally {
+    try {
+      const db = DatabaseService.getInstance();
+      await db.query('DELETE FROM update_manifests WHERE version = $1', [testVersion]);
+      await db.query('DELETE FROM update_history WHERE agent_id = $1', [testAgentId]);
+    } catch {}
     server.close();
   }
 }
