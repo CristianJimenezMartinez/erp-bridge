@@ -1,9 +1,5 @@
-import os from 'os';
 import fs from 'fs';
-import path from 'path';
 import {
-  AgentHeartbeatPayload,
-  AgentPairingRequest,
   AgentSystemInfo,
   FactusolDetectedInstance,
   LicenseActivationResponse,
@@ -14,13 +10,11 @@ import {
 import { FactusolDetector } from './detector';
 import {
   AutoUpdater,
-  VERSION_REGEX,
   UpdateClient,
   UpdateClientState,
   UpdateOptions,
+  UpdateOrchestratorService,
 } from './update';
-
-// Submódulos modulares en árbol
 import {
   AgentConfigFile,
   AgentFactusolSettings,
@@ -32,31 +26,44 @@ import {
   AgentNotificationSettings,
   ConfigManager,
 } from './config';
-import { HoldedClient } from '@erp-bridge/connector-holded';
 import { SyncHistoryRecord, HistoryManager } from './history';
-import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport, AgentDiskLogger } from './diagnostics';
+import {
+  EventBus,
+  LogEvent,
+  SystemInfoService,
+  AgentStatusDetails,
+  PreflightHealthService,
+  PreflightHealthReport,
+  LiveHealthService,
+  LiveHealthReport,
+  IncidentReporterService,
+  IncidentReportPayload,
+  IncidentReportResult,
+} from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import {
   WooCommerceTestResult,
   UniversalBridgeTestResult,
   ShopifyTestResult,
-  WooCommerceTester,
-  UniversalBridgeTester,
-  ShopifyTester,
+  ChannelTesterService,
+  SECRET_MASK,
+  isSecretMaskedOrEmpty,
 } from './channels';
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 import { AutoStartService } from './system';
-import { OrderNotifierService } from './notifications/order-notifier.service';
-import { OrderPlausibilityAdapter } from './adapters/order-plausibility.adapter';
+import { NotificationTesterService } from './notifications';
 import {
   SalesLedgerManager,
   GetSalesOrdersOptions,
   PaginatedSalesOrdersResult,
   SalesOrderRecord,
+  SalesOrderManager,
 } from './orders';
+import { StatusAggregatorService, HeartbeatService } from './status';
+import { PairingService, ConfigApplierService, FileWatcherCoordinatorService } from './lifecycle';
 
-// Re-exportar tipos para 100% de compatibilidad externa
+// Re-exportar tipos y submódulos para 100% de compatibilidad externa
 export * from './config';
 export * from './history';
 export * from './orders';
@@ -67,17 +74,15 @@ export * from './channels';
 export * from './sync';
 export * from './update';
 export * from './system';
+export * from './status';
+export * from './lifecycle';
+export * from './notifications';
+
+export { SECRET_MASK, isSecretMaskedOrEmpty };
 
 export interface AgentGuiServer {
   stop(): Promise<void>;
   getUrl?(): string;
-}
-
-export const SECRET_MASK = '••••••••';
-export function isSecretMaskedOrEmpty(val: unknown): boolean {
-  if (val === undefined || val === null || val === '') return true;
-  const str = String(val).trim();
-  return str === SECRET_MASK || /^[•*]{4,}$/.test(str);
 }
 
 export class LocalAgent {
@@ -97,12 +102,20 @@ export class LocalAgent {
   public readonly autoStartService: AutoStartService;
   public readonly preflightHealthService: PreflightHealthService;
 
+  // Delegados especializados modularizados
+  public readonly salesOrderManager: SalesOrderManager;
+  public readonly channelTester: ChannelTesterService;
+  public readonly statusAggregator: StatusAggregatorService;
+  public readonly incidentReporter: IncidentReporterService;
+  public readonly heartbeatService: HeartbeatService;
+  public readonly updateOrchestrator: UpdateOrchestratorService;
+  public readonly pairingService: PairingService;
+  public readonly configApplierService: ConfigApplierService;
+  public readonly notificationTester: NotificationTesterService;
+  public readonly fileWatcherCoordinator: FileWatcherCoordinatorService;
+
   private isRunning = false;
-  private isUpdating = false;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
   private guiServer: AgentGuiServer | null = null;
-  private cachedLicenseVal: { data: LicenseValidationStatus; timestamp: number } | null = null;
-  private cachedFactusolHealth: { connected: boolean; statusMessage: string; articleCount?: number; timestamp: number } | null = null;
 
   constructor(customConfig?: Partial<AgentConfigFile>, customStoreDir?: string) {
     this.configManager = new ConfigManager(customConfig);
@@ -130,9 +143,7 @@ export class LocalAgent {
         if (fs.existsSync(cfgPath)) {
           const raw = fs.readFileSync(cfgPath, 'utf8').replace(/^\uFEFF/, '');
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.shopify) {
-            cfg.shopify = parsed.shopify;
-          }
+          if (parsed && parsed.shopify) cfg.shopify = parsed.shopify;
         }
       } catch {}
     }
@@ -157,25 +168,47 @@ export class LocalAgent {
     this.autoUpdater = new AutoUpdater(updateOptions);
     this.updateClient = new UpdateClient(updateOptions, this.eventBus);
 
+    // Inicialización de delegados especializados
+    this.salesOrderManager = new SalesOrderManager(this.salesLedgerManager, this.configManager, this.factusolService, this.eventBus);
+    this.channelTester = new ChannelTesterService(this.configManager);
+    this.statusAggregator = new StatusAggregatorService({
+      configManager: this.configManager,
+      licenseService: this.licenseService,
+      factusolService: this.factusolService,
+      fileWatcherService: this.fileWatcherService,
+      historyManager: this.historyManager,
+      eventBus: this.eventBus,
+      preflightHealthService: this.preflightHealthService,
+      getUpdateStatus: () => this.getUpdateStatus(),
+      getPreflightHealth: (force?: boolean) => this.getPreflightHealth(force),
+    });
+    this.incidentReporter = new IncidentReporterService(this.configManager, this.licenseService, this.eventBus, () => this.exportDiagnostic());
+    this.updateOrchestrator = new UpdateOrchestratorService({
+      autoUpdater: this.autoUpdater,
+      updateClient: this.updateClient,
+      getCurrentVersion: () => this.configManager.getVersion(),
+    });
+    this.heartbeatService = new HeartbeatService({
+      configManager: this.configManager,
+      licenseService: this.licenseService,
+      factusolService: this.factusolService,
+      fileWatcherService: this.fileWatcherService,
+      onUpdateDetected: (info) => void this.applyUpdateFromInfo(info),
+      isUpdating: () => this.updateOrchestrator.getIsUpdating(),
+    });
+    this.pairingService = new PairingService(this.configManager);
+    this.configApplierService = new ConfigApplierService(this.configManager, this.licenseService, this.factusolService, this.syncEngine, this.eventBus);
+    this.notificationTester = new NotificationTesterService(this.configManager);
+    this.fileWatcherCoordinator = new FileWatcherCoordinatorService(this.configManager, this.licenseService, this.syncEngine, this.eventBus);
+
     this.addEvent('info', `🚀 Bentian Local Agent inicializado en ${cfg.agentName} (v${this.configManager.getVersion()})`);
   }
 
   // --- Métodos de Configuración ---
-  public getVersion(): string {
-    return this.configManager.getVersion();
-  }
-
-  public getConfig(): Readonly<AgentConfigFile> {
-    return this.configManager.getConfig();
-  }
-
-  public setApiBaseUrl(url: string): void {
-    this.configManager.setApiBaseUrl(url);
-  }
-
-  public setFactusolDbPath(dbPath: string): void {
-    this.configManager.setFactusolDbPath(dbPath);
-  }
+  public getVersion(): string { return this.configManager.getVersion(); }
+  public getConfig(): Readonly<AgentConfigFile> { return this.configManager.getConfig(); }
+  public setApiBaseUrl(url: string): void { this.configManager.setApiBaseUrl(url); }
+  public setFactusolDbPath(dbPath: string): void { this.configManager.setFactusolDbPath(dbPath); }
 
   public async saveFullConfig(updates: {
     factusol?: AgentFactusolSettings;
@@ -188,372 +221,32 @@ export class LocalAgent {
     licenseKey?: string;
     notifications?: AgentNotificationSettings;
   }): Promise<{ success: boolean; message: string }> {
-    const cfg = this.configManager.get();
-    if (updates.factusol) {
-      cfg.factusol = { ...(cfg.factusol || {}), ...updates.factusol };
-      if (updates.factusol.databasePath !== undefined) {
-        const cleaned = FactusolPathResolver.cleanPath(updates.factusol.databasePath);
-        const resolved = FactusolPathResolver.resolve(cleaned);
-        const finalPath = (resolved.success && resolved.resolvedPath) ? resolved.resolvedPath : cleaned;
-        cfg.factusolDbPath = finalPath;
-        cfg.factusol.databasePath = finalPath;
-        updates.factusol.databasePath = finalPath;
-      }
-    }
-    if (updates.woocommerce) {
-      const existingSecret = cfg.woocommerce?.consumerSecret;
-      cfg.woocommerce = { ...(cfg.woocommerce || {}), ...updates.woocommerce };
-      if (isSecretMaskedOrEmpty(updates.woocommerce.consumerSecret) && existingSecret) {
-        cfg.woocommerce.consumerSecret = existingSecret;
-      }
-    }
-    if (updates.universalBridge) {
-      const existingSecretKey = cfg.universalBridge?.secretKey;
-      const existingDbPass = cfg.universalBridge?.dbPass;
-      cfg.universalBridge = { ...(cfg.universalBridge || {}), ...updates.universalBridge };
-      if (isSecretMaskedOrEmpty(updates.universalBridge.secretKey) && existingSecretKey) {
-        cfg.universalBridge.secretKey = existingSecretKey;
-      }
-      if (isSecretMaskedOrEmpty(updates.universalBridge.dbPass) && existingDbPass) {
-        cfg.universalBridge.dbPass = existingDbPass;
-      }
-    }
-    if (updates.shopify) {
-      const existingToken = cfg.shopify?.accessToken;
-      cfg.shopify = { ...(cfg.shopify || {}), ...updates.shopify };
-      if (isSecretMaskedOrEmpty(updates.shopify.accessToken) && existingToken) {
-        cfg.shopify.accessToken = existingToken;
-      }
-    }
-    if (updates.holded) {
-      const existingApiKey = cfg.holded?.apiKey;
-      cfg.holded = { ...(cfg.holded || {}), ...updates.holded };
-      if (isSecretMaskedOrEmpty(updates.holded.apiKey) && existingApiKey && cfg.holded) {
-        cfg.holded.apiKey = existingApiKey;
-      }
-    }
-    if (updates.channelType) {
-      cfg.channelType = updates.channelType;
-    }
-    if (updates.syncRules) {
-      cfg.syncRules = { ...(cfg.syncRules || {}), ...updates.syncRules };
-    }
-    if (updates.notifications) {
-      const existingSmtpPass = cfg.notifications?.smtpPass;
-      cfg.notifications = { ...(cfg.notifications || {}), ...updates.notifications };
-      if (isSecretMaskedOrEmpty(updates.notifications.smtpPass) && existingSmtpPass) {
-        cfg.notifications.smtpPass = existingSmtpPass;
-      }
-    }
-
-    let licenseMsg = '';
-    if (updates.licenseKey && updates.licenseKey !== cfg.licenseKey && !isSecretMaskedOrEmpty(updates.licenseKey)) {
-      const licRes = await this.licenseService.activateLicense(updates.licenseKey);
-      if (!licRes.success) {
-        licenseMsg = ` (Aviso en licencia: ${licRes.error})`;
-      } else {
-        cfg.licenseKey = updates.licenseKey;
-        licenseMsg = ' (Licencia activada con éxito)';
-      }
-    }
-
-    const saveRes = this.configManager.saveConfigToDisk();
-    if (!saveRes.success) {
-      this.addEvent('error', `✕ Fallo al guardar en disco: ${saveRes.error}`);
-      return {
-        success: false,
-        message: `Error al persistir la configuración en disco: ${saveRes.error}. Comprueba los permisos de acceso.`
-      };
-    }
-
-    this.syncEngine.startAutoSyncLoop(() => this.isRunning);
-
-    if (cfg.factusolDbPath) {
-      let activePath = cfg.factusolDbPath;
-      if (!fs.existsSync(activePath)) {
-        const unc = FactusolPathResolver.resolveMappedDriveToUnc(activePath);
-        if (unc && fs.existsSync(unc)) activePath = unc;
-      }
-      if (fs.existsSync(activePath)) {
-        await this.factusolService.reconnect(activePath).catch(() => null);
-      } else {
-        this.logger.warn(`Ruta de Factusol guardada pero no accesible inmediatamente (Desconectado/Offline): ${cfg.factusolDbPath}`);
-      }
-    }
-
-    this.addEvent('success', `✓ Configuración guardada en disco (${path.basename(saveRes.filePath)})${licenseMsg}`);
-    return { success: true, message: `Configuración guardada correctamente en disco${licenseMsg}` };
+    return this.configApplierService.saveFullConfig(updates, () => this.isRunning);
   }
 
   // --- Métodos de Diagnósticos y Eventos ---
-  public getRecentEvents(): LogEvent[] {
-    return this.eventBus.getRecentEvents();
-  }
+  public getRecentEvents(): LogEvent[] { return this.eventBus.getRecentEvents(); }
+  public addEvent(level: 'info' | 'warn' | 'error' | 'success', message: string): void { this.eventBus.addEvent(level, message); }
+  public getSyncHistory(): SyncHistoryRecord[] { return this.historyManager.getSyncHistory(); }
+  public addSyncHistoryRecord(record: Omit<SyncHistoryRecord, 'id' | 'timestamp'>): void { this.historyManager.addSyncHistoryRecord(record); }
 
-  public addEvent(level: 'info' | 'warn' | 'error' | 'success', message: string): void {
-    this.eventBus.addEvent(level, message);
-  }
-
-  public getSyncHistory(): SyncHistoryRecord[] {
-    return this.historyManager.getSyncHistory();
-  }
-
-  public addSyncHistoryRecord(record: Omit<SyncHistoryRecord, 'id' | 'timestamp'>): void {
-    this.historyManager.addSyncHistoryRecord(record);
-  }
-
-  // --- Métodos de Libro de Ventas (Sales Ledger) ---
+  // --- Métodos de Libro de Ventas (Sales Ledger) Delegados ---
   public getSalesOrders(options?: GetSalesOrdersOptions): PaginatedSalesOrdersResult {
-    return this.salesLedgerManager.getOrders(options);
+    return this.salesOrderManager.getSalesOrders(options);
   }
-
   public getSalesOrderById(id: string): SalesOrderRecord | null {
-    return this.salesLedgerManager.getOrderById(id);
+    return this.salesOrderManager.getSalesOrderById(id);
   }
-
   public async retrySalesOrder(id: string): Promise<{ success: boolean; message: string; order?: SalesOrderRecord }> {
-    const order = this.salesLedgerManager.getOrderById(id);
-    if (!order) {
-      return { success: false, message: 'Pedido no encontrado en el registro local.' };
-    }
-    if (order.status === 'synced') {
-      return {
-        success: false,
-        message: `El pedido #${order.orderNumber} ya se encuentra sincronizado en Factusol (Nº ${order.factusolOrderNumber || '-'}).`,
-      };
-    }
-
-    const config = this.configManager.get();
-    const series = order.factusolSeries || config.factusol?.orderSeries || '1';
-    const warehouse = config.factusol?.warehouseCode || 'GEN';
-
-    const canonicalOrder = {
-      id: order.webOrderId,
-      orderNumber: order.orderNumber,
-      reference: order.orderNumber,
-      orderDate: order.date || new Date().toISOString(),
-      status: 'processing',
-      customer: {
-        id: order.webOrderId,
-        name: order.customerName,
-        email: order.customerEmail || 'cliente@tienda.com',
-        phone: order.customerPhone || '',
-      },
-      shippingAddress: {
-        firstName: order.customerName.split(' ')[0] || 'Cliente',
-        lastName: order.customerName.split(' ').slice(1).join(' ') || '',
-        street: order.shippingAddress || '',
-        city: '',
-        postalCode: '',
-        country: 'ES',
-        phone: order.customerPhone || '',
-        email: order.customerEmail || '',
-      },
-      billingAddress: {
-        firstName: order.customerName.split(' ')[0] || 'Cliente',
-        lastName: order.customerName.split(' ').slice(1).join(' ') || '',
-        street: order.shippingAddress || '',
-        city: '',
-        postalCode: '',
-        country: 'ES',
-        phone: order.customerPhone || '',
-        email: order.customerEmail || '',
-      },
-      lines: (order.lines || []).map((l, idx) => ({
-        id: `line-${idx + 1}`,
-        sku: l.sku,
-        name: l.name,
-        quantity: l.quantity,
-        unitPrice: l.unitPrice,
-        total: l.total,
-        taxRate: 21,
-        taxAmount: Math.round(l.total * 0.21 * 100) / 100,
-      })),
-      totals: {
-        subtotal: Math.round((order.totalAmount / 1.21) * 100) / 100,
-        tax: Math.round((order.totalAmount - order.totalAmount / 1.21) * 100) / 100,
-        total: order.totalAmount,
-        discount: 0,
-        shipping: 0,
-      },
-      paymentMethod: order.paymentMethod || 'Web',
-      currency: order.currency || 'EUR',
-      series,
-      warehouse,
-    };
-
-    let connector = this.factusolService.getConnector();
-    if (!connector) {
-      const connected = await this.factusolService.connect();
-      if (!connected) {
-        const err = 'No se pudo conectar con la base de datos de Factusol.';
-        this.salesLedgerManager.markOrderRetried(id, 'failed', err);
-        return { success: false, message: err };
-      }
-      connector = this.factusolService.getConnector();
-    }
-    if (!connector) {
-      const err = 'Driver OLEDB de Factusol no inicializado.';
-      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
-      return { success: false, message: err };
-    }
-
-    const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
-    if (!plausibility.valid || !plausibility.sanitizedOrder) {
-      const err = `Pedido descartado por validación de seguridad: ${plausibility.error}`;
-      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
-      return { success: false, message: err };
-    }
-    const safeOrder = plausibility.sanitizedOrder;
-
-    try {
-      const res = await connector.createOrder(safeOrder as any);
-      if (res.success) {
-        const assignedNum = String(res.externalId || res.orderNumber || order.webOrderId);
-        const updated = this.salesLedgerManager.markOrderRetried(id, 'synced', undefined, assignedNum, series);
-        this.addEvent('success', `✓ Reintento exitoso: Pedido #${order.orderNumber} registrado en Factusol (Nº ${assignedNum}).`);
-        AgentDiskLogger.getInstance().log({
-          level: 'SUCCESS',
-          component: 'SalesLedger',
-          action: 'retry_sales_order',
-          status: 'SUCCESS',
-          message: `Reintento exitoso: Pedido #${order.orderNumber} -> Factusol Nº ${assignedNum}`,
-          metadata: { orderId: id, factusolOrderNumber: assignedNum, series },
-        });
-        return {
-          success: true,
-          message: `Pedido #${order.orderNumber} insertado correctamente en Factusol (Serie ${series}, Pedido #${assignedNum}).`,
-          order: updated || undefined,
-        };
-      } else {
-        const errMsg = res.error || 'Error desconocido al registrar pedido en Factusol';
-        this.salesLedgerManager.markOrderRetried(id, 'failed', errMsg);
-        this.addEvent('warn', `Aviso en reintento de pedido #${order.orderNumber}: ${errMsg}`);
-        return { success: false, message: `No se pudo registrar en Factusol: ${errMsg}` };
-      }
-    } catch (retryErr) {
-      const msg = retryErr instanceof Error ? retryErr.message : String(retryErr);
-      this.salesLedgerManager.markOrderRetried(id, 'failed', msg);
-      return { success: false, message: `Error durante el reintento: ${msg}` };
-    }
+    return this.salesOrderManager.retrySalesOrder(id);
   }
 
-  public getSystemInfo(): AgentSystemInfo {
-    return SystemInfoService.getSystemInfo();
-  }
+  public getSystemInfo(): AgentSystemInfo { return SystemInfoService.getSystemInfo(); }
+  public async getHWID(): Promise<string> { return this.licenseService.getHWID(); }
+  public exportDiagnostic(): string { return this.statusAggregator.exportDiagnostic(); }
 
-  public async getHWID(): Promise<string> {
-    return this.licenseService.getHWID();
-  }
-
-  public exportDiagnostic(): string {
-    const cfg = this.configManager.get();
-    const licStatus = this.licenseService.getLicenseStatus();
-    return DiagnosticExporter.generate({
-      config: cfg,
-      configFilePath: this.configManager.getConfigFilePath(),
-      currentVersion: this.configManager.getVersion(),
-      currentHwid: 'Cargando HWID...',
-      licenseStatus: licStatus.status,
-      activePlan: licStatus.plan,
-      watcherActive: this.fileWatcherService.isActive(),
-      syncHistory: this.historyManager.getSyncHistory(),
-      recentEvents: this.eventBus.getRecentEvents(),
-      preflight: (this.preflightHealthService as any).cachedReport || undefined,
-    });
-  }
-
-  public async reportIncident(payload: {
-    contact: string;
-    category: string;
-    description: string;
-    includeDiagnostics?: boolean;
-    timestamp?: string;
-  }): Promise<{ success: boolean; ticketId: string; message: string; cloudReceived: boolean }> {
-    const ticketId = `#INC-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const cfg = this.configManager.get();
-    const hwid = await this.getHWID();
-    const licStatus = this.licenseService.getLicenseStatus();
-    const diagnosticsText = payload.includeDiagnostics !== false ? this.exportDiagnostic() : null;
-
-    const incidentRecord = {
-      ticketId,
-      createdAt: new Date().toISOString(),
-      contact: payload.contact,
-      category: payload.category || 'other',
-      description: payload.description,
-      agentId: cfg.agentId || 'ag_local',
-      organizationId: cfg.organizationId || 'org_default',
-      appVersion: this.getVersion(),
-      hwid,
-      licenseKey: cfg.licenseKey ? `${cfg.licenseKey.substring(0, 8)}...` : 'Sin clave',
-      plan: licStatus.plan,
-      diagnostics: diagnosticsText
-    };
-
-    // 1. Persistencia local en %APPDATA%\\Bentian Agent\\incidents\\ (Regla 1 AppData)
-    try {
-      const appDataDir = path.dirname(this.configManager.getConfigFilePath());
-      const incidentsDir = path.join(appDataDir, 'incidents');
-      if (!fs.existsSync(incidentsDir)) {
-        fs.mkdirSync(incidentsDir, { recursive: true });
-      }
-      const tempFile = path.join(incidentsDir, `incident-${ticketId.replace('#', '')}.tmp`);
-      const finalFile = path.join(incidentsDir, `incident-${ticketId.replace('#', '')}.json`);
-      fs.writeFileSync(tempFile, JSON.stringify(incidentRecord, null, 2), 'utf8');
-      fs.renameSync(tempFile, finalFile);
-    } catch (err) {
-      this.logger.warn('Aviso: no se pudo guardar copia local de la incidencia:', { err: String(err) });
-    }
-
-    // 2. Intentar despacho al servidor central si hay conectividad
-    let cloudReceived = false;
-    let serverMessage = 'Incidencia registrada y asignada al equipo de soporte técnico.';
-    const apiBaseUrl = cfg.apiBaseUrl || 'https://bridge.cristianjm.com';
-
-    try {
-      const res = await fetch(`${apiBaseUrl}/api/v1/agents/fleet/report-incident`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ticketId,
-          contact: payload.contact,
-          category: payload.category,
-          description: payload.description,
-          diagnostics: diagnosticsText,
-          agentId: cfg.agentId || 'ag_local',
-          organizationId: cfg.organizationId || 'org_default',
-          appVersion: this.getVersion(),
-          hwid
-        }),
-        signal: AbortSignal.timeout(6000)
-      });
-
-      if (res.ok) {
-        cloudReceived = true;
-        const data: any = await res.json().catch(() => ({}));
-        if (data.message) serverMessage = data.message;
-      }
-    } catch (netErr) {
-      this.logger.warn('No se pudo enviar la incidencia a la API central en este momento:', { err: String(netErr) });
-    }
-
-    this.logger.info(`Incidencia técnica registrada: ${ticketId} [${payload.category}]`);
-    this.eventBus.emit('event', {
-      level: 'INFO',
-      component: 'Support',
-      action: 'incident_reported',
-      message: `Incidencia técnica registrada: ${ticketId} (${payload.category})`
-    });
-
-    return {
-      success: true,
-      ticketId,
-      cloudReceived,
-      message: cloudReceived
-        ? serverMessage
-        : `La incidencia se ha registrado en el equipo con el ticket ${ticketId}. Guardada copia técnica local.`
-    };
+  public async reportIncident(payload: IncidentReportPayload): Promise<IncidentReportResult> {
+    return this.incidentReporter.reportIncident(payload);
   }
 
   public async getPreflightHealth(force = false): Promise<PreflightHealthReport> {
@@ -565,142 +258,18 @@ export class LocalAgent {
   }
 
   public async getStatusDetails(): Promise<AgentStatusDetails> {
-    const hwid = await this.licenseService.getHWID();
-    const now = Date.now();
-
-    let license: LicenseValidationStatus;
-    if (this.cachedLicenseVal && now - this.cachedLicenseVal.timestamp < 60_000) {
-      license = this.cachedLicenseVal.data;
-    } else {
-      license = await this.licenseService.validateLicense();
-      this.cachedLicenseVal = { data: license, timestamp: now };
-    }
-
-    const cfg = this.configManager.get();
-    const rawDbPath = cfg.factusol?.databasePath || cfg.factusolDbPath || '';
-    const dbPath = FactusolPathResolver.cleanPath(rawDbPath);
-
-    let preflight: PreflightHealthReport | undefined;
-    try {
-      preflight = await this.getPreflightHealth();
-    } catch {
-      // Ignorar excepciones para proteger telemetría del dashboard
-    }
-
-    let articleCount: number | undefined;
-    let fileSizeBytes: number | undefined;
-    let connected = false;
-    let statusMessage = dbPath ? 'Desconectado / Offline (Ruta de red o disco no accesible)' : 'No configurado';
-
-    let effectivePath = dbPath;
-    if (effectivePath && !fs.existsSync(effectivePath)) {
-      const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(effectivePath);
-      if (uncFallback && fs.existsSync(uncFallback)) {
-        effectivePath = uncFallback;
-      }
-    }
-
-    if (effectivePath && fs.existsSync(effectivePath)) {
-      try {
-        const stats = fs.statSync(effectivePath);
-        fileSizeBytes = stats.size;
-
-        if (this.cachedFactusolHealth && now - this.cachedFactusolHealth.timestamp < 30_000) {
-          connected = this.cachedFactusolHealth.connected;
-          statusMessage = this.cachedFactusolHealth.statusMessage;
-          articleCount = this.cachedFactusolHealth.articleCount;
-        } else {
-          const connector = this.factusolService.getConnector();
-          if (connector) {
-            const health = await connector.healthCheck();
-            connected = health.status === 'HEALTHY';
-            statusMessage = health.message || '';
-            if (connected) {
-              articleCount = await this.factusolService.getArticleCount(effectivePath);
-            }
-          }
-          this.cachedFactusolHealth = { connected, statusMessage, articleCount, timestamp: now };
-        }
-      } catch (err) {
-        statusMessage = err instanceof Error ? err.message : String(err);
-      }
-    }
-
-    const safeWoo = cfg.woocommerce ? {
-      ...cfg.woocommerce,
-      consumerSecret: cfg.woocommerce.consumerSecret ? SECRET_MASK : '',
-    } : cfg.woocommerce;
-
-    const safeUniv = cfg.universalBridge ? {
-      ...cfg.universalBridge,
-      secretKey: cfg.universalBridge.secretKey ? SECRET_MASK : '',
-      dbPass: cfg.universalBridge.dbPass ? SECRET_MASK : '',
-    } : cfg.universalBridge;
-
-    const safeNotif = cfg.notifications ? {
-      ...cfg.notifications,
-      smtpPass: cfg.notifications.smtpPass ? SECRET_MASK : '',
-    } : cfg.notifications;
-
-    const safeShopify = cfg.shopify ? { ...cfg.shopify, accessToken: cfg.shopify.accessToken ? SECRET_MASK : '' } : cfg.shopify;
-    const safeHolded = cfg.holded ? { ...cfg.holded, apiKey: cfg.holded.apiKey ? SECRET_MASK : '' } : cfg.holded;
-
-    return {
-      agentName: cfg.agentName || 'Bentian Agent',
-      agentVersion: this.configManager.getVersion(),
-      agentId: cfg.agentId || 'Sin registrar (Modo Standalone)',
-      apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
-      licenseKey: cfg.licenseKey,
-      hwid,
-      license,
-      factusol: {
-        configured: Boolean(dbPath),
-        databasePath: dbPath || '',
-        fileName: dbPath ? path.basename(dbPath) : '',
-        connected,
-        watcherActive: this.fileWatcherService.isActive(),
-        articleCount,
-        fileSizeBytes,
-        statusMessage,
-      },
-      factusolSettings: cfg.factusol,
-      woocommerceSettings: safeWoo,
-      universalBridgeSettings: safeUniv,
-      shopifySettings: safeShopify,
-      holdedSettings: safeHolded,
-      channelType: cfg.channelType || 'woocommerce',
-      syncRules: cfg.syncRules,
-      notifications: safeNotif,
-      syncHistory: this.historyManager.getSyncHistory(),
-      system: SystemInfoService.getSystemInfo(),
-      recentEvents: this.eventBus.getRecentEvents(),
-      update: this.getUpdateStatus(),
-      preflight,
-    };
+    return this.statusAggregator.getStatusDetails();
   }
 
-  private resolveNotificationSettings(customSettings?: AgentNotificationSettings): AgentNotificationSettings {
-    const cfg = this.configManager.get();
-    const settings = customSettings || cfg.notifications || {};
-    return {
-      ...settings,
-      smtpPass: customSettings && isSecretMaskedOrEmpty(customSettings.smtpPass) && cfg.notifications?.smtpPass
-        ? cfg.notifications.smtpPass : settings.smtpPass,
-      telegramBotToken: customSettings && isSecretMaskedOrEmpty(customSettings.telegramBotToken) && cfg.notifications?.telegramBotToken
-        ? cfg.notifications.telegramBotToken : settings.telegramBotToken,
-    };
-  }
-
+  // --- Métodos de Notificaciones Delegados ---
   public async testEmailNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
-    return OrderNotifierService.sendTestEmail(this.resolveNotificationSettings(custom));
+    return this.notificationTester.testEmailNotification(custom);
   }
-
   public async testTelegramNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
-    return OrderNotifierService.sendTestTelegram(this.resolveNotificationSettings(custom));
+    return this.notificationTester.testTelegramNotification(custom);
   }
-
   public async testDiscordNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
-    return OrderNotifierService.sendTestDiscord(this.resolveNotificationSettings(custom));
+    return this.notificationTester.testDiscordNotification(custom);
   }
 
   public async getLiveHealth(): Promise<LiveHealthReport> {
@@ -723,111 +292,29 @@ export class LocalAgent {
   }
   public resolveFactusolPath(inputPath: string): PathResolutionResult { return FactusolPathResolver.resolve(inputPath); }
 
-  // --- Métodos de Canales Web ---
+  // --- Métodos de Canales Web Delegados ---
   public async testWooCommerceConnection(settings: { storeUrl: string; consumerKey: string; consumerSecret: string }): Promise<WooCommerceTestResult> {
-    const cfg = this.configManager.get();
-    let finalSecret = settings.consumerSecret;
-    if (isSecretMaskedOrEmpty(finalSecret) && cfg.woocommerce?.consumerSecret) {
-      finalSecret = cfg.woocommerce.consumerSecret;
-    }
-    return WooCommerceTester.test({ ...settings, consumerSecret: finalSecret });
+    return this.channelTester.testWooCommerceConnection(settings);
   }
-
   public async testUniversalBridge(settings: { storeUrl: string; secretKey?: string }): Promise<UniversalBridgeTestResult> {
-    const cfg = this.configManager.get();
-    let finalKey = settings.secretKey;
-    if (isSecretMaskedOrEmpty(finalKey) && cfg.universalBridge?.secretKey) {
-      finalKey = cfg.universalBridge.secretKey;
-    }
-    return UniversalBridgeTester.test({ ...settings, secretKey: finalKey });
+    return this.channelTester.testUniversalBridge(settings);
   }
-
-  public async testShopifyConnection(settings: {
-    shopSubdomain: string;
-    accessToken: string;
-    apiVersion?: string;
-  }): Promise<ShopifyTestResult> {
-    const cfg = this.configManager.get();
-    const finalToken = (isSecretMaskedOrEmpty(settings.accessToken) && cfg.shopify?.accessToken) ? cfg.shopify.accessToken : settings.accessToken;
-    return ShopifyTester.test({ ...settings, accessToken: finalToken });
+  public async testShopifyConnection(settings: { shopSubdomain: string; accessToken: string; apiVersion?: string }): Promise<ShopifyTestResult> {
+    return this.channelTester.testShopifyConnection(settings);
   }
-
   public async testHoldedConnection(config: { apiKey: string; defaultWarehouseId?: string }): Promise<{ success: boolean; latencyMs: number; message?: string }> {
-    const cfg = this.configManager.get();
-    const finalApiKey = (isSecretMaskedOrEmpty(config?.apiKey) && cfg.holded?.apiKey) ? cfg.holded.apiKey : config?.apiKey;
-    if (!finalApiKey || isSecretMaskedOrEmpty(finalApiKey)) {
-      return { success: false, latencyMs: 0, message: 'La API Key de Holded no puede estar vacía.' };
-    }
-    try {
-      const client = new HoldedClient({ apiKey: finalApiKey.trim(), defaultWarehouseId: config?.defaultWarehouseId?.trim() || cfg.holded?.defaultWarehouseId });
-      const result = await client.testConnection();
-      return {
-        success: result.success,
-        latencyMs: result.latencyMs,
-        message: result.success ? `Conexión con Holded Cloud verificada correctamente (${result.latencyMs} ms).` : 'No se pudo conectar con la API de Holded. Verifica tu API Key.',
-      };
-    } catch (err: any) {
-      return { success: false, latencyMs: 0, message: `Error al conectar con Holded: ${err?.message || String(err)}` };
-    }
+    return this.channelTester.testHoldedConnection(config);
   }
 
   // --- Métodos de Sincronización ---
-  public async triggerManualSync(): Promise<SyncManualResult> {
-    return this.syncEngine.triggerManualSync();
-  }
-
+  public async triggerManualSync(): Promise<SyncManualResult> { return this.syncEngine.triggerManualSync(); }
   public async uploadCatalog(options?: { limit?: number; onlyMissing?: boolean }): Promise<CatalogUploadResult> {
     return this.syncEngine.uploadCatalog(options);
   }
 
   // --- Ciclo de Vida del Agente ---
-  public async pair(pairingToken: string, customName?: string): Promise<{
-    agentId: string;
-    detectedFactusol: FactusolDetectedInstance[];
-  }> {
-    const cfg = this.configManager.get();
-    const name = customName || cfg.agentName || os.hostname();
-    this.logger.info(`Iniciando emparejamiento con el Core (Token: ${pairingToken})...`);
-
-    const detected = FactusolDetector.detectAll(cfg.factusolDbPath ? [path.dirname(cfg.factusolDbPath)] : []);
-    const primary = detected.length > 0 ? detected[0] : null;
-
-    const requestPayload: AgentPairingRequest = {
-      pairingToken,
-      name,
-      systemInfo: SystemInfoService.getSystemInfo(),
-      detectedFactusol: detected,
-    };
-
-    const response = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/pair`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-
-    if (!response.ok) {
-      const errBody = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
-      throw new Error(errBody.error?.message || `Fallo al emparejar con el servidor: HTTP ${response.status}`);
-    }
-
-    const resJson = (await response.json()) as {
-      data: { agent: { id: string; name: string }; authToken: string };
-    };
-
-    cfg.agentId = resJson.data.agent.id;
-    cfg.agentName = resJson.data.agent.name;
-    cfg.authToken = resJson.data.authToken;
-    if (primary) {
-      cfg.factusolDbPath = primary.databasePath;
-    }
-
-    this.configManager.saveConfigToDisk();
-    this.logger.info(`Emparejamiento exitoso. Agent ID: ${cfg.agentId}`);
-
-    return {
-      agentId: resJson.data.agent.id,
-      detectedFactusol: detected,
-    };
+  public async pair(pairingToken: string, customName?: string): Promise<{ agentId: string; detectedFactusol: FactusolDetectedInstance[] }> {
+    return this.pairingService.pair(pairingToken, customName);
   }
 
   public async start(): Promise<void> {
@@ -853,7 +340,6 @@ export class LocalAgent {
       this.addEvent('warn', `⚠️ Licencia no activa (${licenseCheck.status}). Active su clave para sincronizar.`);
     }
 
-    // Auto-detect Factusol if not already set
     if (!cfg.factusolDbPath) {
       const primary = FactusolDetector.getPrimaryInstance();
       if (primary) {
@@ -862,61 +348,10 @@ export class LocalAgent {
       }
     }
 
-    // Conectar Factusol e inicializar vigilante
     if (cfg.factusolDbPath && fs.existsSync(cfg.factusolDbPath)) {
       await this.factusolService.connect(cfg.factusolDbPath);
-
       this.fileWatcherService.start(cfg.factusolDbPath, cfg.organizationId || 'org_default', async (reason) => {
-        this.logger.info(`Cambio detectado en base Factusol (${reason}). Disparando sincronización de stock autónoma...`);
-        this.addEvent('info', `Cambio detectado en Factusol (${reason}). Sincronizando stock...`);
-        AgentDiskLogger.getInstance().log({
-          level: 'INFO',
-          component: 'FileWatcher',
-          action: 'file_change_detected',
-          duration_ms: 0,
-          status: 'SUCCESS',
-          message: `Cambio en Factusol detectado por vigilante en tiempo real (${reason}). Sincronizando stock...`,
-          metadata: { reason, databasePath: cfg.factusolDbPath },
-        });
-
-        const lic = this.licenseService.getLicenseStatus();
-        if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
-          return;
-        }
-
-        if (!this.syncEngine.isBusy()) {
-          void this.syncEngine.triggerManualSync(false);
-        }
-        if (cfg.agentId && cfg.apiBaseUrl) {
-          const tNotify = performance.now();
-          await fetch(`${cfg.apiBaseUrl}/api/v1/sync/run-reactive`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(cfg.authToken ? { Authorization: `Bearer ${cfg.authToken}` } : {}),
-            },
-            body: JSON.stringify({
-              agentId: cfg.agentId,
-              organizationId: cfg.organizationId,
-              reason,
-              timestamp: new Date().toISOString(),
-            }),
-          })
-            .then((res) => {
-              const dur = Math.round(performance.now() - tNotify);
-              AgentDiskLogger.getInstance().log({
-                level: res.ok ? 'DEBUG' : 'WARN',
-                component: 'FileWatcher',
-                action: 'notify_reactive_sync',
-                duration_ms: dur,
-                status: res.ok ? 'SUCCESS' : 'FAILURE',
-                message: `Notificación de sincronización reactiva a la API (${dur}ms, HTTP ${res.status})`,
-              });
-            })
-            .catch((err) => {
-              this.logger.warn(`No se pudo notificar sync reactivo a la API: ${err instanceof Error ? err.message : String(err)}`);
-            });
-        }
+        await this.fileWatcherCoordinator.handleFileWatcherChange(reason);
       });
       this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
     }
@@ -930,186 +365,13 @@ export class LocalAgent {
       }
     }, 3000);
 
-    this.startHeartbeat();
+    this.heartbeatService.start(() => this.isRunning);
     this.licenseService.startValidationLoop();
     this.updateClient.startPeriodicCheck();
   }
 
-  private startHeartbeat(): void {
-    const sendBeat = async () => {
-      if (!this.isRunning) return;
-      const cfg = this.configManager.get();
-      const hwid = await this.licenseService.getHWID().catch(() => 'unknown_hwid');
-      const effectiveAgentId = cfg.agentId || `ag_${hwid.substring(0, 16)}`;
-
-      try {
-        let factusolHealth: any;
-        const connector = this.factusolService.getConnector();
-        if (connector) {
-          const check = await connector.healthCheck();
-          const count = await this.factusolService.getArticleCount(cfg.factusolDbPath).catch(() => undefined);
-          factusolHealth = {
-            status: check.status,
-            latencyMs: check.latencyMs,
-            databasePath: cfg.factusolDbPath,
-            message: check.message,
-            articleCount: count,
-          };
-        }
-
-        const heartbeat: AgentHeartbeatPayload & Record<string, any> = {
-          agentId: effectiveAgentId,
-          hwid,
-          version: this.configManager.getVersion(),
-          status: 'ONLINE',
-          systemInfo: SystemInfoService.getSystemInfo(),
-          factusolHealth,
-          fileWatcherActive: this.fileWatcherService.isActive(),
-          channelInfo: {
-            channelType: cfg.channelType || (cfg.universalBridge?.storeUrl ? 'universal_bridge' : 'woocommerce'),
-            storeUrl: cfg.universalBridge?.storeUrl || cfg.woocommerce?.storeUrl || '',
-          },
-        };
-
-        if (cfg.apiBaseUrl) {
-          const tBeatNetStart = performance.now();
-          const res = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/${effectiveAgentId}/heartbeat`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(cfg.authToken ? { Authorization: `Bearer ${cfg.authToken}` } : {}),
-            },
-            body: JSON.stringify(heartbeat),
-          }).catch(() => null);
-          const beatLatencyMs = Math.round(performance.now() - tBeatNetStart);
-
-          AgentDiskLogger.getInstance().log({
-            level: res && res.ok ? 'INFO' : 'WARN',
-            component: 'Heartbeat',
-            action: 'send_heartbeat',
-            duration_ms: beatLatencyMs,
-            status: res && res.ok ? 'SUCCESS' : 'FAILURE',
-            message: res && res.ok
-              ? `Latido Heartbeat enviado a ${cfg.apiBaseUrl} en ${beatLatencyMs}ms (HTTP ${res.status})`
-              : `Aviso en latido Heartbeat al Core tras ${beatLatencyMs}ms (${res ? `HTTP ${res.status}` : 'Sin respuesta de red'})`,
-            metadata: {
-              agentId: effectiveAgentId,
-              apiBaseUrl: cfg.apiBaseUrl,
-              factusolStatus: factusolHealth?.status,
-              factusolLatencyMs: factusolHealth?.latencyMs,
-              articleCount: factusolHealth?.articleCount,
-              fileWatcherActive: this.fileWatcherService.isActive(),
-            },
-          });
-
-          if (res && res.ok) {
-            try {
-              const resJson = (await res.json()) as {
-                data?: {
-                  updateAvailable?: boolean;
-                  targetVersion?: string;
-                  updateInfo?: any;
-                };
-              };
-              if (resJson.data?.updateAvailable && !this.isUpdating) {
-                this.logger.info(`🔥 Nueva versión detectada en latido Heartbeat: v${resJson.data.targetVersion}`);
-                void this.applyUpdateFromInfo(resJson.data.updateInfo || { version: resJson.data.targetVersion! });
-              }
-            } catch {}
-          }
-        }
-      } catch (err) {
-        this.logger.warn('Fallo al emitir heartbeat al Core', { err: String(err) });
-      }
-    };
-
-    void sendBeat();
-    const cfg = this.configManager.get();
-    this.heartbeatTimer = setInterval(sendBeat, cfg.heartbeatIntervalMs || 30000);
-  }
-
-  public async applyUpdateFromInfo(info: {
-    version: string;
-    downloadUrl?: string;
-    sha256?: string;
-    signature?: string;
-  }): Promise<void> {
-    if (this.isUpdating) return;
-    this.isUpdating = true;
-    const tUpdateStart = performance.now();
-
-    if (!info.version || !VERSION_REGEX.test(info.version)) {
-      this.logger.error(`Versión de actualización sospechosa o no válida: "${info.version}". Rechazando actualización.`);
-      this.isUpdating = false;
-      return;
-    }
-
-    if (!this.autoUpdater.isNewer(info.version, this.configManager.getVersion())) {
-      this.logger.warn(`Versión de actualización v${info.version} no es superior a la versión actual v${this.configManager.getVersion()}. Rechazando posible intento de downgrade.`);
-      this.isUpdating = false;
-      return;
-    }
-
-    let downloadedFile: string | null = null;
-    try {
-      let { downloadUrl, sha256, signature } = info;
-      if (!downloadUrl || !sha256 || !signature) {
-        const check = await this.autoUpdater.checkForUpdate();
-        if (!check.available || !check.downloadUrl || !check.sha256 || !check.signature) {
-          this.isUpdating = false;
-          return;
-        }
-        downloadUrl = check.downloadUrl;
-        sha256 = check.sha256;
-        signature = check.signature;
-      }
-
-      this.logger.info(`Iniciando auto-actualización silenciosa hacia v${info.version}...`);
-      const tDownloadStart = performance.now();
-      downloadedFile = await this.autoUpdater.downloadUpdate(downloadUrl, info.version);
-      const downloadMs = Math.round(performance.now() - tDownloadStart);
-
-      const tVerifyStart = performance.now();
-      const isValid = this.autoUpdater.verifyUpdate(downloadedFile, sha256, signature);
-      const verifyMs = Math.round(performance.now() - tVerifyStart);
-
-      if (!isValid) {
-        if (downloadedFile && fs.existsSync(downloadedFile)) {
-          try { fs.unlinkSync(downloadedFile); } catch {}
-        }
-        this.logger.error(`Firma o integridad inválida para v${info.version}. Actualización rechazada de forma segura.`);
-        await this.autoUpdater.reportStatus(info.version, 'failed', 'Fallo de verificación criptográfica Ed25519');
-        AgentDiskLogger.getInstance().log({
-          level: 'ERROR',
-          component: 'AutoUpdater',
-          action: 'apply_update',
-          duration_ms: Math.round(performance.now() - tUpdateStart),
-          status: 'FAILURE',
-          message: `Firma criptográfica inválida para v${info.version}`,
-        });
-        this.isUpdating = false;
-        return;
-      }
-
-      this.logger.info(`✓ Verificación criptográfica exitosa. Aplicando reemplazo atómico en Windows...`);
-      AgentDiskLogger.getInstance().log({
-        level: 'SUCCESS',
-        component: 'AutoUpdater',
-        action: 'apply_update',
-        duration_ms: Math.round(performance.now() - tUpdateStart),
-        status: 'SUCCESS',
-        message: `Actualización a v${info.version} descargada (${downloadMs}ms) y verificada (${verifyMs}ms). Iniciando reemplazo.`,
-        metadata: { version: info.version, downloadMs, verifyMs },
-      });
-      await this.autoUpdater.applyUpdate(downloadedFile, undefined, true, sha256);
-    } catch (err) {
-      if (downloadedFile && fs.existsSync(downloadedFile)) {
-        try { fs.unlinkSync(downloadedFile); } catch {}
-      }
-      this.logger.error(`Error durante el ciclo de actualización automática: ${String(err)}`);
-      await this.autoUpdater.reportStatus(info.version, 'failed', String(err));
-      this.isUpdating = false;
-    }
+  public async applyUpdateFromInfo(info: { version: string; downloadUrl?: string; sha256?: string; signature?: string }): Promise<void> {
+    return this.updateOrchestrator.applyUpdateFromInfo(info);
   }
 
   public async checkForUpdates(channel?: UpdateChannel): Promise<UpdateCheckResponse> {
@@ -1125,16 +387,7 @@ export class LocalAgent {
   }
 
   public async checkForUpdatesAndApply(): Promise<void> {
-    if (this.isUpdating) return;
-    try {
-      const check = await this.checkForUpdates();
-      if (check.available && check.version && check.downloadUrl && check.sha256 && check.signature) {
-        this.logger.info(`Nueva versión detectada al iniciar: v${check.version}`);
-        await this.applyUpdate();
-      }
-    } catch (err) {
-      this.logger.warn(`Aviso en comprobación inicial de actualizaciones: ${String(err)}`);
-    }
+    return this.updateOrchestrator.checkForUpdatesAndApply();
   }
 
   // --- Métodos de Arranque Automático (Windows) ---
@@ -1161,10 +414,7 @@ export class LocalAgent {
   public async stop(): Promise<void> {
     this.isRunning = false;
     this.syncEngine.stopAutoSyncLoop();
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
+    this.heartbeatService.stop();
     this.updateClient.stopPeriodicCheck();
     this.licenseService.stopValidationLoop();
     this.fileWatcherService.stop();
@@ -1177,3 +427,6 @@ export class LocalAgent {
     this.logger.info('ERP Bridge Local Agent detenido con éxito.');
   }
 }
+
+// Alias de conveniencia
+export { LocalAgent as Agent };

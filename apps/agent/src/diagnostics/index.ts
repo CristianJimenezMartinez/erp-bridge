@@ -7,3 +7,4 @@ export * from './preflight-probes';
 export * from './preflight-health.service';
 export * from './disk-logger';
 export * from './live-health.service';
+export * from './incident-reporter.service';

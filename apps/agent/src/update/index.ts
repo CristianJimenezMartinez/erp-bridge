@@ -4,3 +4,4 @@ export * from './update.swapper';
 export * from './update.client';
 export * from './auto-updater';
 export * from './update-supervisor';
+export * from './update-orchestrator.service';
