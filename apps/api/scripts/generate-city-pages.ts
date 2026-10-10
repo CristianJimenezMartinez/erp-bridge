@@ -40,13 +40,6 @@ const SITEMAP_FILE = path.resolve(PUBLIC_DIR, 'sitemap.xml');
 const CITIES_OUTPUT_ROOT = path.resolve(PUBLIC_DIR, 'conector-factusol');
 
 function getCanonicalVersion(): string {
-  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
-  if (fs.existsSync(latestJsonPath)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
-      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
-    } catch {}
-  }
   const rootPkgPath = path.resolve(__dirname, '../../../package.json');
   if (fs.existsSync(rootPkgPath)) {
     try {
@@ -54,7 +47,14 @@ function getCanonicalVersion(): string {
       if (pkg.version) return String(pkg.version).replace(/^v/, '').trim();
     } catch {}
   }
-  return '0.3.5';
+  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
+  if (fs.existsSync(latestJsonPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
+      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
+    } catch {}
+  }
+  return '0.4.0';
 }
 
 function renderHeader(currentVersion: string): string {

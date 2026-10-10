@@ -25,21 +25,21 @@ const CONTENT_SECTIONS = [
 ];
 
 export function getCanonicalVersion(): string {
-  // 1. releases/latest.json
-  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
-  if (fs.existsSync(latestJsonPath)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
-      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
-    } catch {}
-  }
-
-  // 2. Monorepo root package.json
+  // 1. Monorepo root package.json (Single Source of Truth)
   const rootPkgPath = path.resolve(__dirname, '../../../package.json');
   if (fs.existsSync(rootPkgPath)) {
     try {
       const pkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8'));
       if (pkg.version) return String(pkg.version).replace(/^v/, '').trim();
+    } catch {}
+  }
+
+  // 2. releases/latest.json
+  const latestJsonPath = path.resolve(__dirname, '../../../releases/latest.json');
+  if (fs.existsSync(latestJsonPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(latestJsonPath, 'utf8'));
+      if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
     } catch {}
   }
 
@@ -52,7 +52,7 @@ export function getCanonicalVersion(): string {
     } catch {}
   }
 
-  return '0.3.5';
+  return '0.4.0';
 }
 
 export function assembleLandingPage(): string {

@@ -129,7 +129,7 @@ export const logsScript = `
         '   BENTIAN ERP BRIDGE - INFORME TÉCNICO DE SOPORTE',
         '==================================================',
         'Fecha de Captura: ' + new Date().toLocaleString(),
-        'Versión Agente:   v' + (s.agentVersion || s.version || '0.3.8'),
+        'Versión Agente:   v' + (s.agentVersion || s.version || '0.4.0'),
         'Equipo Hostname:  ' + (s.hostname || 'Local'),
         'HWID Fingerprint: ' + (s.hwid || 'N/A'),
         '--------------------------------------------------',
