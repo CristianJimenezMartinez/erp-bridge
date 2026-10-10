@@ -197,3 +197,15 @@
 * **Mantenimiento Dual Mandatario:**
   - Cualquier actualización a las reglas debe aplicarse de forma estrictamente simultánea en `AGENTS.md` y `GEMINI.md`.
 
+---
+
+## 19. Disparadores CI/CD y Sincronización Mandatoria de Dependencias y Lockfile
+* **Sincronización Mandatoria de Lockfile (`pnpm-lock.yaml`):**
+  - Siempre que se añada, modifique, elimine o actualice cualquier dependencia, versión o script en cualquiera de los archivos `package.json` del monorepo, es **ESTRICTAMENTE OBLIGATORIO** ejecutar `pnpm install` localmente para regenerar `pnpm-lock.yaml`.
+  - Queda prohibido hacer commit o push sin verificar previamente en local que `pnpm install --frozen-lockfile --ignore-scripts` concluya con código de salida 0.
+* **Cobertura Completa de Rutas en Disparadores CI/CD (`deploy-hetzner.yml`):**
+  - El flujo de Continuous Deployment en GitHub Actions (`.github/workflows/deploy-hetzner.yml`) debe vigilar obligatoriamente en su bloque `paths:` los archivos de gestión de dependencias raíz: `package.json`, `pnpm-lock.yaml` y `pnpm-workspace.yaml`.
+  - Queda prohibido omitir estos archivos del trigger, garantizando que cualquier corrección de dependencias o actualización de lockfile dispare automáticamente el pipeline de auditoría Quality Gate y el despliegue al servidor de producción.
+* **Verificación Activa Post-Despliegue:**
+  - Tras cualquier despliegue a producción, el agente debe verificar activamente el estado del servidor mediante `curl.exe -i -L -k "https://bridge.cristianjm.com/health"` y comprobar que la versión reportada coincida con la versión canónica actual.
+

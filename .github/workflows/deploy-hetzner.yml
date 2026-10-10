@@ -9,6 +9,9 @@ on:
       - 'packages/**'
       - 'scripts/**'
       - '.github/workflows/deploy-hetzner.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
 
 jobs:
   deploy:
