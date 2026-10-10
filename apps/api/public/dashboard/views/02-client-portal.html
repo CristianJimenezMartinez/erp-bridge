@@ -128,6 +128,28 @@
           </div>
         </div>
 
+        <!-- SECCIÓN: CANALES Y WEBHOOKS EN TIEMPO REAL (SHOPIFY & HOLDED) -->
+        <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-semibold text-white">Canales y Webhooks en Tiempo Real</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">EN VIVO</span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                Integraciones activas de <strong class="text-zinc-200">Shopify</strong> (pedidos y stock) y <strong class="text-zinc-200">Holded</strong> (facturación y clientes) con verificación HMAC-SHA256.
+              </p>
+            </div>
+          </div>
+          <button data-action="switch-tab" data-tab="multichannel" id="btn-portal-open-multichannel" class="px-4 py-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-indigo-300 hover:text-white border border-indigo-500/20 text-xs font-semibold transition flex items-center gap-2 shrink-0 self-start md:self-auto cursor-pointer">
+            <span>Abrir Monitor de Webhooks y Canales</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
         <!-- GUÍA RÁPIDA EN 3 PASOS -->
         <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-5">
           <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono mb-4">Guía Rápida de Instalación en tu Servidor Factusol</h3>

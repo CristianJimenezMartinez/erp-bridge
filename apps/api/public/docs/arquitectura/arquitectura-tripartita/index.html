@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP</title>
-  <meta name="description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
-  <meta name="keywords" content="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+  <title>Arquitectura Tripartita: Shopify + Factusol + Holded ERP | Bentian</title>
+  <meta name="description" content="Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.">
+  <meta name="keywords" content="arquitectura tripartita shopify factusol holded, facturacion holded pedidos shopify factusol, conectar tienda online almacen fisico gestoria nube, sincronizar shopify factusol holded, flujo pedidos ecommerce almacen erp cloud, automatizar facturas holded pedidos factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
-  <link rel="canonical" href="https://bridge.cristianjm.com/docs/canales/prestashop/">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/">
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
@@ -15,10 +15,10 @@
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://bridge.cristianjm.com/docs/canales/prestashop/">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP">
-  <meta property="og:description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
+  <meta property="og:title" content="Arquitectura Tripartita: Shopify + Factusol + Holded ERP | Bentian">
+  <meta property="og:description" content="Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -30,9 +30,9 @@
     "@graph": [
       {
         "@type": "TechArticle",
-        "@id": "https://bridge.cristianjm.com/docs/canales/prestashop/#article",
-        "headline": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
-        "description": "Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.",
+        "@id": "https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/#article",
+        "headline": "Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud",
+        "description": "Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -69,14 +69,14 @@
           {
             "@type": "ListItem",
             "position": 3,
-            "name": "Canales eCommerce",
+            "name": "Arquitectura & Sincronización",
             "item": "https://bridge.cristianjm.com/docs/"
           },
           {
             "@type": "ListItem",
             "position": 4,
-            "name": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
-            "item": "https://bridge.cristianjm.com/docs/canales/prestashop/"
+            "name": "Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud",
+            "item": "https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/"
           }
         ]
       }
@@ -270,10 +270,10 @@
             </div>
           
             <div class="category-group" data-category="canales">
-              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-indigo-400">
-                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-indigo-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
                 <span>Canales eCommerce</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
@@ -284,7 +284,7 @@
                     </li>
                   
                     <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
-                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
+                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Conexión con PrestaShop 1.7 y 8.x mediante Webservices
                       </a>
                     </li>
@@ -311,10 +311,10 @@
             </div>
           
             <div class="category-group" data-category="arquitectura">
-              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-zinc-400">
-                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+              <div class="group flex items-center gap-2 px-2 py-1 mb-1.5 text-xs font-bold uppercase tracking-wider select-none text-indigo-400">
+                <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-indigo-400 group-hover:text-white transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
                 <span>Arquitectura & Sincronización</span>
-                
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
@@ -337,7 +337,7 @@
                     </li>
                   
                     <li data-title="arquitectura tripartita: tienda online + almacén local + facturación cloud" data-keywords="arquitectura tripartita shopify factusol holded, facturacion holded pedidos shopify factusol, conectar tienda online almacen fisico gestoria nube, sincronizar shopify factusol holded, flujo pedidos ecommerce almacen erp cloud, automatizar facturas holded pedidos factusol">
-                      <a href="/docs/arquitectura/arquitectura-tripartita/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                      <a href="/docs/arquitectura/arquitectura-tripartita/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
                         Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud
                       </a>
                     </li>
@@ -489,28 +489,28 @@
           <span>/</span>
           <a href="/docs/" class="hover:text-zinc-300 transition">Docs</a>
           <span>/</span>
-          <span class="text-zinc-400">Canales eCommerce</span>
+          <span class="text-zinc-400">Arquitectura & Sincronización</span>
           <span>/</span>
-          <span class="text-indigo-400 font-medium truncate max-w-xs">Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud</span>
         </nav>
 
         <!-- Article Header -->
         <div class="mb-8 pb-6 border-b border-white/[0.08]">
           <div class="flex items-center gap-2 mb-3">
             <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              Conector PrestaShop
+              Patrón Enterprise Tripartito
             </span>
             <span class="text-xs text-zinc-500">·</span>
-            <span class="text-xs text-zinc-500 font-mono">5 min de lectura</span>
+            <span class="text-xs text-zinc-500 font-mono">7 min de lectura</span>
             <span class="text-xs text-zinc-500">·</span>
             <span class="text-xs text-zinc-500 font-mono">Actualizado v0.4.0</span>
           </div>
 
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
-            Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+            Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Cómo activar los servicios web oficiales de PrestaShop, conceder permisos en recursos de pedidos/stock y mapear combinaciones.
+            Patrón de ingeniería empresarial para sincronizar Shopify/WooCommerce, almacén físico Factusol y facturación contable en Holded sin fricciones ni duplicidades.
           </p>
         </div>
 
@@ -518,94 +518,98 @@
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        PrestaShop dispone de una arquitectura nativa de servicios web (Webservices RESTful) que permite interactuar con su base de datos sin necesidad de instalar módulos no verificados. Bentian aprovecha este motor estándar para sincronizar pedidos, productos y stock disponible.
+        La mayoría de empresas comerciales en España operan hoy con un ecosistema híbrido: venden online en plataformas líderes como <strong>Shopify</strong> o <strong>WooCommerce</strong>, gestionan la logística, compras y almacén físico en <strong>Factusol</strong> en sus servidores locales de empresa, y coordinan la contabilidad, impuestos y facturación electrónica con su gestoría a través de <strong>Holded Cloud ERP</strong>. La <strong>Arquitectura Tripartita de Bentian ERP Bridge</strong> es el patrón de ingeniería distribuida que sincroniza estos tres pilares en un ciclo continuo, automatizado y a prueba de fallos.
       </p>
 
-      <h2 id="activar-webservices" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Activación del Servicio Web en PrestaShop</h2>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Accede al Backoffice de PrestaShop.</li>
-        <li>En el menú lateral, dirígete a <strong class="text-white">Parámetros avanzados → Webservice (Servicio web)</strong>.</li>
-        <li>Activa la casilla <strong class="text-emerald-400">Activar el servicio web de PrestaShop: SÍ</strong>.</li>
-        <li>Guarda los cambios.</li>
-      </ol>
-
-      <h2 id="generar-clave-api" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Creación de la Clave de Servicio Web</h2>
+      <h2 id="el-reto-omnicanal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Haz clic en <strong class="text-indigo-400">Añadir una nueva clave de servicio web</strong>. Puedes generar una clave aleatoria de 32 caracteres pulsando el botón <em>Generar</em>.
+        Cuando estos tres sistemas funcionan de forma desconectada, surgen fricciones críticas que frenan el crecimiento del negocio:
       </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Roturas de stock y sobreventas:</strong> Si un producto se vende en la tienda física de mostrador a las 11:00 y alguien lo compra en Shopify a las 11:05 porque el inventario no se actualizó, la empresa debe cancelar el pedido y sufrir daño reputacional.</li>
+        <li><strong>Doble entrada administrativa de pedidos:</strong> El personal de administración tiene que transcribir los pedidos de Shopify albarán por albarán en Factusol, y posteriormente volver a crear la factura en Holded para enviársela a la gestoría.</li>
+        <li><strong>Descuadres en el modelo 303 de IVA:</strong> Desfases entre las fechas de pedido de la tienda web y las fechas de facturación en la nube, provocando discrepancias tributarias con la AEAT.</li>
+      </ul>
 
-      <h2 id="recursos-necesarios" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Permisos en Recursos (GET / POST / PUT)</h2>
+      <h2 id="diagrama-flujo-tripartito" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Diagrama de Flujo Extremo a Extremo</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Marca los siguientes permisos para la clave generada:
+        Bentian orquesta el flujo de información de forma completamente desacoplada y orientada a eventos:
       </p>
-      <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
-          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
-            <tr>
-              <th class="px-4 py-2.5">Recurso</th>
-              <th class="px-4 py-2.5">GET (Ver)</th>
-              <th class="px-4 py-2.5">POST (Crear)</th>
-              <th class="px-4 py-2.5">PUT (Modificar)</th>
-              <th class="px-4 py-2.5 font-sans">Propósito</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">orders</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Descargar pedidos y marcar estado sincronizado.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">order_details</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Lectura de líneas de pedido y referencias.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">stock_availables</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Actualizar el stock disponible en tiempo real.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">products</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Consultar y sincronizar tarifas y referencias.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="p-5 rounded-2xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6 space-y-3">
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 1: TIENDA ONLINE (Shopify / WooCommerce) ]</div>
+        <div class="text-zinc-400">Cliente compra ➔ Pago confirmado ➔ Webhook TLS 1.3 con firma HMAC</div>
+        <div class="text-indigo-400">▼ (Descarga en milisegundos a cola local SQLite)</div>
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 2: ALMACÉN LOCAL (Factusol ERP) ]</div>
+        <div class="text-zinc-400">Ingesta atómica en F_PCL / F_LPC ➔ Reserva de stock DISSTO ➔ Impresión albarán picking</div>
+        <div class="text-indigo-400">▼ (Confirmación ACK & Emisión contable cloud)</div>
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 3: GESTORÍA & CONTABILIDAD (Holded Cloud ERP) ]</div>
+        <div class="text-zinc-400">Factura oficial generada ➔ Asiento en Libro Diario ➔ Sincronización bancaria y fiscal</div>
       </div>
 
-      <h2 id="prestashop-8" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Compatibilidad con PrestaShop 8 y PHP 8.x</h2>
+      <h2 id="fase-1-venta-checkout" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Fase 1 (Venta): Ingesta Reactiva del Pedido Web (Shopify)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge es compatible tanto con PrestaShop 1.7 como con las ediciones modernas de PrestaShop 8.x ejecutadas en servidores con PHP 8.1 o PHP 8.2.
+        En cuanto el cliente finaliza la compra en Shopify:
       </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li>Shopify emite un webhook seguro <code class="text-indigo-300 font-mono">orders/create</code> con el payload del pedido.</li>
+        <li>El agente de Bentian valida la firma criptográfica del header <code class="text-zinc-200 font-mono">X-Shopify-Hmac-Sha256</code> para garantizar autenticidad.</li>
+        <li>Desglosa los importes brutos, netos, cuotas de IVA (21%, 10%, 4%) y Recargo de Equivalencia si el cliente es comerciante minorista.</li>
+      </ul>
 
-      <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Configuración en Bentian ERP Bridge</h2>
+      <h2 id="fase-2-operaciones-almacen" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Fase 2 (Operaciones): Inyección Atómica en Factusol y Stock</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En el panel de control de Bentian, selecciona la plataforma <strong>PrestaShop</strong>, introduce la URL base de tu tienda y la clave de Webservice generada. Haz clic en <strong>Probar Conexión</strong> para confirmar la sincronización.
+        Sin que intervenga ningún usuario humano, el agente procesa el pedido en la red local de la empresa:
       </p>
+      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+        <li>Abre una transacción atómica OLEDB sobre el archivo <code class="text-zinc-200 font-mono">.accdb</code> de Factusol.</li>
+        <li>Crea o localiza la ficha del cliente en <code class="text-indigo-300 font-mono">F_CLI</code> por CIF o DNI.</li>
+        <li>Inserta la cabecera del pedido en <code class="text-indigo-300 font-mono">F_PCL</code> y las líneas en <code class="text-indigo-300 font-mono">F_LPC</code>.</li>
+        <li>Actualiza de inmediato las unidades pendientes de servir, recalculando el stock disponible (<code class="text-emerald-400 font-mono">DISSTO</code>).</li>
+        <li>Los operarios del almacén ven el nuevo albarán en sus terminales locales para comenzar el picking de inmediato.</li>
+      </ol>
+
+      <h2 id="fase-3-contabilidad-holded" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Fase 3 (Contabilidad): Emisión Fiscal Automatizada en Holded</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Una vez confirmado el pedido en Factusol, Bentian contacta con la API REST de Holded:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li>Crea la factura oficial de venta con la serie configurada (ej. serie <em>"SHOP"</em> o <em>"2026"</em>).</li>
+        <li>Genera automáticamente el asiento contable en el libro diario de Holded vinculando la cuenta 430 del cliente con la 700 de ventas y 477 de IVA.</li>
+        <li>Tu gestoría contable puede consultar en cualquier momento los libros de IVA actualizados en tiempo real para las liquidaciones trimestrales sin tener que pedirte extractos.</li>
+      </ul>
+
+      <h2 id="resiliencia-desacoplada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Resiliencia Desacoplada ante Cortes y PC Apagado</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        ¿Qué ocurre si el almacén cierra a las 19:00 o se apaga el ordenador durante el fin de semana?
+      </p>
+      <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6 leading-relaxed">
+        <strong>Tolerancia Total a Fallos con Store-and-Forward:</strong> Los pedidos de Shopify quedan retenidos de forma segura en la nube de Shopify. El lunes por la mañana a las 08:00, al encender el PC del almacén, Bentian despierta, recupera todos los pedidos acumulados, los custodia en su cola SQLite local en milisegundos y procede a la inyección secuencial en Factusol y emisión en Holded. Cero pedidos perdidos, cero descuadres.
+      </div>
+
+      <h2 id="beneficios-roi" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Beneficios: Ahorro de 15h/semana y Cumplimiento Veri*Factu</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Las empresas que han desplegado la arquitectura tripartita obtienen ventajas comerciales y operativas inmediatas:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Ahorro medio de 15 horas semanales</strong> de trabajo administrativo rutinario eliminando el picado manual de facturas y albaranes.</li>
+        <li><strong>Eliminación del 100% de sobreventas</strong> gracias al cálculo matemático de existencias disponibles en menos de 3 segundos.</li>
+        <li><strong>Cumplimiento normativo riguroso:</strong> Trazabilidad completa exigida por la Ley Antifraude y el reglamento Veri*Factu, con registros correlativos e inmutables.</li>
+      </ul>
     
         </article>
 
         <!-- Pagination: Prev / Next Buttons -->
         <div class="mt-12 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-4">
           
-            <a href="/docs/canales/woocommerce/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
+            <a href="/docs/arquitectura/deteccion-tiempo-real/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
               <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">← Artículo Anterior</span>
-              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión con WooCommerce y Compatibilidad HPOS</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">FileWatcher en Tiempo Real y Ciclos Incrementales</span>
             </a>
           
           
-            <a href="/docs/canales/shopify/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
+            <a href="/docs/fiscalidad/cuadre-iva-centimos/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
               <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">Siguiente Artículo →</span>
-              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión Factusol con Shopify y Webhooks en Tiempo Real</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Cuadre de IVA al Céntimo y Prevención de Descuadres</span>
             </a>
           
         </div>
@@ -629,32 +633,44 @@
         <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
           
             <li>
-              <a href="#activar-webservices" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="activar-webservices">
-                1. Activación del Servicio Web en PrestaShop
+              <a href="#el-reto-omnicanal" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="el-reto-omnicanal">
+                1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud
               </a>
             </li>
           
             <li>
-              <a href="#generar-clave-api" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="generar-clave-api">
-                2. Creación de la Clave de Servicio Web
+              <a href="#diagrama-flujo-tripartito" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="diagrama-flujo-tripartito">
+                2. Diagrama de Flujo Extremo a Extremo
               </a>
             </li>
           
             <li>
-              <a href="#recursos-necesarios" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="recursos-necesarios">
-                3. Permisos en Recursos (GET / POST / PUT)
+              <a href="#fase-1-venta-checkout" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="fase-1-venta-checkout">
+                3. Fase 1 (Venta): Ingesta Reactiva del Pedido Web (Shopify)
               </a>
             </li>
           
             <li>
-              <a href="#prestashop-8" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="prestashop-8">
-                4. Compatibilidad con PrestaShop 8 y PHP 8.x
+              <a href="#fase-2-operaciones-almacen" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="fase-2-operaciones-almacen">
+                4. Fase 2 (Operaciones): Inyección Atómica en Factusol y Stock
               </a>
             </li>
           
             <li>
-              <a href="#configuracion-bentian" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="configuracion-bentian">
-                5. Configuración en Bentian ERP Bridge
+              <a href="#fase-3-contabilidad-holded" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="fase-3-contabilidad-holded">
+                5. Fase 3 (Contabilidad): Emisión Fiscal Automatizada en Holded
+              </a>
+            </li>
+          
+            <li>
+              <a href="#resiliencia-desacoplada" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="resiliencia-desacoplada">
+                6. Resiliencia Desacoplada ante Cortes y PC Apagado
+              </a>
+            </li>
+          
+            <li>
+              <a href="#beneficios-roi" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="beneficios-roi">
+                7. Beneficios: Ahorro de 15h/semana y Cumplimiento Veri*Factu
               </a>
             </li>
           

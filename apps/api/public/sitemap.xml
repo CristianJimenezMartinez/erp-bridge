@@ -607,7 +607,7 @@
   <!-- Doc: Conexión con Shopify mediante Admin REST y GraphQL -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/shopify/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/shopify/" />
@@ -800,5 +800,27 @@
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/terminos/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/terminos/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/terminos/" />
+  </url>
+
+  <!-- Doc: Integración Factusol con Holded Cloud ERP y Facturación Contable -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/canales/holded/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+  </url>
+
+  <!-- Doc: Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
   </url>
 </urlset>

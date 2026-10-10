@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP</title>
-  <meta name="description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
-  <meta name="keywords" content="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+  <title>Conectar Factusol con Holded Cloud ERP | Facturación y Contabilidad</title>
+  <meta name="description" content="Guía paso a paso para integrar Factusol con Holded Cloud ERP. Emisión automática de facturas de venta, sincronización de clientes, asientos contables y libros de IVA.">
+  <meta name="keywords" content="sincronizar factusol con holded, conector factusol holded, integracion holded factusol facturacion, enlazar almacen factusol gestoria holded, api holded pedidos facturas factusol, asientos contables holded factusol, facturacion automatica holded">
   <meta name="author" content="Cristian Jiménez Martínez">
-  <link rel="canonical" href="https://bridge.cristianjm.com/docs/canales/prestashop/">
+  <link rel="canonical" href="https://bridge.cristianjm.com/docs/canales/holded/">
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
@@ -15,10 +15,10 @@
 
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://bridge.cristianjm.com/docs/canales/prestashop/">
+  <meta property="og:url" content="https://bridge.cristianjm.com/docs/canales/holded/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP">
-  <meta property="og:description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
+  <meta property="og:title" content="Conectar Factusol con Holded Cloud ERP | Facturación y Contabilidad">
+  <meta property="og:description" content="Guía paso a paso para integrar Factusol con Holded Cloud ERP. Emisión automática de facturas de venta, sincronización de clientes, asientos contables y libros de IVA.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -30,9 +30,9 @@
     "@graph": [
       {
         "@type": "TechArticle",
-        "@id": "https://bridge.cristianjm.com/docs/canales/prestashop/#article",
-        "headline": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
-        "description": "Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.",
+        "@id": "https://bridge.cristianjm.com/docs/canales/holded/#article",
+        "headline": "Integración Factusol con Holded Cloud ERP y Facturación Contable",
+        "description": "Guía paso a paso para integrar Factusol con Holded Cloud ERP. Emisión automática de facturas de venta, sincronización de clientes, asientos contables y libros de IVA.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -75,8 +75,8 @@
           {
             "@type": "ListItem",
             "position": 4,
-            "name": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
-            "item": "https://bridge.cristianjm.com/docs/canales/prestashop/"
+            "name": "Integración Factusol con Holded Cloud ERP y Facturación Contable",
+            "item": "https://bridge.cristianjm.com/docs/canales/holded/"
           }
         ]
       }
@@ -284,7 +284,7 @@
                     </li>
                   
                     <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
-                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
+                      <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Conexión con PrestaShop 1.7 y 8.x mediante Webservices
                       </a>
                     </li>
@@ -296,7 +296,7 @@
                     </li>
                   
                     <li data-title="integración factusol con holded cloud erp y facturación contable" data-keywords="sincronizar factusol con holded, conector factusol holded, integracion holded factusol facturacion, enlazar almacen factusol gestoria holded, api holded pedidos facturas factusol, asientos contables holded factusol, facturacion automatica holded">
-                      <a href="/docs/canales/holded/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                      <a href="/docs/canales/holded/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
                         Integración Factusol con Holded Cloud ERP y Facturación Contable
                       </a>
                     </li>
@@ -491,121 +491,157 @@
           <span>/</span>
           <span class="text-zinc-400">Canales eCommerce</span>
           <span>/</span>
-          <span class="text-indigo-400 font-medium truncate max-w-xs">Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Integración Factusol con Holded Cloud ERP y Facturación Contable</span>
         </nav>
 
         <!-- Article Header -->
         <div class="mb-8 pb-6 border-b border-white/[0.08]">
           <div class="flex items-center gap-2 mb-3">
             <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              Conector PrestaShop
+              Conector Holded Cloud
             </span>
             <span class="text-xs text-zinc-500">·</span>
-            <span class="text-xs text-zinc-500 font-mono">5 min de lectura</span>
+            <span class="text-xs text-zinc-500 font-mono">6 min de lectura</span>
             <span class="text-xs text-zinc-500">·</span>
             <span class="text-xs text-zinc-500 font-mono">Actualizado v0.4.0</span>
           </div>
 
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
-            Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+            Integración Factusol con Holded Cloud ERP y Facturación Contable
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Cómo activar los servicios web oficiales de PrestaShop, conceder permisos en recursos de pedidos/stock y mapear combinaciones.
+            Cómo enlazar el almacén físico de Factusol con la facturación y la gestoría en la nube de Holded vía REST API v1 oficial sin doble picado de datos.
           </p>
         </div>
 
         <!-- Article Rich Content Body -->
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        PrestaShop dispone de una arquitectura nativa de servicios web (Webservices RESTful) que permite interactuar con su base de datos sin necesidad de instalar módulos no verificados. Bentian aprovecha este motor estándar para sincronizar pedidos, productos y stock disponible.
-      </p>
+    <p class="text-base text-zinc-300 leading-relaxed mb-6">
+      Miles de pymes y distribuidores en España utilizan <strong>Factusol</strong> en sus instalaciones locales para gestionar el almacén físico, preparar albaranes con lectores de códigos de barras y controlar las existencias sin latencias. Al mismo tiempo, sus asesorías y directores financieros prefieren <strong>Holded Cloud ERP</strong> para la facturación electrónica, el seguimiento de tesorería y la conciliación bancaria en tiempo real. <strong>Bentian ERP Bridge</strong> une ambos mundos: conecta tu base de datos local de Factusol con la API oficial de Holded sin necesidad de duplicar el trabajo administrativo ni teclear facturas a mano.
+    </p>
 
-      <h2 id="activar-webservices" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Activación del Servicio Web en PrestaShop</h2>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Accede al Backoffice de PrestaShop.</li>
-        <li>En el menú lateral, dirígete a <strong class="text-white">Parámetros avanzados → Webservice (Servicio web)</strong>.</li>
-        <li>Activa la casilla <strong class="text-emerald-400">Activar el servicio web de PrestaShop: SÍ</strong>.</li>
-        <li>Guarda los cambios.</li>
-      </ol>
+    <h2 id="el-dilema-operativo" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Dilema: Almacén Físico (Factusol) vs Facturación Cloud (Holded)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Hasta ahora, las empresas que querían beneficiarse de la agilidad de Holded y la solidez local de Factusol se enfrentaban a un grave cuello de botella operativo:
+    </p>
+    <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+      <li><strong>Doble picado de albaranes:</strong> El almacén prepara el pedido en Factusol y la persona de administración debe volver a introducir el cliente, las líneas y los precios en Holded para emitir la factura.</li>
+      <li><strong>Descuadres de IVA y Recargo de Equivalencia:</strong> Al introducir facturas manualmente, es habitual cometer errores en los decimales o en el tipo impositivo aplicable.</li>
+      <li><strong>Retrasos en la gestoría:</strong> La gestoría no recibe las facturas hasta final de mes o trimestre, dificultando las previsiones de tesorería y liquidaciones del modelo 303.</li>
+    </ul>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+      Bentian automatiza este traspaso: en cuanto un pedido o albarán queda validado en Factusol, el agente emite la factura legal en Holded de forma instantánea y desatendida.
+    </p>
 
-      <h2 id="generar-clave-api" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Creación de la Clave de Servicio Web</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Haz clic en <strong class="text-indigo-400">Añadir una nueva clave de servicio web</strong>. Puedes generar una clave aleatoria de 32 caracteres pulsando el botón <em>Generar</em>.
-      </p>
+    <h2 id="generar-api-key" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Generación de API Key en Holded Business</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Para autorizar a Bentian a interactuar con tu cuenta de Holded:
+    </p>
+    <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+      <li>Inicia sesión en tu cuenta de <strong class="text-white">Holded</strong> (<code class="text-zinc-200">app.holded.com</code>) con permisos de administrador.</li>
+      <li>Haz clic en el icono de tu perfil (esquina superior derecha) y selecciona <strong class="text-indigo-400">Configuración</strong>.</li>
+      <li>En la barra lateral izquierda, entra en <strong class="text-white">Desarrolladores → API</strong>.</li>
+      <li>Pulsa en <strong class="text-emerald-400">Nueva API Key</strong>. Asigna una descripción identificativa (ej: <code class="text-zinc-200">Bentian Factusol Bridge</code>).</li>
+      <li>Copia la clave generada (un hash alfanumérico seguro de 32 caracteres).</li>
+    </ol>
 
-      <h2 id="recursos-necesarios" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Permisos en Recursos (GET / POST / PUT)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Marca los siguientes permisos para la clave generada:
-      </p>
-      <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
-          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
-            <tr>
-              <th class="px-4 py-2.5">Recurso</th>
-              <th class="px-4 py-2.5">GET (Ver)</th>
-              <th class="px-4 py-2.5">POST (Crear)</th>
-              <th class="px-4 py-2.5">PUT (Modificar)</th>
-              <th class="px-4 py-2.5 font-sans">Propósito</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">orders</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Descargar pedidos y marcar estado sincronizado.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">order_details</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Lectura de líneas de pedido y referencias.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">stock_availables</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Actualizar el stock disponible en tiempo real.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">products</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Consultar y sincronizar tarifas y referencias.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <h2 id="mapeo-entidades" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Mapeo de Entidades: Albarán/Pedido Factusol ➔ Factura Holded</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Bentian traduce los registros relacionales de Factusol en documentos canónicos JSON compatibles con la API REST v1 de Holded (<code class="text-zinc-200 font-mono">/api/invoicing/v1/documents/invoice</code>):
+    </p>
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
+        <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08] font-sans">
+          <tr>
+            <th class="px-4 py-2.5 font-semibold">Campo Factusol (OLEDB)</th>
+            <th class="px-4 py-2.5 font-semibold">Propiedad Holded REST API</th>
+            <th class="px-4 py-2.5 font-semibold">Transformación / Regla</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+          <tr>
+            <td class="px-4 py-2 text-white font-mono">F_PCL.CODPCL / F_FAC.CODFAC</td>
+            <td class="px-4 py-2 text-indigo-300 font-mono">customId</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Identificador unívoco para idempotencia anti-duplicados.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-mono">F_CLI.NIFCLI</td>
+            <td class="px-4 py-2 text-indigo-300 font-mono">contactCode / code</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Búsqueda o alta automática del contacto por NIF/CIF.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-mono">F_LPC.ARTLPC</td>
+            <td class="px-4 py-2 text-indigo-300 font-mono">items[].sku</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Código de artículo maestro de Factusol.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-mono">F_LPC.CANLPC</td>
+            <td class="px-4 py-2 text-indigo-300 font-mono">items[].units</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Cantidad facturada con precisión decimal.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-mono">F_LPC.TOTLPC / F_LPC.IVALPC</td>
+            <td class="px-4 py-2 text-indigo-300 font-mono">items[].subtotal / taxes</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Tipo impositivo de IVA (21%, 10%, 4%) y R.E. aplicable.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <h2 id="prestashop-8" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Compatibilidad con PrestaShop 8 y PHP 8.x</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge es compatible tanto con PrestaShop 1.7 como con las ediciones modernas de PrestaShop 8.x ejecutadas en servidores con PHP 8.1 o PHP 8.2.
-      </p>
+    <h2 id="clientes-formas-pago" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Sincronización Automática de Clientes, NIFs y Formas de Pago</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Cuando se emite una factura en Holded, Bentian comprueba previamente si el cliente ya existe en el directorio de contactos de Holded. Si no existe:
+    </p>
+    <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+      <li>Crea el contacto en Holded con su razón social, NIF/CIF, dirección postal, código postal y provincia de Factusol.</li>
+      <li>Asigna el canal de venta y la cuenta contable de cliente (<code class="text-zinc-200">4300xxxx</code>) correspondiente.</li>
+      <li>Mapea la forma de pago (transferencia, tarjeta, domiciliación SEPA o pagaré) respetando los plazos de vencimiento pactados.</li>
+    </ul>
 
-      <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Configuración en Bentian ERP Bridge</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En el panel de control de Bentian, selecciona la plataforma <strong>PrestaShop</strong>, introduce la URL base de tu tienda y la clave de Webservice generada. Haz clic en <strong>Probar Conexión</strong> para confirmar la sincronización.
-      </p>
-    
+    <h2 id="contabilidad-gestoria" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Libros de IVA, Asientos Contables y Traspaso a Gestoría</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Una de las mayores ventajas de Holded es su módulo de contabilidad automatizada. Al generar las facturas a través de Bentian:
+    </p>
+    <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 mb-6">
+      <strong class="text-white font-semibold block mb-1">Impacto Contable Inmediato:</strong>
+      Holded genera de manera automática el asiento contable en el libro diario (cuentas 700 de ventas, 477 de IVA repercutido y 430 de clientes). Tu gestor o asesor fiscal tiene acceso directo a los balances de sumas y saldos y a los modelos tributarios sin necesidad de enviar carpetas de facturas en papel ni archivos Excel desfasados.
+    </div>
+
+    <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Configuración del Conector en Bentian y Políticas Offline</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      La activación en el agente de Bentian se realiza en dos minutos:
+    </p>
+    <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+      <li>Abre la interfaz gráfica del agente Bentian (<code class="text-zinc-200 font-mono">http://127.0.0.1:39281</code>).</li>
+      <li>Ve a la pestaña <strong class="text-white">Canales & ERPs Cloud</strong> y activa el interruptor <strong class="text-emerald-400">Holded ERP</strong>.</li>
+      <li>Introduce tu <strong class="text-indigo-400">API Key</strong> de Holded y selecciona la serie de facturación deseada (ej. serie <em>"F26"</em> o <em>"HOLD"</em>).</li>
+      <li>Elige el evento disparador: emitir factura al registrar el pedido, o emitir factura únicamente cuando el albarán pase a estado <em>"Cobrado"</em> en Factusol.</li>
+      <li>Pulsa en <strong class="text-indigo-400">Probar Conexión</strong> para verificar el handshake TLS 1.3 con la API de Holded.</li>
+    </ol>
+
+    <h2 id="idempotencia-customid" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Idempotencia y Prevención de Duplicados (customId)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      La API de Holded soporta el atributo <code class="text-indigo-300 font-mono">customId</code> en la creación de documentos. Bentian asigna a este parámetro el identificador único del documento de Factusol (ej: <code class="text-zinc-200 font-mono">FACTUSOL-FAC-2026-00452</code>).
+    </p>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+      Si la conexión a Internet se interrumpe durante el envío y el agente reintenta la llamada, Holded detecta que el <code class="text-zinc-200">customId</code> ya existe y devuelve la factura previamente generada en lugar de duplicarla. Esto proporciona <strong>garantía transaccional de entrega única (Exactly-Once Semantics)</strong>.
+    </p>
+  
         </article>
 
         <!-- Pagination: Prev / Next Buttons -->
         <div class="mt-12 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-4">
           
-            <a href="/docs/canales/woocommerce/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
+            <a href="/docs/canales/shopify/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
               <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">← Artículo Anterior</span>
-              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión con WooCommerce y Compatibilidad HPOS</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión Factusol con Shopify y Webhooks en Tiempo Real</span>
             </a>
           
           
-            <a href="/docs/canales/shopify/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
+            <a href="/docs/canales/endpoint-universal/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-end text-right">
               <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">Siguiente Artículo →</span>
-              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Conexión Factusol con Shopify y Webhooks en Tiempo Real</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Endpoint Universal: Especificación Técnica y Protocolo Bidireccional</span>
             </a>
           
         </div>
@@ -629,32 +665,44 @@
         <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
           
             <li>
-              <a href="#activar-webservices" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="activar-webservices">
-                1. Activación del Servicio Web en PrestaShop
+              <a href="#el-dilema-operativo" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="el-dilema-operativo">
+                1. El Dilema: Almacén Físico (Factusol) vs Facturación Cloud (Holded)
               </a>
             </li>
           
             <li>
-              <a href="#generar-clave-api" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="generar-clave-api">
-                2. Creación de la Clave de Servicio Web
+              <a href="#generar-api-key" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="generar-api-key">
+                2. Generación de API Key en Holded Business
               </a>
             </li>
           
             <li>
-              <a href="#recursos-necesarios" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="recursos-necesarios">
-                3. Permisos en Recursos (GET / POST / PUT)
+              <a href="#mapeo-entidades" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="mapeo-entidades">
+                3. Mapeo de Entidades: Albarán/Pedido Factusol ➔ Factura Holded
               </a>
             </li>
           
             <li>
-              <a href="#prestashop-8" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="prestashop-8">
-                4. Compatibilidad con PrestaShop 8 y PHP 8.x
+              <a href="#clientes-formas-pago" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="clientes-formas-pago">
+                4. Sincronización Automática de Clientes, NIFs y Formas de Pago
+              </a>
+            </li>
+          
+            <li>
+              <a href="#contabilidad-gestoria" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="contabilidad-gestoria">
+                5. Libros de IVA, Asientos Contables y Traspaso a Gestoría
               </a>
             </li>
           
             <li>
               <a href="#configuracion-bentian" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="configuracion-bentian">
-                5. Configuración en Bentian ERP Bridge
+                6. Configuración del Conector en Bentian y Políticas Offline
+              </a>
+            </li>
+          
+            <li>
+              <a href="#idempotencia-customid" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="idempotencia-customid">
+                7. Idempotencia y Prevención de Duplicados (customId)
               </a>
             </li>
           

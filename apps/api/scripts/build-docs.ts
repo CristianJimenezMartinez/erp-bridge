@@ -843,7 +843,7 @@ function updateSitemap(articles: DocArticle[]) {
   <!-- Centro de Documentación Técnica -->
   <url>
     <loc>${hubUrl}</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="${hubUrl}" />
@@ -862,7 +862,7 @@ function updateSitemap(articles: DocArticle[]) {
   <!-- Doc: ${art.title} -->
   <url>
     <loc>${docUrl}</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="${docUrl}" />
@@ -871,6 +871,9 @@ function updateSitemap(articles: DocArticle[]) {
   </url>
 `;
       sitemap = sitemap.replace('</urlset>', `${entry}</urlset>`);
+    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita'].includes(art.slug)) {
+      const reg = new RegExp(`(<loc>https:\\/\\/bridge\\.cristianjm\\.com\\/docs\\/${art.slug}\\/<\\/loc>\\s*<lastmod>)[^<]+(<\\/lastmod>)`, 'i');
+      sitemap = sitemap.replace(reg, `$12026-10-10T14:00:00+02:00$2`);
     }
   }
 

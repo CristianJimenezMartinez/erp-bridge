@@ -24,6 +24,7 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('licenses')" id="nav-tab-licenses" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Todas las Licencias</button>
         <button onclick="switchDashboardTab('fleet-errors')" id="nav-tab-fleet-errors" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1"><span>Errores Flota</span><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span></button>
         <button onclick="switchDashboardTab('fleet')" id="nav-tab-fleet" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Salud Equipos</button>
+        <button onclick="switchDashboardTab('multichannel')" id="nav-tab-multichannel" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Webhooks & Canales</span></button>
         <button onclick="switchDashboardTab('audit')" id="nav-tab-audit" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Auditoría</button>
         <button onclick="switchDashboardTab('organizations')" id="nav-tab-organizations" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Organizaciones</button>
         <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Vista Cliente</button>
@@ -36,6 +37,7 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('licenses')" id="mob-nav-tab-licenses" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Licencias</button>
         <button onclick="switchDashboardTab('fleet-errors')" id="mob-nav-tab-fleet-errors" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Errores</button>
         <button onclick="switchDashboardTab('fleet')" id="mob-nav-tab-fleet" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Salud</button>
+        <button onclick="switchDashboardTab('multichannel')" id="mob-nav-tab-multichannel" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Webhooks</button>
         <button onclick="switchDashboardTab('audit')" id="mob-nav-tab-audit" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Auditoría</button>
         <button onclick="switchDashboardTab('organizations')" id="mob-nav-tab-organizations" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Orgs</button>
         <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Cliente</button>
@@ -87,12 +89,14 @@ function setupRoleNavigation(role) {
     if (nav) {
       nav.innerHTML = `
         <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-3 py-1 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] shadow-sm font-medium">Mi Conexión ERP</button>
+        <button onclick="switchDashboardTab('multichannel')" id="nav-tab-multichannel" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Canales & Webhooks</span></button>
         <button onclick="switchDashboardTab('licenses')" id="nav-tab-licenses" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Todas Mis Licencias</button>
       `;
     }
     if (mobNav) {
       mobNav.innerHTML = `
         <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-3 py-1.5 rounded-md transition text-white bg-[#18181b] font-medium whitespace-nowrap">Conexión</button>
+        <button onclick="switchDashboardTab('multichannel')" id="mob-nav-tab-multichannel" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Canales & Webhooks</button>
         <button onclick="switchDashboardTab('licenses')" id="mob-nav-tab-licenses" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Licencias</button>
       `;
     }
@@ -113,7 +117,8 @@ function switchDashboardTab(tabName) {
     'licenses',
     'fleet',
     'audit',
-    'organizations'
+    'organizations',
+    'multichannel'
   ];
 
   allViews.forEach(v => {
@@ -155,6 +160,8 @@ function switchDashboardTab(tabName) {
     if (typeof window.loadAuditLogs === 'function') window.loadAuditLogs();
   } else if (tabName === 'organizations') {
     if (typeof window.loadOrganizations === 'function') window.loadOrganizations();
+  } else if (tabName === 'multichannel') {
+    if (typeof window.loadMultichannelData === 'function') window.loadMultichannelData();
   } else if (tabName === 'client-portal') {
     if (typeof window.loadClientPortal === 'function') window.loadClientPortal();
     const banner = document.getElementById('client-preview-superadmin-banner');

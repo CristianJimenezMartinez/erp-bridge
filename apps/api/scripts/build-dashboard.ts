@@ -19,7 +19,8 @@ export const DASHBOARD_VIEWS = [
   '06-admin-overview.html',
   '07-organizations.html',
   '08-audit.html',
-  '09-fleet-errors.html'
+  '09-fleet-errors.html',
+  '10-multichannel-webhooks.html'
 ];
 
 /**
@@ -46,6 +47,7 @@ export const DASHBOARD_SCRIPTS = [
   'fleet.js',
   'organizations.js',
   'audit-errors.js',
+  'multichannel.js',
   'navigation.js'
 ];
 
@@ -261,6 +263,7 @@ export function buildDashboard(): void {
     'id="view-tab-organizations"',
     'id="view-tab-audit"',
     'id="view-tab-fleet-errors"',
+    'id="view-tab-multichannel"',
 
     // Formularios de autenticación
     'id="login-form-key"',
@@ -298,6 +301,15 @@ export function buildDashboard(): void {
     'id="audit-logs-container"',
     'id="fleet-errors-tbody"',
 
+    // Multicanal y Webhooks
+    'id="channel-shopify-status"',
+    'id="channel-holded-status"',
+    'id="webhooks-live-stream-tbody"',
+    'id="webhook-url-input"',
+    'id="webhook-secret-input"',
+    'id="btn-copy-webhook-url"',
+    'id="btn-toggle-secret"',
+
     // Modales interactivos
     'id="modal-new-key"',
     'id="modal-partner-buy"',
@@ -319,6 +331,7 @@ export function buildDashboard(): void {
     'src="/dashboard/js/fleet.js',
     'src="/dashboard/js/organizations.js',
     'src="/dashboard/js/audit-errors.js',
+    'src="/dashboard/js/multichannel.js',
     'src="/dashboard/js/navigation.js'
   ];
 

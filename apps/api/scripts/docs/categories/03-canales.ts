@@ -1,4 +1,6 @@
 import { DocArticle } from '../types';
+import { shopifyArticle } from './canales-shopify';
+import { holdedArticle } from './canales-holded';
 
 export const canalesArticles: DocArticle[] = [
   {
@@ -168,57 +170,8 @@ export const canalesArticles: DocArticle[] = [
       </p>
     `,
   },
-  {
-    slug: 'canales/shopify',
-    categorySlug: 'canales',
-    title: 'Conexión con Shopify mediante Admin REST y GraphQL',
-    subtitle: 'Conexión directa entre Factusol y Shopify sin intermediarios mensuales cloud. Configuración de Custom App y scopes de inventario.',
-    badge: 'Conector Shopify',
-    readingTime: '4 min de lectura',
-    metaTitle: 'Conectar Factusol con Shopify (Local-First) | Bentian ERP',
-    metaDescription: 'Cómo conectar Factusol con Shopify sin intermediarios cloud de 100€/mes. Configuración de Custom App en Shopify Admin y sincronización de stock.',
-    keywords: 'conectar factusol shopify, shopify factusol sin intermediarios, conector shopify factusol, custom app shopify factusol, inventario shopify factusol',
-    toc: [
-      { id: 'ventaja-directa', label: '1. Por qué Conexión Directa vs Conectores Cloud', level: 2 },
-      { id: 'crear-custom-app', label: '2. Creación de una Custom App en Shopify', level: 2 },
-      { id: 'permisos-scopes', label: '3. Scopes de Permisos Requeridos', level: 2 },
-      { id: 'configuracion-agente', label: '4. Vinculación en el Panel de Bentian', level: 2 },
-    ],
-    contentHtml: `
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        Muchas pymes que eligen Shopify para su tienda online descubren con frustración que los conectores habituales cobran entre 90 € y 250 € al mes por alojar un puente en la nube. Bentian ERP Bridge revoluciona este modelo: se conecta <strong>directamente desde tu PC con Factusol a la API oficial de Shopify</strong>, sin intermediarios ni costes mensuales recurrentes.
-      </p>
-
-      <h2 id="ventaja-directa" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Por qué Conexión Directa vs Conectores Cloud</h2>
-      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Ahorro masivo:</strong> Te ahorras entre 1.000 € y 3.000 € al año en plataformas intermediarias.</li>
-        <li><strong>Privacidad total:</strong> Tus datos de Factusol no pasan por los servidores de ninguna empresa intermediaria.</li>
-        <li><strong>Velocidad:</strong> El agente encola pedidos de Shopify directamente en el archivo de Factusol en milisegundos.</li>
-      </ul>
-
-      <h2 id="crear-custom-app" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Creación de una Custom App en Shopify</h2>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Inicia sesión en tu panel de administración de Shopify.</li>
-        <li>Ve a <strong class="text-white">Configuración → Aplicaciones y canales de ventas → Desarrollar aplicaciones</strong>.</li>
-        <li>Haz clic en <strong class="text-indigo-400">Crear una aplicación</strong> y nómbrala <code>Bentian ERP Bridge</code>.</li>
-      </ol>
-
-      <h2 id="permisos-scopes" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Scopes de Permisos Requeridos</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En la pestaña <em>Configuración de API de Admin</em>, concede los siguientes permisos:
-      </p>
-      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6 font-mono text-xs">
-        <li><code class="text-emerald-400">read_orders, write_orders</code> (Descarga y gestión de pedidos)</li>
-        <li><code class="text-emerald-400">read_products, write_products</code> (Artículos y tarifas)</li>
-        <li><code class="text-emerald-400">read_inventory, write_inventory</code> (Stock disponible)</li>
-      </ul>
-
-      <h2 id="configuracion-agente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Vinculación en el Panel de Bentian</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Copia el <strong class="text-white">Admin API Access Token</strong> generado por Shopify e introdúcelo en la configuración de canal de Bentian.
-      </p>
-    `,
-  },
+  shopifyArticle,
+  holdedArticle,
   {
     slug: 'canales/endpoint-universal',
     categorySlug: 'canales',

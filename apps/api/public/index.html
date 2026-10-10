@@ -78,7 +78,7 @@
 <!-- GEO IA & RICH SNIPPETS: ESTRUCTURAS JSON-LD SCHEMA.ORG PARA MOTORES IA     -->
 <!-- ========================================================================= -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","@id":"https://bridge.cristianjm.com/#software","name":"Bentian ERP Bridge","operatingSystem":"Windows 10, Windows 11, Windows Server 2019, Windows Server 2022, Windows Server 2025","applicationCategory":"BusinessApplication","applicationSubCategory":"ERP Integration Software","description":"Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP y plataformas eCommerce (WooCommerce, PrestaShop) con arquitectura Zero-Knowledge y Edge Processing.","url":"https://bridge.cristianjm.com","softwareVersion": "0.4.0","downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe","brand":{"@type":"Brand","name":"Bentian"},"sku":"BENTIAN-ERP-BRIDGE","mpn":"EB-040","offers":[{"@type":"Offer","name":"Plan Base Anual (1 Conexión ERP)","price":"199.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","url":"https://bridge.cristianjm.com/#pricing","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"Bentian"},"shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"0.00","currency":"EUR"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"ES"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"}}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"ES","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":60,"returnMethod":"https://schema.org/ReturnOnline","returnFees":"https://schema.org/FreeReturn"},"description":"Suscripción anual completa para 1 ERP Factusol y 1 Tienda Online."},{"@type":"Offer","name":"Plan Base Mensual (1 Conexión ERP)","price":"29.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","url":"https://bridge.cristianjm.com/#pricing","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"Bentian"},"shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"0.00","currency":"EUR"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"ES"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"}}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"ES","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":60,"returnMethod":"https://schema.org/ReturnOnline","returnFees":"https://schema.org/FreeReturn"},"description":"Suscripción mensual flexible para 1 ERP Factusol y 1 Tienda Online."}],"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"18","bestRating":"5","worstRating":"1"},"review":[{"@type":"Review","author":{"@type":"Person","name":"Federico Rubio"},"datePublished":"2026-09-15","reviewBody":"Conexión en tiempo real entre Factusol y tienda online sin incidencias ni bloqueos de concurrencia ldb.","reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5","worstRating":"1"}}],"featureList":["Sincronización reactiva de stock con dirty-checking","Ingesta atómica de pedidos a Factusol (F_PCL y F_LPC)","Compatibilidad nativa con Recargo de Equivalencia (R.E.) y fiscalidad española","Detección automática de bases de datos Access (.accdb)","Auto-actualizador silencioso atómico con firmas Ed25519","Modo Offline con cola persistente Store-and-Forward"]},{"@type":"Organization","@id":"https://bridge.cristianjm.com/#organization","name":"Bentian","url":"https://bridge.cristianjm.com","logo":"https://bridge.cristianjm.com/assets/icon.png","founder":{"@type":"Person","name":"Cristian Jiménez Martínez","jobTitle":"Lead Software Architect","url":"https://cristianjm.com"},"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"soporte@cristianjm.com","availableLanguage":["Spanish","English"]}},{"@type":"WebSite","@id":"https://bridge.cristianjm.com/#website","url":"https://bridge.cristianjm.com","name":"Bentian ERP Bridge","publisher":{"@id":"https://bridge.cristianjm.com/#organization"},"inLanguage":"es-ES"},{"@type":"FAQPage","@id":"https://bridge.cristianjm.com/#faq","mainEntity":[{"@type":"Question","name":"¿Tengo que cambiar o modificar mi versión actual de Factusol?","acceptedAnswer":{"@type":"Answer","text":"No. El agente se conecta a tu base de datos existente de Factusol mediante lectura OLEDB estándar sin alterar la estructura de tus tablas ni obligarte a cambiar de versión. Es compatible con versiones 2024, 2025 y 2026."}},{"@type":"Question","name":"¿Dónde se almacenan los datos de mis clientes y facturas?","acceptedAnswer":{"@type":"Answer","text":"Tus datos se quedan en tu propio equipo. La plataforma sigue una arquitectura Zero-Knowledge y Local-First: los ficheros de Factusol nunca se suben ni se replican en servidores cloud externos; solo se transmite el delta necesario cifrado punto a punto hacia tu tienda online."}},{"@type":"Question","name":"¿Qué ocurre si el ordenador del almacén se apaga o se corta la conexión?","acceptedAnswer":{"@type":"Answer","text":"No se pierde ningún dato. Los pedidos que tus clientes hagan en la tienda online se retienen de forma segura en la cola de Store-and-Forward. En cuanto el ordenador vuelve a encenderse o se recupera la red, el agente descarga y genera los pedidos en Factusol automáticamente."}},{"@type":"Question","name":"¿Tengo que abrir puertos en el router o configurar una IP fija?","acceptedAnswer":{"@type":"Answer","text":"No. El agente realiza conexiones salientes seguras HTTPS por el puerto 443 estándar. No necesitas abrir puertos en tu router, ni configurar DMZ, ni disponer de una IP fija en tu empresa."}},{"@type":"Question","name":"¿Soporta Recargo de Equivalencia (R.E.) y múltiples tarifas?","acceptedAnswer":{"@type":"Answer","text":"Sí. Está específicamente desarrollado para el mercado español. Gestiona clientes con y sin Recargo de Equivalencia y te permite elegir qué tarifa de precios de Factusol (Tarifa 1, 2, etc.) debe publicarse en tu tienda online."}},{"@type":"Question","name":"¿En cuántos ordenadores debo instalar el conector?","acceptedAnswer":{"@type":"Answer","text":"Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano."}},{"@type":"Question","name":"¿Cómo se actualiza el agente?","acceptedAnswer":{"@type":"Answer","text":"El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales."}},{"@type":"Question","name":"¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?","acceptedAnswer":{"@type":"Answer","text":"Es normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en 'Más información' y luego en 'Ejecutar de todas formas'."}},{"@type":"Question","name":"¿Puedo cancelar la suscripción si no la necesito?","acceptedAnswer":{"@type":"Answer","text":"Por supuesto. Puedes cancelar desde tu panel de usuario de Stripe en cualquier momento con un solo clic. Sin permanencias, sin penalizaciones y sin preguntas."}}]}]}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","@id":"https://bridge.cristianjm.com/#software","name":"Bentian ERP Bridge","operatingSystem":"Windows 10, Windows 11, Windows Server","applicationCategory":"BusinessApplication","applicationSubCategory":"ERP Integration Software","description":"Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP, plataformas eCommerce (Shopify, WooCommerce, PrestaShop) y ERPs Cloud (Holded) con arquitectura Zero-Knowledge y Edge Processing.","url":"https://bridge.cristianjm.com","softwareVersion": "0.4.0","downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe","brand":{"@type":"Brand","name":"Bentian"},"sku":"BENTIAN-ERP-BRIDGE","mpn":"EB-040","offers":[{"@type":"Offer","name":"Plan Base Anual (1 Conexión ERP)","price":"199.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","url":"https://bridge.cristianjm.com/#pricing","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"Bentian"},"shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"0.00","currency":"EUR"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"ES"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"}}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"ES","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":60,"returnMethod":"https://schema.org/ReturnOnline","returnFees":"https://schema.org/FreeReturn"},"description":"Suscripción anual completa para 1 ERP Factusol y 1 Tienda Online."},{"@type":"Offer","name":"Plan Base Mensual (1 Conexión ERP)","price":"29.00","priceCurrency":"EUR","priceValidUntil":"2027-12-31","url":"https://bridge.cristianjm.com/#pricing","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"Bentian"},"shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"0.00","currency":"EUR"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"ES"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":0,"maxValue":0,"unitCode":"DAY"}}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"ES","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":60,"returnMethod":"https://schema.org/ReturnOnline","returnFees":"https://schema.org/FreeReturn"},"description":"Suscripción mensual flexible para 1 ERP Factusol y 1 Tienda Online."}],"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"18","bestRating":"5","worstRating":"1"},"review":[{"@type":"Review","author":{"@type":"Person","name":"Federico Rubio"},"datePublished":"2026-09-15","reviewBody":"Conexión en tiempo real entre Factusol y tienda online sin incidencias ni bloqueos de concurrencia ldb.","reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5","worstRating":"1"}}],"featureList":["Conector nativo Factusol Shopify vía Admin GraphQL API con Webhooks reactivos en tiempo real","Integración bidireccional Factusol Holded Cloud ERP para facturación automática y enlace contable","Arquitectura Tripartita: Tienda Online (Shopify/WooCommerce) + Almacén Físico (Factusol) + Facturación Cloud (Holded)","Sincronización reactiva de stock disponible (DISSTO) con dirty-checking para evitar sobreventas","Ingesta atómica de pedidos a Factusol OLEDB (tablas F_PCL y F_LPC)","Compatibilidad nativa con Recargo de Equivalencia (R.E.) y fiscalidad española (Veri*Factu)","Conexión REST API v3 con WooCommerce y compatibilidad total con HPOS","Conector para PrestaShop (1.7 y 8.x) mediante servicios web Webservices","Detección automática de bases de datos Access (.accdb) y rutas de red NAS","Auto-actualizador silencioso atómico con firmas asimétricas Ed25519","Modo Offline con cola persistente Store-and-Forward"]},{"@type":"Organization","@id":"https://bridge.cristianjm.com/#organization","name":"Bentian","url":"https://bridge.cristianjm.com","logo":"https://bridge.cristianjm.com/assets/icon.png","founder":{"@type":"Person","name":"Cristian Jiménez Martínez","jobTitle":"Lead Software Architect","url":"https://cristianjm.com"},"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"soporte@cristianjm.com","availableLanguage":["Spanish","English"]}},{"@type":"WebSite","@id":"https://bridge.cristianjm.com/#website","url":"https://bridge.cristianjm.com","name":"Bentian ERP Bridge","publisher":{"@id":"https://bridge.cristianjm.com/#organization"},"inLanguage":"es-ES"},{"@type":"FAQPage","@id":"https://bridge.cristianjm.com/#faq","mainEntity":[{"@type":"Question","name":"¿Tengo que cambiar o modificar mi versión actual de Factusol?","acceptedAnswer":{"@type":"Answer","text":"No. El agente se conecta a tu base de datos existente de Factusol mediante lectura OLEDB estándar sin alterar la estructura de tus tablas ni obligarte a cambiar de versión. Es compatible con versiones 2024, 2025 y 2026."}},{"@type":"Question","name":"¿Dónde se almacenan los datos de mis clientes y facturas?","acceptedAnswer":{"@type":"Answer","text":"Tus datos se quedan en tu propio equipo. La plataforma sigue una arquitectura Zero-Knowledge y Local-First: los ficheros de Factusol nunca se suben ni se replican en servidores cloud externos; solo se transmite el delta necesario cifrado punto a punto hacia tu tienda online."}},{"@type":"Question","name":"¿Qué ocurre si el ordenador del almacén se apaga o se corta la conexión?","acceptedAnswer":{"@type":"Answer","text":"No se pierde ningún dato. Los pedidos que tus clientes hagan en la tienda online se retienen de forma segura en la cola de Store-and-Forward. En cuanto el ordenador vuelve a encenderse o se recupera la red, el agente descarga y genera los pedidos en Factusol automáticamente."}},{"@type":"Question","name":"¿Tengo que abrir puertos en el router o configurar una IP fija?","acceptedAnswer":{"@type":"Answer","text":"No. El agente realiza conexiones salientes seguras HTTPS por el puerto 443 estándar. No necesitas abrir puertos en tu router, ni configurar DMZ, ni disponer de una IP fija en tu empresa."}},{"@type":"Question","name":"¿Soporta Recargo de Equivalencia (R.E.) y múltiples tarifas?","acceptedAnswer":{"@type":"Answer","text":"Sí. Está específicamente desarrollado para el mercado español. Gestiona clientes con y sin Recargo de Equivalencia y te permite elegir qué tarifa de precios de Factusol (Tarifa 1, 2, etc.) debe publicarse en tu tienda online."}},{"@type":"Question","name":"¿En cuántos ordenadores debo instalar el conector?","acceptedAnswer":{"@type":"Answer","text":"Bentian ERP Bridge se instala en un único ordenador o servidor: aquel donde se encuentra o tiene acceso a la base de datos de Factusol. No necesitas instalarlo en cada puesto de tu empresa, ya que el agente sincroniza de forma centralizada todo el catálogo, existencias y pedidos web en segundo plano."}},{"@type":"Question","name":"¿Cómo se actualiza el agente?","acceptedAnswer":{"@type":"Answer","text":"El agente incluye un supervisor de auto-actualización atómica. Comprueba la firma criptográfica Ed25519 de cada versión publicada y se actualiza en segundo plano sin interrumpir tu trabajo ni requerir desinstalaciones manuales."}},{"@type":"Question","name":"¿Por qué Windows Defender SmartScreen muestra un aviso azul al instalar?","acceptedAnswer":{"@type":"Answer","text":"Es normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en 'Más información' y luego en 'Ejecutar de todas formas'."}},{"@type":"Question","name":"¿Puedo sincronizar Factusol con Shopify en tiempo real sin pagar comisiones mensuales a intermediarios?","acceptedAnswer":{"@type":"Answer","text":"Sí. Bentian ERP Bridge se conecta directamente mediante la Admin API oficial de Shopify (GraphQL 2024-10+) desde tu ordenador local. A diferencia de plataformas intermediarias en la nube que cobran entre 90 € y 250 € al mes o añaden comisiones por pedido tramitado, Bentian opera con tarifa plana, sincroniza inventario disponible (DISSTO) con webhooks reactivos en tiempo real y calcula con rigor matemático el Recargo de Equivalencia español (5,2%, 1,4%, 0,5%) en las líneas de Factusol."}},{"@type":"Question","name":"¿Cómo funciona la integración entre Factusol y Holded Cloud ERP para la facturación y la gestoría?","acceptedAnswer":{"@type":"Answer","text":"La integración con Holded une tu almacén físico local con la gestión financiera en la nube. Con la Arquitectura Tripartita (Shopify / WooCommerce ➔ Factusol ➔ Holded), las ventas online o en mostrador físico reservan stock y generan el albarán en Factusol al instante, mientras Bentian emite de forma automática la factura legal correlativa y el asiento contable en Holded Cloud ERP para tu gestoría. Tu asesor fiscal dispone de los libros de IVA al día y tu negocio elimina hasta 15 horas semanales de picado manual de facturas."}},{"@type":"Question","name":"¿Qué es la Arquitectura Tripartita (Shopify -> Factusol -> Holded) y qué problemas resuelve?","acceptedAnswer":{"@type":"Answer","text":"Es un patrón de ingeniería empresarial que sincroniza tres pilares: captación de ventas online en Shopify, preparación y control de existencias físico en Factusol local, y emisión de facturas oficiales y asientos contables en Holded Cloud ERP. Resuelve de forma definitiva las roturas de stock, el doble picado manual de facturas y los descuadres de IVA entre tienda web y gestoría, manteniendo la soberanía de datos con arquitectura Local-First."}},{"@type":"Question","name":"¿Puedo cancelar la suscripción si no la necesito?","acceptedAnswer":{"@type":"Answer","text":"Por supuesto. Puedes cancelar desde tu panel de usuario de Stripe en cualquier momento con un solo clic. Sin permanencias, sin penalizaciones y sin preguntas."}}]}]}
 </script>
 
   <!-- Tipografía: Inter (Editorial) + JetBrains Mono (Datos Técnicos) -->
@@ -1252,30 +1252,87 @@
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="conectores">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
-          <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Ecosistema</span>
+          <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Ecosistema & Integraciones</span>
           <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
             Conectores de integración.
           </h2>
           <p class="mt-4 text-zinc-400 text-sm leading-relaxed">
-            Arquitectura modular orientada a conectar sistemas de gestión con canales de venta. Mostramos con honestidad lo que funciona hoy en producción y la ruta de expansión.
+            Arquitectura modular orientada a conectar sistemas de gestión locales con canales de venta y ERPs en la nube. Mostramos con honestidad lo que funciona hoy en producción y la ruta de expansión.
           </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           
           <!-- CONECTOR ACTIVO 1: FACTUSOL -->
-          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.1] hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-mono text-zinc-400">ERP Local</span>
-              <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded font-semibold">ACTIVO 100%</span>
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.1] hover:border-indigo-500/50 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-400">ERP Local</span>
+                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded font-semibold">ACTIVO 100%</span>
+              </div>
+              <h3 class="text-lg font-semibold text-white">Factusol ERP</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Lectura OLEDB de tablas <code class="text-zinc-300 font-mono">F_ART</code>, <code class="text-zinc-300 font-mono">F_STO</code>, <code class="text-zinc-300 font-mono">F_CLI</code>, <code class="text-zinc-300 font-mono">F_PCL</code> y <code class="text-zinc-300 font-mono">F_FAC</code>. Compatible con bases de datos Access (<code class="text-zinc-300 font-mono">.accdb</code>) en versiones 2024, 2025 y 2026 en local o red NAS.
+              </p>
             </div>
-            <h3 class="text-lg font-semibold text-white">Factusol</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Lectura OLEDB de tablas <code class="text-zinc-300 font-mono">F_ART</code>, <code class="text-zinc-300 font-mono">F_STO</code>, <code class="text-zinc-300 font-mono">F_CLI</code>, <code class="text-zinc-300 font-mono">F_PCL</code> y <code class="text-zinc-300 font-mono">F_FAC</code>. Compatible con versiones 2024, 2025 y 2026.
-            </p>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <span class="text-[11px] text-zinc-500">Conector nativo:</span>
+              <a href="/docs/factusol/localizacion-base-datos/" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">
+                <span>Docs Factusol</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
           </div>
 
-          <!-- CONECTOR ACTIVO 2: WOOCOMMERCE -->
+          <!-- CONECTOR ACTIVO 2: SHOPIFY -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-indigo-500/40 hover:border-indigo-500 transition shadow-lg shadow-indigo-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-indigo-300">eCommerce</span>
+                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded font-semibold">ACTIVO 100%</span>
+              </div>
+              <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <span>Shopify</span>
+                <span class="text-[10px] font-mono text-indigo-300 bg-indigo-950/70 border border-indigo-800/60 px-1.5 py-0.5 rounded">GraphQL API</span>
+              </h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Conexión directa vía Shopify Admin API (GraphQL 2024-10+). Sincronización atómica de stock multiubicación (<code class="text-zinc-300 font-mono">DISSTO</code>) en lotes de 50 ítems, Webhooks reactivos en tiempo real (<code class="text-zinc-300 font-mono">orders/create</code>), control Token Bucket y mapeo de IVA español con Recargo de Equivalencia. Sin costes mensuales cloud.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <span class="text-[11px] text-zinc-500">Guía de integración:</span>
+              <a href="/docs/canales/shopify/" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">
+                <span>Ver Guía Shopify</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- CONECTOR ACTIVO 3: HOLDED CLOUD ERP -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-emerald-500/40 hover:border-emerald-500 transition shadow-lg shadow-emerald-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-emerald-300">Cloud ERP & Finanzas</span>
+                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded font-semibold">ACTIVO 100%</span>
+              </div>
+              <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <span>Holded Cloud ERP</span>
+                <span class="text-[10px] font-mono text-emerald-300 bg-emerald-950/70 border border-emerald-800/60 px-1.5 py-0.5 rounded">Gestoría Cloud</span>
+              </h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Enlace directo del almacén físico Factusol con la facturación y asesoría contable en la nube vía Holded REST API v1. Emisión automática de facturas de venta desde albaranes, sincronización de clientes, asientos contables en Libro Diario y protección anti-duplicados mediante <code class="text-zinc-300 font-mono">customId</code>. Cero doble picado manual.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <span class="text-[11px] text-zinc-500">Guía de integración:</span>
+              <a href="/docs/canales/holded/" class="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition">
+                <span>Ver Guía Holded</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- CONECTOR ACTIVO 4: WOOCOMMERCE -->
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.1] hover:border-indigo-500/50 transition flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-4">
@@ -1284,67 +1341,170 @@
               </div>
               <h3 class="text-lg font-semibold text-white">WooCommerce</h3>
               <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                Conexión bidireccional por REST API v3 con autenticación HMAC. Sincronización de artículos, stock, variaciones, estados de pedido y clientes.
+                Conexión bidireccional por REST API v3 con autenticación HMAC. Sincronización de artículos, stock, variaciones, estados de pedido y clientes. Compatible 100% con High-Performance Order Storage (HPOS).
               </p>
             </div>
             <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-              <span class="text-[11px] text-zinc-400">Plugin oficial WordPress:</span>
+              <a href="/docs/canales/woocommerce/" class="text-xs text-zinc-400 hover:text-zinc-200 transition">Guía técnica</a>
               <a href="/releases/latest/bentian-erp-bridge-for-factusol.zip" download="bentian-erp-bridge-for-factusol.zip" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 transition">
-                <span>Descargar .zip</span>
+                <span>Plugin .zip</span>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               </a>
             </div>
           </div>
 
-          <!-- CONECTOR 3: PRESTASHOP (BETA ACTIVA) -->
-          <div class="p-6 rounded-2xl bg-[#121215] border border-sky-500/30 hover:border-sky-500/60 transition">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-mono text-zinc-400">eCommerce</span>
-              <span class="text-[11px] font-mono text-sky-400 bg-sky-950/40 border border-sky-800/40 px-2 py-0.5 rounded font-semibold">BETA ACTIVA</span>
+          <!-- CONECTOR 5: PRESTASHOP (BETA ACTIVA) -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-sky-500/30 hover:border-sky-500/60 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-400">eCommerce</span>
+                <span class="text-[11px] font-mono text-sky-400 bg-sky-950/40 border border-sky-800/40 px-2 py-0.5 rounded font-semibold">BETA ACTIVA</span>
+              </div>
+              <h3 class="text-lg font-semibold text-white">PrestaShop</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Integración a través de conector PHP nativo y Web Services API (PrestaShop 1.7 / 8.x). Operativo en producción asistida para sincronización de catálogo, stock y pedidos.
+              </p>
             </div>
-            <h3 class="text-lg font-semibold text-white">PrestaShop</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Integración a través de conector PHP nativo y Web Services API (PrestaShop 1.7 / 8.x). Operativo en producción asistida para sincronización de catálogo, stock y pedidos.
-            </p>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <span class="text-[11px] text-zinc-500">Documentación:</span>
+              <a href="/docs/canales/prestashop/" class="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1 transition">
+                <span>Ver Guía PrestaShop</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
           </div>
 
-          <!-- CONECTOR ACTIVO 3: SHOPIFY -->
-          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.1] hover:border-indigo-500/50 transition">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-mono text-zinc-400">eCommerce</span>
-              <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded font-semibold">ACTIVO 100%</span>
+          <!-- CONECTOR 6: SIMPLYGEST & MIRAKL (ROADMAP) -->
+          <div class="p-6 rounded-2xl bg-[#121215]/50 border border-white/[0.04] flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-500">ERP Local & Marketplaces</span>
+                <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded font-semibold">EXPANSIÓN</span>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-300">SimplyGest & Mirakl</h3>
+              <p class="text-xs text-zinc-500 mt-2 leading-relaxed">
+                Conector para bases de datos SimplyGest con familias y tallas/colores, y pasarela universal Mirakl para centralizar pedidos procedentes de marketplaces europeos.
+              </p>
             </div>
-            <h3 class="text-lg font-semibold text-white">Shopify</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              Conexión directa vía Shopify Admin API (GraphQL). Sincronización atómica de stock disponible (<code class="text-zinc-300 font-mono">DISSTO</code>) en lotes de 50 ítems, Token Bucket rate limiting y mapeo fiscal de IVA español con Recargo de Equivalencia.
-            </p>
-          </div>
-
-          <!-- CONECTOR 5: SIMPLYGEST (EN ROADMAP) -->
-          <div class="p-6 rounded-2xl bg-[#121215]/50 border border-white/[0.04]">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-mono text-zinc-500">ERP Local</span>
-              <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded font-semibold">EN ROADMAP</span>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <span class="text-[11px] text-zinc-500">Protocolo abierto:</span>
+              <a href="/docs/canales/endpoint-universal/" class="text-xs font-medium text-zinc-400 hover:text-zinc-200 flex items-center gap-1 transition">
+                <span>Endpoint Universal</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
             </div>
-            <h3 class="text-lg font-semibold text-zinc-300">SimplyGest</h3>
-            <p class="text-xs text-zinc-500 mt-2 leading-relaxed">
-              Conector para base de datos SimplyGest con soporte de familias y tallas/colores. Mapeador canónico preparado para despliegue.
-            </p>
-          </div>
-
-          <!-- CONECTOR 6: MIRAKL (EXPANSIÓN) -->
-          <div class="p-6 rounded-2xl bg-[#121215]/50 border border-white/[0.04]">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-mono text-zinc-500">Marketplace</span>
-              <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded font-semibold">EXPANSIÓN</span>
-            </div>
-            <h3 class="text-lg font-semibold text-zinc-300">Mirakl Universal</h3>
-            <p class="text-xs text-zinc-500 mt-2 leading-relaxed">
-              Conexión para publicar catálogos y centralizar pedidos de marketplaces operadores bajo la plataforma Mirakl.
-            </p>
           </div>
 
         </div>
+
+        <!-- ========================================================================= -->
+        <!-- BLOQUE DESTACADO: CASO DE ÉXITO DE ARQUITECTURA TRIPARTITA                -->
+        <!-- ========================================================================= -->
+        <div class="mt-16 p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#121217] to-[#0a0a0d] border border-indigo-500/30 shadow-2xl relative overflow-hidden">
+          <div class="absolute -right-24 -top-24 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -left-24 -bottom-24 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="relative z-10">
+            <div class="max-w-3xl mb-10">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-950/80 border border-indigo-700/50 text-xs font-mono text-indigo-300 font-semibold mb-4">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                <span>CASO DE ÉXITO & ARQUITECTURA DISTRIBUIDA</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+                Arquitectura Tripartita:<br class="hidden sm:inline" />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-sky-300 to-emerald-400">
+                  Shopify ➔ Factusol Almacén ➔ Holded Facturación
+                </span>
+              </h3>
+              <p class="text-sm text-zinc-300 mt-4 leading-relaxed">
+                El patrón de ingeniería definitivo para distribuidores y comercios minoristas en España: sincroniza las ventas de tu tienda online, el picking en almacén local y los libros contables de tu gestoría sin duplicidades y con cero comisiones por pedido.
+              </p>
+            </div>
+
+            <!-- Flow Diagram Cards (3 Pasos Conectados) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+              
+              <!-- Paso 1: Shopify -->
+              <div class="p-6 rounded-2xl bg-[#16161c] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-mono text-indigo-400 font-semibold">PASO 1 · CAPTACIÓN</span>
+                    <span class="text-[11px] font-mono text-zinc-500">eCommerce</span>
+                  </div>
+                  <h4 class="text-base font-bold text-white">Venta en Shopify</h4>
+                  <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    El cliente finaliza su pedido en Shopify. Se dispara un webhook seguro (<code class="text-indigo-300 font-mono">orders/create</code>) con firma HMAC-SHA256, cálculo de IVA y Recargo de Equivalencia (R.E.).
+                  </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Ingesta reactiva &lt; 800ms</span>
+                </div>
+              </div>
+
+              <!-- Paso 2: Factusol Local -->
+              <div class="p-6 rounded-2xl bg-[#16161c] border border-white/[0.08] hover:border-sky-500/40 transition flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-mono text-sky-400 font-semibold">PASO 2 · OPERACIONES</span>
+                    <span class="text-[11px] font-mono text-zinc-500">Almacén Local</span>
+                  </div>
+                  <h4 class="text-base font-bold text-white">Inyección Factusol</h4>
+                  <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    Bentian inyecta el pedido en <code class="text-sky-300 font-mono">F_PCL</code> y líneas en <code class="text-sky-300 font-mono">F_LPC</code> de forma atómica. Reserva stock disponible (<code class="text-sky-300 font-mono">DISSTO</code>) e imprime el albarán para los mozos de almacén.
+                  </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-sky-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Cero sobreventas en mostrador</span>
+                </div>
+              </div>
+
+              <!-- Paso 3: Holded Cloud -->
+              <div class="p-6 rounded-2xl bg-[#16161c] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-mono text-emerald-400 font-semibold">PASO 3 · FISCALIDAD</span>
+                    <span class="text-[11px] font-mono text-zinc-500">Gestoría Cloud</span>
+                  </div>
+                  <h4 class="text-base font-bold text-white">Factura en Holded</h4>
+                  <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    El agente genera la factura legal correlativa en Holded Cloud ERP mediante REST API. Registra el asiento contable en Libro Diario y lo deja listo para la gestoría fiscal y modelos 303/390.
+                  </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>100% Sin doble picado manual</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Métricas y Enlace al Caso de Estudio -->
+            <div class="mt-8 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex flex-wrap items-center gap-6 text-xs text-zinc-400 font-mono">
+                <div class="flex items-center gap-2">
+                  <span class="text-emerald-400 font-bold text-sm">~15h/sem</span>
+                  <span>Ahorro administrativo</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-indigo-400 font-bold text-sm">100%</span>
+                  <span>Store-and-Forward tolerante a cortes</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sky-400 font-bold text-sm">Veri*Factu</span>
+                  <span>Trazabilidad legal española</span>
+                </div>
+              </div>
+              <a href="/docs/arquitectura/arquitectura-tripartita/" class="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition shadow-lg shadow-indigo-600/20 shrink-0">
+                <span>Leer Guía Arquitectura Tripartita</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1719,6 +1879,26 @@
             </summary>
             <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
               Es completamente normal en versiones de software recién compiladas que aún no cuentan con semanas de telemetría masiva en Microsoft. El instalador está firmado criptográficamente, libre de amenazas y compilado localmente. Para continuar, pulsa en <strong>"Más información"</strong> y luego en <strong>"Ejecutar de todas formas"</strong>.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Puedo conectar Factusol con Shopify y gestionar el Recargo de Equivalencia sin comisiones mensuales?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. Bentian ERP Bridge se conecta directamente mediante la Admin API oficial de Shopify (GraphQL 2024-10+) desde tu ordenador local. A diferencia de plataformas intermediarias en la nube que cobran entre 90 € y 250 € al mes o añaden comisiones por pedido tramitado, Bentian opera con tarifa plana, sincroniza inventario disponible (<code class="text-zinc-300 font-mono">DISSTO</code>) con webhooks reactivos en tiempo real y calcula con rigor matemático el Recargo de Equivalencia español (5,2%, 1,4%, 0,5%) en las líneas de Factusol.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Cómo funciona la integración con Holded Cloud ERP y qué ventajas aporta la arquitectura tripartita?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              La integración con Holded une tu almacén físico local con la gestión financiera en la nube. Con la <strong>Arquitectura Tripartita</strong> (Shopify / WooCommerce ➔ Factusol ➔ Holded), las ventas online o en mostrador físico reservan stock y generan el albarán en Factusol al instante, mientras Bentian emite de forma automática la factura legal correlativa y el asiento contable en Holded Cloud ERP para tu gestoría. Tu asesor fiscal dispone de los libros de IVA al día y tu negocio elimina hasta 15 horas semanales de picado manual de facturas.
             </p>
           </details>
 

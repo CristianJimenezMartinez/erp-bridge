@@ -27,14 +27,14 @@ export const DOC_CATEGORIES: DocCategory[] = [
     slug: 'canales',
     title: 'Canales eCommerce',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
-    description: 'Sincronización con WooCommerce (HPOS), PrestaShop, Shopify y Endpoint Universal.',
+    description: 'Sincronización con WooCommerce (HPOS), PrestaShop, Shopify, Holded Cloud ERP y Endpoint Universal.',
     order: 3,
   },
   {
     slug: 'arquitectura',
     title: 'Arquitectura & Sincronización',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-    description: 'Filosofía Local-First, cola SQLite Store-and-Forward y monitoreo en tiempo real.',
+    description: 'Filosofía Local-First, cola SQLite Store-and-Forward, arquitectura tripartita y monitoreo en tiempo real.',
     order: 4,
   },
   {

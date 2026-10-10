@@ -260,4 +260,105 @@ export const arquitecturaArticles: DocArticle[] = [
       </p>
     `,
   },
+  {
+    slug: 'arquitectura/arquitectura-tripartita',
+    categorySlug: 'arquitectura',
+    title: 'Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud',
+    subtitle: 'Patrón de ingeniería empresarial para sincronizar Shopify/WooCommerce, almacén físico Factusol y facturación contable en Holded sin fricciones ni duplicidades.',
+    badge: 'Patrón Enterprise Tripartito',
+    readingTime: '7 min de lectura',
+    metaTitle: 'Arquitectura Tripartita: Shopify + Factusol + Holded ERP | Bentian',
+    metaDescription: 'Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.',
+    keywords: 'arquitectura tripartita shopify factusol holded, facturacion holded pedidos shopify factusol, conectar tienda online almacen fisico gestoria nube, sincronizar shopify factusol holded, flujo pedidos ecommerce almacen erp cloud, automatizar facturas holded pedidos factusol',
+    toc: [
+      { id: 'el-reto-omnicanal', label: '1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud', level: 2 },
+      { id: 'diagrama-flujo-tripartito', label: '2. Diagrama de Flujo Extremo a Extremo', level: 2 },
+      { id: 'fase-1-venta-checkout', label: '3. Fase 1 (Venta): Ingesta Reactiva del Pedido Web (Shopify)', level: 2 },
+      { id: 'fase-2-operaciones-almacen', label: '4. Fase 2 (Operaciones): Inyección Atómica en Factusol y Stock', level: 2 },
+      { id: 'fase-3-contabilidad-holded', label: '5. Fase 3 (Contabilidad): Emisión Fiscal Automatizada en Holded', level: 2 },
+      { id: 'resiliencia-desacoplada', label: '6. Resiliencia Desacoplada ante Cortes y PC Apagado', level: 2 },
+      { id: 'beneficios-roi', label: '7. Beneficios: Ahorro de 15h/semana y Cumplimiento Veri*Factu', level: 2 },
+    ],
+    contentHtml: `
+      <p class="text-base text-zinc-300 leading-relaxed mb-6">
+        La mayoría de empresas comerciales en España operan hoy con un ecosistema híbrido: venden online en plataformas líderes como <strong>Shopify</strong> o <strong>WooCommerce</strong>, gestionan la logística, compras y almacén físico en <strong>Factusol</strong> en sus servidores locales de empresa, y coordinan la contabilidad, impuestos y facturación electrónica con su gestoría a través de <strong>Holded Cloud ERP</strong>. La <strong>Arquitectura Tripartita de Bentian ERP Bridge</strong> es el patrón de ingeniería distribuida que sincroniza estos tres pilares en un ciclo continuo, automatizado y a prueba de fallos.
+      </p>
+
+      <h2 id="el-reto-omnicanal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Cuando estos tres sistemas funcionan de forma desconectada, surgen fricciones críticas que frenan el crecimiento del negocio:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Roturas de stock y sobreventas:</strong> Si un producto se vende en la tienda física de mostrador a las 11:00 y alguien lo compra en Shopify a las 11:05 porque el inventario no se actualizó, la empresa debe cancelar el pedido y sufrir daño reputacional.</li>
+        <li><strong>Doble entrada administrativa de pedidos:</strong> El personal de administración tiene que transcribir los pedidos de Shopify albarán por albarán en Factusol, y posteriormente volver a crear la factura en Holded para enviársela a la gestoría.</li>
+        <li><strong>Descuadres en el modelo 303 de IVA:</strong> Desfases entre las fechas de pedido de la tienda web y las fechas de facturación en la nube, provocando discrepancias tributarias con la AEAT.</li>
+      </ul>
+
+      <h2 id="diagrama-flujo-tripartito" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Diagrama de Flujo Extremo a Extremo</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Bentian orquesta el flujo de información de forma completamente desacoplada y orientada a eventos:
+      </p>
+      <div class="p-5 rounded-2xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6 space-y-3">
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 1: TIENDA ONLINE (Shopify / WooCommerce) ]</div>
+        <div class="text-zinc-400">Cliente compra ➔ Pago confirmado ➔ Webhook TLS 1.3 con firma HMAC</div>
+        <div class="text-indigo-400">▼ (Descarga en milisegundos a cola local SQLite)</div>
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 2: ALMACÉN LOCAL (Factusol ERP) ]</div>
+        <div class="text-zinc-400">Ingesta atómica en F_PCL / F_LPC ➔ Reserva de stock DISSTO ➔ Impresión albarán picking</div>
+        <div class="text-indigo-400">▼ (Confirmación ACK & Emisión contable cloud)</div>
+        <div class="text-emerald-400 font-bold text-sm">[ PASO 3: GESTORÍA & CONTABILIDAD (Holded Cloud ERP) ]</div>
+        <div class="text-zinc-400">Factura oficial generada ➔ Asiento en Libro Diario ➔ Sincronización bancaria y fiscal</div>
+      </div>
+
+      <h2 id="fase-1-venta-checkout" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Fase 1 (Venta): Ingesta Reactiva del Pedido Web (Shopify)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        En cuanto el cliente finaliza la compra en Shopify:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li>Shopify emite un webhook seguro <code class="text-indigo-300 font-mono">orders/create</code> con el payload del pedido.</li>
+        <li>El agente de Bentian valida la firma criptográfica del header <code class="text-zinc-200 font-mono">X-Shopify-Hmac-Sha256</code> para garantizar autenticidad.</li>
+        <li>Desglosa los importes brutos, netos, cuotas de IVA (21%, 10%, 4%) y Recargo de Equivalencia si el cliente es comerciante minorista.</li>
+      </ul>
+
+      <h2 id="fase-2-operaciones-almacen" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Fase 2 (Operaciones): Inyección Atómica en Factusol y Stock</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Sin que intervenga ningún usuario humano, el agente procesa el pedido en la red local de la empresa:
+      </p>
+      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+        <li>Abre una transacción atómica OLEDB sobre el archivo <code class="text-zinc-200 font-mono">.accdb</code> de Factusol.</li>
+        <li>Crea o localiza la ficha del cliente en <code class="text-indigo-300 font-mono">F_CLI</code> por CIF o DNI.</li>
+        <li>Inserta la cabecera del pedido en <code class="text-indigo-300 font-mono">F_PCL</code> y las líneas en <code class="text-indigo-300 font-mono">F_LPC</code>.</li>
+        <li>Actualiza de inmediato las unidades pendientes de servir, recalculando el stock disponible (<code class="text-emerald-400 font-mono">DISSTO</code>).</li>
+        <li>Los operarios del almacén ven el nuevo albarán en sus terminales locales para comenzar el picking de inmediato.</li>
+      </ol>
+
+      <h2 id="fase-3-contabilidad-holded" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Fase 3 (Contabilidad): Emisión Fiscal Automatizada en Holded</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Una vez confirmado el pedido en Factusol, Bentian contacta con la API REST de Holded:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
+        <li>Crea la factura oficial de venta con la serie configurada (ej. serie <em>"SHOP"</em> o <em>"2026"</em>).</li>
+        <li>Genera automáticamente el asiento contable en el libro diario de Holded vinculando la cuenta 430 del cliente con la 700 de ventas y 477 de IVA.</li>
+        <li>Tu gestoría contable puede consultar en cualquier momento los libros de IVA actualizados en tiempo real para las liquidaciones trimestrales sin tener que pedirte extractos.</li>
+      </ul>
+
+      <h2 id="resiliencia-desacoplada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Resiliencia Desacoplada ante Cortes y PC Apagado</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        ¿Qué ocurre si el almacén cierra a las 19:00 o se apaga el ordenador durante el fin de semana?
+      </p>
+      <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6 leading-relaxed">
+        <strong>Tolerancia Total a Fallos con Store-and-Forward:</strong> Los pedidos de Shopify quedan retenidos de forma segura en la nube de Shopify. El lunes por la mañana a las 08:00, al encender el PC del almacén, Bentian despierta, recupera todos los pedidos acumulados, los custodia en su cola SQLite local en milisegundos y procede a la inyección secuencial en Factusol y emisión en Holded. Cero pedidos perdidos, cero descuadres.
+      </div>
+
+      <h2 id="beneficios-roi" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Beneficios: Ahorro de 15h/semana y Cumplimiento Veri*Factu</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Las empresas que han desplegado la arquitectura tripartita obtienen ventajas comerciales y operativas inmediatas:
+      </p>
+      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><strong>Ahorro medio de 15 horas semanales</strong> de trabajo administrativo rutinario eliminando el picado manual de facturas y albaranes.</li>
+        <li><strong>Eliminación del 100% de sobreventas</strong> gracias al cálculo matemático de existencias disponibles en menos de 3 segundos.</li>
+        <li><strong>Cumplimiento normativo riguroso:</strong> Trazabilidad completa exigida por la Ley Antifraude y el reglamento Veri*Factu, con registros correlativos e inmutables.</li>
+      </ul>
+    `,
+  },
 ];
+
