@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cola SQLite Store-and-Forward para Factusol | Bentian ERP Bridge</title>
-  <meta name="description" content="Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia SQLite (WAL) e inyección en Factusol.">
-  <meta name="keywords" content="store and forward factusol, cola sqlite pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, wal sqlite factusol">
+  <title>Cola Store-and-Forward JSON Atómico para Factusol | Bentian ERP Bridge</title>
+  <meta name="description" content="Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia en JSON atómico e inyección en Factusol.">
+  <meta name="keywords" content="store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
   <link rel="canonical" href="https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/">
 
@@ -17,8 +17,8 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Cola SQLite Store-and-Forward para Factusol | Bentian ERP Bridge">
-  <meta property="og:description" content="Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia SQLite (WAL) e inyección en Factusol.">
+  <meta property="og:title" content="Cola Store-and-Forward JSON Atómico para Factusol | Bentian ERP Bridge">
+  <meta property="og:description" content="Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia en JSON atómico e inyección en Factusol.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -31,8 +31,8 @@
       {
         "@type": "TechArticle",
         "@id": "https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/#article",
-        "headline": "Cola Desacoplada Store-and-Forward (SQLite)",
-        "description": "Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia SQLite (WAL) e inyección en Factusol.",
+        "headline": "Cola Desacoplada Store-and-Forward (JSON Atómico)",
+        "description": "Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia en JSON atómico e inyección en Factusol.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -75,7 +75,7 @@
           {
             "@type": "ListItem",
             "position": 4,
-            "name": "Cola Desacoplada Store-and-Forward (SQLite)",
+            "name": "Cola Desacoplada Store-and-Forward (JSON Atómico)",
             "item": "https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/"
           }
         ]
@@ -195,25 +195,25 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian">
+                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian, bentian portable sin permisos">
                       <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Requisitos del Sistema y Entorno Operativo
                       </a>
                     </li>
                   
-                    <li data-title="instalación y despliegue del agente en windows" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, desplegar conector factusol, bentian tray windows">
+                    <li data-title="instalación y despliegue del agente en windows (instalador vs portable)" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, bentian portable zip, version portable factusol, desplegar conector factusol, bentian tray windows, autoactualizacion bentian">
                       <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Instalación y Despliegue del Agente en Windows
+                        Instalación y Despliegue del Agente en Windows (Instalador vs Portable)
                       </a>
                     </li>
                   
-                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian, plan fundador bentian, licenciamiento erp bridge">
+                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian 1 clic, modo exploracion bentian, plan fundador bentian, licenciamiento erp bridge, hwid factusol">
                       <a href="/docs/primeros-pasos/activacion-de-licencias/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Activación de Licencias, Beta de 60 Días y Plan Fundador
                       </a>
                     </li>
                   
-                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil">
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web">
                       <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Guía del Asistente de Configuración (Onboarding Wizard)
                       </a>
@@ -301,7 +301,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="endpoint universal: especificación técnica y protocolo bidireccional" data-keywords="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos sqlite, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
+                    <li data-title="endpoint universal: especificación técnica y protocolo bidireccional" data-keywords="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos json atomico, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
                       <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Endpoint Universal: Especificación Técnica y Protocolo Bidireccional
                       </a>
@@ -324,9 +324,9 @@
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, wal sqlite factusol">
+                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
-                        Cola Desacoplada Store-and-Forward (SQLite)
+                        Cola Desacoplada Store-and-Forward (JSON Atómico)
                       </a>
                     </li>
                   
@@ -503,7 +503,7 @@
           <span>/</span>
           <span class="text-zinc-400">Arquitectura & Sincronización</span>
           <span>/</span>
-          <span class="text-indigo-400 font-medium truncate max-w-xs">Cola Desacoplada Store-and-Forward (SQLite)</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Cola Desacoplada Store-and-Forward (JSON Atómico)</span>
         </nav>
 
         <!-- Article Header -->
@@ -519,10 +519,10 @@
           </div>
 
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
-            Cola Desacoplada Store-and-Forward (SQLite)
+            Cola Desacoplada Store-and-Forward (JSON Atómico)
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia SQLite (WAL) e inyección en Factusol.
+            Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia en JSON atómico estructurado e inyección en Factusol.
           </p>
         </div>
 
@@ -535,7 +535,7 @@
 
       <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 leading-relaxed mb-6">
         <strong class="text-white font-semibold block mb-1">Aclaración Mandataria de Arquitectura:</strong>
-        Si el ordenador del almacén está físicamente apagado, ningún software local puede ejecutar instrucciones ni capturar datos directamente. La promesa técnica de Bentian radica en una <strong>arquitectura de custodia desacoplada en dos niveles</strong>: los pedidos permanecen disponibles y seguros en la base de datos de la tienda online mientras el PC permanezca inactivo; en el instante en que el agente vuelve a estar operativo, recupera los pedidos automáticamente y los custodia en su cola local SQLite transaccional, blindando su posterior inyección en Factusol aunque la base de datos esté temporalmente bloqueada o la tienda web sufra una caída posterior.
+        Si el ordenador del almacén está físicamente apagado, ningún software local puede ejecutar instrucciones ni capturar datos directamente. La promesa técnica de Bentian radica en una <strong>arquitectura de custodia desacoplada en dos niveles</strong>: los pedidos permanecen disponibles y seguros en la base de datos de la tienda online mientras el PC permanezca inactivo; en el instante en que el agente vuelve a estar operativo, recupera los pedidos automáticamente y los custodia en su cola local Store-and-Forward con persistencia en JSON atómico estructurado, blindando su posterior inyección en Factusol aunque la base de datos esté temporalmente bloqueada o la tienda web sufra una caída posterior.
       </div>
 
       <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. La Realidad Operativa: El PC del Almacén se Apaga</h2>
@@ -580,10 +580,10 @@
               <td class="px-4 py-2 font-sans text-zinc-300">Descarga automática al encender el PC o en ciclo programado de polling.</td>
             </tr>
             <tr>
-              <td class="px-4 py-2 text-white font-bold font-sans">Fase 3: Custodia SQLite</td>
-              <td class="px-4 py-2 text-indigo-300">%APPDATA%\Bentian Agent\queue.db</td>
+              <td class="px-4 py-2 text-white font-bold font-sans">Fase 3: Custodia Local</td>
+              <td class="px-4 py-2 text-indigo-300">%APPDATA%\Bentian Agent\ (JSON Atómico)</td>
               <td class="px-4 py-2 text-emerald-400 font-bold">QUEUED (Custodiado)</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Persistencia local con WAL mode. Cero pérdida ante caídas de red o bloqueos.</td>
+              <td class="px-4 py-2 font-sans text-zinc-300">Persistencia local en JSON atómico (.tmp + rename) y .bak. Cero pérdida ante caídas de red o bloqueos.</td>
             </tr>
             <tr>
               <td class="px-4 py-2 text-white font-bold font-sans">Fase 4: Inyección ERP</td>
@@ -596,7 +596,7 @@
       </div>
 
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6">
-        [ Fase 1: Web Hosting ] ──(HTTPS Poll / Fase 2)──▶ [ Fase 3: SQLite WAL Local ] ──(Transacción OLEDB)──▶ [ Fase 4: Factusol F_PCL ]
+        [ Fase 1: Web Hosting ] ──(HTTPS Poll / Fase 2)──▶ [ Fase 3: JSON Atómico Local ] ──(Transacción OLEDB)──▶ [ Fase 4: Factusol F_PCL ]
         <div class="text-[10px] text-emerald-400 mt-2">▲ Retención en Web (PC Apagado) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Blindaje Local Offline en Disco &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Inyección & Flujo ACK</div>
       </div>
 
@@ -618,25 +618,25 @@
         <li><strong>Validación sintáctica:</strong> Verifica la integridad del JSON entrante (cabecera, cliente, NIF/CIF y líneas con precios sin IVA y tipos impositivos).</li>
       </ul>
 
-      <h2 id="fase-3-custodia-sqlite" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Fase 3: Custodia en Cola Local SQLite (Modo WAL)</h2>
+      <h2 id="fase-3-custodia-local" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Fase 3: Custodia en Cola Local en JSON Atómico</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En cuanto los pedidos se descargan por HTTPS, el agente <strong>NO</strong> intenta grabarlos directamente en Factusol. Los inserta de inmediato en su motor local transaccional SQLite:
+        En cuanto los pedidos se descargan por HTTPS, el agente <strong>NO</strong> intenta grabarlos directamente en Factusol. Los custodia de inmediato en su almacenamiento local estructurado en JSON atómico con respaldo defensivo en AppData:
       </p>
       <div class="p-3 rounded-lg bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 mb-4">
-        Ruta inmutable: %APPDATA%\Bentian Agent\queue.db
+        Ruta obligatoria: %APPDATA%\Bentian Agent\ (JSON estructurado con reemplazo atómico .tmp y .bak)
       </div>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Este almacenamiento se configura en modo <strong>Write-Ahead Logging (WAL)</strong> (<code>PRAGMA journal_mode=WAL</code>; <code>PRAGMA synchronous=NORMAL</code>), garantizando:
+        Este almacenamiento opera mediante <strong>escritura atómica certificada</strong> (escritura en fichero temporal <code>.tmp</code>, sincronización y reemplazo atómico vía <code>fs.renameSync</code> con copia de respaldo <code>.bak</code>), garantizando:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Inmunidad ante caídas de Internet:</strong> Si la fibra óptica se corta un segundo después de descargar el pedido, el dato ya reside en el disco NVMe/SSD local. No se perderá aunque el almacén quede incomunicado.</li>
-        <li><strong>Inmunidad ante caídas de la tienda web:</strong> Si el servidor de la tienda online sufre un reinicio o mantenimiento en la nube, el agente puede seguir trabajando con los pedidos ya custodiados.</li>
-        <li><strong>Concurrencia libre de bloqueos:</strong> El modo WAL permite lecturas continuas desde la interfaz gráfica del agente mientras el motor de sincronización escribe pedidos en disco sin cuellos de botella.</li>
+        <li><strong>Inmunidad ante caídas eléctricas y de Internet:</strong> La escritura atómica previene corrupción de archivos ante cortes de luz accidentales. Si la fibra óptica se interrumpe tras la descarga, el pedido ya está custodiado en disco local.</li>
+        <li><strong>Inmunidad ante caídas de la tienda web:</strong> Si el servidor de la tienda online sufre un reinicio o mantenimiento, el agente continúa procesando secuencialmente los pedidos custodiados.</li>
+        <li><strong>Integridad garantizada sin bloqueos:</strong> La separación entre el estado de configuración, la cola y las copias de seguridad (.bak) asegura máxima solidez y prevención anti-wiping sin dependencias externas de drivers ni bloqueos de base de datos.</li>
       </ul>
 
       <h2 id="fase-4-inyeccion-factusol" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Fase 4: Inyección Atómica en Factusol y Confirmación ACK</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Con el pedido custodiado en SQLite, el motor <code>LocalSyncEngine</code> procede a su inyección en la base de datos de Factusol (<code>.accdb</code>):
+        Con el pedido custodiado en la cola local de AppData, el motor <code>LocalSyncEngine</code> procede a su inyección en la base de datos de Factusol (<code>.accdb</code>):
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
         <li><strong>Apertura de Transacción OLEDB:</strong> Se inicia una transacción atómica agrupada (<code>BeginTrans</code>) en el motor OLEDB de 32 bits de Microsoft ACE.</li>
@@ -652,7 +652,7 @@
         ¿Qué ocurre si un operario del almacén está realizando un balance contable, una regeneración de stock o una copia de seguridad en Factusol y bloquea la tabla en modo exclusivo (error <code>3045 / Could not use; file already in use</code>)?
       </p>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Un conector síncrono colapsaría. Bentian, en cambio, mantiene el pedido en estado <code>PENDING_INJECTION</code> en su cola SQLite y aplica un algoritmo de <strong>retroceso exponencial (*exponential backoff*) con jitter aleatorio</strong>:
+        Un conector síncrono colapsaría. Bentian, en cambio, mantiene el pedido en estado <code>PENDING_INJECTION</code> en su cola local Store-and-Forward y aplica un algoritmo de <strong>retroceso exponencial (*exponential backoff*) con jitter aleatorio</strong>:
       </p>
       <div class="p-3 rounded-lg bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-400 mb-6">
         Intento 1: Inmediato ──▶ Intento 2: 5 seg ──▶ Intento 3: 15 seg ──▶ Intento 4: 45 seg ──▶ Intento 5: 2 min...
@@ -663,11 +663,11 @@
 
       <h2 id="garantia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">8. Garantía de Entrega e Idempotencia Extremo a Extremo</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        La cola SQLite local incorpora una restricción de unicidad primaria sobre el identificador original del pedido web (<code>web_order_id</code>). Esta salvaguarda garantiza la propiedad de <strong>idempotencia estricta</strong>:
+        La cola local Store-and-Forward incorpora un control de unicidad primaria sobre el identificador original del pedido web (<code>web_order_id</code>). Esta salvaguarda garantiza la propiedad de <strong>idempotencia estricta</strong>:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
         <li><strong>Fallo de red durante el ACK:</strong> Si el agente inyecta el pedido en Factusol pero la llamada de confirmación ACK a la tienda online falla por un timeout de red, la tienda web mantendrá el pedido como <code>PENDING</code>. En el siguiente ciclo de polling, la tienda volverá a enviar el mismo pedido al agente.</li>
-        <li><strong>Detección de duplicado en SQLite:</strong> El agente detecta que el <code>web_order_id</code> ya existe en su cola local en estado <code>SYNCED</code> con su número de Factusol asignado. <strong>El agente jamás reinserta el pedido en Factusol</strong>, evitando duplicaciones de albarán o descuadres de inventario. En su lugar, reenvía inmediatamente la confirmación ACK a la tienda web para sincronizar su estado.</li>
+        <li><strong>Detección de duplicado en la cola local:</strong> El agente detecta que el <code>web_order_id</code> ya existe en su registro local en estado <code>SYNCED</code> con su número de Factusol asignado. <strong>El agente jamás reinserta el pedido en Factusol</strong>, evitando duplicaciones de albarán o descuadres de inventario. En su lugar, reenvía inmediatamente la confirmación ACK a la tienda web para sincronizar su estado.</li>
       </ul>
     
         </article>
@@ -731,8 +731,8 @@
             </li>
           
             <li>
-              <a href="#fase-3-custodia-sqlite" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="fase-3-custodia-sqlite">
-                5. Fase 3: Custodia en Cola Local SQLite (Modo WAL)
+              <a href="#fase-3-custodia-local" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="fase-3-custodia-local">
+                5. Fase 3: Custodia en Cola Local en JSON Atómico
               </a>
             </li>
           

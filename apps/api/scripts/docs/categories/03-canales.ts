@@ -176,17 +176,17 @@ export const canalesArticles: DocArticle[] = [
     slug: 'canales/endpoint-universal',
     categorySlug: 'canales',
     title: 'Endpoint Universal: Especificación Técnica y Protocolo Bidireccional',
-    subtitle: 'Norma de integración Enterprise para tiendas a medida (PHP, Laravel, Node.js, Plesk): ciclo ACK, idempotencia SQLite, diccionario de datos, HMAC-SHA256 y resiliencia.',
+    subtitle: 'Norma de integración Enterprise para tiendas a medida (PHP, Laravel, Node.js, Plesk): ciclo ACK, idempotencia en custodia local JSON atómico, diccionario de datos, HMAC-SHA256 y resiliencia.',
     badge: 'Especificación Enterprise',
     readingTime: '9 min de lectura',
     metaTitle: 'Especificación Técnica Endpoint Universal Factusol | Bentian ERP Bridge',
-    metaDescription: 'Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia SQLite, HMAC-SHA256 y código PHP de producción.',
-    keywords: 'endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos sqlite, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol',
+    metaDescription: 'Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia en custodia local JSON atómico, HMAC-SHA256 y código PHP de producción.',
+    keywords: 'endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos json atomico, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol',
     toc: [
       { id: 'proposito-arquitectura', label: '1. Propósito y Arquitectura de Integración Enterprise', level: 2 },
       { id: 'protocolo-bidireccional', label: '2. Protocolo Bidireccional de Comunicación (Polling & Flujo ACK)', level: 2 },
       { id: 'flujo-confirmacion-ack', label: '3. Confirmación de Recepción (Flujo ACK) y Cierre de Transacción', level: 2 },
-      { id: 'resiliencia-idempotencia', label: '4. Resiliencia ante Fallos de Red e Idempotencia en SQLite', level: 2 },
+      { id: 'resiliencia-idempotencia', label: '4. Resiliencia ante Fallos de Red e Idempotencia en Custodia Local', level: 2 },
       { id: 'diccionario-datos', label: '5. Diccionario de Datos: Especificación Rigurosa de Campos JSON', level: 2 },
       { id: 'paginacion-versionado', label: '6. Paginación de Alto Rendimiento, Límites y Versionado', level: 2 },
       { id: 'seguridad-headers-hmac', label: '7. Seguridad: Headers, Criptografía HMAC-SHA256 y Anti-Replay', level: 2 },
@@ -217,7 +217,7 @@ export const canalesArticles: DocArticle[] = [
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
         <li><strong>Fase 1 (Sondeo / Pull):</strong> El agente solicita pedidos en espera enviando una petición <code>GET /api/bentian-orders.php?limit=50&status=PENDING</code> (o <code>?action=get_orders</code>).</li>
-        <li><strong>Fase 2 (Custodia Local):</strong> El agente almacena el bloque de pedidos en su base de datos local SQLite (<code>queue.db</code>) en modo WAL.</li>
+        <li><strong>Fase 2 (Custodia Local):</strong> El agente almacena el bloque de pedidos en su custodia local en JSON atómico estructurado con reemplazo seguro (<code>.tmp</code> + <code>fs.renameSync</code>) y respaldo defensivo <code>.bak</code> en <code>%APPDATA%\\Bentian Agent\\</code>.</li>
         <li><strong>Fase 3 (Inyección Atómica):</strong> El conector Factusol abre una transacción OLEDB (<code>BeginTrans</code>), busca o crea el cliente en <code>F_CLI</code>, inserta la cabecera en <code>F_PCL</code> y las líneas en <code>F_LPC</code>, y consolida la operación con <code>CommitTrans</code>.</li>
         <li><strong>Fase 4 (Confirmación / ACK):</strong> El agente emite una petición <code>POST /api/bentian-ack.php</code> (o <code>?action=ack_orders</code>) notificando a la tienda online que el pedido ha sido registrado con éxito en Factusol y facilitando el número de pedido oficial del ERP.</li>
         <li><strong>Fase 5 (Transición en Web):</strong> La tienda web cambia el estado del pedido de <code>PENDING</code> a <code>SYNCED</code>, almacenando la referencia y fecha para auditoría.</li>
@@ -282,7 +282,7 @@ X-Bentian-Timestamp: 1791189000
   "message": "Pedidos marcados como sincronizados correctamente"
 }</code></pre>
 
-      <h2 id="resiliencia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Resiliencia ante Fallos de Red e Idempotencia en SQLite</h2>
+      <h2 id="resiliencia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Resiliencia ante Fallos de Red e Idempotencia en Custodia Local</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         En cualquier sistema distribuido sobre Internet, las confirmaciones de red pueden fallar: un corte de fibra de 2 segundos, una saturación temporal en el hosting o un error <code>502 Bad Gateway</code> de un proxy inverso pueden impedir que el agente entregue el ACK a la tienda online tras haber insertado el pedido en Factusol.
       </p>
@@ -293,11 +293,11 @@ X-Bentian-Timestamp: 1791189000
       </div>
 
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian resuelve este dilema mediante <strong>idempotencia estricta en su cola local SQLite (<code>queue.db</code>)</strong>:
+        Bentian resuelve este dilema mediante <strong>idempotencia estricta en su cola local Store-and-Forward persistida en JSON atómico estructurado</strong>:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Clave Primaria de Idempotencia:</strong> La tabla local de SQLite indexa unívocamente el identificador del pedido web (<code>web_order_id</code>).</li>
-        <li><strong>Detección de Pedido ya Inyectado:</strong> Cuando el agente descarga el lote de pedidos y recibe de nuevo el pedido <code>1042</code>, consulta SQLite antes de tocar Factusol. Al detectar que el pedido ya figura con estado <code>INJECTED</code> y cuenta con el número correlativo <code>2026/0014</code> asignado, <strong>el agente aborta inmediatamente cualquier inserción en <code>F_PCL</code> y <code>F_LPC</code></strong>.</li>
+        <li><strong>Clave Primaria de Idempotencia:</strong> El registro local indexa unívocamente el identificador del pedido web (<code>web_order_id</code>).</li>
+        <li><strong>Detección de Pedido ya Inyectado:</strong> Cuando el agente descarga el lote de pedidos y recibe de nuevo el pedido <code>1042</code>, consulta su registro local persistido antes de tocar Factusol. Al detectar que el pedido ya figura con estado <code>INJECTED</code> y cuenta con el número correlativo <code>2026/0014</code> asignado, <strong>el agente aborta inmediatamente cualquier inserción en <code>F_PCL</code> y <code>F_LPC</code></strong>.</li>
         <li><strong>Reintento Exclusivo del ACK:</strong> El agente detecta que la única tarea pendiente es la confirmación remota. Por tanto, emite de nuevo la llamada <code>POST /api/bentian-ack.php</code> hacia la tienda web. En cuanto el servidor responde con HTTP 200, el agente marca el pedido como <code>ACK_CONFIRMED</code>.</li>
         <li><strong>Resultado Garantizado:</strong> Cero duplicaciones en Factusol, cero descuadres de existencias y entrega garantizada del estado final en la tienda web (*At-Least-Once Delivery con Efecto Exactly-Once en Factusol*).</li>
       </ul>
@@ -324,7 +324,7 @@ X-Bentian-Timestamp: 1791189000
               <td class="px-3 py-2 text-indigo-300 font-bold">id</td>
               <td class="px-3 py-2">String | Int</td>
               <td class="px-3 py-2 text-rose-400 font-sans font-bold">OBLIGATORIO</td>
-              <td class="px-3 py-2">queue.db / SUFPCL</td>
+              <td class="px-3 py-2">Cola Local JSON / SUFPCL</td>
               <td class="px-3 py-2 font-sans text-zinc-300">Identificador unívoco del pedido en la tienda web. Clave de idempotencia (ej: <code>"1042"</code>).</td>
             </tr>
             <tr>

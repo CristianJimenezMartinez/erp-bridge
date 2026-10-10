@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Especificación Técnica Endpoint Universal Factusol | Bentian ERP Bridge</title>
-  <meta name="description" content="Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia SQLite, HMAC-SHA256 y código PHP de producción.">
-  <meta name="keywords" content="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos sqlite, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
+  <meta name="description" content="Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia en custodia local JSON atómico, HMAC-SHA256 y código PHP de producción.">
+  <meta name="keywords" content="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos json atomico, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
   <link rel="canonical" href="https://bridge.cristianjm.com/docs/canales/endpoint-universal/">
 
@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://bridge.cristianjm.com/docs/canales/endpoint-universal/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="Especificación Técnica Endpoint Universal Factusol | Bentian ERP Bridge">
-  <meta property="og:description" content="Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia SQLite, HMAC-SHA256 y código PHP de producción.">
+  <meta property="og:description" content="Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia en custodia local JSON atómico, HMAC-SHA256 y código PHP de producción.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -32,7 +32,7 @@
         "@type": "TechArticle",
         "@id": "https://bridge.cristianjm.com/docs/canales/endpoint-universal/#article",
         "headline": "Endpoint Universal: Especificación Técnica y Protocolo Bidireccional",
-        "description": "Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia SQLite, HMAC-SHA256 y código PHP de producción.",
+        "description": "Especificación técnica completa del Endpoint Universal de Bentian: protocolo bidireccional, confirmación ACK, idempotencia en custodia local JSON atómico, HMAC-SHA256 y código PHP de producción.",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -195,25 +195,25 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian">
+                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian, bentian portable sin permisos">
                       <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Requisitos del Sistema y Entorno Operativo
                       </a>
                     </li>
                   
-                    <li data-title="instalación y despliegue del agente en windows" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, desplegar conector factusol, bentian tray windows">
+                    <li data-title="instalación y despliegue del agente en windows (instalador vs portable)" data-keywords="instalar bentian, instalador factusol woocommerce, bentian setup exe, bentian portable zip, version portable factusol, desplegar conector factusol, bentian tray windows, autoactualizacion bentian">
                       <a href="/docs/primeros-pasos/instalacion-y-despliegue/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Instalación y Despliegue del Agente en Windows
+                        Instalación y Despliegue del Agente en Windows (Instalador vs Portable)
                       </a>
                     </li>
                   
-                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian, plan fundador bentian, licenciamiento erp bridge">
+                    <li data-title="activación de licencias, beta de 60 días y plan fundador" data-keywords="licencia bentian, activar bentian factusol, clave beta bentian 1 clic, modo exploracion bentian, plan fundador bentian, licenciamiento erp bridge, hwid factusol">
                       <a href="/docs/primeros-pasos/activacion-de-licencias/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Activación de Licencias, Beta de 60 Días y Plan Fundador
                       </a>
                     </li>
                   
-                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil">
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web">
                       <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Guía del Asistente de Configuración (Onboarding Wizard)
                       </a>
@@ -301,7 +301,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="endpoint universal: especificación técnica y protocolo bidireccional" data-keywords="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos sqlite, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
+                    <li data-title="endpoint universal: especificación técnica y protocolo bidireccional" data-keywords="endpoint universal factusol, especificacion enterprise erp bridge, protocolo ack pedidos factusol, idempotencia pedidos json atomico, api rest factusol json, hmac sha256 factusol, conectar tienda php factusol">
                       <a href="/docs/canales/endpoint-universal/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
                         Endpoint Universal: Especificación Técnica y Protocolo Bidireccional
                       </a>
@@ -324,9 +324,9 @@
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (sqlite)" data-keywords="store and forward factusol, cola sqlite pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, wal sqlite factusol">
+                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Cola Desacoplada Store-and-Forward (SQLite)
+                        Cola Desacoplada Store-and-Forward (JSON Atómico)
                       </a>
                     </li>
                   
@@ -522,7 +522,7 @@
             Endpoint Universal: Especificación Técnica y Protocolo Bidireccional
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Norma de integración Enterprise para tiendas a medida (PHP, Laravel, Node.js, Plesk): ciclo ACK, idempotencia SQLite, diccionario de datos, HMAC-SHA256 y resiliencia.
+            Norma de integración Enterprise para tiendas a medida (PHP, Laravel, Node.js, Plesk): ciclo ACK, idempotencia en custodia local JSON atómico, diccionario de datos, HMAC-SHA256 y resiliencia.
           </p>
         </div>
 
@@ -551,7 +551,7 @@
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
         <li><strong>Fase 1 (Sondeo / Pull):</strong> El agente solicita pedidos en espera enviando una petición <code>GET /api/bentian-orders.php?limit=50&status=PENDING</code> (o <code>?action=get_orders</code>).</li>
-        <li><strong>Fase 2 (Custodia Local):</strong> El agente almacena el bloque de pedidos en su base de datos local SQLite (<code>queue.db</code>) en modo WAL.</li>
+        <li><strong>Fase 2 (Custodia Local):</strong> El agente almacena el bloque de pedidos en su custodia local en JSON atómico estructurado con reemplazo seguro (<code>.tmp</code> + <code>fs.renameSync</code>) y respaldo defensivo <code>.bak</code> en <code>%APPDATA%\Bentian Agent\</code>.</li>
         <li><strong>Fase 3 (Inyección Atómica):</strong> El conector Factusol abre una transacción OLEDB (<code>BeginTrans</code>), busca o crea el cliente en <code>F_CLI</code>, inserta la cabecera en <code>F_PCL</code> y las líneas en <code>F_LPC</code>, y consolida la operación con <code>CommitTrans</code>.</li>
         <li><strong>Fase 4 (Confirmación / ACK):</strong> El agente emite una petición <code>POST /api/bentian-ack.php</code> (o <code>?action=ack_orders</code>) notificando a la tienda online que el pedido ha sido registrado con éxito en Factusol y facilitando el número de pedido oficial del ERP.</li>
         <li><strong>Fase 5 (Transición en Web):</strong> La tienda web cambia el estado del pedido de <code>PENDING</code> a <code>SYNCED</code>, almacenando la referencia y fecha para auditoría.</li>
@@ -616,7 +616,7 @@ X-Bentian-Timestamp: 1791189000
   "message": "Pedidos marcados como sincronizados correctamente"
 }</code></pre>
 
-      <h2 id="resiliencia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Resiliencia ante Fallos de Red e Idempotencia en SQLite</h2>
+      <h2 id="resiliencia-idempotencia" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Resiliencia ante Fallos de Red e Idempotencia en Custodia Local</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         En cualquier sistema distribuido sobre Internet, las confirmaciones de red pueden fallar: un corte de fibra de 2 segundos, una saturación temporal en el hosting o un error <code>502 Bad Gateway</code> de un proxy inverso pueden impedir que el agente entregue el ACK a la tienda online tras haber insertado el pedido en Factusol.
       </p>
@@ -627,11 +627,11 @@ X-Bentian-Timestamp: 1791189000
       </div>
 
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian resuelve este dilema mediante <strong>idempotencia estricta en su cola local SQLite (<code>queue.db</code>)</strong>:
+        Bentian resuelve este dilema mediante <strong>idempotencia estricta en su cola local Store-and-Forward persistida en JSON atómico estructurado</strong>:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Clave Primaria de Idempotencia:</strong> La tabla local de SQLite indexa unívocamente el identificador del pedido web (<code>web_order_id</code>).</li>
-        <li><strong>Detección de Pedido ya Inyectado:</strong> Cuando el agente descarga el lote de pedidos y recibe de nuevo el pedido <code>1042</code>, consulta SQLite antes de tocar Factusol. Al detectar que el pedido ya figura con estado <code>INJECTED</code> y cuenta con el número correlativo <code>2026/0014</code> asignado, <strong>el agente aborta inmediatamente cualquier inserción en <code>F_PCL</code> y <code>F_LPC</code></strong>.</li>
+        <li><strong>Clave Primaria de Idempotencia:</strong> El registro local indexa unívocamente el identificador del pedido web (<code>web_order_id</code>).</li>
+        <li><strong>Detección de Pedido ya Inyectado:</strong> Cuando el agente descarga el lote de pedidos y recibe de nuevo el pedido <code>1042</code>, consulta su registro local persistido antes de tocar Factusol. Al detectar que el pedido ya figura con estado <code>INJECTED</code> y cuenta con el número correlativo <code>2026/0014</code> asignado, <strong>el agente aborta inmediatamente cualquier inserción en <code>F_PCL</code> y <code>F_LPC</code></strong>.</li>
         <li><strong>Reintento Exclusivo del ACK:</strong> El agente detecta que la única tarea pendiente es la confirmación remota. Por tanto, emite de nuevo la llamada <code>POST /api/bentian-ack.php</code> hacia la tienda web. En cuanto el servidor responde con HTTP 200, el agente marca el pedido como <code>ACK_CONFIRMED</code>.</li>
         <li><strong>Resultado Garantizado:</strong> Cero duplicaciones en Factusol, cero descuadres de existencias y entrega garantizada del estado final en la tienda web (*At-Least-Once Delivery con Efecto Exactly-Once en Factusol*).</li>
       </ul>
@@ -658,7 +658,7 @@ X-Bentian-Timestamp: 1791189000
               <td class="px-3 py-2 text-indigo-300 font-bold">id</td>
               <td class="px-3 py-2">String | Int</td>
               <td class="px-3 py-2 text-rose-400 font-sans font-bold">OBLIGATORIO</td>
-              <td class="px-3 py-2">queue.db / SUFPCL</td>
+              <td class="px-3 py-2">Cola Local JSON / SUFPCL</td>
               <td class="px-3 py-2 font-sans text-zinc-300">Identificador unívoco del pedido en la tienda web. Clave de idempotencia (ej: <code>"1042"</code>).</td>
             </tr>
             <tr>
@@ -1311,7 +1311,7 @@ echo json_encode(['error' => 'Acción no reconocida: ' . htmlspecialchars($actio
           
             <li>
               <a href="#resiliencia-idempotencia" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="resiliencia-idempotencia">
-                4. Resiliencia ante Fallos de Red e Idempotencia en SQLite
+                4. Resiliencia ante Fallos de Red e Idempotencia en Custodia Local
               </a>
             </li>
           
