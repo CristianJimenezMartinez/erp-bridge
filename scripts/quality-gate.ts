@@ -68,6 +68,7 @@ const allSrcFiles = [
   ...getFiles(path.join(repoRoot, 'packages/connectors/prestashop/src')),
   ...getFiles(path.join(repoRoot, 'packages/connectors/simplygest/src')),
   ...getFiles(path.join(repoRoot, 'packages/connectors/woocommerce/src')),
+  ...getFiles(path.join(repoRoot, 'packages/connectors/holded/src')),
 ];
 
 // ============================================================================
@@ -132,6 +133,7 @@ const packages = [
   { name: 'packages/connectors/prestashop', dir: 'packages/connectors/prestashop/src', tsconfig: 'packages/connectors/prestashop/tsconfig.json' },
   { name: 'packages/connectors/simplygest', dir: 'packages/connectors/simplygest/src', tsconfig: 'packages/connectors/simplygest/tsconfig.json' },
   { name: 'packages/connectors/woocommerce', dir: 'packages/connectors/woocommerce/src', tsconfig: 'packages/connectors/woocommerce/tsconfig.json' },
+  { name: 'packages/connectors/holded', dir: 'packages/connectors/holded/src', tsconfig: 'packages/connectors/holded/tsconfig.json' },
 ];
 
 let circularCyclesFound = 0;
@@ -348,6 +350,7 @@ const monorepoPackages = [
   'packages/connectors/prestashop/package.json',
   'packages/connectors/simplygest/package.json',
   'packages/connectors/shopify/package.json',
+  'packages/connectors/holded/package.json',
 ];
 
 for (const pkgRel of monorepoPackages) {

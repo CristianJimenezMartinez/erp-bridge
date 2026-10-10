@@ -19,6 +19,7 @@ const VERSIONED_FILES = [
   path.resolve(rootDir, 'packages/connectors/prestashop/package.json'),
   path.resolve(rootDir, 'packages/connectors/simplygest/package.json'),
   path.resolve(rootDir, 'packages/connectors/shopify/package.json'),
+  path.resolve(rootDir, 'packages/connectors/holded/package.json'),
 ];
 
 /**

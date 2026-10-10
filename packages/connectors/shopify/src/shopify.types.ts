@@ -7,6 +7,7 @@ export interface ShopifyConnectorConfig {
   locationId?: string; // e.g. 'gid://shopify/Location/12345678'
   timeoutMs?: number;
   rateLimitMinimumPoints?: number; // Default: 100
+  endpointUrl?: string; // Optional custom endpoint for local/mock testing
 }
 
 export type ConnectorType = 'SOURCE' | 'DESTINATION' | 'BIDIRECTIONAL';

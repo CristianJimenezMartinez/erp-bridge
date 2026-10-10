@@ -129,6 +129,28 @@ importers:
         specifier: ^5.4.2
         version: 5.9.3
 
+  packages/connectors/holded:
+    dependencies:
+      '@erp-bridge/sdk':
+        specifier: workspace:*
+        version: link:../../sdk
+      '@erp-bridge/shared':
+        specifier: workspace:*
+        version: link:../../shared
+      zod:
+        specifier: ^3.22.4
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.24
+        version: 20.19.43
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@20.19.43)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.4.2
+        version: 5.9.3
+
   packages/connectors/prestashop:
     dependencies:
       '@erp-bridge/sdk':

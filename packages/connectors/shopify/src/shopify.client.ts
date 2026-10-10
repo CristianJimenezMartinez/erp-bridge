@@ -13,14 +13,18 @@ export class ShopifyClient {
 
   constructor(config: ShopifyConnectorConfig, rateLimiter?: ShopifyRateLimiter) {
     this.config = config;
-    const cleanSubdomain = config.shopSubdomain
-      .replace(/^https?:\/\//i, '')
-      .replace(/\.myshopify\.com.*$/i, '')
-      .replace(/\/.*$/, '')
-      .trim();
+    if (config.endpointUrl) {
+      this.endpointUrl = config.endpointUrl;
+    } else {
+      const cleanSubdomain = config.shopSubdomain
+        .replace(/^https?:\/\//i, '')
+        .replace(/\.myshopify\.com.*$/i, '')
+        .replace(/\/.*$/, '')
+        .trim();
 
-    const apiVersion = config.apiVersion || '2026-01';
-    this.endpointUrl = `https://${cleanSubdomain}.myshopify.com/admin/api/${apiVersion}/graphql.json`;
+      const apiVersion = config.apiVersion || '2026-01';
+      this.endpointUrl = `https://${cleanSubdomain}.myshopify.com/admin/api/${apiVersion}/graphql.json`;
+    }
     this.rateLimiter = rateLimiter || new ShopifyRateLimiter(config.rateLimitMinimumPoints ?? 100);
   }
 
