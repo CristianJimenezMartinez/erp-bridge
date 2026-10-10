@@ -3,15 +3,15 @@
 
 > **Documento Técnico de Soporte & Despliegue en Clientes**  
 > **Área:** Compatibilidad con Windows 10/11, Windows Server y EDRs Corporativos  
-> **Versión Oficial:** v0.4.0 (Octubre 2026)  
+> **Versión Oficial:** v0.4.1 (Octubre 2026)  
 > **Estado:** Validado y Recomendado  
-> **Afecta a:** `BentianAgent.exe`, `BentianTray.exe`, `Bentian-Setup.exe` (canónico) o `Bentian-Setup-v0.4.0.exe`
+> **Afecta a:** `BentianAgent.exe`, `BentianTray.exe`, `Bentian-Setup.exe` (canónico) o `Bentian-Setup-v0.4.1.exe`
 
 ---
 
 ## 1. ¿Por Qué Aparece la Pantalla Azul de SmartScreen?
 
-Al descargar e iniciar por primera vez el instalador oficial (`Bentian-Setup.exe` o `Bentian-Setup-v0.4.0.exe`) o el ejecutable del agente en equipos con Windows 10, Windows 11 o Windows Server, el sistema operativo puede mostrar una ventana de alerta azul con el mensaje:
+Al descargar e iniciar por primera vez el instalador oficial (`Bentian-Setup.exe` o `Bentian-Setup-v0.4.1.exe`) o el ejecutable del agente en equipos con Windows 10, Windows 11 o Windows Server, el sistema operativo puede mostrar una ventana de alerta azul con el mensaje:
 
 > **"Windows protegió su PC"**  
 > *Microsoft Defender SmartScreen evitó el inicio de una aplicación no reconocida. Si ejecuta esta aplicación, su PC podría estar en riesgo.*
@@ -56,7 +56,7 @@ Cuando aparezca la ventana azul de Microsoft Defender SmartScreen:
 │  Windows protegió su PC                                      [X] │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  Aplicación: Bentian-Setup.exe (o Bentian-Setup-v0.4.0.exe)      │
+│  Aplicación: Bentian-Setup.exe (o Bentian-Setup-v0.4.1.exe)      │
 │  Editor:     Cristian Jiménez Martínez / Bentian ERP Bridge      │
 │                                                                  │
 │  ┌─────────────────────────┐             ┌──────────────────┐   │
@@ -76,7 +76,7 @@ Cuando aparezca la ventana azul de Microsoft Defender SmartScreen:
 ### Método B: Desbloqueo en Propiedades de Archivo (Específico Windows 11 y Smart App Control)
 En Windows 11 (versiones 22H2, 23H2 y 24H2), Microsoft incluye **Smart App Control (SAC / Control Inteligente de Aplicaciones)**. Si SAC está en modo "Evaluación" o "Activado", puede bloquear la ejecución sin mostrar el botón "Ejecutar de todas formas" debido a la marca de procedencia de Internet (*Zone.Identifier: ZoneId=3*):
 
-1. Abre el Explorador de Archivos de Windows 11 y localiza el instalador descargado (`Bentian-Setup.exe` o `Bentian-Setup-v0.4.0.exe`).
+1. Abre el Explorador de Archivos de Windows 11 y localiza el instalador descargado (`Bentian-Setup.exe` o `Bentian-Setup-v0.4.1.exe`).
 2. **Acceso a Propiedades en Windows 11:**
    - Selecciona el archivo y presiona la combinación rápida de teclado **`Alt + Enter`**.
    - *(Alternativa gráfica: Haz clic derecho, selecciona el icono de Propiedades al pie del menú o presiona `Shift + F10` -> **Propiedades**)*.

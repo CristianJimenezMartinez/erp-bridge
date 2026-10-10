@@ -1,6 +1,6 @@
 {
   "name": "@erp-bridge/connector-holded",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Holded Cloud ERP Connector for Bentian ERP Bridge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
