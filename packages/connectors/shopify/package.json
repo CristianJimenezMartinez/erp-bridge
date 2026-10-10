@@ -1,6 +1,6 @@
 {
   "name": "@erp-bridge/connector-shopify",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Shopify GraphQL E-Commerce Connector for Bentian ERP Bridge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
