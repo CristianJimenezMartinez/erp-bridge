@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "node dist/test/read-products.spec.js"
+    "test": "ts-node test/read-products.spec.ts"
   },
   "dependencies": {
     "@erp-bridge/connector-factusol": "workspace:*",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   }
 }

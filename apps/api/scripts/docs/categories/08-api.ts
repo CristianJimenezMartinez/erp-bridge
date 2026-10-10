@@ -16,7 +16,7 @@ export const apiArticles: DocArticle[] = [
       { id: 'endpoint-status', label: '2. GET /api/local/status (Telemetría y Estado)', level: 2 },
       { id: 'endpoint-sync-now', label: '3. POST /api/local/sync-now (Forzar Sincronización)', level: 2 },
       { id: 'endpoint-save-config', label: '4. POST /api/local/save-full-config', level: 2 },
-      { id: 'endpoint-test-email', label: '5. POST /api/local/test-email', level: 2 },
+      { id: 'endpoint-test-notificaciones', label: '5. POST /api/local/test-email, test-telegram y test-discord', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
@@ -85,10 +85,15 @@ HTTP/1.1 200 OK
         Guarda de forma atómica la configuración completa del sistema en <code class="text-indigo-300 font-mono">%APPDATA%\\Bentian Agent\\agent-config.json</code> y reinicializa los adaptadores de Factusol y canal de ventas en caliente sin necesidad de reiniciar el proceso.
       </p>
 
-      <h2 id="endpoint-test-email" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. POST /api/local/test-email</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        Envía un correo de prueba con firma criptográfica DKIM a la dirección indicada para verificar la correcta recepción de alertas transaccionales de nuevos pedidos.
+      <h2 id="endpoint-test-notificaciones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Endpoints de Test de Notificaciones (Email, Telegram y Discord)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Permiten validar la recepción en tiempo real de alertas de nuevos pedidos para cada canal configurado de forma independiente:
       </p>
+      <ul class="text-xs text-zinc-300 space-y-2 list-disc list-inside mb-6">
+        <li><code class="text-indigo-300 font-mono">POST /api/local/test-email</code>: Envía un correo de prueba conectando directamente con el servidor SMTP propio configurado (Gmail, Outlook, hosting cPanel/Plesk).</li>
+        <li><code class="text-indigo-300 font-mono">POST /api/local/test-telegram</code>: Envía un mensaje de prueba al chat o canal de Telegram mediante el Bot API (<code class="text-zinc-300 font-mono">api.telegram.org</code>).</li>
+        <li><code class="text-indigo-300 font-mono">POST /api/local/test-discord</code>: Envía un embed interactivo con formato de pedido de Factusol al canal de Discord mediante el Webhook oficial configurado.</li>
+      </ul>
     `,
   },
   {

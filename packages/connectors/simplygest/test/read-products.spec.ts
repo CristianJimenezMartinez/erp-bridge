@@ -11,7 +11,7 @@ import {
   getArticlesQuery,
   insertOrderHeaderQuery,
   insertOrderLineQuery,
-} from '../index';
+} from '../src/index';
 
 console.log('========================================================================');
 console.log('   SIMPLYGEST CONNECTOR — PRUEBAS UNITARIAS Y DE LECTURA (SPEC)         ');

@@ -681,7 +681,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           chkOnlyPos.checked = rules.onlyStockAboveZero;
         }
 
-        // Notificaciones por Email
+        // Notificaciones Multicanal (Email, Telegram, Discord)
         const notif = data.notifications || {};
         const chkAlerts = document.getElementById('check-order-alerts-enabled');
         if (chkAlerts && notif.orderAlertsEnabled !== undefined && (force || document.activeElement !== chkAlerts)) {
@@ -719,6 +719,39 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inSmtpFrom = document.getElementById('input-notif-smtp-from');
         if (inSmtpFrom && (force || !inSmtpFrom.value || document.activeElement !== inSmtpFrom)) {
           if (notif.smtpFrom || force) inSmtpFrom.value = notif.smtpFrom || '';
+        }
+
+        // Telegram
+        const chkTg = document.getElementById('check-telegram-alerts-enabled');
+        if (chkTg && notif.telegramAlertsEnabled !== undefined && (force || document.activeElement !== chkTg)) {
+          chkTg.checked = notif.telegramAlertsEnabled;
+          if (typeof toggleTelegramSection === 'function') {
+            toggleTelegramSection(notif.telegramAlertsEnabled);
+          }
+        }
+
+        const inTgToken = document.getElementById('input-notif-telegram-token');
+        if (inTgToken && (force || !inTgToken.value || document.activeElement !== inTgToken)) {
+          if (notif.telegramBotToken || force) inTgToken.value = notif.telegramBotToken || '';
+        }
+
+        const inTgChatId = document.getElementById('input-notif-telegram-chatid');
+        if (inTgChatId && (force || !inTgChatId.value || document.activeElement !== inTgChatId)) {
+          if (notif.telegramChatId || force) inTgChatId.value = notif.telegramChatId || '';
+        }
+
+        // Discord
+        const chkDiscord = document.getElementById('check-discord-alerts-enabled');
+        if (chkDiscord && notif.discordAlertsEnabled !== undefined && (force || document.activeElement !== chkDiscord)) {
+          chkDiscord.checked = notif.discordAlertsEnabled;
+          if (typeof toggleDiscordSection === 'function') {
+            toggleDiscordSection(notif.discordAlertsEnabled);
+          }
+        }
+
+        const inDiscordWebhook = document.getElementById('input-notif-discord-webhook');
+        if (inDiscordWebhook && (force || !inDiscordWebhook.value || document.activeElement !== inDiscordWebhook)) {
+          if (notif.discordWebhookUrl || force) inDiscordWebhook.value = notif.discordWebhookUrl || '';
         }
 
         const inLicKey = document.getElementById('input-lic-key');

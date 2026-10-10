@@ -49,6 +49,7 @@ export interface AgentSyncRules {
 }
 
 export interface AgentNotificationSettings {
+  // Email (SMTP Propio - BYO SMTP)
   orderAlertsEnabled?: boolean;
   alertEmail?: string;
   smtpHost?: string;
@@ -57,6 +58,15 @@ export interface AgentNotificationSettings {
   smtpPass?: string;
   smtpFrom?: string;
   smtpSecure?: boolean;
+
+  // Telegram Bot
+  telegramAlertsEnabled?: boolean;
+  telegramBotToken?: string;
+  telegramChatId?: string;
+
+  // Discord Webhook
+  discordAlertsEnabled?: boolean;
+  discordWebhookUrl?: string;
 }
 
 export interface AgentConfigFile {

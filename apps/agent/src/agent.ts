@@ -679,63 +679,49 @@ export class LocalAgent {
     };
   }
 
-  public async testEmailNotification(customSettings?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+  private resolveNotificationSettings(customSettings?: AgentNotificationSettings): AgentNotificationSettings {
     const cfg = this.configManager.get();
-    let settings = customSettings || cfg.notifications || {};
-    if (customSettings && isSecretMaskedOrEmpty(customSettings.smtpPass) && cfg.notifications?.smtpPass) {
-      settings = { ...settings, smtpPass: cfg.notifications.smtpPass };
-    }
-    return OrderNotifierService.sendTestEmail(settings, cfg.apiBaseUrl, cfg.licenseKey);
+    const settings = customSettings || cfg.notifications || {};
+    return {
+      ...settings,
+      smtpPass: customSettings && isSecretMaskedOrEmpty(customSettings.smtpPass) && cfg.notifications?.smtpPass
+        ? cfg.notifications.smtpPass : settings.smtpPass,
+      telegramBotToken: customSettings && isSecretMaskedOrEmpty(customSettings.telegramBotToken) && cfg.notifications?.telegramBotToken
+        ? cfg.notifications.telegramBotToken : settings.telegramBotToken,
+    };
+  }
+
+  public async testEmailNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    return OrderNotifierService.sendTestEmail(this.resolveNotificationSettings(custom));
+  }
+
+  public async testTelegramNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    return OrderNotifierService.sendTestTelegram(this.resolveNotificationSettings(custom));
+  }
+
+  public async testDiscordNotification(custom?: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    return OrderNotifierService.sendTestDiscord(this.resolveNotificationSettings(custom));
   }
 
   public async getLiveHealth(): Promise<LiveHealthReport> {
-    return LiveHealthService.runDiagnostics(
-      this.configManager.get(),
-      this.licenseService.getLicenseStatus()
-    );
+    return LiveHealthService.runDiagnostics(this.configManager.get(), this.licenseService.getLicenseStatus());
   }
 
   // --- Métodos de Licenciamiento ---
-  public getLicenseStatus(): { status: AgentLicenseStatus; plan?: string } {
-    return this.licenseService.getLicenseStatus();
-  }
-
-  public async activateLicense(licenseKey: string): Promise<LicenseActivationResponse> {
-    return this.licenseService.activateLicense(licenseKey);
-  }
-
-  public async validateLicense(): Promise<LicenseValidationStatus> {
-    return this.licenseService.validateLicense();
-  }
-
-  public async deactivateLicense(customKey?: string): Promise<{ success: boolean; message?: string }> {
-    return this.licenseService.deactivateLicense(customKey);
-  }
+  public getLicenseStatus(): { status: AgentLicenseStatus; plan?: string } { return this.licenseService.getLicenseStatus(); }
+  public async activateLicense(licenseKey: string): Promise<LicenseActivationResponse> { return this.licenseService.activateLicense(licenseKey); }
+  public async validateLicense(): Promise<LicenseValidationStatus> { return this.licenseService.validateLicense(); }
+  public async deactivateLicense(customKey?: string): Promise<{ success: boolean; message?: string }> { return this.licenseService.deactivateLicense(customKey); }
 
   // --- Métodos de Factusol ---
-  public async testFactusolConnection(dbPath: string) {
-    return this.factusolService.testConnection(dbPath);
-  }
-
-  public async reconnectFactusol(dbPath: string) {
-    return this.factusolService.reconnect(dbPath);
-  }
-
-  public async getFactusolArticleCount(customDbPath?: string) {
-    return this.factusolService.getArticleCount(customDbPath);
-  }
-
-  public async getFactusolMetadata(customDbPath?: string): Promise<FactusolMetadata> {
-    return this.factusolService.getMetadata(customDbPath);
-  }
-
+  public async testFactusolConnection(dbPath: string) { return this.factusolService.testConnection(dbPath); }
+  public async reconnectFactusol(dbPath: string) { return this.factusolService.reconnect(dbPath); }
+  public async getFactusolArticleCount(customDbPath?: string) { return this.factusolService.getArticleCount(customDbPath); }
+  public async getFactusolMetadata(customDbPath?: string): Promise<FactusolMetadata> { return this.factusolService.getMetadata(customDbPath); }
   public async getFactusolPreviewArticles(limit = 25): Promise<{ articles: ArticlePreviewItem[]; total?: number }> {
     return this.factusolService.getPreviewArticles(undefined, limit);
   }
-
-  public resolveFactusolPath(inputPath: string): PathResolutionResult {
-    return FactusolPathResolver.resolve(inputPath);
-  }
+  public resolveFactusolPath(inputPath: string): PathResolutionResult { return FactusolPathResolver.resolve(inputPath); }
 
   // --- Métodos de Canales Web ---
   public async testWooCommerceConnection(settings: { storeUrl: string; consumerKey: string; consumerSecret: string }): Promise<WooCommerceTestResult> {

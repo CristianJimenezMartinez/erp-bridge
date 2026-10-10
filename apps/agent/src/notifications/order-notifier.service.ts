@@ -30,8 +30,12 @@ export class OrderNotifierService {
     const { order, channel, factusolOrderNumber, series, config } = payload;
     const notif = config.notifications;
 
-    if (!notif || !notif.orderAlertsEnabled || !notif.alertEmail || !notif.alertEmail.trim()) {
-      return { success: false, error: 'Alertas de pedidos desactivadas o sin email de destino' };
+    const hasEmail = Boolean(notif?.orderAlertsEnabled && notif?.alertEmail?.trim() && notif?.smtpHost && notif?.smtpUser && notif?.smtpPass);
+    const hasTelegram = Boolean(notif?.telegramAlertsEnabled && notif?.telegramBotToken?.trim() && notif?.telegramChatId?.trim());
+    const hasDiscord = Boolean(notif?.discordAlertsEnabled && notif?.discordWebhookUrl?.trim());
+
+    if (!hasEmail && !hasTelegram && !hasDiscord) {
+      return { success: false, error: 'Ningún canal de notificaciones (Email SMTP, Telegram o Discord) está activo y configurado.' };
     }
 
     const ref = order.reference || order.orderNumber || 'S/REF';
@@ -188,64 +192,130 @@ export class OrderNotifierService {
 </html>
     `;
 
-    const recipients = notif.alertEmail.split(/[,;]/).map((e) => e.trim()).filter(Boolean);
-    let anySent = false;
-    let lastError: string | undefined;
+    // Formato para Telegram
+    const telegramText = [
+      `📦 <b>¡Nuevo Pedido en Factusol!</b>`,
+      `<b>Serie:</b> <code>${escapeHtml(series)}</code> | <b>Factusol Nº:</b> <code>#${escapeHtml(factusolOrderNumber)}</code>`,
+      `<b>Tienda:</b> ${escapeHtml(channelLabel)} (Ref: #${escapeHtml(ref)})`,
+      `<b>Cliente:</b> ${escapeHtml(customerName)}${customerPhone ? ` (${escapeHtml(customerPhone)})` : ''}`,
+      `<b>Total:</b> <b>${escapeHtml(totalEur)} €</b>`,
+      order.lines && order.lines.length > 0
+        ? `<b>Artículos:</b>\n` + order.lines.slice(0, 8).map(l => ` • ${escapeHtml(l.name)} x${Number(l.quantity)} (${Number(l.total).toFixed(2)} €)`).join('\n')
+        : '',
+      order.notes ? `<b>Notas:</b> <i>${escapeHtml(order.notes)}</i>` : '',
+      `\n<i>Bentian ERP Bridge — Alerta en tiempo real</i>`
+    ].filter(Boolean).join('\n');
 
-    for (const recipient of recipients) {
-      const res = await this.deliverEmail({
-        to: recipient,
-        subject,
-        html: htmlBody,
-        text: textBody,
-        settings: notif,
-        apiBaseUrl: config.apiBaseUrl,
-        licenseKey: config.licenseKey,
-        orderReference: ref,
-      });
+    // Formato para Discord Webhook
+    const discordPayload = {
+      embeds: [{
+        title: `📦 Nuevo Pedido Factusol: Serie ${series} Nº ${factusolOrderNumber}`,
+        description: `Se ha registrado e inyectado con éxito un nuevo pedido desde **${channelLabel}** en Factusol.`,
+        color: 0x10b981,
+        fields: [
+          { name: 'Referencia Web', value: `#${ref}`, inline: true },
+          { name: 'Factusol', value: `Serie ${series} - Nº ${factusolOrderNumber}`, inline: true },
+          { name: 'Total Pedido', value: `**${totalEur} €**`, inline: true },
+          { name: 'Cliente', value: customerName, inline: false },
+          { name: 'Artículos', value: order.lines.slice(0, 6).map(l => `• \`${l.sku || 'S/SKU'}\` **${l.name}** x${l.quantity} (${Number(l.total).toFixed(2)} €)`).join('\n') || 'Sin líneas', inline: false }
+        ],
+        footer: { text: 'Bentian ERP Bridge — Conector Local Factusol' },
+        timestamp: new Date().toISOString()
+      }]
+    };
 
-      if (res.success) {
-        anySent = true;
-        this.notifiedOrders.set(orderKey, now);
+    const dispatches: Promise<{ channel: string; success: boolean; error?: string }>[] = [];
+
+    // 1. Despacho por Email (SMTP Propio)
+    if (hasEmail) {
+      dispatches.push((async () => {
+        const recipients = notif!.alertEmail!.split(/[,;]/).map((e) => e.trim()).filter(Boolean);
+        let anySent = false;
+        let lastError: string | undefined;
+        for (const recipient of recipients) {
+          const res = await this.deliverEmail({
+            to: recipient,
+            subject,
+            html: htmlBody,
+            text: textBody,
+            settings: notif!,
+          });
+          if (res.success) anySent = true;
+          else lastError = res.error;
+        }
+        return { channel: 'Email', success: anySent, error: lastError };
+      })());
+    }
+
+    // 2. Despacho por Telegram
+    if (hasTelegram) {
+      dispatches.push((async () => {
+        const res = await this.sendViaTelegram(notif!.telegramBotToken!, notif!.telegramChatId!, telegramText);
+        return { channel: 'Telegram', success: res.success, error: res.error };
+      })());
+    }
+
+    // 3. Despacho por Discord
+    if (hasDiscord) {
+      dispatches.push((async () => {
+        const res = await this.sendViaDiscord(notif!.discordWebhookUrl!, discordPayload);
+        return { channel: 'Discord', success: res.success, error: res.error };
+      })());
+    }
+
+    const settled = await Promise.allSettled(dispatches);
+    let anySuccess = false;
+    const errors: string[] = [];
+
+    for (const r of settled) {
+      if (r.status === 'fulfilled') {
+        if (r.value.success) {
+          anySuccess = true;
+        } else if (r.value.error) {
+          errors.push(`[${r.value.channel}] ${r.value.error}`);
+        }
       } else {
-        lastError = res.error;
+        errors.push(`Fallo inesperado: ${r.reason?.message || String(r.reason)}`);
       }
     }
 
+    if (anySuccess) {
+      this.notifiedOrders.set(orderKey, now);
+    }
 
     const durationMs = Math.round(performance.now() - tStart);
     AgentDiskLogger.getInstance().log({
-      level: anySent ? 'SUCCESS' : 'ERROR',
+      level: anySuccess ? 'SUCCESS' : 'ERROR',
       component: 'OrderNotifier',
       action: 'send_order_alert',
       duration_ms: durationMs,
-      status: anySent ? 'SUCCESS' : 'FAILURE',
-      message: anySent
-        ? `Aviso de pedido #${ref} (Factusol ${series}-${factusolOrderNumber}) enviado a ${notif.alertEmail} en ${durationMs}ms`
-        : `Fallo al enviar aviso de pedido #${ref}: ${lastError}`,
-      metadata: { ref, factusolOrderNumber, series, alertEmail: notif.alertEmail },
+      status: anySuccess ? 'SUCCESS' : 'FAILURE',
+      message: anySuccess
+        ? `Aviso de pedido #${ref} (Factusol ${series}-${factusolOrderNumber}) despachado con éxito en ${durationMs}ms`
+        : `Fallo al enviar alertas de pedido #${ref}: ${errors.join(', ')}`,
+      metadata: { ref, factusolOrderNumber, series, hasEmail, hasTelegram, hasDiscord },
     });
 
-    return { success: anySent, error: lastError };
+    return { success: anySuccess, error: errors.length > 0 ? errors.join(' | ') : undefined };
   }
 
-  public static async sendTestEmail(
-    settings: AgentNotificationSettings,
-    apiBaseUrl?: string,
-    licenseKey?: string
-  ): Promise<{ success: boolean; message: string }> {
+  public static async sendTestEmail(settings: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
     if (!settings.alertEmail || !settings.alertEmail.trim()) {
-      return { success: false, message: 'Debe especificar un email de destino en la casilla de alertas.' };
+      return { success: false, message: 'Debe especificar al menos un email de destino en la casilla de alertas.' };
+    }
+    if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPass) {
+      return { success: false, message: 'Debe configurar los datos del servidor SMTP propio (Host, Usuario y Contraseña) para enviar correos.' };
     }
 
     const subject = `🔔 [Bentian ERP Bridge] Correo de Prueba de Alertas Factusol`;
-    const text = `Este es un correo de prueba enviado por Bentian ERP Bridge para verificar la recepción de alertas de nuevos pedidos.\n\nServidor: ${settings.smtpHost || 'Relay Central Bentian'}\nFecha: ${new Date().toISOString()}`;
+    const text = `Este es un correo de prueba enviado por Bentian ERP Bridge a través de su servidor SMTP propio para verificar la recepción de alertas de nuevos pedidos.\n\nServidor: ${settings.smtpHost}:${settings.smtpPort || 465}\nFecha: ${new Date().toISOString()}`;
     const html = `
       <div style="background:#121215;padding:24px;border-radius:12px;color:#f4f4f5;font-family:sans-serif;max-width:500px;border:1px solid rgba(255,255,255,0.1);">
-        <h2 style="color:#34d399;margin-top:0;">✓ Conexión de Correo Correcta</h2>
-        <p>Tu configuración para recibir avisos de nuevos pedidos de Factusol está funcionando perfectamente.</p>
+        <h2 style="color:#34d399;margin-top:0;">✓ Conexión SMTP Correcta</h2>
+        <p>Tu configuración para recibir avisos de nuevos pedidos de Factusol está funcionando perfectamente a través de tu propio servidor de correo.</p>
         <div style="background:#18181b;padding:12px;border-radius:8px;font-size:12px;color:#a1a1aa;margin:16px 0;">
-          <strong>Canal de Envío:</strong> ${settings.smtpHost ? `SMTP Propio (${settings.smtpHost}:${settings.smtpPort || 465})` : 'Relay Central Bentian'}<br>
+          <strong>Servidor SMTP:</strong> ${settings.smtpHost}:${settings.smtpPort || 465}<br>
+          <strong>Usuario:</strong> ${settings.smtpUser}<br>
           <strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}
         </div>
         <p style="font-size:12px;color:#71717a;margin:0;">Bentian ERP Bridge — Alertas de pedidos en tiempo real.</p>
@@ -259,16 +329,119 @@ export class OrderNotifierService {
       html,
       text,
       settings,
-      apiBaseUrl,
-      licenseKey,
     });
 
     return {
       success: res.success,
       message: res.success
-        ? `✓ Correo de prueba enviado con éxito a ${firstRecipient}. Revisa tu bandeja de entrada o spam.`
-        : `Error al enviar correo de prueba: ${res.error || 'Fallo desconocido'}`,
+        ? `✓ Correo de prueba enviado con éxito a ${firstRecipient} vía SMTP propio. Revisa tu bandeja de entrada o spam.`
+        : `Error al enviar correo vía SMTP: ${res.error || 'Fallo desconocido'}`,
     };
+  }
+
+  public static async sendTestTelegram(settings: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    if (!settings.telegramBotToken || !settings.telegramBotToken.trim()) {
+      return { success: false, message: 'Debe especificar el Token del Bot de Telegram (ej. 123456789:ABCdef...).' };
+    }
+    if (!settings.telegramChatId || !settings.telegramChatId.trim()) {
+      return { success: false, message: 'Debe especificar el Chat ID o Grupo de Telegram destinatario.' };
+    }
+
+    const msg = [
+      '🔔 <b>[Bentian ERP Bridge] Prueba de Conexión con Telegram</b>',
+      '',
+      '¡Tu Bot de Telegram está correctamente configurado y vinculado con Bentian!',
+      'A partir de ahora recibirás un mensaje instantáneo en este chat cada vez que un cliente realice una compra y el pedido se registre en Factusol.',
+      '',
+      `📅 <b>Fecha y hora:</b> <code>${new Date().toLocaleString('es-ES')}</code>`,
+      '🏢 <i>Bentian ERP Bridge — Conector Local Factusol</i>'
+    ].join('\n');
+
+    const res = await this.sendViaTelegram(settings.telegramBotToken, settings.telegramChatId, msg);
+    return {
+      success: res.success,
+      message: res.success
+        ? '✓ Mensaje de prueba enviado con éxito a Telegram. Revisa la conversación con tu bot.'
+        : `Error al conectar con Telegram: ${res.error || 'Fallo desconocido'}`,
+    };
+  }
+
+  public static async sendTestDiscord(settings: AgentNotificationSettings): Promise<{ success: boolean; message: string }> {
+    if (!settings.discordWebhookUrl || !settings.discordWebhookUrl.trim()) {
+      return { success: false, message: 'Debe especificar la URL del Webhook de Discord (comienza por https://discord.com/api/webhooks/...).' };
+    }
+
+    const payload = {
+      embeds: [{
+        title: '🔔 [Bentian ERP Bridge] Prueba de Webhook de Discord',
+        description: '¡Tu canal de Discord está conectado con éxito a Bentian ERP Bridge!\n\nRecibirás alertas enriquecidas con todos los datos contables cada vez que un pedido entre en Factusol.',
+        color: 0x10b981,
+        fields: [
+          { name: 'Estado', value: '✓ Vinculado y Operativo', inline: true },
+          { name: 'Fecha y Hora', value: new Date().toLocaleString('es-ES'), inline: true },
+        ],
+        footer: { text: 'Bentian ERP Bridge — Conector Local Factusol' },
+        timestamp: new Date().toISOString()
+      }]
+    };
+
+    const res = await this.sendViaDiscord(settings.discordWebhookUrl, payload);
+    return {
+      success: res.success,
+      message: res.success
+        ? '✓ Mensaje de prueba enviado con éxito al canal de Discord.'
+        : `Error al enviar a Discord: ${res.error || 'Fallo desconocido'}`,
+    };
+  }
+
+  public static async sendViaTelegram(token: string, chatId: string, text: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const cleanToken = token.trim();
+      const cleanChatId = chatId.trim();
+      const url = `https://api.telegram.org/bot${cleanToken}/sendMessage`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: cleanChatId,
+          text,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({})) as any;
+        return { success: false, error: errJson.description || `HTTP ${res.status} desde API de Telegram` };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: `Fallo al contactar Telegram: ${err.message}` };
+    }
+  }
+
+  public static async sendViaDiscord(webhookUrl: string, payload: any): Promise<{ success: boolean; error?: string }> {
+    try {
+      const cleanUrl = webhookUrl.trim();
+      if (!cleanUrl.startsWith('https://discord.com/api/webhooks/') && !cleanUrl.startsWith('https://discordapp.com/api/webhooks/')) {
+        return { success: false, error: 'URL de Webhook de Discord no válida (debe comenzar por https://discord.com/api/webhooks/)' };
+      }
+      const res = await fetch(cleanUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        return { success: false, error: `HTTP ${res.status} desde Discord: ${text.substring(0, 100)}` };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: `Fallo al contactar Discord: ${err.message}` };
+    }
   }
 
   private static async deliverEmail(opts: {
@@ -277,64 +450,30 @@ export class OrderNotifierService {
     html: string;
     text: string;
     settings: AgentNotificationSettings;
-    apiBaseUrl?: string;
-    licenseKey?: string;
-    orderReference?: string;
   }): Promise<{ success: boolean; error?: string }> {
-    const { to, subject, html, text, settings, apiBaseUrl, licenseKey, orderReference } = opts;
+    const { to, subject, html, text, settings } = opts;
 
-    // 1. Si hay SMTP configurado, enviar vía SMTP directo
-    if (settings.smtpHost && settings.smtpUser && settings.smtpPass) {
-      try {
-        await this.sendViaSmtpSocket({
-          host: settings.smtpHost,
-          port: settings.smtpPort || 465,
-          user: settings.smtpUser,
-          pass: settings.smtpPass,
-          from: settings.smtpFrom || settings.smtpUser,
-          to,
-          subject,
-          html,
-          text,
-        });
-        return { success: true };
-      } catch (smtpErr: any) {
-        this.logger.error(`Error en SMTP propio (${settings.smtpHost}):`, smtpErr.message);
-        // Si falla el SMTP propio y no hay API, retornar el error
-        if (!apiBaseUrl) {
-          return { success: false, error: smtpErr.message };
-        }
-      }
+    if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPass) {
+      return { success: false, error: 'Se requiere configurar el servidor SMTP propio (Host, Usuario y Contraseña) para enviar alertas por correo.' };
     }
 
-    // 2. Si hay API central configurada, usar relay seguro de Bentian
-    if (apiBaseUrl) {
-      try {
-        const cleanApiUrl = apiBaseUrl.replace(/\/+$/, '');
-        const res = await fetch(`${cleanApiUrl}/api/v1/notifications/order`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(licenseKey ? { 'x-license-key': licenseKey } : {}),
-          },
-          body: JSON.stringify({ to, subject, html, text, orderReference }),
-          signal: AbortSignal.timeout(12000),
-        });
-
-
-        if (res.ok) {
-          return { success: true };
-        } else {
-          const errData = (await res.json().catch(() => ({}))) as any;
-          return { success: false, error: errData.message || `HTTP ${res.status} desde el servidor central` };
-        }
-      } catch (apiErr: any) {
-        this.logger.warn('Aviso en relay de notificaciones con el servidor central:', apiErr.message);
-        return { success: false, error: `Fallo al contactar servidor central: ${apiErr.message}` };
-      }
+    try {
+      await this.sendViaSmtpSocket({
+        host: settings.smtpHost,
+        port: settings.smtpPort || 465,
+        user: settings.smtpUser,
+        pass: settings.smtpPass,
+        from: settings.smtpFrom || settings.smtpUser,
+        to,
+        subject,
+        html,
+        text,
+      });
+      return { success: true };
+    } catch (smtpErr: any) {
+      this.logger.error(`Error en SMTP propio (${settings.smtpHost}):`, smtpErr.message);
+      return { success: false, error: `Error SMTP: ${smtpErr.message}` };
     }
-
-    return { success: false, error: 'No se configuró ni servidor SMTP ni conexión con el servidor central' };
   }
 
   private static sendViaSmtpSocket(config: {

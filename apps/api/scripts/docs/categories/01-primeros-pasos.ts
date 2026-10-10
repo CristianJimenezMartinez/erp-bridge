@@ -525,24 +525,24 @@ export const primerosPasosArticles: DocArticle[] = [
     metaDescription: 'Manual completo del Asistente de Configuración de Bentian ERP Bridge. Activación en 1 clic, modo continuar sin Factusol, Serie 1 vs W y documentación integrada.',
     keywords: 'asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web',
     toc: [
-      { id: 'vision-general-asistente', label: '1. Visión General del Asistente y Filosofía Zero-Touch', level: 2 },
+      { id: 'vision-general-asistente', label: '1. Visión General del Asistente Zero-Touch (4 Pasos)', level: 2 },
       { id: 'paso-1-licencia', label: '2. Paso 1: Licencia (Activación en 1 Clic o Modo Exploración)', level: 2 },
       { id: 'paso-2-factusol', label: '3. Paso 2: Conexión con Factusol y Modo Continuar sin Factusol', level: 2 },
       { id: 'serie-factusol-recomendada', label: '4. Configuración Clave: Serie 1 Directo vs Serie W en Factusol', level: 2 },
       { id: 'paso-3-tienda', label: '5. Paso 3: Conexión con la Tienda Web (Universal o WooCommerce)', level: 2 },
-      { id: 'paso-4-alertas', label: '6. Paso 4: Alertas Transaccionales por Email (Relay Seguro DKIM)', level: 2 },
-      { id: 'paso-5-spotlight', label: '7. Paso 5: Finalización, Spotlight Tour y Documentación Integrada', level: 2 },
+      { id: 'paso-4-listo', label: '6. Paso 4: ¡Todo Listo!, Spotlight Tour y Documentación Integrada', level: 2 },
+      { id: 'notificaciones-multicanal', label: '7. Centro de Notificaciones Multi-Canal (Email SMTP Propio, Telegram y Discord)', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         La primera vez que abres Bentian ERP Bridge, el programa lanza automáticamente el <strong>Asistente de Configuración Rápida (Onboarding Wizard)</strong>. Este asistente está pensado para que cualquier responsable de administración, almacén o comercial —incluso sin experiencia técnica avanzada— complete la puesta en marcha en menos de 5 minutos.
       </p>
 
-      <h2 id="vision-general-asistente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Visión General del Asistente y Filosofía Zero-Touch</h2>
+      <h2 id="vision-general-asistente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Visión General del Asistente Zero-Touch (4 Pasos)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        El asistente guía la configuración a través de 5 sencillos pasos visuales:
+        El asistente guía la configuración a través de 4 sencillos pasos visuales:
       </p>
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6 text-center text-xs">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 text-center text-xs">
         <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
           <div class="font-bold text-indigo-400 mb-0.5">Paso 1</div>
           <div class="text-zinc-300">Licencia</div>
@@ -555,12 +555,8 @@ export const primerosPasosArticles: DocArticle[] = [
           <div class="font-bold text-indigo-400 mb-0.5">Paso 3</div>
           <div class="text-zinc-300">Tienda Web</div>
         </div>
-        <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
-          <div class="font-bold text-indigo-400 mb-0.5">Paso 4</div>
-          <div class="text-zinc-300">Avisos Email</div>
-        </div>
         <div class="p-2.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30">
-          <div class="font-bold text-emerald-400 mb-0.5">Paso 5</div>
+          <div class="font-bold text-emerald-400 mb-0.5">Paso 4</div>
           <div class="text-emerald-300 font-semibold">¡Listo!</div>
         </div>
       </div>
@@ -718,26 +714,58 @@ export const primerosPasosArticles: DocArticle[] = [
         </div>
       </div>
 
-      <h2 id="paso-4-alertas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Paso 4: Alertas Transaccionales por Email (Relay Seguro DKIM)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Recibe una notificación corporativa inmediata cada vez que entra un nuevo pedido web en Factusol:
-      </p>
-      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-4">
-        <li><strong>Desglose completo:</strong> Datos de facturación del cliente, líneas de artículos, base imponible e IVA desglosado.</li>
-        <li><strong>Múltiples destinatarios:</strong> Puedes indicar varias direcciones separadas por comas (ej: <code class="text-zinc-200">pedidos@tuempresa.com, almacen@tuempresa.com</code>).</li>
-        <li><strong>Botón de prueba inmediata:</strong> Haz clic en <strong class="text-zinc-200">Probar Envío de Email</strong> para verificar la recepción en tu bandeja de entrada en tiempo real.</li>
-        <li><strong>Relay seguro Bentian con DKIM:</strong> Los correos se envían firmados criptográficamente mediante el relay oficial de Bentian, garantizando entrega directa sin spam y sin necesidad de configurar servidores SMTP complejos.</li>
-      </ul>
-
-      <h2 id="paso-5-spotlight" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Paso 5: Finalización, Spotlight Tour y Documentación Integrada</h2>
+      <h2 id="paso-4-listo" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Paso 4: ¡Todo Listo!, Spotlight Tour y Documentación Integrada</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         Al hacer clic en <strong class="text-emerald-400 font-bold">Comenzar a Trabajar</strong>:
       </p>
       <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>El agente guarda tu configuración de forma blindada en <code class="text-zinc-200 font-mono">%APPDATA%\\Bentian Agent\\agent-config.json</code> con respaldo atómico.</li>
+        <li>El agente guarda tu configuración de forma blindada en <code class="text-zinc-200 font-mono">%APPDATA%\\Bentian Agent\\agent-config.json</code> con reemplazo atómico y copia defensiva.</li>
         <li>El motor local autónomo arranca la supervisión de pedidos y sincronización de stock en segundo plano.</li>
         <li>El sistema inicia un <strong>Spotlight Tour interactivo</strong> que te mostrará los controles esenciales del panel (estado del servicio, botón de sincronización forzada y visor de eventos).</li>
       </ol>
+
+      <h2 id="notificaciones-multicanal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Centro de Notificaciones Multi-Canal (Email SMTP Propio, Telegram y Discord)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Para mantener el asistente inicial rápido y sin fricciones, los avisos de nuevos pedidos se configuran de forma independiente desde la pestaña dedicada <strong>Notificaciones</strong> en el menú lateral de la app:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-xs text-zinc-300">
+        <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
+          <div class="font-bold text-amber-400 mb-1 flex items-center gap-1.5">
+            <span>✉️</span>
+            <span>Email (SMTP Propio)</span>
+          </div>
+          <p class="text-zinc-400 leading-relaxed mb-2">
+            Configura tu propio servidor de correo corporativo (Gmail, Outlook 365, cPanel o Plesk) con puerto seguro STARTTLS/SSL.
+          </p>
+          <p class="text-zinc-300 text-[11px]">
+            Tus avisos no consumen cuotas ajenas ni dependen de servidores de terceros. Incluye botón <em>Probar Envío Email</em>.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
+          <div class="font-bold text-sky-400 mb-1 flex items-center gap-1.5">
+            <span>📱</span>
+            <span>Telegram Bot</span>
+          </div>
+          <p class="text-zinc-400 leading-relaxed mb-2">
+            Alertas push instantáneas y 100% gratuitas en tu móvil mediante la API de bots de Telegram (<code class="text-sky-300 font-mono">api.telegram.org</code>).
+          </p>
+          <p class="text-zinc-300 text-[11px]">
+            Crea tu bot con <code class="text-zinc-200">@BotFather</code>, introduce tu <em>Chat ID</em> y pulsa en <em>Probar Envío Telegram</em>.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
+          <div class="font-bold text-indigo-400 mb-1 flex items-center gap-1.5">
+            <span>💬</span>
+            <span>Discord Webhook</span>
+          </div>
+          <p class="text-zinc-400 leading-relaxed mb-2">
+            Notificaciones enriquecidas en canales de equipo de Discord para almacén, administración o comerciales.
+          </p>
+          <p class="text-zinc-300 text-[11px]">
+            Pega la URL del Webhook del canal y haz clic en <em>Probar Envío Discord</em> para ver el embed en directo.
+          </p>
+        </div>
+      </div>
 
       <!-- Caja final acceso documentacion -->
       <div class="p-5 rounded-2xl bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent border border-blue-500/25 mb-6">
