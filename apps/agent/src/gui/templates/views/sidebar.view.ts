@@ -13,35 +13,35 @@ export function renderSidebar(agentVersion: string = '0.2.0'): string {
     </div>
 
     <ul class="nav-list">
-      <li class="nav-item active" onclick="switchTab('overview')">
+      <li class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
         <span>Estado General</span>
       </li>
-      <li class="nav-item" onclick="switchTab('factusol')">
+      <li class="nav-item" data-tab="factusol" onclick="switchTab('factusol')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
         <span>Factusol ERP</span>
       </li>
-      <li class="nav-item" onclick="switchTab('channel')">
+      <li class="nav-item" data-tab="channel" onclick="switchTab('channel')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
         <span>Canal Web / Tienda</span>
       </li>
-      <li class="nav-item" onclick="switchTab('sync')">
+      <li class="nav-item" data-tab="sync" onclick="switchTab('sync')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span>Automatización</span>
       </li>
-      <li class="nav-item" onclick="switchTab('notifications')">
+      <li class="nav-item" data-tab="notifications" onclick="switchTab('notifications')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         <span>Notificaciones</span>
       </li>
-      <li class="nav-item" onclick="switchTab('history')">
+      <li class="nav-item" data-tab="history" onclick="switchTab('history')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
         <span>Historial de Ventas</span>
       </li>
-      <li class="nav-item" onclick="switchTab('logs')">
+      <li class="nav-item" data-tab="logs" onclick="switchTab('logs')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m14 2-4 4 4 4"/><path d="m10 14 4 4-4 4"/><path d="M4 12h16"/></svg>
         <span>Diagnóstico y Ayuda</span>
       </li>
-      <li class="nav-item" onclick="switchTab('license')">
+      <li class="nav-item" data-tab="license" onclick="switchTab('license')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
         <span>Licencia del Equipo</span>
       </li>

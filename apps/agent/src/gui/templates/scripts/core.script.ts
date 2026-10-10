@@ -464,11 +464,10 @@ export const coreScript = `
       const targetPane = document.getElementById('tab-' + tabId);
       if (targetPane) targetPane.classList.add('active');
 
-      const tabs = ['overview', 'factusol', 'channel', 'sync', 'history', 'logs', 'license'];
-      const navItems = document.querySelectorAll('.nav-list .nav-item');
-      const idx = tabs.indexOf(tabId);
-      if (idx !== -1 && navItems[idx]) {
-        navItems[idx].classList.add('active');
+      const navItem = document.querySelector('.nav-list .nav-item[data-tab="' + tabId + '"]') ||
+                      document.querySelector('.nav-list .nav-item[onclick*="\'' + tabId + '\'"]');
+      if (navItem) {
+        navItem.classList.add('active');
       }
 
       const titles = {
@@ -476,6 +475,7 @@ export const coreScript = `
         factusol: 'Factusol ERP (Acceso Local)',
         channel: 'Canal Web / Tienda Online',
         sync: 'Automatización y Reglas',
+        notifications: 'Centro de Notificaciones & Alertas',
         history: 'Historial de Ventas',
         logs: 'Diagnóstico Técnico y Ayuda',
         license: 'Licencia del Equipo'
