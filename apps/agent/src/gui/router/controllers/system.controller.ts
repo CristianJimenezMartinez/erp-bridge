@@ -14,7 +14,12 @@ const logger = new Logger('SystemController');
 export class SystemController {
   public static renderIndex(agent: LocalAgent, getToken?: () => string): RouteHandler {
     return (_req, res) => {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      });
       const token = getToken ? getToken() : '';
       res.end(renderDashboardHtml(agent.getVersion(), token));
     };

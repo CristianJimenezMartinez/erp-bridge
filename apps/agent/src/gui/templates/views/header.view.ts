@@ -6,6 +6,10 @@ export function renderHeader(): string {
         <strong>Reiniciando motor local...</strong>
         <span id="connection-banner-sub">Reanudando enlace con el servicio en 127.0.0.1:39281 (intento <span id="banner-reconnect-count">1</span>)...</span>
       </div>
+      <button onclick="window.location.reload(true)" class="btn btn-sm" style="margin-left:auto;background:rgba(245,158,11,0.22);border:1px solid rgba(245,158,11,0.5);color:#fef3c7;cursor:pointer;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.38)'" onmouseout="this.style.background='rgba(245,158,11,0.22)'">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>Recargar Interfaz</span>
+      </button>
     </div>
 
     <!-- Header -->
@@ -19,6 +23,10 @@ export function renderHeader(): string {
         <button id="btn-update-restart" onclick="triggerRestartUpdate()" class="btn" style="display:none;align-items:center;gap:6px;font-weight:600;background:linear-gradient(135deg, #f59e0b, #d97706);color:#fff;border:none;box-shadow:0 0 12px rgba(245,158,11,0.45);cursor:pointer;padding:6px 14px;border-radius:6px;font-size:12px;transition:all 0.2s ease;">
           <svg id="update-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span id="btn-update-text">Reiniciar para Actualizar</span>
+        </button>
+        <button onclick="window.location.reload(true)" id="btn-refresh-header" class="btn btn-secondary btn-sm" title="Refrescar interfaz y sincronizar datos" style="display:inline-flex;align-items:center;gap:6px;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Refrescar</span>
         </button>
         <button onclick="triggerManualSync()" id="btn-sync-header" class="btn btn-primary">
           <svg id="sync-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>

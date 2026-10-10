@@ -1,5 +1,8 @@
 import http from 'http';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 import { Socket } from 'net';
 import { Logger } from '@erp-bridge/shared';
 import { LocalAgent } from '../agent';
@@ -23,11 +26,35 @@ export class LocalGuiServer {
   private readonly sockets = new Set<Socket>();
   private readonly localToken: string;
 
+  private static getOrCreatePersistentLocalToken(): string {
+    try {
+      const appData = process.env.APPDATA || (process.platform === 'darwin'
+        ? path.join(os.homedir(), 'Library', 'Application Support')
+        : path.join(os.homedir(), '.config'));
+      const dir = path.join(appData, 'Bentian Agent');
+      const tokenFile = path.join(dir, '.gui-session-token');
+      if (fs.existsSync(tokenFile)) {
+        const existing = fs.readFileSync(tokenFile, 'utf8').trim();
+        if (existing && existing.length >= 32) {
+          return existing;
+        }
+      }
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const newToken = crypto.randomBytes(32).toString('hex');
+      fs.writeFileSync(tokenFile, newToken, { encoding: 'utf8', mode: 0o600 });
+      return newToken;
+    } catch {
+      return crypto.randomBytes(32).toString('hex');
+    }
+  }
+
   constructor(
     private readonly agent: LocalAgent,
     private readonly defaultPort: number = 39281
   ) {
-    this.localToken = crypto.randomBytes(32).toString('hex');
+    this.localToken = LocalGuiServer.getOrCreatePersistentLocalToken();
     this.activePort = this.defaultPort;
     this.router = this.buildRouter();
     this.agent.setGuiServer(this);
