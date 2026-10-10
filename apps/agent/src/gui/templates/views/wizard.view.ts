@@ -1,6 +1,6 @@
 export function renderWizardModal(): string {
   return `  <!-- ================= ONBOARDING WIZARD MODAL ================= -->
-  <div id="modal-wizard" class="modal-overlay">
+  <div id="modal-wizard" class="modal-overlay" onclick="if(event.target === this) closeWizardModal()">
     <div class="modal-card">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 8px;">

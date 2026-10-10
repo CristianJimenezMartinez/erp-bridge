@@ -554,51 +554,5 @@ export const channelScript = `
       };
       await submitConfigUpdates(payload, 'Ajustes del Canal Web guardados con éxito.');
     }
-
-    async function saveSyncRules() {
-      const payload = {
-        syncRules: {
-          enableFileWatcher: document.getElementById('check-watcher-enabled').checked,
-          debounceSeconds: parseInt(document.getElementById('input-debounce-sec').value, 10) || 5,
-          periodicIntervalMinutes: parseInt(document.getElementById('select-periodic-min').value, 10) || 15,
-          syncStock: document.getElementById('check-sync-stock').checked,
-          syncPrices: document.getElementById('check-sync-prices').checked,
-          syncDescriptions: document.getElementById('check-sync-desc').checked,
-          safetyStockBuffer: parseInt(document.getElementById('input-safety-stock').value, 10) || 0,
-          onlyStockAboveZero: document.getElementById('check-only-stock-pos').checked,
-        }
-      };
-      await submitConfigUpdates(payload, 'Reglas de automatización guardadas.');
-    }
-
-    async function loadAutoStart(force) {
-      if (window.__autoStartLoaded && !force) return;
-      try {
-        const res = await fetch('/api/local/autostart');
-        const data = await res.json();
-        const chk = document.getElementById('check-autostart-enabled');
-        if (chk && data && typeof data.enabled === 'boolean' && (force || document.activeElement !== chk)) {
-          chk.checked = data.enabled;
-        }
-        window.__autoStartLoaded = true;
-      } catch (e) {}
-    }
-
-    async function toggleAutoStart(enabled) {
-      try {
-        const res = await fetch('/api/local/autostart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast(enabled ? 'Auto-arranque con Windows activado' : 'Auto-arranque desactivado', 'info');
-        } else {
-          showToast('No se pudo cambiar el auto-arranque', 'warn');
-        }
-      } catch (e) {
-        showToast('Error al configurar auto-arranque', 'error');
-      }
-    }
+    window.saveChannelSettings = saveChannelSettings;
 `;

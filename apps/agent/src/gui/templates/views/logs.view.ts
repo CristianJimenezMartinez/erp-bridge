@@ -86,7 +86,11 @@ export function renderLogsTab(): string {
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 <span>Reportar Incidencia</span>
               </button>
-              <button onclick="downloadDiagnostics()" id="btn-diag-dl" class="btn btn-primary btn-sm" title="Descargar informe completo (.txt) para soporte técnico">
+              <button onclick="toggleBottomConsole(true)" class="btn btn-primary btn-sm" title="Abrir y desplegar la consola de actividad en vivo (Dock Inferior)" style="display:inline-flex;align-items:center;gap:6px;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Consola en Vivo (Dock)</span>
+              </button>
+              <button onclick="downloadDiagnostics()" id="btn-diag-dl" class="btn btn-secondary btn-sm" title="Descargar informe completo (.txt) para soporte técnico">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                 <span>Descargar Informe Técnico (.txt)</span>
               </button>
@@ -190,43 +194,6 @@ export function renderLogsTab(): string {
                 <span>→</span>
               </div>
             </a>
-          </div>
-        </div>
-
-        <!-- Visor de Actividad con Selector (Diario de Operaciones vs Consola Técnica) -->
-        <div class="form-section">
-          <div class="section-header">
-            <div>
-              <div class="section-title">Visor de Actividad y Eventos</div>
-              <div class="section-desc">Alterna entre los eventos limpios de negocio y la consola técnica detallada.</div>
-            </div>
-            <!-- Selector de Vista -->
-            <div style="display:flex;background:rgba(255,255,255,0.06);padding:3px;border-radius:8px;border:1px solid var(--card-border);gap:4px;">
-              <button type="button" id="btn-mode-journal" onclick="setLogViewMode('journal')" class="btn btn-sm log-mode-btn active" style="font-size:12px;padding:5px 12px;border:none;">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;vertical-align:-2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Diario de Operaciones
-              </button>
-              <button type="button" id="btn-mode-console" onclick="setLogViewMode('console')" class="btn btn-sm log-mode-btn" style="font-size:12px;padding:5px 12px;border:none;">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:4px;vertical-align:-2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                Consola Técnica
-              </button>
-            </div>
-          </div>
-
-          <!-- Filtros de Consola Técnica (visibles solo en modo consola técnica) -->
-          <div id="technical-console-controls" style="display:none;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
-            <input type="text" id="log-search-input" onkeyup="filterLogs()" placeholder="Buscar en el registro..." class="form-control" style="max-width: 240px; padding: 6px 12px; font-size: 12px;">
-            <div style="display: flex; gap: 6px;">
-              <button onclick="setLogLevelFilter('all')" class="btn btn-secondary btn-sm log-filter-btn active" data-filter="all">Todos</button>
-              <button onclick="setLogLevelFilter('info')" class="btn btn-secondary btn-sm log-filter-btn" data-filter="info">Info</button>
-              <button onclick="setLogLevelFilter('success')" class="btn btn-secondary btn-sm log-filter-btn" data-filter="success">Éxito</button>
-              <button onclick="setLogLevelFilter('warn')" class="btn btn-secondary btn-sm log-filter-btn" data-filter="warn">Avisos</button>
-              <button onclick="setLogLevelFilter('error')" class="btn btn-secondary btn-sm log-filter-btn" data-filter="error">Errores</button>
-            </div>
-          </div>
-
-          <div id="full-logs-panel" class="logs-panel" style="min-height: 280px; max-height: 480px;">
-            <div class="log-line log-info">Cargando registros...</div>
           </div>
         </div>
       </section>`;

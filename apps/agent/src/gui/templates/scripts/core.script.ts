@@ -315,6 +315,29 @@ export const coreScript = `
         };
       }
 
+      // Detección proactiva de ausencia de URL de la tienda web (en cualquier contexto)
+      if (lower.includes('url del sitio web no configurada') || lower.includes('url de la tienda') || lower.includes('tienda online no configurada') || lower.includes('falta vincular tu tienda') || lower.includes('url no configurada') || lower.includes('storeurl') || lower.includes('no has introducido la dirección')) {
+        const activeType = (typeof currentChannelType !== 'undefined' && currentChannelType) ||
+                           (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.channelType) ||
+                           'universal_bridge';
+        const targetInput = activeType === 'woocommerce'
+          ? 'input-wc-url'
+          : (activeType === 'shopify'
+            ? 'input-shopify-subdomain'
+            : (activeType === 'holded'
+              ? 'input-holded-apikey'
+              : 'input-universal-url'));
+        return {
+          title: 'Dirección web requerida',
+          message: 'No has configurado la dirección web de tu comercio online.',
+          cause: 'El agente necesita la URL de tu tienda para conectar Factusol y sincronizar pedidos y catálogo.',
+          suggestion: 'Introduce la dirección de tu web en la pestaña Canal Web y guarda los cambios.',
+          actionLabel: 'Configurar Canal Web →',
+          targetTab: 'channel',
+          targetInputId: targetInput
+        };
+      }
+
       // Incidencias en Canal Web (Universal / WooCommerce)
       if (context === 'channel' || lower.includes('endpoint') || lower.includes('curl') || lower.includes('http') || lower.includes('woocommerce') || lower.includes('wordpress')) {
         if (lower.includes('404') || lower.includes('not found') || lower.includes('no encontrado') || lower.includes('endpointfound') || lower.includes('endpoint')) {
@@ -537,7 +560,79 @@ export const coreScript = `
         }, 200);
       }
     }
+    window.navigateToResolution = navigateToResolution;
 
+    // Obtener identificador del campo de URL según el canal activo
+    function getChannelUrlTarget() {
+      const type = (typeof currentChannelType !== 'undefined' && currentChannelType) ||
+                   (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.channelType) ||
+                   'universal_bridge';
+      if (type === 'woocommerce') return { tab: 'channel', inputId: 'input-wc-url', type: 'woocommerce' };
+      if (type === 'shopify') return { tab: 'channel', inputId: 'input-shopify-subdomain', type: 'shopify' };
+      if (type === 'holded') return { tab: 'channel', inputId: 'input-holded-apikey', type: 'holded' };
+      return { tab: 'channel', inputId: 'input-universal-url', type: 'universal_bridge' };
+    }
+    window.getChannelUrlTarget = getChannelUrlTarget;
+
+    // Comprobar si la URL del comercio activo está configurada
+    function isStoreUrlConfigured() {
+      const target = getChannelUrlTarget();
+      const inputEl = document.getElementById(target.inputId);
+      if (inputEl && inputEl.value && inputEl.value.trim().length > 0) return true;
+      if (typeof currentStatus !== 'undefined' && currentStatus) {
+        const s = currentStatus;
+        if (target.type === 'universal_bridge' && s.universalBridgeSettings && s.universalBridgeSettings.storeUrl) return true;
+        if (target.type === 'woocommerce' && s.woocommerceSettings && s.woocommerceSettings.storeUrl) return true;
+        if (target.type === 'shopify' && s.shopifySettings && s.shopifySettings.shopSubdomain) return true;
+        if (target.type === 'holded' && s.holdedSettings && s.holdedSettings.apiKey) return true;
+      }
+      return false;
+    }
+    window.isStoreUrlConfigured = isStoreUrlConfigured;
+
+    // Navegación asistida al input de URL del canal activo con aviso
+    function navigateToChannelUrlInput(reason) {
+      const target = getChannelUrlTarget();
+      if (reason && typeof showSmartToast === 'function') {
+        showSmartToast({
+          title: 'Configuración de Tienda Requerida',
+          message: reason,
+          actionLabel: 'Completar URL →',
+          targetTab: 'channel',
+          targetInputId: target.inputId,
+          type: 'warn'
+        });
+      }
+      navigateToResolution('channel', target.inputId);
+    }
+    window.navigateToChannelUrlInput = navigateToChannelUrlInput;
+
+    // Abrir la tienda web o llevar al usuario a configurarla si no está puesta
+    function openStoreWebOrConfigure() {
+      const target = getChannelUrlTarget();
+      let url = '';
+      if (typeof currentStatus !== 'undefined' && currentStatus) {
+        const s = currentStatus;
+        if (target.type === 'universal_bridge') url = (s.universalBridgeSettings && s.universalBridgeSettings.storeUrl) || '';
+        else if (target.type === 'woocommerce') url = (s.woocommerceSettings && s.woocommerceSettings.storeUrl) || '';
+        else if (target.type === 'shopify') {
+          const sub = (s.shopifySettings && s.shopifySettings.shopSubdomain) || '';
+          url = sub ? (sub.startsWith('http') ? sub : ('https://' + sub + '.myshopify.com')) : '';
+        }
+      }
+      if (!url) {
+        const inputEl = document.getElementById(target.inputId);
+        if (inputEl && inputEl.value) url = inputEl.value.trim();
+      }
+
+      if (url && url.trim().length > 0) {
+        const cleanUrl = url.trim().startsWith('http') ? url.trim() : ('https://' + url.trim());
+        window.open(cleanUrl, '_blank');
+      } else {
+        navigateToChannelUrlInput('Indica la dirección web de tu tienda para poder visitarla y sincronizar.');
+      }
+    }
+    window.openStoreWebOrConfigure = openStoreWebOrConfigure;
 
     // Channel Switcher
     function selectChannelType(type) {
@@ -773,4 +868,18 @@ export const coreScript = `
     window.prevSpotlightStep = prevSpotlightStep;
     window.finishSpotlightTour = finishSpotlightTour;
     window.closeSpotlightTour = closeSpotlightTour;
+
+    // Listener global de teclado (Escape para cerrar modales o replegar consola dock)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        if (typeof closeErrorResolverModal === 'function') closeErrorResolverModal();
+        if (typeof closeIncidentModal === 'function') closeIncidentModal();
+        if (typeof closeWizardModal === 'function') closeWizardModal();
+        if (typeof closeOrderDetailModal === 'function') closeOrderDetailModal();
+        const dock = document.getElementById('bottom-console-dock');
+        if (dock && dock.classList.contains('open')) {
+          if (typeof toggleBottomConsole === 'function') toggleBottomConsole(false);
+        }
+      }
+    });
 `;

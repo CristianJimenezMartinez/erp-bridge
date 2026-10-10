@@ -284,8 +284,18 @@ export const logsScript = `
       const oledbStatus = pf.oledbProvider ? pf.oledbProvider.status + (pf.oledbProvider.message ? ' - ' + pf.oledbProvider.message : '') : 'N/A';
       const clockStatus = pf.clockDrift ? pf.clockDrift.status + (pf.clockDrift.message ? ' - ' + pf.clockDrift.message : '') : 'N/A';
       const netStatus = pf.networkStorage ? pf.networkStorage.status + (pf.networkStorage.message ? ' - ' + pf.networkStorage.message : '') : 'N/A';
-      const channelUrl = s.channel ? (s.channel.url || s.channel.storeUrl || 'N/A') : 'N/A';
-      const channelType = s.channel ? (s.channel.type || window.currentChannelType || 'N/A') : 'N/A';
+      const chType = s.channelType || window.currentChannelType || 'universal_bridge';
+      let channelUrl = 'N/A';
+      if (chType === 'universal_bridge') {
+        channelUrl = (s.universalBridgeSettings && s.universalBridgeSettings.storeUrl) || 'N/A';
+      } else if (chType === 'woocommerce') {
+        channelUrl = (s.woocommerceSettings && s.woocommerceSettings.storeUrl) || 'N/A';
+      } else if (chType === 'shopify') {
+        channelUrl = (s.shopifySettings && s.shopifySettings.shopSubdomain) ? (s.shopifySettings.shopSubdomain + '.myshopify.com') : 'N/A';
+      } else if (chType === 'holded') {
+        channelUrl = 'Holded Invoicing API';
+      }
+      const channelType = chType;
       const factusolDb = s.factusol ? (s.factusol.databasePath || s.factusolDbPath || 'N/A') : 'N/A';
       const factusolConnected = s.factusol ? (s.factusol.connected ? 'Conectado (OK)' : 'Desconectado / Offline') : 'N/A';
       const licPlan = s.license ? (s.license.plan || 'N/A') : 'N/A';

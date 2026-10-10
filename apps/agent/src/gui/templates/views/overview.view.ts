@@ -74,7 +74,7 @@ export function renderOverviewTab(): string {
           </div>
 
           <!-- Card Canal Web -->
-          <div class="card">
+          <div class="card" id="card-channel-overview" style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON') openStoreWebOrConfigure()" title="Clic para gestionar o visitar la tienda web">
             <div class="card-header">
               <span class="card-title">
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
@@ -83,10 +83,12 @@ export function renderOverviewTab(): string {
               <span id="card-wc-badge" class="tag tag-amber">Comprobando...</span>
             </div>
             <div id="card-wc-metric" class="card-metric">---</div>
-            <div id="card-wc-url" class="card-desc">Sin configurar</div>
+            <div id="card-wc-url" class="card-desc" style="cursor: pointer; text-decoration: underline dotted;" title="Clic para visitar o configurar la tienda web" onclick="event.stopPropagation(); openStoreWebOrConfigure();">Sin configurar</div>
             <div class="card-footer">
-              <span>Puerto 443 HTTPS</span>
-              <button onclick="switchTab('channel')" class="btn btn-secondary btn-sm">Gestionar</button>
+              <span id="card-wc-footer-sub">Puerto 443 HTTPS</span>
+              <button id="btn-card-wc-manage" onclick="event.stopPropagation(); openStoreWebOrConfigure()" class="btn btn-secondary btn-sm" title="Abrir tienda web o configurar URL">
+                <span id="btn-card-wc-manage-text">Gestionar</span>
+              </button>
             </div>
           </div>
 

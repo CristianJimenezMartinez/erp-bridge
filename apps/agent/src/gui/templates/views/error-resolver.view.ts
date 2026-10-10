@@ -1,6 +1,6 @@
 export function renderErrorResolverModal(): string {
   return `  <!-- ================= HUMAN ERROR RESOLVER MODAL ================= -->
-  <div id="modal-error-resolver" class="modal-overlay">
+  <div id="modal-error-resolver" class="modal-overlay" onclick="if(event.target === this) closeErrorResolverModal()">
     <div class="modal-card" style="max-width: 620px;">
       <div class="modal-header" style="border-bottom: 1px solid var(--card-border); background: #17171d;">
         <div style="display: flex; align-items: center; gap: 10px;">

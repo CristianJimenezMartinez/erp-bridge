@@ -159,6 +159,22 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
+  // 8.5. Web Channel URL Missing
+  {
+    code: 'ERR_CHANNEL_URL_MISSING',
+    pattern: /url del sitio web no configurada|url de la tienda no configurada|tienda online no configurada|falta vincular tu tienda|sin configurar la url|storeurl no configurad|url no configurada|no has introducido la dirección/i,
+    build: () => ({
+      code: 'ERR_CHANNEL_URL_MISSING',
+      title: 'Falta configurar la dirección de tu tienda online',
+      message: 'Para sincronizar existencias y pedidos con Factusol es necesario indicar la dirección web de tu comercio.',
+      suggestion: 'Accede a la pestaña Canal Web, introduce la dirección de tu tienda (ejemplo: https://mitienda.com) y pulsa en Guardar Ajustes.',
+      actionLabel: 'Configurar Canal Web',
+      targetTab: 'channel',
+      targetInputId: 'input-universal-url',
+      helpUrl: 'https://bridge.cristianjm.com/docs/canales/',
+    }),
+  },
+
   // 9. Web Channel 401 Unauthorized / Authorization Headers Blocked
   {
     code: 'ERR_WEB_AUTH_BLOCKED',

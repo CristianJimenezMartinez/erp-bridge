@@ -1,6 +1,6 @@
 export function renderIncidentModal(): string {
   return `  <!-- ================= REPORT INCIDENT MODAL ================= -->
-  <div id="modal-incident" class="modal-overlay">
+  <div id="modal-incident" class="modal-overlay" onclick="if(event.target === this) closeIncidentModal()">
     <div class="modal-card" style="max-width: 620px;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 8px;">

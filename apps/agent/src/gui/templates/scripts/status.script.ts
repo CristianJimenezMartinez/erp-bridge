@@ -190,6 +190,20 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
               : !!(wc.storeUrl && wc.consumerKey)));
         cardWcBadge.className = isConfigured ? 'tag tag-green' : 'tag tag-amber';
         cardWcBadge.textContent = isConfigured ? 'Vinculado' : 'Sin Configurar';
+
+        const btnCardWcText = document.getElementById('btn-card-wc-manage-text');
+        const btnCardWc = document.getElementById('btn-card-wc-manage');
+        if (btnCardWcText) {
+          btnCardWcText.textContent = isConfigured ? 'Visitar Web ↗' : 'Vincular Web →';
+        }
+        if (btnCardWc) {
+          btnCardWc.title = isConfigured ? 'Abrir tienda online en el navegador' : 'Configurar dirección web en Canal Web';
+          if (!isConfigured) {
+            btnCardWc.className = 'btn btn-primary btn-sm';
+          } else {
+            btnCardWc.className = 'btn btn-secondary btn-sm';
+          }
+        }
       }
 
       // Licencia
@@ -429,7 +443,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       // 3. Caso Canal Web No Configurado
       if (!isChannelConfigured) {
-        const targetInput = chType === 'woocommerce' ? 'input-wc-url' : (chType === 'shopify' ? 'input-shopify-subdomain' : 'input-universal-url');
+        const targetInput = chType === 'woocommerce' ? 'input-wc-url' : (chType === 'shopify' ? 'input-shopify-subdomain' : (chType === 'holded' ? 'input-holded-apikey' : 'input-universal-url'));
         if (banner) {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(255, 255, 255, 0.03)';
@@ -584,7 +598,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
         const inOrderSeries = document.getElementById('input-factusol-order-series');
         if (inOrderSeries && (force || !inOrderSeries.value || document.activeElement !== inOrderSeries)) {
-          inOrderSeries.value = fSettings.orderSeries || 'W';
+          inOrderSeries.value = fSettings.orderSeries || '1';
         }
 
         const chType = data.channelType || 'universal_bridge';

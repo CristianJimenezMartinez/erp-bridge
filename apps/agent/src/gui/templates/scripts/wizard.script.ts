@@ -491,7 +491,20 @@ export const wizardScript = `
       localStorage.setItem('bentian_onboarding_completed', 'true');
       closeWizardModal();
       switchTab('overview');
-      triggerManualSync();
+      if (typeof isStoreUrlConfigured === 'function' && isStoreUrlConfigured()) {
+        triggerManualSync();
+      } else {
+        if (typeof showSmartToast === 'function') {
+          showSmartToast({
+            title: '¡Asistente completado!',
+            message: 'Recuerda vincular la dirección de tu tienda online en Canal Web para activar la sincronización.',
+            actionLabel: 'Vincular Tienda →',
+            targetTab: 'channel',
+            targetInputId: 'input-universal-url',
+            type: 'info'
+          });
+        }
+      }
 
       if (typeof startSpotlightTour === 'function') {
         setTimeout(function() {

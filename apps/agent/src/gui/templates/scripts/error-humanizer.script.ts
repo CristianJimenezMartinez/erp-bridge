@@ -90,6 +90,17 @@ export const errorHumanizerScript = `
         helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/'
       },
       {
+        code: 'ERR_CHANNEL_URL_MISSING',
+        pattern: /url del sitio web no configurada|url de la tienda no configurada|tienda online no configurada|falta vincular tu tienda|sin configurar la url|storeurl no configurad|url no configurada|no has introducido la dirección/i,
+        title: 'Falta configurar la dirección de tu tienda online',
+        message: 'Para sincronizar existencias y pedidos con Factusol es necesario indicar la dirección web de tu comercio.',
+        suggestion: 'Accede a la pestaña Canal Web, introduce la dirección de tu tienda (ejemplo: https://mitienda.com) y pulsa en Guardar Ajustes.',
+        actionLabel: 'Configurar Canal Web',
+        targetTab: 'channel',
+        targetInputId: 'input-universal-url',
+        helpUrl: 'https://bridge.cristianjm.com/docs/canales/'
+      },
+      {
         code: 'ERR_WEB_AUTH_BLOCKED',
         pattern: /401|unauthorized|cabeceras? de autorización bloqueadas|no autorizado|claves? inválidas?|signature_invalid/i,
         title: 'Cabeceras de autorización bloqueadas en tu servidor web',
@@ -329,7 +340,7 @@ export const errorHumanizerScript = `
         suggestion: 'Revisa la configuración del apartado correspondiente o consulta el registro de eventos técnicos para obtener más detalles.',
         actionLabel: 'Ver registro de eventos técnicos',
         targetTab: 'logs',
-        targetInputId: 'full-logs-panel',
+        targetInputId: 'bottom-console-dock',
         helpUrl: 'https://bridge.cristianjm.com/docs/'
       };
     }
@@ -348,7 +359,11 @@ export const errorHumanizerScript = `
       if (err.targetTab === 'channel' && typeof selectChannelType === 'function') {
         if (err.targetInputId && (err.targetInputId.includes('wc') || err.code.includes('WOO'))) {
           selectChannelType('woocommerce');
-        } else if (err.targetInputId && (err.targetInputId.includes('univ') || err.code.includes('UNIVERSAL') || err.code.includes('ENDPOINT'))) {
+        } else if (err.targetInputId && (err.targetInputId.includes('shopify') || err.code.includes('SHOPIFY'))) {
+          selectChannelType('shopify');
+        } else if (err.targetInputId && (err.targetInputId.includes('holded') || err.code.includes('HOLDED'))) {
+          selectChannelType('holded');
+        } else {
           selectChannelType('universal_bridge');
         }
       }

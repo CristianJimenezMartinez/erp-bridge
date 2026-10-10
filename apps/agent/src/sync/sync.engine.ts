@@ -521,6 +521,12 @@ export class LocalSyncEngine {
         } catch (catErr) {
           this.logger.warn(`Aviso en subida progresiva de catálogo (WooCommerce): ${String(catErr)}`);
         }
+      } else if (config.channelType === 'woocommerce' && !woo.storeUrl) {
+        if (isManual) {
+          const msg = 'Dirección de la tienda WooCommerce no configurada.';
+          this.eventBus.addEvent('warn', msg);
+          return { success: false, message: msg };
+        }
       } else {
         // Modo Standalone sin WooCommerce configurado
         if (dbPath && fs.existsSync(dbPath)) {
