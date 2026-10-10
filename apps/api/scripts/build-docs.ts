@@ -871,7 +871,7 @@ function updateSitemap(articles: DocArticle[]) {
   </url>
 `;
       sitemap = sitemap.replace('</urlset>', `${entry}</urlset>`);
-    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita'].includes(art.slug)) {
+    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita', 'seguridad/certificacion-softpedia-100-clean', 'arquitectura/benchmark-estres-catalogo-real'].includes(art.slug)) {
       const reg = new RegExp(`(<loc>https:\\/\\/bridge\\.cristianjm\\.com\\/docs\\/${art.slug}\\/<\\/loc>\\s*<lastmod>)[^<]+(<\\/lastmod>)`, 'i');
       sitemap = sitemap.replace(reg, `$12026-10-10T14:00:00+02:00$2`);
     }
@@ -901,15 +901,20 @@ function updateLlmsTxt(articles: DocArticle[]) {
   if (!fs.existsSync(LLMS_FILE)) return;
   let llms = fs.readFileSync(LLMS_FILE, 'utf8');
 
-  if (!llms.includes('# Documentación Técnica y Manuales')) {
-    let section = `\n\n# Documentación Técnica y Manuales Oficiales\n`;
-    for (const art of articles) {
-      section += `- [${art.title}](https://bridge.cristianjm.com/docs/${art.slug}/): ${art.subtitle}\n`;
-    }
-    llms += section;
-    fs.writeFileSync(LLMS_FILE, llms, 'utf8');
-    console.log(`✓ [llms.txt] Añadidos ${articles.length} artículos a llms.txt`);
+  let section = `# Documentación Técnica y Manuales Oficiales\n`;
+  for (const art of articles) {
+    section += `- [${art.title}](https://bridge.cristianjm.com/docs/${art.slug}/): ${art.subtitle}\n`;
   }
+
+  const marker = '# Documentación Técnica y Manuales Oficiales';
+  if (llms.includes(marker)) {
+    const idx = llms.indexOf(marker);
+    llms = llms.substring(0, idx).trimEnd() + '\n\n' + section;
+  } else {
+    llms = llms.trimEnd() + '\n\n' + section;
+  }
+  fs.writeFileSync(LLMS_FILE, llms, 'utf8');
+  console.log(`✓ [llms.txt] Actualizada lista con ${articles.length} artículos en llms.txt`);
 }
 
 export function buildDocs() {

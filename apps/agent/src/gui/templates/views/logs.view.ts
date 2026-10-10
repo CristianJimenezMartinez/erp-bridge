@@ -110,6 +110,89 @@ export function renderLogsTab(): string {
           </div>
         </div>
 
+        <!-- Base de Conocimiento y Guías Técnicas Más Consultadas -->
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title" style="display:flex;align-items:center;gap:8px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                <span>Documentación y Guías Técnicas Recomendadas</span>
+              </div>
+              <div class="section-desc">Manuales paso a paso, configuración de red NAS, conectores cloud y resolución de incidencias.</div>
+            </div>
+            <a href="https://bridge.cristianjm.com/docs/" target="_blank" class="btn btn-secondary btn-sm" title="Explorar todos los manuales y arquitectura" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span>Centro de Documentación ↗</span>
+            </a>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;margin-top:14px;">
+            <!-- Guía 1: Factusol OLEDB y Red NAS -->
+            <a href="https://bridge.cristianjm.com/docs/factusol/rutas-red-nas-anti-wiping/" target="_blank" style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:all 0.2s ease;cursor:pointer;" onmouseover="this.style.borderColor='rgba(59,130,246,0.45)';this.style.background='rgba(59,130,246,0.05)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='rgba(255,255,255,0.03)'">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:600;font-size:13px;color:#f8fafc;display:flex;align-items:center;gap:6px;">
+                  <span>📖</span>
+                  <span>Guía Factusol OLEDB y NAS</span>
+                </span>
+                <span class="tag tag-blue">Factusol</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Configuración de rutas UNC/SMB, controladores Access 64-bit y protección anti-wiping en caídas de red.</div>
+              <div style="margin-top:auto;padding-top:6px;font-size:11px;color:#60a5fa;display:flex;align-items:center;gap:4px;font-weight:500;">
+                <span>Consultar guía</span>
+                <span>→</span>
+              </div>
+            </a>
+
+            <!-- Guía 2: Conexión Shopify GraphQL & Holded Cloud ERP -->
+            <a href="https://bridge.cristianjm.com/docs/canales/shopify/" target="_blank" style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:all 0.2s ease;cursor:pointer;" onmouseover="this.style.borderColor='rgba(16,185,129,0.45)';this.style.background='rgba(16,185,129,0.05)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='rgba(255,255,255,0.03)'">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:600;font-size:13px;color:#f8fafc;display:flex;align-items:center;gap:6px;">
+                  <span>🛍️</span>
+                  <span>Shopify GraphQL & Holded</span>
+                </span>
+                <span class="tag tag-green">Canales</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Vinculación de tiendas Shopify GraphQL, sincronización de stock y conexión Holded Cloud ERP.</div>
+              <div style="margin-top:auto;padding-top:6px;font-size:11px;color:#34d399;display:flex;align-items:center;gap:4px;font-weight:500;">
+                <span>Consultar guía</span>
+                <span>→</span>
+              </div>
+            </a>
+
+            <!-- Guía 3: Certificación Softpedia 100% Clean & Exclusiones Antivirus EDR -->
+            <a href="https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:all 0.2s ease;cursor:pointer;" onmouseover="this.style.borderColor='rgba(168,85,247,0.45)';this.style.background='rgba(168,85,247,0.05)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='rgba(255,255,255,0.03)'">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:600;font-size:13px;color:#f8fafc;display:flex;align-items:center;gap:6px;">
+                  <span>🛡️</span>
+                  <span>Certificación Softpedia & EDR</span>
+                </span>
+                <span class="tag" style="background:rgba(168,85,247,0.15);color:#c084fc;">Seguridad</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Certificación Softpedia 100% Clean, firmas Ed25519 y reglas de exclusión para Microsoft Defender/EDR.</div>
+              <div style="margin-top:auto;padding-top:6px;font-size:11px;color:#c084fc;display:flex;align-items:center;gap:4px;font-weight:500;">
+                <span>Consultar guía</span>
+                <span>→</span>
+              </div>
+            </a>
+
+            <!-- Guía 4: Resolución de Incidencias (Error 3045, .laccdb bloqueado) -->
+            <a href="https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/" target="_blank" style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--card-border);text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:all 0.2s ease;cursor:pointer;" onmouseover="this.style.borderColor='rgba(245,158,11,0.45)';this.style.background='rgba(245,158,11,0.05)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='rgba(255,255,255,0.03)'">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:600;font-size:13px;color:#f8fafc;display:flex;align-items:center;gap:6px;">
+                  <span>⚡</span>
+                  <span>Error 3045 & .laccdb Bloqueado</span>
+                </span>
+                <span class="tag tag-amber">Soporte</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary,#94a3b8);line-height:1.4;">Solución a bloqueos concurrentes de ficheros de bloqueo .laccdb y liberación de descriptores de Factusol.</div>
+              <div style="margin-top:auto;padding-top:6px;font-size:11px;color:#fbbf24;display:flex;align-items:center;gap:4px;font-weight:500;">
+                <span>Consultar guía</span>
+                <span>→</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
         <!-- Visor de Actividad con Selector (Diario de Operaciones vs Consola Técnica) -->
         <div class="form-section">
           <div class="section-header">

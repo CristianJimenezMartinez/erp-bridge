@@ -3,9 +3,11 @@ import { primerosPasosArticles } from './categories/01-primeros-pasos';
 import { factusolArticles } from './categories/02-factusol';
 import { canalesArticles } from './categories/03-canales';
 import { arquitecturaArticles } from './categories/04-arquitectura';
+import { benchmarkArticle } from './categories/arquitectura-benchmark';
 import { fiscalidadArticles } from './categories/05-fiscalidad';
 import { troubleshootingArticles } from './categories/06-troubleshooting';
 import { seguridadArticles } from './categories/07-seguridad';
+import { softpediaArticle } from './categories/seguridad-softpedia';
 import { apiArticles } from './categories/08-api';
 
 export const DOC_CATEGORIES: DocCategory[] = [
@@ -34,7 +36,7 @@ export const DOC_CATEGORIES: DocCategory[] = [
     slug: 'arquitectura',
     title: 'Arquitectura & Sincronización',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-    description: 'Filosofía Local-First, cola SQLite Store-and-Forward, arquitectura tripartita y monitoreo en tiempo real.',
+    description: 'Filosofía Local-First, cola JSON atómico estructurado con reemplazo seguro anti-wiping y backup defensivo Store-and-Forward, arquitectura tripartita y monitoreo en tiempo real.',
     order: 4,
   },
   {
@@ -72,9 +74,11 @@ export const DOC_ARTICLES: DocArticle[] = [
   ...factusolArticles,
   ...canalesArticles,
   ...arquitecturaArticles,
+  benchmarkArticle,
   ...fiscalidadArticles,
   ...troubleshootingArticles,
   ...seguridadArticles,
+  softpediaArticle,
   ...apiArticles,
 ];
 

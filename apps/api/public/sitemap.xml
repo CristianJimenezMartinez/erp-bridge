@@ -823,4 +823,26 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
   </url>
+
+  <!-- Doc: Benchmark de Estrés con Catálogo Real (+5.300 Artículos de Suministros Rubio) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+  </url>
+
+  <!-- Doc: Certificación Softpedia 100% Clean, Análisis Antivirus y Reputación de Binarios -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+  </url>
 </urlset>

@@ -43,13 +43,21 @@ export function renderSidebar(agentVersion: string = '0.2.0'): string {
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
         <span>Licencia del Equipo</span>
       </li>
+      <li class="nav-item" onclick="window.open('https://bridge.cristianjm.com/docs/', '_blank')" title="Abrir Centro de Documentación y Guías Oficiales" style="margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Documentación ↗</span>
+      </li>
     </ul>
 
     <div class="sidebar-footer">
-      <div style="margin-bottom: 6px;">
+      <div style="margin-bottom: 6px; display: flex; flex-direction: column; gap: 6px;">
         <button onclick="openWizardModal()" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: flex-start; gap: 6px;">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>
           <span>Asistente de Inicio</span>
+        </button>
+        <button onclick="window.open('https://bridge.cristianjm.com/docs/', '_blank')" class="btn btn-secondary btn-sm" title="Centro de Documentación y Manuales Oficiales" style="width: 100%; justify-content: flex-start; gap: 6px; background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.25); color: #93c5fd;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Manuales & Docs ↗</span>
         </button>
       </div>
       <div class="status-pill status-online" id="sidebar-status-pill">
