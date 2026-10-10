@@ -2,9 +2,7 @@ export function renderSidebar(agentVersion: string = '0.2.0'): string {
   return `  <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-logo" style="display:flex;align-items:center;justify-content:center;">
-        <img src="/api/local/icon" width="24" height="24" alt="Bentian" style="border-radius:6px;display:block;" />
-      </div>
+      <img class="brand-logo" src="/api/local/icon" width="34" height="34" alt="Bentian" />
       <div>
         <div class="brand-title">Bentian ERP Bridge</div>
         <div class="brand-subtitle">

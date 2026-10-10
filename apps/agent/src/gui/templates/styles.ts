@@ -31,7 +31,7 @@ export const dashboardStyles = `
 
     /* Sidebar Items */
     .brand { padding: 18px 16px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 12px; }
-    .brand-logo { width: 34px; height: 34px; border-radius: 9px; background: #18181b; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 8px; display: block; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
     .brand-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
     .brand-subtitle { font-size: 11px; color: var(--text-subtle); display: flex; align-items: center; gap: 6px; margin-top: 1px; }
 
