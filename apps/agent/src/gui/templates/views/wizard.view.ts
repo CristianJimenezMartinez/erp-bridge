@@ -24,13 +24,41 @@ export function renderWizardModal(): string {
         <!-- PASO 1: LICENCIA -->
         <div id="wizard-pane-1">
           <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 1: Activa tu Licencia</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Introduce la clave de puesto que recibiste al suscribirte a Bentian ERP Bridge.</p>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Consigue tu acceso en 1 clic o introduce la clave recibida por correo.</p>
           
+          <!-- Bloque destacado: Activar Licencia Beta Gratuita en 1 Clic -->
+          <div id="wiz-quick-claim-card" style="padding: 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.08)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 14px; font-weight: 700; color: #fff;">⚡ Activar Licencia Beta Gratuita en 1 Clic</span>
+                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 1px 7px; border-radius: 999px; font-weight: 700;">ACCESO TOTAL 2026</span>
+              </div>
+              <span style="font-size: 11px; color: #cbd5e1;">Sin tarjeta ni compromiso</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 0; margin-bottom: 12px; line-height: 1.4;">
+              Introduce tu correo para vincular de forma inmediata una clave oficial de prueba válida hasta el <strong>31 de Diciembre de 2026</strong>.
+            </p>
+            <div class="input-with-button">
+              <input type="email" id="wiz-input-claim-email" class="form-control" placeholder="tu-email@empresa.com" style="font-size: 13px;">
+              <button onclick="wizClaimBetaOneClick()" id="wiz-btn-claim-oneclick" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; font-weight: 600;">
+                <span>Activar en 1 Clic ⚡</span>
+              </button>
+            </div>
+            <div id="wiz-quick-claim-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <!-- Separador secundario -->
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <div style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.08);"></div>
+            <span style="font-size: 11px; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.5px;">O si ya dispones de una clave</span>
+            <div style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.08);"></div>
+          </div>
+
           <div class="form-group">
-            <label class="form-label">Clave de Licencia (EB-XXXXX):</label>
+            <label class="form-label" style="font-size: 12px; color: var(--text-muted);">Clave de Licencia (EB-XXXXX):</label>
             <div class="input-with-button">
               <input type="text" id="wiz-input-lic" class="form-control" style="font-family: monospace; font-size: 14px;" placeholder="EB-XXXXX-XXXXX-XXXXX-XXXXX">
-              <button onclick="wizPasteAndActivateLicense()" id="wiz-btn-activate" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+              <button onclick="wizPasteAndActivateLicense()" id="wiz-btn-activate" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 <span>Pegar y Activar</span>
               </button>
@@ -38,19 +66,8 @@ export function renderWizardModal(): string {
             <div id="wiz-lic-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
           </div>
 
-          <div id="wiz-beta-promo-box" style="margin-top: 16px; padding: 14px 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-            <div>
-              <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 6px;">
-                <span>🎁 ¿Aún no tienes clave?</span>
-                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 1px 6px; border-radius: 999px; font-weight: 700;">BETA GRATUITA</span>
-              </div>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
-                Consigue tu clave instantánea con acceso completo hasta el <strong>31 de Diciembre de 2026</strong>.
-              </div>
-            </div>
-            <a href="https://bridge.cristianjm.com/beta/" target="_blank" class="btn btn-secondary btn-sm" style="color: #c7d2fe; border-color: rgba(99, 102, 241, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
-              <span>Obtener Clave Beta ↗</span>
-            </a>
+          <div style="text-align: center; margin-top: 14px;">
+            <button type="button" onclick="wizSkipToExplore()" style="background:none;border:none;color:#94a3b8;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:12px;">Saltar por ahora y explorar el programa sin clave →</button>
           </div>
         </div>
 
@@ -92,6 +109,8 @@ export function renderWizardModal(): string {
             </div>
             <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
+
+          <div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#fde68a;">🧪 ¿No tienes Factusol en este ordenador?</div><div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Puedes continuar para configurar tu tienda web o explorar el panel en modo demostración.</div></div><button type="button" onclick="wizSkipFactusolStep()" class="btn btn-secondary btn-sm" style="white-space:nowrap;border-color:rgba(245,158,11,0.4);color:#fbbf24;">Continuar sin Factusol →</button></div>
 
           <!-- BLOQUE PEDAGÓGICO: SERIE PARA PEDIDOS WEB EN FACTUSOL -->
           <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);">

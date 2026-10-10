@@ -154,30 +154,53 @@
 
           <!-- Resultado Exitoso (Entrega Instantánea) -->
           <div id="betaClaimSuccess" class="hidden space-y-4 pt-2">
-            <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-start gap-2.5">
+            <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-start gap-2.5 shadow-sm">
               <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               <div>
                 <p class="font-semibold text-emerald-300">¡Clave de activación emitida con éxito!</p>
-                <p class="mt-0.5 text-emerald-400/80">También te hemos enviado una copia de seguridad por correo electrónico.</p>
+                <p class="mt-0.5 text-emerald-400/80">Hemos generado tu licencia oficial y enviado una copia de respaldo a tu correo electrónico.</p>
               </div>
             </div>
 
-            <div class="p-4 rounded-xl bg-black/60 border border-white/[0.12] space-y-2">
+            <!-- Bloque Destacado de Clave EB-XXXXX -->
+            <div class="p-5 rounded-2xl bg-black/80 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.12)] space-y-3">
               <div class="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-                <span>Tu Clave de Activación:</span>
-                <span class="text-emerald-400 font-semibold lowercase">Entrega Instantánea</span>
+                <span class="flex items-center gap-1.5 text-zinc-300 font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Tu Clave Oficial de Activación:
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold text-[10px] tracking-wide border border-emerald-500/30">ENTREGA INSTANTÁNEA</span>
               </div>
-              <div class="flex items-center justify-between gap-3 bg-zinc-900/90 px-3 py-2.5 rounded-lg border border-white/[0.08]">
-                <code id="displayLicenseKey" class="font-mono text-base md:text-lg font-bold text-white select-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
-                <button type="button" id="btnCopyKey" onclick="copyBetaKey()" class="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-indigo-600/40 text-indigo-200 hover:bg-indigo-600/60 border border-indigo-500/30 transition shrink-0 flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-zinc-950/90 p-3.5 rounded-xl border border-white/[0.12] ring-1 ring-emerald-500/20">
+                <code id="displayLicenseKey" class="font-mono text-lg sm:text-xl font-black text-emerald-400 select-all tracking-wider break-all text-center sm:text-left py-1">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
+                <button type="button" id="btnCopyKey" onclick="copyBetaKey()" class="px-4 py-2.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/30 transition shadow-md shadow-indigo-600/30 shrink-0 flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+                  <svg id="copyKeyIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                   <span id="btnCopyKeyText">Copiar Clave</span>
                 </button>
               </div>
-              <p class="text-[11px] text-zinc-500 flex items-center justify-between pt-1 font-mono">
-                <span>Válida hasta: <strong class="text-emerald-400" id="displayExpiresDate">31 de Diciembre de 2026</strong></span>
-                <span id="displayDaysRemaining"></span>
+              <p class="text-[11px] text-zinc-400 flex flex-wrap items-center justify-between gap-2 pt-1 font-mono border-t border-white/[0.06]">
+                <span>Vigencia garantizada: <strong class="text-emerald-400 font-semibold" id="displayExpiresDate">31 de Diciembre de 2026</strong></span>
+                <span id="displayDaysRemaining" class="text-zinc-500"></span>
               </p>
+            </div>
+
+            <!-- Callout: Agente / Asistente Local con Instrucción y Botón Directo -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-indigo-500/5 border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div class="space-y-0.5">
+                  <p class="text-zinc-200 font-medium leading-relaxed">
+                    <strong class="text-white font-semibold">¿Ya tienes el Agente instalado?</strong> Si ya tienes el Agente abierto en este equipo, la clave se copiará y podrás pegarla con 1 clic en el Asistente.
+                  </p>
+                  <p class="text-[11px] text-indigo-300/80">Acceso directo al puerto local seguro 39281 del asistente en ejecución.</p>
+                </div>
+              </div>
+              <button type="button" id="btnOpenLocalAgent" onclick="openAndCopyForLocalAgent()" class="w-full sm:w-auto px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition border border-indigo-400/40 flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                <span>Copiar y Abrir Asistente</span>
+              </button>
             </div>
 
             <div class="pt-1 flex flex-col sm:flex-row gap-3">
@@ -202,7 +225,7 @@
                 <div class="p-2.5 rounded-lg bg-black/40 border border-white/[0.05]">
                   <span class="inline-block w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] text-center font-bold mb-1">2</span>
                   <p class="text-[11px] text-zinc-300 font-medium">Pega tu Clave</p>
-                  <p class="text-[10px] text-zinc-500 leading-tight mt-0.5">Abre el agente, pulsa en "Activar" y pega la clave generada.</p>
+                  <p class="text-[10px] text-zinc-500 leading-tight mt-0.5">Abre el asistente local (puerto 39281) y pega la clave generada.</p>
                 </div>
                 <div class="p-2.5 rounded-lg bg-black/40 border border-white/[0.05]">
                   <span class="inline-block w-4 h-4 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] text-center font-bold mb-1">3</span>
@@ -413,6 +436,35 @@
     }
     evaluateBetaStatus();
 
+    // 2. Autorelleno inteligente de parámetros URL (?email=... &company=...)
+    function prefillFromUrl() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const emailParam = params.get('email') || params.get('e') || params.get('mail');
+        const companyParam = params.get('company') || params.get('empresa') || params.get('c');
+        
+        if (emailParam) {
+          const emailInput = document.getElementById('betaEmail');
+          if (emailInput && !emailInput.value) {
+            emailInput.value = decodeURIComponent(emailParam).trim();
+          }
+        }
+        if (companyParam) {
+          const companyInput = document.getElementById('betaCompany');
+          if (companyInput && !companyInput.value) {
+            companyInput.value = decodeURIComponent(companyParam).trim();
+          }
+        }
+      } catch (err) {
+        console.warn('Error leyendo parámetros URL de la beta:', err);
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', prefillFromUrl);
+    } else {
+      prefillFromUrl();
+    }
+
     const betaForm = document.getElementById('betaClaimForm');
     const betaSuccess = document.getElementById('betaClaimSuccess');
     const betaError = document.getElementById('betaClaimError');
@@ -442,11 +494,29 @@
           const email = document.getElementById('betaEmail').value.trim();
           const companyName = document.getElementById('betaCompany').value.trim();
 
-          const res = await fetch('/api/v1/licenses/beta/claim', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, companyName, consentTerms, consentMarketing })
-          });
+          // Petición con soporte prioritario a /api/v1/licenses/beta/claim y fallback a /licenses/claim-beta
+          let res;
+          try {
+            res = await fetch('/api/v1/licenses/beta/claim', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, companyName, consentTerms, consentMarketing })
+            });
+          } catch (_netErr) {
+            res = await fetch('/licenses/claim-beta', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, companyName, consentTerms, consentMarketing })
+            });
+          }
+
+          if (res.status === 404) {
+            res = await fetch('/licenses/claim-beta', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, companyName, consentTerms, consentMarketing })
+            });
+          }
 
           const data = await res.json();
           if (!res.ok) {
@@ -456,22 +526,42 @@
           const lic = data.data;
           if (!lic || !lic.licenseKey) {
             // Clave ya emitida: por seguridad no se muestra en pantalla, se reenvía por email.
-            betaError.textContent = data.message || 'Ya existe una clave para este correo. Te la hemos reenviado por email.';
+            betaError.textContent = data.message || 'Ya existe una clave para este correo. Te la hemos reenviado por email; revisa tu bandeja de entrada y spam.';
             betaError.classList.remove('hidden');
             return;
           }
 
-          document.getElementById('displayLicenseKey').textContent = lic.licenseKey;
+          // Visualización ultraclara y legible de la clave generada
+          const keyEl = document.getElementById('displayLicenseKey');
+          if (keyEl) {
+            keyEl.textContent = lic.licenseKey;
+          }
+
           if (lic.expiresAt) {
             const expDate = new Date(lic.expiresAt);
-            document.getElementById('displayExpiresDate').textContent = expDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            const expEl = document.getElementById('displayExpiresDate');
+            if (expEl) {
+              expEl.textContent = expDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
           }
           if (lic.daysRemaining !== undefined) {
-            document.getElementById('displayDaysRemaining').textContent = `(${lic.daysRemaining} días restantes)`;
+            const daysEl = document.getElementById('displayDaysRemaining');
+            if (daysEl) {
+              daysEl.textContent = `(${lic.daysRemaining} días restantes)`;
+            }
           }
 
           betaForm.classList.add('hidden');
           betaSuccess.classList.remove('hidden');
+
+          // Auto-scroll suave para asegurar visibilidad inmediata del bloque de clave
+          const claimCard = document.getElementById('betaClaimCard');
+          if (claimCard) {
+            claimCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
+          // Intento de precopiado silencioso
+          tryCopyBetaKeySilently(lic.licenseKey);
         } catch (err) {
           betaError.textContent = err.message || 'Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.';
           betaError.classList.remove('hidden');
@@ -483,16 +573,84 @@
       });
     }
 
-    function copyBetaKey() {
-      const key = document.getElementById('displayLicenseKey').textContent;
-      navigator.clipboard.writeText(key).then(() => {
-        const btnText = document.getElementById('btnCopyKeyText');
-        const orig = btnText ? btnText.textContent : 'Copiar Clave';
-        if (btnText) btnText.textContent = '¡Copiada!';
+    // Copia silenciosa preventiva tras generación
+    function tryCopyBetaKeySilently(key) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(key).catch(() => {});
+      }
+    }
+
+    // Copia interactiva universal (Clipboard API + fallback execCommand)
+    async function copyBetaKey() {
+      const keyEl = document.getElementById('displayLicenseKey');
+      if (!keyEl) return;
+      const key = keyEl.textContent.trim();
+      let copied = false;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(key);
+          copied = true;
+        } catch (_e) {
+          copied = false;
+        }
+      }
+
+      if (!copied) {
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = key;
+          textarea.style.position = 'fixed';
+          textarea.style.top = '0';
+          textarea.style.left = '0';
+          textarea.style.opacity = '0';
+          textarea.setAttribute('readonly', '');
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          copied = document.execCommand('copy');
+          document.body.removeChild(textarea);
+        } catch (err) {
+          console.warn('Fallback copy error:', err);
+        }
+      }
+
+      // Feedback visual: texto '¡Clave Copiada! ✓' y cambio de estilos
+      const btnText = document.getElementById('btnCopyKeyText');
+      const btn = document.getElementById('btnCopyKey');
+      const copyIcon = document.getElementById('copyKeyIcon');
+
+      if (btnText) {
+        const origText = btnText.textContent;
+        btnText.textContent = '¡Clave Copiada! ✓';
+
+        if (btn) {
+          btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
+          btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500', 'border-emerald-400');
+        }
+
+        if (copyIcon) {
+          copyIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>';
+        }
+
         setTimeout(() => {
-          if (btnText) btnText.textContent = orig;
-        }, 2000);
-      });
+          btnText.textContent = origText;
+          if (btn) {
+            btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500', 'border-emerald-400');
+            btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+          }
+          if (copyIcon) {
+            copyIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>';
+          }
+        }, 2500);
+      }
+    }
+
+    // Acción combinada para usuarios con el asistente o agente local abierto
+    async function openAndCopyForLocalAgent() {
+      await copyBetaKey();
+      // Abre el asistente local de Bentian Agent en su puerto oficial canónico 39281
+      window.open('http://127.0.0.1:39281/', '_blank');
     }
 
     // Consulta en vivo del cupo de 25 plazas del Plan Fundador

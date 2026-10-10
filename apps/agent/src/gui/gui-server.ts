@@ -94,6 +94,7 @@ export class LocalGuiServer {
 
     // 6. License
     router.post('/api/local/activate-license', LicenseController.activateLicense(this.agent));
+    router.post('/api/local/claim-beta-license', LicenseController.claimBetaLicense(this.agent));
 
     // 7. System & Config
     router.get('/api/local/autostart', SystemController.getAutoStart(this.agent));

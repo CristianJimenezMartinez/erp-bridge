@@ -27,7 +27,11 @@ async function testGuiServer() {
     assert.strictEqual(resRoot.status, 200, 'GET / debe responder 200 OK');
     const html = await resRoot.text();
     assert(html.includes('Bentian ERP Bridge'), 'El HTML debe contener "Bentian ERP Bridge"');
-    console.log('  ✓ GET / respondió 200 OK con el template HTML.');
+    assert(html.includes('wiz-input-claim-email'), 'El HTML debe contener el input de email para claim beta en 1 clic');
+    assert(html.includes('wizClaimBetaOneClick'), 'El HTML debe incluir la función wizClaimBetaOneClick');
+    assert(html.includes('wizSkipFactusolStep'), 'El HTML debe incluir la función wizSkipFactusolStep');
+    assert(html.includes('wizSkipToExplore'), 'El HTML debe incluir la función wizSkipToExplore');
+    console.log('  ✓ GET / respondió 200 OK con el template HTML y el asistente sin fricción.');
 
     // 2. Test GET /api/local/status
     console.log('2. Probando GET /api/local/status...');
@@ -266,6 +270,19 @@ async function testGuiServer() {
     assert(incJson.success, 'La respuesta debe ser success: true');
     assert(incJson.ticketId && incJson.ticketId.startsWith('#INC-'), 'Debe generar un ticketId con formato #INC-');
     console.log(`  ✓ Incidencia registrada exitosamente: ${incJson.ticketId}`);
+
+    // 22. Claim Beta License endpoint (POST /api/local/claim-beta-license)
+    console.log('22. Probando endpoint de reclamación beta en 1 clic (POST /api/local/claim-beta-license)...');
+    const resClaimInvalid = await fetch(`${url}/api/local/claim-beta-license`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'correo-invalido' })
+    });
+    assert.strictEqual(resClaimInvalid.status, 400, 'Debe rechazar email no válido con 400 Bad Request');
+    const claimInvalidJson = (await resClaimInvalid.json()) as any;
+    assert.strictEqual(claimInvalidJson.success, false);
+    assert(claimInvalidJson.error.includes('no válida'));
+    console.log('  ✓ Email inválido rechazado correctamente con 400 Bad Request.');
 
   } finally {
     await server.stop();

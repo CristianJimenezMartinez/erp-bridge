@@ -228,6 +228,118 @@ export const wizardScript = `
       }
     }
 
+    async function wizClaimBetaOneClick() {
+      const emailInput = document.getElementById('wiz-input-claim-email');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const alertBox = document.getElementById('wiz-quick-claim-alert');
+      const btn = document.getElementById('wiz-btn-claim-oneclick');
+
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        if (alertBox) {
+          renderWizardErrorCard(alertBox, {
+            title: 'Correo electrónico requerido',
+            cause: 'No has introducido una dirección de correo válida.',
+            suggestion: 'Escribe tu correo (ej: info@tuempresa.com) para activar tu clave instantánea.'
+          }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-claim-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('edit') : '') + '<span>Escribir correo</span></button>');
+        }
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Activando...';
+      }
+
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Solicitando y activando clave Beta gratuita en la nube...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/claim-beta-license', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        const data = await res.json();
+        if (data.success && data.licenseKey) {
+          const licInput = document.getElementById('wiz-input-lic');
+          if (licInput) {
+            licInput.value = data.licenseKey;
+          }
+          if (alertBox) {
+            renderWizardSuccessCard(alertBox, '¡Licencia Beta activada con éxito! Válida hasta el 31/12/2026.');
+          }
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: '¡Licencia Beta Activada!',
+              message: 'Puesto vinculado con éxito. Avanzando...',
+              type: 'success'
+            });
+          }
+          if (typeof fetchStatus === 'function') {
+            fetchStatus();
+          }
+          setTimeout(function() {
+            setWizardStep(2);
+          }, 1200);
+        } else {
+          const errInfo = (typeof humanizeErrorMessage === 'function')
+            ? humanizeErrorMessage(data.error || 'No se pudo reclamar la clave beta', 'license')
+            : { title: 'Aviso en activación', message: data.error || 'Error al solicitar la clave', cause: data.error, suggestion: 'Comprueba tu conexión a internet o solicita una clave manual.' };
+          if (alertBox) {
+            renderWizardErrorCard(alertBox, errInfo, 
+              '<button type="button" onclick="wizClaimBetaOneClick()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar activación</span></button>'
+            );
+          }
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: 'Aviso de Activación',
+              message: errInfo.message || errInfo.title,
+              type: 'warn'
+            });
+          }
+        }
+      } catch (err) {
+        const errInfo = (typeof humanizeErrorMessage === 'function')
+          ? humanizeErrorMessage(err, 'license')
+          : { title: 'Error de conexión', message: String(err), cause: 'No hay comunicación con el servidor central', suggestion: 'Verifica tu conexión a internet.' };
+        if (alertBox) {
+          renderWizardErrorCard(alertBox, errInfo, 
+            '<button type="button" onclick="wizClaimBetaOneClick()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>'
+          );
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Activar en 1 Clic ⚡</span>';
+        }
+      }
+    }
+
+    function wizSkipFactusolStep() {
+      if (typeof showSmartToast === 'function') {
+        showSmartToast({
+          title: 'Modo Evaluación',
+          message: 'Modo evaluación: Podrás vincular tu Factusol en cualquier momento.',
+          type: 'info'
+        });
+      }
+      setWizardStep(3);
+    }
+
+    function wizSkipToExplore() {
+      localStorage.setItem('bentian_onboarding_completed', 'true');
+      closeWizardModal();
+      if (typeof showSmartToast === 'function') {
+        showSmartToast({
+          title: 'Modo Exploración',
+          message: 'Asistente cerrado. Puedes explorar el programa libremente o configurarlo desde Ajustes.',
+          type: 'info'
+        });
+      }
+    }
+
     function wizSelectChannel(type) {
       const cardUniv = document.getElementById('wiz-choice-univ');
       const cardWoo = document.getElementById('wiz-choice-woo');
@@ -483,6 +595,9 @@ export const wizardScript = `
     window.wizPrevStep = wizPrevStep;
     window.wizSelectChannel = wizSelectChannel;
     window.wizPasteAndActivateLicense = wizPasteAndActivateLicense;
+    window.wizClaimBetaOneClick = wizClaimBetaOneClick;
+    window.wizSkipFactusolStep = wizSkipFactusolStep;
+    window.wizSkipToExplore = wizSkipToExplore;
     window.wizTestUniversal = wizTestUniversal;
     window.wizTestWooCommerce = wizTestWooCommerce;
     window.wizTestFactusolConnection = wizTestFactusolConnection;
