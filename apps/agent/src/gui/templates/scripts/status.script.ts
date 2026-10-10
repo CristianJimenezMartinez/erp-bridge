@@ -155,6 +155,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const univ = data.universalBridgeSettings || {};
       const wc = data.woocommerceSettings || {};
       const shopify = data.shopifySettings || {};
+      const holded = data.holdedSettings || {};
 
       const cardWcMetric = document.getElementById('card-wc-metric');
       const cardWcUrl = document.getElementById('card-wc-url');
@@ -165,6 +166,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       } else if (chType === 'shopify') {
         if (cardWcMetric) cardWcMetric.textContent = 'Shopify Store';
         if (cardWcUrl) cardWcUrl.textContent = shopify.shopSubdomain ? (shopify.shopSubdomain + '.myshopify.com') : 'Sin configurar';
+      } else if (chType === 'holded') {
+        if (cardWcMetric) cardWcMetric.textContent = 'Holded Cloud ERP';
+        if (cardWcUrl) cardWcUrl.textContent = holded.apiKey ? 'API Key Configurada' : 'Sin configurar';
       } else {
         if (cardWcMetric) cardWcMetric.textContent = 'WooCommerce';
         if (cardWcUrl) cardWcUrl.textContent = wc.storeUrl || 'Sin configurar';
@@ -172,7 +176,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (cardWcBadge) {
         const isConfigured = chType === 'universal_bridge'
           ? !!(univ.storeUrl && univ.storeUrl.trim())
-          : (chType === 'shopify' ? !!(shopify.shopSubdomain && shopify.accessToken) : !!(wc.storeUrl && wc.consumerKey));
+          : (chType === 'shopify'
+            ? !!(shopify.shopSubdomain && shopify.accessToken)
+            : (chType === 'holded'
+              ? !!(holded.apiKey && holded.apiKey.trim())
+              : !!(wc.storeUrl && wc.consumerKey)));
         cardWcBadge.className = isConfigured ? 'tag tag-green' : 'tag tag-amber';
         cardWcBadge.textContent = isConfigured ? 'Vinculado' : 'Sin Configurar';
       }
@@ -318,7 +326,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         ? !!(univ.storeUrl && univ.storeUrl.trim())
         : (chType === 'shopify'
           ? !!(shopify.shopSubdomain && shopify.shopSubdomain.trim() && shopify.accessToken && shopify.accessToken.trim())
-          : !!(wc.storeUrl && wc.storeUrl.trim() && wc.consumerKey && wc.consumerKey.trim()));
+          : (chType === 'holded'
+            ? !!(holded.apiKey && holded.apiKey.trim())
+            : !!(wc.storeUrl && wc.storeUrl.trim() && wc.consumerKey && wc.consumerKey.trim())));
 
       const isLicenseActive = lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
 
@@ -616,6 +626,17 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inShopifyLoc = document.getElementById('input-shopify-location');
         if (inShopifyLoc && (force || !inShopifyLoc.value || document.activeElement !== inShopifyLoc)) {
           if (shopify.locationId || force) inShopifyLoc.value = shopify.locationId || '';
+        }
+
+        const holded = data.holdedSettings || {};
+        const inHoldedKey = document.getElementById('input-holded-apikey');
+        if (inHoldedKey && (force || !inHoldedKey.value || document.activeElement !== inHoldedKey)) {
+          if (holded.apiKey || force) inHoldedKey.value = holded.apiKey || '';
+        }
+
+        const inHoldedWh = document.getElementById('input-holded-warehouse');
+        if (inHoldedWh && (force || !inHoldedWh.value || document.activeElement !== inHoldedWh)) {
+          if (holded.defaultWarehouseId || force) inHoldedWh.value = holded.defaultWarehouseId || '';
         }
 
         // Reglas de Sync

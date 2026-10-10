@@ -32,6 +32,7 @@ import { monitoringRouter } from './routes/monitoring.router';
 import { notificationsRouter } from './routes/notifications.router';
 import { contactRouter } from './routes/contact.router';
 import { meRouter } from './routes/me.router';
+import { webhooksRouter } from './routes/webhooks';
 import { getLatestReleasedVersion } from './utils/version.util';
 
 dotenv.config();
@@ -189,6 +190,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use(contactRouter);
   app.use('/api/v1', meRouter);
   app.use(meRouter);
+  app.use('/api/webhooks', webhooksRouter);
+  app.use('/webhooks', webhooksRouter);
   // Eliminado app.use(notificationsRouter) sin prefijo para mitigar relé de email abierto (API-007)
 
   // Servir descargas de releases oficiales (protegiendo claves o archivos privados)

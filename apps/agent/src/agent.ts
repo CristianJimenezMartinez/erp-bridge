@@ -27,10 +27,12 @@ import {
   AgentWooCommerceSettings,
   AgentUniversalBridgeSettings,
   AgentShopifySettings,
+  AgentHoldedSettings,
   AgentSyncRules,
   AgentNotificationSettings,
   ConfigManager,
 } from './config';
+import { HoldedClient } from '@erp-bridge/connector-holded';
 import { SyncHistoryRecord, HistoryManager } from './history';
 import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport, AgentDiskLogger } from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
@@ -180,7 +182,8 @@ export class LocalAgent {
     woocommerce?: AgentWooCommerceSettings;
     universalBridge?: AgentUniversalBridgeSettings;
     shopify?: AgentShopifySettings;
-    channelType?: 'woocommerce' | 'universal_bridge' | 'shopify';
+    holded?: AgentHoldedSettings;
+    channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded';
     syncRules?: AgentSyncRules;
     licenseKey?: string;
     notifications?: AgentNotificationSettings;
@@ -220,6 +223,13 @@ export class LocalAgent {
       cfg.shopify = { ...(cfg.shopify || {}), ...updates.shopify };
       if (isSecretMaskedOrEmpty(updates.shopify.accessToken) && existingToken) {
         cfg.shopify.accessToken = existingToken;
+      }
+    }
+    if (updates.holded) {
+      const existingApiKey = cfg.holded?.apiKey;
+      cfg.holded = { ...(cfg.holded || {}), ...updates.holded };
+      if (isSecretMaskedOrEmpty(updates.holded.apiKey) && existingApiKey && cfg.holded) {
+        cfg.holded.apiKey = existingApiKey;
       }
     }
     if (updates.channelType) {
@@ -632,10 +642,8 @@ export class LocalAgent {
       smtpPass: cfg.notifications.smtpPass ? SECRET_MASK : '',
     } : cfg.notifications;
 
-    const safeShopify = cfg.shopify ? {
-      ...cfg.shopify,
-      accessToken: cfg.shopify.accessToken ? SECRET_MASK : '',
-    } : cfg.shopify;
+    const safeShopify = cfg.shopify ? { ...cfg.shopify, accessToken: cfg.shopify.accessToken ? SECRET_MASK : '' } : cfg.shopify;
+    const safeHolded = cfg.holded ? { ...cfg.holded, apiKey: cfg.holded.apiKey ? SECRET_MASK : '' } : cfg.holded;
 
     return {
       agentName: cfg.agentName || 'Bentian Agent',
@@ -659,6 +667,7 @@ export class LocalAgent {
       woocommerceSettings: safeWoo,
       universalBridgeSettings: safeUniv,
       shopifySettings: safeShopify,
+      holdedSettings: safeHolded,
       channelType: cfg.channelType || 'woocommerce',
       syncRules: cfg.syncRules,
       notifications: safeNotif,
@@ -753,11 +762,27 @@ export class LocalAgent {
     apiVersion?: string;
   }): Promise<ShopifyTestResult> {
     const cfg = this.configManager.get();
-    let finalToken = settings.accessToken;
-    if (isSecretMaskedOrEmpty(finalToken) && cfg.shopify?.accessToken) {
-      finalToken = cfg.shopify.accessToken;
-    }
+    const finalToken = (isSecretMaskedOrEmpty(settings.accessToken) && cfg.shopify?.accessToken) ? cfg.shopify.accessToken : settings.accessToken;
     return ShopifyTester.test({ ...settings, accessToken: finalToken });
+  }
+
+  public async testHoldedConnection(config: { apiKey: string; defaultWarehouseId?: string }): Promise<{ success: boolean; latencyMs: number; message?: string }> {
+    const cfg = this.configManager.get();
+    const finalApiKey = (isSecretMaskedOrEmpty(config?.apiKey) && cfg.holded?.apiKey) ? cfg.holded.apiKey : config?.apiKey;
+    if (!finalApiKey || isSecretMaskedOrEmpty(finalApiKey)) {
+      return { success: false, latencyMs: 0, message: 'La API Key de Holded no puede estar vacía.' };
+    }
+    try {
+      const client = new HoldedClient({ apiKey: finalApiKey.trim(), defaultWarehouseId: config?.defaultWarehouseId?.trim() || cfg.holded?.defaultWarehouseId });
+      const result = await client.testConnection();
+      return {
+        success: result.success,
+        latencyMs: result.latencyMs,
+        message: result.success ? `Conexión con Holded Cloud verificada correctamente (${result.latencyMs} ms).` : 'No se pudo conectar con la API de Holded. Verifica tu API Key.',
+      };
+    } catch (err: any) {
+      return { success: false, latencyMs: 0, message: `Error al conectar con Holded: ${err?.message || String(err)}` };
+    }
   }
 
   // --- Métodos de Sincronización ---

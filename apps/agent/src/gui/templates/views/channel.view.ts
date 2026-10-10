@@ -34,6 +34,14 @@ export function renderChannelTab(): string {
               <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Shopify Store</div>
               <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización directa vía GraphQL Admin API oficial.</div>
             </div>
+
+            <div id="card-choice-holded" class="channel-card" onclick="selectChannelType('holded')">
+              <div class="channel-icon" style="color: #ff5a5f;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+              </div>
+              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Holded Cloud ERP</div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización cloud bidireccional con Holded Invoicing API (Stock, Catálogo y Pedidos).</div>
+            </div>
           </div>
 
           <!-- OPCIÓN A: CONECTOR WEB UNIVERSAL (HTTPS 443) -->
@@ -131,10 +139,23 @@ export function renderChannelTab(): string {
 
           <!-- OPCIÓN C: SHOPIFY ADMIN GRAPHQL API -->
           <div id="panel-shopify" style="display: none;">
+            <div style="padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 20px;">
+              <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Paso a Paso: Configurar Conexión Oficial con Shopify Store
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                1. En tu panel de Shopify, ve a <strong>Configuración &gt; Aplicaciones y canales de ventas &gt; Desarrollar aplicaciones</strong>.<br>
+                2. Crea una aplicación privada y activa los permisos de API Admin: <code>read_products, write_products, read_inventory, write_inventory, read_orders, write_orders</code>.<br>
+                3. Instala la aplicación y copia el <strong>Token de acceso a la API del Administrador</strong> (empieza por <code>shpat_</code>).<br>
+                4. Introduce el subdominio y el token, y pulsa <strong>Comprobar Conexión Shopify</strong>.
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="form-label">Subdominio de tu Tienda Shopify:</label>
               <input type="text" id="input-shopify-subdomain" class="form-control" placeholder="mi-tienda (o https://mi-tienda.myshopify.com)">
-              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Introduce tu subdominio o la URL completa de tu tienda Shopify.</div>
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Introduce tu subdominio (ej: <code>mi-tienda</code>) o la URL completa de tu tienda Shopify.</div>
             </div>
 
             <div class="form-group">
@@ -155,13 +176,50 @@ export function renderChannelTab(): string {
               <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Identificador de la ubicación donde Factusol actualizará el stock disponible.</div>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 6px;">
-              <button onclick="testShopifyConnection()" id="btn-test-shopify" class="btn btn-secondary btn-sm">
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+              <button onclick="testShopifyConnection()" id="btn-test-shopify" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
                 <span>Comprobar Conexión Shopify</span>
               </button>
+              <span id="shopify-latency-badge" class="tag" style="display: none;"></span>
             </div>
             <div id="shopify-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <!-- OPCIÓN D: HOLDED CLOUD ERP -->
+          <div id="panel-holded" style="display: none;">
+            <div style="padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 20px;">
+              <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Conexión Cloud ERP con Holded (Facturación, Stock y Pedidos)
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                1. Accede a tu cuenta de Holded y dirígete a <strong>Configuración &gt; Desarrolladores &gt; API Keys</strong>.<br>
+                2. Crea una <strong>API Key</strong> con permisos de Facturación / Invoicing (Contactos, Productos, Ventas).<br>
+                3. Pega tu API Key a continuación y pulsa <strong>Comprobar Conexión Holded</strong> para verificar la latencia y comunicación en vivo.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Holded API Key:</label>
+              <input type="password" id="input-holded-apikey" class="form-control" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Clave privada de API generada en tu cuenta de Holded Cloud.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ID de Almacén Predeterminado (Default Warehouse ID):</label>
+              <input type="text" id="input-holded-warehouse" class="form-control" placeholder="64b8f0... (Opcional - dejar vacío para almacén principal)">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Identificador de almacén para gestión multialmacén en Holded (opcional).</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+              <button onclick="testHoldedConnection()" id="btn-test-holded" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
+                <span>Comprobar Conexión Holded</span>
+              </button>
+              <span id="holded-latency-badge" class="tag" style="display: none;"></span>
+            </div>
+            <div id="holded-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">

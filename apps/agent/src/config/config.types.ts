@@ -31,6 +31,12 @@ export interface AgentShopifySettings {
   apiVersion?: string;
 }
 
+export interface AgentHoldedSettings {
+  apiKey?: string;
+  defaultWarehouseId?: string;
+  endpointUrl?: string;
+}
+
 export interface AgentSyncRules {
   enableFileWatcher?: boolean;
   debounceSeconds?: number;
@@ -67,7 +73,8 @@ export interface AgentConfigFile {
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
-  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify';
+  holded?: AgentHoldedSettings;
+  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded';
   syncRules?: AgentSyncRules;
   notifications?: AgentNotificationSettings;
 }

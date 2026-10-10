@@ -35,6 +35,12 @@ importers:
       '@erp-bridge/connector-factusol':
         specifier: workspace:*
         version: link:../../packages/connectors/factusol
+      '@erp-bridge/connector-holded':
+        specifier: workspace:*
+        version: link:../../packages/connectors/holded
+      '@erp-bridge/connector-shopify':
+        specifier: workspace:*
+        version: link:../../packages/connectors/shopify
       '@erp-bridge/core':
         specifier: workspace:*
         version: link:../../packages/core

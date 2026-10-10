@@ -500,6 +500,8 @@ export const coreScript = `
           if (typeof selectChannelType === 'function') selectChannelType('universal_bridge');
         } else if (inputId.indexOf('shopify') !== -1) {
           if (typeof selectChannelType === 'function') selectChannelType('shopify');
+        } else if (inputId.indexOf('holded') !== -1) {
+          if (typeof selectChannelType === 'function') selectChannelType('holded');
         }
       }
 
@@ -537,31 +539,27 @@ export const coreScript = `
       const cardUniv = document.getElementById('card-choice-universal');
       const cardWoo = document.getElementById('card-choice-woo');
       const cardShopify = document.getElementById('card-choice-shopify');
+      const cardHolded = document.getElementById('card-choice-holded');
       const panelUniv = document.getElementById('panel-universal-bridge');
       const panelWoo = document.getElementById('panel-woocommerce');
       const panelShopify = document.getElementById('panel-shopify');
+      const panelHolded = document.getElementById('panel-holded');
+
+      [cardUniv, cardWoo, cardShopify, cardHolded].forEach(function(c) { if (c) c.classList.remove('selected'); });
+      [panelUniv, panelWoo, panelShopify, panelHolded].forEach(function(p) { if (p) p.style.display = 'none'; });
 
       if (type === 'universal_bridge') {
         if (cardUniv) cardUniv.classList.add('selected');
-        if (cardWoo) cardWoo.classList.remove('selected');
-        if (cardShopify) cardShopify.classList.remove('selected');
         if (panelUniv) panelUniv.style.display = 'block';
-        if (panelWoo) panelWoo.style.display = 'none';
-        if (panelShopify) panelShopify.style.display = 'none';
       } else if (type === 'shopify') {
         if (cardShopify) cardShopify.classList.add('selected');
-        if (cardUniv) cardUniv.classList.remove('selected');
-        if (cardWoo) cardWoo.classList.remove('selected');
         if (panelShopify) panelShopify.style.display = 'block';
-        if (panelUniv) panelUniv.style.display = 'none';
-        if (panelWoo) panelWoo.style.display = 'none';
+      } else if (type === 'holded') {
+        if (cardHolded) cardHolded.classList.add('selected');
+        if (panelHolded) panelHolded.style.display = 'block';
       } else {
         if (cardWoo) cardWoo.classList.add('selected');
-        if (cardUniv) cardUniv.classList.remove('selected');
-        if (cardShopify) cardShopify.classList.remove('selected');
         if (panelWoo) panelWoo.style.display = 'block';
-        if (panelUniv) panelUniv.style.display = 'none';
-        if (panelShopify) panelShopify.style.display = 'none';
       }
     }
 

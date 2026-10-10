@@ -228,7 +228,9 @@ export const channelScript = `
         return;
       }
 
+      const latencyBadge = document.getElementById('shopify-latency-badge');
       if (btn) btn.disabled = true;
+      if (latencyBadge) latencyBadge.style.display = 'none';
       if (alertBox) {
         alertBox.style.display = 'block';
         alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión GraphQL Admin API Shopify...</div>';
@@ -243,6 +245,11 @@ export const channelScript = `
         const data = await res.json();
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-green';
+            latencyBadge.textContent = (data.durationMs || 0) + ' ms';
+          }
           const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
           const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
           let locationsListHtml = '';
@@ -265,6 +272,11 @@ export const channelScript = `
             type: 'success'
           });
         } else {
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-amber';
+            latencyBadge.textContent = 'Error';
+          }
           const errInfo = humanizeErrorMessage(data.message, 'channel');
           const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
           const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
@@ -383,6 +395,126 @@ export const channelScript = `
       }
     }
 
+    async function testHoldedConnection() {
+      const keyEl = document.getElementById('input-holded-apikey');
+      const whEl = document.getElementById('input-holded-warehouse');
+      const apiKey = keyEl ? keyEl.value.trim() : '';
+      const defaultWarehouseId = whEl ? whEl.value.trim() : '';
+      const alertBox = document.getElementById('holded-test-alert');
+      const btn = document.getElementById('btn-test-holded');
+      const latencyBadge = document.getElementById('holded-latency-badge');
+
+      if (!apiKey) {
+        showSmartToast({
+          title: 'API Key requerida',
+          message: 'Introduce la API Key de Holded Cloud ERP.',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-holded-apikey',
+          type: 'warn'
+        });
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (latencyBadge) latencyBadge.style.display = 'none';
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Conectando con Holded Invoicing API...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/channel/test-holded', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey, defaultWarehouseId })
+        });
+        const data = await res.json();
+        const latencyVal = (typeof data.latencyMs === 'number' && data.latencyMs > 0) ? data.latencyMs : (typeof data.durationMs === 'number' ? data.durationMs : 0);
+        const timeSuffix = latencyVal > 0 ? ' (' + latencyVal + ' ms)' : '';
+
+        if (data.success) {
+          const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || 'Conexión verificada exitosamente.');
+          const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-green';
+            latencyBadge.textContent = latencyVal + ' ms';
+          }
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-success-card">' +
+                (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
+                '<span>' + safeMsg + timeSuffix + '</span>' +
+              '</div>';
+          }
+          showSmartToast({
+            title: 'Holded ERP Conectado',
+            message: 'Conexión con Holded Cloud verificada' + timeSuffix,
+            type: 'success'
+          });
+        } else {
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-amber';
+            latencyBadge.textContent = 'Error';
+          }
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || 'Error de Conexión');
+          const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
+          const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+          const safeSuggestion = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.suggestion) : errInfo.suggestion;
+          let extraActions = '<button type="button" onclick="testHoldedConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>';
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-error-card">' +
+                '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+                '<div class="smart-error-cause">' +
+                  '<strong>Causa:</strong> ' + safeCause + '<br>' +
+                  '<strong>Solución recomendada:</strong> ' + safeSuggestion +
+                '</div>' +
+                '<div class="smart-error-actions">' + extraActions + '</div>' +
+              '</div>';
+          }
+          showSmartToast({
+            title: errInfo.title,
+            message: errInfo.message,
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-holded-apikey',
+            type: 'error'
+          });
+        }
+      } catch (err) {
+        if (latencyBadge) {
+          latencyBadge.style.display = 'inline-flex';
+          latencyBadge.className = 'tag tag-amber';
+          latencyBadge.textContent = 'Fallo';
+        }
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.title) : errInfo.title;
+        const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+        if (alertBox) {
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+              '<div class="smart-error-cause">' + safeCause + '</div>' +
+              '<div class="smart-error-actions"><button type="button" onclick="testHoldedConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
+            '</div>';
+        }
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-holded-apikey',
+          type: 'error'
+        });
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
     async function saveChannelSettings() {
       sanitizeUrlInput('input-universal-url');
       sanitizeUrlInput('input-wc-url');
@@ -395,6 +527,8 @@ export const channelScript = `
       const shopSubEl = document.getElementById('input-shopify-subdomain');
       const shopTokEl = document.getElementById('input-shopify-token');
       const shopLocEl = document.getElementById('input-shopify-location');
+      const holdedKeyEl = document.getElementById('input-holded-apikey');
+      const holdedWhEl = document.getElementById('input-holded-warehouse');
 
       const payload = {
         channelType: currentChannelType,
@@ -412,6 +546,10 @@ export const channelScript = `
           shopSubdomain: shopSubEl ? shopSubEl.value.trim() : '',
           accessToken: shopTokEl ? shopTokEl.value.trim() : '',
           locationId: shopLocEl ? shopLocEl.value.trim() : '',
+        },
+        holded: {
+          apiKey: holdedKeyEl ? holdedKeyEl.value.trim() : '',
+          defaultWarehouseId: holdedWhEl ? holdedWhEl.value.trim() : '',
         }
       };
       await submitConfigUpdates(payload, 'Ajustes del Canal Web guardados con éxito.');
