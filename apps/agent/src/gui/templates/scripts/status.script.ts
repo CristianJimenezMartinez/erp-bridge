@@ -43,6 +43,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (document.hidden && !forceFormSync && _initialFetchCompleted && !_isReconnecting) return;
       try {
         const res = await fetch('/api/local/status');
+        if (res.status === 401 || res.status === 403) {
+          if (!window.__reloadingForToken) {
+            window.__reloadingForToken = true;
+            window.location.reload();
+          }
+          return;
+        }
         if (!res.ok) {
           throw new Error('HTTP ' + res.status);
         }

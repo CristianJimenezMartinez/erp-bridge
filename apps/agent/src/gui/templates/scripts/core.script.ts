@@ -19,7 +19,15 @@ export const coreScript = `
             }
           }
         }
-        return origFetch.call(this, input, init);
+        return origFetch.call(this, input, init).then(function(res) {
+          if (res && (res.status === 401 || res.status === 403) && typeof url === 'string' && url.startsWith('/api/local/')) {
+            if (!window.__reloadingForToken) {
+              window.__reloadingForToken = true;
+              setTimeout(function() { window.location.reload(); }, 300);
+            }
+          }
+          return res;
+        });
       };
     })();
 
