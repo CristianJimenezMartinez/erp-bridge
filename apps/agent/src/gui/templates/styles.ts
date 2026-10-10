@@ -424,4 +424,215 @@ export const dashboardStyles = `
       padding: 2px 7px;
       border-radius: 6px;
     }
+
+    /* Repeat Count Badge */
+    .log-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      background: rgba(239, 68, 68, 0.22);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      margin-left: 6px;
+      margin-right: 6px;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .log-count-badge-warn {
+      background: rgba(245, 158, 11, 0.22);
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .log-count-badge-info {
+      background: rgba(99, 102, 241, 0.22);
+      color: #c7d2fe;
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    /* Bottom Console Dock & Drawer */
+    .bottom-console-dock {
+      border-top: 1px solid var(--card-border);
+      background: #0d0d12;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dock-bar {
+      height: 34px;
+      background: #111116;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 11.5px;
+      transition: background 0.15s ease;
+    }
+    .dock-bar:hover {
+      background: #16161d;
+    }
+    .dock-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
+    .dock-status-text {
+      font-weight: 600;
+      color: #fff;
+      font-size: 11px;
+    }
+    .dock-divider {
+      color: rgba(255, 255, 255, 0.15);
+      margin: 0 2px;
+    }
+    .dock-latest-msg {
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+    }
+    .dock-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .dock-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .dock-badge-error {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+    .dock-badge-warn {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .dock-toggle-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: #e4e4e7;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .dock-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .dock-drawer {
+      height: 0;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      background: #09090d;
+      transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bottom-console-dock.open .dock-drawer {
+      height: 250px;
+      display: flex;
+    }
+    .bottom-console-dock.open #dock-toggle-icon {
+      transform: rotate(180deg);
+    }
+    .dock-drawer-header {
+      height: 38px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #111116;
+      flex-shrink: 0;
+    }
+    .dock-drawer-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dock-filters {
+      display: flex;
+      gap: 4px;
+    }
+    .dock-filter-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dock-filter-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+    .dock-filter-btn.active {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.35);
+      font-weight: 600;
+    }
+    .dock-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-logs-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      background: #08080b;
+    }
+    .dock-logs-stream::-webkit-scrollbar {
+      width: 6px;
+    }
+    .dock-logs-stream::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+    }
 `;

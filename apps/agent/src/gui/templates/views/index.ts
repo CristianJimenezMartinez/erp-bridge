@@ -12,3 +12,4 @@ export { renderWizardModal } from './wizard.view';
 export { renderToast } from './toast.view';
 export { renderErrorResolverModal } from './error-resolver.view';
 export { renderIncidentModal } from './incident.view';
+export { renderBottomConsole } from './bottom-console.view';

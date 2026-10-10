@@ -247,6 +247,50 @@ export const errorHumanizerScript = `
         targetTab: 'overview',
         targetInputId: 'card-f-path',
         helpUrl: 'https://bridge.cristianjm.com/docs/system-requirements/'
+      },
+      {
+        code: 'ERR_NOTIF_TELEGRAM',
+        pattern: /telegram.*(?:token|chat_id|failed|error|unauthorized|401|404)|chat not found/i,
+        title: 'Fallo de conexión con Telegram Bot',
+        message: 'El bot token o el Chat ID de Telegram configurado no es válido o el bot no ha sido iniciado.',
+        suggestion: 'Verifica el Bot Token de @BotFather y asegúrate de haber enviado "/start" al bot desde tu chat o canal antes de enviar alertas.',
+        actionLabel: 'Configurar Telegram',
+        targetTab: 'notifications',
+        targetInputId: 'input-tele-token',
+        helpUrl: 'https://bridge.cristianjm.com/docs/notifications-telegram/'
+      },
+      {
+        code: 'ERR_NOTIF_DISCORD',
+        pattern: /discord.*(?:webhook|failed|error|404|400|invalid webhook)/i,
+        title: 'Webhook de Discord no válido',
+        message: 'La URL del Webhook de Discord no responde o ha sido eliminada del canal de Discord.',
+        suggestion: 'En tu servidor de Discord, ve a Ajustes del canal > Integraciones > Webhooks > Crear/Copiar enlace del Webhook y pégalo aquí.',
+        actionLabel: 'Configurar Discord',
+        targetTab: 'notifications',
+        targetInputId: 'input-disc-webhook',
+        helpUrl: 'https://bridge.cristianjm.com/docs/notifications-discord/'
+      },
+      {
+        code: 'ERR_NOTIF_SMTP',
+        pattern: /smtp|nodemailer|transporter|auth.*credentials|connect ECONNREFUSED.*587|connect ECONNREFUSED.*465/i,
+        title: 'Fallo al autenticar servidor de correo SMTP',
+        message: 'No se pudo conectar o autenticar con el servidor de correo saliente (SMTP) configurado.',
+        suggestion: 'Revisa el host SMTP, el puerto (465 o 587) y tu contraseña. Si usas Gmail o Microsoft 365, recuerda usar una "Contraseña de Aplicación".',
+        actionLabel: 'Configurar Correo SMTP',
+        targetTab: 'notifications',
+        targetInputId: 'input-smtp-host',
+        helpUrl: 'https://bridge.cristianjm.com/docs/notifications-email/'
+      },
+      {
+        code: 'ERR_PORT_OCCUPIED',
+        pattern: /EADDRINUSE|puerto 39281 ocupado|port 39281 already in use/i,
+        title: 'Puerto local 39281 ocupado por otro proceso',
+        message: 'Existe otra instancia de Bentian Agent o un proceso huérfano escuchando en el puerto HTTP 39281.',
+        suggestion: 'Cierra cualquier otra ventana o proceso BentianAgent.exe desde el Administrador de Tareas y reintenta.',
+        actionLabel: 'Ver Diagnóstico del Sistema',
+        targetTab: 'logs',
+        targetInputId: 'btn-refresh-preflight',
+        helpUrl: 'https://bridge.cristianjm.com/docs/troubleshooting/'
       }
     ];
 
@@ -328,6 +372,7 @@ export const errorHumanizerScript = `
         factusol: 'Factusol ERP',
         channel: 'Canal Web',
         sync: 'Automatización',
+        notifications: 'Centro de Notificaciones & Alertas',
         history: 'Historial',
         logs: 'Diagnóstico',
         license: 'Licencia'

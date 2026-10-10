@@ -10,6 +10,8 @@ export interface LogEvent {
   timestamp: string;
   level: 'info' | 'warn' | 'error' | 'success';
   message: string;
+  count?: number;
+  firstTimestamp?: string;
 }
 
 export interface AgentStatusDetails {

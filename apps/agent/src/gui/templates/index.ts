@@ -14,6 +14,7 @@ import {
   renderToast,
   renderErrorResolverModal,
   renderIncidentModal,
+  renderBottomConsole,
 } from './views';
 import { renderClientScript } from './scripts';
 
@@ -56,6 +57,7 @@ export function renderDashboardHtml(agentVersion: string = '0.2.0', localToken: 
     renderLogsTab(),
     renderLicenseTab(),
     '    </main>',
+    renderBottomConsole(),
     '  </div>',
     '',
     renderWizardModal(),
