@@ -85,11 +85,11 @@ async function loadFleetErrors() {
             <td class="p-3 text-zinc-300">${_safeEscapeHtml(err.org_name || err.organization_id || 'General')}</td>
             <td class="p-3 font-mono text-zinc-400">${_safeEscapeHtml(err.component || 'OLEDB / Factusol')}</td>
             <td class="p-3">
-              <div class="text-zinc-200">${_safeEscapeHtml(err.message || 'Error de sincronización')}</div>
+              <div class="text-zinc-200 max-w-xs truncate" title="${_safeEscapeHtml(err.message || 'Error de sincronización')}">${_safeEscapeHtml(err.message || 'Error de sincronización')}</div>
               <div class="text-[10px] text-zinc-500 font-mono">${_safeEscapeHtml(err.error_code || 'ERR_UNKNOWN')}</div>
             </td>
-            <td class="p-3 text-zinc-400 font-mono text-[11px]">${dateStr}</td>
-            <td class="p-3 text-right">
+            <td class="p-3 text-zinc-400 font-mono text-[11px] whitespace-nowrap">${dateStr}</td>
+            <td class="p-3 text-right whitespace-nowrap">
               <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${isFatal ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
                 ${isFatal ? 'FATAL' : 'WARNING'}
               </span>

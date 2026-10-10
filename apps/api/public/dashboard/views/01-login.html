@@ -16,17 +16,17 @@
       </div>
 
       <!-- TABS DE MODO DE ACCESO (4 ROLES) -->
-      <div class="flex border-b border-white/[0.08] mb-4 text-[11px] font-medium">
-        <button type="button" id="tab-btn-key" onclick="switchLoginMode('key')" class="flex-1 pb-2 border-b-2 border-indigo-500 text-indigo-400 font-semibold text-center transition-colors">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-[#121215] rounded-xl border border-white/[0.08] mb-4 text-[11px] font-medium">
+        <button type="button" id="tab-btn-key" onclick="switchLoginMode('key')" class="py-1.5 px-2 rounded-lg bg-[#18181b] border border-white/[0.1] text-indigo-400 font-semibold text-center transition-colors shadow-sm">
           Clave (EB-...)
         </button>
-        <button type="button" id="tab-btn-email" onclick="switchLoginMode('email')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-email" onclick="switchLoginMode('email')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Email Cliente
         </button>
-        <button type="button" id="tab-btn-partner" onclick="switchLoginMode('partner')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-partner" onclick="switchLoginMode('partner')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Instalador (PT-...)
         </button>
-        <button type="button" id="tab-btn-admin" onclick="switchLoginMode('admin')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-admin" onclick="switchLoginMode('admin')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Superadmin
         </button>
       </div>

@@ -199,7 +199,7 @@
                 <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Protegido (Timing-Safe)</span>
               </div>
 
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                 <div class="relative flex-1">
                   <input 
                     id="webhook-secret-input" 
@@ -220,24 +220,26 @@
                   </button>
                 </div>
 
-                <button 
-                  id="btn-copy-secret" 
-                  data-action="copy-secret" 
-                  class="px-3 py-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-300 border border-white/[0.08] text-xs font-medium transition shrink-0 cursor-pointer"
-                  title="Copiar token"
-                >
-                  <span id="text-copy-secret">Copiar</span>
-                </button>
+                <div class="grid grid-cols-2 gap-2 mt-2 sm:mt-0 sm:flex">
+                  <button 
+                    id="btn-copy-secret" 
+                    data-action="copy-secret" 
+                    class="px-3 py-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-300 border border-white/[0.08] text-xs font-medium transition shrink-0 cursor-pointer text-center"
+                    title="Copiar token"
+                  >
+                    <span id="text-copy-secret">Copiar</span>
+                  </button>
 
-                <button 
-                  id="btn-regenerate-secret" 
-                  data-action="regenerate-secret" 
-                  class="px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition shrink-0 flex items-center gap-1 cursor-pointer"
-                  title="Regenerar token criptográfico"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                  <span>Regenerar</span>
-                </button>
+                  <button 
+                    id="btn-regenerate-secret" 
+                    data-action="regenerate-secret" 
+                    class="px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition shrink-0 flex items-center justify-center gap-1 cursor-pointer text-center"
+                    title="Regenerar token criptográfico"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Regenerar</span>
+                  </button>
+                </div>
               </div>
               <p class="text-[11px] text-zinc-500 leading-relaxed">
                 El secreto se almacena en memoria segura. En caso de regenerarlo, actualiza la firma en Shopify / Holded de inmediato.

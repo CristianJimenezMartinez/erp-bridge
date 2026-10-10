@@ -125,17 +125,17 @@
       </div>
 
       <!-- TABS DE MODO DE ACCESO (4 ROLES) -->
-      <div class="flex border-b border-white/[0.08] mb-4 text-[11px] font-medium">
-        <button type="button" id="tab-btn-key" onclick="switchLoginMode('key')" class="flex-1 pb-2 border-b-2 border-indigo-500 text-indigo-400 font-semibold text-center transition-colors">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-[#121215] rounded-xl border border-white/[0.08] mb-4 text-[11px] font-medium">
+        <button type="button" id="tab-btn-key" onclick="switchLoginMode('key')" class="py-1.5 px-2 rounded-lg bg-[#18181b] border border-white/[0.1] text-indigo-400 font-semibold text-center transition-colors shadow-sm">
           Clave (EB-...)
         </button>
-        <button type="button" id="tab-btn-email" onclick="switchLoginMode('email')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-email" onclick="switchLoginMode('email')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Email Cliente
         </button>
-        <button type="button" id="tab-btn-partner" onclick="switchLoginMode('partner')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-partner" onclick="switchLoginMode('partner')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Instalador (PT-...)
         </button>
-        <button type="button" id="tab-btn-admin" onclick="switchLoginMode('admin')" class="flex-1 pb-2 border-b-2 border-transparent text-zinc-400 hover:text-white text-center transition-colors">
+        <button type="button" id="tab-btn-admin" onclick="switchLoginMode('admin')" class="py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors">
           Superadmin
         </button>
       </div>
@@ -350,12 +350,12 @@
           Conexión Segura
         </span>
 
-        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 text-[11px] font-medium border border-white/[0.08] transition">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 text-[11px] font-medium border border-white/[0.08] transition">
           <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           <span>Instalador (.exe)</span>
         </a>
 
-        <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-[11px] font-medium border border-amber-500/30 transition" title="Guía de ayuda contra bloqueos de SmartScreen y antivirus">
+        <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-[11px] font-medium border border-amber-500/30 transition" title="Guía de ayuda contra bloqueos de SmartScreen y antivirus">
           <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           <span>Ayuda SmartScreen / Antivirus</span>
         </a>
@@ -372,7 +372,7 @@
             <div class="w-5 h-5 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-[10px] font-bold text-indigo-300 shrink-0">
               <span id="user-avatar-char">U</span>
             </div>
-            <span id="user-display" class="text-[11px] text-zinc-200 font-mono truncate max-w-[160px]">Usuario</span>
+            <span id="user-display" class="text-[11px] text-zinc-200 font-mono truncate max-w-[120px] sm:max-w-[160px]">Usuario</span>
             <svg id="user-dropdown-chevron" class="w-3 h-3 text-zinc-400 group-hover:text-zinc-200 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
 
@@ -419,10 +419,10 @@
     </header>
 
     <!-- MAIN BODY CONTAINER -->
-    <main class="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto space-y-6">
+    <main class="flex-1 p-3.5 sm:p-6 max-w-7xl 2xl:max-w-[1680px] w-full mx-auto space-y-6 transition-all duration-150">
 
       <!-- SELECTOR DE PESTAÑAS MÓVIL (< 768px) -->
-      <div id="mobile-tabs-container" class="md:hidden flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-white/[0.06] text-xs overflow-x-auto">
+      <div id="mobile-tabs-container" class="md:hidden flex items-center gap-1.5 p-1.5 rounded-xl bg-[#121215] border border-white/[0.08] text-xs overflow-x-auto scrollbar-none scroll-smooth snap-x">
         <!-- Renderizado dinámico vía JavaScript -->
       </div>
 
@@ -502,7 +502,7 @@
             <div>
               <span class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Tu Clave de Licencia</span>
               <div class="mt-3 p-3.5 rounded-lg bg-[#18181b] border border-white/[0.08] flex items-center justify-between gap-2">
-                <span id="client-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider">Cargando...</span>
+                <span id="client-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider break-all">Cargando...</span>
                 <button onclick="copyClientKey()" class="px-2.5 py-1 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-semibold transition shrink-0 flex items-center gap-1 cursor-pointer">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                   <span>Copiar</span>
@@ -529,12 +529,12 @@
             <div>
               <span class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Servidor Factusol Vinculado</span>
               <div class="mt-3 p-3.5 rounded-lg bg-[#18181b] border border-white/[0.08]">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                    <span id="client-device-hostname" class="font-semibold text-white text-xs sm:text-sm font-mono">Sin asignar</span>
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <svg class="w-4 h-4 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    <span id="client-device-hostname" class="font-semibold text-white text-xs sm:text-sm font-mono truncate">Sin asignar</span>
                   </div>
-                  <span id="client-device-status-badge" class="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                  <span id="client-device-status-badge" class="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 shrink-0">
                     Pendiente
                   </span>
                 </div>
@@ -718,14 +718,14 @@
                 El conector se ejecuta en el PC/servidor donde reside Factusol. Si cambias de máquina, puedes desvincular el HWID con 1 clic.
               </p>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="relative">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <div class="relative flex-1 sm:flex-initial w-full sm:w-64">
                 <input 
                   type="text" 
                   id="search-input" 
                   oninput="handleSearch(this.value)" 
                   placeholder="Buscar por alias, clave, hostname..." 
-                  class="bg-[#18181b] border border-white/[0.08] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-52 sm:w-64 transition"
+                  class="bg-[#18181b] border border-white/[0.08] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-full sm:w-64 transition"
                 />
                 <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
               </div>
@@ -741,15 +741,15 @@
 
           <!-- TABLA DE CLAVES -->
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs min-w-[780px]">
               <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
                 <tr>
                   <th class="p-3">Servidor / Alias</th>
                   <th class="p-3">Clave de Activación</th>
-                  <th class="p-3">Tipo & Puesto</th>
-                  <th class="p-3">Estado Conexión</th>
+                  <th class="p-3 whitespace-nowrap">Tipo & Puesto</th>
+                  <th class="p-3 whitespace-nowrap">Estado Conexión</th>
                   <th class="p-3">Equipo Vinculado (HWID)</th>
-                  <th class="p-3 text-right">Acciones</th>
+                  <th class="p-3 text-right whitespace-nowrap">Acciones</th>
                 </tr>
               </thead>
               <tbody id="licenses-tbody" class="divide-y divide-white/[0.04]">
@@ -823,14 +823,14 @@
           </div>
 
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs text-zinc-300">
+            <table class="w-full text-left text-xs text-zinc-300 min-w-[720px]">
               <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
                 <tr>
                   <th class="py-3 px-4">Servidor / Hostname</th>
                   <th class="py-3 px-4">Organización</th>
-                  <th class="py-3 px-4">Versión</th>
-                  <th class="py-3 px-4">Último Latido</th>
-                  <th class="py-3 px-4 text-right">Estado</th>
+                  <th class="py-3 px-4 whitespace-nowrap">Versión</th>
+                  <th class="py-3 px-4 whitespace-nowrap">Último Latido</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap">Estado</th>
                 </tr>
               </thead>
               <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.04]">
@@ -1136,15 +1136,15 @@
 
         <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs">
+            <table class="w-full text-left text-xs min-w-[760px]">
               <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
                 <tr>
                   <th class="p-3">Equipo / Hostname</th>
                   <th class="p-3">Organización / Cliente</th>
-                  <th class="p-3">Componente</th>
+                  <th class="p-3 whitespace-nowrap">Componente</th>
                   <th class="p-3">Mensaje & Código de Error</th>
-                  <th class="p-3">Fecha / Ocurrencia</th>
-                  <th class="p-3 text-right">Severidad</th>
+                  <th class="p-3 whitespace-nowrap">Fecha / Ocurrencia</th>
+                  <th class="p-3 text-right whitespace-nowrap">Severidad</th>
                 </tr>
               </thead>
               <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.04]">
@@ -1360,7 +1360,7 @@
                 <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Protegido (Timing-Safe)</span>
               </div>
 
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                 <div class="relative flex-1">
                   <input 
                     id="webhook-secret-input" 
@@ -1381,24 +1381,26 @@
                   </button>
                 </div>
 
-                <button 
-                  id="btn-copy-secret" 
-                  data-action="copy-secret" 
-                  class="px-3 py-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-300 border border-white/[0.08] text-xs font-medium transition shrink-0 cursor-pointer"
-                  title="Copiar token"
-                >
-                  <span id="text-copy-secret">Copiar</span>
-                </button>
+                <div class="grid grid-cols-2 gap-2 mt-2 sm:mt-0 sm:flex">
+                  <button 
+                    id="btn-copy-secret" 
+                    data-action="copy-secret" 
+                    class="px-3 py-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-300 border border-white/[0.08] text-xs font-medium transition shrink-0 cursor-pointer text-center"
+                    title="Copiar token"
+                  >
+                    <span id="text-copy-secret">Copiar</span>
+                  </button>
 
-                <button 
-                  id="btn-regenerate-secret" 
-                  data-action="regenerate-secret" 
-                  class="px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition shrink-0 flex items-center gap-1 cursor-pointer"
-                  title="Regenerar token criptográfico"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                  <span>Regenerar</span>
-                </button>
+                  <button 
+                    id="btn-regenerate-secret" 
+                    data-action="regenerate-secret" 
+                    class="px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition shrink-0 flex items-center justify-center gap-1 cursor-pointer text-center"
+                    title="Regenerar token criptográfico"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Regenerar</span>
+                  </button>
+                </div>
               </div>
               <p class="text-[11px] text-zinc-500 leading-relaxed">
                 El secreto se almacena en memoria segura. En caso de regenerarlo, actualiza la firma en Shopify / Holded de inmediato.
@@ -1495,44 +1497,50 @@
 <!-- ============================================================ -->
   <!-- MODAL: GENERAR NUEVA CLAVE DE SERVIDOR                       -->
   <!-- ============================================================ -->
-  <div id="modal-new-key" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
+  <div id="modal-new-key" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <h3 class="text-sm font-semibold text-zinc-100">Vincular Nuevo Servidor / Generar Clave</h3>
-        <button onclick="closeModal('modal-new-key')" class="text-zinc-500 hover:text-zinc-300">
+        <button onclick="closeModal('modal-new-key')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <p class="text-xs text-zinc-400">
-        Asigna un nombre para identificar el servidor o PC donde se ejecutará el conector con Factusol.
-      </p>
+      <!-- Formulario y Contenido -->
+      <form onsubmit="handleCreateLicenseSubmit(event)" class="flex flex-col flex-1 min-h-0">
+        <!-- Cuerpo scrollable -->
+        <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+          <p class="text-xs text-zinc-400">
+            Asigna un nombre para identificar el servidor o PC donde se ejecutará el conector con Factusol.
+          </p>
 
-      <form onsubmit="handleCreateLicenseSubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nombre / Alias del Servidor</label>
-          <input 
-            type="text" 
-            id="new-key-alias" 
-            placeholder="ej. Servidor Factusol Central" 
-            required 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
-          />
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nombre / Alias del Servidor</label>
+            <input 
+              type="text" 
+              id="new-key-alias" 
+              placeholder="ej. Servidor Factusol Central" 
+              required 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Tipo de Puesto</label>
+            <select id="new-key-seat-type" class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500">
+              <option value="BASE" selected>Licencia Base Principal (199 €/año)</option>
+              <option value="ADDITIONAL_SEAT">Puesto Adicional Mismo CIF (99 €/año)</option>
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Tipo de Puesto</label>
-          <select id="new-key-seat-type" class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500">
-            <option value="BASE" selected>Licencia Base Principal (199 €/año)</option>
-            <option value="ADDITIONAL_SEAT">Puesto Adicional Mismo CIF (99 €/año)</option>
-          </select>
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-new-key')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+        <!-- Pie de acciones -->
+        <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+          <button type="button" onclick="closeModal('modal-new-key')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white transition cursor-pointer">
             Cancelar
           </button>
-          <button type="submit" id="btn-submit-key" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+          <button type="submit" id="btn-submit-key" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition cursor-pointer">
             Generar Clave
           </button>
         </div>
@@ -1543,74 +1551,80 @@
 <!-- ============================================================ -->
   <!-- MODAL: COMPRA MAYORISTA DE LICENCIA (PARTNER -25%)           -->
   <!-- ============================================================ -->
-  <div id="modal-partner-buy" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-emerald-500/30 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
+  <div id="modal-partner-buy" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">-25%</span>
           <h3 class="text-sm font-semibold text-white">Comprar Licencia (Tarifa Partner)</h3>
         </div>
-        <button onclick="closeModal('modal-partner-buy')" class="text-zinc-500 hover:text-zinc-300">
+        <button onclick="closeModal('modal-partner-buy')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-lg text-xs text-emerald-200/90 leading-relaxed flex items-center justify-between">
-        <div>
-          <span class="text-[11px] text-zinc-400 block">Tarifa Mayorista de Distribuidor:</span>
-          <strong class="text-base text-emerald-400 font-bold font-mono">149,25 €</strong> <span class="text-zinc-400 text-[11px]">/ año + IVA</span>
-        </div>
-        <span class="text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">PVP: 199,00 €</span>
-      </div>
+      <!-- Formulario y Contenido -->
+      <form onsubmit="handlePartnerBuySubmit(event)" class="flex flex-col flex-1 min-h-0">
+        <!-- Cuerpo scrollable -->
+        <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+          <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-lg text-xs text-emerald-200/90 leading-relaxed flex items-center justify-between">
+            <div>
+              <span class="text-[11px] text-zinc-400 block">Tarifa Mayorista de Distribuidor:</span>
+              <strong class="text-base text-emerald-400 font-bold font-mono">149,25 €</strong> <span class="text-zinc-400 text-[11px]">/ año + IVA</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">PVP: 199,00 €</span>
+          </div>
 
-      <form onsubmit="handlePartnerBuySubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Razón Social o Nombre del Cliente</label>
-          <input 
-            type="text" 
-            id="partner-buy-client-name" 
-            placeholder="ej. Ferretería Industrial SL" 
-            required 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-          />
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Razón Social o Nombre del Cliente</label>
+            <input 
+              type="text" 
+              id="partner-buy-client-name" 
+              placeholder="ej. Ferretería Industrial SL" 
+              required 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">CIF / NIF de la Empresa (Obligatorio)</label>
+            <input 
+              type="text" 
+              id="partner-buy-tax-id" 
+              placeholder="ej. B12345678" 
+              required 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 font-mono uppercase focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Email del Cliente (opcional)</label>
+            <input 
+              type="email" 
+              id="partner-buy-email" 
+              placeholder="administracion@cliente.com" 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Alias del Servidor Factusol</label>
+            <input 
+              type="text" 
+              id="partner-buy-alias" 
+              placeholder="ej. Servidor Factusol Central" 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
         </div>
 
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">CIF / NIF de la Empresa (Obligatorio)</label>
-          <input 
-            type="text" 
-            id="partner-buy-tax-id" 
-            placeholder="ej. B12345678" 
-            required 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 font-mono uppercase focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Email del Cliente (opcional)</label>
-          <input 
-            type="email" 
-            id="partner-buy-email" 
-            placeholder="administracion@cliente.com" 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Alias del Servidor Factusol</label>
-          <input 
-            type="text" 
-            id="partner-buy-alias" 
-            placeholder="ej. Servidor Factusol Central" 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-partner-buy')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+        <!-- Pie de acciones -->
+        <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+          <button type="button" onclick="closeModal('modal-partner-buy')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white transition cursor-pointer">
             Cancelar
           </button>
-          <button type="submit" id="btn-submit-partner-buy" class="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+          <button type="submit" id="btn-submit-partner-buy" class="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 cursor-pointer">
             <span>Pagar en Stripe (149,25 €) →</span>
           </button>
         </div>
@@ -1621,58 +1635,64 @@
 <!-- ============================================================ -->
   <!-- MODAL: EMISIÓN DE EVALUACIÓN TEMPORAL (15 DÍAS)              -->
   <!-- ============================================================ -->
-  <div id="modal-partner-issue" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-emerald-500/20 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
+  <div id="modal-partner-issue" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <h3 class="text-sm font-semibold text-white">Emitir Clave de Evaluación (15 días)</h3>
-        <button onclick="closeModal('modal-partner-issue')" class="text-zinc-500 hover:text-zinc-300">
+        <button onclick="closeModal('modal-partner-issue')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <p class="text-xs text-zinc-400 leading-relaxed">
-        Se dará de alta a la empresa en tu cartera y se generará su clave de activación de forma instantánea.
-      </p>
+      <!-- Formulario y Contenido -->
+      <form onsubmit="handlePartnerIssueSubmit(event)" class="flex flex-col flex-1 min-h-0">
+        <!-- Cuerpo scrollable -->
+        <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Se dará de alta a la empresa en tu cartera y se generará su clave de activación de forma instantánea.
+          </p>
 
-      <form onsubmit="handlePartnerIssueSubmit(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Razón Social o Nombre del Cliente</label>
-          <input 
-            type="text" 
-            id="partner-issue-client-name" 
-            placeholder="ej. Ferretería Industrial SL" 
-            required 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-          />
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Razón Social o Nombre del Cliente</label>
+            <input 
+              type="text" 
+              id="partner-issue-client-name" 
+              placeholder="ej. Ferretería Industrial SL" 
+              required 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">CIF / NIF de la Empresa (Obligatorio)</label>
+            <input 
+              type="text" 
+              id="partner-issue-tax-id" 
+              placeholder="ej. B12345678" 
+              required 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 font-mono uppercase focus:outline-none focus:border-emerald-500"
+            />
+            <p class="text-[10px] text-zinc-500 mt-1">El conector validará este CIF directamente en la base de datos Factusol del cliente.</p>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-medium text-zinc-400 mb-1">Alias del Servidor</label>
+            <input 
+              type="text" 
+              id="partner-issue-alias" 
+              placeholder="ej. Servidor Factusol Central" 
+              class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
         </div>
 
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">CIF / NIF de la Empresa (Obligatorio)</label>
-          <input 
-            type="text" 
-            id="partner-issue-tax-id" 
-            placeholder="ej. B12345678" 
-            required 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 font-mono uppercase focus:outline-none focus:border-emerald-500"
-          />
-          <p class="text-[10px] text-zinc-500 mt-1">El conector validará este CIF directamente en la base de datos Factusol del cliente.</p>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Alias del Servidor</label>
-          <input 
-            type="text" 
-            id="partner-issue-alias" 
-            placeholder="ej. Servidor Factusol Central" 
-            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-          />
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-partner-issue')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+        <!-- Pie de acciones -->
+        <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+          <button type="button" onclick="closeModal('modal-partner-issue')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white transition cursor-pointer">
             Cancelar
           </button>
-          <button type="submit" id="btn-submit-partner-issue" class="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">
+          <button type="submit" id="btn-submit-partner-issue" class="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition cursor-pointer">
             Emitir Licencia Base
           </button>
         </div>
@@ -1683,30 +1703,35 @@
 <!-- ============================================================ -->
   <!-- MODAL: EDITAR ALIAS                                         -->
   <!-- ============================================================ -->
-  <div id="modal-edit-alias" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
+  <div id="modal-edit-alias" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <h3 class="text-sm font-semibold text-zinc-100">Editar Nombre del Servidor</h3>
-        <button onclick="closeModal('modal-edit-alias')" class="text-zinc-500 hover:text-zinc-300">
+        <button onclick="closeModal('modal-edit-alias')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <input type="hidden" id="edit-alias-id" />
-      <div>
-        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nuevo Nombre del Servidor</label>
-        <input 
-          type="text" 
-          id="edit-alias-input" 
-          class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500"
-        />
+      <!-- Cuerpo scrollable -->
+      <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+        <input type="hidden" id="edit-alias-id" />
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nuevo Nombre del Servidor</label>
+          <input 
+            type="text" 
+            id="edit-alias-input" 
+            class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closeModal('modal-edit-alias')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+      <!-- Pie de acciones -->
+      <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modal-edit-alias')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white transition cursor-pointer">
           Cancelar
         </button>
-        <button onclick="handleSaveAlias()" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+        <button onclick="handleSaveAlias()" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition cursor-pointer">
           Guardar Cambios
         </button>
       </div>
@@ -1716,32 +1741,42 @@
 <!-- ============================================================ -->
   <!-- MODAL: DESVINCULAR EQUIPO (MUDANZA PC)                       -->
   <!-- ============================================================ -->
-  <div id="modal-unbind" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-red-500/20 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-      <div class="flex items-center gap-3 text-amber-400">
-        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+  <div id="modal-unbind" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div class="flex items-center gap-2.5 text-amber-400">
+          <div class="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-zinc-100">¿Mudar Licencia a un Nuevo PC?</h3>
         </div>
-        <h3 class="text-sm font-semibold text-zinc-100">¿Mudar Licencia a un Nuevo PC?</h3>
+        <button onclick="closeModal('modal-unbind')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <p class="text-xs text-zinc-300 leading-relaxed">
-        Estás a punto de desvincular el equipo <strong id="unbind-machine-name" class="text-white font-mono">PC-ACTUAL</strong> de la clave <span id="unbind-key-display" class="font-mono text-indigo-400">EB-XXXXX</span>.
-      </p>
+      <!-- Cuerpo scrollable -->
+      <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+        <p class="text-xs text-zinc-300 leading-relaxed">
+          Estás a punto de desvincular el equipo <strong id="unbind-machine-name" class="text-white font-mono">PC-ACTUAL</strong> de la clave <span id="unbind-key-display" class="font-mono text-indigo-400">EB-XXXXX</span>.
+        </p>
 
-      <p class="text-[11px] text-zinc-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04]">
-        ✓ La licencia quedará liberada al instante para que actives esta misma clave en tu nuevo ordenador.<br/>
-        ✓ No necesitas contactar a soporte técnico.
-      </p>
+        <p class="text-[11px] text-zinc-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.04]">
+          ✓ La licencia quedará liberada al instante para que actives esta misma clave en tu nuevo ordenador.<br/>
+          ✓ No necesitas contactar a soporte técnico.
+        </p>
 
-      <input type="hidden" id="unbind-license-id" />
-      <input type="hidden" id="unbind-hwid" />
+        <input type="hidden" id="unbind-license-id" />
+        <input type="hidden" id="unbind-hwid" />
+      </div>
 
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closeModal('modal-unbind')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white">
+      <!-- Pie de acciones -->
+      <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modal-unbind')" class="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-white transition cursor-pointer">
           Cancelar
         </button>
-        <button onclick="confirmUnbind()" id="btn-confirm-unbind" class="px-3.5 py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium transition">
+        <button onclick="confirmUnbind()" id="btn-confirm-unbind" class="px-3.5 py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium transition cursor-pointer">
           Confirmar y Liberar Licencia
         </button>
       </div>
@@ -1751,16 +1786,18 @@
 <!-- ============================================================ -->
   <!-- MODAL: GUÍA DE INSTALACIÓN RÁPIDA                           -->
   <!-- ============================================================ -->
-  <div id="modal-instructions" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
+  <div id="modal-instructions" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <h3 class="text-sm font-semibold text-zinc-100">Cómo Instalar Bentian en tu Servidor Factusol</h3>
-        <button onclick="closeModal('modal-instructions')" class="text-zinc-500 hover:text-zinc-300">
+        <button onclick="closeModal('modal-instructions')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <div class="space-y-3 text-xs text-zinc-300">
+      <!-- Cuerpo scrollable -->
+      <div class="p-5 overflow-y-auto custom-scroll space-y-3 flex-1 text-xs text-zinc-300">
         <div class="flex gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
           <span class="w-5 h-5 rounded-full bg-indigo-600/30 text-indigo-400 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
           <div>
@@ -1792,91 +1829,106 @@
         </div>
       </div>
 
-      <div class="flex justify-end pt-2">
-        <button onclick="closeModal('modal-instructions')" class="px-4 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium">
+      <!-- Pie de acciones -->
+      <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex items-center justify-end gap-2.5 shrink-0">
+        <button onclick="closeModal('modal-instructions')" class="px-4 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition cursor-pointer">
           Entendido
         </button>
       </div>
     </div>
   </div>
 
-<!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA -->
-  <div id="modal-welcome-checkout" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="relative w-full max-w-lg bg-[#121215] border border-emerald-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/30 text-center">
-      <!-- Icono de éxito animado -->
-      <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 mx-auto flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
-        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-
-      <h2 class="text-2xl font-bold text-white tracking-tight">¡Suscripción Confirmada!</h2>
-      <p class="text-xs text-zinc-400 mt-1">Tu licencia de Bentian ERP Bridge ya está activa y vinculada a tu cuenta.</p>
-
-      <!-- Tarjeta con la clave de licencia -->
-      <div class="mt-6 p-4 rounded-xl bg-[#18181b] border border-white/[0.1] text-left">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Tu Clave de Activación</span>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">ACTIVA</span>
-        </div>
-        <div class="flex items-center justify-between gap-2 mt-2">
-          <code id="welcome-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider select-all break-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
-          <button onclick="copiarClaveBienvenida()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition flex items-center gap-1.5 shadow-sm">
+<!-- ============================================================ -->
+  <!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA        -->
+  <!-- ============================================================ -->
+  <div id="modal-welcome-checkout" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
-            <span>Copiar</span>
-          </button>
+          </div>
+          <h3 class="text-sm font-semibold text-white">¡Suscripción Confirmada!</h3>
+        </div>
+        <button onclick="closeModal('modal-welcome-checkout')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Cuerpo scrollable -->
+      <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+        <p class="text-xs text-zinc-400">
+          Tu licencia de Bentian ERP Bridge ya está activa y vinculada a tu cuenta.
+        </p>
+
+        <!-- Tarjeta con la clave de licencia -->
+        <div class="p-4 rounded-xl bg-[#18181b] border border-white/[0.1] text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Tu Clave de Activación</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">ACTIVA</span>
+          </div>
+          <div class="flex items-center justify-between gap-2 mt-2">
+            <code id="welcome-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider select-all break-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
+            <button onclick="copiarClaveBienvenida()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pasos de instalación guiada -->
+        <div class="text-left space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-xs font-semibold text-zinc-300 block">Siguientes pasos para conectar tu Factusol:</span>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">1</span>
+            <span>Descarga e instala el <strong>Agente Bentian</strong> en el PC o servidor con acceso a Factusol.</span>
+          </div>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">2</span>
+            <span>Pega tu <strong>clave de activación</strong> cuando el instalador te la solicite.</span>
+          </div>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">3</span>
+            <span>El agente detectará la base de datos y comenzará la sincronización en segundo plano.</span>
+          </div>
+        </div>
+
+        <!-- Aviso de SmartScreen y Antivirus en Modal de Bienvenida -->
+        <div class="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left text-[11px] text-amber-200/90 flex items-start gap-2.5">
+          <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <span>¿Pantalla azul de SmartScreen? Pulsa <strong class="text-white font-semibold">"Más información"</strong> y luego <strong class="text-white font-semibold">"Ejecutar de todas formas"</strong>.</span>
+            <div class="mt-1">
+              <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="text-amber-400 hover:text-amber-300 underline font-medium">Ver guía técnica paso a paso & exclusiones de antivirus &rarr;</a>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Pasos de instalación guiada -->
-      <div class="mt-6 text-left space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-        <span class="text-xs font-semibold text-zinc-300 block">Siguientes pasos para conectar tu Factusol:</span>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">1</span>
-          <span>Descarga e instala el <strong>Agente Bentian</strong> en el PC o servidor con acceso a Factusol.</span>
-        </div>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">2</span>
-          <span>Pega tu <strong>clave de activación</strong> cuando el instalador te la solicite.</span>
-        </div>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">3</span>
-          <span>El agente detectará la base de datos y comenzará la sincronización en segundo plano.</span>
-        </div>
-      </div>
-
-      <!-- Botón primario de descarga del instalador -->
-      <div class="mt-7 flex flex-col sm:flex-row items-center gap-3">
+      <!-- Pie de acciones -->
+      <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 shrink-0">
+        <button 
+          onclick="closeModal('modal-welcome-checkout')" 
+          class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white font-medium text-xs border border-white/[0.08] transition cursor-pointer"
+        >
+          Ir a mi Panel
+        </button>
         <a 
           href="/releases/latest/Bentian-Setup.exe" 
           data-download-installer
           id="btn-welcome-download"
-          class="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2"
+          class="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           <span data-app-version data-version-format="Descargar Instalador ({version})">Descargar Instalador (v0.4.1)</span>
         </a>
-        <button 
-          onclick="closeModal('modal-welcome-checkout')" 
-          class="w-full sm:w-auto py-3 px-5 rounded-xl bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white font-medium text-sm border border-white/[0.08] transition"
-        >
-          Ir a mi Panel
-        </button>
-      </div>
-
-      <!-- Aviso de SmartScreen y Antivirus en Modal de Bienvenida -->
-      <div class="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left text-[11px] text-amber-200/90 flex items-start gap-2.5">
-        <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div>
-          <span>¿Pantalla azul de SmartScreen? Pulsa <strong class="text-white font-semibold">"Más información"</strong> y luego <strong class="text-white font-semibold">"Ejecutar de todas formas"</strong>.</span>
-          <div class="mt-1">
-            <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="text-amber-400 hover:text-amber-300 underline font-medium">Ver guía técnica paso a paso & exclusiones de antivirus &rarr;</a>
-          </div>
-        </div>
       </div>
     </div>
   </div>

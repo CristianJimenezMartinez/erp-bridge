@@ -1,80 +1,94 @@
-  <!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA -->
-  <div id="modal-welcome-checkout" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="relative w-full max-w-lg bg-[#121215] border border-emerald-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/30 text-center">
-      <!-- Icono de éxito animado -->
-      <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 mx-auto flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
-        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-
-      <h2 class="text-2xl font-bold text-white tracking-tight">¡Suscripción Confirmada!</h2>
-      <p class="text-xs text-zinc-400 mt-1">Tu licencia de Bentian ERP Bridge ya está activa y vinculada a tu cuenta.</p>
-
-      <!-- Tarjeta con la clave de licencia -->
-      <div class="mt-6 p-4 rounded-xl bg-[#18181b] border border-white/[0.1] text-left">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Tu Clave de Activación</span>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">ACTIVA</span>
-        </div>
-        <div class="flex items-center justify-between gap-2 mt-2">
-          <code id="welcome-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider select-all break-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
-          <button onclick="copiarClaveBienvenida()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition flex items-center gap-1.5 shadow-sm">
+  <!-- ============================================================ -->
+  <!-- MODAL: BIENVENIDA POST-CHECKOUT & ENTREGA DE LICENCIA        -->
+  <!-- ============================================================ -->
+  <div id="modal-welcome-checkout" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-end sm:items-center justify-center">
+    <div class="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col bg-[#121215] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Cabecera -->
+      <div class="shrink-0 bg-[#151518] px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
-            <span>Copiar</span>
-          </button>
+          </div>
+          <h3 class="text-sm font-semibold text-white">¡Suscripción Confirmada!</h3>
+        </div>
+        <button onclick="closeModal('modal-welcome-checkout')" class="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.08] transition cursor-pointer" aria-label="Cerrar modal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Cuerpo scrollable -->
+      <div class="p-5 overflow-y-auto custom-scroll space-y-4 flex-1">
+        <p class="text-xs text-zinc-400">
+          Tu licencia de Bentian ERP Bridge ya está activa y vinculada a tu cuenta.
+        </p>
+
+        <!-- Tarjeta con la clave de licencia -->
+        <div class="p-4 rounded-xl bg-[#18181b] border border-white/[0.1] text-left">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Tu Clave de Activación</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">ACTIVA</span>
+          </div>
+          <div class="flex items-center justify-between gap-2 mt-2">
+            <code id="welcome-license-key" class="font-mono text-sm sm:text-base font-bold text-indigo-300 tracking-wider select-all break-all">EB-XXXXX-XXXXX-XXXXX-XXXXX</code>
+            <button onclick="copiarClaveBienvenida()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Pasos de instalación guiada -->
+        <div class="text-left space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-xs font-semibold text-zinc-300 block">Siguientes pasos para conectar tu Factusol:</span>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">1</span>
+            <span>Descarga e instala el <strong>Agente Bentian</strong> en el PC o servidor con acceso a Factusol.</span>
+          </div>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">2</span>
+            <span>Pega tu <strong>clave de activación</strong> cuando el instalador te la solicite.</span>
+          </div>
+          <div class="flex items-start gap-3 text-xs text-zinc-400">
+            <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">3</span>
+            <span>El agente detectará la base de datos y comenzará la sincronización en segundo plano.</span>
+          </div>
+        </div>
+
+        <!-- Aviso de SmartScreen y Antivirus en Modal de Bienvenida -->
+        <div class="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left text-[11px] text-amber-200/90 flex items-start gap-2.5">
+          <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div>
+            <span>¿Pantalla azul de SmartScreen? Pulsa <strong class="text-white font-semibold">"Más información"</strong> y luego <strong class="text-white font-semibold">"Ejecutar de todas formas"</strong>.</span>
+            <div class="mt-1">
+              <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="text-amber-400 hover:text-amber-300 underline font-medium">Ver guía técnica paso a paso & exclusiones de antivirus &rarr;</a>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Pasos de instalación guiada -->
-      <div class="mt-6 text-left space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-        <span class="text-xs font-semibold text-zinc-300 block">Siguientes pasos para conectar tu Factusol:</span>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">1</span>
-          <span>Descarga e instala el <strong>Agente Bentian</strong> en el PC o servidor con acceso a Factusol.</span>
-        </div>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">2</span>
-          <span>Pega tu <strong>clave de activación</strong> cuando el instalador te la solicite.</span>
-        </div>
-        <div class="flex items-start gap-3 text-xs text-zinc-400">
-          <span class="w-5 h-5 rounded-full bg-white/[0.08] text-white flex items-center justify-center font-mono font-bold shrink-0">3</span>
-          <span>El agente detectará la base de datos y comenzará la sincronización en segundo plano.</span>
-        </div>
-      </div>
-
-      <!-- Botón primario de descarga del instalador -->
-      <div class="mt-7 flex flex-col sm:flex-row items-center gap-3">
+      <!-- Pie de acciones -->
+      <div class="px-5 py-3.5 bg-[#151518] border-t border-white/[0.06] flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 shrink-0">
+        <button 
+          onclick="closeModal('modal-welcome-checkout')" 
+          class="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white font-medium text-xs border border-white/[0.08] transition cursor-pointer"
+        >
+          Ir a mi Panel
+        </button>
         <a 
           href="/releases/latest/Bentian-Setup.exe" 
           data-download-installer
           id="btn-welcome-download"
-          class="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2"
+          class="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           <span data-app-version data-version-format="Descargar Instalador ({version})">Descargar Instalador (v{{VERSION}})</span>
         </a>
-        <button 
-          onclick="closeModal('modal-welcome-checkout')" 
-          class="w-full sm:w-auto py-3 px-5 rounded-xl bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white font-medium text-sm border border-white/[0.08] transition"
-        >
-          Ir a mi Panel
-        </button>
-      </div>
-
-      <!-- Aviso de SmartScreen y Antivirus en Modal de Bienvenida -->
-      <div class="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-left text-[11px] text-amber-200/90 flex items-start gap-2.5">
-        <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div>
-          <span>¿Pantalla azul de SmartScreen? Pulsa <strong class="text-white font-semibold">"Más información"</strong> y luego <strong class="text-white font-semibold">"Ejecutar de todas formas"</strong>.</span>
-          <div class="mt-1">
-            <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="text-amber-400 hover:text-amber-300 underline font-medium">Ver guía técnica paso a paso & exclusiones de antivirus &rarr;</a>
-          </div>
-        </div>
       </div>
     </div>
   </div>

@@ -79,9 +79,9 @@ async function loadFleetHealthData() {
               <div class="font-medium text-zinc-200 text-xs">${_safeEscapeHtml(a.organizationName || a.companyName || a.organization_id || 'Cliente')}</div>
               <div class="text-[10px] text-zinc-500 font-mono mt-0.5">${_safeEscapeHtml(a.taxId ? 'CIF: ' + a.taxId : (a.licenseAlias || a.licenseKey || ''))}</div>
             </td>
-            <td class="py-3.5 px-4">${versionBadge}</td>
-            <td class="py-3.5 px-4 text-zinc-400 font-mono text-[11px]">${lastHeartbeat}</td>
-            <td class="py-3.5 px-4 text-right">
+            <td class="py-3.5 px-4 whitespace-nowrap">${versionBadge}</td>
+            <td class="py-3.5 px-4 text-zinc-400 font-mono text-[11px] whitespace-nowrap">${lastHeartbeat}</td>
+            <td class="py-3.5 px-4 text-right whitespace-nowrap">
               <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${isOnline ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'}">
                 <span class="w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-500'}"></span>
                 ${isOnline ? 'ONLINE' : 'OFFLINE'}

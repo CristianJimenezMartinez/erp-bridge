@@ -119,8 +119,8 @@ function renderLicenses(list) {
             </button>
           </div>
         </td>
-        <td class="p-3">${seatBadge}</td>
-        <td class="p-3">
+        <td class="p-3 whitespace-nowrap">${seatBadge}</td>
+        <td class="p-3 whitespace-nowrap">
           ${hasMachine ? (
             isOnline ? `
               <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -144,7 +144,7 @@ function renderLicenses(list) {
           <div class="text-zinc-200 text-xs font-medium">${_safeEscapeHtml(hostname)}</div>
           <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${_safeEscapeHtml(fullHwid)}">HWID: ${_safeEscapeHtml(shortHwid)}</div>
         </td>
-        <td class="p-3 text-right">
+        <td class="p-3 text-right whitespace-nowrap">
           ${hasMachine ? `
             <button 
               data-action="unbind-license"
