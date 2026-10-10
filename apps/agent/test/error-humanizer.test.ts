@@ -114,22 +114,65 @@ assertValidHumanized(e19, 'ERR_LICENSE_INVALID', 'license');
 // 20. Windows Script Host Blocked
 console.log('20. Verificando error cscript.exe bloqueado...');
 const e20 = humanizeError('Error: cscript.exe bloqueado por antivirus EDR');
-assertValidHumanized(e20, 'ERR_CSCRIPT_BLOCKED', 'overview');
+assertValidHumanized(e20, 'ERR_CSCRIPT_BLOCKED', 'logs');
 
 // 21. Clock Drift
 console.log('21. Verificando error Desfase reloj...');
 const e21 = humanizeError('Clock drift detectado: desfase del reloj superior a 180s');
-assertValidHumanized(e21, 'ERR_CLOCK_DESYNC', 'overview');
+assertValidHumanized(e21, 'ERR_CLOCK_DESYNC', 'logs');
 
-// 22. Disk Space Low
-console.log('22. Verificando error Espacio en disco...');
-const e22 = humanizeError('ENOSPC: No space left on device. Espacio en disco insuficiente');
-assertValidHumanized(e22, 'ERR_DISK_SPACE_LOW', 'overview');
+// 22. Factusol Series Invalid
+console.log('22. Verificando error Serie de pedidos Factusol...');
+const e22 = humanizeError('Error TIPPCL: Serie de pedidos no válida en Factusol');
+assertValidHumanized(e22, 'ERR_FACTUSOL_SERIES_INVALID', 'factusol');
+assert.strictEqual(e22.targetInputId, 'input-factusol-order-series');
 
-// 23. Fallback genérico operacional
-console.log('23. Verificando fallback genérico...');
+// 23. Shopify Auth Invalid
+console.log('23. Verificando error Shopify Auth...');
+const e23 = humanizeError('Shopify API Error: 401 Unauthorized - invalid access token shpat_123');
+assertValidHumanized(e23, 'ERR_SHOPIFY_AUTH_INVALID', 'channel');
+assert.strictEqual(e23.targetInputId, 'input-shopify-token');
+
+// 24. Shopify Location Missing
+console.log('24. Verificando error Shopify Location...');
+const e24 = humanizeError('Error: location id no configurado para sincronizar inventario shopify');
+assertValidHumanized(e24, 'ERR_SHOPIFY_LOCATION_MISSING', 'channel');
+assert.strictEqual(e24.targetInputId, 'btn-detect-shopify-loc');
+
+// 25. Holded Auth Invalid
+console.log('25. Verificando error Holded Auth...');
+const e25 = humanizeError('Holded Cloud Error: 401 Unauthorized API Key token inválido');
+assertValidHumanized(e25, 'ERR_HOLDED_AUTH_INVALID', 'channel');
+assert.strictEqual(e25.targetInputId, 'input-holded-apikey');
+
+// 26. Web Rate Limit 429
+console.log('26. Verificando error HTTP 429 Too Many Requests...');
+const e26 = humanizeError('HTTP 429 Too Many Requests: Límite de peticiones excedido, Retry-After: 60');
+assertValidHumanized(e26, 'ERR_WEB_RATE_LIMIT_429', 'sync');
+assert.strictEqual(e26.targetInputId, 'select-periodic-min');
+
+// 27. Web Server 500 / 503
+console.log('27. Verificando error HTTP 500 Internal Server Error...');
+const e27 = humanizeError('HTTP 500 Internal Server Error: fatal php error');
+assertValidHumanized(e27, 'ERR_WEB_SERVER_5XX', 'channel');
+assert.strictEqual(e27.targetInputId, 'btn-test-univ');
+
+// 28. Autostart Failed
+console.log('28. Verificando error Inicio automático...');
+const e28 = humanizeError('Error al registrar inicio automático en registry run bentian');
+assertValidHumanized(e28, 'ERR_AUTOSTART_FAILED', 'sync');
+assert.strictEqual(e28.targetInputId, 'check-autostart-enabled');
+
+// 29. Disk Space Low
+console.log('29. Verificando error Espacio en disco...');
+const e29 = humanizeError('ENOSPC: No space left on device. Espacio en disco insuficiente');
+assertValidHumanized(e29, 'ERR_DISK_SPACE_LOW', 'overview');
+
+// 30. Fallback genérico operacional
+console.log('30. Verificando fallback genérico...');
 const eFallback = humanizeError('Algo completamente no catalogado');
 assert.strictEqual(eFallback.code, 'ERR_INTERNAL_GENERIC');
 assert.strictEqual(eFallback.targetTab, 'logs');
+assert.strictEqual(eFallback.targetInputId, 'dock-logs-stream');
 
-console.log('✅ TODAS LAS 22 REGLAS DE HUMANIZACIÓN DE ERRORES PASARON CON ÉXITO');
+console.log('✅ TODAS LAS REGLAS DE HUMANIZACIÓN DE ERRORES PASARON CON ÉXITO');

@@ -63,10 +63,10 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
-  // 3. Factusol Exclusive Lock / .ldb / .laccdb
+  // 3. Factusol Exclusive Lock / .ldb / .laccdb / 3045
   {
     code: 'ERR_FACTUSOL_EXCLUSIVE_LOCK',
-    pattern: /\.l(acc)?db|bloqueo|en modo exclusivo|exclusively locked|otro usuario está intentando|detuvo el proceso porque otro/i,
+    pattern: /\.l(acc)?db|bloqueo|en modo exclusivo|exclusively locked|otro usuario está intentando|detuvo el proceso porque otro|archivo ya está en uso|fichero bloqueado|AccessDatabaseTimeoutError|3045|timeout.*30s|en uso por otro proceso/i,
     build: () => ({
       code: 'ERR_FACTUSOL_EXCLUSIVE_LOCK',
       title: 'Base de datos bloqueada por otro usuario o proceso',
@@ -76,6 +76,22 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       targetTab: 'factusol',
       targetInputId: 'btn-test-fact',
       helpUrl: 'https://bridge.cristianjm.com/docs/factusol-locking/',
+    }),
+  },
+
+  // 3.5. Factusol Invalid Order Series / TIPPCL
+  {
+    code: 'ERR_FACTUSOL_SERIES_INVALID',
+    pattern: /serie de pedidos? no válida|no existe la serie|TIPPCL|serie.*inválida|serie.*factusol/i,
+    build: () => ({
+      code: 'ERR_FACTUSOL_SERIES_INVALID',
+      title: 'Serie de pedidos no configurada o no válida en Factusol',
+      message: 'La serie de pedidos configurada no existe en la configuración de tipos de documento de Factusol o contiene caracteres no permitidos.',
+      suggestion: 'Verifica la serie de pedidos en Factusol (por ejemplo "1" o "W") e introdúcela en el campo Serie de Pedidos de la pestaña Factusol.',
+      actionLabel: 'Configurar serie de pedidos',
+      targetTab: 'factusol',
+      targetInputId: 'input-factusol-order-series',
+      helpUrl: 'https://bridge.cristianjm.com/docs/factusol-setup/',
     }),
   },
 
@@ -175,6 +191,54 @@ export const ERROR_RULES: ErrorPatternRule[] = [
     }),
   },
 
+  // 8.6. Shopify Admin API Authentication Error
+  {
+    code: 'ERR_SHOPIFY_AUTH_INVALID',
+    pattern: /shpat_|shopify.*unauthorized|shopify.*invalid access token|shopify.*401|403.*shopify|invalid api key for shopify/i,
+    build: () => ({
+      code: 'ERR_SHOPIFY_AUTH_INVALID',
+      title: 'Credenciales de Shopify no válidas',
+      message: 'El token de acceso Admin API (shpat_...) o el subdominio de tu tienda Shopify es incorrecto o carece de permisos.',
+      suggestion: 'Comprueba el subdominio de tu tienda y regenera el Token de acceso a la API del Administrador en Apps Personalizadas de tu panel Shopify.',
+      actionLabel: 'Revisar conexión Shopify',
+      targetTab: 'channel',
+      targetInputId: 'input-shopify-token',
+      helpUrl: 'https://bridge.cristianjm.com/docs/shopify-setup/',
+    }),
+  },
+
+  // 8.7. Shopify Location Missing
+  {
+    code: 'ERR_SHOPIFY_LOCATION_MISSING',
+    pattern: /shopify.*location|ubicación de inventario|inventory_level.*location|location id no configurad/i,
+    build: () => ({
+      code: 'ERR_SHOPIFY_LOCATION_MISSING',
+      title: 'Falta configurar la ubicación de inventario de Shopify',
+      message: 'Shopify requiere asociar las existencias de Factusol a un identificador de ubicación física o almacén (Location ID).',
+      suggestion: 'Pulsa el botón "Auto-detectar Ubicación" en la sección Shopify de la pestaña Canal Web para obtenerlo automáticamente.',
+      actionLabel: 'Detectar ubicación en Shopify',
+      targetTab: 'channel',
+      targetInputId: 'btn-detect-shopify-loc',
+      helpUrl: 'https://bridge.cristianjm.com/docs/shopify-setup/',
+    }),
+  },
+
+  // 8.8. Holded Cloud API Authentication Error
+  {
+    code: 'ERR_HOLDED_AUTH_INVALID',
+    pattern: /holded.*(api[- ]?key|unauthorized|401|403|autenticación|token inv[aá]lido)/i,
+    build: () => ({
+      code: 'ERR_HOLDED_AUTH_INVALID',
+      title: 'Clave API de Holded Cloud no válida',
+      message: 'No se pudo autenticar con Holded Cloud. La API Key introducida no es válida o ha sido revocada.',
+      suggestion: 'Accede a tu panel de Holded > Configuración > Desarrolladores > API Keys, crea una nueva clave y pégala en Bentian.',
+      actionLabel: 'Configurar Holded API Key',
+      targetTab: 'channel',
+      targetInputId: 'input-holded-apikey',
+      helpUrl: 'https://bridge.cristianjm.com/docs/holded-setup/',
+    }),
+  },
+
   // 9. Web Channel 401 Unauthorized / Authorization Headers Blocked
   {
     code: 'ERR_WEB_AUTH_BLOCKED',
@@ -267,7 +331,39 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       suggestion: 'Aumenta "max_execution_time" a 120s y "memory_limit" a 256M o 512M en el panel de tu hosting (cPanel/Plesk), o amplía el intervalo entre ciclos.',
       actionLabel: 'Ajustar reglas de sincronización',
       targetTab: 'sync',
-      targetInputId: 'input-sync-interval',
+      targetInputId: 'select-periodic-min',
+      helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
+    }),
+  },
+
+  // 14.5. Web Rate Limit HTTP 429
+  {
+    code: 'ERR_WEB_RATE_LIMIT_429',
+    pattern: /429|too many requests|rate limit|l[ií]mite de peticiones excedido|retry[- ]after/i,
+    build: () => ({
+      code: 'ERR_WEB_RATE_LIMIT_429',
+      title: 'Límite de peticiones alcanzado en tu tienda web (HTTP 429)',
+      message: 'El servidor de tu web o hosting ha limitado temporalmente el volumen de consultas automáticas por segundo.',
+      suggestion: 'Aumenta el intervalo de sincronización periódica en Automatización (por ejemplo a 15 o 30 minutos) para evitar sobrecargar el servidor web.',
+      actionLabel: 'Ajustar intervalo de sincronización',
+      targetTab: 'sync',
+      targetInputId: 'select-periodic-min',
+      helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
+    }),
+  },
+
+  // 14.6. Web Server Internal Error 500 / 503
+  {
+    code: 'ERR_WEB_SERVER_5XX',
+    pattern: /500 internal server error|503 service unavailable|error interno del servidor|fatal php error/i,
+    build: () => ({
+      code: 'ERR_WEB_SERVER_5XX',
+      title: 'Error interno en tu servidor web (HTTP 500 / 503)',
+      message: 'El servidor de tu hosting o WordPress ha experimentado un fallo crítico de ejecución al procesar la petición.',
+      suggestion: 'Revisa el archivo error_log de tu servidor web o desactiva temporalmente extensiones o plugins conflictivos.',
+      actionLabel: 'Comprobar canal web',
+      targetTab: 'channel',
+      targetInputId: 'btn-test-univ',
       helpUrl: 'https://bridge.cristianjm.com/docs/network-troubleshooting/',
     }),
   },
@@ -369,8 +465,8 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       message: 'El sistema de seguridad de Windows o tu antivirus ha bloqueado el intérprete local "cscript.exe" necesario para la lectura OLEDB de Factusol.',
       suggestion: 'Añade el ejecutable Bentian Agent o el proceso "cscript.exe" a las exclusiones de tu antivirus (Windows Defender, Kaspersky, SentinelOne, etc.).',
       actionLabel: 'Ver diagnóstico del sistema',
-      targetTab: 'overview',
-      targetInputId: 'pf-alert-box',
+      targetTab: 'logs',
+      targetInputId: 'btn-refresh-preflight',
       helpUrl: 'https://bridge.cristianjm.com/docs/antivirus-exclusions/',
     }),
   },
@@ -385,9 +481,25 @@ export const ERROR_RULES: ErrorPatternRule[] = [
       message: 'El reloj interno de tu equipo tiene una diferencia superior a 3 minutos con respecto a la hora oficial de Internet, lo que invalida las firmas criptográficas.',
       suggestion: 'En Windows, ve a Configuración > Hora e idioma > Fecha y hora, y pulsa en "Sincronizar ahora".',
       actionLabel: 'Ver comprobación del sistema',
-      targetTab: 'overview',
-      targetInputId: 'pf-clock-badge',
+      targetTab: 'logs',
+      targetInputId: 'btn-refresh-preflight',
       helpUrl: 'https://bridge.cristianjm.com/docs/system-clock-ntp/',
+    }),
+  },
+
+  // 21.5. Windows Autostart Registry Failure
+  {
+    code: 'ERR_AUTOSTART_FAILED',
+    pattern: /autostart|inicio autom[aá]tico.*fall[oó]|registry.*run.*bentian|arranque autom[aá]tico/i,
+    build: () => ({
+      code: 'ERR_AUTOSTART_FAILED',
+      title: 'No se pudo configurar el inicio automático con Windows',
+      message: 'Windows impidió registrar Bentian Agent en el registro de inicio de sesión de usuario (HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run).',
+      suggestion: 'Abre la pestaña Automatización y activa o desactiva manualmente la casilla "Arrancar automáticamente al iniciar Windows".',
+      actionLabel: 'Configurar inicio automático',
+      targetTab: 'sync',
+      targetInputId: 'check-autostart-enabled',
+      helpUrl: 'https://bridge.cristianjm.com/docs/troubleshooting/',
     }),
   },
 
@@ -438,7 +550,7 @@ export function humanizeError(rawError: unknown): HumanizedError {
     suggestion: 'Revisa la configuración del apartado correspondiente o consulta el registro de eventos técnicos para obtener más detalles.',
     actionLabel: 'Ver registro de eventos técnicos',
     targetTab: 'logs',
-    targetInputId: 'full-logs-panel',
+    targetInputId: 'dock-logs-stream',
     helpUrl: 'https://bridge.cristianjm.com/docs/',
   };
 }

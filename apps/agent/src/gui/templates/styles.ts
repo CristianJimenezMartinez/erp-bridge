@@ -120,8 +120,8 @@ export const dashboardStyles = `
 
     /* Logs Panel */
     .logs-panel { background: #0c0c10; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-    .log-line { display: flex; gap: 10px; line-height: 1.5; word-break: break-all; }
-    .log-time { color: var(--text-subtle); flex-shrink: 0; }
+    .log-line { display: flex; align-items: center; gap: 10px; line-height: 1.4; word-break: break-all; padding: 3px 8px; min-height: 26px; border-radius: 4px; box-sizing: border-box; margin: 0; }
+    .log-time { color: var(--text-subtle); width: 58px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
     .log-info { color: #a1a1aa; }
     .log-success { color: #34d399; }
     .log-warn { color: #fbbf24; }
@@ -309,7 +309,6 @@ export const dashboardStyles = `
     .log-line.log-error, .log-line.log-warn {
       cursor: pointer;
       border-radius: 4px;
-      padding: 2px 6px;
       transition: background 0.15s ease;
     }
     .log-line.log-error:hover {
@@ -322,6 +321,9 @@ export const dashboardStyles = `
       margin-left: auto;
       font-size: 10px;
       padding: 2px 8px;
+      height: 20px;
+      line-height: 14px;
+      box-sizing: border-box;
       border-radius: 4px;
       background: rgba(239, 68, 68, 0.18);
       border: 1px solid rgba(239, 68, 68, 0.35);
@@ -331,6 +333,7 @@ export const dashboardStyles = `
       align-items: center;
       gap: 4px;
       white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.15s ease;
     }
     .log-solve-btn:hover {
