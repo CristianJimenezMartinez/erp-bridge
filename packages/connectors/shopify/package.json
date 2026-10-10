@@ -1,0 +1,22 @@
+{
+  "name": "@erp-bridge/connector-shopify",
+  "version": "0.3.8",
+  "description": "Shopify GraphQL E-Commerce Connector for Bentian ERP Bridge",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "ts-node test/shopify.test.ts"
+  },
+  "dependencies": {
+    "@erp-bridge/sdk": "workspace:*",
+    "@erp-bridge/shared": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}

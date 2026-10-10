@@ -26,6 +26,14 @@ export function renderChannelTab(): string {
               <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">WooCommerce / WordPress</div>
               <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Conexión directa mediante claves de la API REST oficial de WooCommerce (Consumer Key / Consumer Secret).</div>
             </div>
+
+            <div id="card-choice-shopify" class="channel-card" onclick="selectChannelType('shopify')">
+              <div class="channel-icon" style="color: #96bf48;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </div>
+              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Shopify Store</div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización directa vía GraphQL Admin API oficial.</div>
+            </div>
           </div>
 
           <!-- OPCIÓN A: CONECTOR WEB UNIVERSAL (HTTPS 443) -->
@@ -119,6 +127,41 @@ export function renderChannelTab(): string {
               </button>
             </div>
             <div id="wc-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <!-- OPCIÓN C: SHOPIFY ADMIN GRAPHQL API -->
+          <div id="panel-shopify" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Subdominio de tu Tienda Shopify:</label>
+              <input type="text" id="input-shopify-subdomain" class="form-control" placeholder="mi-tienda (o https://mi-tienda.myshopify.com)">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Introduce tu subdominio o la URL completa de tu tienda Shopify.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Admin API Access Token (shpat_...):</label>
+              <input type="password" id="input-shopify-token" class="form-control" placeholder="shpat_xxxxxxxxxxxxxxxxxxxxxxxx">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Token de acceso privado generado en Apps Personalizadas de Shopify con permisos de inventario y catálogo.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Location ID (Ubicación de Inventario):</label>
+              <div class="input-with-button">
+                <input type="text" id="input-shopify-location" class="form-control" placeholder="gid://shopify/Location/123456789">
+                <button onclick="autoDetectShopifyLocation()" id="btn-detect-shopify-loc" class="btn btn-secondary" style="white-space: nowrap;">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>Auto-detectar Ubicación</span>
+                </button>
+              </div>
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Identificador de la ubicación donde Factusol actualizará el stock disponible.</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 6px;">
+              <button onclick="testShopifyConnection()" id="btn-test-shopify" class="btn btn-secondary btn-sm">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
+                <span>Comprobar Conexión Shopify</span>
+              </button>
+            </div>
+            <div id="shopify-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">

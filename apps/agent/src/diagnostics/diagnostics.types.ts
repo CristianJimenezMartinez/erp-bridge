@@ -1,6 +1,6 @@
 import { AgentSystemInfo } from '@erp-bridge/shared';
 import { AgentLicenseStatus } from '../license/license.types';
-import { AgentFactusolSettings, AgentWooCommerceSettings, AgentUniversalBridgeSettings, AgentSyncRules, AgentNotificationSettings } from '../config/config.types';
+import { AgentFactusolSettings, AgentWooCommerceSettings, AgentUniversalBridgeSettings, AgentShopifySettings, AgentSyncRules, AgentNotificationSettings } from '../config/config.types';
 import { SyncHistoryRecord } from '../history/history.types';
 import { UpdateClientState } from '../update/update.types';
 
@@ -33,6 +33,7 @@ export interface AgentStatusDetails {
   factusolSettings?: AgentFactusolSettings;
   woocommerceSettings?: AgentWooCommerceSettings;
   universalBridgeSettings?: AgentUniversalBridgeSettings;
+  shopifySettings?: AgentShopifySettings;
   channelType?: string;
   syncRules?: AgentSyncRules;
   notifications?: AgentNotificationSettings;

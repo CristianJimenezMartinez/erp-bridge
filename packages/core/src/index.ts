@@ -9,3 +9,4 @@ export * from './watcher';
 export * from './services';
 export * from './license';
 export * from './update';
+export * from './queue';

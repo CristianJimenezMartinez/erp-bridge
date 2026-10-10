@@ -154,7 +154,7 @@ export const dashboardStyles = `
     .wizard-step-item.done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 
     /* Channel Cards */
-    .channel-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .channel-select-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px; }
     .channel-card { border: 2px solid var(--card-border); background: #17171e; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; user-select: none; }
     .channel-card:hover { border-color: var(--card-hover); }
     .channel-card.selected { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }

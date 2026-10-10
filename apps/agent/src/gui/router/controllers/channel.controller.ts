@@ -48,6 +48,28 @@ export class ChannelController {
     };
   }
 
+  public static testShopify(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      const lic = agent.getLicenseStatus();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            success: false,
+            message: `Acción bloqueada: Se requiere una licencia activa (${lic.status}) para conectar y validar la tienda web. Activa tu clave en la pestaña Licencia.`,
+            durationMs: 0,
+          })
+        );
+        return;
+      }
+      const t0 = performance.now();
+      const result = await agent.testShopifyConnection(ctx.body);
+      const durationMs = Math.round((performance.now() - t0) * 10) / 10;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ...result, durationMs: result.durationMs ?? durationMs }));
+    };
+  }
+
   public static downloadCompanion(): RouteHandler {
     return (_req, res, ctx) => {
       const secretKey = ctx.parsedUrl.searchParams.get('secretKey') || undefined;

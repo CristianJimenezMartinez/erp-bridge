@@ -28,3 +28,23 @@ export interface UniversalBridgeTestResult {
     dbError?: string;
   };
 }
+
+export interface ShopifyLocation {
+  id: string;
+  name: string;
+}
+
+export interface ShopifyTestSettings {
+  shopSubdomain: string;
+  accessToken: string;
+  apiVersion?: string;
+}
+
+export interface ShopifyTestResult {
+  success: boolean;
+  message: string;
+  locations?: ShopifyLocation[];
+  durationMs?: number;
+  shopName?: string;
+  myshopifyDomain?: string;
+}

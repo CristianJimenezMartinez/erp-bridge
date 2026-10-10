@@ -24,6 +24,13 @@ export interface AgentUniversalBridgeSettings {
   enabled?: boolean;
 }
 
+export interface AgentShopifySettings {
+  shopSubdomain?: string;
+  accessToken?: string;
+  locationId?: string;
+  apiVersion?: string;
+}
+
 export interface AgentSyncRules {
   enableFileWatcher?: boolean;
   debounceSeconds?: number;
@@ -59,7 +66,8 @@ export interface AgentConfigFile {
   factusol?: AgentFactusolSettings;
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
-  channelType?: 'woocommerce' | 'universal_bridge';
+  shopify?: AgentShopifySettings;
+  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify';
   syncRules?: AgentSyncRules;
   notifications?: AgentNotificationSettings;
 }

@@ -1,3 +1,4 @@
+export * from './brand';
 export * from './canonical';
 export * from './domain';
 export * from './dtos';

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "ts-node test/mapping.test.ts && ts-node test/event-bus.test.ts && ts-node test/retry.test.ts && ts-node test/scheduler.test.ts && ts-node test/watcher.test.ts && ts-node test/agent-service.test.ts && ts-node test/flow-engine.test.ts && ts-node test/invoice-sync.test.ts && ts-node test/license-key.test.ts && ts-node test/license-token.test.ts && ts-node test/license-service.test.ts && ts-node test/update-service.test.ts"
+    "test": "ts-node test/mapping.test.ts && ts-node test/event-bus.test.ts && ts-node test/retry.test.ts && ts-node test/scheduler.test.ts && ts-node test/watcher.test.ts && ts-node test/agent-service.test.ts && ts-node test/flow-engine.test.ts && ts-node test/invoice-sync.test.ts && ts-node test/license-key.test.ts && ts-node test/license-token.test.ts && ts-node test/license-service.test.ts && ts-node test/update-service.test.ts && ts-node test/queue.test.ts"
   },
   "dependencies": {
     "@erp-bridge/sdk": "workspace:*",

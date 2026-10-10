@@ -827,14 +827,25 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
     }
 
     // Blindaje criptográfico: El token firmado NUNCA puede sobrepasar la fecha de expiración de la licencia
-    if (lic && lic.expiresAt && result.licenseToken) {
-      const licExpiresMs = new Date(lic.expiresAt).getTime();
+    if (result.licenseToken) {
       const verification = LicenseTokenManager.verifyToken(result.licenseToken);
       if (verification.valid && verification.payload) {
-        if (verification.payload.expiresAt > licExpiresMs) {
-          verification.payload.expiresAt = licExpiresMs;
+        let shouldRecreate = false;
+        if (lic && lic.expiresAt) {
+          const licExpiresMs = new Date(lic.expiresAt).getTime();
+          if (verification.payload.expiresAt > licExpiresMs) {
+            verification.payload.expiresAt = licExpiresMs;
+            result.expiresAt = new Date(licExpiresMs).toISOString();
+            shouldRecreate = true;
+          }
+        }
+        if (lic?.features && Array.isArray(lic.features)) {
+          verification.payload.features = lic.features;
+          result.features = lic.features;
+          shouldRecreate = true;
+        }
+        if (shouldRecreate) {
           result.licenseToken = LicenseTokenManager.createToken(verification.payload);
-          result.expiresAt = new Date(licExpiresMs).toISOString();
         }
       }
     }
@@ -872,19 +883,28 @@ licensesRouter.post('/licenses/validate', async (req: Request, res: Response, ne
       return res.status(403).json({ error: { message: result.message }, data: result });
     }
 
-    // Blindaje criptográfico: El token renovado NUNCA puede sobrepasar la expiración de la licencia
+    // Blindaje criptográfico: El token renovado NUNCA puede sobrepasar la expiración de la licencia y propaga features
     if (verification.valid && verification.payload && result.renewedToken) {
       const lic = await licenseService.getLicenseById(verification.payload.licenseId);
-      if (lic && lic.expiresAt) {
-        const licExpiresMs = new Date(lic.expiresAt).getTime();
-        const renewedVerif = LicenseTokenManager.verifyToken(result.renewedToken);
-        if (renewedVerif.valid && renewedVerif.payload) {
+      const renewedVerif = LicenseTokenManager.verifyToken(result.renewedToken);
+      if (renewedVerif.valid && renewedVerif.payload) {
+        let shouldRecreate = false;
+        if (lic && lic.expiresAt) {
+          const licExpiresMs = new Date(lic.expiresAt).getTime();
           if (renewedVerif.payload.expiresAt > licExpiresMs) {
             renewedVerif.payload.expiresAt = licExpiresMs;
-            result.renewedToken = LicenseTokenManager.createToken(renewedVerif.payload);
             result.expiresAt = new Date(licExpiresMs).toISOString();
             result.gracePeriodRemainingSeconds = Math.max(0, Math.floor((licExpiresMs - Date.now()) / 1000));
+            shouldRecreate = true;
           }
+        }
+        if (lic?.features && Array.isArray(lic.features)) {
+          renewedVerif.payload.features = lic.features;
+          result.features = lic.features;
+          shouldRecreate = true;
+        }
+        if (shouldRecreate) {
+          result.renewedToken = LicenseTokenManager.createToken(renewedVerif.payload);
         }
       }
     }

@@ -79,4 +79,20 @@ const valResp = {
 const parsedValResp = LicenseValidationResponseSchema.parse(valResp);
 assert.strictEqual(parsedValResp.valid, true);
 
+// 7. License with features
+const licenseWithFeatures = {
+  ...validLicense,
+  features: ['sync:stock', 'sync:orders', 'multi_tariff'],
+};
+const parsedFeaturesLicense = LicenseSchema.parse(licenseWithFeatures);
+assert.deepStrictEqual(parsedFeaturesLicense.features, ['sync:stock', 'sync:orders', 'multi_tariff']);
+
+// 8. LicenseValidationResponse with features
+const valRespWithFeatures = {
+  ...valResp,
+  features: ['sync:stock', 'realtime_watcher'],
+};
+const parsedValRespFeatures = LicenseValidationResponseSchema.parse(valRespWithFeatures);
+assert.deepStrictEqual(parsedValRespFeatures.features, ['sync:stock', 'realtime_watcher']);
+
 console.log('✓ Shared License Schema Tests Passed');

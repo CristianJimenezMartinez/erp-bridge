@@ -106,8 +106,8 @@ console.log('    ✓ upload_image restringido a formatos seguros (SVG retirado p
 
 // 1.7 Sincronización SSoT de la plantilla
 assert.strictEqual(
-  EMBEDDED_COMPANION_PHP_TEMPLATE,
-  phpContent,
+  EMBEDDED_COMPANION_PHP_TEMPLATE.replace(/\r\n/g, '\n'),
+  phpContent.replace(/\r\n/g, '\n'),
   'companion-template.ts debe ser idéntico al conector erp-bridge-endpoint.php'
 );
 console.log('    ✓ companion-template.ts sincronizado al 100% con erp-bridge-endpoint.php');

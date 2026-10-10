@@ -26,6 +26,7 @@ import {
   AgentFactusolSettings,
   AgentWooCommerceSettings,
   AgentUniversalBridgeSettings,
+  AgentShopifySettings,
   AgentSyncRules,
   AgentNotificationSettings,
   ConfigManager,
@@ -34,7 +35,14 @@ import { SyncHistoryRecord, HistoryManager } from './history';
 import { EventBus, LogEvent, SystemInfoService, DiagnosticExporter, AgentStatusDetails, PreflightHealthService, PreflightHealthReport, LiveHealthService, LiveHealthReport, AgentDiskLogger } from './diagnostics';
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
-import { WooCommerceTestResult, UniversalBridgeTestResult, WooCommerceTester, UniversalBridgeTester } from './channels';
+import {
+  WooCommerceTestResult,
+  UniversalBridgeTestResult,
+  ShopifyTestResult,
+  WooCommerceTester,
+  UniversalBridgeTester,
+  ShopifyTester,
+} from './channels';
 import { SyncManualResult, CatalogUploadResult, FileWatcherService, LocalSyncEngine } from './sync';
 import { AutoStartService } from './system';
 import { OrderNotifierService } from './notifications/order-notifier.service';
@@ -114,6 +122,21 @@ export class LocalAgent {
     this.autoStartService = new AutoStartService();
 
     const cfg = this.configManager.get();
+    if (!cfg.shopify) {
+      try {
+        const cfgPath = this.configManager.getConfigFilePath();
+        if (fs.existsSync(cfgPath)) {
+          const raw = fs.readFileSync(cfgPath, 'utf8').replace(/^\uFEFF/, '');
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.shopify) {
+            cfg.shopify = parsed.shopify;
+          }
+        }
+      } catch {}
+    }
+    if (customConfig?.shopify) {
+      cfg.shopify = { ...(cfg.shopify || {}), ...customConfig.shopify };
+    }
     this.preflightHealthService = new PreflightHealthService({
       apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
       factusolDbPath: cfg.factusol?.databasePath || cfg.factusolDbPath,
@@ -156,7 +179,8 @@ export class LocalAgent {
     factusol?: AgentFactusolSettings;
     woocommerce?: AgentWooCommerceSettings;
     universalBridge?: AgentUniversalBridgeSettings;
-    channelType?: 'woocommerce' | 'universal_bridge';
+    shopify?: AgentShopifySettings;
+    channelType?: 'woocommerce' | 'universal_bridge' | 'shopify';
     syncRules?: AgentSyncRules;
     licenseKey?: string;
     notifications?: AgentNotificationSettings;
@@ -189,6 +213,13 @@ export class LocalAgent {
       }
       if (isSecretMaskedOrEmpty(updates.universalBridge.dbPass) && existingDbPass) {
         cfg.universalBridge.dbPass = existingDbPass;
+      }
+    }
+    if (updates.shopify) {
+      const existingToken = cfg.shopify?.accessToken;
+      cfg.shopify = { ...(cfg.shopify || {}), ...updates.shopify };
+      if (isSecretMaskedOrEmpty(updates.shopify.accessToken) && existingToken) {
+        cfg.shopify.accessToken = existingToken;
       }
     }
     if (updates.channelType) {
@@ -601,6 +632,11 @@ export class LocalAgent {
       smtpPass: cfg.notifications.smtpPass ? SECRET_MASK : '',
     } : cfg.notifications;
 
+    const safeShopify = cfg.shopify ? {
+      ...cfg.shopify,
+      accessToken: cfg.shopify.accessToken ? SECRET_MASK : '',
+    } : cfg.shopify;
+
     return {
       agentName: cfg.agentName || 'Bentian Agent',
       agentVersion: this.configManager.getVersion(),
@@ -622,6 +658,7 @@ export class LocalAgent {
       factusolSettings: cfg.factusol,
       woocommerceSettings: safeWoo,
       universalBridgeSettings: safeUniv,
+      shopifySettings: safeShopify,
       channelType: cfg.channelType || 'woocommerce',
       syncRules: cfg.syncRules,
       notifications: safeNotif,
@@ -708,6 +745,19 @@ export class LocalAgent {
       finalKey = cfg.universalBridge.secretKey;
     }
     return UniversalBridgeTester.test({ ...settings, secretKey: finalKey });
+  }
+
+  public async testShopifyConnection(settings: {
+    shopSubdomain: string;
+    accessToken: string;
+    apiVersion?: string;
+  }): Promise<ShopifyTestResult> {
+    const cfg = this.configManager.get();
+    let finalToken = settings.accessToken;
+    if (isSecretMaskedOrEmpty(finalToken) && cfg.shopify?.accessToken) {
+      finalToken = cfg.shopify.accessToken;
+    }
+    return ShopifyTester.test({ ...settings, accessToken: finalToken });
   }
 
   // --- Métodos de Sincronización ---

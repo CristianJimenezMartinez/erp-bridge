@@ -29,6 +29,7 @@ export class LicenseService {
   private currentHwid: string | null = null;
   private licenseStatus: AgentLicenseStatus = 'UNLICENSED';
   private activePlan?: string;
+  private activeFeatures: string[] = [];
   private licenseCheckTimer: NodeJS.Timeout | null = null;
   private lastSeenTimestamp = 0;
   private lastOnlineTimestamp = 0;
@@ -237,12 +238,14 @@ export class LicenseService {
         await this.persistProofIfValid((resJson.data as unknown as { licenseProof?: unknown }).licenseProof, hwid);
         this.licenseStatus = 'VALID';
         this.activePlan = resJson.data.plan;
+        this.activeFeatures = resJson.data.features || localPayload?.features || [];
         this.lastOnlineTimestamp = Date.now();
         await this.secureStore.saveLastOnlineTimestamp(this.lastOnlineTimestamp, hwid);
-        return { status: 'VALID', plan: resJson.data.plan };
+        return { status: 'VALID', plan: resJson.data.plan, features: this.activeFeatures };
       } else if (response.status === 403 || response.status === 400) {
         this.licenseStatus = 'EXPIRED';
         this.activePlan = undefined;
+        this.activeFeatures = [];
         return { status: 'EXPIRED', message: resJson.error?.message || 'Licencia revocada o expirada' };
       }
     } catch {
@@ -292,14 +295,16 @@ export class LicenseService {
 
       this.licenseStatus = 'GRACE_PERIOD';
       this.activePlan = gracePayload.plan;
+      this.activeFeatures = localPayload?.features || [];
       this.tokenExpiresAt = gracePayload.expiresAt;
       const remainingHours = Math.round((gracePayload.expiresAt - now) / 3600000);
       this.logger.warn(`Operando en período de gracia offline (${remainingHours}h restantes). Plan: ${gracePayload.plan}`);
-      return { status: 'GRACE_PERIOD', plan: gracePayload.plan };
+      return { status: 'GRACE_PERIOD', plan: gracePayload.plan, features: this.activeFeatures };
     }
 
     this.licenseStatus = 'EXPIRED';
     this.activePlan = undefined;
+    this.activeFeatures = [];
     return { status: 'EXPIRED', message: 'Período de gracia expirado sin conexión al servidor' };
   }
 
@@ -372,5 +377,13 @@ export class LicenseService {
 
   public setLastSeenTimestamp(ts: number): void {
     this.lastSeenTimestamp = ts;
+  }
+
+  public getActiveFeatures(): string[] {
+    return [...this.activeFeatures];
+  }
+
+  public hasFeature(feature: string): boolean {
+    return this.activeFeatures.includes(feature);
   }
 }

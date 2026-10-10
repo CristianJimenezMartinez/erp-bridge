@@ -79,6 +79,7 @@ export class LocalGuiServer {
     // 4. Channels
     router.post('/api/local/test-woocommerce', ChannelController.testWooCommerce(this.agent));
     router.post('/api/local/test-universal-bridge', ChannelController.testUniversalBridge(this.agent));
+    router.post('/api/local/test-shopify', ChannelController.testShopify(this.agent));
     router.get('/api/local/download-companion', ChannelController.downloadCompanion());
 
     // 5. Sync & History

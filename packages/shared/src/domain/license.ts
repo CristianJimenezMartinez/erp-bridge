@@ -15,6 +15,7 @@ export interface License {
   status: LicenseStatus;
   maxActivations: number;
   currentActivations: number;
+  features?: string[];
   createdAt: Date;
   expiresAt?: Date | null;
   trialEndsAt?: Date | null;
@@ -31,6 +32,7 @@ export const LicenseSchema = z.object({
   status: LicenseStatusSchema,
   maxActivations: z.number().int().min(1),
   currentActivations: z.number().int().min(0),
+  features: z.array(z.string()).optional(),
   createdAt: z.coerce.date(),
   expiresAt: z.coerce.date().nullable().optional(),
   trialEndsAt: z.coerce.date().nullable().optional(),
@@ -82,6 +84,7 @@ export interface LicenseTokenPayload {
   plan: LicensePlan;
   hwid: string;
   agentId?: string;
+  features?: string[];
   issuedAt: number; // UNIX timestamp ms
   expiresAt: number; // UNIX timestamp ms
 }
@@ -92,6 +95,7 @@ export const LicenseTokenPayloadSchema = z.object({
   plan: LicensePlanSchema,
   hwid: z.string().min(16),
   agentId: z.string().uuid().optional(),
+  features: z.array(z.string()).optional(),
   issuedAt: z.number(),
   expiresAt: z.number(),
 });
@@ -114,6 +118,7 @@ export interface LicenseActivationResponse {
   success: boolean;
   licenseToken?: string;
   plan?: LicensePlan;
+  features?: string[];
   expiresAt?: string;
   gracePeriodDays?: number;
   error?: string;
@@ -123,6 +128,7 @@ export const LicenseActivationResponseSchema = z.object({
   success: z.boolean(),
   licenseToken: z.string().optional(),
   plan: LicensePlanSchema.optional(),
+  features: z.array(z.string()).optional(),
   expiresAt: z.string().optional(),
   gracePeriodDays: z.number().optional(),
   error: z.string().optional(),
@@ -143,6 +149,7 @@ export const LicenseValidationRequestSchema = z.object({
 export interface LicenseValidationResponse {
   valid: boolean;
   plan?: LicensePlan;
+  features?: string[];
   renewedToken?: string;
   expiresAt?: string;
   gracePeriodRemainingSeconds?: number;
@@ -152,6 +159,7 @@ export interface LicenseValidationResponse {
 export const LicenseValidationResponseSchema = z.object({
   valid: z.boolean(),
   plan: LicensePlanSchema.optional(),
+  features: z.array(z.string()).optional(),
   renewedToken: z.string().optional(),
   expiresAt: z.string().optional(),
   gracePeriodRemainingSeconds: z.number().optional(),
@@ -162,6 +170,7 @@ export interface CreateLicenseDto {
   organizationId: string;
   plan: LicensePlan;
   alias?: string | null;
+  features?: string[];
   maxActivations?: number;
   expiresAt?: Date | string | null;
   trialDays?: number;
@@ -171,6 +180,7 @@ export const CreateLicenseDtoSchema = z.object({
   organizationId: z.string().min(1),
   plan: LicensePlanSchema,
   alias: z.string().max(100).nullable().optional(),
+  features: z.array(z.string()).optional(),
   maxActivations: z.number().int().min(1).default(1),
   expiresAt: z.union([z.coerce.date(), z.null()]).optional(),
   trialDays: z.number().int().min(1).optional(),
@@ -179,3 +189,18 @@ export const CreateLicenseDtoSchema = z.object({
 export interface LicenseWithActivations extends License {
   activations: LicenseActivation[];
 }
+
+/**
+ * Capacidades estándar que pueden ser habilitadas en licencias de Bentian / Sincriva.
+ */
+export const STANDARD_LICENSE_FEATURES = [
+  'sync:stock',
+  'sync:products',
+  'sync:orders',
+  'sync:invoices',
+  'multi_tariff',
+  'equivalence_surcharge',
+  'realtime_watcher',
+] as const;
+
+export type StandardLicenseFeature = (typeof STANDARD_LICENSE_FEATURES)[number];

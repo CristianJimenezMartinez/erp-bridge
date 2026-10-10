@@ -208,21 +208,210 @@ export const channelScript = `
       }
     }
 
+    async function testShopifyConnection() {
+      const subEl = document.getElementById('input-shopify-subdomain');
+      const tokEl = document.getElementById('input-shopify-token');
+      const shopSubdomain = subEl ? subEl.value.trim() : '';
+      const accessToken = tokEl ? tokEl.value.trim() : '';
+      const alertBox = document.getElementById('shopify-test-alert');
+      const btn = document.getElementById('btn-test-shopify');
+
+      if (!shopSubdomain || !accessToken) {
+        showSmartToast({
+          title: 'Credenciales incompletas',
+          message: 'Introduce el subdominio de Shopify y el Admin Access Token.',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-shopify-subdomain',
+          type: 'warn'
+        });
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión GraphQL Admin API Shopify...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/test-shopify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shopSubdomain, accessToken })
+        });
+        const data = await res.json();
+        const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
+        if (data.success) {
+          const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || '');
+          const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
+          let locationsListHtml = '';
+          if (data.locations && data.locations.length > 0) {
+            locationsListHtml = '<div style="margin-top:6px;font-size:11px;color:var(--text-muted);">Ubicaciones detectadas: ' +
+              data.locations.map(function(l) { return escapeHtml(l.name) + ' (<code>' + escapeHtml(l.id) + '</code>)'; }).join(', ') +
+              '</div>';
+          }
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-success-card">' +
+                (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
+                '<span>' + safeMsg + timeSuffix + '</span>' +
+                locationsListHtml +
+              '</div>';
+          }
+          showSmartToast({
+            title: 'Shopify Conectado',
+            message: 'Conexión GraphQL API verificada' + timeSuffix,
+            type: 'success'
+          });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || '');
+          const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
+          const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+          const safeSuggestion = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.suggestion) : errInfo.suggestion;
+          let extraActions = '<button type="button" onclick="testShopifyConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>';
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-error-card">' +
+                '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+                '<div class="smart-error-cause">' +
+                  '<strong>Causa:</strong> ' + safeCause + '<br>' +
+                  '<strong>Solución recomendada:</strong> ' + safeSuggestion +
+                '</div>' +
+                '<div class="smart-error-actions">' + extraActions + '</div>' +
+              '</div>';
+          }
+          showSmartToast({
+            title: errInfo.title,
+            message: errInfo.message,
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-shopify-subdomain',
+            type: 'error'
+          });
+        }
+      } catch (err) {
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.title) : errInfo.title;
+        const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+        if (alertBox) {
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+              '<div class="smart-error-cause">' + safeCause + '</div>' +
+              '<div class="smart-error-actions"><button type="button" onclick="testShopifyConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
+            '</div>';
+        }
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-shopify-subdomain',
+          type: 'error'
+        });
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function autoDetectShopifyLocation() {
+      const subEl = document.getElementById('input-shopify-subdomain');
+      const tokEl = document.getElementById('input-shopify-token');
+      const locInput = document.getElementById('input-shopify-location');
+      const btn = document.getElementById('btn-detect-shopify-loc');
+
+      const shopSubdomain = subEl ? subEl.value.trim() : '';
+      const accessToken = tokEl ? tokEl.value.trim() : '';
+
+      if (!shopSubdomain || !accessToken) {
+        showSmartToast({
+          title: 'Credenciales requeridas',
+          message: 'Introduce primero el subdominio y el Access Token de Shopify para consultar las ubicaciones.',
+          type: 'warn'
+        });
+        return;
+      }
+
+      let originalContent = '';
+      if (btn) {
+        btn.disabled = true;
+        originalContent = btn.innerHTML;
+        btn.innerHTML = '<span class="spin">⏳</span> Detectando...';
+      }
+
+      try {
+        const res = await fetch('/api/local/test-shopify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shopSubdomain, accessToken })
+        });
+        const data = await res.json();
+        if (data.success && data.locations && data.locations.length > 0) {
+          const firstLoc = data.locations[0];
+          if (locInput) locInput.value = firstLoc.id;
+          showSmartToast({
+            title: 'Ubicación Detectada',
+            message: 'Ubicación seleccionada: ' + firstLoc.name + ' (' + firstLoc.id + ')',
+            type: 'success'
+          });
+        } else if (data.success) {
+          showSmartToast({
+            title: 'Sin Ubicaciones',
+            message: 'No se encontraron ubicaciones de inventario activas en tu tienda de Shopify.',
+            type: 'warn'
+          });
+        } else {
+          showSmartToast({
+            title: 'Error de Detección',
+            message: data.message || 'No se pudo conectar con Shopify para detectar ubicaciones.',
+            type: 'error'
+          });
+        }
+      } catch (err) {
+        showSmartToast({
+          title: 'Error de Red',
+          message: 'No se pudo contactar con el agente local: ' + err.message,
+          type: 'error'
+        });
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          if (originalContent) btn.innerHTML = originalContent;
+        }
+      }
+    }
+
     async function saveChannelSettings() {
       sanitizeUrlInput('input-universal-url');
       sanitizeUrlInput('input-wc-url');
 
+      const univUrlEl = document.getElementById('input-universal-url');
+      const univKeyEl = document.getElementById('input-universal-key');
+      const wcUrlEl = document.getElementById('input-wc-url');
+      const wcKeyEl = document.getElementById('input-wc-key');
+      const wcSecEl = document.getElementById('input-wc-secret');
+      const shopSubEl = document.getElementById('input-shopify-subdomain');
+      const shopTokEl = document.getElementById('input-shopify-token');
+      const shopLocEl = document.getElementById('input-shopify-location');
+
       const payload = {
         channelType: currentChannelType,
         universalBridge: {
-          storeUrl: document.getElementById('input-universal-url').value.trim(),
-          secretKey: document.getElementById('input-universal-key').value.trim(),
+          storeUrl: univUrlEl ? univUrlEl.value.trim() : '',
+          secretKey: univKeyEl ? univKeyEl.value.trim() : '',
           enabled: currentChannelType === 'universal_bridge'
         },
         woocommerce: {
-          storeUrl: document.getElementById('input-wc-url').value.trim(),
-          consumerKey: document.getElementById('input-wc-key').value.trim(),
-          consumerSecret: document.getElementById('input-wc-secret').value.trim(),
+          storeUrl: wcUrlEl ? wcUrlEl.value.trim() : '',
+          consumerKey: wcKeyEl ? wcKeyEl.value.trim() : '',
+          consumerSecret: wcSecEl ? wcSecEl.value.trim() : '',
+        },
+        shopify: {
+          shopSubdomain: shopSubEl ? shopSubEl.value.trim() : '',
+          accessToken: shopTokEl ? shopTokEl.value.trim() : '',
+          locationId: shopLocEl ? shopLocEl.value.trim() : '',
         }
       };
       await submitConfigUpdates(payload, 'Ajustes del Canal Web guardados con éxito.');

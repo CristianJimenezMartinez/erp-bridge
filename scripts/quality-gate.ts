@@ -347,6 +347,7 @@ const monorepoPackages = [
   'packages/connectors/woocommerce/package.json',
   'packages/connectors/prestashop/package.json',
   'packages/connectors/simplygest/package.json',
+  'packages/connectors/shopify/package.json',
 ];
 
 for (const pkgRel of monorepoPackages) {
