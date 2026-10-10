@@ -450,7 +450,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
           if (bannerDesc) bannerDesc.textContent = 'Factusol está preparado con ' + (fact.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Revisar Tienda Online →';
+          if (bannerBtnText) bannerBtnText.textContent = 'Vincular Tienda Web →';
           if (bannerIconBox) {
             bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#60a5fa';
@@ -478,7 +478,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           primaryBtn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
           primaryBtn.style.boxShadow = '0 4px 20px rgba(59,130,246,0.35)';
         }
-        if (primaryBtnText) primaryBtnText.textContent = 'Revisar Tienda Online →';
+        if (primaryBtnText) primaryBtnText.textContent = 'Vincular Tienda Web →';
         if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>';
         _currentZenPrimaryAction = function() {
           navigateToResolution('channel', targetInput);
