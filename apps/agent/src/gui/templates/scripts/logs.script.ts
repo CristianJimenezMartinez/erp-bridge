@@ -186,18 +186,14 @@ export const logsScript = `
     }
 
     function renderLogs(events) {
-      const overviewList = document.getElementById('overview-logs-list');
       const fullPanel = document.getElementById('full-logs-panel');
       const searchVal = (document.getElementById('log-search-input') ? document.getElementById('log-search-input').value : '').toLowerCase();
 
       // Agrupación deduplicada de eventos
       const grouped = groupLogs(events || []);
-
-      // 1. En Estado General (Última Actividad y Ventas): siempre mostrar operaciones limpias de negocio
       const businessEvents = grouped.filter(isBusinessOperation);
-      const overviewHtml = buildLogHtml(businessEvents.slice(0, 15), 'No hay actividad de ventas reciente. El agente vigila cambios en Factusol en segundo plano.');
 
-      // 2. En Diagnóstico y Ayuda: según el modo seleccionado (Diario de Operaciones vs Consola Técnica)
+      // 1. En Diagnóstico y Ayuda: según el modo seleccionado (Diario de Operaciones vs Consola Técnica)
       let fullHtml = '';
       if (currentLogViewMode === 'journal') {
         fullHtml = buildLogHtml(businessEvents, 'No hay operaciones de negocio registradas en esta sesión.');
@@ -210,7 +206,6 @@ export const logsScript = `
         fullHtml = buildLogHtml(filtered, 'No hay registros técnicos que coincidan con los filtros.');
       }
 
-      if (overviewList && overviewList.innerHTML !== overviewHtml) overviewList.innerHTML = overviewHtml;
       if (fullPanel && fullPanel.innerHTML !== fullHtml) fullPanel.innerHTML = fullHtml;
 
       // 3. Actualizar la barra inferior persistente (Bottom Dock Console)

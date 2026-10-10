@@ -107,28 +107,5 @@ export function renderOverviewTab(): string {
             </div>
           </div>
         </div>
-
-        <!-- Última Actividad y Ventas -->
-        <div class="form-section" id="overview-recent-activity-section">
-          <div class="section-header">
-            <div>
-              <div class="section-title">Última Actividad y Ventas</div>
-              <div class="section-desc">Eventos recientes de pedidos importados, ventas y sincronizaciones en tiempo real.</div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button onclick="switchTab('history')" class="btn btn-secondary btn-sm" title="Consultar historial detallado de pedidos y ventas">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-                <span>Historial de Ventas ↗</span>
-              </button>
-              <button onclick="switchTab('logs')" class="btn btn-secondary btn-sm" title="Ir a diagnóstico técnico y consola">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m14 2-4 4 4 4"/><path d="m10 14 4 4-4 4"/><path d="M4 12h16"/></svg>
-                <span>Diagnóstico y Ayuda ↗</span>
-              </button>
-            </div>
-          </div>
-          <div id="overview-logs-list" class="logs-panel" style="height: 180px;">
-            <div class="log-line log-info">Cargando actividad...</div>
-          </div>
-        </div>
       </section>`;
 }

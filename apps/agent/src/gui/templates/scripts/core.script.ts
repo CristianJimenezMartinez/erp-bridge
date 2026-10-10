@@ -593,11 +593,11 @@ export const coreScript = `
         position: 'bottom'
       },
       {
-        target: '#overview-recent-activity-section',
-        fallback: '#overview-logs-list',
+        target: '#bottom-console-dock',
+        fallback: '.cards-grid',
         badge: 'Foco 2 de 3',
-        title: 'Cola de Pedidos',
-        description: 'Cada pedido web que entra en Factusol aparece aquí con su serie, número y total.',
+        title: 'Consola de Actividad & Resolver',
+        description: 'Supervisa en directo los eventos, avisos e incidencias, con botón de solución en 1 clic.',
         position: 'top'
       },
       {
