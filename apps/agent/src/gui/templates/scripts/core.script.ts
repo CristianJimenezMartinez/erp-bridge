@@ -464,8 +464,7 @@ export const coreScript = `
       const targetPane = document.getElementById('tab-' + tabId);
       if (targetPane) targetPane.classList.add('active');
 
-      const navItem = document.querySelector('.nav-list .nav-item[data-tab="' + tabId + '"]') ||
-                      document.querySelector('.nav-list .nav-item[onclick*="\'' + tabId + '\'"]');
+      const navItem = document.querySelector('.nav-list .nav-item[data-tab="' + tabId + '"]');
       if (navItem) {
         navItem.classList.add('active');
       }

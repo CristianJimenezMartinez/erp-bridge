@@ -31,7 +31,13 @@ async function testGuiServer() {
     assert(html.includes('wizClaimBetaOneClick'), 'El HTML debe incluir la función wizClaimBetaOneClick');
     assert(html.includes('wizSkipFactusolStep'), 'El HTML debe incluir la función wizSkipFactusolStep');
     assert(html.includes('wizSkipToExplore'), 'El HTML debe incluir la función wizSkipToExplore');
-    console.log('  ✓ GET / respondió 200 OK con el template HTML y el asistente sin fricción.');
+    const scriptMatches = html.match(/<script>([\s\S]*?)<\/script>/);
+    assert(scriptMatches, 'El HTML debe contener bloque <script>');
+    const vm = require('vm');
+    assert.doesNotThrow(() => {
+      new vm.Script(scriptMatches[1]);
+    }, 'El JavaScript del cliente embebido debe compilar sin errores de sintaxis');
+    console.log('  ✓ GET / respondió 200 OK y el JavaScript embebido compila con sintaxis 100% válida.');
 
     // 2. Test GET /api/local/status
     console.log('2. Probando GET /api/local/status...');
