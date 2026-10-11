@@ -54,8 +54,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd -e .env -e .env.*
-            echo "🔄 Reiniciando contenedor bentian-api-prod..."
-            docker restart bentian-api-prod
+            echo "🔄 Compilando y levantando contenedor bentian-api-prod..."
+            docker compose -f docker-compose.prod.yml build api
+            docker compose -f docker-compose.prod.yml up -d --force-recreate
             echo "✅ Despliegue completado con éxito."
 
       - name: Live Health Check
