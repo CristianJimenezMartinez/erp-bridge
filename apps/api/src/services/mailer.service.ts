@@ -769,9 +769,14 @@ export class MailerService {
   }): Promise<void> {
     return new Promise((resolve, reject) => {
       const isSsl = config.port === 465;
+      const rejectUnauthorized = process.env['SMTP_REJECT_UNAUTHORIZED'] === 'true';
       const socket = isSsl
-        ? tls.connect({ host: config.host, port: config.port, rejectUnauthorized: false })
+        ? tls.connect({ host: config.host, port: config.port, rejectUnauthorized })
         : net.connect({ host: config.host, port: config.port });
+
+      const safeTo = config.to.replace(/[\r\n]/g, '').trim();
+      const safeFrom = config.from.replace(/[\r\n]/g, '').trim();
+      const safeSubject = config.subject.replace(/[\r\n]/g, ' ').trim();
 
       let step = 0;
       let buffer = '';
@@ -811,20 +816,20 @@ export class MailerService {
             send(Buffer.from(config.pass).toString('base64'));
           } else if (step === 4 && code === 235) {
             step = 5;
-            const cleanFrom = config.from.includes('<') ? config.from.replace(/.*<([^>]+)>.*/, '$1') : config.from;
+            const cleanFrom = safeFrom.includes('<') ? safeFrom.replace(/.*<([^>]+)>.*/, '$1') : safeFrom;
             send(`MAIL FROM:<${cleanFrom}>`);
           } else if (step === 5 && code === 250) {
             step = 6;
-            send(`RCPT TO:<${config.to}>`);
+            send(`RCPT TO:<${safeTo}>`);
           } else if (step === 6 && code === 250) {
             step = 7;
             send(`DATA`);
           } else if (step === 7 && code === 354) {
             const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2)}`;
             const message = [
-              `From: ${config.from}`,
-              `To: ${config.to}`,
-              `Subject: =?UTF-8?B?${Buffer.from(config.subject).toString('base64')}?=`,
+              `From: ${safeFrom}`,
+              `To: ${safeTo}`,
+              `Subject: =?UTF-8?B?${Buffer.from(safeSubject).toString('base64')}?=`,
               `MIME-Version: 1.0`,
               `Content-Type: multipart/alternative; boundary="${boundary}"`,
               ``,

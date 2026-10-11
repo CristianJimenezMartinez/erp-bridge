@@ -19,15 +19,16 @@ export class PrestaShopCustomerHandler {
       let psAddr: PrestaShopAddress | undefined;
 
       if (criteria.email) {
+        const safeEmail = criteria.email.replace(/[\[\]|%!]/g, '').trim();
         const res = await this.client.get<{ customers?: PrestaShopCustomer[] }>('customers', {
-          'filter[email]': `[${criteria.email.trim()}]`,
+          'filter[email]': `[${safeEmail}]`,
           display: 'full',
         });
         psCust = res.customers?.[0];
       }
 
       if (!psCust && criteria.taxId) {
-        const cleanTaxId = criteria.taxId.trim();
+        const cleanTaxId = criteria.taxId.replace(/[\[\]|%!]/g, '').trim();
         const addrRes = await this.client.get<{ addresses?: PrestaShopAddress[] }>('addresses', {
           'filter[dni]': `[${cleanTaxId}]`,
           display: 'full',
@@ -43,7 +44,8 @@ export class PrestaShopCustomerHandler {
         }
 
         if (psAddr?.id_customer) {
-          const custRes = await this.client.get<{ customer?: PrestaShopCustomer }>(`customers/${psAddr.id_customer}`);
+          const safeCustId = String(psAddr.id_customer).replace(/[^0-9]/g, '');
+          const custRes = await this.client.get<{ customer?: PrestaShopCustomer }>(`customers/${safeCustId}`);
           psCust = custRes.customer;
         }
       }
@@ -51,8 +53,9 @@ export class PrestaShopCustomerHandler {
       if (!psCust) return null;
 
       if (!psAddr) {
+        const safeCustId = String(psCust.id).replace(/[^0-9]/g, '');
         const addrRes = await this.client.get<{ addresses?: PrestaShopAddress[] }>('addresses', {
-          'filter[id_customer]': `[${psCust.id}]`,
+          'filter[id_customer]': `[${safeCustId}]`,
           display: 'full',
         });
         psAddr = addrRes.addresses?.[0];

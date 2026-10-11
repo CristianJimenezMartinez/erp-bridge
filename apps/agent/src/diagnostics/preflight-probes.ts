@@ -263,29 +263,39 @@ export class PreflightProbes {
       }
     }
 
-    // Medición de latencia
+    // Medición de latencia no bloqueante con timeout estricto de 2000ms
     let latency: DiskLatencyResult | undefined;
-    const targetToCheck = fs.existsSync(dbPath) ? dbPath : path.dirname(dbPath);
-    if (fs.existsSync(targetToCheck)) {
+    try {
+      const targetToCheck = fs.existsSync(dbPath) ? dbPath : path.dirname(dbPath);
+      const statWithTimeout = () => Promise.race([
+        fs.promises.stat(targetToCheck),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout de lectura NAS/disco')), 2000)),
+      ]);
+
       const samples: number[] = [];
       for (let i = 0; i < 3; i++) {
         const start = performance.now();
         try {
-          fs.statSync(targetToCheck);
+          await statWithTimeout();
+          samples.push(performance.now() - start);
         } catch {
-          // Ignorar
+          break;
         }
-        samples.push(performance.now() - start);
       }
-      const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
-      const min = Math.min(...samples);
-      const max = Math.max(...samples);
-      latency = {
-        avgMs: Math.round(avg * 10) / 10,
-        minMs: Math.round(min * 10) / 10,
-        maxMs: Math.round(max * 10) / 10,
-        jitterMs: Math.round((max - min) * 10) / 10,
-      };
+
+      if (samples.length > 0) {
+        const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+        const min = Math.min(...samples);
+        const max = Math.max(...samples);
+        latency = {
+          avgMs: Math.round(avg * 10) / 10,
+          minMs: Math.round(min * 10) / 10,
+          maxMs: Math.round(max * 10) / 10,
+          jitterMs: Math.round((max - min) * 10) / 10,
+        };
+      }
+    } catch {
+      // Ignorar errores de sondeo en disco inaccesible
     }
 
     return {

@@ -251,13 +251,14 @@ export class TripartitePipelineService {
     const shouldCreateHoldedDoc = options?.createHoldedDocument ?? true;
 
     if (shouldCreateHoldedDoc) {
-      // Aplicación estricta de CanonicalTax (IVA 21%, 10%, 4%, 0% y R.E. 5.2%, 1.4%, 0.5%, 0%)
-      const holdedOrder = HoldedMapper.mapCanonicalOrderToHoldedSalesOrder(order, warehouse);
-
+      let holdedOrder: unknown = null;
       try {
+        // Aplicación estricta de CanonicalTax (IVA 21%, 10%, 4%, 0% y R.E. 5.2%, 1.4%, 0.5%, 0%)
+        holdedOrder = HoldedMapper.mapCanonicalOrderToHoldedSalesOrder(order, warehouse);
+
         let resp: { status?: number; id?: string };
         if (typeof this.holded.createSalesOrder === 'function') {
-          resp = await this.holded.createSalesOrder(holdedOrder);
+          resp = await this.holded.createSalesOrder(holdedOrder as any);
         } else if (typeof this.holded.createOrder === 'function') {
           const mRes = await this.holded.createOrder(order);
           resp = { status: mRes.success ? 1 : 0, id: mRes.externalId || mRes.orderId };
@@ -408,11 +409,12 @@ export class TripartitePipelineService {
     ]);
 
     let shopifySync: { success: boolean; queued?: boolean; error?: string } = { success: true };
-    if (shopifySettled.status === 'fulfilled') {
-      const res = shopifySettled.value;
-      shopifySync = { success: res?.success !== false };
+    if (shopifySettled.status === 'fulfilled' && shopifySettled.value?.success !== false) {
+      shopifySync = { success: true };
     } else {
-      const err = shopifySettled.reason instanceof Error ? shopifySettled.reason.message : String(shopifySettled.reason);
+      const err = shopifySettled.status === 'fulfilled'
+        ? (shopifySettled.value?.error || 'Respuesta de error en sincronización de Shopify')
+        : (shopifySettled.reason instanceof Error ? shopifySettled.reason.message : String(shopifySettled.reason));
       this.logger.warn(`⚠️ Fallo al propagar stock a Shopify (${err}). Encolando en Store-and-Forward.`);
       await this.queue.store('STOCK_SYNC', {
         target: 'shopify',
@@ -424,11 +426,12 @@ export class TripartitePipelineService {
     }
 
     let holdedSync: { success: boolean; queued?: boolean; error?: string } = { success: true };
-    if (holdedSettled.status === 'fulfilled') {
-      const res = holdedSettled.value;
-      holdedSync = { success: res?.success !== false };
+    if (holdedSettled.status === 'fulfilled' && holdedSettled.value?.success !== false) {
+      holdedSync = { success: true };
     } else {
-      const err = holdedSettled.reason instanceof Error ? holdedSettled.reason.message : String(holdedSettled.reason);
+      const err = holdedSettled.status === 'fulfilled'
+        ? (holdedSettled.value?.error || 'Respuesta de error en sincronización de Holded')
+        : (holdedSettled.reason instanceof Error ? holdedSettled.reason.message : String(holdedSettled.reason));
       this.logger.warn(`⚠️ Fallo al propagar stock a Holded (${err}). Encolando en Store-and-Forward.`);
       await this.queue.store('STOCK_SYNC', {
         target: 'holded',

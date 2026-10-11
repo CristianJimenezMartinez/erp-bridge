@@ -8,10 +8,14 @@ export class PrestaShopProductMapper {
     targetId?: number,
     langId = 1
   ): Record<string, unknown> {
+    const rawPrice = (product.salePrice && product.salePrice > 0 ? product.salePrice : product.regularPrice) ?? 0;
+    const safePrice = Number.isFinite(rawPrice) ? rawPrice : 0;
+    const safeCost = product.costPrice && Number.isFinite(product.costPrice) ? product.costPrice : 0;
+
     const payload: Record<string, unknown> = {
       reference: product.sku,
-      price: (product.salePrice && product.salePrice > 0 ? product.salePrice : product.regularPrice).toFixed(6),
-      wholesale_price: product.costPrice ? product.costPrice.toFixed(6) : '0.000000',
+      price: safePrice.toFixed(6),
+      wholesale_price: safeCost.toFixed(6),
       active: product.status === 'published' ? 1 : 0,
       name: PrestaShopXml.toLanguageNode(product.name, langId),
       description: PrestaShopXml.toLanguageNode(product.description || '', langId),
@@ -20,7 +24,7 @@ export class PrestaShopProductMapper {
         product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'producto',
         langId
       ),
-      weight: product.weight ? String(product.weight) : '0.000000',
+      weight: product.weight && Number.isFinite(Number(product.weight)) ? String(product.weight) : '0.000000',
       ean13: product.barcode || '',
     };
 

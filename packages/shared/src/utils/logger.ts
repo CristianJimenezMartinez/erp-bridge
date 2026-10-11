@@ -32,8 +32,9 @@ export function sanitizeMessage(message: string): string {
   // 1. Claves de licencia de Bentian (ej. EB-XXXXX-XXXXX-XXXXX-XXXXX)
   sanitized = sanitized.replace(/\bEB-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}-[0-9A-HJ-NP-Z]{5}\b/g, 'EB-*****-*****-*****-*****');
 
-  // 2. Tokens de autenticación Bearer y JWTs
+  // 2. Tokens de autenticación Bearer, Basic y JWTs
   sanitized = sanitized.replace(/Bearer\s+[A-Za-z0-9\-_=]+\.[A-Za-z0-9\-_=]+\.?[A-Za-z0-9\-_.+/=]*/gi, 'Bearer ***REDACTED***');
+  sanitized = sanitized.replace(/Basic\s+[A-Za-z0-9+/=]+/gi, 'Basic ***REDACTED***');
   sanitized = sanitized.replace(/\beyJ[A-Za-z0-9\-_=]+\.eyJ[A-Za-z0-9\-_=]+\.?[A-Za-z0-9\-_.+/=]*/g, '***REDACTED_JWT***');
 
   // 3. Tokens de Stripe y API keys conocidos

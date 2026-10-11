@@ -15,12 +15,13 @@ export class PairingService {
     detectedFactusol: FactusolDetectedInstance[];
   }> {
     const cfg = this.configManager.get();
-    const name = customName || cfg.agentName || os.hostname();
-    this.logger.info(`Iniciando emparejamiento con el Core (Token: ${pairingToken})...`);
+    const maskedToken = pairingToken.length > 8 ? `${pairingToken.slice(0, 4)}...${pairingToken.slice(-4)}` : '***';
+    this.logger.info(`Iniciando emparejamiento con el Core (Token: ${maskedToken})...`);
 
     const detected = FactusolDetector.detectAll(cfg.factusolDbPath ? [path.dirname(cfg.factusolDbPath)] : []);
     const primary = detected.length > 0 ? detected[0] : null;
 
+    const name = customName || cfg.agentName || os.hostname();
     const requestPayload: AgentPairingRequest = {
       pairingToken,
       name,
@@ -28,7 +29,17 @@ export class PairingService {
       detectedFactusol: detected,
     };
 
-    const response = await fetch(`${cfg.apiBaseUrl}/api/v1/agents/pair`, {
+    const baseUrl = (cfg.apiBaseUrl || 'https://bridge.cristianjm.com').trim().replace(/\/+$/, '');
+    try {
+      const parsedUrl = new URL(baseUrl);
+      if (parsedUrl.protocol !== 'https:' && parsedUrl.hostname !== '127.0.0.1' && parsedUrl.hostname !== 'localhost') {
+        throw new Error('La URL de la API de Bentian debe usar HTTPS');
+      }
+    } catch {
+      throw new Error(`URL de API inválida o no segura: ${cfg.apiBaseUrl}`);
+    }
+
+    const response = await fetch(`${baseUrl}/api/v1/agents/pair`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestPayload),

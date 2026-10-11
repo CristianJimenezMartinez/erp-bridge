@@ -168,10 +168,14 @@ export class AuthService {
     const expectedSignature = crypto.createHmac('sha256', this.SECRET).update(dataToSign).digest();
     const expectedEncodedSignature = base64UrlEncode(expectedSignature);
 
-    const sigBuf = Buffer.from(encodedSignature);
-    const expectedBuf = Buffer.from(expectedEncodedSignature);
+    const sigBuf = Buffer.from(encodedSignature, 'utf8');
+    const expectedBuf = Buffer.from(expectedEncodedSignature, 'utf8');
 
-    if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    if (sigBuf.length !== expectedBuf.length) {
+      crypto.timingSafeEqual(expectedBuf, expectedBuf);
+      return { valid: false, reason: 'Firma de token inválida' };
+    }
+    if (!crypto.timingSafeEqual(sigBuf, expectedBuf)) {
       return { valid: false, reason: 'Firma de token inválida' };
     }
 
@@ -250,12 +254,19 @@ export function clearLoginAttempts(): void {
   pendingEmailOtps.clear();
 }
 
+export const MAX_ATTEMPT_STORE_SIZE = 10000;
+
 function pruneLoginAttempts(now: number): void {
   for (const [key, record] of loginAttempts.entries()) {
     if (record.blockedUntil && now < record.blockedUntil) continue;
     if (now - record.firstAttempt > ATTEMPT_WINDOW_MS) {
       loginAttempts.delete(key);
     }
+  }
+  while (loginAttempts.size > MAX_ATTEMPT_STORE_SIZE) {
+    const oldestKey = loginAttempts.keys().next().value;
+    if (oldestKey) loginAttempts.delete(oldestKey);
+    else break;
   }
 }
 
@@ -286,6 +297,11 @@ function registerPartnerFailure(ip: string, now: number): void {
   }
   if (current.count >= MAX_LOGIN_ATTEMPTS) {
     current.blockedUntil = now + LOCKOUT_MS;
+  }
+  while (partnerAttempts.size >= MAX_ATTEMPT_STORE_SIZE) {
+    const oldestKey = partnerAttempts.keys().next().value;
+    if (oldestKey) partnerAttempts.delete(oldestKey);
+    else break;
   }
   partnerAttempts.set(ip, current);
 }
@@ -799,7 +815,12 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
 
       const provBuf = Buffer.from(otp.trim(), 'utf8');
       const expBuf = Buffer.from(otpRecord.code, 'utf8');
-      const isOtpMatch = provBuf.length === expBuf.length && crypto.timingSafeEqual(provBuf, expBuf);
+      let isOtpMatch = false;
+      if (provBuf.length === expBuf.length) {
+        isOtpMatch = crypto.timingSafeEqual(provBuf, expBuf);
+      } else {
+        crypto.timingSafeEqual(expBuf, expBuf);
+      }
 
       if (!isOtpMatch) {
         otpRecord.attempts += 1;
@@ -860,6 +881,18 @@ authRouter.post('/auth/email-session', async (req: Request, res: Response): Prom
     } else {
       // Generar nuevo código criptográfico de 6 dígitos
       generatedOtp = crypto.randomInt(100000, 999999).toString();
+      
+      // Limpieza de OTPs expirados o exceso de tamaño (máx 5000 entradas)
+      const nowMs = Date.now();
+      for (const [k, v] of pendingEmailOtps.entries()) {
+        if (nowMs > v.expiresAt) pendingEmailOtps.delete(k);
+      }
+      while (pendingEmailOtps.size >= 5000) {
+        const oldestKey = pendingEmailOtps.keys().next().value;
+        if (oldestKey) pendingEmailOtps.delete(oldestKey);
+        else break;
+      }
+
       pendingEmailOtps.set(cleanEmail, {
         code: generatedOtp,
         expiresAt: Date.now() + validityMinutes * 60 * 1000,

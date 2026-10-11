@@ -78,7 +78,7 @@ function getDbConnection(&$errorMsg = null) {
         }
     }
 
-    $errorMsg = $lastException ? $lastException->getMessage() : 'Error desconocido al conectar con MariaDB/MySQL';
+    $errorMsg = 'Error al conectar con MariaDB/MySQL';
     return null;
 }
 
@@ -983,11 +983,16 @@ if ($mainAction === 'push_catalog' || $mainAction === 'sync_catalog') {
             if (empty($code)) continue;
 
             $regPrice = floatval($p['regularPrice'] ?? $p['price'] ?? 0);
+            if (!is_finite($regPrice) || $regPrice < 0) $regPrice = 0.0;
             $rawSale = isset($p['salePrice']) ? floatval($p['salePrice']) : null;
+            if ($rawSale !== null && (!is_finite($rawSale) || $rawSale < 0)) $rawSale = null;
             $vat = floatval($p['taxRate'] ?? $p['vat_rate'] ?? 21.0);
+            if (!is_finite($vat) || $vat < 0) $vat = 21.0;
             $withVat = round($regPrice * (1 + $vat / 100), 4);
             $salePrice = ($rawSale !== null && $rawSale > 0 && $rawSale < $regPrice) ? $rawSale : null;
             $saleWithVat = $salePrice !== null ? round($salePrice * (1 + $vat / 100), 4) : null;
+            $weight = floatval($p['weight'] ?? 0);
+            if (!is_finite($weight) || $weight < 0) $weight = 0.0;
 
             // Normalización canónica de imagen con prefijo /
             $rawImg = '';
@@ -1022,7 +1027,7 @@ if ($mainAction === 'push_catalog' || $mainAction === 'sync_catalog') {
                 ':price_with_vat' => $withVat,
                 ':sale_price_with_vat' => $saleWithVat,
                 ':unit_of_measure' => substr($p['unitOfMeasure'] ?? 'UNIDADES', 0, 20),
-                ':weight' => floatval($p['weight'] ?? 0),
+                ':weight' => $weight,
                 ':barcode' => substr($p['barcode'] ?? '', 0, 50) ?: null,
                 ':imgart' => $cleanImg ?: null,
                 ':image_url' => $imgUrl ?: null,
@@ -1035,7 +1040,7 @@ if ($mainAction === 'push_catalog' || $mainAction === 'sync_catalog') {
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al procesar lote de catálogo: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al procesar lote de catálogo']);
     }
     exit;
 }
@@ -1062,9 +1067,11 @@ if ($mainAction === 'push_stock') {
         foreach ($updates as $u) {
             $code = substr($u['code'] ?? $u['sku'] ?? '', 0, 50);
             if (empty($code)) continue;
+            $stockVal = floatval($u['stock'] ?? 0);
+            if (!is_finite($stockVal)) $stockVal = 0.0;
             $stmt->execute([
                 ':code' => $code,
-                ':stock' => floatval($u['stock'] ?? 0),
+                ':stock' => $stockVal,
             ]);
             $count++;
         }
@@ -1073,7 +1080,7 @@ if ($mainAction === 'push_stock') {
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al actualizar existencias: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al actualizar existencias']);
     }
     exit;
 }
@@ -1226,7 +1233,7 @@ if ($mainAction === 'ack_cancelled_orders') {
     } catch (Exception $e) {
         $pdo->rollBack();
         http_response_code(500);
-        echo json_encode(['error' => 'Fallo al confirmar reposición de pedidos cancelados: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Fallo al confirmar reposición de pedidos cancelados']);
     }
     exit;
 }

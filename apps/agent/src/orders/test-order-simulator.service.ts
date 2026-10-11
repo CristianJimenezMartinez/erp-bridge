@@ -202,8 +202,11 @@ export class TestOrderSimulatorService {
       this.logger.warn(`Aviso al consultar artículos de Factusol: ${String(artErr)}`);
     }
 
-    // Fallback a artículo de demostración si la base de datos está vacía o sin artículos
+    // Fallback a artículo de demostración si la base de datos está vacía o sin artículos (solo en modo simulación dryRun)
     if (!artCode) {
+      if (!dryRun) {
+        throw new Error('No se puede realizar un pedido de prueba real si no existe al menos un artículo registrado en el catálogo de Factusol.');
+      }
       artCode = 'TEST-001';
       artName = 'TUERCA HEXAGONAL M8 - ARTÍCULO DE PRUEBA';
       artPrice = 14.50;

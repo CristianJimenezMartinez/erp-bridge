@@ -26,6 +26,7 @@ export class AccdbFileWatcher {
   private isRunning = false;
   private pending = false;
   private debounceTimer: NodeJS.Timeout | null = null;
+  private rateLimitTimer: NodeJS.Timeout | null = null;
   private lastRunAt = 0;
   private lastChangeDetectedAt: Date | null = null;
   private lastExecutedAt: Date | null = null;
@@ -102,6 +103,11 @@ export class AccdbFileWatcher {
       this.debounceTimer = null;
     }
 
+    if (this.rateLimitTimer) {
+      clearTimeout(this.rateLimitTimer);
+      this.rateLimitTimer = null;
+    }
+
     fs.unwatchFile(this.config.filePath);
     this.isWatching = false;
     this.logger.info(`Watcher detenido para: ${this.config.filePath}`);
@@ -122,6 +128,8 @@ export class AccdbFileWatcher {
   }
 
   private async runOnce(reason: string): Promise<void> {
+    if (!this.isWatching) return;
+
     if (this.isRunning) {
       this.pending = true;
       this.logger.debug(`Ejecución en curso. Marcando ejecución pendiente tras calma (${reason})`);
@@ -135,7 +143,12 @@ export class AccdbFileWatcher {
     if (diff < minIntervalMs) {
       const wait = minIntervalMs - diff;
       this.logger.debug(`Rate limit alcanzado. Postergando ejecución ${wait}ms (${reason})`);
-      setTimeout(() => {
+      if (this.rateLimitTimer) {
+        clearTimeout(this.rateLimitTimer);
+      }
+      this.rateLimitTimer = setTimeout(() => {
+        this.rateLimitTimer = null;
+        if (!this.isWatching) return;
         this.runOnce(`${reason}|rate-limit`).catch((err) => {
           this.logger.error('Error en ejecución diferida por rate limit', err);
         });

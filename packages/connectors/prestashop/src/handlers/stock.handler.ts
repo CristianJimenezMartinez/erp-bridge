@@ -118,8 +118,9 @@ export class PrestaShopStockHandler {
     if (cached) return cached;
 
     // Buscar producto por referencia (SKU)
+    const safeSku = (sku || '').replace(/[\[\]|%!]/g, '').trim();
     const res = await this.client.get<{ products?: Array<{ id: number }> }>('products', {
-      'filter[reference]': `[${sku}]`,
+      'filter[reference]': `[${safeSku}]`,
       display: '[id]',
     });
 
@@ -128,9 +129,10 @@ export class PrestaShopStockHandler {
       throw new ConnectionError(ErrorCode.ENTITY_NOT_FOUND, `No se localizo producto en PrestaShop con referencia: ${sku}`);
     }
 
+    const safeProdId = String(prod.id).replace(/[^0-9]/g, '');
     // Buscar stock_available asociado
     const stockRes = await this.client.get<{ stock_availables?: PrestaShopStockAvailable[] }>('stock_availables', {
-      'filter[id_product]': `[${prod.id}]`,
+      'filter[id_product]': `[${safeProdId}]`,
       display: 'full',
     });
 

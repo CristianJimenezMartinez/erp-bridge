@@ -12,14 +12,15 @@ export class PrestaShopStockMapper {
       id: Number(idStockAvailable),
       id_product: Number(idProduct),
       id_product_attribute: Number(idProductAttribute),
-      quantity: Math.floor(quantity),
+      quantity: Number.isFinite(quantity) ? Math.floor(quantity) : 0,
       depends_on_stock: 0,
       out_of_stock: 2, // Permite pedidos según configuración global o denegar según tienda
     };
   }
 
   public static toCanonicalStock(raw: PrestaShopStockAvailable, sku = ''): CanonicalStock {
-    const qty = parseInt(String(raw.quantity || 0), 10);
+    const parsed = parseInt(String(raw.quantity ?? 0), 10);
+    const qty = Number.isFinite(parsed) ? parsed : 0;
     return {
       sku: sku || `STOCK-P${raw.id_product}-A${raw.id_product_attribute}`,
       quantity: qty,

@@ -14,6 +14,19 @@ export class PrestaShopClient {
     if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
       cleanUrl = `https://${cleanUrl}`;
     }
+
+    if (process.env['NODE_ENV'] === 'production') {
+      try {
+        const parsed = new URL(cleanUrl);
+        const host = parsed.hostname.toLowerCase();
+        if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.startsWith('169.254.') || host.endsWith('.internal') || host.endsWith('.local')) {
+          throw new ConnectionError(ErrorCode.CONNECTION_FAILED, `Host no permitido para PrestaShop en producción: ${host}`);
+        }
+      } catch (uErr: unknown) {
+        if (uErr instanceof ConnectionError) throw uErr;
+      }
+    }
+
     this.baseUrl = cleanUrl;
 
     const authHeader = `Basic ${Buffer.from(`${config.apiKey.trim()}:`).toString('base64')}`;
@@ -120,10 +133,15 @@ export class PrestaShopClient {
         true
       );
     }
+    const rawData = err?.response?.data;
+    const sanitizedData = typeof rawData === 'string'
+      ? rawData.substring(0, 300)
+      : (typeof rawData === 'object' && rawData !== null ? 'objeto_respuesta_error' : undefined);
+
     return new ConnectionError(
       ErrorCode.CONNECTION_FAILED,
       `Error de PrestaShop WebService: ${msg}`,
-      { status, data: err?.response?.data },
+      { status, data: sanitizedData },
       status ? status >= 500 : true
     );
   }

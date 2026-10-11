@@ -57,12 +57,21 @@ export class PrestaShopOrderMapper {
     const date = raw.date_add ? new Date(raw.date_add) : new Date();
     const status = PrestaShopOrderMapper.mapStatus(raw.current_state);
 
-    const lines: CanonicalOrderLine[] = (raw.associations?.order_rows || []).map((row, index) => {
-      const unitPrice = parseFloat(String(row.unit_price_tax_excl || row.product_price || 0));
-      const total = parseFloat(String(row.total_price_tax_incl || row.unit_price_tax_incl || 0));
-      const subtotal = parseFloat(String(row.total_price_tax_excl || row.unit_price_tax_excl || 0));
-      const qty = parseFloat(String(row.product_quantity || 1));
-      const vatPercent = subtotal > 0 ? Math.round(((total - subtotal) / subtotal) * 100) : 21;
+    const safeFloat = (val: unknown, fallback = 0): number => {
+      const n = parseFloat(String(val ?? 0));
+      return Number.isFinite(n) ? Math.round(n * 100) / 100 : fallback;
+    };
+
+    const rawRows = raw.associations?.order_rows;
+    const orderRows = Array.isArray(rawRows) ? rawRows : (rawRows ? [rawRows] : []);
+
+    const lines: CanonicalOrderLine[] = orderRows.map((row: any, index: number) => {
+      const unitPrice = safeFloat(row.unit_price_tax_excl || row.product_price || 0);
+      const total = safeFloat(row.total_price_tax_incl || row.unit_price_tax_incl || 0);
+      const subtotal = safeFloat(row.total_price_tax_excl || row.unit_price_tax_excl || 0);
+      const parsedQty = parseFloat(String(row.product_quantity || 1));
+      const qty = Number.isFinite(parsedQty) ? Math.max(0, parsedQty) : 1;
+      const vatPercent = subtotal > 0 ? Math.max(0, Math.round(((total - subtotal) / subtotal) * 100)) : 21;
 
       return {
         id: String(row.id || index + 1),
@@ -80,11 +89,11 @@ export class PrestaShopOrderMapper {
       };
     });
 
-    const netAmount = parseFloat(String(raw.total_paid_tax_excl || 0));
-    const totalAmount = parseFloat(String(raw.total_paid_tax_incl || raw.total_paid || 0));
-    const taxAmount = Math.max(0, totalAmount - netAmount);
-    const shippingAmount = parseFloat(String(raw.total_shipping_tax_incl || raw.total_shipping || 0));
-    const discountAmount = parseFloat(String(raw.total_discounts || 0));
+    const netAmount = safeFloat(raw.total_paid_tax_excl || 0);
+    const totalAmount = safeFloat(raw.total_paid_tax_incl || raw.total_paid || 0);
+    const taxAmount = Math.max(0, Math.round((totalAmount - netAmount) * 100) / 100);
+    const shippingAmount = safeFloat(raw.total_shipping_tax_incl || raw.total_shipping || 0);
+    const discountAmount = safeFloat(raw.total_discounts || 0);
 
     const defaultCustomer: CanonicalCustomer = customer || {
       id: String(raw.id_customer),

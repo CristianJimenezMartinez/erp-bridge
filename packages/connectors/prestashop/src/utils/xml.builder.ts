@@ -6,6 +6,7 @@ export class PrestaShopXml {
     attributeNamePrefix: '@_',
     format: false,
     suppressEmptyNode: false,
+    cdataPropName: '__cdata',
   });
 
   private static readonly parser = new XMLParser({
@@ -13,6 +14,8 @@ export class PrestaShopXml {
     attributeNamePrefix: '@_',
     parseTagValue: false,
     trimValues: true,
+    processEntities: false,
+    stopNodes: ['*.rawSourceData'],
   });
 
   public static build(resourceName: string, data: Record<string, unknown>): string {
@@ -29,11 +32,13 @@ export class PrestaShopXml {
     return PrestaShopXml.parser.parse(xmlString) as T;
   }
 
-  public static toLanguageNode(text: string, langId = 1): { language: { '@_id': string; '#text': string } } {
+  public static toLanguageNode(text: string, langId = 1): { language: { '@_id': string; '__cdata': string } } {
+    const raw = String(text ?? '');
+    const safeText = raw.replace(/\]\]>/g, ']]]]><![CDATA[>');
     return {
       language: {
         '@_id': String(langId),
-        '#text': text,
+        '__cdata': safeText,
       },
     };
   }
@@ -46,20 +51,22 @@ export class PrestaShopXml {
       if (typeof first === 'string') return first;
       if (first && typeof first === 'object') {
         const item = first as Record<string, unknown>;
+        if (typeof item['__cdata'] === 'string') return item['__cdata'];
         if (typeof item['value'] === 'string') return item['value'];
         if (typeof item['#text'] === 'string') return item['#text'];
       }
       return '';
     }
     if (typeof value === 'object' && value !== null) {
-      const v = value as { language?: { '#text'?: string; value?: string } | Array<{ '#text'?: string; value?: string }>; value?: string; '#text'?: string };
+      const v = value as { language?: { '#text'?: string; value?: string; __cdata?: string } | Array<{ '#text'?: string; value?: string; __cdata?: string }>; value?: string; '#text'?: string; __cdata?: string };
       if (Array.isArray(v.language)) {
         const first = v.language[0];
-        return first?.['#text'] || first?.value || '';
+        return first?.['__cdata'] || first?.['#text'] || first?.value || '';
       }
       if (v.language && typeof v.language === 'object') {
-        return v.language['#text'] || v.language.value || '';
+        return v.language['__cdata'] || v.language['#text'] || v.language.value || '';
       }
+      if (typeof v.__cdata === 'string') return v.__cdata;
       if (typeof v.value === 'string') return v.value;
       if (typeof v['#text'] === 'string') return v['#text'];
     }

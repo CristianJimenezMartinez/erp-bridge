@@ -70,8 +70,9 @@ export class PrestaShopProductHandler {
   public async updateProduct(product: CanonicalProduct, targetIdentifier?: string): Promise<ProductMutationResult> {
     let externalId = targetIdentifier;
     if (!externalId) {
+      const safeSku = (product.sku || '').replace(/[\[\]|%!]/g, '').trim();
       const existing = await this.client.get<{ products?: Array<{ id: number }> }>('products', {
-        'filter[reference]': `[${product.sku}]`,
+        'filter[reference]': `[${safeSku}]`,
         display: '[id]',
       });
       if (existing.products?.[0]) {
@@ -87,7 +88,13 @@ export class PrestaShopProductHandler {
     }
 
     try {
-      const numericId = parseInt(externalId, 10);
+      const numericId = parseInt(String(externalId).replace(/[^0-9]/g, ''), 10);
+      if (!numericId || !Number.isFinite(numericId)) {
+        throw new ConnectionError(
+          ErrorCode.VALIDATION_ERROR,
+          `ID externo de PrestaShop inválido para producto SKU ${product.sku}: ${externalId}`
+        );
+      }
       const payload = PrestaShopProductMapper.toPsProductPayload(product, numericId, this.langId);
       const res = await this.client.put<{ product?: { id: number } }>(`products/${numericId}`, payload);
 

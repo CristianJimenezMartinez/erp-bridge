@@ -71,29 +71,32 @@ export class PrestaShopOrderHandler {
   }
 
   public async injectCarrierTracking(orderId: string, trackingNumber: string): Promise<void> {
+    const cleanOrderId = String(orderId ?? '').replace(/[^0-9]/g, '');
+    if (!cleanOrderId) return;
     try {
       const carrierRes = await this.client.get<{ order_carriers?: PrestaShopOrderCarrier[] }>('order_carriers', {
-        'filter[id_order]': `[${orderId}]`,
+        'filter[id_order]': `[${cleanOrderId}]`,
         display: 'full',
       });
 
       const carrier = carrierRes.order_carriers?.[0];
-      if (carrier && carrier.id) {
-        await this.client.put(`order_carriers/${carrier.id}`, {
-          id: carrier.id,
-          id_order: orderId,
+      const carrierId = carrier && carrier.id ? String(carrier.id).replace(/[^0-9]/g, '') : '';
+      if (carrierId) {
+        await this.client.put(`order_carriers/${carrierId}`, {
+          id: parseInt(carrierId, 10),
+          id_order: parseInt(cleanOrderId, 10),
           tracking_number: trackingNumber,
         });
-        this.logger.info(`Tracking inyectado en ps_order_carrier ID ${carrier.id} para Pedido #${orderId}: ${trackingNumber}`);
+        this.logger.info(`Tracking inyectado en ps_order_carrier ID ${carrierId} para Pedido #${cleanOrderId}: ${trackingNumber}`);
       } else {
         // Actualizacion directa en recurso order si no hay order_carrier disponible
-        await this.client.put(`orders/${orderId}`, {
-          id: parseInt(orderId, 10),
+        await this.client.put(`orders/${cleanOrderId}`, {
+          id: parseInt(cleanOrderId, 10),
           shipping_number: trackingNumber,
         });
       }
     } catch (err) {
-      this.logger.warn(`No se pudo inyectar el tracking number en PrestaShop para pedido ${orderId}`, { error: String(err) });
+      this.logger.warn(`No se pudo inyectar el tracking number en PrestaShop para pedido ${cleanOrderId}`, { error: String(err) });
     }
   }
 
