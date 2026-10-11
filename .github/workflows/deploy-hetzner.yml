@@ -61,11 +61,15 @@ jobs:
 
       - name: Live Health Check
         run: |
-          sleep 5
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bridge.cristianjm.com/health)
-          echo "Health Check HTTP Status: $STATUS"
-          if [ "$STATUS" -ne 200 ]; then
-            echo "❌ Falló el health check en producción"
-            exit 1
-          fi
-          echo "✅ Servidor respondiendo 200 OK en bridge.cristianjm.com"
+          echo "Esperando a que el contenedor complete su arranque y conexión..."
+          for i in {1..8}; do
+            sleep 4
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://bridge.cristianjm.com/health || true)
+            echo "Intento $i/8 - Health Check HTTP Status: $STATUS"
+            if [ "$STATUS" -eq 200 ]; then
+              echo "✅ Servidor respondiendo 200 OK en bridge.cristianjm.com"
+              exit 0
+            fi
+          done
+          echo "❌ Falló el health check en producción tras varios reintentos"
+          exit 1

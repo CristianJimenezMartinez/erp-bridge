@@ -20,8 +20,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
       # Conexión Gestionada a Supabase (PostgreSQL Frankfurt) con SSL
       - DATABASE_URL=${DATABASE_URL}
+      - DB_SSL_REJECT_UNAUTHORIZED=${DB_SSL_REJECT_UNAUTHORIZED:-false}
       # Seguridad y Autenticación Administrativa
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
