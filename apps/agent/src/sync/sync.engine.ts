@@ -15,6 +15,7 @@ import { ProgressiveCatalogHelper, ProgressiveCatalogContext } from './progressi
 import { OrderNotifierService } from '../notifications/order-notifier.service';
 import { SalesLedgerManager } from '../orders/sales-ledger.manager';
 import { OrderPlausibilityAdapter } from '../adapters/order-plausibility.adapter';
+import { ShopifySyncHelper } from './shopify-sync.helper';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -151,6 +152,19 @@ export class LocalSyncEngine {
       return this.syncUniversalBridge(dbPath, config, start, isManual);
     }
 
+    const isShopify =
+      config.channelType === 'shopify' ||
+      (Boolean(config.shopify?.shopSubdomain) && !woo.storeUrl);
+
+    if (isShopify) {
+      if (!dbPath || !fs.existsSync(dbPath)) {
+        const msg = `Base de datos de Factusol no configurada o inaccesible (${dbPath || 'Sin ruta'}).`;
+        this.eventBus.addEvent('error', `❌ ${msg}`);
+        return { success: false, message: msg };
+      }
+      return this.syncShopify(dbPath, config, start, isManual);
+    }
+
     try {
       if (dbPath && fs.existsSync(dbPath) && woo.storeUrl && woo.consumerKey && woo.consumerSecret) {
         const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
@@ -187,25 +201,15 @@ export class LocalSyncEngine {
 
           if (!stockRows || stockRows.length === 0) {
             AgentDiskLogger.getInstance().log({
-              level: 'WARN',
-              component: 'SyncEngine',
-              action: 'query_factusol_stock',
-              duration_ms: stockQueryDurationMs,
-              status: 'FAILURE',
-              message: `Consulta de stock en Factusol devolvió 0 registros o falló en ${stockQueryDurationMs}ms`,
-              metadata: { warehouse },
+              level: 'WARN', component: 'SyncEngine', action: 'query_factusol_stock', duration_ms: stockQueryDurationMs, status: 'FAILURE',
+              message: `Consulta de stock en Factusol devolvió 0 registros o falló en ${stockQueryDurationMs}ms`, metadata: { warehouse },
             });
             this.logger.warn('La consulta de stock en Factusol devolvió 0 registros o falló. Se aborta la sincronización de stock preventivamente para evitar vaciado en WooCommerce.');
             this.eventBus.addEvent('warn', 'Lectura de stock en Factusol inaccesible. Sincronización de stock omitida preventivamente.');
           } else {
             AgentDiskLogger.getInstance().log({
-              level: 'SUCCESS',
-              component: 'SyncEngine',
-              action: 'query_factusol_stock',
-              duration_ms: stockQueryDurationMs,
-              status: 'SUCCESS',
-              message: `Consulta Factusol F_STO completada (${stockRows.length} referencias) en ${stockQueryDurationMs}ms`,
-              metadata: { warehouse, count: stockRows.length },
+              level: 'SUCCESS', component: 'SyncEngine', action: 'query_factusol_stock', duration_ms: stockQueryDurationMs, status: 'SUCCESS',
+              message: `Consulta Factusol F_STO completada (${stockRows.length} referencias) en ${stockQueryDurationMs}ms`, metadata: { warehouse, count: stockRows.length },
             });
 
             const stockMap = new Map<string, number>();
@@ -413,18 +417,9 @@ export class LocalSyncEngine {
                   canonicalOrder.paymentMethod || wcOrder.payment_method_title
                 );
                 AgentDiskLogger.getInstance().log({
-                  level: 'SUCCESS',
-                  component: 'SyncEngine',
-                  action: 'insert_factusol_order',
-                  duration_ms: insertDurationMs,
-                  status: 'SUCCESS',
+                  level: 'SUCCESS', component: 'SyncEngine', action: 'insert_factusol_order', duration_ms: insertDurationMs, status: 'SUCCESS',
                   message: `Pedido #${wcOrder.id} procesado en Factusol en ${insertDurationMs}ms (Serie ${series}, Pedido #${assignedNum})`,
-                  metadata: {
-                    channel: 'woocommerce',
-                    wcOrderId: wcOrder.id,
-                    factusolOrderNumber: assignedNum,
-                    series,
-                  },
+                  metadata: { channel: 'woocommerce', wcOrderId: wcOrder.id, factusolOrderNumber: assignedNum, series },
                 });
                 this.eventBus.addEvent('success', `✓ Pedido #${wcOrder.id} procesado en Factusol (Serie ${series}, Pedido #${assignedNum})`);
 
@@ -447,18 +442,9 @@ export class LocalSyncEngine {
                   canonicalOrder.paymentMethod || wcOrder.payment_method_title
                 );
                 AgentDiskLogger.getInstance().log({
-                  level: 'ERROR',
-                  component: 'SyncEngine',
-                  action: 'insert_factusol_order',
-                  duration_ms: insertDurationMs,
-                  status: 'FAILURE',
+                  level: 'ERROR', component: 'SyncEngine', action: 'insert_factusol_order', duration_ms: insertDurationMs, status: 'FAILURE',
                   message: `No se pudo importar pedido #${wcOrder.id} a Factusol tras ${insertDurationMs}ms: ${orderRes.error}`,
-                  metadata: {
-                    channel: 'woocommerce',
-                    wcOrderId: wcOrder.id,
-                    series,
-                    error: orderRes.error,
-                  },
+                  metadata: { channel: 'woocommerce', wcOrderId: wcOrder.id, series, error: orderRes.error },
                 });
                 this.logger.warn(`No se pudo importar pedido #${wcOrder.id} a Factusol: ${orderRes.error}`);
               }
@@ -498,11 +484,7 @@ export class LocalSyncEngine {
 
           if (cancelRes.ordersCancelled > 0) {
             AgentDiskLogger.getInstance().log({
-              level: 'SUCCESS',
-              component: 'SyncEngine',
-              action: 'sync_cancellations',
-              duration_ms: cancelDurationMs,
-              status: 'SUCCESS',
+              level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cancellations', duration_ms: cancelDurationMs, status: 'SUCCESS',
               message: `Stock repuesto en Factusol para ${cancelRes.ordersCancelled} pedidos cancelados/reembolsados de WooCommerce en ${cancelDurationMs}ms`,
               metadata: { channel: 'woocommerce', ordersCancelled: cancelRes.ordersCancelled },
             });
@@ -557,17 +539,9 @@ export class LocalSyncEngine {
         this.logger.debug(`Sondeo rutinario completado sin novedades: ${summary}`);
       }
       AgentDiskLogger.getInstance().log({
-        level: 'SUCCESS',
-        component: 'SyncEngine',
-        action: 'sync_cycle_complete',
-        duration_ms: cycleDurationMs,
-        status: 'SUCCESS',
+        level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cycle_complete', duration_ms: cycleDurationMs, status: 'SUCCESS',
         message: `Ciclo completo de sincronización WooCommerce finalizado en ${cycleDurationMs}ms`,
-        metadata: {
-          channel: 'woocommerce',
-          itemsUpdated,
-          ordersImported,
-        },
+        metadata: { channel: 'woocommerce', itemsUpdated, ordersImported },
       });
       return { success: true, message: summary };
     } catch (err) {
@@ -610,8 +584,11 @@ export class LocalSyncEngine {
       const isWoo = Boolean(
         woo?.storeUrl && woo?.consumerKey && woo?.consumerSecret
       );
+      const isShopify =
+        config.channelType === 'shopify' ||
+        (Boolean(config.shopify?.shopSubdomain) && !woo?.storeUrl);
 
-      if (!dbPath || !fs.existsSync(dbPath) || (!isBridge && !isWoo)) {
+      if (!dbPath || !fs.existsSync(dbPath) || (!isBridge && !isWoo && !isShopify)) {
         return;
       }
 
@@ -787,11 +764,7 @@ export class LocalSyncEngine {
           timings['pushStockMs'] = pushStockDurationMs;
 
           AgentDiskLogger.getInstance().log({
-            level: 'SUCCESS',
-            component: 'SyncEngine',
-            action: 'push_channel_stock',
-            duration_ms: pushStockDurationMs,
-            status: 'SUCCESS',
+            level: 'SUCCESS', component: 'SyncEngine', action: 'push_channel_stock', duration_ms: pushStockDurationMs, status: 'SUCCESS',
             message: `Stock sincronizado en Universal Bridge: ${itemsUpdated} referencias actualizadas en ${pushStockDurationMs}ms (dirty-check)`,
             metadata: { channel: 'universal_bridge', itemsUpdated },
           });
@@ -802,11 +775,7 @@ export class LocalSyncEngine {
           const pushStockDurationMs = Math.round(performance.now() - tPushStockStart);
           timings['pushStockMs'] = pushStockDurationMs;
           AgentDiskLogger.getInstance().log({
-            level: 'INFO',
-            component: 'SyncEngine',
-            action: 'push_channel_stock',
-            duration_ms: pushStockDurationMs,
-            status: 'SKIPPED',
+            level: 'INFO', component: 'SyncEngine', action: 'push_channel_stock', duration_ms: pushStockDurationMs, status: 'SKIPPED',
             message: `Dirty-check Universal Bridge: existencias al día en Factusol (0 modificaciones necesarias)`,
             metadata: { channel: 'universal_bridge', totalTracked: this.lastUniversalBridgeStock.size },
           });
@@ -814,13 +783,8 @@ export class LocalSyncEngine {
         }
       } else {
         AgentDiskLogger.getInstance().log({
-          level: 'WARN',
-          component: 'SyncEngine',
-          action: 'query_factusol_stock',
-          duration_ms: stockQueryDurationMs,
-          status: 'FAILURE',
-          message: `Consulta Factusol F_STO devolvió 0 registros o falló en ${stockQueryDurationMs}ms`,
-          metadata: { warehouse },
+          level: 'WARN', component: 'SyncEngine', action: 'query_factusol_stock', duration_ms: stockQueryDurationMs, status: 'FAILURE',
+          message: `Consulta Factusol F_STO devolvió 0 registros o falló en ${stockQueryDurationMs}ms`, metadata: { warehouse },
         });
         if (stockRows === null) {
           this.eventBus.addEvent('warn', '⚠️ Base de datos Factusol no accesible o fallo al consultar F_STO. Comprueba la conexión de red o permisos del archivo.');
@@ -935,18 +899,9 @@ export class LocalSyncEngine {
               );
 
               AgentDiskLogger.getInstance().log({
-                level: 'SUCCESS',
-                component: 'SyncEngine',
-                action: 'insert_factusol_order',
-                duration_ms: insertDurationMs,
-                status: 'SUCCESS',
+                level: 'SUCCESS', component: 'SyncEngine', action: 'insert_factusol_order', duration_ms: insertDurationMs, status: 'SUCCESS',
                 message: `Pedido ${canonicalOrder.reference} registrado en Factusol en ${insertDurationMs}ms (Nº ${factNum || mutRes.externalId})`,
-                metadata: {
-                  channel: 'universal_bridge',
-                  orderId: numId,
-                  factusolOrderNumber: factNum,
-                  series,
-                },
+                metadata: { channel: 'universal_bridge', orderId: numId, factusolOrderNumber: factNum, series },
               });
               this.eventBus.addEvent('success', `✓ Pedido ${canonicalOrder.reference} registrado en Factusol (Nº ${factNum || mutRes.externalId}).`);
 
@@ -970,18 +925,9 @@ export class LocalSyncEngine {
               );
 
               AgentDiskLogger.getInstance().log({
-                level: 'ERROR',
-                component: 'SyncEngine',
-                action: 'insert_factusol_order',
-                duration_ms: insertDurationMs,
-                status: 'FAILURE',
+                level: 'ERROR', component: 'SyncEngine', action: 'insert_factusol_order', duration_ms: insertDurationMs, status: 'FAILURE',
                 message: `No se pudo registrar pedido web #${numId} (${po.order_number}) en Factusol tras ${insertDurationMs}ms: ${mutRes.error}`,
-                metadata: {
-                  channel: 'universal_bridge',
-                  orderId: numId,
-                  series,
-                  error: mutRes.error,
-                },
+                metadata: { channel: 'universal_bridge', orderId: numId, series, error: mutRes.error },
               });
               this.logger.warn(`No se pudo registrar pedido web #${numId} (${po.order_number}) en Factusol: ${mutRes.error}`);
             }
@@ -1091,13 +1037,8 @@ export class LocalSyncEngine {
 
     if (isManual || ordersImported > 0 || ordersCancelled > 0) {
       this.historyManager.addSyncHistoryRecord({
-        type: isManual ? 'manual' : 'periodic',
-        mode: 'full',
-        status: 'success',
-        durationSeconds: parseFloat(duration),
-        itemsUpdated,
-        ordersImported,
-        message: summary,
+        type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'success',
+        durationSeconds: parseFloat(duration), itemsUpdated, ordersImported, message: summary,
       });
     }
 
@@ -1127,6 +1068,61 @@ export class LocalSyncEngine {
     }
   }
 
+  private async syncShopify(
+    dbPath: string,
+    config: any,
+    start: number,
+    isManual: boolean = true
+  ): Promise<SyncManualResult> {
+    try {
+      const driver = new AccessDriver({ databasePath: dbPath });
+      const warehouse = config.factusol?.warehouseCode || 'GEN';
+      const series = config.factusol?.orderSeries || '1';
+
+      const stockRes = await ShopifySyncHelper.syncStockToShopify(driver, config, warehouse);
+      const orderRes = await ShopifySyncHelper.importShopifyOrders(driver, config, {
+        plausibilityAdapter: OrderPlausibilityAdapter,
+        orderNotifier: OrderNotifierService,
+        salesLedgerManager: this.salesLedgerManager,
+        eventBus: this.eventBus,
+        series,
+        warehouse,
+      });
+
+      const itemsUpdated = stockRes.itemsUpdated;
+      const ordersImported = orderRes.ordersImported;
+      const cycleDurationMs = Date.now() - start;
+      const duration = (cycleDurationMs / 1000).toFixed(1);
+      const summary = `✓ Sincronización completada con Shopify (${itemsUpdated} productos, ${ordersImported} pedidos)`;
+
+      if (isManual || itemsUpdated > 0 || ordersImported > 0) {
+        this.historyManager.addSyncHistoryRecord({
+          type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'success',
+          durationSeconds: parseFloat(duration), itemsUpdated, ordersImported, message: summary,
+        });
+        this.eventBus.addEvent('success', summary);
+      } else {
+        this.logger.debug(`Sondeo Shopify completado sin novedades: ${summary}`);
+      }
+
+      AgentDiskLogger.getInstance().log({
+        level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cycle_complete', duration_ms: cycleDurationMs, status: 'SUCCESS',
+        message: `Ciclo completo de sincronización Shopify finalizado en ${cycleDurationMs}ms`,
+        metadata: { channel: 'shopify', itemsUpdated, ordersImported },
+      });
+      return { success: true, message: summary };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const duration = parseFloat(((Date.now() - start) / 1000).toFixed(1));
+      this.historyManager.addSyncHistoryRecord({
+        type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'error',
+        durationSeconds: duration, itemsUpdated: 0, ordersImported: 0, message: `Fallo en sincronización Shopify: ${msg}`,
+      });
+      this.eventBus.addEvent('warn', `Aviso en sincronización Shopify: ${msg}`);
+      return { success: false, message: `Sincronización finalizada con incidencias: ${msg}` };
+    }
+  }
+
   private createProgressiveContext(): ProgressiveCatalogContext {
     return {
       configManager: this.configManager,
@@ -1139,7 +1135,7 @@ export class LocalSyncEngine {
   }
 
   private recordSalesOrder(
-    channel: 'woocommerce' | 'universal_bridge',
+    channel: 'woocommerce' | 'universal_bridge' | 'shopify',
     webOrderId: string,
     orderNumber: string,
     date: string,
@@ -1155,8 +1151,9 @@ export class LocalSyncEngine {
     if (!this.salesLedgerManager) return;
     try {
       this.salesLedgerManager.recordOrder({
-        channel,
+        channel: channel as any,
         webOrderId,
+
         orderNumber,
         date: date || new Date().toISOString(),
         factusolSeries: series,

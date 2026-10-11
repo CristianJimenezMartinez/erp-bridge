@@ -4,10 +4,13 @@ import {
   WooCommerceTestResult,
   UniversalBridgeTestResult,
   ShopifyTestResult,
+  PrestashopTestResult,
+  PrestashopTestSettings,
 } from './channel.types';
 import { WooCommerceTester } from './woocommerce.tester';
 import { UniversalBridgeTester } from './universal-bridge.tester';
 import { ShopifyTester } from './shopify.tester';
+import { PrestashopTester } from './prestashop.tester';
 
 export const SECRET_MASK = '••••••••';
 export function isSecretMaskedOrEmpty(val: unknown): boolean {
@@ -55,6 +58,15 @@ export class ChannelTesterService {
         ? cfg.shopify.accessToken
         : settings.accessToken;
     return ShopifyTester.test({ ...settings, accessToken: finalToken });
+  }
+
+  public async testPrestashopConnection(settings: PrestashopTestSettings): Promise<PrestashopTestResult> {
+    const cfg = this.configManager.get();
+    let finalKey = settings.apiKey;
+    if (isSecretMaskedOrEmpty(finalKey) && (cfg as any).prestashop?.apiKey) {
+      finalKey = (cfg as any).prestashop.apiKey;
+    }
+    return PrestashopTester.test({ ...settings, apiKey: finalKey });
   }
 
   public async testHoldedConnection(config: {

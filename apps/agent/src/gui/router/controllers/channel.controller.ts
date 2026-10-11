@@ -70,6 +70,30 @@ export class ChannelController {
     };
   }
 
+  public static testPrestashop(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      const lic = agent.getLicenseStatus();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            success: false,
+            message: `Acción bloqueada: Se requiere una licencia activa (${lic.status}) para conectar y validar la tienda web. Activa tu clave en la pestaña Licencia.`,
+            durationMs: 0,
+            latencyMs: 0,
+            checks: { serverOnline: false, sslValid: false, apiActive: false, permissionsOk: false },
+          })
+        );
+        return;
+      }
+      const t0 = performance.now();
+      const result = await agent.testPrestashopConnection(ctx.body);
+      const durationMs = Math.round((performance.now() - t0) * 10) / 10;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ...result, durationMs: result.latencyMs ?? durationMs }));
+    };
+  }
+
   public static testHolded(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
       const lic = agent.getLicenseStatus();

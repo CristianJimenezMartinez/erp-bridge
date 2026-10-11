@@ -107,6 +107,7 @@ export class LocalGuiServer {
     router.post('/api/local/test-woocommerce', ChannelController.testWooCommerce(this.agent));
     router.post('/api/local/test-universal-bridge', ChannelController.testUniversalBridge(this.agent));
     router.post('/api/local/test-shopify', ChannelController.testShopify(this.agent));
+    router.post('/api/local/test-prestashop', ChannelController.testPrestashop(this.agent));
     router.post('/api/local/channel/test-holded', ChannelController.testHolded(this.agent));
     router.post('/api/local/test-holded', ChannelController.testHolded(this.agent));
     router.get('/api/local/download-companion', ChannelController.downloadCompanion());
@@ -118,6 +119,8 @@ export class LocalGuiServer {
     router.get('/api/local/sales-orders', SalesOrdersController.getOrders(this.agent));
     router.get('/api/local/sales-orders/:id', SalesOrdersController.getOrderById(this.agent));
     router.post('/api/local/sales-orders/:id/retry', SalesOrdersController.retryOrder(this.agent));
+    router.post('/api/local/simulate-test-order', SalesOrdersController.simulateTestOrder(this.agent));
+
 
     // 6. License
     router.post('/api/local/activate-license', LicenseController.activateLicense(this.agent));

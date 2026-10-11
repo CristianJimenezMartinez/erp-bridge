@@ -48,3 +48,26 @@ export interface ShopifyTestResult {
   shopName?: string;
   myshopifyDomain?: string;
 }
+
+export interface PrestashopChecklist {
+  serverOnline: boolean;
+  sslValid: boolean;
+  apiActive: boolean;
+  permissionsOk: boolean;
+}
+
+export interface PrestashopTestSettings {
+  storeUrl: string;
+  apiKey: string;
+}
+
+export interface PrestashopTestResult {
+  success: boolean;
+  message: string;
+  storeName?: string;
+  version?: string;
+  latencyMs?: number;
+  statusCode?: number;
+  checks?: PrestashopChecklist;
+}
+

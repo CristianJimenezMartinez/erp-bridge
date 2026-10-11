@@ -1,3 +1,5 @@
 export * from './sales-ledger.types';
 export * from './sales-ledger.manager';
 export * from './sales-order.manager';
+export * from './test-order-simulator.service';
+

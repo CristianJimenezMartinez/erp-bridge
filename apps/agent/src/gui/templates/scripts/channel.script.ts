@@ -515,9 +515,160 @@ export const channelScript = `
       }
     }
 
+    async function testPrestashopConnection() {
+      sanitizeUrlInput('input-prestashop-url');
+      const urlEl = document.getElementById('input-prestashop-url');
+      const keyEl = document.getElementById('input-prestashop-key');
+      const storeUrl = urlEl ? urlEl.value.trim() : '';
+      const apiKey = keyEl ? keyEl.value.trim() : '';
+      const chkBox = document.getElementById('prestashop-checklist-box');
+      const alertBox = document.getElementById('prestashop-test-alert');
+      const btn = document.getElementById('btn-test-prestashop');
+      const latencyBadge = document.getElementById('prestashop-latency-badge');
+
+      if (!storeUrl || !apiKey) {
+        showSmartToast({
+          title: 'Credenciales incompletas',
+          message: 'Introduce la URL de tu tienda PrestaShop y la clave Webservice.',
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: !storeUrl ? 'input-prestashop-url' : 'input-prestashop-key',
+          type: 'warn'
+        });
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (latencyBadge) latencyBadge.style.display = 'none';
+      if (chkBox) chkBox.style.display = 'block';
+
+      const cServer = document.getElementById('chk-ps-server');
+      const cSsl = document.getElementById('chk-ps-ssl');
+      const cApi = document.getElementById('chk-ps-api');
+      const cPerms = document.getElementById('chk-ps-perms');
+      [cServer, cSsl, cApi, cPerms].forEach(function(el) { if (el) el.className = 'checklist-step'; });
+
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;"><span class="spin">⏳</span> Comprobando conexión con PrestaShop Webservices API...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/test-prestashop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storeUrl, apiKey })
+        });
+        const data = await res.json();
+        const chks = data.checks || {};
+
+        if (cServer) cServer.className = chks.serverOnline ? 'checklist-step ok' : 'checklist-step fail';
+        if (cSsl) cSsl.className = chks.sslValid ? 'checklist-step ok' : 'checklist-step fail';
+        if (cApi) cApi.className = chks.apiActive ? 'checklist-step ok' : 'checklist-step fail';
+        if (cPerms) cPerms.className = chks.permissionsOk ? 'checklist-step ok' : 'checklist-step fail';
+
+        const latencyVal = (typeof data.latencyMs === 'number' && data.latencyMs > 0) ? data.latencyMs : (typeof data.durationMs === 'number' ? data.durationMs : 0);
+        const timeSuffix = latencyVal > 0 ? ' (' + latencyVal + ' ms)' : '';
+
+        if (data.success) {
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-green';
+            latencyBadge.textContent = latencyVal + ' ms';
+          }
+          const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(data.message) : (data.message || 'Conexión exitosa con PrestaShop');
+          const safeMsg = (typeof escapeHtml === 'function') ? escapeHtml(cleanMsg) : cleanMsg;
+          let detailsHtml = '';
+          if (data.storeName || data.version) {
+            detailsHtml = '<div style="margin-top:6px;font-size:11px;color:var(--text-muted);">' +
+              (data.storeName ? 'Tienda: <strong>' + escapeHtml(data.storeName) + '</strong> ' : '') +
+              (data.version ? '• Versión: <code>' + escapeHtml(data.version) + '</code>' : '') +
+              '</div>';
+          }
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-success-card">' +
+                (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
+                '<span>' + safeMsg + timeSuffix + '</span>' +
+                detailsHtml +
+              '</div>';
+          }
+          showSmartToast({
+            title: 'PrestaShop Conectado',
+            message: 'Conexión con PrestaShop Webservices verificada' + timeSuffix,
+            type: 'success'
+          });
+        } else {
+          if (latencyBadge) {
+            latencyBadge.style.display = 'inline-flex';
+            latencyBadge.className = 'tag tag-amber';
+            latencyBadge.textContent = 'Error';
+          }
+          const errInfo = humanizeErrorMessage(data.message, 'channel');
+          const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(errInfo.title) : (errInfo.title || 'Error de Conexión');
+          const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(cleanTitle) : cleanTitle;
+          const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+          const safeSuggestion = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.suggestion) : errInfo.suggestion;
+          let extraActions = '';
+          if (!storeUrl.startsWith('https://')) {
+            extraActions += '<button type="button" onclick="fixInputHttps(&quot;input-prestashop-url&quot;); testPrestashopConnection();" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('lock') : '') + '<span>Añadir https://</span></button>';
+          }
+          extraActions += '<button type="button" onclick="testPrestashopConnection()" class="smart-error-btn">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar conexión</span></button>';
+          if (alertBox) {
+            alertBox.innerHTML = 
+              '<div class="smart-error-card">' +
+                '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+                '<div class="smart-error-cause">' +
+                  '<strong>Causa:</strong> ' + safeCause + '<br>' +
+                  '<strong>Solución recomendada:</strong> ' + safeSuggestion +
+                '</div>' +
+                '<div class="smart-error-actions">' + extraActions + '</div>' +
+              '</div>';
+          }
+          showSmartToast({
+            title: errInfo.title,
+            message: errInfo.message,
+            actionLabel: 'Corregir en Canal Web →',
+            targetTab: 'channel',
+            targetInputId: 'input-prestashop-url',
+            type: 'error'
+          });
+        }
+      } catch (err) {
+        if (latencyBadge) {
+          latencyBadge.style.display = 'inline-flex';
+          latencyBadge.className = 'tag tag-amber';
+          latencyBadge.textContent = 'Fallo';
+        }
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.title) : errInfo.title;
+        const safeCause = (typeof escapeHtml === 'function') ? escapeHtml(errInfo.cause) : errInfo.cause;
+        if (alertBox) {
+          alertBox.innerHTML = 
+            '<div class="smart-error-card">' +
+              '<div class="smart-error-header">' + (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') + '<span>' + safeTitle + '</span></div>' +
+              '<div class="smart-error-cause">' + safeCause + '</div>' +
+              '<div class="smart-error-actions"><button type="button" onclick="testPrestashopConnection()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button></div>' +
+            '</div>';
+        }
+        showSmartToast({
+          title: errInfo.title,
+          message: errInfo.message,
+          actionLabel: 'Corregir en Canal Web →',
+          targetTab: 'channel',
+          targetInputId: 'input-prestashop-url',
+          type: 'error'
+        });
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+    window.testPrestashopConnection = testPrestashopConnection;
+
     async function saveChannelSettings() {
       sanitizeUrlInput('input-universal-url');
       sanitizeUrlInput('input-wc-url');
+      sanitizeUrlInput('input-prestashop-url');
 
       const univUrlEl = document.getElementById('input-universal-url');
       const univKeyEl = document.getElementById('input-universal-key');
@@ -527,6 +678,8 @@ export const channelScript = `
       const shopSubEl = document.getElementById('input-shopify-subdomain');
       const shopTokEl = document.getElementById('input-shopify-token');
       const shopLocEl = document.getElementById('input-shopify-location');
+      const psUrlEl = document.getElementById('input-prestashop-url');
+      const psKeyEl = document.getElementById('input-prestashop-key');
       const holdedKeyEl = document.getElementById('input-holded-apikey');
       const holdedWhEl = document.getElementById('input-holded-warehouse');
 
@@ -546,6 +699,10 @@ export const channelScript = `
           shopSubdomain: shopSubEl ? shopSubEl.value.trim() : '',
           accessToken: shopTokEl ? shopTokEl.value.trim() : '',
           locationId: shopLocEl ? shopLocEl.value.trim() : '',
+        },
+        prestashop: {
+          storeUrl: psUrlEl ? psUrlEl.value.trim() : '',
+          apiKey: psKeyEl ? psKeyEl.value.trim() : '',
         },
         holded: {
           apiKey: holdedKeyEl ? holdedKeyEl.value.trim() : '',

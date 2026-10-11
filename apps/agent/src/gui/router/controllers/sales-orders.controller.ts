@@ -56,4 +56,32 @@ export class SalesOrdersController {
       res.end(JSON.stringify(result));
     };
   }
+
+  public static simulateTestOrder(agent: LocalAgent): RouteHandler {
+    return async (_req, res, ctx) => {
+      try {
+        const body = (ctx.body && typeof ctx.body === 'object') ? ctx.body : {};
+        const dryRun = body.dryRun !== undefined ? Boolean(body.dryRun) : true;
+        const targetArticleCode = typeof body.targetArticleCode === 'string' ? body.targetArticleCode : undefined;
+        const orderSeries = typeof body.orderSeries === 'string' ? body.orderSeries : undefined;
+        const dbPath = typeof body.dbPath === 'string' ? body.dbPath : undefined;
+
+        const result = await agent.simulateTestOrder({
+          dryRun,
+          targetArticleCode,
+          orderSeries,
+          dbPath,
+        });
+
+        const statusCode = result.success ? 200 : 400;
+        res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: msg }));
+      }
+    };
+  }
 }
+

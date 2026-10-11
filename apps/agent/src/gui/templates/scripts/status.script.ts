@@ -649,6 +649,17 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           if (shopify.locationId || force) inShopifyLoc.value = shopify.locationId || '';
         }
 
+        const prestashop = data.prestashopSettings || {};
+        const inPsUrl = document.getElementById('input-prestashop-url');
+        if (inPsUrl && (force || !inPsUrl.value || document.activeElement !== inPsUrl)) {
+          if (prestashop.storeUrl || force) inPsUrl.value = prestashop.storeUrl || '';
+        }
+
+        const inPsKey = document.getElementById('input-prestashop-key');
+        if (inPsKey && (force || !inPsKey.value || document.activeElement !== inPsKey)) {
+          if (prestashop.apiKey || force) inPsKey.value = prestashop.apiKey || '';
+        }
+
         const holded = data.holdedSettings || {};
         const inHoldedKey = document.getElementById('input-holded-apikey');
         if (inHoldedKey && (force || !inHoldedKey.value || document.activeElement !== inHoldedKey)) {

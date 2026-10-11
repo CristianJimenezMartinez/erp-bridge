@@ -530,6 +530,8 @@ export const coreScript = `
           if (typeof selectChannelType === 'function') selectChannelType('universal_bridge');
         } else if (inputId.indexOf('shopify') !== -1) {
           if (typeof selectChannelType === 'function') selectChannelType('shopify');
+        } else if (inputId.indexOf('prestashop') !== -1) {
+          if (typeof selectChannelType === 'function') selectChannelType('prestashop');
         } else if (inputId.indexOf('holded') !== -1) {
           if (typeof selectChannelType === 'function') selectChannelType('holded');
         }
@@ -641,14 +643,16 @@ export const coreScript = `
       const cardUniv = document.getElementById('card-choice-universal');
       const cardWoo = document.getElementById('card-choice-woo');
       const cardShopify = document.getElementById('card-choice-shopify');
+      const cardPrestashop = document.getElementById('card-choice-prestashop');
       const cardHolded = document.getElementById('card-choice-holded');
       const panelUniv = document.getElementById('panel-universal-bridge');
       const panelWoo = document.getElementById('panel-woocommerce');
       const panelShopify = document.getElementById('panel-shopify');
+      const panelPrestashop = document.getElementById('panel-prestashop');
       const panelHolded = document.getElementById('panel-holded');
 
-      [cardUniv, cardWoo, cardShopify, cardHolded].forEach(function(c) { if (c) c.classList.remove('selected'); });
-      [panelUniv, panelWoo, panelShopify, panelHolded].forEach(function(p) { if (p) p.style.display = 'none'; });
+      [cardUniv, cardWoo, cardShopify, cardPrestashop, cardHolded].forEach(function(c) { if (c) c.classList.remove('selected'); });
+      [panelUniv, panelWoo, panelShopify, panelPrestashop, panelHolded].forEach(function(p) { if (p) p.style.display = 'none'; });
 
       if (type === 'universal_bridge') {
         if (cardUniv) cardUniv.classList.add('selected');
@@ -656,6 +660,9 @@ export const coreScript = `
       } else if (type === 'shopify') {
         if (cardShopify) cardShopify.classList.add('selected');
         if (panelShopify) panelShopify.style.display = 'block';
+      } else if (type === 'prestashop') {
+        if (cardPrestashop) cardPrestashop.classList.add('selected');
+        if (panelPrestashop) panelPrestashop.style.display = 'block';
       } else if (type === 'holded') {
         if (cardHolded) cardHolded.classList.add('selected');
         if (panelHolded) panelHolded.style.display = 'block';

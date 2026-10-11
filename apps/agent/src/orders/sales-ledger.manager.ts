@@ -66,7 +66,7 @@ export class SalesLedgerManager {
   }
 
   public recordOrder(data: Partial<SalesOrderRecord> & {
-    channel: 'woocommerce' | 'universal_bridge';
+    channel: 'woocommerce' | 'universal_bridge' | 'shopify' | 'prestashop';
     webOrderId: string;
   }): SalesOrderRecord {
     const existingIndex = this.orders.findIndex(

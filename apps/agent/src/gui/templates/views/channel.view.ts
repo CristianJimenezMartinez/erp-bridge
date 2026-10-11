@@ -35,6 +35,14 @@ export function renderChannelTab(): string {
               <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización directa vía GraphQL Admin API oficial.</div>
             </div>
 
+            <div id="card-choice-prestashop" class="channel-card" onclick="selectChannelType('prestashop')">
+              <div class="channel-icon" style="color: #ea1b75;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 16l2 2 4-4M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+              </div>
+              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">PrestaShop</div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">PrestaShop 1.7 / 8.x - Conexión directa mediante claves Webservices API oficial de PrestaShop.</div>
+            </div>
+
             <div id="card-choice-holded" class="channel-card" onclick="selectChannelType('holded')">
               <div class="channel-icon" style="color: #ff5a5f;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
@@ -186,7 +194,67 @@ export function renderChannelTab(): string {
             <div id="shopify-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
 
-          <!-- OPCIÓN D: HOLDED CLOUD ERP -->
+          <!-- OPCIÓN D: PRESTASHOP WEBSERVICES API -->
+          <div id="panel-prestashop" style="display: none;">
+            <div style="padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 20px;">
+              <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Paso a Paso: Configurar Conexión Oficial con PrestaShop
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                1. En tu panel de PrestaShop, entra en <strong>Parámetros Avanzados &gt; Web service</strong>.<br>
+                2. Asegúrate de marcar <strong>Activar el servicio Web: SÍ</strong> y pulsa Guardar.<br>
+                3. Pulsa <strong>Añadir nueva clave del servicio web</strong>, genera una clave con permisos de Ver / Modificar / Añadir (GET, POST, PUT) y guarda.<br>
+                4. Pega la URL de tu tienda y la clave generada a continuación, y pulsa <strong>Comprobar Conexión</strong>.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Dirección de tu Tienda PrestaShop:</label>
+              <input type="url" id="input-prestashop-url" onblur="sanitizeUrlInput('input-prestashop-url')" class="form-control" placeholder="https://mitienda.com">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Introduce la dirección URL donde está instalado PrestaShop (añadirá https:// automáticamente).</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Clave Webservice de PrestaShop:</label>
+              <input type="password" id="input-prestashop-key" class="form-control" placeholder="Clave alfanumérica de 32 caracteres">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Clave alfanumérica de autenticación creada en Parámetros Avanzados &gt; Web service.</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+              <button onclick="testPrestashopConnection()" id="btn-test-prestashop" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
+                <span>Comprobar Conexión</span>
+              </button>
+              <span id="prestashop-latency-badge" class="tag" style="display: none;"></span>
+            </div>
+
+            <!-- Checklist Interactivo de 4 Pasos -->
+            <div id="prestashop-checklist-box" style="display: none; margin-top: 20px;">
+              <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 8px;">Checklist de Estado de PrestaShop:</div>
+              <div class="checklist-container">
+                <div id="chk-ps-server" class="checklist-step">
+                  <span class="checklist-circle">1</span>
+                  <span>1. Servidor web OK (HTTP 200 responde)</span>
+                </div>
+                <div id="chk-ps-ssl" class="checklist-step">
+                  <span class="checklist-circle">2</span>
+                  <span>2. Certificado SSL OK (Conexión segura HTTPS)</span>
+                </div>
+                <div id="chk-ps-api" class="checklist-step">
+                  <span class="checklist-circle">3</span>
+                  <span>3. Webservices API activa (Endpoint /api disponible)</span>
+                </div>
+                <div id="chk-ps-perms" class="checklist-step">
+                  <span class="checklist-circle">4</span>
+                  <span>4. Permisos de lectura/escritura y clave verificados</span>
+                </div>
+              </div>
+              <div id="prestashop-test-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+            </div>
+          </div>
+
+          <!-- OPCIÓN E: HOLDED CLOUD ERP -->
           <div id="panel-holded" style="display: none;">
             <div style="padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 20px;">
               <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">

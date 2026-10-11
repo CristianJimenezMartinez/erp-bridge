@@ -8,7 +8,7 @@ export interface SalesOrderLine {
 
 export interface SalesOrderRecord {
   id: string;
-  channel: 'woocommerce' | 'universal_bridge';
+  channel: 'woocommerce' | 'universal_bridge' | 'shopify' | 'prestashop';
   webOrderId: string;
   orderNumber: string;
   date: string;

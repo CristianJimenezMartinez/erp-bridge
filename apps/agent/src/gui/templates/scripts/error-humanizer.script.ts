@@ -438,6 +438,8 @@ export const errorHumanizerScript = `
           selectChannelType('woocommerce');
         } else if (err.targetInputId && (err.targetInputId.includes('shopify') || err.code.includes('SHOPIFY'))) {
           selectChannelType('shopify');
+        } else if (err.targetInputId && (err.targetInputId.includes('prestashop') || err.code.includes('PRESTASHOP'))) {
+          selectChannelType('prestashop');
         } else if (err.targetInputId && (err.targetInputId.includes('holded') || err.code.includes('HOLDED'))) {
           selectChannelType('holded');
         } else {

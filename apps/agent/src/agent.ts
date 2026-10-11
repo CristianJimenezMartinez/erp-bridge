@@ -46,6 +46,8 @@ import {
   WooCommerceTestResult,
   UniversalBridgeTestResult,
   ShopifyTestResult,
+  PrestashopTestResult,
+  PrestashopTestSettings,
   ChannelTesterService,
   SECRET_MASK,
   isSecretMaskedOrEmpty,
@@ -59,6 +61,9 @@ import {
   PaginatedSalesOrdersResult,
   SalesOrderRecord,
   SalesOrderManager,
+  TestOrderSimulatorService,
+  TestOrderSimulationOptions,
+  TestOrderSimulationResult,
 } from './orders';
 import { StatusAggregatorService, HeartbeatService } from './status';
 import { PairingService, ConfigApplierService, FileWatcherCoordinatorService } from './lifecycle';
@@ -104,6 +109,7 @@ export class LocalAgent {
 
   // Delegados especializados modularizados
   public readonly salesOrderManager: SalesOrderManager;
+  public readonly testOrderSimulator: TestOrderSimulatorService;
   public readonly channelTester: ChannelTesterService;
   public readonly statusAggregator: StatusAggregatorService;
   public readonly incidentReporter: IncidentReporterService;
@@ -170,6 +176,7 @@ export class LocalAgent {
 
     // Inicialización de delegados especializados
     this.salesOrderManager = new SalesOrderManager(this.salesLedgerManager, this.configManager, this.factusolService, this.eventBus);
+    this.testOrderSimulator = new TestOrderSimulatorService(this.configManager, this.eventBus, this.salesLedgerManager, this.factusolService);
     this.channelTester = new ChannelTesterService(this.configManager);
     this.statusAggregator = new StatusAggregatorService({
       configManager: this.configManager,
@@ -302,6 +309,9 @@ export class LocalAgent {
   public async testShopifyConnection(settings: { shopSubdomain: string; accessToken: string; apiVersion?: string }): Promise<ShopifyTestResult> {
     return this.channelTester.testShopifyConnection(settings);
   }
+  public async testPrestashopConnection(settings: PrestashopTestSettings): Promise<PrestashopTestResult> {
+    return this.channelTester.testPrestashopConnection(settings);
+  }
   public async testHoldedConnection(config: { apiKey: string; defaultWarehouseId?: string }): Promise<{ success: boolean; latencyMs: number; message?: string }> {
     return this.channelTester.testHoldedConnection(config);
   }
@@ -388,6 +398,10 @@ export class LocalAgent {
 
   public async checkForUpdatesAndApply(): Promise<void> {
     return this.updateOrchestrator.checkForUpdatesAndApply();
+  }
+
+  public async simulateTestOrder(options?: TestOrderSimulationOptions): Promise<TestOrderSimulationResult> {
+    return this.testOrderSimulator.simulateOrder(options || {});
   }
 
   // --- Métodos de Arranque Automático (Windows) ---
