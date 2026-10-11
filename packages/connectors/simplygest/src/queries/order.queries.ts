@@ -74,8 +74,9 @@ export function insertOrderLineQuery(
 }
 
 export function readOrdersQuery(limit = 50): string {
+  const safeLimit = Math.max(1, Math.min(500, Math.floor(Number(limit)) || 50));
   return `
-    SELECT TOP ${limit}
+    SELECT TOP ${safeLimit}
       NUMERO, FECHA, CLIENTE, REFPEDIDO, BASE_IMP, IVA, TOTAL, ESTADO
     FROM PEDIDOS_VENTA
     ORDER BY FECHA DESC, NUMERO DESC
