@@ -101,6 +101,12 @@ export class TestOrderSimulatorService {
     }
 
     if (!options.customDriver && !this.defaultDriver) {
+      if (dbPath && /[\x00-\x1f;'"\x60]/.test(dbPath)) {
+        const errMsg = 'La ruta de base de datos Factusol contiene caracteres no permitidos (; \' " ` o caracteres de control).';
+        steps.push({ step: 1, name: 'Conexión con Factusol OLEDB', status: 'failed', details: errMsg });
+        return this.buildFailureResult(steps, errMsg, dryRun, t0);
+      }
+
       if (!dbPath) {
         const errMsg = 'No se ha configurado la ruta del archivo de base de datos de Factusol.';
         steps.push({ step: 1, name: 'Conexión con Factusol OLEDB', status: 'failed', details: errMsg });
@@ -146,7 +152,7 @@ export class TestOrderSimulatorService {
     try {
       let artRows: any[] = [];
       if (options.targetArticleCode) {
-        const targetClean = sanitizeSql(options.targetArticleCode);
+        const targetClean = sanitizeAndTruncate(options.targetArticleCode, 13);
         artRows = await driver.query<any>(`SELECT TOP 1 CODART, DESART, PCOART FROM F_ART WHERE CODART = '${targetClean}'`).catch(() => []);
       }
 
@@ -381,19 +387,40 @@ export class TestOrderSimulatorService {
 
     // 7. Si dryRun === false: insertar pedido en F_PCL y líneas en F_LPC, y actualizar DISSTO
     try {
-      const maxRows = await driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
-      const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
+      const MAX_RETRIES = 3;
+      let nextOrderCode = 1;
+      let inserted = false;
+      let lastInsertErr: any = null;
 
-      const vatBreakdown = calculateOrderVatBreakdown(safeOrder);
-      const headerSql = insertOrderHeaderQuery(safeOrder, nextOrderCode, Number(clientCode) || 1, vatBreakdown, series);
-      const lineSqls = safeOrder.lines.map((line, idx) =>
-        insertOrderLineQuery(line, nextOrderCode, series, line.position || (idx + 1))
-      );
-      const stockSqls = safeOrder.lines.map((line) =>
-        decrementStockQuery(line.sku, warehouse, line.quantity)
-      );
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const maxRows = await driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
+          nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
 
-      await driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
+          const vatBreakdown = calculateOrderVatBreakdown(safeOrder);
+          const headerSql = insertOrderHeaderQuery(safeOrder, nextOrderCode, Number(clientCode) || 1, vatBreakdown, series);
+          const lineSqls = safeOrder.lines.map((line, idx) =>
+            insertOrderLineQuery(line, nextOrderCode, series, line.position || (idx + 1))
+          );
+          const stockSqls = safeOrder.lines.map((line) =>
+            decrementStockQuery(line.sku, warehouse, line.quantity)
+          );
+
+          await driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
+          inserted = true;
+          break;
+        } catch (attemptErr) {
+          lastInsertErr = attemptErr;
+          this.logger.warn(`Intento ${attempt}/${MAX_RETRIES} de inserción en Factusol falló`, { error: String(attemptErr) });
+          if (attempt < MAX_RETRIES) {
+            await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, attempt - 1)));
+          }
+        }
+      }
+
+      if (!inserted) {
+        throw lastInsertErr || new Error('No se pudo insertar el pedido en Factusol tras reintentos');
+      }
 
       steps.push({
         step: 4,

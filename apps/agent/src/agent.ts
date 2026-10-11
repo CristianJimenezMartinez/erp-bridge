@@ -17,12 +17,6 @@ import {
 } from './update';
 import {
   AgentConfigFile,
-  AgentFactusolSettings,
-  AgentWooCommerceSettings,
-  AgentUniversalBridgeSettings,
-  AgentShopifySettings,
-  AgentHoldedSettings,
-  AgentSyncRules,
   AgentNotificationSettings,
   ConfigManager,
 } from './config';
@@ -66,7 +60,7 @@ import {
   TestOrderSimulationResult,
 } from './orders';
 import { StatusAggregatorService, HeartbeatService } from './status';
-import { PairingService, ConfigApplierService, FileWatcherCoordinatorService } from './lifecycle';
+import { PairingService, ConfigApplierService, FileWatcherCoordinatorService, FullConfigUpdates } from './lifecycle';
 
 // Re-exportar tipos y submódulos para 100% de compatibilidad externa
 export * from './config';
@@ -217,17 +211,7 @@ export class LocalAgent {
   public setApiBaseUrl(url: string): void { this.configManager.setApiBaseUrl(url); }
   public setFactusolDbPath(dbPath: string): void { this.configManager.setFactusolDbPath(dbPath); }
 
-  public async saveFullConfig(updates: {
-    factusol?: AgentFactusolSettings;
-    woocommerce?: AgentWooCommerceSettings;
-    universalBridge?: AgentUniversalBridgeSettings;
-    shopify?: AgentShopifySettings;
-    holded?: AgentHoldedSettings;
-    channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded';
-    syncRules?: AgentSyncRules;
-    licenseKey?: string;
-    notifications?: AgentNotificationSettings;
-  }): Promise<{ success: boolean; message: string }> {
+  public async saveFullConfig(updates: FullConfigUpdates): Promise<{ success: boolean; message: string }> {
     return this.configApplierService.saveFullConfig(updates, () => this.isRunning);
   }
 

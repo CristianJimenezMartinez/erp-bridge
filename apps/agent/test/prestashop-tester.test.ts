@@ -1,7 +1,13 @@
 import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 import { PrestashopTester } from '../src/channels/prestashop.tester';
 import { ChannelTesterService, SECRET_MASK } from '../src/channels/channel-tester.service';
 import { ChannelController } from '../src/gui/router/controllers/channel.controller';
+import { ConfigManager } from '../src/config/config.manager';
+import { ConfigApplierService } from '../src/lifecycle/config-applier.service';
+import { EventBus } from '../src/diagnostics/event-bus';
 
 async function runPrestashopTesterTests() {
   console.log('--- Probando PrestashopTester: Validación, Anti-SSRF, Mocks HTTP y ChannelTesterService ---');
@@ -425,7 +431,128 @@ async function runPrestashopTesterTests() {
     console.log('  ✓ ChannelController.testPrestashop validado con éxito.');
   }
 
-  console.log('\n✅ TODOS LOS TESTS DE PRESTASHOP TESTER PASARON SATISFACTORIAMENTE (8/8)');
+  // ==========================================
+  // BLOQUE 9: Hardened Anti-SSRF (IPv6, CGNAT, Credential Stripping)
+  // ==========================================
+  console.log('9. Probando blindaje avanzado Anti-SSRF (IPv6 bracketed, CGNAT, URL Credential Stripping)...');
+  {
+    const hardenedSsrfVectors = [
+      'https://[::1]/api',
+      'https://[fc00::1]/api',
+      'https://[fe80::1]/api',
+      'https://[::ffff:127.0.0.1]/api',
+      'https://100.64.0.1/api',
+      'https://100.100.1.1/api',
+      'https://224.0.0.1/api',
+    ];
+
+    for (const vec of hardenedSsrfVectors) {
+      const res = await PrestashopTester.test({ storeUrl: vec, apiKey: 'valid_key_123' });
+      assert.strictEqual(res.success, false, `Vector ${vec} debe ser bloqueado por Anti-SSRF`);
+      assert(res.message.includes('Anti-SSRF'), `Mensaje debe indicar Anti-SSRF para ${vec}`);
+    }
+
+    // Probar stripping de credenciales en URL
+    const originalFetch = globalThis.fetch;
+    let requestedUrl = '';
+    try {
+      globalThis.fetch = (async (input: RequestInfo | URL) => {
+        requestedUrl = String(input);
+        return {
+          ok: true,
+          status: 200,
+          text: async () => JSON.stringify({ api: { shops: [{ id: 1, name: 'Secure Shop' }] } }),
+          headers: new Headers({ 'psws-version': '8.2.0' }),
+        } as unknown as Response;
+      }) as typeof fetch;
+
+      const res = await PrestashopTester.test({
+        storeUrl: 'https://admin:super_secret_password@mitienda-prestashop.es:8443',
+        apiKey: 'key_1234567890',
+      });
+      assert.strictEqual(res.success, true);
+      assert(!requestedUrl.includes('super_secret_password'), 'La URL solicitada NO debe contener la contraseña embebida');
+      assert(!requestedUrl.includes('admin:'), 'La URL solicitada NO debe contener el usuario embebido');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+
+    console.log('  ✓ Blindaje Anti-SSRF avanzado e higienización de credenciales validados.');
+  }
+
+  // ==========================================
+  // BLOQUE 10: Persistencia de Configuración PrestaShop y Enmascaramiento
+  // ==========================================
+  console.log('10. Probando persistencia en disco de PrestaShop y protección anti-wiping de claves...');
+  {
+    const tmpDataDir = path.join(os.tmpdir(), `bentian-ps-config-test-${Date.now()}`);
+    fs.mkdirSync(tmpDataDir, { recursive: true });
+    process.env.BENTIAN_DATA_DIR = tmpDataDir;
+
+    try {
+      const configManager = new ConfigManager();
+      const mockLicenseService = {
+        activateLicense: async () => ({ success: true }),
+      } as any;
+      const mockFactusolService = {
+        reconnect: async () => {},
+      } as any;
+      const mockSyncEngine = {
+        startAutoSyncLoop: () => {},
+      } as any;
+      const eventBus = new EventBus();
+
+      const configApplier = new ConfigApplierService(
+        configManager,
+        mockLicenseService,
+        mockFactusolService,
+        mockSyncEngine,
+        eventBus
+      );
+
+      // Guardar por primera vez
+      const saveRes = await configApplier.saveFullConfig({
+        channelType: 'prestashop',
+        prestashop: {
+          storeUrl: 'https://tienda-oficial.com',
+          apiKey: 'REAL_SECRET_PRESTASHOP_API_KEY_123',
+        },
+      }, () => false);
+
+      assert.strictEqual(saveRes.success, true);
+
+      // Verificar persistencia en memoria y en disco
+      const savedCfg = configManager.get();
+      assert.strictEqual(savedCfg.channelType, 'prestashop');
+      assert.strictEqual(savedCfg.prestashop?.storeUrl, 'https://tienda-oficial.com');
+      assert.strictEqual(savedCfg.prestashop?.apiKey, 'REAL_SECRET_PRESTASHOP_API_KEY_123');
+
+      const diskContent = JSON.parse(fs.readFileSync(path.join(tmpDataDir, 'agent-config.json'), 'utf8'));
+      assert.strictEqual(diskContent.prestashop?.apiKey, 'REAL_SECRET_PRESTASHOP_API_KEY_123');
+
+      // Re-guardar con clave enmascarada (********) no debe pisar la clave real
+      const reSaveRes = await configApplier.saveFullConfig({
+        prestashop: {
+          storeUrl: 'https://tienda-oficial.com/updated',
+          apiKey: SECRET_MASK,
+        },
+      }, () => false);
+
+      assert.strictEqual(reSaveRes.success, true);
+      const reSavedCfg = configManager.get();
+      assert.strictEqual(reSavedCfg.prestashop?.storeUrl, 'https://tienda-oficial.com/updated');
+      assert.strictEqual(reSavedCfg.prestashop?.apiKey, 'REAL_SECRET_PRESTASHOP_API_KEY_123', 'La clave real debe preservarse');
+
+      console.log('  ✓ Persistencia de PrestaShop y protección de secretos validadas con éxito.');
+    } finally {
+      delete process.env.BENTIAN_DATA_DIR;
+      try {
+        fs.rmSync(tmpDataDir, { recursive: true, force: true });
+      } catch {}
+    }
+  }
+
+  console.log('\n✅ TODOS LOS TESTS DE PRESTASHOP TESTER PASARON SATISFACTORIAMENTE (10/10)');
 }
 
 runPrestashopTesterTests().catch((err) => {

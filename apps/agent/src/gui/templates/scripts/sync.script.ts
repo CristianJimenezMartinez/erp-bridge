@@ -160,6 +160,7 @@ export const syncScript = `
 
       function renderChecklist(targetEl, stepsList) {
         if (!targetEl) return;
+        const esc = window.escapeHtml || function(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
         targetEl.innerHTML = stepsList.map(s => {
           let iconHtml = '';
           let badgeClass = '';
@@ -186,8 +187,8 @@ export const syncScript = `
             '<div style="display:flex;align-items:flex-start;gap:10px;">' +
               '<div style="margin-top:2px;">' + iconHtml + '</div>' +
               '<div>' +
-                '<div style="font-weight:600;font-size:12.5px;color:#fff;">' + s.name + '</div>' +
-                '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">' + (s.details || '') + '</div>' +
+                '<div style="font-weight:600;font-size:12.5px;color:#fff;">' + esc(s.name) + '</div>' +
+                '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">' + esc(s.details || '') + '</div>' +
               '</div>' +
             '</div>' +
             '<span class="' + badgeClass + '" style="font-size:9.5px;padding:1px 6px;">' + statusText + '</span>' +
@@ -230,13 +231,22 @@ export const syncScript = `
           }
 
           if (modalDetails) {
+            const esc = window.escapeHtml || function(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
             const art = data.details.article || {};
             const cust = data.details.customer || {};
+            const safeOrderNum = esc(data.orderNumber || '');
+            const safeSeries = esc(data.series ? data.series + '-' : '');
+            const safeArtCode = esc(data.articleCode || '');
+            const safeArtDesc = esc(data.articleDescription || '');
+            const safeCustName = esc(cust.name || 'Cliente de Pruebas');
+            const safeCustTax = esc(cust.taxId || 'Sin NIF');
+            const safeCustProv = esc(cust.province || 'Alicante');
+
             modalDetails.innerHTML = 
               '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">' +
                 '<div>' +
                   '<div style="color:var(--text-subtle);font-size:10.5px;text-transform:uppercase;">Nº Pedido Factusol</div>' +
-                  '<div style="font-weight:700;font-size:14px;color:#fff;margin-top:2px;">#' + (data.series ? data.series + '-' : '') + data.orderNumber + (dryRun ? ' (Simulado)' : '') + '</div>' +
+                  '<div style="font-weight:700;font-size:14px;color:#fff;margin-top:2px;">#' + safeSeries + safeOrderNum + (dryRun ? ' (Simulado)' : '') + '</div>' +
                 '</div>' +
                 '<div>' +
                   '<div style="color:var(--text-subtle);font-size:10.5px;text-transform:uppercase;">Total con 21% IVA</div>' +
@@ -244,12 +254,12 @@ export const syncScript = `
                 '</div>' +
                 '<div style="grid-column:1 / -1;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">' +
                   '<div style="color:var(--text-subtle);font-size:10.5px;text-transform:uppercase;">Artículo Asignado</div>' +
-                  '<div style="color:#e4e4e7;margin-top:2px;"><strong>' + data.articleCode + '</strong> — ' + data.articleDescription + '</div>' +
+                  '<div style="color:#e4e4e7;margin-top:2px;"><strong>' + safeArtCode + '</strong> — ' + safeArtDesc + '</div>' +
                   '<div style="color:var(--text-muted);font-size:11px;margin-top:2px;">Stock: ' + (art.stockBefore !== undefined ? art.stockBefore : '--') + ' → <strong>' + (art.stockAfter !== undefined ? art.stockAfter : '--') + ' uds</strong></div>' +
                 '</div>' +
                 '<div style="grid-column:1 / -1;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">' +
                   '<div style="color:var(--text-subtle);font-size:10.5px;text-transform:uppercase;">Cliente Factusol</div>' +
-                  '<div style="color:#e4e4e7;margin-top:2px;">' + (cust.name || 'Cliente de Pruebas') + ' (' + (cust.taxId || 'Sin NIF') + ') — ' + (cust.province || 'Alicante') + '</div>' +
+                  '<div style="color:#e4e4e7;margin-top:2px;">' + safeCustName + ' (' + safeCustTax + ') — ' + safeCustProv + '</div>' +
                 '</div>' +
               '</div>';
             modalDetails.style.display = 'block';

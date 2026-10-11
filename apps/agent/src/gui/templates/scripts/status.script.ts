@@ -162,6 +162,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const univ = data.universalBridgeSettings || {};
       const wc = data.woocommerceSettings || {};
       const shopify = data.shopifySettings || {};
+      const prestashop = data.prestashopSettings || {};
       const holded = data.holdedSettings || {};
 
       const cardWcMetric = document.getElementById('card-wc-metric');
@@ -173,6 +174,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       } else if (chType === 'shopify') {
         if (cardWcMetric) cardWcMetric.textContent = 'Shopify Store';
         if (cardWcUrl) cardWcUrl.textContent = shopify.shopSubdomain ? (shopify.shopSubdomain + '.myshopify.com') : 'Sin configurar';
+      } else if (chType === 'prestashop') {
+        if (cardWcMetric) cardWcMetric.textContent = 'PrestaShop API';
+        if (cardWcUrl) cardWcUrl.textContent = prestashop.storeUrl || 'Sin configurar';
       } else if (chType === 'holded') {
         if (cardWcMetric) cardWcMetric.textContent = 'Holded Cloud ERP';
         if (cardWcUrl) cardWcUrl.textContent = holded.apiKey ? 'API Key Configurada' : 'Sin configurar';
@@ -185,9 +189,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           ? !!(univ.storeUrl && univ.storeUrl.trim())
           : (chType === 'shopify'
             ? !!(shopify.shopSubdomain && shopify.accessToken)
-            : (chType === 'holded'
-              ? !!(holded.apiKey && holded.apiKey.trim())
-              : !!(wc.storeUrl && wc.consumerKey)));
+            : (chType === 'prestashop'
+              ? !!(prestashop.storeUrl && prestashop.apiKey)
+              : (chType === 'holded'
+                ? !!(holded.apiKey && holded.apiKey.trim())
+                : !!(wc.storeUrl && wc.consumerKey))));
         cardWcBadge.className = isConfigured ? 'tag tag-green' : 'tag tag-amber';
         cardWcBadge.textContent = isConfigured ? 'Vinculado' : 'Sin Configurar';
 
@@ -322,6 +328,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const univ = data.universalBridgeSettings || {};
       const wc = data.woocommerceSettings || {};
       const shopify = data.shopifySettings || {};
+      const prestashop = data.prestashopSettings || {};
+      const holded = data.holdedSettings || {};
       const lic = data.license || {};
 
       const banner = document.getElementById('zen-alert-banner');
@@ -347,9 +355,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         ? !!(univ.storeUrl && univ.storeUrl.trim())
         : (chType === 'shopify'
           ? !!(shopify.shopSubdomain && shopify.shopSubdomain.trim() && shopify.accessToken && shopify.accessToken.trim())
-          : (chType === 'holded'
-            ? !!(holded.apiKey && holded.apiKey.trim())
-            : !!(wc.storeUrl && wc.storeUrl.trim() && wc.consumerKey && wc.consumerKey.trim())));
+          : (chType === 'prestashop'
+            ? !!(prestashop.storeUrl && prestashop.storeUrl.trim() && prestashop.apiKey && prestashop.apiKey.trim())
+            : (chType === 'holded'
+              ? !!(holded.apiKey && holded.apiKey.trim())
+              : !!(wc.storeUrl && wc.storeUrl.trim() && wc.consumerKey && wc.consumerKey.trim()))));
 
       const isLicenseActive = lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
 

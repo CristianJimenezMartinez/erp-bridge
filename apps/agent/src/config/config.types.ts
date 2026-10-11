@@ -37,6 +37,11 @@ export interface AgentHoldedSettings {
   endpointUrl?: string;
 }
 
+export interface AgentPrestashopSettings {
+  storeUrl?: string;
+  apiKey?: string;
+}
+
 export interface AgentSyncRules {
   enableFileWatcher?: boolean;
   debounceSeconds?: number;
@@ -83,8 +88,9 @@ export interface AgentConfigFile {
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
+  prestashop?: AgentPrestashopSettings;
   holded?: AgentHoldedSettings;
-  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded';
+  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded' | 'prestashop';
   syncRules?: AgentSyncRules;
   notifications?: AgentNotificationSettings;
 }

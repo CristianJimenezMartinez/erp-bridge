@@ -6,6 +6,7 @@ import {
   AgentWooCommerceSettings,
   AgentUniversalBridgeSettings,
   AgentShopifySettings,
+  AgentPrestashopSettings,
   AgentHoldedSettings,
   AgentSyncRules,
   AgentNotificationSettings,
@@ -22,8 +23,9 @@ export interface FullConfigUpdates {
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
+  prestashop?: AgentPrestashopSettings;
   holded?: AgentHoldedSettings;
-  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded';
+  channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded' | 'prestashop';
   syncRules?: AgentSyncRules;
   licenseKey?: string;
   notifications?: AgentNotificationSettings;
@@ -79,6 +81,13 @@ export class ConfigApplierService {
       cfg.shopify = { ...(cfg.shopify || {}), ...updates.shopify };
       if (isSecretMaskedOrEmpty(updates.shopify.accessToken) && existingToken) {
         cfg.shopify.accessToken = existingToken;
+      }
+    }
+    if (updates.prestashop) {
+      const existingApiKey = cfg.prestashop?.apiKey;
+      cfg.prestashop = { ...(cfg.prestashop || {}), ...updates.prestashop };
+      if (isSecretMaskedOrEmpty(updates.prestashop.apiKey) && existingApiKey && cfg.prestashop) {
+        cfg.prestashop.apiKey = existingApiKey;
       }
     }
     if (updates.holded) {

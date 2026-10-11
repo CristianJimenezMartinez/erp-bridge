@@ -1,11 +1,16 @@
 import { PrestashopChecklist, PrestashopTestResult, PrestashopTestSettings } from './channel.types';
 
 function isBlockedSsrf(hostname: string): boolean {
-  const h = hostname.toLowerCase().trim();
+  const h = hostname.toLowerCase().trim().replace(/^\[|\]$/g, '');
   if (
     h === '169.254.169.254' ||
     h === '0.0.0.0' ||
     h === '::1' ||
+    h === '0:0:0:0:0:0:0:1' ||
+    h.startsWith('fe80:') ||
+    h.startsWith('fc00:') ||
+    h.startsWith('fd00:') ||
+    h.startsWith('::ffff:') ||
     h.endsWith('.internal') ||
     h.endsWith('.local') ||
     h.endsWith('.onion')
@@ -24,6 +29,8 @@ function isBlockedSsrf(hostname: string): boolean {
     if (b0 === 192 && b1 === 168) return true;
     if (b0 === 127 || b0 === 0) return true;
     if (b0 === 169 && b1 === 254) return true;
+    if (b0 === 100 && b1 >= 64 && b1 <= 127) return true;
+    if (b0 >= 224) return true;
   }
   return false;
 }
@@ -73,6 +80,11 @@ export class PrestashopTester {
         checks: emptyChecks,
       };
     }
+
+    // Limpieza de credenciales incrustadas en URL
+    urlObj.username = '';
+    urlObj.password = '';
+    cleanUrl = `${urlObj.origin}${urlObj.pathname}`.replace(/\/+$/, '').replace(/\/api\/?$/i, '');
 
     const isLocal = urlObj.hostname === 'localhost' || urlObj.hostname === '127.0.0.1';
     if (urlObj.protocol !== 'https:' && !isLocal) {

@@ -155,6 +155,7 @@ export class StatusAggregatorService {
     } : cfg.notifications;
 
     const safeShopify = cfg.shopify ? { ...cfg.shopify, accessToken: cfg.shopify.accessToken ? SECRET_MASK : '' } : cfg.shopify;
+    const safePrestashop = cfg.prestashop ? { ...cfg.prestashop, apiKey: cfg.prestashop.apiKey ? SECRET_MASK : '' } : cfg.prestashop;
     const safeHolded = cfg.holded ? { ...cfg.holded, apiKey: cfg.holded.apiKey ? SECRET_MASK : '' } : cfg.holded;
 
     return {
@@ -179,6 +180,7 @@ export class StatusAggregatorService {
       woocommerceSettings: safeWoo,
       universalBridgeSettings: safeUniv,
       shopifySettings: safeShopify,
+      prestashopSettings: safePrestashop,
       holdedSettings: safeHolded,
       channelType: cfg.channelType || 'woocommerce',
       syncRules: cfg.syncRules,

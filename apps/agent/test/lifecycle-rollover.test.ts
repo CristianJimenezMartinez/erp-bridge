@@ -85,8 +85,8 @@ async function testFiscalRolloverInSyncEngine() {
   const historyManager = new HistoryManager(tempDir);
   const syncEngine = new LocalSyncEngine(configManager, factusolService, historyManager, eventBus);
 
-  // Ejecutar triggerManualSync (sin WooCommerce configurado)
-  const syncResult = await syncEngine.triggerManualSync();
+  // Ejecutar ciclo de sincronización en segundo plano (isManual = false) para verificar rollover
+  const syncResult = await syncEngine.triggerManualSync(false);
   assert.strictEqual(syncResult.success, true);
 
   // Verificar que la configuración se actualizó automáticamente al nuevo año

@@ -64,7 +64,13 @@ export class SalesOrdersController {
         const dryRun = body.dryRun !== undefined ? Boolean(body.dryRun) : true;
         const targetArticleCode = typeof body.targetArticleCode === 'string' ? body.targetArticleCode : undefined;
         const orderSeries = typeof body.orderSeries === 'string' ? body.orderSeries : undefined;
-        const dbPath = typeof body.dbPath === 'string' ? body.dbPath : undefined;
+        const dbPath = typeof body.dbPath === 'string' ? body.dbPath.trim() : undefined;
+
+        if (dbPath && /[\x00-\x1f;'"\x60]/.test(dbPath)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Caracteres no válidos en la ruta de base de datos (; \' " ` o caracteres de control)' }));
+          return;
+        }
 
         const result = await agent.simulateTestOrder({
           dryRun,

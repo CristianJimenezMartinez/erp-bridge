@@ -571,6 +571,7 @@ export const coreScript = `
                    'universal_bridge';
       if (type === 'woocommerce') return { tab: 'channel', inputId: 'input-wc-url', type: 'woocommerce' };
       if (type === 'shopify') return { tab: 'channel', inputId: 'input-shopify-subdomain', type: 'shopify' };
+      if (type === 'prestashop') return { tab: 'channel', inputId: 'input-prestashop-url', type: 'prestashop' };
       if (type === 'holded') return { tab: 'channel', inputId: 'input-holded-apikey', type: 'holded' };
       return { tab: 'channel', inputId: 'input-universal-url', type: 'universal_bridge' };
     }
@@ -586,6 +587,7 @@ export const coreScript = `
         if (target.type === 'universal_bridge' && s.universalBridgeSettings && s.universalBridgeSettings.storeUrl) return true;
         if (target.type === 'woocommerce' && s.woocommerceSettings && s.woocommerceSettings.storeUrl) return true;
         if (target.type === 'shopify' && s.shopifySettings && s.shopifySettings.shopSubdomain) return true;
+        if (target.type === 'prestashop' && s.prestashopSettings && s.prestashopSettings.storeUrl) return true;
         if (target.type === 'holded' && s.holdedSettings && s.holdedSettings.apiKey) return true;
       }
       return false;
@@ -621,6 +623,7 @@ export const coreScript = `
           const sub = (s.shopifySettings && s.shopifySettings.shopSubdomain) || '';
           url = sub ? (sub.startsWith('http') ? sub : ('https://' + sub + '.myshopify.com')) : '';
         }
+        else if (target.type === 'prestashop') url = (s.prestashopSettings && s.prestashopSettings.storeUrl) || '';
       }
       if (!url) {
         const inputEl = document.getElementById(target.inputId);
