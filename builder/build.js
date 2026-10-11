@@ -332,11 +332,11 @@ async function runMasterBuild() {
 
   // Firma digital Ed25519 del ejecutable
   // Orden de búsqueda de la clave privada (nunca debe vivir en una carpeta sincronizada):
-  // 1) BENTIAN_UPDATE_PRIVATE_KEY_PATH  2) ~/.bentian-secrets/update-private.pem  3) builder/keys/ (legado)
+  // 1) BENTIAN_UPDATE_PRIVATE_KEY_PATH  2) ~/.bentian-secrets/update-private-v2.pem  3) ~/.bentian-secrets/update-private.pem (legado)
   const privateKeyCandidates = [
     process.env.BENTIAN_UPDATE_PRIVATE_KEY_PATH,
-    path.join(require('os').homedir(), '.bentian-secrets', 'update-private.pem'),
-    path.resolve(__dirname, 'keys', 'update-private.pem')
+    path.join(require('os').homedir(), '.bentian-secrets', 'update-private-v2.pem'),
+    path.join(require('os').homedir(), '.bentian-secrets', 'update-private.pem')
   ].filter(Boolean);
   const privateKeyPath = privateKeyCandidates.find(p => fs.existsSync(p));
   let exeSignature = '';

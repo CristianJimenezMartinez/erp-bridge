@@ -97,7 +97,7 @@ npm test
 cd "g:\Otros ordenadores\Mi PC\Bentian\erp-bridge"
 node builder/build.js patch --deploy
 ```
-* Valida automáticamente la presencia de `%USERPROFILE%\.bentian-secrets\update-private.pem`.
+* Valida automáticamente la presencia de `%USERPROFILE%\.bentian-secrets\update-private-v2.pem` (o `update-private.pem` legado en release puente).
 * Genera los instaladores, hashes SHA-256 y firma digital Ed25519 en `manifest.json`.
 * Despliega en caliente al servidor Hetzner con verificación HTTP 200 en `/health`.
 

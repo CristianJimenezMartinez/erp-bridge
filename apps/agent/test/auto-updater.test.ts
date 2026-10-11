@@ -1,8 +1,15 @@
 import assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import { UpdateSigner } from '@erp-bridge/core';
-import { UpdateVerifier } from '../src/update/update-verifier';
+import {
+  UpdateVerifier,
+  DEFAULT_UPDATE_PUBLIC_KEY,
+  LEGACY_UPDATE_PUBLIC_KEY,
+  UPDATE_PUBLIC_KEY_V2,
+  TRUSTED_UPDATE_PUBLIC_KEYS,
+} from '../src/update/update-verifier';
 import { AutoUpdater } from '../src/update/auto-updater';
 import { UpdateSupervisor } from '../src/update/update-supervisor';
 
@@ -100,6 +107,48 @@ async function run() {
     },
     /Versión de actualización no válida o insegura/
   );
+
+  // 5. Test INF-001: Dual Key Bridge Release Verification (v1 legacy + v2 current)
+  console.log('5. Testing INF-001: Dual Key Bridge Release Verification...');
+  assert.strictEqual(DEFAULT_UPDATE_PUBLIC_KEY, UPDATE_PUBLIC_KEY_V2);
+  assert(TRUSTED_UPDATE_PUBLIC_KEYS.includes(UPDATE_PUBLIC_KEY_V2));
+  assert(TRUSTED_UPDATE_PUBLIC_KEYS.includes(LEGACY_UPDATE_PUBLIC_KEY));
+
+  const samplePayload = path.join(testDir, 'bridge-test.bin');
+  fs.writeFileSync(samplePayload, 'BENTIAN-BRIDGE-RELEASE-PAYLOAD-DATA');
+  const sampleSha = UpdateVerifier.calculateFileSHA256(samplePayload);
+
+  // 5.1 Test with untrusted ephemeral key
+  const untrusted = UpdateSigner.generateKeyPair();
+  const untrustedSig = UpdateSigner.sign(fs.readFileSync(samplePayload), untrusted.privateKey);
+  const untrustedVerifyDefault = UpdateVerifier.verifyBinary(samplePayload, sampleSha, untrustedSig);
+  assert.strictEqual(untrustedVerifyDefault.valid, false, 'Firma no confiable debe ser rechazada sin publicKeyPem');
+  const untrustedVerifyExplicit = UpdateVerifier.verifyBinary(samplePayload, sampleSha, untrustedSig, DEFAULT_UPDATE_PUBLIC_KEY);
+  assert.strictEqual(untrustedVerifyExplicit.valid, false, 'Firma no confiable debe ser rechazada con DEFAULT_UPDATE_PUBLIC_KEY');
+
+  // 5.2 Test with v2 key from .bentian-secrets
+  const v2PrivPath = path.join(os.homedir(), '.bentian-secrets', 'update-private-v2.pem');
+  if (fs.existsSync(v2PrivPath)) {
+    const v2Priv = fs.readFileSync(v2PrivPath, 'utf8');
+    const v2Sig = UpdateSigner.sign(fs.readFileSync(samplePayload), v2Priv);
+    const v2VerifyNoKey = UpdateVerifier.verifyBinary(samplePayload, sampleSha, v2Sig);
+    assert.strictEqual(v2VerifyNoKey.valid, true, 'Firma v2 debe ser aceptada sin pasar publicKeyPem');
+    const v2VerifyExplicit = UpdateVerifier.verifyBinary(samplePayload, sampleSha, v2Sig, DEFAULT_UPDATE_PUBLIC_KEY);
+    assert.strictEqual(v2VerifyExplicit.valid, true, 'Firma v2 debe ser aceptada con DEFAULT_UPDATE_PUBLIC_KEY');
+    console.log('  ✓ Firma con clave v2 verificada exitosamente en modo puente.');
+  }
+
+  // 5.3 Test with legacy v1 key from .bentian-secrets
+  const v1PrivPath = path.join(os.homedir(), '.bentian-secrets', 'update-private.pem');
+  if (fs.existsSync(v1PrivPath)) {
+    const v1Priv = fs.readFileSync(v1PrivPath, 'utf8');
+    const v1Sig = UpdateSigner.sign(fs.readFileSync(samplePayload), v1Priv);
+    const v1VerifyNoKey = UpdateVerifier.verifyBinary(samplePayload, sampleSha, v1Sig);
+    assert.strictEqual(v1VerifyNoKey.valid, true, 'Firma v1 (legada) debe ser aceptada en la release puente sin pasar publicKeyPem');
+    const v1VerifyExplicit = UpdateVerifier.verifyBinary(samplePayload, sampleSha, v1Sig, DEFAULT_UPDATE_PUBLIC_KEY);
+    assert.strictEqual(v1VerifyExplicit.valid, true, 'Firma v1 (legada) debe ser aceptada en la release puente con DEFAULT_UPDATE_PUBLIC_KEY');
+    console.log('  ✓ Firma de transición con clave v1 legada verificada exitosamente en modo puente.');
+  }
 
   // Cleanup
   if (fs.existsSync(testDir)) {

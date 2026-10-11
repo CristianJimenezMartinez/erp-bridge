@@ -209,3 +209,18 @@
 * **Verificación Activa Post-Despliegue:**
   - Tras cualquier despliegue a producción, el agente debe verificar activamente el estado del servidor mediante `curl.exe -i -L -k "https://bridge.cristianjm.com/health"` y comprobar que la versión reportada coincida con la versión canónica actual.
 
+---
+
+## 20. Identificación Estricta de Entornos y Datos de Test (Anti-Pollution & Naming Standard)
+* **Preservación Absoluta de Registros Reales (Prohibición de Borrado en Producción):**
+  - Queda **TERMINANTEMENTE PROHIBIDO** ejecutar sentencias destructivas (`DELETE FROM licenses` o similares) contra la base de datos de producción. Las licencias históricas de usuarios y organizaciones reales (como Suministros Rubio, clientes de pago, beta testers oficiales y cuentas de auditoría certificadas) deben conservarse 100% intactas para garantizar la continuidad operativa y auditoría contable.
+* **Prefijo Canónico Obligatorio `[TEST]`:**
+  - Todo dato generado con fines de prueba, auditoría interna, verificación de staging o testing E2E que se inserte o persista en la base de datos compartida debe llevar de forma obligatoria el prefijo `[TEST]` tanto en el nombre de la organización (`name`/`legal_name`) como en el alias de la licencia (`alias`), por ejemplo: `[TEST] Auditor Hetzner` o `[TEST] Licencia Inicial Desarrollo`.
+* **Convención de Emails para Cuentas de Prueba:**
+  - Las direcciones de correo electrónico utilizadas en tests o scripts de automatización deben utilizar exclusivamente dominios controlados (`@bentian.es`) o contar con prefijo explícito `test-*@...` o `beta_tester_*@...`. Queda prohibido utilizar correos simulados de empresas reales para tests.
+* **Estado de Facturación para Pruebas (`billing_status: 'TRIAL'`):**
+  - Todo registro de prueba o licencia interna de desarrollo debe configurarse con `billing_status: 'TRIAL'`. Queda terminantemente prohibido marcar registros de prueba con `billing_status: 'ACTIVE'`, a fin de prevenir la contaminación de métricas financieras (MRR, ARR, active paid licenses).
+* **Blindaje del Cálculo de MRR/ARR:**
+  - El endpoint de analítica financiera y KPIs (`/admin/licensing/overview`) calcula el volumen de licencias de pago activas (`active_paid`) exigiendo rigurosamente `status = 'active'`, `billing_status = 'ACTIVE'` y la presencia verificada de una suscripción o sesión válida de Stripe (`(stripe_subscription_id IS NOT NULL OR stripe_session_id IS NOT NULL)`). Si `active_paid === 0`, las métricas ARR y MRR deben reportar exactamente 0 €.
+
+

@@ -80,21 +80,21 @@ licensesRouter.get('/admin/licensing/overview', requireAuth, requireRole(['SUPER
       const stats = await db.query(`
         SELECT 
           COUNT(*)::int as total,
-          COUNT(CASE WHEN status = 'active' AND billing_status = 'ACTIVE' THEN 1 END)::int as active_paid,
+          COUNT(CASE WHEN status = 'active' AND billing_status = 'ACTIVE' AND (stripe_subscription_id IS NOT NULL OR stripe_session_id IS NOT NULL) THEN 1 END)::int as active_paid,
           COUNT(CASE WHEN status = 'trial' OR billing_status = 'TRIAL' THEN 1 END)::int as trials,
           COUNT(CASE WHEN status IN ('revoked', 'suspended') OR billing_status IN ('PAST_DUE', 'CANCELED') THEN 1 END)::int as unpaid_or_canceled,
           COUNT(CASE WHEN seat_type = 'BASE' OR seat_type IS NULL THEN 1 END)::int as base_seats
         FROM licenses
       `).then(r => r.rows[0] as Record<string, any>).catch(() => null);
 
-      const total = stats ? Number(stats['total']) : 1;
-      const activePaid = stats ? Number(stats['active_paid']) : 1;
-      const trials = stats ? Number(stats['trials']) : 0;
-      const unpaidOrCanceled = stats ? Number(stats['unpaid_or_canceled']) : 0;
-      const baseSeats = stats ? Number(stats['base_seats']) : 1;
+      const total = stats ? Number(stats['total']) : 0;
+      const activePaid = stats ? Number(stats['active_paid'] ?? 0) : 0;
+      const trials = stats ? Number(stats['trials'] ?? 0) : 0;
+      const unpaidOrCanceled = stats ? Number(stats['unpaid_or_canceled'] ?? 0) : 0;
+      const baseSeats = stats ? Number(stats['base_seats'] ?? 0) : 0;
       const additionalSeats = 0;
-      const arr = activePaid * 199;
-      const mrr = Math.round(arr / 12);
+      const arr = activePaid > 0 ? activePaid * 199 : 0;
+      const mrr = activePaid > 0 ? Math.round(arr / 12) : 0;
 
       return res.json({
         data: {
@@ -112,14 +112,14 @@ licensesRouter.get('/admin/licensing/overview', requireAuth, requireRole(['SUPER
 
     return res.json({
       data: {
-        total: 1,
-        activePaid: 1,
+        total: 0,
+        activePaid: 0,
         trials: 0,
         unpaidOrCanceled: 0,
-        baseSeats: 1,
+        baseSeats: 0,
         additionalSeats: 0,
-        arr: 199,
-        mrr: 17,
+        arr: 0,
+        mrr: 0,
       },
     });
   } catch (error) {

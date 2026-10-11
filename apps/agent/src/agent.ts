@@ -10,6 +10,7 @@ import {
 import { FactusolDetector } from './detector';
 import {
   AutoUpdater,
+  DEFAULT_UPDATE_PUBLIC_KEY,
   UpdateClient,
   UpdateClientState,
   UpdateOptions,
@@ -161,8 +162,7 @@ export class LocalAgent {
       checkIntervalMs: 60 * 60 * 1000,
       autoDownload: true,
       autoApply: true,
-      publicKeyPem:
-        '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA2Sc3emV3VqjbPmw5RXc1aaeaz0dtpzwI7WP6eHhDpBU=\n-----END PUBLIC KEY-----',
+      publicKeyPem: DEFAULT_UPDATE_PUBLIC_KEY,
     };
 
     this.autoUpdater = new AutoUpdater(updateOptions);

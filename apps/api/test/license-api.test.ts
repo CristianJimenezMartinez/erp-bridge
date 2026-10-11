@@ -221,7 +221,25 @@ async function run() {
     assert.strictEqual(spotsJson.data.priceEur, 139, 'Precio fundador debe ser 139€');
     assert.strictEqual(spotsJson.data.officialPriceEur, 199, 'Precio oficial debe ser 199€');
 
-    console.log('✓ License API E2E Tests Passed (including 25-key founder quota and 199€ pricing)');
+    // 9. Test Superadmin Overview: solo cuenta licencias activas con billing_status ACTIVE y Stripe real
+    const overviewRes = await fetch(`${baseUrl}/api/v1/admin/licensing/overview`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    assert.strictEqual(overviewRes.status, 200);
+    const overviewJson = (await overviewRes.json()) as any;
+    assert(overviewJson.data, 'Debe devolver data en overview');
+    assert(typeof overviewJson.data.activePaid === 'number');
+    assert(typeof overviewJson.data.arr === 'number');
+    assert(typeof overviewJson.data.mrr === 'number');
+    if (overviewJson.data.activePaid === 0) {
+      assert.strictEqual(overviewJson.data.arr, 0, 'Si activePaid es 0, ARR debe ser 0 €');
+      assert.strictEqual(overviewJson.data.mrr, 0, 'Si activePaid es 0, MRR debe ser 0 €');
+    } else {
+      assert.strictEqual(overviewJson.data.arr, overviewJson.data.activePaid * 199);
+      assert.strictEqual(overviewJson.data.mrr, Math.round(overviewJson.data.arr / 12));
+    }
+
+    console.log('✓ License API E2E Tests Passed (including 25-key founder quota, 199€ pricing and overview ARR/MRR)');
   } finally {
     try {
       const db = DatabaseService.getInstance();

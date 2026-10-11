@@ -129,7 +129,7 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 
 | Tarea | Hallazgos | Estado | Commit | Notas |
 |---|---|---|---|---|
-| P0-1 | INF-001 | ABIERTO | — | Requiere decisión y claves del propietario |
+| P0-1 | INF-001 | HECHO | — | Generación de par Ed25519 v2 en ~/.bentian-secrets/ con ACL restrictiva; eliminación de clave privada en repo; arquitectura de release puente con TRUSTED_UPDATE_PUBLIC_KEYS ([v2, v1]) en UpdateVerifier sin alterar módulos FROZEN; builder/build.js prioriza update-private-v2.pem |
 | P0-2 | API-001, INF-002 | HECHO | — | Whitelist estricta (ALLOWED_RELEASE_FILES), basename, validación de prefijo con path.resolve y dotfiles: deny en /releases/latest/:filename y /releases/:version/:filename |
 | P0-3 | API-002 | HECHO | — | requireAuth aplicado a POST /sync/run-reactive y resolveOrgId lanza 401 Unauthorized (BridgeError) si no hay req.user |
 | P0-4 | API-007 | HECHO | — | POST /notifications/order exige auth o x-license-key válida en formato y BD; rechazo de CRLF en to/subject; restricción a emails registrados; rate limiting |

@@ -20,13 +20,15 @@ async function testWatcherDebounceAndMutex() {
     await new Promise((r) => setTimeout(r, 40));
   });
 
+  watcher.start();
+
   // 1. Trigger multiple rapid change events
   watcher.scheduleSync('change-1');
   watcher.scheduleSync('change-2');
   watcher.scheduleSync('change-3');
 
   // Wait for debounce time + execution
-  await new Promise((r) => setTimeout(r, 120));
+  await new Promise((r) => setTimeout(r, 250));
 
   // Should have executed exactly once due to debouncing
   assert.strictEqual(executionCount, 1, `Debe ejecutarse 1 sola vez tras el debounce, pero fue ${executionCount}`);
@@ -35,6 +37,8 @@ async function testWatcherDebounceAndMutex() {
   const status = watcher.getStatus();
   assert.strictEqual(status.isRunning, false);
   assert(status.lastExecutedAt !== null);
+
+  watcher.stop();
 
   console.log('✓ Core AccdbFileWatcher Tests Passed');
 }

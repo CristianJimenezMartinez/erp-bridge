@@ -2,10 +2,21 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { VerificationResult } from './update.types';
 
-// Clave pública oficial por defecto para verificar releases firmadas con Ed25519
-export const DEFAULT_UPDATE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+// Clave pública oficial v1 previa (legada)
+export const LEGACY_UPDATE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEA2Sc3emV3VqjbPmw5RXc1aaeaz0dtpzwI7WP6eHhDpBU=
 -----END PUBLIC KEY-----`;
+
+// Clave pública oficial v2 para verificar releases firmadas con Ed25519
+export const UPDATE_PUBLIC_KEY_V2 = `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEABqU2IJsPQ+IfwKO+SmoEGkUNmrCZUoqL9fHA3vJXCfU=
+-----END PUBLIC KEY-----`;
+
+// Clave pública oficial por defecto
+export const DEFAULT_UPDATE_PUBLIC_KEY = UPDATE_PUBLIC_KEY_V2;
+
+// Lista de claves públicas de confianza (arquitectura de release puente)
+export const TRUSTED_UPDATE_PUBLIC_KEYS = [UPDATE_PUBLIC_KEY_V2, LEGACY_UPDATE_PUBLIC_KEY];
 
 export class UpdateVerifier {
   /**
@@ -137,8 +148,14 @@ export class UpdateVerifier {
         reason = 'Firma HMAC-SHA256 inválida o clave secreta no coincidente.';
       }
     } else {
-      const key = publicKeyPem || DEFAULT_UPDATE_PUBLIC_KEY;
-      signatureValid = this.verifyEd25519(filePath, signature, key);
+      if (publicKeyPem) {
+        const keysToTry = TRUSTED_UPDATE_PUBLIC_KEYS.some((k) => k.trim() === publicKeyPem.trim())
+          ? TRUSTED_UPDATE_PUBLIC_KEYS
+          : [publicKeyPem];
+        signatureValid = keysToTry.some((key) => this.verifyEd25519(filePath, signature, key));
+      } else {
+        signatureValid = TRUSTED_UPDATE_PUBLIC_KEYS.some((key) => this.verifyEd25519(filePath, signature, key));
+      }
       if (!signatureValid) {
         reason = 'Firma digital Ed25519 inválida o no coincide con la clave pública de Bentian ERP Bridge.';
       }

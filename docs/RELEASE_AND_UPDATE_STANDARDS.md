@@ -92,7 +92,7 @@ const updateOptions: UpdateOptions = {
   checkIntervalMs: 60 * 60 * 1000, // Comprobación cada 1 hora
   autoDownload: true,              // Descarga automática en segundo plano
   autoApply: true,                 // Sustitución automática sin requerir clics
-  publicKeyPem: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA2Sc3emV3VqjbPmw5RXc1aaeaz0dtpzwI7WP6eHhDpBU=\n-----END PUBLIC KEY-----',
+  publicKeyPem: DEFAULT_UPDATE_PUBLIC_KEY, // Clave pública Ed25519 v2 (con soporte puente para v1 legada en TRUSTED_UPDATE_PUBLIC_KEYS)
 };
 ```
 
