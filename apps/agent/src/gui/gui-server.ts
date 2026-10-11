@@ -110,7 +110,7 @@ export class LocalGuiServer {
     router.post('/api/local/test-prestashop', ChannelController.testPrestashop(this.agent));
     router.post('/api/local/channel/test-holded', ChannelController.testHolded(this.agent));
     router.post('/api/local/test-holded', ChannelController.testHolded(this.agent));
-    router.get('/api/local/download-companion', ChannelController.downloadCompanion());
+    router.any(['GET', 'POST'], '/api/local/download-companion', ChannelController.downloadCompanion());
 
     // 5. Sync & History
     router.get('/api/local/history', SyncController.getHistory(this.agent));

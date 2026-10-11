@@ -13,7 +13,8 @@ export class WooCommerceStockMapper {
     stock: CanonicalStock,
     externalId?: number
   ): WooCommerceStockPayload {
-    const qty = Math.max(0, stock.availableQuantity ?? stock.quantity ?? 0);
+    const rawQty = Number(stock.availableQuantity ?? stock.quantity ?? 0);
+    const qty = Number.isFinite(rawQty) ? Math.max(0, rawQty) : 0;
     return {
       ...(externalId ? { id: externalId } : {}),
       sku: stock.sku,

@@ -1,6 +1,13 @@
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { EMBEDDED_COMPANION_PHP_TEMPLATE } from './companion-template';
+
+function escapePhpSingleQuote(val: string): string {
+  return String(val)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
+}
 
 export class CompanionGenerator {
   public static generate(options: {
@@ -35,12 +42,12 @@ export class CompanionGenerator {
       phpTemplate = EMBEDDED_COMPANION_PHP_TEMPLATE;
     }
 
-    const secret = options.secretKey || 'eb_sec_' + Math.random().toString(36).substring(2, 15);
-    let customized = phpTemplate.replace(/%%EB_SECRET_KEY%%/g, secret);
-    customized = customized.replace(/%%EB_DB_HOST%%/g, 'localhost');
-    customized = customized.replace(/%%EB_DB_NAME%%/g, options.dbName || '');
-    customized = customized.replace(/%%EB_DB_USER%%/g, options.dbUser || '');
-    customized = customized.replace(/%%EB_DB_PASS%%/g, options.dbPass || '');
+    const secret = options.secretKey || 'eb_sec_' + crypto.randomBytes(20).toString('hex');
+    let customized = phpTemplate.replace(/%%EB_SECRET_KEY%%/g, () => escapePhpSingleQuote(secret));
+    customized = customized.replace(/%%EB_DB_HOST%%/g, () => 'localhost');
+    customized = customized.replace(/%%EB_DB_NAME%%/g, () => escapePhpSingleQuote(options.dbName || ''));
+    customized = customized.replace(/%%EB_DB_USER%%/g, () => escapePhpSingleQuote(options.dbUser || ''));
+    customized = customized.replace(/%%EB_DB_PASS%%/g, () => escapePhpSingleQuote(options.dbPass || ''));
 
     return customized;
   }

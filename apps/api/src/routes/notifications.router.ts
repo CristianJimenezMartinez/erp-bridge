@@ -148,7 +148,15 @@ notificationsRouter.post('/notifications/order', async (req: Request, res: Respo
 
     logger.info(`Solicitud de notificación de pedido recibida para: ${effectiveTo} (Licencia: ${licenseKey}, Ref: ${orderRef})`);
 
-    const sanitizedHtml = html ? String(html).replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : '';
+    const sanitizedHtml = html
+      ? String(html)
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+          .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+          .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+          .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+          .replace(/javascript:[^"'\s>]+/gi, '')
+      : '';
     const bodyText = text ? String(text) : (sanitizedHtml ? sanitizedHtml.replace(/<[^>]*>?/gm, '') : '');
 
     const result = await MailerService.sendEmail({

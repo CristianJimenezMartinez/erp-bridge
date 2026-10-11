@@ -1,3 +1,4 @@
+import dns from 'dns';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ActionExecutionResult,
@@ -17,7 +18,7 @@ import {
   PostgresFlowRepository,
 } from '../database';
 
-function validateWebhookUrl(urlStr: string): URL {
+async function validateWebhookUrl(urlStr: string): Promise<URL> {
   let parsed: URL;
   try {
     parsed = new URL(urlStr);
@@ -77,6 +78,42 @@ function validateWebhookUrl(urlStr: string): URL {
   // IPv6 local/privado
   if (/^fe[89ab][0-9a-f]:/i.test(host) || /^f[cd][0-9a-f]{2}:/i.test(host)) {
     throw new Error(`Destino IPv6 privado/link-local bloqueado: ${host}`);
+  }
+
+  // Validación estricta anti-DNS Rebinding resolviendo direcciones IP
+  if (parsed.hostname !== 'localhost' && !isLoopback) {
+    try {
+      const records = await dns.promises.lookup(parsed.hostname, { all: true });
+      for (const rec of records) {
+        const ip = rec.address.toLowerCase().trim();
+        if (ip === '127.0.0.1' || ip === '::1' || ip.startsWith('127.')) {
+          if (!isDev) throw new Error(`Destino resuelto a loopback no permitido en producción: ${ip}`);
+        }
+        if (ip === '0.0.0.0' || ip.startsWith('0.')) {
+          throw new Error(`Destino resuelto a 0.0.0.0/8: ${ip}`);
+        }
+        if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+          throw new Error(`Destino resuelto a rango privado RFC1918 (10.0.0.0/8): ${ip}`);
+        }
+        if (/^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+          throw new Error(`Destino resuelto a rango privado RFC1918 (172.16.0.0/12): ${ip}`);
+        }
+        if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+          throw new Error(`Destino resuelto a rango privado RFC1918 (192.168.0.0/16): ${ip}`);
+        }
+        if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+          throw new Error(`Destino resuelto a link-local (169.254.0.0/16): ${ip}`);
+        }
+        if (/^fe[89ab][0-9a-f]:/i.test(ip) || /^f[cd][0-9a-f]{2}:/i.test(ip)) {
+          throw new Error(`Destino resuelto a IPv6 privado/link-local: ${ip}`);
+        }
+      }
+    } catch (dnsErr: any) {
+      if (dnsErr.message && dnsErr.message.includes('Destino')) {
+        throw dnsErr;
+      }
+      throw new Error(`No se pudo resolver el host del webhook (${parsed.hostname}): ${dnsErr.message}`);
+    }
   }
 
   return parsed;
@@ -255,8 +292,8 @@ export class FlowEngine {
           const url = action.configuration['url'] as string;
           if (!url) throw new Error('Falta la URL del webhook en la configuración de la acción.');
 
-          // Validar URL: HTTPS obligatorio (o localhost dev), anti-SSRF RFC1918/Metadata
-          validateWebhookUrl(url);
+          // Validar URL: HTTPS obligatorio (o localhost dev), anti-SSRF RFC1918/Metadata con anti-DNS Rebinding
+          await validateWebhookUrl(url);
 
           const payload = {
             event: event.type,

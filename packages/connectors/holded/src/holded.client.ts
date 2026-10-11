@@ -16,6 +16,13 @@ export class HoldedClient {
   constructor(config: HoldedConnectorConfig, rateLimiter?: HoldedRateLimiter) {
     this.config = config;
     const base = config.endpointUrl || 'https://api.holded.com/api/v1';
+    if (config.endpointUrl) {
+      const parsed = new URL(config.endpointUrl);
+      const isLoopback = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+      if (process.env.NODE_ENV === 'production' && !isLoopback && !parsed.hostname.endsWith('holded.com')) {
+        throw new Error(`Dominio no autorizado para API de Holded: ${parsed.hostname}`);
+      }
+    }
     this.baseUrl = base.replace(/\/+$/, '');
     this.rateLimiter = rateLimiter || new HoldedRateLimiter(config.maxRequestsPerMinute ?? 250);
   }

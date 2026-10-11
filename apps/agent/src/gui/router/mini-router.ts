@@ -62,12 +62,12 @@ export class MiniRouter {
     const pathname = parsedUrl.pathname;
     const method = req.method || 'GET';
 
-    // 2. Validación de Sec-Fetch-Site: si está presente y su valor es cross-site, bloquear con 403 Forbidden
+    // 2. Validación de Sec-Fetch-Site: si está presente y no es same-origin ni none, bloquear con 403 Forbidden
     const secFetchSite = req.headers['sec-fetch-site'];
-    if (secFetchSite === 'cross-site') {
+    if (secFetchSite && secFetchSite !== 'same-origin' && secFetchSite !== 'none') {
       this.logger.warn(`Acceso bloqueado: Sec-Fetch-Site no permitido (${secFetchSite})`);
       res.writeHead(403, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Acceso denegado: cross-site fetch no permitido' }));
+      res.end(JSON.stringify({ error: 'Acceso denegado: cross-origin/same-site fetch no permitido' }));
       return;
     }
 

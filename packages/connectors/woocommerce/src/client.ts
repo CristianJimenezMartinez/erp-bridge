@@ -30,7 +30,7 @@ export class WooCommerceClient {
       consumerKey: options.consumerKey.trim(),
       consumerSecret: options.consumerSecret.trim(),
       version: options.version || 'wc/v3',
-      queryStringAuth: options.queryStringAuth ?? true,
+      queryStringAuth: options.queryStringAuth ?? false,
       axiosConfig: {
         timeout: options.timeoutMs || 15000,
       },

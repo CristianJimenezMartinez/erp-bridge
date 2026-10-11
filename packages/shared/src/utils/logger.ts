@@ -16,6 +16,8 @@ const SENSITIVE_KEYS = new Set([
   'token',
   'consumersecret',
   'consumer_secret',
+  'consumerkey',
+  'consumer_key',
   'apikey',
   'api_key',
   'credential',
@@ -36,10 +38,11 @@ export function sanitizeMessage(message: string): string {
 
   // 3. Tokens de Stripe y API keys conocidos
   sanitized = sanitized.replace(/\b(sk_live_|sk_test_|whsec_|pk_live_|pk_test_)[0-9a-zA-Z]{16,}\b/g, '***REDACTED***');
+  sanitized = sanitized.replace(/\b(ck_[0-9a-fA-F]{40}|cs_[0-9a-fA-F]{40})\b/g, '***REDACTED_WC_KEY***');
 
   // 4. Pares clave=valor de credenciales sensibles (password, secret, token, apikey, etc.)
   sanitized = sanitized.replace(
-    /((?:password|passwd|pass|secret|token|api_?key|consumer_?secret|credential|authorization)[\s]*[=:]\s*['"]?)([^'"\s,;]+)(['"]?)/gi,
+    /((?:password|passwd|pass|secret|token|api_?key|consumer_?secret|consumer_?key|credential|authorization)[\s]*[=:]\s*['"]?)([^'"\s,;&]+)(['"]?)/gi,
     '$1***REDACTED***$3'
   );
 

@@ -913,9 +913,10 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           return c && (c.status === 'FAIL' || c.status === 'WARN') && c.recommendation;
         });
         if (issues.length > 0) {
+          const esc = window.escapeHtml || function(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
           alertBox.style.display = 'block';
           alertMsg.innerHTML = issues.map(function(i) {
-            return '<strong>' + i.name + ':</strong> ' + i.recommendation;
+            return '<strong>' + esc(i.name) + ':</strong> ' + esc(i.recommendation);
           }).join('<br style="margin-bottom:6px;"/>');
         } else {
           alertBox.style.display = 'none';

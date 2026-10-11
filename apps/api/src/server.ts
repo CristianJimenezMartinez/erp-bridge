@@ -153,7 +153,7 @@ export async function bootstrapApp(): Promise<Express> {
       port: Number(process.env['DB_PORT']) || 5432,
       database: process.env['DB_DATABASE'] || 'Factusol',
       user: process.env['DB_USER'] || 'postgres',
-      password: process.env['DB_PASSWORD'] || '123456789',
+      password: process.env['DB_PASSWORD'] || (process.env.NODE_ENV === 'production' ? '' : '123456789'),
     });
 
     const health = await db.checkHealth();

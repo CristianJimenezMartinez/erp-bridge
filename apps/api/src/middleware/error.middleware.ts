@@ -19,6 +19,8 @@ export function errorHandler(
 
     const statusCode = err.code.includes('NOT_FOUND')
       ? 404
+      : err.code.includes('FORBIDDEN') || err.code.includes('PERMISSION')
+      ? 403
       : err.code.includes('AUTH')
       ? 401
       : err.code.includes('VALIDATION')

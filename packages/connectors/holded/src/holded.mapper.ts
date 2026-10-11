@@ -20,8 +20,8 @@ export class HoldedMapper {
    * Mapea un producto nativo de Holded ERP al modelo CanonicalProduct del monorepo.
    */
   public static mapHoldedProductToCanonical(p: HoldedProduct): CanonicalProduct {
-    const rawStock = p.stock ?? 0;
-    const stockQuantity = Math.max(0, Math.floor(rawStock));
+    const numStock = Number(p.stock ?? 0);
+    const stockQuantity = Number.isFinite(numStock) ? Math.max(0, Math.floor(numStock)) : 0;
 
     const canonical = {
       id: p.id,
@@ -63,7 +63,8 @@ export class HoldedMapper {
       availableQty = 0;
     }
 
-    const finalStock = Math.max(0, Math.floor(availableQty));
+    const numAvailable = Number(availableQty);
+    const finalStock = Number.isFinite(numAvailable) ? Math.max(0, Math.floor(numAvailable)) : 0;
     const warehouseId = stock.warehouse && stock.warehouse !== 'GEN' ? stock.warehouse : undefined;
 
     return {

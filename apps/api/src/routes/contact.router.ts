@@ -94,6 +94,22 @@ contactRouter.post(
         }
       }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+      const safeName = escapeHtml(cleanName);
+      const safeEmail = escapeHtml(cleanEmail);
+      const safePhone = cleanPhone ? escapeHtml(cleanPhone) : '';
+      const safeServiceLabel = escapeHtml(cleanServiceLabel);
+      const safeSource = escapeHtml(cleanSource);
+      const safeMessage = escapeHtml(cleanMessage);
+
       // 2. Notificación Inmediata por Email a Cristian vía Resend
       const adminNotificationHtml = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #f4f4f5; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px;">
@@ -103,7 +119,7 @@ contactRouter.post(
             </div>
             <div>
               <h2 style="margin: 0; font-size: 18px; color: #ffffff;">Nuevo Lead Entrante</h2>
-              <span style="font-size: 12px; color: #a1a1aa;">Origen: <strong>${cleanSource}</strong></span>
+              <span style="font-size: 12px; color: #a1a1aa;">Origen: <strong>${safeSource}</strong></span>
             </div>
           </div>
 
@@ -111,21 +127,21 @@ contactRouter.post(
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
               <tr>
                 <td style="padding: 8px 0; color: #a1a1aa; width: 120px;">Nombre:</td>
-                <td style="padding: 8px 0; color: #ffffff; font-weight: 600;">${cleanName}</td>
+                <td style="padding: 8px 0; color: #ffffff; font-weight: 600;">${safeName}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #a1a1aa;">Email:</td>
-                <td style="padding: 8px 0;"><a href="mailto:${cleanEmail}" style="color: #818cf8; text-decoration: none;">${cleanEmail}</a></td>
+                <td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color: #818cf8; text-decoration: none;">${safeEmail}</a></td>
               </tr>
-              ${cleanPhone ? `
+              ${safePhone ? `
               <tr>
                 <td style="padding: 8px 0; color: #a1a1aa;">Teléfono:</td>
-                <td style="padding: 8px 0;"><a href="tel:${cleanPhone}" style="color: #34d399; text-decoration: none;">${cleanPhone}</a></td>
+                <td style="padding: 8px 0;"><a href="tel:${safePhone}" style="color: #34d399; text-decoration: none;">${safePhone}</a></td>
               </tr>
               ` : ''}
               <tr>
                 <td style="padding: 8px 0; color: #a1a1aa;">Servicio:</td>
-                <td style="padding: 8px 0; color: #fbbf24; font-weight: 500;">${cleanServiceLabel}</td>
+                <td style="padding: 8px 0; color: #fbbf24; font-weight: 500;">${safeServiceLabel}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #a1a1aa;">Fecha / Hora:</td>
@@ -137,12 +153,12 @@ contactRouter.post(
           <div style="margin-bottom: 24px;">
             <h3 style="margin: 0 0 8px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #a1a1aa;">Mensaje del Cliente:</h3>
             <div style="background: #18181b; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #e4e4e7; white-space: pre-wrap;">
-${cleanMessage}
+${safeMessage}
             </div>
           </div>
 
           <div style="text-align: center; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
-            <a href="mailto:${cleanEmail}?subject=Re:%20${encodeURIComponent(cleanServiceLabel)}%20-%20Cristian%20Jiménez" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+            <a href="mailto:${safeEmail}?subject=Re:%20${encodeURIComponent(cleanServiceLabel)}%20-%20Cristian%20Jiménez" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;">
               Responder al Cliente Directamente →
             </a>
           </div>
@@ -153,7 +169,7 @@ ${cleanMessage}
         await MailerService.sendEmail({
           to: 'cristianjimeneztrabajo@gmail.com',
           from: 'Bentian Lead Tracker <soporte@cristianjm.com>',
-          subject: `🚨 [Nuevo Lead] ${cleanName} - ${cleanServiceLabel}`,
+          subject: `🚨 [Nuevo Lead] ${safeName} - ${safeServiceLabel}`,
           html: adminNotificationHtml,
           text: `Nuevo lead de ${cleanSource}:\nNombre: ${cleanName}\nEmail: ${cleanEmail}\nTel: ${cleanPhone || 'No facilitado'}\nServicio: ${cleanServiceLabel}\nMensaje:\n${cleanMessage}`,
         });
@@ -166,10 +182,10 @@ ${cleanMessage}
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; background: #09090b; color: #f4f4f5; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px;">
           <h2 style="margin: 0 0 16px 0; color: #ffffff; font-size: 20px;">Hemos recibido tu consulta</h2>
           <p style="font-size: 14px; color: #d4d4d8; line-height: 1.6; margin-bottom: 16px;">
-            Hola <strong>${cleanName}</strong>,
+            Hola <strong>${safeName}</strong>,
           </p>
           <p style="font-size: 14px; color: #d4d4d8; line-height: 1.6; margin-bottom: 16px;">
-            Gracias por ponerte en contacto. He recibido correctamente tu mensaje sobre <strong>${cleanServiceLabel}</strong>.
+            Gracias por ponerte en contacto. He recibido correctamente tu mensaje sobre <strong>${safeServiceLabel}</strong>.
           </p>
           <p style="font-size: 14px; color: #d4d4d8; line-height: 1.6; margin-bottom: 24px;">
             Revisaré los detalles técnicos de tu solicitud personalmente y me pondré en contacto contigo a la mayor brevedad (habitualmente en menos de 24 horas laborables).

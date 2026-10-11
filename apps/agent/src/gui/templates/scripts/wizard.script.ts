@@ -128,18 +128,22 @@ export const wizardScript = `
 
     function renderWizardErrorCard(alertEl, errInfo, extraActionsHtml) {
       if (!alertEl) return;
+      const esc = window.escapeHtml || function(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
       const rawTitle = errInfo.title || '¿Qué ha ocurrido?';
       const cleanTitle = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(rawTitle) : rawTitle;
+      const safeTitle = esc(cleanTitle);
+      const safeCause = errInfo.cause ? esc(errInfo.cause) : '';
+      const safeSuggestion = errInfo.suggestion ? esc(errInfo.suggestion) : '';
       alertEl.style.display = 'block';
       alertEl.innerHTML = 
         '<div class="smart-error-card">' +
           '<div class="smart-error-header">' +
             (typeof renderIcon === 'function' ? renderIcon('info', 'color:#f87171;') : '') +
-            '<span>' + cleanTitle + '</span>' +
+            '<span>' + safeTitle + '</span>' +
           '</div>' +
           '<div class="smart-error-cause">' +
-            (errInfo.cause ? ('<strong>Causa:</strong> ' + errInfo.cause + '<br>') : '') +
-            (errInfo.suggestion ? ('<strong>Solución recomendada:</strong> ' + errInfo.suggestion) : '') +
+            (safeCause ? ('<strong>Causa:</strong> ' + safeCause + '<br>') : '') +
+            (safeSuggestion ? ('<strong>Solución recomendada:</strong> ' + safeSuggestion) : '') +
           '</div>' +
           (extraActionsHtml ? ('<div class="smart-error-actions">' + extraActionsHtml + '</div>') : '') +
         '</div>';
@@ -147,12 +151,14 @@ export const wizardScript = `
 
     function renderWizardSuccessCard(alertEl, message) {
       if (!alertEl) return;
+      const esc = window.escapeHtml || function(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
       const cleanMsg = (typeof stripLeadingIcons === 'function') ? stripLeadingIcons(message) : (message || '');
+      const safeMsg = esc(cleanMsg);
       alertEl.style.display = 'block';
       alertEl.innerHTML = 
         '<div class="smart-success-card">' +
           (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') +
-          '<span>' + cleanMsg + '</span>' +
+          '<span>' + safeMsg + '</span>' +
         '</div>';
     }
 

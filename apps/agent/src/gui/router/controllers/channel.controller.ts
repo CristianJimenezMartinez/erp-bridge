@@ -126,10 +126,11 @@ export class ChannelController {
 
   public static downloadCompanion(): RouteHandler {
     return (_req, res, ctx) => {
-      const secretKey = ctx.parsedUrl.searchParams.get('secretKey') || undefined;
-      const dbName = ctx.parsedUrl.searchParams.get('dbName') || undefined;
-      const dbUser = ctx.parsedUrl.searchParams.get('dbUser') || undefined;
-      const dbPass = ctx.parsedUrl.searchParams.get('dbPass') || undefined;
+      const body = ctx.body || {};
+      const secretKey = body.secretKey || ctx.parsedUrl.searchParams.get('secretKey') || undefined;
+      const dbName = body.dbName || ctx.parsedUrl.searchParams.get('dbName') || undefined;
+      const dbUser = body.dbUser || ctx.parsedUrl.searchParams.get('dbUser') || undefined;
+      const dbPass = body.dbPass || ctx.parsedUrl.searchParams.get('dbPass') || undefined;
 
       const customized = CompanionGenerator.generate({ secretKey, dbName, dbUser, dbPass });
       const payload = Buffer.from(customized, 'utf8');

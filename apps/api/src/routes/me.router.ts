@@ -116,6 +116,17 @@ meRouter.delete('/me', requireAuth, async (req: AuthenticatedRequest, res: Respo
   try {
     const user = req.user!;
     const orgId = user.organizationId;
+
+    if (orgId === 'org_default' || orgId === 'org_system' || orgId === 'default') {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'No está permitido suprimir o anonimizar la organización raíz o de sistema predeterminada.',
+        },
+      });
+    }
+
     const db = DatabaseService.getInstance();
     const timestamp = new Date().toISOString();
     const requestId = `gdpr_del_${crypto.randomUUID()}`;

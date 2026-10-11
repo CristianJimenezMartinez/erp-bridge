@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import { EventBus } from '@erp-bridge/core';
 import { shopifyWebhookRouter, verifyShopifyHmac, sanitizePayload } from './shopify.webhook';
 import { holdedWebhookRouter, verifyHoldedSecret } from './holded.webhook';
+import { requireAuth, requireRole } from '../auth.router';
+import { resolveOrgId } from '../org-scope';
 
 export const webhooksRouter = Router();
 
@@ -14,15 +16,12 @@ webhooksRouter.use('/holded', holdedWebhookRouter);
 webhooksRouter.use(shopifyWebhookRouter);
 webhooksRouter.use(holdedWebhookRouter);
 
-// Telemetría y estado de canales para el Dashboard Cloud
-webhooksRouter.get('/status', (req: Request, res: Response) => {
+// Telemetría y estado de canales para el Dashboard Cloud (Protegido por Auth & Multi-Tenant)
+webhooksRouter.get('/status', requireAuth, (req: Request, res: Response) => {
   const shopifySecretConfigured = Boolean(process.env['SHOPIFY_WEBHOOK_SECRET']?.trim());
   const holdedSecretConfigured = Boolean(process.env['HOLDED_WEBHOOK_SECRET']?.trim());
 
-  const orgId =
-    (req.query['organizationId'] as string) ||
-    (req.headers['x-organization-id'] as string) ||
-    'org_default';
+  const orgId = resolveOrgId(req);
 
   const recentEvents = EventBus.getInstance().getRecentEvents(orgId, 20);
   const shopifyEvents = recentEvents.filter((e) => e.source === 'shopify-webhook');
@@ -73,11 +72,8 @@ webhooksRouter.get('/status', (req: Request, res: Response) => {
   });
 });
 
-webhooksRouter.get('/events', (req: Request, res: Response) => {
-  const orgId =
-    (req.query['organizationId'] as string) ||
-    (req.headers['x-organization-id'] as string) ||
-    'org_default';
+webhooksRouter.get('/events', requireAuth, (req: Request, res: Response) => {
+  const orgId = resolveOrgId(req);
 
   const realEvents = EventBus.getInstance().getRecentEvents(orgId, 50);
 
@@ -169,9 +165,9 @@ webhooksRouter.get('/events', (req: Request, res: Response) => {
   return res.json({ success: true, count: combined.length, data: combined });
 });
 
-webhooksRouter.post('/test-ping', async (req: Request, res: Response) => {
+webhooksRouter.post('/test-ping', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response) => {
   const channel = req.body?.channel === 'holded' ? 'holded' : 'shopify';
-  const orgId = req.body?.organizationId || 'org_default';
+  const orgId = resolveOrgId(req);
 
   let eventType = 'ORDER_CREATED';
   let data: Record<string, any> = {};
@@ -212,7 +208,7 @@ webhooksRouter.post('/test-ping', async (req: Request, res: Response) => {
   });
 });
 
-webhooksRouter.post('/regenerate-secret', (_req: Request, res: Response) => {
+webhooksRouter.post('/regenerate-secret', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), (_req: Request, res: Response) => {
   const rawBytes = crypto.randomBytes(32).toString('hex');
   const newSecret = `shpss_sec_${rawBytes}`;
   const masked = `shpss_••••••••••••••••${rawBytes.slice(-4)}`;

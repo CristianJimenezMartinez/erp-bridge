@@ -24,6 +24,22 @@ const pairingTokenRateLimiter = rateLimit({
   message: 'Demasiadas solicitudes de generación de tokens de emparejamiento. Por favor, espere.',
 });
 
+const reportIncidentRateLimiter = rateLimit({
+  name: 'agent-report-incident',
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Demasiadas solicitudes de soporte técnico desde esta IP. Por favor, espere unos minutos.',
+});
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const CreatePairingTokenSchema = z.object({
   createdById: z.string().trim().max(100).optional(),
 });
@@ -226,7 +242,7 @@ agentsRouter.post('/fleet/report-error', async (req: Request, res: Response, nex
 });
 
 // 2.3 Report agent incident / support ticket (from Agent GUI)
-agentsRouter.post('/fleet/report-incident', async (req: Request, res: Response, next: NextFunction) => {
+agentsRouter.post('/fleet/report-incident', reportIncidentRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = FleetReportIncidentSchema.parse(req.body);
     const { ticketId, contact, category, description, diagnostics, agentId, organizationId, appVersion, hwid } = validated;
@@ -248,26 +264,36 @@ agentsRouter.post('/fleet/report-incident', async (req: Request, res: Response, 
 
     // Despacho de email a soporte técnico
     const supportEmail = process.env.SUPPORT_EMAIL || 'cristianjimeneztrabajo@gmail.com';
+    const safeTicketId = escapeHtml(ticketId);
+    const safeContact = escapeHtml(contact || 'No especificado');
+    const safeCategory = escapeHtml(category || 'General');
+    const safeAppVersion = escapeHtml(appVersion || 'Desconocida');
+    const safeHwid = escapeHtml(hwid || 'N/A');
+    const safeOrgId = escapeHtml(organizationId || 'org_default');
+    const safeAgentId = escapeHtml(agentId || 'ag_local');
+    const safeDescription = escapeHtml(description);
+    const safeDiagnostics = diagnostics ? escapeHtml(diagnostics.substring(0, 3000)) : '';
+
     try {
       await MailerService.sendEmail({
         to: supportEmail,
-        subject: `🚨 [Incidencia Bentian] ${ticketId} - ${category || 'General'}`,
+        subject: `🚨 [Incidencia Bentian] ${safeTicketId} - ${safeCategory}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0f172a; color: #f8fafc; border-radius: 10px;">
-            <h2 style="color: #ef4444; margin-top: 0;">🚨 Nueva Incidencia Técnica: ${ticketId}</h2>
+            <h2 style="color: #ef4444; margin-top: 0;">🚨 Nueva Incidencia Técnica: ${safeTicketId}</h2>
             <p style="font-size: 14px; color: #94a3b8;">Se ha recibido una nueva incidencia desde la app de escritorio Bentian Agent.</p>
             <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 16px;">
-              <p style="margin: 4px 0;"><strong>Contacto:</strong> <a href="mailto:${contact}" style="color: #818cf8;">${contact || 'No especificado'}</a></p>
-              <p style="margin: 4px 0;"><strong>Categoría:</strong> ${category || 'General'}</p>
-              <p style="margin: 4px 0;"><strong>Versión Agente:</strong> v${appVersion || 'Desconocida'}</p>
-              <p style="margin: 4px 0;"><strong>HWID:</strong> <code>${hwid || 'N/A'}</code></p>
-              <p style="margin: 4px 0;"><strong>Organización / Agente:</strong> ${organizationId || 'org_default'} / ${agentId || 'ag_local'}</p>
+              <p style="margin: 4px 0;"><strong>Contacto:</strong> <a href="mailto:${safeContact}" style="color: #818cf8;">${safeContact}</a></p>
+              <p style="margin: 4px 0;"><strong>Categoría:</strong> ${safeCategory}</p>
+              <p style="margin: 4px 0;"><strong>Versión Agente:</strong> v${safeAppVersion}</p>
+              <p style="margin: 4px 0;"><strong>HWID:</strong> <code>${safeHwid}</code></p>
+              <p style="margin: 4px 0;"><strong>Organización / Agente:</strong> ${safeOrgId} / ${safeAgentId}</p>
             </div>
             <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 16px;">
               <h4 style="margin-top: 0; color: #f1f5f9;">Descripción del Usuario:</h4>
-              <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: #cbd5e1;">${description}</p>
+              <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: #cbd5e1;">${safeDescription}</p>
             </div>
-            ${diagnostics ? `<div style="background: #090d16; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #94a3b8; max-height: 250px; overflow-y: auto; white-space: pre-wrap;">${diagnostics.substring(0, 3000)}</div>` : ''}
+            ${safeDiagnostics ? `<div style="background: #090d16; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #94a3b8; max-height: 250px; overflow-y: auto; white-space: pre-wrap;">${safeDiagnostics}</div>` : ''}
           </div>
         `,
         text: `Nueva Incidencia ${ticketId}\\nContacto: ${contact}\\nCategoría: ${category}\\nVersión: v${appVersion}\\nHWID: ${hwid}\\n\\nDescripción:\\n${description}\\n\\n${diagnostics ? diagnostics.substring(0, 2000) : ''}`
@@ -365,10 +391,11 @@ agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, n
       ).catch(() => null);
 
       if (hwid) {
+        // Anti-hijacking: solo actualizar agent_id si la activación no está asignada o ya pertenece a este agente
         await db.query(
           `UPDATE license_activations
            SET agent_id = $1, last_validated_at = CURRENT_TIMESTAMP
-           WHERE hwid = $2`,
+           WHERE hwid = $2 AND (agent_id IS NULL OR agent_id = '' OR agent_id = $1)`,
           [validated.agentId, hwid]
         ).catch(() => null);
       }

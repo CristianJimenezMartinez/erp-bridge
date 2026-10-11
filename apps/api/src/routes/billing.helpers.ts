@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { DatabaseService } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
+import { withKeyedLock } from '../middleware/keyed-mutex';
 
 const logger = new Logger('BillingHelpers');
 
@@ -30,22 +31,9 @@ export function sanitizeReturnUrl(urlStr: string | undefined, fallback: string):
   }
 }
 
-const inFlightSessionLocks = new Map<string, Promise<any>>();
-
 export async function acquireSessionLock<T>(sessionId: string, fn: () => Promise<T>): Promise<T> {
   if (!sessionId) return fn();
-  while (inFlightSessionLocks.has(sessionId)) {
-    try {
-      await inFlightSessionLocks.get(sessionId);
-    } catch {}
-  }
-  const promise = fn();
-  inFlightSessionLocks.set(sessionId, promise);
-  try {
-    return await promise;
-  } finally {
-    inFlightSessionLocks.delete(sessionId);
-  }
+  return withKeyedLock(`stripe_session:${sessionId}`, fn);
 }
 
 export function computeOrganizationIdFromEmail(email: string): string {

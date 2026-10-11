@@ -42,10 +42,21 @@ export function consumeRateLimit(
     stores.set(name, store);
   }
 
-  // Limpieza oportunista para acotar memoria
+  // Limpieza oportunista para acotar memoria y política de expulsión FIFO anti-DoS
   if (store.size > 5000) {
     for (const [k, b] of store.entries()) {
       if (now >= b.resetAt) store.delete(k);
+    }
+    if (store.size > 10000) {
+      const keysIter = store.keys();
+      while (store.size > 8000) {
+        const nextKey = keysIter.next().value;
+        if (nextKey !== undefined) {
+          store.delete(nextKey);
+        } else {
+          break;
+        }
+      }
     }
   }
 

@@ -146,7 +146,8 @@ export class WooCommerceOrderMapper {
   }
 
   public static toCanonicalOrderLine(raw: WooCommerceOrderLineRaw, index: number): CanonicalOrderLine {
-    const qty = Number(raw.quantity) || 1;
+    const parsedQty = Number(raw.quantity);
+    const qty = Number.isFinite(parsedQty) ? Math.max(0, parsedQty) : 1;
     const total = Number(raw.total) || 0;
     const subtotal = Number(raw.subtotal) || total;
     const totalTax = Number(raw.total_tax) || 0;
@@ -208,7 +209,7 @@ export class WooCommerceOrderMapper {
       reference: String(raw.number || raw.id),
       date: isNaN(dateVal.getTime()) ? new Date() : dateVal,
       status: this.mapStatus(raw.status),
-      hasEquivalenceSurcharge: false,
+      hasEquivalenceSurcharge: customer.hasEquivalenceSurcharge ?? false,
       customer,
       shippingAddress,
       billingAddress,

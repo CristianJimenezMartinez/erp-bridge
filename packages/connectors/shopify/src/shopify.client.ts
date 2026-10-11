@@ -14,6 +14,11 @@ export class ShopifyClient {
   constructor(config: ShopifyConnectorConfig, rateLimiter?: ShopifyRateLimiter) {
     this.config = config;
     if (config.endpointUrl) {
+      const parsed = new URL(config.endpointUrl);
+      const isLoopback = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+      if (process.env.NODE_ENV === 'production' && !isLoopback && !parsed.hostname.endsWith('myshopify.com') && !parsed.hostname.endsWith('shopify.com')) {
+        throw new Error(`Dominio no autorizado para API de Shopify: ${parsed.hostname}`);
+      }
       this.endpointUrl = config.endpointUrl;
     } else {
       const cleanSubdomain = config.shopSubdomain

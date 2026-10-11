@@ -42,10 +42,11 @@ export class DatabaseService {
       process.env['DB_SSL'] === 'true'
     );
 
+    const rejectUnauthorized = process.env['DB_SSL_REJECT_UNAUTHORIZED'] !== 'false';
     const sslConfig = config.ssl !== undefined
       ? config.ssl
       : isCloudPostgres
-      ? { rejectUnauthorized: false }
+      ? { rejectUnauthorized }
       : undefined;
 
     const poolConfig: PoolConfig = connStr
@@ -59,7 +60,7 @@ export class DatabaseService {
           port: config.port || Number(process.env['DB_PORT']) || 5432,
           database: config.database || process.env['DB_DATABASE'] || 'Factusol',
           user: config.user || process.env['DB_USER'] || 'postgres',
-          password: config.password || process.env['DB_PASSWORD'] || '123456789',
+          password: config.password || process.env['DB_PASSWORD'] || (process.env.NODE_ENV === 'production' ? '' : '123456789'),
           ssl: sslConfig,
           max: config.maxPoolSize || 10,
         };
