@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requisitos del Sistema y Especificaciones de Instalación | Bentian ERP Bridge</title>
+  <meta name="description" content="Especificaciones técnicas completas, hardware mínimo y recomendado, compatibilidad de Factusol y sistemas operativos Windows para instalar Bentian ERP Bridge.">
+  <meta name="keywords" content="requisitos sistema bentian erp bridge, compatibilidad factusol windows 11, factusol windows server, requisitos hardware conector factusol, desinstalador limpio bentian, access database engine factusol">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/requisitos-sistema/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/requisitos-sistema/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Requisitos del Sistema y Especificaciones de Instalación | Bentian ERP Bridge">
+  <meta property="og:description" content="Ficha técnica de compatibilidad empresarial: Windows 10/11/Server, Factusol 2018-2026+, usuario estándar y 100% Clean Software.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:locale" content="es_ES">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Requisitos del Sistema | Bentian ERP Bridge">
+  <meta name="twitter:description" content="Especificaciones de software y hardware para el conector oficial Factusol a eCommerce.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Tailwind CSS Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Requisitos del Sistema", "item": "https://bridge.cristianjm.com/requisitos-sistema/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://bridge.cristianjm.com/requisitos-sistema/#software",
+        "name": "Bentian ERP Bridge",
+        "softwareVersion": "0.4.7",
+        "operatingSystem": "Windows 10 (1809+), Windows 11, Windows Server 2016, 2019, 2022 (x64)",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "ERP Middleware",
+        "url": "https://bridge.cristianjm.com/requisitos-sistema/",
+        "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
+        "fileSize": "48MB",
+        "memoryRequirements": "4 GB RAM mínima, 8 GB recomendada para >100.000 artículos",
+        "storageRequirements": "250 MB de espacio libre en disco",
+        "processorRequirements": "Procesador dual-core x64 a 1.8 GHz o superior",
+        "description": "Especificaciones y requisitos de instalación para el middleware local de integración entre Factusol ERP y plataformas web de comercio electrónico.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Bentian",
+          "url": "https://bridge.cristianjm.com"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Cristian Jiménez Martínez",
+          "url": "https://cristianjm.com"
+        }
+      },
+      {
+        "@type": "TechArticle",
+        "@id": "https://bridge.cristianjm.com/requisitos-sistema/#article",
+        "headline": "Requisitos del Sistema y Especificaciones de Instalación de Bentian ERP Bridge",
+        "description": "Ficha técnica certificada de homologación: entornos compatibles, requerimientos de hardware, dependencias de software, permisos de Windows y desinstalación limpia.",
+        "inLanguage": "es-ES",
+        "url": "https://bridge.cristianjm.com/requisitos-sistema/"
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-indigo-500/30 selection:text-white">
+
+  <!-- Header Canónico Unificado -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Marca -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border border-white/[0.12] p-1 bg-zinc-900 group-hover:border-indigo-500/50 transition">
+          <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="32" height="32">
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-bold text-base tracking-tight text-white">Bentian</span>
+          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900 border border-white/[0.06] px-2 py-0.5 rounded">ERP Bridge</span>
+        </div>
+      </a>
+
+      <!-- Navegación -->
+      <nav class="flex items-center gap-3 sm:gap-6 text-xs font-medium">
+        <a href="/" class="text-zinc-400 hover:text-white transition flex items-center gap-1.5">
+          <span>&larr; Web Principal</span>
+        </a>
+        <a href="/quien-esta-detras/" class="text-zinc-400 hover:text-white transition hidden md:inline">Autor</a>
+        <a href="/seguridad/" class="text-zinc-400 hover:text-white transition hidden md:inline">Seguridad</a>
+        <a href="/docs/" class="text-zinc-400 hover:text-white transition hidden lg:inline">Docs</a>
+        <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden sm:inline">Clientes</a>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+          <span>Descargar Agente</span>
+          <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v0.4.7</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-grow">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs text-zinc-500 mb-8 font-mono">
+      <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+      <span>/</span>
+      <span class="text-zinc-300">Requisitos del Sistema</span>
+    </nav>
+
+    <!-- Hero Header -->
+    <div class="mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+        <span>Ficha Técnica de Homologación & Especificaciones</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+        Requisitos del Sistema y <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-300 to-indigo-200">Especificaciones Técnicas</span>
+      </h1>
+
+      <p class="text-base sm:text-lg text-zinc-400 max-w-3xl leading-relaxed">
+        Especificaciones exhaustivas de compatibilidad de hardware, sistemas operativos Windows, componentes de Factusol y políticas de ejecución en red empresarial.
+      </p>
+    </div>
+
+    <!-- Banner Certificación 100% Clean & Spec Sheet Header -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-12 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl flex-shrink-0">
+          ✓
+        </div>
+        <div>
+          <div class="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 mb-1">
+            Certificado 100% Clean Software
+          </div>
+          <h2 class="text-lg sm:text-xl font-bold text-white">Bentian ERP Bridge para Windows (x64)</h2>
+          <p class="text-xs text-zinc-400 mt-0.5">Sin adware, sin spyware, sin telemetría invasiva y con manifiesto criptográfico Ed25519.</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="w-full sm:w-auto text-center px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/20">
+          Descargar Setup (.exe)
+        </a>
+        <a href="/releases/latest/BentianAgent-Portable.zip" data-download-portable class="w-full sm:w-auto text-center px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 font-medium text-xs border border-white/[0.08] transition">
+          Versión Portable (.zip)
+        </a>
+      </div>
+    </div>
+
+    <!-- Tabla 1: Plataformas y Sistemas Operativos Compatibles -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl overflow-hidden mb-12 shadow-xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.01]">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>1. Sistemas Operativos Compatibles</span>
+          <span class="text-xs font-normal text-zinc-400 font-mono">(Arquitectura x64)</span>
+        </h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] text-zinc-400 font-mono text-[11px] uppercase tracking-wider bg-white/[0.02]">
+              <th class="p-4 sm:p-5">Sistema Operativo</th>
+              <th class="p-4 sm:p-5">Ediciones Soportadas</th>
+              <th class="p-4 sm:p-5">Arquitectura</th>
+              <th class="p-4 sm:p-5 text-right">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Windows 11</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Home, Pro, Enterprise, Pro for Workstations</td>
+              <td class="p-4 sm:p-5 font-mono text-xs">64-bit (x64)</td>
+              <td class="p-4 sm:p-5 text-right text-emerald-400 font-semibold font-mono">Compatible Oficial</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Windows 10</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Versión 1809 o superior (Build 17763+), Pro, Enterprise</td>
+              <td class="p-4 sm:p-5 font-mono text-xs">64-bit (x64)</td>
+              <td class="p-4 sm:p-5 text-right text-emerald-400 font-semibold font-mono">Compatible Oficial</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Windows Server 2022</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Standard, Datacenter (Desktop Experience & Core)</td>
+              <td class="p-4 sm:p-5 font-mono text-xs">64-bit (x64)</td>
+              <td class="p-4 sm:p-5 text-right text-emerald-400 font-semibold font-mono">Compatible Oficial</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Windows Server 2019</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Standard, Datacenter</td>
+              <td class="p-4 sm:p-5 font-mono text-xs">64-bit (x64)</td>
+              <td class="p-4 sm:p-5 text-right text-emerald-400 font-semibold font-mono">Compatible Oficial</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Windows Server 2016</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Standard, Datacenter (con .NET 4.8)</td>
+              <td class="p-4 sm:p-5 font-mono text-xs">64-bit (x64)</td>
+              <td class="p-4 sm:p-5 text-right text-emerald-400 font-semibold font-mono">Compatible Oficial</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla 2: Requisitos de Hardware -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl overflow-hidden mb-12 shadow-xl">
+      <div class="p-6 border-b border-white/[0.08] bg-white/[0.01]">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>2. Requisitos de Hardware del Equipo</span>
+        </h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="border-b border-white/[0.08] text-zinc-400 font-mono text-[11px] uppercase tracking-wider bg-white/[0.02]">
+              <th class="p-4 sm:p-5">Componente</th>
+              <th class="p-4 sm:p-5">Requisito Mínimo</th>
+              <th class="p-4 sm:p-5 text-indigo-400 font-bold bg-indigo-500/[0.04]">Requisito Recomendado</th>
+              <th class="p-4 sm:p-5 text-zinc-400">Catálogos Masivos (&gt;100.000 SKUs)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Procesador (CPU)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Dual-Core x64 a 1.8 GHz</td>
+              <td class="p-4 sm:p-5 text-white font-semibold bg-indigo-500/[0.04]">Quad-Core x64 a 2.5 GHz o superior</td>
+              <td class="p-4 sm:p-5 text-zinc-400">6 núcleos o superior (Intel Core i5 / AMD Ryzen 5)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Memoria RAM</td>
+              <td class="p-4 sm:p-5 text-zinc-400">4 GB RAM del sistema</td>
+              <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-indigo-500/[0.04]">8 GB RAM</td>
+              <td class="p-4 sm:p-5 text-zinc-400">16 GB RAM (procesado instantáneo en RAM)</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Espacio en Disco</td>
+              <td class="p-4 sm:p-5 text-zinc-400">250 MB libres</td>
+              <td class="p-4 sm:p-5 text-white font-semibold bg-indigo-500/[0.04]">1 GB libre en SSD / NVMe</td>
+              <td class="p-4 sm:p-5 text-zinc-400">SSD dedicado para ficheros .accdb</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-5 font-semibold text-white">Resolución de Pantalla</td>
+              <td class="p-4 sm:p-5 text-zinc-400">1280 x 720 px</td>
+              <td class="p-4 sm:p-5 text-white bg-indigo-500/[0.04]">1920 x 1080 px (FHD)</td>
+              <td class="p-4 sm:p-5 text-zinc-400">Monitores duales / estándar empresarial</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Grid de Especificaciones Técnicas Detalladas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+
+      <!-- Software Necesario -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
+          03
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Software y Dependencias</h3>
+        <ul class="text-xs sm:text-sm text-zinc-300 space-y-2.5 leading-relaxed">
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">•</span>
+            <div><strong>Factusol ERP:</strong> Compatible con todas las versiones anuales desde Factusol 2018 hasta 2026+. Soporta formatos relacionales <code class="font-mono text-zinc-200 text-xs">.accdb</code> (Access 2016-2024/365) y bases de datos históricas <code class="font-mono text-zinc-200 text-xs">.mdb</code>.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">•</span>
+            <div><strong>Microsoft Access Database Engine:</strong> Incluido de forma predeterminada con la propia instalación de Factusol en el equipo. En caso de ausencia, es descargable gratuitamente desde la web de Microsoft (versión x64 recomendada).</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">•</span>
+            <div><strong>Microsoft Edge WebView2 / .NET 4.8:</strong> Integrado de serie en Windows 10 y Windows 11 para la renderización de la ventana de interfaz nativa en modo app independiente.</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Permisos de Ejecución -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
+          04
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Permisos de Ejecución en Windows</h3>
+        <div class="text-xs sm:text-sm text-zinc-300 space-y-2.5 leading-relaxed">
+          <p>
+            <strong>Usuario Estándar de Windows:</strong> Bentian ERP Bridge está diseñado para operar con los privilegios de un usuario común sin requerir permisos de Administrador para su ejecución en segundo plano, sincronización ni acceso a la bandeja del sistema (System Tray).
+          </p>
+          <div class="p-3 bg-black/40 border border-white/[0.06] rounded-xl text-xs space-y-1 text-zinc-400">
+            <div>✓ Configuración en perfil del usuario activo (<code class="font-mono text-[11px]">%APPDATA%</code>).</div>
+            <div>✓ Cero problemas de UAC durante el ciclo diario.</div>
+            <div>✓ No modifica archivos críticos de Windows ni inyecta drivers de kernel.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Red y Cortafuegos -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
+          05
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Requisitos de Red & Firewall</h3>
+        <ul class="text-xs sm:text-sm text-zinc-300 space-y-2.5 leading-relaxed">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 mt-0.5">•</span>
+            <div><strong>Conexión Saliente Exclusiva:</strong> Tráfico saliente a través del puerto <strong>TCP 443 (HTTPS)</strong> con cifrado TLS 1.2 / TLS 1.3 hacia tu eCommerce y hacia la API de licencias.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-400 mt-0.5">•</span>
+            <div><strong>Cero Puertos Entrantes:</strong> No requiere abrir puertos en el router, ni configurar DMZ, ni mapear puertos NAT hacia el equipo de la oficina.</div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-400 mt-0.5">•</span>
+            <div><strong>Servidor Local Administrativo:</strong> Escucha únicamente en la interfaz de bucle invertido <code class="font-mono text-zinc-200 text-xs">127.0.0.1:39281</code> con puerto fijo inmutable y cerrojo anti-bifurcación.</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Desinstalación Limpia -->
+      <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
+          06
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2">Desinstalación Limpia Garantizada</h3>
+        <div class="text-xs sm:text-sm text-zinc-300 space-y-2.5 leading-relaxed">
+          <p>
+            Bentian incluye un <strong>desinstalador nativo estándar de Windows</strong> accesible desde <em>Configuración &gt; Aplicaciones instaladas</em> o el <em>Panel de Control</em> tradicional.
+          </p>
+          <div class="p-3 bg-black/40 border border-white/[0.06] rounded-xl text-xs space-y-1 text-zinc-400">
+            <div>✓ Elimina binarios, accesos directos y servicios de forma pulcra.</div>
+            <div>✓ <strong>Seguridad sagrada:</strong> NUNCA toca, borra ni altera tu base de datos de Factusol.</div>
+            <div>✓ Deja el registro de Windows completamente limpio sin restos huérfanos.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Verificación Criptográfica y Sumas SHA-256 -->
+    <div class="border border-white/[0.08] bg-[#121215] rounded-2xl p-6 sm:p-8 mb-12 shadow-xl">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/[0.08]">
+        <div>
+          <h3 class="text-lg font-bold text-white">Integridad Criptográfica de Distribución</h3>
+          <p class="text-xs text-zinc-400">Verifica la autenticidad del instalador oficial antes de ejecutarlo en tu red corporativa.</p>
+        </div>
+        <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+          Versión Activa: <span data-app-version>v0.4.7</span>
+        </span>
+      </div>
+
+      <div class="space-y-4 text-xs font-mono">
+        <div>
+          <div class="text-zinc-400 mb-1 flex items-center justify-between">
+            <span>Bentian-Setup.exe (Instalador Oficial de Windows):</span>
+            <span class="text-zinc-500 text-[11px]">Algoritmo SHA-256</span>
+          </div>
+          <div class="bg-black/60 border border-white/[0.08] p-3 rounded-lg text-emerald-400 break-all select-all" data-installer-sha256>
+            latest.json sincronizado automáticamente
+          </div>
+        </div>
+
+        <div>
+          <div class="text-zinc-400 mb-1 flex items-center justify-between">
+            <span>Firma Digital Asimétrica:</span>
+            <span class="text-zinc-500 text-[11px]">Algoritmo Ed25519 (RFC 8032)</span>
+          </div>
+          <div class="bg-black/60 border border-white/[0.08] p-3 rounded-lg text-zinc-300">
+            Manifiesto verificado por clave pública embebida · Auto-Update Swapper con rollback automático
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-4 text-xs text-zinc-400">
+        <div>Comprueba el hash en PowerShell: <code class="bg-black/40 px-2 py-1 rounded text-indigo-300 font-mono">Get-FileHash Bentian-Setup.exe -Algorithm SHA256</code></div>
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-indigo-400 hover:text-indigo-300 font-semibold transition">
+          Descargar instalador verificado &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- CTA Final -->
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-950/40 via-violet-900/20 to-indigo-950/40 border border-indigo-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+        Listo para Integrar Factusol en tu Empresa
+      </h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm leading-relaxed">
+        Descarga e instala Bentian ERP Bridge en menos de 2 minutos. Prueba la sincronización completa durante 60 días de Beta Pública Gratuita.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 text-sm">
+          <span>Descargar Instalador Oficial</span>
+          <span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded text-indigo-200" data-app-version>v0.4.7</span>
+        </a>
+        <a href="/quien-esta-detras/" class="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition py-2">
+          <span>Conocer quién está detrás</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Canónico -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        © 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a>
+      </div>
+      <div class="flex flex-wrap items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/quien-esta-detras/" class="hover:text-zinc-300 transition">Autor</a>
+        <a href="/seguridad/" class="hover:text-zinc-300 transition">Seguridad</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">WooCommerce</a>
+        <a href="/factusol-prestashop/" class="hover:text-zinc-300 transition">PrestaShop</a>
+        <a href="/docs/" class="hover:text-zinc-300 transition">Documentación</a>
+        <a href="/dashboard/" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js"></script>
+</body>
+</html>

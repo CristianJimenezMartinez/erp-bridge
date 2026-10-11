@@ -54,6 +54,9 @@
 - [Comparativa vs DELSOL Conecta](https://bridge.cristianjm.com/alternativa-delsol-conecta/): Diferencias técnicas, de costes y de rendimiento.
 - [Comparativa Windows vs Plugins PHP](https://bridge.cristianjm.com/comparativa-conector-windows-vs-plugin-wordpress/): Por qué un agente local evita caídas de hosting y errores de memoria.
 - [Conector Factusol PrestaShop 8](https://bridge.cristianjm.com/factusol-prestashop-8/): Compatibilidad garantizada con PHP 8.1 / 8.2 mediante WebService REST API.
+- [Quién está detrás de Bentian](https://bridge.cristianjm.com/quien-esta-detras/): Autoría técnica y perfil oficial del fundador Cristian Jiménez Martínez, SLA de soporte directo <24h y caso de estudio.
+- [Seguridad y Arquitectura Local-First](https://bridge.cristianjm.com/seguridad/): Cero bases de datos en nube, cifrado DPAPI, Store-and-Forward tolerante a cortes de red y firma asimétrica Ed25519.
+- [Requisitos del Sistema y Homologación Softpedia](https://bridge.cristianjm.com/requisitos-sistema/): Especificaciones de Windows x64, dependencias OLEDB/WebView2, permisos de usuario estándar y desinstalación limpia.
 - [Cobertura por Ciudades en España](https://bridge.cristianjm.com/conector-factusol/): Directorio de soporte regional para polígonos y almacenes.
 - [Conector Factusol Madrid](https://bridge.cristianjm.com/conector-factusol/madrid/): Especializado para empresas de Cobo Calleja, Coslada y San Fernando.
 - [Conector Factusol Barcelona](https://bridge.cristianjm.com/conector-factusol/barcelona/): Especializado para empresas de Zona Franca y el Vallès.
