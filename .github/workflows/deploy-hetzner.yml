@@ -48,9 +48,12 @@ jobs:
           username: root
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
+            set -e
             echo "🚀 Sincronizando repositorio en /opt/bentian/erp-bridge..."
             cd /opt/bentian/erp-bridge
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd -e .env -e .env.*
             echo "🔄 Reiniciando contenedor bentian-api-prod..."
             docker restart bentian-api-prod
             echo "✅ Despliegue completado con éxito."
