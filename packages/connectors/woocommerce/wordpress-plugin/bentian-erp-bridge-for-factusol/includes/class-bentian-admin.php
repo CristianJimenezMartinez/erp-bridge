@@ -155,7 +155,7 @@ class Bentian_Bridge_Admin {
                     <div class="bentian-logo-icon">⚡</div>
                     <div>
                         <h1>Bentian ERP Bridge <span class="bentian-version-tag">v<?php echo esc_html( BENTIAN_BRIDGE_VERSION ); ?></span></h1>
-                        <p class="bentian-subtitle"><?php esc_html_e( 'Conector oficial y de alto rendimiento entre Factusol (DELSOL) y WooCommerce', 'bentian-erp-bridge-for-factusol' ); ?></p>
+                        <p class="bentian-subtitle"><?php esc_html_e( 'Conector para sincronizar Factusol (DELSOL) y WooCommerce', 'bentian-erp-bridge-for-factusol' ); ?></p>
                     </div>
                 </div>
                 <div class="bentian-header-actions">
@@ -291,7 +291,7 @@ class Bentian_Bridge_Admin {
                         <h3><?php esc_html_e( 'Soporte Directo y Licencias Beta', 'bentian-erp-bridge-for-factusol' ); ?></h3>
                         <p><?php esc_html_e( '¿Eres una agencia o distribuidor informático? Solicita tu clave de prueba gratuita o soporte personalizado:', 'bentian-erp-bridge-for-factusol' ); ?></p>
                         <p><strong>Email:</strong> <a href="mailto:cristian@cristianjm.com">cristian@cristianjm.com</a></p>
-                        <p><strong>Web Oficial:</strong> <a href="https://bridge.cristianjm.com" target="_blank">bridge.cristianjm.com</a></p>
+                        <p><strong>Sitio Web:</strong> <a href="https://bridge.cristianjm.com" target="_blank">bridge.cristianjm.com</a></p>
                     </div>
                 </div>
             </div>

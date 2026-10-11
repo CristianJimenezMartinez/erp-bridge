@@ -40,6 +40,12 @@ function copyRecursive(src, dest) {
       copyRecursive(path.join(src, child), path.join(dest, child));
     }
   } else {
+    const filename = path.basename(src);
+    // Filtrar activos exclusivos del directorio de WordPress.org (banners, iconos, screenshots)
+    // Estos se suben al SVN de wp.org en /assets, NUNCA dentro del ZIP del plugin.
+    if (/^(banner|icon|screenshot)-.*\.(png|jpg|jpeg|svg)$/i.test(filename) || filename === '.DS_Store' || filename.endsWith('.tmp')) {
+      return;
+    }
     fs.copyFileSync(src, dest);
   }
 }

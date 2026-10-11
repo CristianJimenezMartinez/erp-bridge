@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Bentian ERP Bridge for Factusol
  * Plugin URI:        https://bridge.cristianjm.com
- * Description:       Conector oficial y de alto rendimiento para sincronizar Factusol (DELSOL) con tu tienda online. Sincronización bidireccional de catálogo, variantes, precios con IVA, stock y pedidos.
+ * Description:       Bridge connector to sync Factusol ERP with WooCommerce. Real-time bidirectional stock, product catalog, variations, and automated order synchronization.
  * Version:           0.3.8
  * Author:            Cristian Jiménez Martínez (Bentian)
  * Author URI:        https://cristianjm.com
@@ -61,12 +61,10 @@ function bentian_bridge_activate() {
 }
 
 /**
- * 3. Inicialización del plugin y carga de traducciones
+ * 3. Inicialización del plugin
  */
 add_action( 'plugins_loaded', 'bentian_bridge_init' );
 function bentian_bridge_init() {
-    load_plugin_textdomain( 'bentian-erp-bridge-for-factusol', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-
     // Si WooCommerce no está activo, mostrar aviso en el admin
     if ( ! class_exists( 'WooCommerce' ) ) {
         add_action( 'admin_notices', function() {
@@ -97,7 +95,7 @@ function bentian_bridge_init() {
  */
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'bentian_bridge_action_links' );
 function bentian_bridge_action_links( $links ) {
-    $settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=bentian-factusol-bridge' ) ) . '">' . esc_html__( 'Ajustes y Conexión', 'bentian-erp-bridge-for-factusol' ) . '</a>';
+    $settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=bentian-erp-bridge-for-factusol' ) ) . '">' . esc_html__( 'Ajustes y Conexión', 'bentian-erp-bridge-for-factusol' ) . '</a>';
     $agent_link    = '<a href="' . esc_url( BENTIAN_AGENT_DOWNLOAD_URL ) . '" style="color: #6366f1; font-weight: bold;" target="_blank">' . esc_html__( 'Descargar Agente Windows', 'bentian-erp-bridge-for-factusol' ) . '</a>';
     array_unshift( $links, $settings_link, $agent_link );
     return $links;
