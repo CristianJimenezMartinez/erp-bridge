@@ -139,36 +139,49 @@ const packages = [
 let circularCyclesFound = 0;
 const circularDetails: string[] = [];
 
+function parseMadgeOutput(stdout: string): string[][] | null {
+  const startIdx = stdout.indexOf('[');
+  const endIdx = stdout.lastIndexOf(']');
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
+  try {
+    const parsed = JSON.parse(stdout.substring(startIdx, endIdx + 1));
+    // madge returns an array of cycles, where each cycle is an array of file path strings:
+    // e.g. [ [ 'fileA.ts', 'fileB.ts' ] ] or [] when clean.
+    if (Array.isArray(parsed) && parsed.every((item) => Array.isArray(item))) {
+      return parsed as string[][];
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 try {
   const dirs = packages.map((p) => `"${path.join(repoRoot, p.dir)}"`).join(' ');
-  const cmd = `npx --no-install madge --circular --json --extensions ts ${dirs}`;
+  const madgeCli = path.join(repoRoot, 'node_modules', 'madge', 'bin', 'cli.js');
+  const cmd = fs.existsSync(madgeCli)
+    ? `"${process.execPath}" "${madgeCli}" --circular --json --extensions ts ${dirs}`
+    : `npx madge --circular --json --extensions ts ${dirs}`;
   const out = execSync(cmd, { cwd: repoRoot, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
-  const startIdx = out.indexOf('[');
-  const endIdx = out.lastIndexOf(']');
-  if (startIdx !== -1 && endIdx !== -1 && endIdx >= startIdx) {
-    const jsonStr = out.substring(startIdx, endIdx + 1);
-    const cycles = JSON.parse(jsonStr);
-    circularCyclesFound = Array.isArray(cycles) ? cycles.length : 0;
+  const cycles = parseMadgeOutput(out);
+  if (cycles !== null) {
+    circularCyclesFound = cycles.length;
     if (circularCyclesFound > 0) {
       circularDetails.push(JSON.stringify(cycles, null, 2));
     }
   }
 } catch (err: any) {
-  const out = (err.stdout || err.stderr || err.message || '').toString();
-  const startIdx = out.indexOf('[');
-  const endIdx = out.lastIndexOf(']');
-  if (startIdx !== -1 && endIdx !== -1 && endIdx >= startIdx) {
-    try {
-      const jsonStr = out.substring(startIdx, endIdx + 1);
-      const cycles = JSON.parse(jsonStr);
-      circularCyclesFound = Array.isArray(cycles) ? cycles.length : 0;
-      if (circularCyclesFound > 0) {
-        circularDetails.push(JSON.stringify(cycles, null, 2));
-      }
-    } catch {
-      circularCyclesFound = 1;
-      circularDetails.push(out.trim());
+  const stdout = (err.stdout || '').toString();
+  const cycles = parseMadgeOutput(stdout);
+  if (cycles !== null) {
+    circularCyclesFound = cycles.length;
+    if (circularCyclesFound > 0) {
+      circularDetails.push(JSON.stringify(cycles, null, 2));
     }
+  } else {
+    const errMsg = (err.stderr || err.stdout || err.message || '').toString().trim();
+    circularCyclesFound = 1;
+    circularDetails.push(`Error al ejecutar análisis de dependencias circulares: ${errMsg}`);
   }
 }
 

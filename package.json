@@ -41,6 +41,7 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "basic-ftp": "^6.2.1",
+    "madge": "^8.0.0",
     "ssh2": "^1.17.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
