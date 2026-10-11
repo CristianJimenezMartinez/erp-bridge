@@ -36,8 +36,9 @@ services:
       - PARTNER_SECRET=${PARTNER_SECRET}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      # Correo Transaccional (Resend API)
+      # Correo Transaccional (Resend API & Brevo fallback)
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - BREVO_API_KEY=${BREVO_API_KEY}
       - MAIL_FROM=${MAIL_FROM}
     volumes:
       - ./releases:/app/releases:ro
