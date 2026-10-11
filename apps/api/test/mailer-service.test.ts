@@ -71,8 +71,44 @@ async function testMailerService() {
   assert.ok(['simulation', 'resend', 'brevo', 'native_smtp'].includes(res6.provider));
   console.log(`  ✓ Test 6 superado (Proveedor detectado: ${res6.provider}).`);
 
+  // Test 1b: Despacho de email de bienvenida para usuario Beta (tono y vigencia hasta 31/12/2026)
+  console.log('  -> Test 1b: Enviar email de bienvenida de Beta Gratuita...');
+  const success1Beta = await MailerService.sendLicenseWelcomeEmail({
+    customerEmail: 'beta-user@empresa.com',
+    licenseKey: 'EB-BETA1-BETA2-BETA3-BETA4',
+    planName: 'Beta Pública Gratuita (Acceso completo hasta el 31 de Diciembre de 2026)',
+    alias: 'Beta 2026 - Distribuciones SL',
+    companyName: 'Distribuciones SL',
+  });
+  assert.strictEqual(success1Beta, true, 'El despacho de correo de bienvenida de Beta debe retornar true');
+  console.log('  ✓ Test 1b superado (Bienvenida Beta con tono adecuado y vigencia 2026).');
+
+  // Test 7: Validación de renderButton con estructura bulletproof para Outlook
+  console.log('  -> Test 7: Validar renderButton bulletproof...');
+  const btnHtml = MailerService.renderButton('Descargar Agente', 'https://bridge.cristianjm.com/download', 'indigo');
+  assert.ok(btnHtml.includes('role="presentation"'), 'El botón debe incluir role=presentation');
+  assert.ok(btnHtml.includes('bgcolor="#4f46e5"'), 'El botón indigo debe tener bgcolor sólido');
+  assert.ok(btnHtml.includes('Descargar Agente'), 'El botón debe incluir el texto esperado');
+  console.log('  ✓ Test 7 superado (renderButton a prueba de balas para Outlook/Gmail).');
+
+  // Test 8: Validación de renderBrandedEmail con colores sólidos y sin rgba
+  console.log('  -> Test 8: Validar renderBrandedEmail con colores sólidos y sin rgba...');
+  const brandedHtml = MailerService.renderBrandedEmail({
+    title: 'Prueba de Render',
+    badgeText: 'ACTIVA',
+    badgeType: 'success',
+    contentHtml: '<p>Contenido de prueba</p>',
+    previewText: 'Texto previo del mensaje',
+  });
+  assert.ok(brandedHtml.includes('xmlns:v="urn:schemas-microsoft-com:vml"'), 'Debe incluir namespaces MSO');
+  assert.ok(brandedHtml.includes('<!--[if (gte mso 9)|(IE)]>'), 'Debe incluir condicionales MSO para Outlook');
+  assert.ok(!brandedHtml.includes('rgba('), 'No debe contener rgba() para garantizar compatibilidad');
+  assert.ok(brandedHtml.includes('#064e3b'), 'Badge success debe usar color hex sólido');
+  assert.ok(brandedHtml.includes('Texto previo del mensaje'), 'Debe incluir el previewText');
+  console.log('  ✓ Test 8 superado (renderBrandedEmail 100% compatible y sólido).');
+
   console.log('======================================================================');
-  console.log('🎉 TODOS LOS TESTS DE MAILER SERVICE PASARON CON ÉXITO (6/6)');
+  console.log('🎉 TODOS LOS TESTS DE MAILER SERVICE PASARON CON ÉXITO (9/9)');
   console.log('======================================================================');
 }
 

@@ -427,53 +427,58 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       });
 
       // 6.1 Notificación urgente al administrador (Cristian Jiménez)
-      const adminBetaAlertHtml = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #f4f4f5; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 32px;">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px;">
-            <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">
-              🎁
-            </div>
-            <div>
-              <h2 style="margin: 0; font-size: 18px; color: #ffffff;">Nueva Solicitud de Beta Gratuita</h2>
-              <span style="font-size: 12px; color: #a1a1aa;">Bentian ERP Bridge · Lead Comercial</span>
-            </div>
-          </div>
+      const mailtoUrl = `mailto:${normalizedEmail}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%2C%20PrestaShop%20o%20Shopify)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez`;
 
-          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-              <tr>
-                <td style="padding: 8px 0; color: #a1a1aa; width: 140px;">Empresa / Comercio:</td>
-                <td style="padding: 8px 0; color: #ffffff; font-weight: 600;">${cleanCompanyName || 'No especificada'}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #a1a1aa;">Email de Contacto:</td>
-                <td style="padding: 8px 0;"><a href="mailto:${normalizedEmail}" style="color: #818cf8; text-decoration: none; font-weight: 600;">${normalizedEmail}</a></td>
-              </tr>
-              ${cleanTaxId ? `
-              <tr>
-                <td style="padding: 8px 0; color: #a1a1aa;">CIF / NIF:</td>
-                <td style="padding: 8px 0; color: #ffffff; font-family: monospace;">${cleanTaxId}</td>
-              </tr>
-              ` : ''}
-              <tr>
-                <td style="padding: 8px 0; color: #a1a1aa;">Clave Generada:</td>
-                <td style="padding: 8px 0; color: #34d399; font-family: monospace; font-weight: bold;">${license.key}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #a1a1aa;">Validez:</td>
-                <td style="padding: 8px 0; color: #fbbf24;">Hasta 31/12/2026 (${trialDays} días)</td>
-              </tr>
-            </table>
-          </div>
+      const adminBetaAlertHtml = MailerService.renderBrandedEmail({
+        title: `Nueva Solicitud de Beta Gratuita: ${cleanCompanyName || normalizedEmail}`,
+        badgeText: 'LEAD BETA 2026',
+        badgeType: 'success',
+        contentHtml: `
+          <h2 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 700; color: #ffffff; line-height: 1.3;">
+            🎁 Nueva Solicitud de Beta Gratuita
+          </h2>
+          <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #a1a1aa;">
+            Un nuevo cliente potencial ha solicitado acceso a la Beta Abierta de <strong>Bentian ERP Bridge</strong> desde la landing page oficial:
+          </p>
 
-          <div style="text-align: center; margin-top: 24px;">
-            <a href="mailto:${normalizedEmail}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%20o%20PrestaShop)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez" 
-               style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;">
-              Contactar con el Cliente Potencial &rarr;
-            </a>
-          </div>
-        </div>
-      `;
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #16161f; border: 1px solid #27272a; border-radius: 12px; margin-bottom: 24px;">
+            <tr>
+              <td style="padding: 20px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px; line-height: 1.8;">
+                  <tr>
+                    <td width="140" style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Empresa / Comercio:</td>
+                    <td style="color: #ffffff; font-weight: 700; padding: 6px 0;">${cleanCompanyName || 'No especificada'}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Email de Contacto:</td>
+                    <td style="padding: 6px 0;">
+                      <a href="mailto:${normalizedEmail}" style="color: #818cf8; text-decoration: underline; font-weight: 600;">${normalizedEmail}</a>
+                    </td>
+                  </tr>
+                  ${cleanTaxId ? `
+                  <tr>
+                    <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">CIF / NIF:</td>
+                    <td style="color: #e4e4e7; font-family: 'SFMono-Regular', Consolas, monospace; padding: 6px 0;">${cleanTaxId}</td>
+                  </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Clave Generada:</td>
+                    <td style="color: #34d399; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; padding: 6px 0;">${license.key}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Validez:</td>
+                    <td style="color: #fbbf24; font-weight: 600; padding: 6px 0;">Hasta 31/12/2026 (${trialDays} días)</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          ${MailerService.renderButton('Contactar con el Cliente Potencial &rarr;', mailtoUrl, 'indigo')}
+        `,
+        previewText: `Nuevo lead: ${cleanCompanyName || normalizedEmail} ha reclamado acceso a la Beta de Bentian ERP Bridge.`,
+        footerNote: 'Alerta interna confidencial generada automáticamente por el sistema de licencias de Bentian ERP Bridge.',
+      });
 
       await MailerService.sendEmail({
         to: 'cristianjimeneztrabajo@gmail.com',
