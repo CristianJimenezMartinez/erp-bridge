@@ -140,48 +140,45 @@
   <header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#09090b]/85 backdrop-blur-md">
     <div class="w-full max-w-[1920px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-14 2xl:px-16 h-20 flex items-center justify-between">
       
-      <!-- Marca Desacoplada (BRAND_MARK + BRAND_NAME + PRODUCT_NAME) -->
-      <a href="/" class="flex items-center gap-3.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl py-1.5 px-2 hover:bg-white/[0.03] transition shrink-0">
+      <!-- Marca Principal Bentian -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl py-1.5 px-2 hover:bg-white/[0.03] transition shrink-0">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center border border-white/[0.12] bg-zinc-900 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.25)] transition shrink-0 p-1.5">
           <!-- Logo Oficial de Bentian -->
           <img src="/assets/icon.svg" alt="Bentian Logo" class="w-full h-full object-contain" width="36" height="36">
         </div>
-        <div class="flex items-baseline gap-2.5">
-          <span class="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-indigo-200 transition" data-brand-name>Bentian</span>
-          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400 bg-zinc-900/90 border border-white/[0.08] px-2.5 py-0.5 rounded-md shadow-inner" data-product-name>ERP Bridge</span>
-        </div>
+        <span class="font-bold text-lg sm:text-xl tracking-tight text-white group-hover:text-indigo-200 transition" data-brand-name>Bentian</span>
       </a>
 
       <!-- Navegación Principal Organizada & Respirada -->
-      <nav class="hidden lg:flex items-center gap-3.5 xl:gap-6 2xl:gap-8 text-xs xl:text-[13px] 2xl:text-sm text-zinc-400 font-medium">
-        <a href="#salvaguardas" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Salvaguardas</a>
-        <a href="#como-funciona" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Cómo Funciona</a>
-        <a href="#conectores" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Conectores</a>
-        <a href="#seguridad" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Seguridad</a>
-        <a href="#fundador" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Fundador</a>
-        <a href="/casos-de-exito/suministros-rubio/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition flex items-center gap-1.5 whitespace-nowrap">
+      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-8 text-xs xl:text-[13px] 2xl:text-sm text-zinc-400 font-medium shrink-0">
+        <a href="#salvaguardas" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Salvaguardas</a>
+        <a href="#como-funciona" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Cómo Funciona</a>
+        <a href="#conectores" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Conectores</a>
+        <a href="#seguridad" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Seguridad</a>
+        <a href="#fundador" class="hidden xl:inline-block px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Fundador</a>
+        <a href="/casos-de-exito/suministros-rubio/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition flex items-center gap-1.5 whitespace-nowrap shrink-0">
           <span>Casos de Éxito</span>
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
         </a>
-        <a href="#precios" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">Tarifas</a>
-        <a href="#faq" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap">FAQ</a>
-        <a href="/beta/" id="nav-beta-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 font-semibold transition text-xs whitespace-nowrap">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>🎁 Clave Beta Gratis</span>
+        <a href="#precios" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Tarifas</a>
+        <a href="#faq" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">FAQ</a>
+        <a href="/beta/" id="nav-beta-btn" class="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 font-semibold transition text-xs whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span>🎁 Clave Beta</span>
         </a>
       </nav>
 
       <!-- Botones de Acción (Con margen y divisor visual de separación) -->
-      <div class="flex items-center gap-3 sm:gap-4 shrink-0 pl-3 sm:pl-5 lg:pl-6 xl:pl-8 border-l border-white/[0.1]">
-        <a href="/docs/" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3 sm:px-3.5 py-2 rounded-lg hover:bg-white/[0.06] transition flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+      <div class="flex items-center gap-3 sm:gap-4 shrink-0 pl-4 sm:pl-6 lg:pl-8 border-l border-white/[0.1]">
+        <a href="/docs/" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3 sm:px-3.5 py-2 rounded-lg hover:bg-white/[0.06] transition flex items-center gap-1.5 whitespace-nowrap shrink-0">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           <span class="inline">Docs</span>
         </a>
-        <a href="/dashboard" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3.5 sm:px-4 py-2 rounded-lg border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden sm:flex items-center gap-2 whitespace-nowrap">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <a href="/dashboard" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3.5 sm:px-4 py-2 rounded-lg border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden sm:flex items-center gap-2 whitespace-nowrap shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           Acceso Clientes
         </a>
-        <a href="#descargas" class="text-xs sm:text-[13px] font-semibold px-4.5 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm hover:shadow-indigo-500/25 whitespace-nowrap">
+        <a href="#descargas" class="text-xs sm:text-[13px] font-semibold px-4.5 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm hover:shadow-indigo-500/25 whitespace-nowrap shrink-0">
           Descargar Agente
         </a>
       </div>
