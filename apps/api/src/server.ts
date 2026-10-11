@@ -201,6 +201,8 @@ export async function bootstrapApp(): Promise<Express> {
     'Bentian-Setup.zip',
     'BentianAgent-Portable.zip',
     'BentianAgent.exe',
+    'bentian-erp-bridge-for-factusol.zip',
+    'bentian-factusol-bridge.zip',
     'latest.json',
     'manifest.json',
     'checksums.txt',
