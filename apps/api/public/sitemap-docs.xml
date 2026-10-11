@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
-<!-- Directorio de Documentación Técnica -->
+
+  <!-- Directorio de Documentación Técnica -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/</loc>
-    <lastmod>2026-10-04T20:00:00+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/" />
   </url>
 
-  <!-- Doc: Requisitos del Sistema y Entorno Operativo -->
+  <!-- Doc: Requisitos del Sistema, Certificación Softpedia y Entorno Operativo -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/primeros-pasos/requisitos-del-sistema/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/primeros-pasos/requisitos-del-sistema/" />
@@ -21,10 +24,10 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/primeros-pasos/requisitos-del-sistema/" />
   </url>
 
-  <!-- Doc: Instalación y Despliegue del Agente en Windows -->
+  <!-- Doc: Instalación y Despliegue del Agente en Windows (Instalador vs Portable) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/primeros-pasos/instalacion-y-despliegue/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/primeros-pasos/instalacion-y-despliegue/" />
@@ -35,7 +38,7 @@
   <!-- Doc: Activación de Licencias, Beta de 60 Días y Plan Fundador -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/primeros-pasos/activacion-de-licencias/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/primeros-pasos/activacion-de-licencias/" />
@@ -46,7 +49,7 @@
   <!-- Doc: Guía del Asistente de Configuración (Onboarding Wizard) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/primeros-pasos/asistente-de-configuracion/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/primeros-pasos/asistente-de-configuracion/" />
@@ -57,7 +60,7 @@
   <!-- Doc: Localización de la Base de Datos de Factusol (.accdb y .mdb) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/localizacion-base-datos/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/localizacion-base-datos/" />
@@ -68,7 +71,7 @@
   <!-- Doc: Rutas de Red, Servidores NAS y Protección Anti-Wiping -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/rutas-red-nas-anti-wiping/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/rutas-red-nas-anti-wiping/" />
@@ -79,7 +82,7 @@
   <!-- Doc: Controladores Microsoft ACE OLEDB vs ODBC -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/controladores-oledb-ace/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/controladores-oledb-ace/" />
@@ -90,7 +93,7 @@
   <!-- Doc: Series de Pedidos en Factusol: Serie 1 Directa vs Serie W -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/series-de-pedidos/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/series-de-pedidos/" />
@@ -101,7 +104,7 @@
   <!-- Doc: Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/calculo-stock-disponible/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/calculo-stock-disponible/" />
@@ -112,7 +115,7 @@
   <!-- Doc: Matriz Oficial de Compatibilidad de Factusol (2018–2026) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/" />
@@ -123,7 +126,7 @@
   <!-- Doc: Conexión con WooCommerce y Compatibilidad HPOS -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/woocommerce/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/woocommerce/" />
@@ -134,7 +137,7 @@
   <!-- Doc: Conexión con PrestaShop 1.7 y 8.x mediante Webservices -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/prestashop/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/prestashop/" />
@@ -142,10 +145,10 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/prestashop/" />
   </url>
 
-  <!-- Doc: Conexión con Shopify mediante Admin REST y GraphQL -->
+  <!-- Doc: Conexión Factusol con Shopify y Webhooks en Tiempo Real -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/shopify/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/shopify/" />
@@ -153,10 +156,21 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/shopify/" />
   </url>
 
-  <!-- Doc: Endpoint Universal: Conecta Cualquier Tienda Personalizada -->
+  <!-- Doc: Integración Factusol con Holded Cloud ERP y Facturación Contable -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/canales/holded/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/holded/" />
+  </url>
+
+  <!-- Doc: Endpoint Universal: Especificación Técnica y Protocolo Bidireccional -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/endpoint-universal/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/endpoint-universal/" />
@@ -167,7 +181,7 @@
   <!-- Doc: Arquitectura Local-First y Privacidad de Datos -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-local-first/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-local-first/" />
@@ -175,10 +189,10 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-local-first/" />
   </url>
 
-  <!-- Doc: Cola Desacoplada Store-and-Forward (SQLite) -->
+  <!-- Doc: Cola Desacoplada Store-and-Forward (JSON Atómico) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/" />
@@ -189,7 +203,7 @@
   <!-- Doc: FileWatcher en Tiempo Real y Ciclos Incrementales -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/arquitectura/deteccion-tiempo-real/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/deteccion-tiempo-real/" />
@@ -197,10 +211,32 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/deteccion-tiempo-real/" />
   </url>
 
+  <!-- Doc: Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+  </url>
+
+  <!-- Doc: Benchmark de Estrés con Catálogo Real (+5.300 Artículos de Suministros Rubio) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
+  </url>
+
   <!-- Doc: Cuadre de IVA al Céntimo y Prevención de Descuadres -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/fiscalidad/cuadre-iva-centimos/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/fiscalidad/cuadre-iva-centimos/" />
@@ -211,7 +247,7 @@
   <!-- Doc: Recargo de Equivalencia en WooCommerce y PrestaShop -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/fiscalidad/recargo-de-equivalencia/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/fiscalidad/recargo-de-equivalencia/" />
@@ -222,7 +258,7 @@
   <!-- Doc: Veri*Factu, Ley Antifraude y la Facturación en Factusol -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/fiscalidad/verifactu-ley-antifraude/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/fiscalidad/verifactu-ley-antifraude/" />
@@ -233,7 +269,7 @@
   <!-- Doc: Catálogo de Errores Humanizados y Resolución en 1 Clic -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/troubleshooting/errores-humanizados/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/troubleshooting/errores-humanizados/" />
@@ -244,7 +280,7 @@
   <!-- Doc: Cómo Solucionar el Error 3045: Base de Datos Bloqueada (.laccdb) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/" />
@@ -255,7 +291,7 @@
   <!-- Doc: Error de Proveedor OLEDB Microsoft.ACE no Registrado -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/troubleshooting/error-oledb-no-registrado/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/troubleshooting/error-oledb-no-registrado/" />
@@ -266,7 +302,7 @@
   <!-- Doc: Error 401 Unauthorized en WooCommerce (.htaccess) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/troubleshooting/error-401-autorizacion-hosting/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/troubleshooting/error-401-autorizacion-hosting/" />
@@ -274,10 +310,21 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/troubleshooting/error-401-autorizacion-hosting/" />
   </url>
 
+  <!-- Doc: Evidencia Técnica de Seguridad: 5 Respuestas Críticas de Ingeniería -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
+  </url>
+
   <!-- Doc: Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/" />
@@ -288,7 +335,7 @@
   <!-- Doc: Windows SmartScreen: Autorización y Reputación de Binarios -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/seguridad/windows-smartscreen/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/windows-smartscreen/" />
@@ -299,7 +346,7 @@
   <!-- Doc: Criptografía Asimétrica Ed25519 y Actualización Atómica -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/seguridad/criptografia-y-actualizaciones/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/criptografia-y-actualizaciones/" />
@@ -307,10 +354,21 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/criptografia-y-actualizaciones/" />
   </url>
 
+  <!-- Doc: Certificación Softpedia 100% Clean, Análisis Antivirus y Reputación de Binarios -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+  </url>
+
   <!-- Doc: Referencia de la API REST Local del Agente (39281) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/api/api-rest-local/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/api/api-rest-local/" />
@@ -321,7 +379,7 @@
   <!-- Doc: Esquema JSON de Pedidos (OrderPayload) y Validación Zod -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/api/esquema-pedidos-json/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/api/esquema-pedidos-json/" />
@@ -329,25 +387,4 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/api/esquema-pedidos-json/" />
   </url>
 
-  <!-- Doc: Integración Factusol con Holded Cloud ERP y Facturación Contable -->
-  <url>
-    <loc>https://bridge.cristianjm.com/docs/canales/holded/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/holded/" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/canales/holded/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/holded/" />
-  </url>
-
-  <!-- Doc: Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud -->
-  <url>
-    <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
-  </url>
 </urlset>

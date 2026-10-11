@@ -871,9 +871,9 @@ function updateSitemap(articles: DocArticle[]) {
   </url>
 `;
       sitemap = sitemap.replace('</urlset>', `${entry}</urlset>`);
-    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita', 'seguridad/certificacion-softpedia-100-clean', 'arquitectura/benchmark-estres-catalogo-real'].includes(art.slug)) {
+    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita', 'seguridad/certificacion-softpedia-100-clean', 'arquitectura/benchmark-estres-catalogo-real', 'seguridad/evidencias-tecnicas-y-auditoria', 'primeros-pasos/requisitos-del-sistema'].includes(art.slug)) {
       const reg = new RegExp(`(<loc>https:\\/\\/bridge\\.cristianjm\\.com\\/docs\\/${art.slug}\\/<\\/loc>\\s*<lastmod>)[^<]+(<\\/lastmod>)`, 'i');
-      sitemap = sitemap.replace(reg, `$12026-10-10T14:00:00+02:00$2`);
+      sitemap = sitemap.replace(reg, `$12026-10-11T12:00:00+02:00$2`);
     }
   }
 
@@ -895,6 +895,54 @@ function updateSitemap(articles: DocArticle[]) {
 
   fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
   console.log(`✓ [sitemap] Sitemap actualizado y sanitizado (100% URLs canónicas, 0 legacy, 0 duplicados, 0 imágenes).`);
+}
+
+function updateSitemapDocs(articles: DocArticle[]) {
+  const SITEMAP_DOCS_FILE = path.resolve(PUBLIC_DIR, 'sitemap-docs.xml');
+  const hubUrl = 'https://bridge.cristianjm.com/docs/';
+  const currentDate = '2026-10-11T12:00:00+02:00';
+
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+  xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n\n`;
+
+  xml += `  <!-- Directorio de Documentación Técnica -->\n`;
+  xml += `  <url>\n`;
+  xml += `    <loc>${hubUrl}</loc>\n`;
+  xml += `    <lastmod>${currentDate}</lastmod>\n`;
+  xml += `    <changefreq>daily</changefreq>\n`;
+  xml += `    <priority>0.9</priority>\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="es-ES" href="${hubUrl}" />\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="es" href="${hubUrl}" />\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${hubUrl}" />\n`;
+  xml += `  </url>\n\n`;
+
+  for (const art of articles) {
+    const docUrl = `https://bridge.cristianjm.com/docs/${art.slug}/`;
+    xml += `  <!-- Doc: ${art.title} -->\n`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${docUrl}</loc>\n`;
+    xml += `    <lastmod>${currentDate}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="es-ES" href="${docUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="es" href="${docUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${docUrl}" />\n`;
+    xml += `  </url>\n\n`;
+  }
+
+  xml += `</urlset>\n`;
+  fs.writeFileSync(SITEMAP_DOCS_FILE, xml, 'utf8');
+  console.log(`✓ [sitemap-docs] Generado sitemap-docs.xml con ${articles.length} artículos técnicos y Hub.`);
+
+  // Actualizar sitemap-index.xml
+  const SITEMAP_INDEX_FILE = path.resolve(PUBLIC_DIR, 'sitemap-index.xml');
+  if (fs.existsSync(SITEMAP_INDEX_FILE)) {
+    let indexXml = fs.readFileSync(SITEMAP_INDEX_FILE, 'utf8');
+    indexXml = indexXml.replace(/(<loc>https:\/\/bridge\.cristianjm\.com\/sitemap-docs\.xml<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i, `$12026-10-11$2`);
+    fs.writeFileSync(SITEMAP_INDEX_FILE, indexXml, 'utf8');
+    console.log(`✓ [sitemap-index] Actualizado lastmod de sitemap-docs.xml en sitemap-index.xml.`);
+  }
 }
 
 function updateLlmsTxt(articles: DocArticle[]) {
@@ -951,8 +999,9 @@ export function buildDocs() {
   fs.writeFileSync(hubOutFile, hubHtml, 'utf8');
   console.log(`✓ [hub] Portada del Centro de Documentación -> ${hubOutFile}`);
 
-  // 3. Actualizar sitemap.xml
+  // 3. Actualizar sitemap.xml y sitemap-docs.xml
   updateSitemap(DOC_ARTICLES);
+  updateSitemapDocs(DOC_ARTICLES);
 
   // 4. Actualizar llms.txt
   updateLlmsTxt(DOC_ARTICLES);

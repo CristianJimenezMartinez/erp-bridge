@@ -475,7 +475,7 @@
   <!-- Doc: Requisitos del Sistema y Entorno Operativo -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/primeros-pasos/requisitos-del-sistema/</loc>
-    <lastmod>2026-10-05T00:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/primeros-pasos/requisitos-del-sistema/" />
@@ -607,7 +607,7 @@
   <!-- Doc: Conexión con Shopify mediante Admin REST y GraphQL -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/shopify/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/shopify/" />
@@ -805,7 +805,7 @@
   <!-- Doc: Integración Factusol con Holded Cloud ERP y Facturación Contable -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/holded/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/canales/holded/" />
@@ -816,7 +816,7 @@
   <!-- Doc: Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
@@ -827,7 +827,7 @@
   <!-- Doc: Benchmark de Estrés con Catálogo Real (+5.300 Artículos de Suministros Rubio) -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/" />
@@ -838,11 +838,22 @@
   <!-- Doc: Certificación Softpedia 100% Clean, Análisis Antivirus y Reputación de Binarios -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/</loc>
-    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/certificacion-softpedia-100-clean/" />
+  </url>
+
+  <!-- Doc: Evidencia Técnica de Seguridad: 5 Respuestas Críticas de Ingeniería -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/seguridad/evidencias-tecnicas-y-auditoria/" />
   </url>
 </urlset>

@@ -195,9 +195,9 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian, bentian portable sin permisos">
+                    <li data-title="requisitos del sistema, certificación softpedia y entorno operativo" data-keywords="requisitos bentian, softpedia bentian erp bridge, alexandra sava softpedia, requisitos factusol windows 11, requisitos conector factusol, permisos administrador bentian, desinstalacion limpia bentian, oledb ace 64 bits factusol">
                       <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Requisitos del Sistema y Entorno Operativo
+                        Requisitos del Sistema, Certificación Softpedia y Entorno Operativo
                       </a>
                     </li>
                   
@@ -423,6 +423,12 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
+                    <li data-title="evidencia técnica de seguridad: 5 respuestas críticas de ingeniería" data-keywords="seguridad factusol, ciso factusol, privacidad erp bridge, datos salientes factusol, claves api agent-config json, store and forward corte internet factusol, updateswapper rollback ed25519, permisos oledb share deny none factusol f_pcl, auditoria ciso factusol">
+                      <a href="/docs/seguridad/evidencias-tecnicas-y-auditoria/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Evidencia Técnica de Seguridad: 5 Respuestas Críticas de Ingeniería
+                      </a>
+                    </li>
+                  
                     <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, sentinelone factusol, bitdefender factusol, seguridad edr conector factusol">
                       <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
@@ -529,41 +535,41 @@
         <!-- Article Rich Content Body -->
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        En Windows, un proceso en ejecución no puede sobrescribir su propio archivo ejecutable en disco (provoca un error de bloqueo de archivo a nivel de kernel). Actualizar un servicio de sincronización empresarial de forma desatendida requiere una arquitectura de seguridad capaz de prevenir corrupciones y ataques de suplantación.
-      </p>
+    <p class="text-base text-zinc-300 leading-relaxed mb-6">
+      En Windows, un proceso en ejecución no puede sobrescribir su propio archivo ejecutable en disco (provoca un error de bloqueo de archivo a nivel de kernel). Actualizar un servicio de sincronización empresarial de forma desatendida requiere una arquitectura de seguridad capaz de prevenir corrupciones y ataques de suplantación.
+    </p>
 
-      <h2 id="el-peligro-actualizaciones-windows" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Peligro de las Auto-Actualizaciones en Windows</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Si un programa descarga un archivo ejecutable y lo reemplaza directamente sin comprobar su firma, cualquier atacante que intercepte la red mediante un ataque Man-in-the-Middle (MitM) podría inyectar código malicioso en el servidor de la empresa.
-      </p>
+    <h2 id="el-peligro-actualizaciones-windows" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Peligro de las Auto-Actualizaciones en Windows</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Si un programa descarga un archivo ejecutable y lo reemplaza directamente sin comprobar su firma, cualquier atacante que intercepte la red mediante un ataque Man-in-the-Middle (MitM) podría inyectar código malicioso en el servidor de la empresa.
+    </p>
 
-      <h2 id="firmas-ed25519" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Firmas Asimétricas Ed25519 en el Manifiesto</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Todas las versiones y parches publicados por Bentian incluyen un archivo <code class="text-zinc-200">manifest.json</code> firmado criptográficamente con la clave privada de curva elíptica <strong>Ed25519</strong> del autor.
-      </p>
-      <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6 font-mono">
-        El agente contiene compilada en su interior la clave pública de Bentian. Antes de tocar el disco, verifica que:
-        <div class="text-emerald-300 mt-1">Ed25519.verify(manifest.sha256, manifest.signature, BENTIAN_PUBLIC_KEY) === true</div>
-        Si un solo byte del archivo ha sido alterado, la actualización se rechaza de inmediato.
-      </div>
+    <h2 id="firmas-ed25519" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Firmas Asimétricas Ed25519 en el Manifiesto</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Todas las versiones y parches publicados por Bentian incluyen un archivo <code class="text-zinc-200">manifest.json</code> firmado criptográficamente con la clave privada de curva elíptica <strong>Ed25519</strong> del autor.
+    </p>
+    <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6 font-mono">
+      El agente contiene compilada en su interior la clave pública de Bentian. Antes de tocar el disco, verifica que:
+      <div class="text-emerald-300 mt-1">Ed25519.verify(manifest.sha256, manifest.signature, BENTIAN_PUBLIC_KEY) === true</div>
+      Si un solo byte del archivo ha sido alterado, la actualización se rechaza de inmediato.
+    </div>
 
-      <h2 id="el-motor-updateswapper" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. El Proceso Desacoplado UpdateSwapper</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Una vez validada la firma, el agente delega la sustitución a un proceso independiente llamado <code class="text-indigo-300">UpdateSwapper</code> que opera desde el directorio temporal (<code class="text-zinc-400 font-mono">%TEMP%\bentian-updates\</code>):
-      </p>
-      <ol class="text-sm text-zinc-300 space-y-1.5 list-decimal list-inside mb-6">
-        <li>Solicita elevación UAC si el directorio de destino requiere permisos de Administrador.</li>
-        <li>Detiene de forma ordenada los procesos <code class="text-zinc-200">BentianAgent.exe</code> y <code class="text-zinc-200">BentianTray.exe</code>.</li>
-        <li>Renombra el binario actual como copia de seguridad (<code class="text-zinc-200 font-mono">BentianAgent.exe.bak</code>).</li>
-        <li>Copia el nuevo ejecutable verificado y arranca la nueva versión.</li>
-      </ol>
+    <h2 id="el-motor-updateswapper" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. El Proceso Desacoplado UpdateSwapper (%TEMP%)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Una vez validada la firma, el agente delega la sustitución a un proceso independiente llamado <code class="text-indigo-300">UpdateSwapper</code> que opera desde el directorio temporal (<code class="text-zinc-400 font-mono">%TEMP%\bentian-updates\</code>):
+    </p>
+    <ol class="text-sm text-zinc-300 space-y-1.5 list-decimal list-inside mb-6">
+      <li>Solicita elevación UAC si el directorio de destino requiere permisos de Administrador (<code class="text-zinc-300 font-mono">C:\Program Files\Bentian Agent</code>).</li>
+      <li>Detiene de forma ordenada los procesos <code class="text-zinc-200">BentianAgent.exe</code> y <code class="text-zinc-200">BentianTray.exe</code>.</li>
+      <li>Renombra el binario actual como copia de seguridad (<code class="text-zinc-200 font-mono">BentianAgent.exe.bak</code>).</li>
+      <li>Copia el nuevo ejecutable verificado y arranca la nueva versión.</li>
+    </ol>
 
-      <h2 id="monitor-estabilidad-rollback" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Monitor de Estabilidad de 10 Segundos y Rollback</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
-        Tras iniciar la nueva versión, el <code class="text-zinc-200">UpdateSwapper</code> no finaliza de inmediato: monitoriza la ejecución durante <strong>10 segundos</strong>. Si el nuevo proceso colapsara por alguna incompatibilidad imprevista de librerías, el swapper mata el proceso fallido, restaura automáticamente el archivo <code class="text-zinc-200 font-mono">.bak</code> anterior y devuelve el sistema a producción en su estado estable.
-      </p>
-    
+    <h2 id="monitor-estabilidad-rollback" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Monitor de Estabilidad de 10 Segundos y Rollback Automático</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+      Tras iniciar la nueva versión, el <code class="text-zinc-200">UpdateSwapper</code> no finaliza de inmediato: monitoriza la ejecución durante <strong>10 segundos</strong>. Si el nuevo proceso colapsara por alguna incompatibilidad imprevista de librerías o excepción fatal, el swapper mata el proceso fallido, restaura automáticamente el archivo <code class="text-zinc-200 font-mono">.bak</code> anterior y devuelve el sistema a producción en su estado estable sin intervención del usuario.
+    </p>
+  
         </article>
 
         <!-- Pagination: Prev / Next Buttons -->
@@ -614,13 +620,13 @@
           
             <li>
               <a href="#el-motor-updateswapper" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="el-motor-updateswapper">
-                3. El Proceso Desacoplado UpdateSwapper
+                3. El Proceso Desacoplado UpdateSwapper (%TEMP%)
               </a>
             </li>
           
             <li>
               <a href="#monitor-estabilidad-rollback" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="monitor-estabilidad-rollback">
-                4. Monitor de Estabilidad de 10 Segundos y Rollback
+                4. Monitor de Estabilidad de 10 Segundos y Rollback Automático
               </a>
             </li>
           

@@ -223,6 +223,7 @@ export const softpediaArticle: DocArticle = {
     </p>
   `,
   relatedSlugs: [
+    'seguridad/evidencias-tecnicas-y-auditoria',
     'seguridad/antivirus-edr-smartscreen',
     'seguridad/windows-smartscreen',
     'seguridad/criptografia-y-actualizaciones',

@@ -20,6 +20,7 @@ const CONTENT_SECTIONS = [
   '09-observability.html',
   '10-connectors.html',
   '11-security.html',
+  '11b-founder.html',
   '12-pricing.html',
   '13-faq.html',
 ];

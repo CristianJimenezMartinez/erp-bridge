@@ -195,9 +195,9 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="requisitos del sistema y entorno operativo" data-keywords="requisitos bentian, factusol windows 11, factusol windows server, requisitos conector factusol, permisos administrador bentian, bentian portable sin permisos">
+                    <li data-title="requisitos del sistema, certificación softpedia y entorno operativo" data-keywords="requisitos bentian, softpedia bentian erp bridge, alexandra sava softpedia, requisitos factusol windows 11, requisitos conector factusol, permisos administrador bentian, desinstalacion limpia bentian, oledb ace 64 bits factusol">
                       <a href="/docs/primeros-pasos/requisitos-del-sistema/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
-                        Requisitos del Sistema y Entorno Operativo
+                        Requisitos del Sistema, Certificación Softpedia y Entorno Operativo
                       </a>
                     </li>
                   
@@ -423,6 +423,12 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
+                    <li data-title="evidencia técnica de seguridad: 5 respuestas críticas de ingeniería" data-keywords="seguridad factusol, ciso factusol, privacidad erp bridge, datos salientes factusol, claves api agent-config json, store and forward corte internet factusol, updateswapper rollback ed25519, permisos oledb share deny none factusol f_pcl, auditoria ciso factusol">
+                      <a href="/docs/seguridad/evidencias-tecnicas-y-auditoria/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
+                        Evidencia Técnica de Seguridad: 5 Respuestas Críticas de Ingeniería
+                      </a>
+                    </li>
+                  
                     <li data-title="exclusiones de antivirus y edr (principio de mínimo privilegio)" data-keywords="exclusiones antivirus factusol, windows defender bentian, crowdstrike factusol cscript, sentinelone factusol, bitdefender factusol, seguridad edr conector factusol">
                       <a href="/docs/seguridad/antivirus-edr-smartscreen/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
                         Exclusiones de Antivirus y EDR (Principio de Mínimo Privilegio)
@@ -529,158 +535,160 @@
         <!-- Article Rich Content Body -->
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        En entornos empresariales y redes corporativas protegidas por antivirus de última generación y plataformas EDR (Endpoint Detection and Response), configurar exclusiones genéricas o globales constituye una vulnerabilidad crítica que los administradores de sistemas y responsables de CISO rechazan de plano.
-      </p>
+    <p class="text-base text-zinc-300 leading-relaxed mb-6">
+      En entornos empresariales y redes corporativas protegidas por antivirus de última generación y plataformas EDR (Endpoint Detection and Response), configurar exclusiones genéricas o globales constituye una vulnerabilidad crítica que los administradores de sistemas y responsables de CISO rechazan de plano.
+    </p>
 
-      <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 mb-6 leading-relaxed">
-        <strong class="text-rose-200 block mb-1">PROHIBICIÓN ESTRICTA Y ADVERTENCIA DE SEGURIDAD EDR / CISO:</strong>
-        PROHIBIDO configurar exclusiones globales para <code>cscript.exe</code> o comodines <code>*.accdb</code> / <code>*.laccdb</code> en todo el sistema. Dichas prácticas debilitan las defensas del Endpoint corporativo y son rechazadas por suites EDR.
-      </div>
+    <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300 mb-6 leading-relaxed">
+      <strong class="text-rose-200 block mb-1">PROHIBICIÓN ESTRICTA Y ADVERTENCIA DE SEGURIDAD EDR / CISO:</strong>
+      PROHIBIDO configurar exclusiones globales para <code>cscript.exe</code> o comodines <code>*.accdb</code> / <code>*.laccdb</code> en todo el sistema. Dichas prácticas debilitan las defensas del Endpoint corporativo y son rechazadas por suites EDR.
+    </div>
 
-      <h2 id="principio-minimo-privilegio" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Principio de Mínimo Privilegio y Reglas Prohibidas</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Excluir de forma global intérpretes nativos del sistema operativo como <code class="text-rose-400">cscript.exe</code> o aplicar comodines como <code class="text-rose-400">*.accdb</code> en todo el disco duro expone el equipo a técnicas de <em>Living off the Land</em> (LotL) y ataques de ransomware ajenos a Bentian.
-      </p>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge opera bajo el <strong>Principio de Mínimo Privilegio Real</strong>: la seguridad del puesto de trabajo prevalece y todas las autorizaciones deben ser quirúrgicas, acotadas exclusivamente a las rutas de sus binarios legítimos, la base de datos empresarial concreta y reglas condicionales por proceso padre.
-      </p>
+    <h2 id="principio-minimo-privilegio" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Principio de Mínimo Privilegio y Reglas Prohibidas</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Excluir de forma global intérpretes nativos del sistema operativo como <code class="text-rose-400">cscript.exe</code> o aplicar comodines como <code class="text-rose-400">*.accdb</code> en todo el disco duro expone el equipo a técnicas de <em>Living off the Land</em> (LotL) y ataques de ransomware ajenos a Bentian.
+    </p>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Bentian ERP Bridge opera bajo el <strong>Principio de Mínimo Privilegio Real</strong>: la seguridad del puesto de trabajo prevalece y todas las autorizaciones deben ser quirúrgicas, acotadas exclusivamente a las rutas de sus binarios legítimos, la base de datos empresarial concreta y reglas condicionales por proceso padre.
+    </p>
 
-      <h2 id="las-tres-reglas-permitidas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Las 3 Únicas Reglas Permitidas en Endpoint</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Para garantizar el rendimiento en microescrituras OLEDB de Factusol sin comprometer la seguridad perimetral ni la detección heurística, se deben implementar <strong>única y exclusivamente las siguientes 3 reglas</strong>:
-      </p>
+    <h2 id="las-tres-reglas-permitidas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Las 3 Únicas Reglas Permitidas en Endpoint</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Para garantizar el rendimiento en microescrituras OLEDB de Factusol sin comprometer la seguridad perimetral ni la detección heurística, se deben implementar <strong>única y exclusivamente las siguientes 3 reglas</strong>:
+    </p>
 
-      <div class="space-y-3 mb-6">
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <div class="text-xs font-bold text-emerald-400 font-mono mb-1">REGLA 1: Exclusión de proceso por binario de Bentian</div>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-2">Autoriza la ejecución de los binarios firmados y verificados del agente por su ruta canónica absoluta:</p>
-          <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-emerald-300 space-y-1">
-            <div>C:\Program Files\Bentian Agent\BentianAgent.exe</div>
-            <div>C:\Program Files\Bentian Agent\BentianTray.exe</div>
-            <div class="text-zinc-500 text-[11px] font-sans">En instalaciones por usuario: %LOCALAPPDATA%\Bentian Agent\*.exe</div>
-          </div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <div class="text-xs font-bold text-amber-400 font-mono mb-1">REGLA 2: Exclusión de carpeta de datos específica de la empresa</div>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-2">Excluye el análisis en tiempo real en la carpeta donde reside la base de datos de Factusol para evitar bloqueos del archivo de cerrojo <code>.laccdb</code> y errores de concurrencia <code>3045</code>. <strong>PROHIBIDO comodín global en el disco</strong>:</p>
-          <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-amber-300 space-y-1">
-            <div>C:\Software DELSOL\Factusol\Datos\FS01\ <span class="text-zinc-500 font-sans">(Directorio específico de la empresa)</span></div>
-            <div class="text-zinc-400">\\SERVIDOR\Datos\FS01\ <span class="text-zinc-500 font-sans">(O ruta UNC de red correspondiente)</span></div>
-          </div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <div class="text-xs font-bold text-indigo-400 font-mono mb-1">REGLA 3: Exclusión del perfil de aplicación en AppData</div>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-2">Permite la persistencia segura de la configuración local (<code>agent-config.json</code>) y la rotación de trazas de diagnóstico:</p>
-          <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-indigo-300">
-            %APPDATA%\Bentian Agent\
-          </div>
+    <div class="space-y-3 mb-6">
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <div class="text-xs font-bold text-emerald-400 font-mono mb-1">REGLA 1: Exclusión de proceso por binario de Bentian</div>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-2">Autoriza la ejecución de los binarios firmados y verificados del agente por su ruta canónica absoluta:</p>
+        <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-emerald-300 space-y-1">
+          <div>C:\Program Files\Bentian Agent\BentianAgent.exe</div>
+          <div>C:\Program Files\Bentian Agent\BentianTray.exe</div>
+          <div class="text-zinc-500 text-[11px] font-sans">En instalaciones por usuario: %LOCALAPPDATA%\Bentian Agent\*.exe</div>
         </div>
       </div>
 
-      <h2 id="windows-defender" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Microsoft Defender Antivirus (Script PowerShell)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Ejecuta el siguiente script en una consola de <strong>PowerShell como Administrador</strong>. Aplica de forma automatizada las 3 reglas de Mínimo Privilegio sin abrir brechas en el sistema:
-      </p>
-
-      <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 mb-6 overflow-x-auto">
-        <div class="text-zinc-500 mb-2"># Script oficial de Mínimo Privilegio para Microsoft Defender</div>
-        <div class="text-cyan-400"># 1. Regla 1: Exclusión de procesos legítimos de Bentian</div>
-        <div>Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianAgent.exe"</div>
-        <div>Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianTray.exe"</div>
-        <div class="mt-2 text-cyan-400"># 2. Regla 2: Exclusión de carpeta de datos específica de Factusol</div>
-        <div>Add-MpPreference -ExclusionPath "C:\Software DELSOL\Factusol\Datos\FS01"</div>
-        <div class="text-zinc-500"># En entornos de red: Add-MpPreference -ExclusionPath "\\SERVIDOR\Datos\FS01"</div>
-        <div class="mt-2 text-cyan-400"># 3. Regla 3: Exclusión del perfil en AppData y actualización atómica</div>
-        <div>Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent"</div>
-        <div>Add-MpPreference -ExclusionPath "$env:TEMP\bentian-updates"</div>
-      </div>
-
-      <h2 id="edr-corporativos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Suites EDR: CrowdStrike Falcon, SentinelOne y Bitdefender</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Las suites EDR corporativas inspeccionan la genealogía de procesos (relación padre/hijo) e impiden la ejecución de scripts no autorizados. Para homologar Bentian ERP Bridge respetando las políticas de CISO:
-      </p>
-
-      <div class="space-y-4 mb-6">
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-            CrowdStrike Falcon Sensor (Regla Custom IOA y SHA-256)
-          </h3>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-3">
-            El motor de Falcon detecta la invocación de <code>cscript.exe</code> como potencial técnica LotL. Cree una regla de exclusión de indicadores de ataque (IOA) <strong>estrictamente condicionada al proceso padre</strong>:
-          </p>
-          <div class="p-3 rounded-lg bg-black/40 font-mono text-xs text-zinc-300 space-y-1">
-            <div><strong>Parent Image Filename:</strong> <span class="text-emerald-400">.*\\BentianAgent\.exe</span></div>
-            <div><strong>Image Filename:</strong> <span class="text-emerald-400">.*\\cscript\.exe</span></div>
-            <div><strong>Command Line:</strong> <span class="text-emerald-400">.*adodb\.js.*</span></div>
-            <div><strong>Action:</strong> <span class="text-emerald-300 font-bold">Allow / No Alert</span></div>
-          </div>
-          <p class="text-xs text-zinc-400 mt-2">
-            Adicionalmente, en <em>Sensor & ML Exclusions</em> agregue el hash criptográfico <strong>SHA-256</strong> del binario oficial publicado en cada release de Bentian.
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-            SentinelOne (Singularity Platform - Interoperabilidad)
-          </h3>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-2">
-            En la consola de gestión de SentinelOne, diríjase a <strong>Sentinels → Exclusions</strong> y configure:
-          </p>
-          <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
-            <li><strong>Path & Hash Exclusion:</strong> Excluya por hash SHA-256 el binario verificado <code>BentianAgent.exe</code>.</li>
-            <li><strong>Interoperability / Behavioral AI Exclusion:</strong> Regla de supresión de alerta condicionada a que el proceso invocador sea <code>BentianAgent.exe</code> sobre el conector OLEDB local.</li>
-            <li><strong>Folder Exclusion:</strong> Directorio específico de datos de Factusol (modo: In-process & On-write).</li>
-          </ul>
-        </div>
-
-        <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
-          <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-            Bitdefender GravityZone Cloud
-          </h3>
-          <p class="text-xs text-zinc-300 leading-relaxed mb-2">
-            En la consola centralizada de GravityZone (<strong>Policies → Antimalware → Exclusions</strong>):
-          </p>
-          <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
-            <li><strong>Exclusión de Procesos:</strong> Agregue por ruta absoluta <code>C:\Program Files\Bentian Agent\BentianAgent.exe</code> y <code>BentianTray.exe</code>.</li>
-            <li><strong>Exclusión de Carpetas:</strong> Añada la carpeta acotada de Factusol (ej: <code>C:\Software DELSOL\Factusol\Datos\FS01\</code>) para evitar contención de bloqueos <code>.laccdb</code>.</li>
-            <li><strong>Advanced Threat Defense (ATD):</strong> Autorice el binario oficial firmado de Bentian en la lista de aplicaciones de confianza.</li>
-          </ul>
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <div class="text-xs font-bold text-amber-400 font-mono mb-1">REGLA 2: Exclusión de carpeta de datos específica de la empresa</div>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-2">Excluye el análisis en tiempo real en la carpeta donde reside la base de datos de Factusol para evitar bloqueos del archivo de cerrojo <code>.laccdb</code> y errores de concurrencia <code>3045</code>. <strong>PROHIBIDO comodín global en el disco</strong>:</p>
+        <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-amber-300 space-y-1">
+          <div>C:\Software DELSOL\Factusol\Datos\FS01\ <span class="text-zinc-500 font-sans">(Directorio específico de la empresa)</span></div>
+          <div class="text-zinc-400">\\SERVIDOR\Datos\FS01\ <span class="text-zinc-500 font-sans">(O ruta UNC de red correspondiente)</span></div>
         </div>
       </div>
 
-      <h2 id="antivirus-adicionales" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Kaspersky Endpoint, Avast y AVG</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Para suites antivirus estándar en puestos de oficina:
-      </p>
-      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Kaspersky Endpoint Security:</strong> Añadir <code>BentianAgent.exe</code> y <code>BentianTray.exe</code> a <em>Aplicaciones de confianza</em> con la opción <em>"No supervisar la actividad de la aplicación"</em> activa.</li>
-        <li><strong>Avast Antivirus y AVG Internet Security:</strong> En <em>General → Excepciones</em>, agregue la ruta de instalación <code>C:\Program Files\Bentian Agent\*</code> y la carpeta de datos de Factusol. En <em>Escudo contra ransomware</em>, confirme que <code>BentianAgent.exe</code> figure como aplicación permitida.</li>
-      </ul>
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <div class="text-xs font-bold text-indigo-400 font-mono mb-1">REGLA 3: Exclusión del perfil de aplicación en AppData</div>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-2">Permite la persistencia segura de la configuración local (<code>agent-config.json</code>) y la rotación de trazas de diagnóstico:</p>
+        <div class="p-2.5 rounded-lg bg-black/40 font-mono text-xs text-indigo-300">
+          %APPDATA%\Bentian Agent\
+        </div>
+      </div>
+    </div>
 
-      <h2 id="verificacion-conexiones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Verificación de Red Saliente (Cero Puertos Entrantes)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge ha sido auditado para entornos corporativos con auditoría estricta de red:
-      </p>
-      <ul class="text-sm text-zinc-300 space-y-1.5 list-disc list-inside mb-6">
-        <li><strong>Tráfico 100% Saliente:</strong> El agente solo realiza peticiones HTTPS salientes estándar por el puerto TCP 443 hacia la tienda web del cliente y la API central (<code>bridge.cristianjm.com</code>).</li>
-        <li><strong>Cero Puertos Entrantes:</strong> No expone ningún servicio hacia la red local ni hacia Internet; no requiere reglas NAT ni aperturas en el firewall perimetral.</li>
-        <li><strong>Aislamiento Local:</strong> La interfaz gráfica del agente escucha estrictamente en la interfaz de bucle invertido <code>127.0.0.1:39281</code>, completamente inaccesible desde otros equipos de la red corporativa.</li>
-      </ul>
-    
+    <h2 id="windows-defender" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Microsoft Defender Antivirus (Script PowerShell)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Ejecuta el siguiente script en una consola de <strong>PowerShell como Administrador</strong>. Aplica de forma automatizada las 3 reglas de Mínimo Privilegio sin abrir brechas en el sistema:
+    </p>
+
+    <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 mb-6 overflow-x-auto">
+      <div class="text-zinc-500 mb-2"># Script oficial de Mínimo Privilegio para Microsoft Defender</div>
+      <div class="text-cyan-400"># 1. Regla 1: Exclusión de procesos legítimos de Bentian</div>
+      <div>Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianAgent.exe"</div>
+      <div>Add-MpPreference -ExclusionProcess "C:\Program Files\Bentian Agent\BentianTray.exe"</div>
+      <div class="mt-2 text-cyan-400"># 2. Regla 2: Exclusión de carpeta de datos específica de Factusol</div>
+      <div>Add-MpPreference -ExclusionPath "C:\Software DELSOL\Factusol\Datos\FS01"</div>
+      <div class="text-zinc-500"># En entornos de red: Add-MpPreference -ExclusionPath "\\SERVIDOR\Datos\FS01"</div>
+      <div class="mt-2 text-cyan-400"># 3. Regla 3: Exclusión del perfil en AppData y actualización atómica</div>
+      <div>Add-MpPreference -ExclusionPath "$env:APPDATA\Bentian Agent"</div>
+      <div>Add-MpPreference -ExclusionPath "$env:TEMP\bentian-updates"</div>
+    </div>
+
+    <h2 id="edr-corporativos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Suites EDR: CrowdStrike Falcon, SentinelOne y Bitdefender</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Las suites EDR corporativas inspeccionan la genealogía de procesos (relación padre/hijo) e impiden la ejecución de scripts no autorizados. Para homologar Bentian ERP Bridge respetando las políticas de CISO:
+    </p>
+
+    <div class="space-y-4 mb-6">
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          CrowdStrike Falcon Sensor (Regla Custom IOA y SHA-256)
+        </h3>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-3">
+          El motor de Falcon detecta la invocación de <code>cscript.exe</code> como potencial técnica LotL. Cree una regla de exclusión de indicadores de ataque (IOA) <strong>estrictamente condicionada al proceso padre</strong>:
+        </p>
+        <div class="p-3 rounded-lg bg-black/40 font-mono text-xs text-zinc-300 space-y-1">
+          <div><strong>Parent Image Filename:</strong> <span class="text-emerald-400">.*\\BentianAgent\.exe</span></div>
+          <div><strong>Image Filename:</strong> <span class="text-emerald-400">.*\\cscript\.exe</span></div>
+          <div><strong>Command Line:</strong> <span class="text-emerald-400">.*adodb\.js.*</span></div>
+          <div><strong>Action:</strong> <span class="text-emerald-300 font-bold">Allow / No Alert</span></div>
+        </div>
+        <p class="text-xs text-zinc-400 mt-2">
+          Adicionalmente, en <em>Sensor & ML Exclusions</em> agregue el hash criptográfico <strong>SHA-256</strong> del binario oficial publicado en cada release de Bentian.
+        </p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          SentinelOne (Singularity Platform - Interoperabilidad)
+        </h3>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-2">
+          En la consola de gestión de SentinelOne, diríjase a <strong>Sentinels → Exclusions</strong> y configure:
+        </p>
+        <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+          <li><strong>Path & Hash Exclusion:</strong> Excluya por hash SHA-256 el binario verificado <code>BentianAgent.exe</code>.</li>
+          <li><strong>Interoperability / Behavioral AI Exclusion:</strong> Regla de supresión de alerta condicionada a que el proceso invocador sea <code>BentianAgent.exe</code> sobre el conector OLEDB local.</li>
+          <li><strong>Folder Exclusion:</strong> Directorio específico de datos de Factusol (modo: In-process & On-write).</li>
+        </ul>
+      </div>
+
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          Bitdefender GravityZone Cloud
+        </h3>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-2">
+          En la consola centralizada de GravityZone (<strong>Policies → Antimalware → Exclusions</strong>):
+        </p>
+        <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+          <li><strong>Exclusión de Procesos:</strong> Agregue por ruta absoluta <code>C:\Program Files\Bentian Agent\BentianAgent.exe</code> y <code>BentianTray.exe</code>.</li>
+          <li><strong>Exclusión de Carpetas:</strong> Añada la carpeta acotada de Factusol (ej: <code>C:\Software DELSOL\Factusol\Datos\FS01\</code>) para evitar contención de bloqueos <code>.laccdb</code>.</li>
+          <li><strong>Advanced Threat Defense (ATD):</strong> Autorice el binario oficial firmado de Bentian en la lista de aplicaciones de confianza.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="antivirus-adicionales" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Kaspersky Endpoint, Avast y AVG</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Para suites antivirus estándar en puestos de oficina:
+    </p>
+    <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+      <li><strong>Kaspersky Endpoint Security:</strong> Añadir <code>BentianAgent.exe</code> y <code>BentianTray.exe</code> a <em>Aplicaciones de confianza</em> con la opción <em>"No supervisar la actividad de la aplicación"</em> activa.</li>
+      <li><strong>Avast Antivirus y AVG Internet Security:</strong> En <em>General → Excepciones</em>, agregue la ruta de instalación <code>C:\Program Files\Bentian Agent\*</code> y la carpeta de datos de Factusol. En <em>Escudo contra ransomware</em>, confirme que <code>BentianAgent.exe</code> figure como aplicación permitida.</li>
+    </ul>
+
+    <h2 id="verificacion-conexiones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Verificación de Red Saliente y Mínimo Privilegio en Factusol</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Bentian ERP Bridge ha sido auditado para entornos corporativos con estricta gobernanza de red y datos:
+    </p>
+    <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
+      <li><strong>Tráfico 100% Saliente Cifrado:</strong> El agente solo realiza peticiones HTTPS salientes estándar por el puerto TCP 443 hacia la tienda web del cliente (TLS 1.3) y la API central (<code>bridge.cristianjm.com</code>).</li>
+      <li><strong>Cero Puertos Entrantes:</strong> No expone ningún servicio hacia la red local ni hacia Internet; no requiere reglas NAT ni aperturas en el firewall perimetral.</li>
+      <li><strong>Aislamiento Local (Loopback):</strong> La interfaz gráfica del agente escucha estrictamente en la interfaz interna <code>127.0.0.1:39281</code>, completamente inaccesible desde otros equipos de la red corporativa.</li>
+      <li><strong>Delimitación de Datos Salientes:</strong> Solo se transmiten SKU, descripciones, precios con IVA y stock disponible calculado (<code>DISSTO</code>). Cero balances contables, cero facturas de compras y cero datos bancarios.</li>
+      <li><strong>Modo OLEDB Share Deny None:</strong> Consultas de catálogo en modo compartido sin bloquear las ventas físicas en mostrador, e inserción atómica de pedidos exclusivamente en <code>F_PCL</code> sin tocar facturación emitida ni registros Veri*Factu.</li>
+    </ul>
+  
         </article>
 
         <!-- Pagination: Prev / Next Buttons -->
         <div class="mt-12 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-4">
           
-            <a href="/docs/troubleshooting/error-401-autorizacion-hosting/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
+            <a href="/docs/seguridad/evidencias-tecnicas-y-auditoria/" class="p-4 rounded-xl border border-white/[0.06] hover:border-indigo-500/30 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col items-start">
               <span class="text-[10px] uppercase font-bold text-zinc-500 group-hover:text-indigo-400 transition mb-1">← Artículo Anterior</span>
-              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Error 401 Unauthorized en WooCommerce (.htaccess)</span>
+              <span class="text-xs font-semibold text-white group-hover:text-indigo-200 transition">Evidencia Técnica de Seguridad: 5 Respuestas Críticas de Ingeniería</span>
             </a>
           
           
@@ -741,7 +749,7 @@
           
             <li>
               <a href="#verificacion-conexiones" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="verificacion-conexiones">
-                6. Verificación de Red Saliente (Cero Puertos Entrantes)
+                6. Verificación de Red Saliente y Mínimo Privilegio en Factusol
               </a>
             </li>
           
