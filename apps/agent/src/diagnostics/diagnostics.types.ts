@@ -1,6 +1,6 @@
 import { AgentSystemInfo } from '@erp-bridge/shared';
 import { AgentLicenseStatus } from '../license/license.types';
-import { AgentFactusolSettings, AgentWooCommerceSettings, AgentUniversalBridgeSettings, AgentShopifySettings, AgentPrestashopSettings, AgentHoldedSettings, AgentSyncRules, AgentNotificationSettings } from '../config/config.types';
+import { AgentFactusolSettings, AgentSimplyGestSettings, AgentWooCommerceSettings, AgentUniversalBridgeSettings, AgentShopifySettings, AgentPrestashopSettings, AgentHoldedSettings, AgentSyncRules, AgentNotificationSettings, SoftwareErpConfig } from '../config/config.types';
 import { SyncHistoryRecord } from '../history/history.types';
 import { UpdateClientState } from '../update/update.types';
 
@@ -22,6 +22,8 @@ export interface AgentStatusDetails {
   hwid: string;
   licenseKey?: string;
   license: { status: AgentLicenseStatus; plan?: string; message?: string };
+  erpType?: 'factusol' | 'simplygest';
+  softwareErp?: SoftwareErpConfig;
   factusol: {
     configured: boolean;
     databasePath: string;
@@ -33,6 +35,16 @@ export interface AgentStatusDetails {
     statusMessage: string;
   };
   factusolSettings?: AgentFactusolSettings;
+  simplygest?: {
+    configured: boolean;
+    databasePath: string;
+    fileName: string;
+    connected: boolean;
+    articleCount?: number;
+    fileSizeBytes?: number;
+    statusMessage: string;
+  };
+  simplygestSettings?: AgentSimplyGestSettings;
   woocommerceSettings?: AgentWooCommerceSettings;
   universalBridgeSettings?: AgentUniversalBridgeSettings;
   shopifySettings?: AgentShopifySettings;

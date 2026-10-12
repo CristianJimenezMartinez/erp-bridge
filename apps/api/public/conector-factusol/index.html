@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conector Factusol por Ciudades y Provincias de España | Bentian ERP Bridge</title>
-  <meta name="description" content="Cobertura regional de Bentian ERP Bridge en España. Conecta tu Factusol local con WooCommerce y PrestaShop en las principales áreas industriales y comerciales del país.">
+  <title>Mapa de Cobertura Nacional y Conector Factusol por Ciudades | Bentian ERP Bridge</title>
+  <meta name="description" content="Mapa interactivo y cobertura provincial de Bentian ERP Bridge en España. Conecta tu Factusol local con WooCommerce y PrestaShop en 52 áreas industriales y polígonos del país.">
   <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/">
 
   <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Conector Factusol por Ciudades y Provincias de España | Bentian ERP Bridge">
-  <meta property="og:description" content="Sincronización en tiempo real entre Factusol y eCommerce en las principales áreas industriales de España.">
+  <meta property="og:title" content="Mapa de Cobertura Nacional y Conector Factusol por Ciudades | Bentian ERP Bridge">
+  <meta property="og:description" content="Mapa interactivo de sincronización en tiempo real entre Factusol y eCommerce en las principales áreas industriales de España.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -66,23 +66,885 @@
     </div>
   </header>
 
-  <main class="py-16 md:py-24 px-6 flex-1 bg-[#09090b]">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
-          RED DE COBERTURA NACIONAL
+  <main class="py-12 md:py-20 px-4 sm:px-6 flex-1 bg-[#09090b]">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Encabezado Hero -->
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          RED DE COBERTURA NACIONAL (52 ÁREAS INDUSTRIALES)
         </div>
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-          Conector Factusol en las Principales Áreas Industriales de España
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-5">
+          Mapa de Cobertura Factusol en España
         </h1>
         <p class="text-base sm:text-lg text-zinc-400 leading-relaxed">
-          Diseñado para pymes, distribuidores y comercios con base de datos Factusol local en cualquier provincia. Selecciona tu ciudad para conocer polígonos compatibles y especificaciones.
+          Diseñado para pymes, distribuidores y mayoristas con base de datos Factusol local en cualquier provincia. Haz clic en el mapa o busca tu ciudad para consultar polígonos industriales y conectividad.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6">
+      <!-- MAPA INTERACTIVO DE ESPAÑA -->
+      <div class="mb-14 rounded-3xl bg-[#121215] border border-white/[0.08] p-4 sm:p-8 relative shadow-2xl overflow-hidden" id="map-container">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/[0.06]">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-ping"></div>
+            <span class="text-xs font-semibold text-white uppercase tracking-wider font-mono">Mapa Peninsular e Insular</span>
+            <span class="text-xs text-zinc-500">Pasa el ratón o pulsa sobre un nodo para explorar</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> 52 Nodos Locales</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> 100% OLEDB Local</span>
+          </div>
+        </div>
+
+        <!-- SVG Map Graphic -->
+        <div class="relative w-full aspect-[920/620] max-h-[580px] flex items-center justify-center">
+          <svg viewBox="0 0 920 620" class="w-full h-full select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="spain-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#18181b" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#0e0e11" stop-opacity="0.9" />
+              </linearGradient>
+              <radialGradient id="radar-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15" />
+                <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+
+            <!-- Grid Radar Background -->
+            <circle cx="430" cy="280" r="280" fill="url(#radar-glow)" />
+            <circle cx="430" cy="280" r="180" fill="none" stroke="#27272a" stroke-dasharray="3 6" stroke-width="1" />
+            <circle cx="430" cy="280" r="280" fill="none" stroke="#27272a" stroke-dasharray="4 8" stroke-width="1" />
+
+            <!-- Silueta estilizada Península Ibérica -->
+            <path d="M 115,75 L 170,55 L 280,50 L 390,60 L 460,75 L 530,95 L 610,135 L 690,165 L 735,160 L 730,195 L 685,250 L 650,290 L 590,340 L 570,390 L 530,440 L 470,470 L 390,500 L 310,510 L 250,500 L 230,480 L 190,440 L 175,380 L 155,320 L 140,250 L 130,180 L 115,130 Z" 
+                  fill="url(#spain-bg)" stroke="#3f3f46" stroke-width="1.8" />
+
+            <!-- Frontera Portugal estilizada -->
+            <path d="M 190,440 L 175,380 L 155,320 L 140,250 L 130,180 L 175,180 L 210,240 L 230,320 L 250,400 L 230,480" 
+                  fill="none" stroke="#27272a" stroke-dasharray="4 4" stroke-width="1.5" />
+            <text x="180" y="310" class="text-[10px] fill-zinc-600 font-mono tracking-widest pointer-events-none select-none">PORTUGAL</text>
+
+            <!-- Islas Baleares -->
+            <!-- Mallorca -->
+            <path d="M 680,270 L 710,260 L 720,280 L 690,295 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+            <!-- Menorca -->
+            <path d="M 730,245 L 750,240 L 745,255 L 730,255 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+            <!-- Ibiza / Formentera -->
+            <path d="M 645,305 L 660,295 L 665,315 L 650,320 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+
+            <!-- Inset Islas Canarias -->
+            <g transform="translate(25, 450)">
+              <rect width="185" height="135" rx="14" fill="#0d0d10" stroke="#27272a" stroke-width="1.5" />
+              <text x="16" y="24" class="text-[10px] font-mono fill-zinc-400 font-semibold tracking-wider uppercase">Islas Canarias</text>
+              <ellipse cx="75" cy="85" rx="18" ry="12" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+              <ellipse cx="135" cy="95" rx="16" ry="14" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+            </g>
+
+            <!-- Pines de Ciudades -->
+            
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="madrid" 
+           data-name="Madrid" 
+           data-province="Madrid" 
+           data-region="Comunidad de Madrid" 
+           data-tagline="Sincronización en tiempo real para pymes, distribuidores y mayoristas de Madrid"
+           data-x="369"
+           data-y="253">
+          <circle cx="369" cy="253" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="369" cy="253" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="369" y="245" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Madrid</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="barcelona" 
+           data-name="Barcelona" 
+           data-province="Barcelona" 
+           data-region="Cataluña" 
+           data-tagline="Conexión Local-First entre Factusol y eCommerce para empresas y comercios de Barcelona"
+           data-x="678"
+           data-y="196">
+          <circle cx="678" cy="196" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="678" cy="196" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="678" y="188" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Barcelona</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="valencia" 
+           data-name="Valencia" 
+           data-province="Valencia" 
+           data-region="Comunidad Valenciana" 
+           data-tagline="Integración Factusol con WooCommerce para el comercio, la industria y distribución valenciana"
+           data-x="544"
+           data-y="307">
+          <circle cx="544" cy="307" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="544" cy="307" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="544" y="299" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Valencia</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="sevilla" 
+           data-name="Sevilla" 
+           data-province="Sevilla" 
+           data-region="Andalucía" 
+           data-tagline="Conector Factusol con WooCommerce y PrestaShop para distribución y comercio en Sevilla"
+           data-x="250"
+           data-y="428">
+          <circle cx="250" cy="428" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="250" cy="428" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="250" y="420" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Sevilla</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="zaragoza" 
+           data-name="Zaragoza" 
+           data-province="Zaragoza" 
+           data-region="Aragón" 
+           data-tagline="Conexión Local-First entre Factusol y eCommerce para el gran nudo logístico de Zaragoza"
+           data-x="517"
+           data-y="181">
+          <circle cx="517" cy="181" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="517" cy="181" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="517" y="173" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Zaragoza</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="malaga" 
+           data-name="Málaga" 
+           data-province="Málaga" 
+           data-region="Andalucía" 
+           data-tagline="Sincronización Factusol en tiempo real para empresas, hostelería y eCommerce en Málaga"
+           data-x="332"
+           data-y="467">
+          <circle cx="332" cy="467" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="332" cy="467" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="332" y="459" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Málaga</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="alicante" 
+           data-name="Alicante" 
+           data-province="Alicante" 
+           data-region="Comunidad Valenciana" 
+           data-tagline="Conector Factusol con WooCommerce para la industria del calzado, textil y comercio en Alicante"
+           data-x="538"
+           data-y="373">
+          <circle cx="538" cy="373" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="538" cy="373" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="538" y="365" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Alicante</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="bilbao" 
+           data-name="Bilbao" 
+           data-province="Bizkaia" 
+           data-region="País Vasco" 
+           data-tagline="Conector Factusol Local-First para suministros industriales, ferretería y pymes de Bizkaia"
+           data-x="410"
+           data-y="88">
+          <circle cx="410" cy="88" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="410" cy="88" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="410" y="80" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Bilbao</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="murcia" 
+           data-name="Murcia" 
+           data-province="Murcia" 
+           data-region="Región de Murcia" 
+           data-tagline="Sincronización en tiempo real para empresas del sector agroalimentario, suministros y distribución en Murcia"
+           data-x="504"
+           data-y="393">
+          <circle cx="504" cy="393" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="504" cy="393" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="504" y="385" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Murcia</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="coruna" 
+           data-name="A Coruña" 
+           data-province="A Coruña" 
+           data-region="Galicia" 
+           data-tagline="Control de stock e inventario en tiempo real para pymes, distribuidores y retail en A Coruña"
+           data-x="122"
+           data-y="82">
+          <circle cx="122" cy="82" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="122" cy="82" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="122" y="74" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">A Coruña</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="vigo" 
+           data-name="Vigo" 
+           data-province="Pontevedra" 
+           data-region="Galicia" 
+           data-tagline="Automatización de stock y pedidos online para la industria y el comercio de Vigo y las Rías Baixas"
+           data-x="106"
+           data-y="147">
+          <circle cx="106" cy="147" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="106" cy="147" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="106" y="139" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Vigo</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="valladolid" 
+           data-name="Valladolid" 
+           data-province="Valladolid" 
+           data-region="Castilla y León" 
+           data-tagline="Conectividad total entre Factusol y tu eCommerce en Valladolid y Castilla y León"
+           data-x="316"
+           data-y="181">
+          <circle cx="316" cy="181" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="316" cy="181" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="316" y="173" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Valladolid</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="cordoba" 
+           data-name="Córdoba" 
+           data-province="Córdoba" 
+           data-region="Andalucía" 
+           data-tagline="Sincronización automatizada de Factusol para joyeros, instaladores y distribuidores en Córdoba"
+           data-x="313"
+           data-y="399">
+          <circle cx="313" cy="399" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="313" cy="399" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="313" y="391" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Córdoba</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="palma" 
+           data-name="Palma de Mallorca" 
+           data-province="Baleares" 
+           data-region="Islas Baleares" 
+           data-tagline="Control de stock e integración Factusol para hostelería, náutica y retail en Baleares"
+           data-x="703"
+           data-y="302">
+          <circle cx="703" cy="302" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="703" cy="302" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="703" y="294" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Palma de Mallorca</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="granada" 
+           data-name="Granada" 
+           data-province="Granada" 
+           data-region="Andalucía" 
+           data-tagline="Sincronización en tiempo real de Factusol con tiendas online para empresas y distribuidores de Granada"
+           data-x="375"
+           data-y="440">
+          <circle cx="375" cy="440" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="375" cy="440" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="375" y="432" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Granada</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="toledo" 
+           data-name="Toledo" 
+           data-province="Toledo" 
+           data-region="Castilla-La Mancha" 
+           data-tagline="Conector Factusol para plataformas logísticas, suministros y comercio electrónico en Toledo y La Sagra"
+           data-x="352"
+           data-y="285">
+          <circle cx="352" cy="285" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="352" cy="285" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="352" y="277" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Toledo</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="santander" 
+           data-name="Santander" 
+           data-province="Cantabria" 
+           data-region="Cantabria" 
+           data-tagline="Integración Factusol con WooCommerce y PrestaShop para empresas y comercios de Cantabria"
+           data-x="364"
+           data-y="76">
+          <circle cx="364" cy="76" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="364" cy="76" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="364" y="68" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Santander</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="gijon" 
+           data-name="Gijón" 
+           data-province="Asturias" 
+           data-region="Principado de Asturias" 
+           data-tagline="Conexión de Factusol con tiendas online para suministros industriales, siderurgia y comercio en Gijón"
+           data-x="267"
+           data-y="72">
+          <circle cx="267" cy="72" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="267" cy="72" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="267" y="64" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Gijón</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="oviedo" 
+           data-name="Oviedo" 
+           data-province="Asturias" 
+           data-region="Principado de Asturias" 
+           data-tagline="Sincronización fluida de Factusol para distribución, farmacia, alimentación y comercio en Oviedo"
+           data-x="257"
+           data-y="82">
+          <circle cx="257" cy="82" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="257" cy="82" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="257" y="74" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Oviedo</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="pamplona" 
+           data-name="Pamplona" 
+           data-province="Navarra" 
+           data-region="Comunidad Foral de Navarra" 
+           data-tagline="Automatización e integración de Factusol para automoción, energía y distribución técnica en Navarra"
+           data-x="477"
+           data-y="114">
+          <circle cx="477" cy="114" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="477" cy="114" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="477" y="106" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Pamplona</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="vitoria" 
+           data-name="Vitoria-Gasteiz" 
+           data-province="Álava" 
+           data-region="País Vasco" 
+           data-tagline="Conector Factusol para logística, manufactura y comercio online en el corazón de Euskadi"
+           data-x="423"
+           data-y="112">
+          <circle cx="423" cy="112" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="423" cy="112" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="423" y="104" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Vitoria-Gasteiz</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="castellon" 
+           data-name="Castellón de la Plana" 
+           data-province="Castellón" 
+           data-region="Comunidad Valenciana" 
+           data-tagline="Conector Factusol para cerámica, suministros técnicos y distribución mayorista en Castellón"
+           data-x="561"
+           data-y="277">
+          <circle cx="561" cy="277" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="561" cy="277" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="561" y="269" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Castellón de la Plana</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="burgos" 
+           data-name="Burgos" 
+           data-province="Burgos" 
+           data-region="Castilla y León" 
+           data-tagline="Integración fiable de Factusol con comercio electrónico para la potente industria y distribución de Burgos"
+           data-x="370"
+           data-y="141">
+          <circle cx="370" cy="141" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="370" cy="141" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="370" y="133" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Burgos</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="salamanca" 
+           data-name="Salamanca" 
+           data-province="Salamanca" 
+           data-region="Castilla y León" 
+           data-tagline="Conexión de Factusol con tiendas online para el comercio, alimentación y distribución de Salamanca"
+           data-x="266"
+           data-y="221">
+          <circle cx="266" cy="221" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="266" cy="221" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="266" y="213" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Salamanca</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="san-sebastian" 
+           data-name="San Sebastián" 
+           data-province="Gipuzkoa" 
+           data-region="País Vasco" 
+           data-tagline="Conector Factusol con WooCommerce y PrestaShop para empresas y suministros en Gipuzkoa"
+           data-x="460"
+           data-y="84">
+          <circle cx="460" cy="84" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="460" cy="84" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="460" y="76" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">San Sebastián</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="tarragona" 
+           data-name="Tarragona" 
+           data-province="Tarragona" 
+           data-region="Cataluña" 
+           data-tagline="Integración en tiempo real entre Factusol y eCommerce para el polo químico y logístico de Tarragona"
+           data-x="629"
+           data-y="212">
+          <circle cx="629" cy="212" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="629" cy="212" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="629" y="204" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Tarragona</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="lleida" 
+           data-name="Lleida" 
+           data-province="Lleida" 
+           data-region="Cataluña" 
+           data-tagline="Conector Factusol para agroindustria, maquinaria y suministros en Ponent y Lleida"
+           data-x="596"
+           data-y="183">
+          <circle cx="596" cy="183" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="596" cy="183" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="596" y="175" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Lleida</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="girona" 
+           data-name="Girona" 
+           data-province="Girona" 
+           data-region="Cataluña" 
+           data-tagline="Conector Factusol con WooCommerce y PrestaShop para empresas y distribución en comarcas de Girona"
+           data-x="712"
+           data-y="162">
+          <circle cx="712" cy="162" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="712" cy="162" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="712" y="154" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Girona</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="almeria" 
+           data-name="Almería" 
+           data-province="Almería" 
+           data-region="Andalucía" 
+           data-tagline="Conector Factusol para agroindustria, suministros de invernadero y distribución en Almería"
+           data-x="435"
+           data-y="460">
+          <circle cx="435" cy="460" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="435" cy="460" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="435" y="452" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Almería</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="cadiz" 
+           data-name="Cádiz" 
+           data-province="Cádiz" 
+           data-region="Andalucía" 
+           data-tagline="Conexión Factusol con WooCommerce y PrestaShop para industria naval, logística y comercio en Cádiz"
+           data-x="234"
+           data-y="478">
+          <circle cx="234" cy="478" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="234" cy="478" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="234" y="470" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Cádiz</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="huelva" 
+           data-name="Huelva" 
+           data-province="Huelva" 
+           data-region="Andalucía" 
+           data-tagline="Conector Factusol para industria química, berries y suministros en Huelva y su comarca"
+           data-x="199"
+           data-y="435">
+          <circle cx="199" cy="435" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="199" cy="435" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="199" y="427" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Huelva</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="jaen" 
+           data-name="Jaén" 
+           data-province="Jaén" 
+           data-region="Andalucía" 
+           data-tagline="Conector Factusol para el sector oleícola, suministros agrícolas e industria en Jaén"
+           data-x="365"
+           data-y="405">
+          <circle cx="365" cy="405" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="365" cy="405" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="365" y="397" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Jaén</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="albacete" 
+           data-name="Albacete" 
+           data-province="Albacete" 
+           data-region="Castilla-La Mancha" 
+           data-tagline="Conector Factusol con WooCommerce y PrestaShop en Albacete: Campollano y Romica"
+           data-x="466"
+           data-y="335">
+          <circle cx="466" cy="335" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="466" cy="335" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="466" y="327" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Albacete</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="ciudad-real" 
+           data-name="Ciudad Real" 
+           data-province="Ciudad Real" 
+           data-region="Castilla-La Mancha" 
+           data-tagline="Conector Factusol para agroindustria, química y distribución en Ciudad Real y Puertollano"
+           data-x="358"
+           data-y="335">
+          <circle cx="358" cy="335" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="358" cy="335" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="358" y="327" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Ciudad Real</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="cuenca" 
+           data-name="Cuenca" 
+           data-province="Cuenca" 
+           data-region="Castilla-La Mancha" 
+           data-tagline="Conector Factusol para madera, agroalimentación y comercio en Cuenca y Tarancón"
+           data-x="452"
+           data-y="273">
+          <circle cx="452" cy="273" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="452" cy="273" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="452" y="265" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Cuenca</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="guadalajara" 
+           data-name="Guadalajara" 
+           data-province="Guadalajara" 
+           data-region="Castilla-La Mancha" 
+           data-tagline="Conector Factusol para el gran polo logístico e industrial del Corredor del Henares en Guadalajara"
+           data-x="397"
+           data-y="240">
+          <circle cx="397" cy="240" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="397" cy="240" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="397" y="232" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Guadalajara</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="badajoz" 
+           data-name="Badajoz" 
+           data-province="Badajoz" 
+           data-region="Extremadura" 
+           data-tagline="Conector Factusol para agroindustria, suministros y comercio transfronterizo en Badajoz"
+           data-x="198"
+           data-y="342">
+          <circle cx="198" cy="342" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="198" cy="342" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="198" y="334" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Badajoz</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="caceres" 
+           data-name="Cáceres" 
+           data-province="Cáceres" 
+           data-region="Extremadura" 
+           data-tagline="Conector Factusol con WooCommerce y PrestaShop en Cáceres, Plasencia y Navalmoral"
+           data-x="229"
+           data-y="307">
+          <circle cx="229" cy="307" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="229" cy="307" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="229" y="299" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Cáceres</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="leon" 
+           data-name="León" 
+           data-province="León" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para biofarmacia, agroalimentación y logística en León y El Bierzo"
+           data-x="271"
+           data-y="126">
+          <circle cx="271" cy="126" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="271" cy="126" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="271" y="118" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">León</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="palencia" 
+           data-name="Palencia" 
+           data-province="Palencia" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para automoción, galletas y agroalimentación en Palencia y Aguilar"
+           data-x="326"
+           data-y="160">
+          <circle cx="326" cy="160" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="326" cy="160" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="326" y="152" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Palencia</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="zamora" 
+           data-name="Zamora" 
+           data-province="Zamora" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para agroalimentación, queso y comercio en Zamora y Benavente"
+           data-x="262"
+           data-y="189">
+          <circle cx="262" cy="189" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="262" cy="189" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="262" y="181" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Zamora</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="segovia" 
+           data-name="Segovia" 
+           data-province="Segovia" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para industria agropecuaria, alimentación y comercio en Segovia"
+           data-x="348"
+           data-y="222">
+          <circle cx="348" cy="222" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="348" cy="222" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="348" y="214" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Segovia</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="avila" 
+           data-name="Ávila" 
+           data-province="Ávila" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para automoción auxiliar, carnes y comercio en Ávila y Arévalo"
+           data-x="318"
+           data-y="239">
+          <circle cx="318" cy="239" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="318" cy="239" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="318" y="231" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Ávila</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="soria" 
+           data-name="Soria" 
+           data-province="Soria" 
+           data-region="Castilla y León" 
+           data-tagline="Conector Factusol para agroalimentación, madera y micología en Soria y Almazán"
+           data-x="434"
+           data-y="175">
+          <circle cx="434" cy="175" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="434" cy="175" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="434" y="167" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Soria</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="logrono" 
+           data-name="Logroño" 
+           data-province="La Rioja" 
+           data-region="La Rioja" 
+           data-tagline="Conector Factusol para bodegas con DOCa Rioja, calzado y suministros en La Rioja"
+           data-x="435"
+           data-y="134">
+          <circle cx="435" cy="134" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="435" cy="134" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="435" y="126" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Logroño</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="ourense" 
+           data-name="Ourense" 
+           data-province="Ourense" 
+           data-region="Galicia" 
+           data-tagline="Conector Factusol para confección, pizarra, vino y suministros en Ourense"
+           data-x="151"
+           data-y="141">
+          <circle cx="151" cy="141" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="151" cy="141" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="151" y="133" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Ourense</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="lugo" 
+           data-name="Lugo" 
+           data-province="Lugo" 
+           data-region="Galicia" 
+           data-tagline="Conector Factusol para sector lácteo, madera, cárnicas y suministros en Lugo y A Mariña"
+           data-x="167"
+           data-y="102">
+          <circle cx="167" cy="102" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="167" cy="102" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="167" y="94" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Lugo</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="huesca" 
+           data-name="Huesca" 
+           data-province="Huesca" 
+           data-region="Aragón" 
+           data-tagline="Conector Factusol para agroindustria, química, suministros y montaña en Huesca y Monzón"
+           data-x="542"
+           data-y="153">
+          <circle cx="542" cy="153" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="542" cy="153" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="542" y="145" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Huesca</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="teruel" 
+           data-name="Teruel" 
+           data-province="Teruel" 
+           data-region="Aragón" 
+           data-tagline="Conector Factusol para jamón D.O., arcillas, aeronáutica y comercio en Teruel y Alcañiz"
+           data-x="506"
+           data-y="257">
+          <circle cx="506" cy="257" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="506" cy="257" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="506" y="249" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Teruel</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="las-palmas" 
+           data-name="Las Palmas de Gran Canaria" 
+           data-province="Las Palmas" 
+           data-region="Canarias" 
+           data-tagline="Conector Factusol para comercio, régimen REF/IGIC y logística portuaria en Las Palmas"
+           data-x="135"
+           data-y="545">
+          <circle cx="135" cy="545" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="135" cy="545" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="135" y="537" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Las Palmas de Gran Canaria</text>
+        </g>
+
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="santa-cruz-de-tenerife" 
+           data-name="Santa Cruz de Tenerife" 
+           data-province="Santa Cruz de Tenerife" 
+           data-region="Canarias" 
+           data-tagline="Conector Factusol con soporte IGIC para empresas y distribución en Santa Cruz de Tenerife"
+           data-x="75"
+           data-y="535">
+          <circle cx="75" cy="535" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="75" cy="535" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="75" y="527" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">Santa Cruz de Tenerife</text>
+        </g>
+          </svg>
+
+          <!-- Floating Tooltip Card -->
+          <div id="map-tooltip" class="hidden absolute pointer-events-auto z-30 transform -translate-x-1/2 -translate-y-full mb-3 w-72 p-4 rounded-xl bg-[#09090b]/95 backdrop-blur-md border border-indigo-500/40 shadow-2xl transition-all duration-150">
+            <div class="flex items-center justify-between mb-1.5">
+              <span id="tooltip-title" class="text-sm font-bold text-white">Ciudad</span>
+              <span id="tooltip-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300">Activo</span>
+            </div>
+            <div id="tooltip-meta" class="text-[11px] font-mono text-zinc-400 mb-2">Provincia • Región</div>
+            <p id="tooltip-desc" class="text-xs text-zinc-300 line-clamp-2 mb-3 leading-relaxed">Descripción del área industrial...</p>
+            <a id="tooltip-link" href="#" class="inline-flex items-center justify-center w-full py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+              Ver conector y polígonos &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUSCADOR EN TIEMPO REAL Y FILTROS POR COMUNIDAD -->
+      <div class="mb-10 space-y-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <!-- Input Buscador -->
+          <div class="relative w-full md:max-w-md">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-zinc-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </span>
+            <input type="text" id="city-search" placeholder="Busca por ciudad, provincia o polígono..." class="w-full pl-10 pr-10 py-3 bg-[#121215] border border-white/[0.08] focus:border-indigo-500 focus:outline-none rounded-xl text-sm text-white placeholder-zinc-500 transition">
+            <button id="search-clear" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-500 hover:text-white transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Contador de Resultados -->
+          <div id="visible-count" class="text-xs font-mono text-zinc-400">
+            51 ciudades disponibles
+          </div>
+        </div>
+
+        <!-- Filtros por Comunidad Autónoma -->
+        <div class="flex flex-wrap items-center gap-2 pt-2">
+          
+    <button type="button" class="filter-chip active px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-indigo-600 text-white shadow-sm hover:bg-indigo-500" data-region="all">
+      Todas (51)
+    </button>
+  
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="castilla y león">
+      Castilla y León (9)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="andalucía">
+      Andalucía (8)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="castilla-la mancha">
+      Castilla-La Mancha (5)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="cataluña">
+      Cataluña (4)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="galicia">
+      Galicia (4)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="comunidad valenciana">
+      Comunidad Valenciana (3)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="aragón">
+      Aragón (3)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="país vasco">
+      País Vasco (3)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="principado de asturias">
+      Principado de Asturias (2)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="extremadura">
+      Extremadura (2)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="canarias">
+      Canarias (2)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="comunidad de madrid">
+      Comunidad de Madrid (1)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="región de murcia">
+      Región de Murcia (1)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="islas baleares">
+      Islas Baleares (1)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="cantabria">
+      Cantabria (1)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="comunidad foral de navarra">
+      Comunidad Foral de Navarra (1)
+    </button>
+  
+
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="la rioja">
+      La Rioja (1)
+    </button>
+  
+        </div>
+      </div>
+
+      <!-- LISTADO DE CIUDADES EN GRID -->
+      <div id="cities-grid" class="grid md:grid-cols-3 gap-6">
         
-        <a href="/conector-factusol/madrid/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/madrid/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="madrid" 
+           data-province="madrid" 
+           data-region="comunidad de madrid" 
+           data-slug="madrid">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Madrid</span>
@@ -96,7 +958,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/barcelona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/barcelona/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="barcelona" 
+           data-province="barcelona" 
+           data-region="cataluña" 
+           data-slug="barcelona">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Barcelona</span>
@@ -110,7 +977,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/valencia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/valencia/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="valencia" 
+           data-province="valencia" 
+           data-region="comunidad valenciana" 
+           data-slug="valencia">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Valencia</span>
@@ -124,7 +996,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/sevilla/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/sevilla/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="sevilla" 
+           data-province="sevilla" 
+           data-region="andalucía" 
+           data-slug="sevilla">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Sevilla</span>
@@ -138,7 +1015,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/zaragoza/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/zaragoza/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="zaragoza" 
+           data-province="zaragoza" 
+           data-region="aragón" 
+           data-slug="zaragoza">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Zaragoza</span>
@@ -152,7 +1034,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/malaga/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/malaga/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="málaga" 
+           data-province="málaga" 
+           data-region="andalucía" 
+           data-slug="malaga">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Málaga</span>
@@ -166,7 +1053,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/alicante/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/alicante/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="alicante" 
+           data-province="alicante" 
+           data-region="comunidad valenciana" 
+           data-slug="alicante">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Alicante</span>
@@ -180,7 +1072,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/bilbao/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/bilbao/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="bilbao" 
+           data-province="bizkaia" 
+           data-region="país vasco" 
+           data-slug="bilbao">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Bizkaia</span>
@@ -194,7 +1091,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/murcia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/murcia/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="murcia" 
+           data-province="murcia" 
+           data-region="región de murcia" 
+           data-slug="murcia">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Murcia</span>
@@ -208,7 +1110,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/coruna/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/coruna/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="a coruña" 
+           data-province="a coruña" 
+           data-region="galicia" 
+           data-slug="coruna">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">A Coruña</span>
@@ -222,7 +1129,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/vigo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/vigo/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="vigo" 
+           data-province="pontevedra" 
+           data-region="galicia" 
+           data-slug="vigo">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Pontevedra</span>
@@ -236,7 +1148,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/valladolid/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/valladolid/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="valladolid" 
+           data-province="valladolid" 
+           data-region="castilla y león" 
+           data-slug="valladolid">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Valladolid</span>
@@ -250,7 +1167,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/cordoba/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/cordoba/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="córdoba" 
+           data-province="córdoba" 
+           data-region="andalucía" 
+           data-slug="cordoba">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Córdoba</span>
@@ -264,7 +1186,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/palma/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/palma/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="palma de mallorca" 
+           data-province="baleares" 
+           data-region="islas baleares" 
+           data-slug="palma">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Baleares</span>
@@ -278,7 +1205,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/granada/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/granada/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="granada" 
+           data-province="granada" 
+           data-region="andalucía" 
+           data-slug="granada">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Granada</span>
@@ -292,7 +1224,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/toledo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/toledo/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="toledo" 
+           data-province="toledo" 
+           data-region="castilla-la mancha" 
+           data-slug="toledo">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Toledo</span>
@@ -306,7 +1243,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/santander/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/santander/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="santander" 
+           data-province="cantabria" 
+           data-region="cantabria" 
+           data-slug="santander">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cantabria</span>
@@ -320,7 +1262,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/gijon/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/gijon/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="gijón" 
+           data-province="asturias" 
+           data-region="principado de asturias" 
+           data-slug="gijon">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Asturias</span>
@@ -334,7 +1281,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/oviedo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/oviedo/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="oviedo" 
+           data-province="asturias" 
+           data-region="principado de asturias" 
+           data-slug="oviedo">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Asturias</span>
@@ -348,7 +1300,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/pamplona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/pamplona/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="pamplona" 
+           data-province="navarra" 
+           data-region="comunidad foral de navarra" 
+           data-slug="pamplona">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Navarra</span>
@@ -362,7 +1319,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/vitoria/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/vitoria/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="vitoria-gasteiz" 
+           data-province="álava" 
+           data-region="país vasco" 
+           data-slug="vitoria">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Álava</span>
@@ -376,7 +1338,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/castellon/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/castellon/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="castellón de la plana" 
+           data-province="castellón" 
+           data-region="comunidad valenciana" 
+           data-slug="castellon">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Castellón</span>
@@ -390,7 +1357,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/burgos/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/burgos/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="burgos" 
+           data-province="burgos" 
+           data-region="castilla y león" 
+           data-slug="burgos">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Burgos</span>
@@ -404,7 +1376,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/salamanca/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/salamanca/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="salamanca" 
+           data-province="salamanca" 
+           data-region="castilla y león" 
+           data-slug="salamanca">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Salamanca</span>
@@ -418,7 +1395,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/san-sebastian/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/san-sebastian/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="san sebastián" 
+           data-province="gipuzkoa" 
+           data-region="país vasco" 
+           data-slug="san-sebastian">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Gipuzkoa</span>
@@ -432,7 +1414,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/tarragona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/tarragona/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="tarragona" 
+           data-province="tarragona" 
+           data-region="cataluña" 
+           data-slug="tarragona">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Tarragona</span>
@@ -446,7 +1433,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/lleida/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/lleida/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="lleida" 
+           data-province="lleida" 
+           data-region="cataluña" 
+           data-slug="lleida">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Lleida</span>
@@ -460,7 +1452,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/girona/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/girona/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="girona" 
+           data-province="girona" 
+           data-region="cataluña" 
+           data-slug="girona">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Girona</span>
@@ -474,7 +1471,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/almeria/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/almeria/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="almería" 
+           data-province="almería" 
+           data-region="andalucía" 
+           data-slug="almeria">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Almería</span>
@@ -488,7 +1490,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/cadiz/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/cadiz/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="cádiz" 
+           data-province="cádiz" 
+           data-region="andalucía" 
+           data-slug="cadiz">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cádiz</span>
@@ -502,7 +1509,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/huelva/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/huelva/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="huelva" 
+           data-province="huelva" 
+           data-region="andalucía" 
+           data-slug="huelva">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Huelva</span>
@@ -516,7 +1528,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/jaen/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/jaen/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="jaén" 
+           data-province="jaén" 
+           data-region="andalucía" 
+           data-slug="jaen">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Jaén</span>
@@ -530,7 +1547,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/albacete/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/albacete/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="albacete" 
+           data-province="albacete" 
+           data-region="castilla-la mancha" 
+           data-slug="albacete">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Albacete</span>
@@ -544,7 +1566,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/ciudad-real/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/ciudad-real/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="ciudad real" 
+           data-province="ciudad real" 
+           data-region="castilla-la mancha" 
+           data-slug="ciudad-real">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Ciudad Real</span>
@@ -558,7 +1585,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/cuenca/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/cuenca/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="cuenca" 
+           data-province="cuenca" 
+           data-region="castilla-la mancha" 
+           data-slug="cuenca">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cuenca</span>
@@ -572,7 +1604,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/guadalajara/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/guadalajara/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="guadalajara" 
+           data-province="guadalajara" 
+           data-region="castilla-la mancha" 
+           data-slug="guadalajara">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Guadalajara</span>
@@ -586,7 +1623,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/badajoz/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/badajoz/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="badajoz" 
+           data-province="badajoz" 
+           data-region="extremadura" 
+           data-slug="badajoz">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Badajoz</span>
@@ -600,7 +1642,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/caceres/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/caceres/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="cáceres" 
+           data-province="cáceres" 
+           data-region="extremadura" 
+           data-slug="caceres">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Cáceres</span>
@@ -614,7 +1661,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/leon/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/leon/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="león" 
+           data-province="león" 
+           data-region="castilla y león" 
+           data-slug="leon">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">León</span>
@@ -628,7 +1680,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/palencia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/palencia/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="palencia" 
+           data-province="palencia" 
+           data-region="castilla y león" 
+           data-slug="palencia">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Palencia</span>
@@ -642,7 +1699,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/zamora/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/zamora/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="zamora" 
+           data-province="zamora" 
+           data-region="castilla y león" 
+           data-slug="zamora">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Zamora</span>
@@ -656,7 +1718,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/segovia/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/segovia/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="segovia" 
+           data-province="segovia" 
+           data-region="castilla y león" 
+           data-slug="segovia">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Segovia</span>
@@ -670,7 +1737,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/avila/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/avila/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="ávila" 
+           data-province="ávila" 
+           data-region="castilla y león" 
+           data-slug="avila">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Ávila</span>
@@ -684,7 +1756,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/soria/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/soria/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="soria" 
+           data-province="soria" 
+           data-region="castilla y león" 
+           data-slug="soria">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Soria</span>
@@ -698,7 +1775,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/logrono/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/logrono/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="logroño" 
+           data-province="la rioja" 
+           data-region="la rioja" 
+           data-slug="logrono">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">La Rioja</span>
@@ -712,7 +1794,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/ourense/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/ourense/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="ourense" 
+           data-province="ourense" 
+           data-region="galicia" 
+           data-slug="ourense">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Ourense</span>
@@ -726,7 +1813,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/lugo/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/lugo/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="lugo" 
+           data-province="lugo" 
+           data-region="galicia" 
+           data-slug="lugo">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Lugo</span>
@@ -740,7 +1832,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/huesca/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/huesca/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="huesca" 
+           data-province="huesca" 
+           data-region="aragón" 
+           data-slug="huesca">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Huesca</span>
@@ -754,7 +1851,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/teruel/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/teruel/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="teruel" 
+           data-province="teruel" 
+           data-region="aragón" 
+           data-slug="teruel">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Teruel</span>
@@ -768,7 +1870,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/las-palmas/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/las-palmas/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="las palmas de gran canaria" 
+           data-province="las palmas" 
+           data-region="canarias" 
+           data-slug="las-palmas">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Las Palmas</span>
@@ -782,7 +1889,12 @@
           </div>
         </a>
 
-        <a href="/conector-factusol/santa-cruz-de-tenerife/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/santa-cruz-de-tenerife/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="santa cruz de tenerife" 
+           data-province="santa cruz de tenerife" 
+           data-region="canarias" 
+           data-slug="santa-cruz-de-tenerife">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Santa Cruz de Tenerife</span>
@@ -796,12 +1908,177 @@
           </div>
         </a>
       </div>
+
     </div>
   </main>
 
   <footer class="border-t border-white/[0.08] py-8 text-center text-xs text-zinc-500 bg-[#09090b]">
-    <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
+      <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-white transition">Factusol WooCommerce</a>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+      </div>
+    </div>
   </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('city-search');
+    const clearBtn = document.getElementById('search-clear');
+    const chips = document.querySelectorAll('.filter-chip');
+    const cards = document.querySelectorAll('.city-card');
+    const pins = document.querySelectorAll('.city-pin');
+    const tooltip = document.getElementById('map-tooltip');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipMeta = document.getElementById('tooltip-meta');
+    const tooltipDesc = document.getElementById('tooltip-desc');
+    const tooltipLink = document.getElementById('tooltip-link');
+    const countBadge = document.getElementById('visible-count');
+    const mapContainer = document.getElementById('map-container');
+
+    let activeRegion = 'all';
+    let searchTerm = '';
+
+    function filterAll() {
+      let visibleCount = 0;
+      const term = searchTerm.trim().toLowerCase();
+
+      cards.forEach(card => {
+        const name = card.dataset.name || '';
+        const province = card.dataset.province || '';
+        const region = card.dataset.region || '';
+
+        const matchRegion = activeRegion === 'all' || region === activeRegion;
+        const matchSearch = !term || name.includes(term) || province.includes(term) || region.includes(term);
+
+        if (matchRegion && matchSearch) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      pins.forEach(pin => {
+        const name = (pin.dataset.name || '').toLowerCase();
+        const province = (pin.dataset.province || '').toLowerCase();
+        const region = (pin.dataset.region || '').toLowerCase();
+
+        const matchRegion = activeRegion === 'all' || region === activeRegion;
+        const matchSearch = !term || name.includes(term) || province.includes(term) || region.includes(term);
+
+        const core = pin.querySelector('.city-core');
+        const halo = pin.querySelector('.city-halo');
+        const label = pin.querySelector('.city-label');
+
+        if (matchRegion && matchSearch) {
+          pin.style.opacity = '1';
+          if (term && (name.includes(term) || province.includes(term))) {
+            core.setAttribute('fill', '#10b981');
+            halo.style.opacity = '0.7';
+            halo.setAttribute('fill', '#10b981');
+            if (label) {
+              label.style.fill = '#ffffff';
+              label.style.fontWeight = 'bold';
+            }
+          } else {
+            core.setAttribute('fill', '#6366f1');
+            halo.style.opacity = '0';
+            halo.setAttribute('fill', '#6366f1');
+            if (label) {
+              label.style.fill = '#a1a1aa';
+              label.style.fontWeight = 'normal';
+            }
+          }
+        } else {
+          pin.style.opacity = '0.2';
+          core.setAttribute('fill', '#52525b');
+          halo.style.opacity = '0';
+          if (label) {
+            label.style.fill = '#3f3f46';
+          }
+        }
+      });
+
+      if (countBadge) {
+        countBadge.textContent = visibleCount + ' ciudades mostradas';
+      }
+    }
+
+    // Pins Tooltip & Navegación
+    pins.forEach(pin => {
+      function showTooltip() {
+        const name = pin.dataset.name;
+        const province = pin.dataset.province;
+        const region = pin.dataset.region;
+        const tagline = pin.dataset.tagline;
+        const slug = pin.dataset.slug;
+
+        tooltipTitle.textContent = name;
+        tooltipMeta.textContent = province + ' • ' + region;
+        tooltipDesc.textContent = tagline;
+        tooltipLink.href = '/conector-factusol/' + slug + '/';
+
+        const rect = pin.getBoundingClientRect();
+        const containerRect = mapContainer.getBoundingClientRect();
+
+        let left = rect.left - containerRect.left + (rect.width / 2);
+        let top = rect.top - containerRect.top;
+
+        if (left < 150) left = 150;
+        if (left > containerRect.width - 150) left = containerRect.width - 150;
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+        tooltip.classList.remove('hidden');
+      }
+
+      pin.addEventListener('mouseenter', showTooltip);
+      pin.addEventListener('click', () => {
+        window.location.href = '/conector-factusol/' + pin.dataset.slug + '/';
+      });
+    });
+
+    mapContainer.addEventListener('mouseleave', () => {
+      tooltip.classList.add('hidden');
+    });
+
+    // Buscador
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        if (clearBtn) clearBtn.style.display = searchTerm ? 'flex' : 'none';
+        filterAll();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchTerm = '';
+        clearBtn.style.display = 'none';
+        filterAll();
+      });
+    }
+
+    // Chips
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => {
+          c.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+          c.classList.add('bg-[#18181b]', 'text-zinc-400');
+        });
+        chip.classList.remove('bg-[#18181b]', 'text-zinc-400');
+        chip.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+
+        activeRegion = chip.dataset.region;
+        filterAll();
+      });
+    });
+  });
+  </script>
 
   <script src="/js/version-sync.js"></script>
 </body>

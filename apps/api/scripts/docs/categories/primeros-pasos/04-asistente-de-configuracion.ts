@@ -19,6 +19,7 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
     { id: 'paso-4-listo', label: '6. Paso 4: ¡Todo Listo!, Spotlight Tour y Documentación Integrada', level: 2 },
     { id: 'notificaciones-multicanal', label: '7. Centro de Notificaciones Multi-Canal (Email SMTP Propio, Telegram y Discord)', level: 2 },
   ],
+  image: '/assets/screenshots/06-setup-wizard.png',
   contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         La primera vez que abres Bentian ERP Bridge, el programa lanza automáticamente el <strong>Asistente de Configuración Rápida (Onboarding Wizard)</strong>. Este asistente está pensado para que cualquier responsable de administración, almacén o comercial —incluso sin experiencia técnica avanzada— complete la puesta en marcha en menos de 5 minutos.
@@ -46,6 +47,26 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
           <div class="text-emerald-300 font-semibold">¡Listo!</div>
         </div>
       </div>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Asistente de Inicio Guiado</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/06-setup-wizard.webp" type="image/webp">
+          <img src="/assets/screenshots/06-setup-wizard.png" alt="Asistente de Configuración en 4 Pasos de Bentian ERP Bridge" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Interfaz interactiva del asistente inicial de Bentian ERP Bridge guiando la vinculación en cuatro pasos sin fricción técnica.
+        </figcaption>
+      </figure>
+
       <p class="text-xs text-zinc-400 mb-6">
         <em>Nota:</em> Puedes volver a abrir el asistente en cualquier momento pulsando el botón <strong class="text-zinc-200">Asistente de Inicio</strong> en el pie de la barra lateral izquierda.
       </p>

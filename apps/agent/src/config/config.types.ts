@@ -1,3 +1,5 @@
+import type { SoftwareErpConfig } from '../erp/erp.types';
+
 export interface AgentFactusolSettings {
   databasePath?: string;
   tariffCode?: string;
@@ -5,6 +7,14 @@ export interface AgentFactusolSettings {
   orderSeries?: string;
   invoiceSeries?: string;
   warehouseCode?: string;
+  activeOnly?: boolean;
+}
+
+export interface AgentSimplyGestSettings {
+  databasePath?: string;
+  tariffCode?: string;
+  warehouseCode?: string;
+  orderSeries?: string;
   activeOnly?: boolean;
 }
 
@@ -84,14 +94,19 @@ export interface AgentConfigFile {
   factusolDbPath?: string;
   heartbeatIntervalMs?: number;
   licenseKey?: string;
+  erpType?: 'factusol' | 'simplygest';
+  simplygestDbPath?: string;
   factusol?: AgentFactusolSettings;
+  simplygest?: AgentSimplyGestSettings;
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
   prestashop?: AgentPrestashopSettings;
   holded?: AgentHoldedSettings;
   channelType?: 'woocommerce' | 'universal_bridge' | 'shopify' | 'holded' | 'prestashop';
+  softwareErp?: SoftwareErpConfig;
   syncRules?: AgentSyncRules;
   notifications?: AgentNotificationSettings;
 }
 
+export type { SoftwareErpConfig } from '../erp/erp.types';

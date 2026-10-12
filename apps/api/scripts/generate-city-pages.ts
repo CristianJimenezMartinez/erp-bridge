@@ -449,11 +449,63 @@ ${renderHeader(currentVersion)}
 </html>`;
 }
 
+function getCitySvgCoordinates(c: CityData): { x: number; y: number } {
+  if (c.slug === 'santa-cruz-de-tenerife') return { x: 75, y: 535 };
+  if (c.slug === 'las-palmas') return { x: 135, y: 545 };
+  const x = Math.round(65 + ((c.coordinates.lng - (-9.5)) / 14.0) * 735);
+  const y = Math.round(45 + ((44.0 - c.coordinates.lat) / 8.2) * 475);
+  return { x, y };
+}
+
 function renderHubPage(cities: CityData[], currentVersion: string): string {
+  // Conteo y ordenación de regiones
+  const regionsMap = new Map<string, number>();
+  for (const c of cities) {
+    regionsMap.set(c.region, (regionsMap.get(c.region) || 0) + 1);
+  }
+  const sortedRegions = Array.from(regionsMap.entries()).sort((a, b) => b[1] - a[1]);
+
+  const filterChipsHtml = `
+    <button type="button" class="filter-chip active px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-indigo-600 text-white shadow-sm hover:bg-indigo-500" data-region="all">
+      Todas (${cities.length})
+    </button>
+  ` + sortedRegions.map(([reg, count]) => `
+    <button type="button" class="filter-chip px-3.5 py-1.5 rounded-full text-xs font-medium transition bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06] hover:border-zinc-700" data-region="${reg.toLowerCase()}">
+      ${reg} (${count})
+    </button>
+  `).join('\n');
+
+  // Pines SVG
+  const pinsHtml = cities
+    .map((c) => {
+      const { x, y } = getCitySvgCoordinates(c);
+      const safeTagline = c.tagline.replace(/"/g, '&quot;');
+      return `
+        <g class="city-pin cursor-pointer transition-all duration-150" 
+           data-slug="${c.slug}" 
+           data-name="${c.name}" 
+           data-province="${c.province}" 
+           data-region="${c.region}" 
+           data-tagline="${safeTagline}"
+           data-x="${x}"
+           data-y="${y}">
+          <circle cx="${x}" cy="${y}" r="14" class="city-halo opacity-0 fill-indigo-500/25 transition-all duration-200 pointer-events-none" />
+          <circle cx="${x}" cy="${y}" r="5" class="city-core fill-indigo-500 stroke-[#09090b] stroke-2 hover:fill-emerald-400 hover:r-7 transition-all duration-200" />
+          <text x="${x}" y="${y - 8}" text-anchor="middle" class="city-label text-[9px] fill-zinc-400 font-sans font-medium pointer-events-none select-none transition-all">${c.name}</text>
+        </g>`;
+    })
+    .join('\n');
+
+  // Tarjetas de ciudades
   const cardsHtml = cities
     .map(
       (c) => `
-        <a href="/conector-factusol/${c.slug}/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition flex flex-col justify-between group">
+        <a href="/conector-factusol/${c.slug}/" 
+           class="city-card p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 hover:bg-zinc-900/60 transition-all flex flex-col justify-between group"
+           data-name="${c.name.toLowerCase()}" 
+           data-province="${c.province.toLowerCase()}" 
+           data-region="${c.region.toLowerCase()}" 
+           data-slug="${c.slug}">
           <div>
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${c.province}</span>
@@ -474,16 +526,16 @@ function renderHubPage(cities: CityData[], currentVersion: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conector Factusol por Ciudades y Provincias de España | Bentian ERP Bridge</title>
-  <meta name="description" content="Cobertura regional de Bentian ERP Bridge en España. Conecta tu Factusol local con WooCommerce y PrestaShop en las principales áreas industriales y comerciales del país.">
+  <title>Mapa de Cobertura Nacional y Conector Factusol por Ciudades | Bentian ERP Bridge</title>
+  <meta name="description" content="Mapa interactivo y cobertura provincial de Bentian ERP Bridge en España. Conecta tu Factusol local con WooCommerce y PrestaShop en 52 áreas industriales y polígonos del país.">
   <link rel="canonical" href="https://bridge.cristianjm.com/conector-factusol/">
 
   <meta property="og:locale" content="es_ES">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bridge.cristianjm.com/conector-factusol/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Conector Factusol por Ciudades y Provincias de España | Bentian ERP Bridge">
-  <meta property="og:description" content="Sincronización en tiempo real entre Factusol y eCommerce en las principales áreas industriales de España.">
+  <meta property="og:title" content="Mapa de Cobertura Nacional y Conector Factusol por Ciudades | Bentian ERP Bridge">
+  <meta property="og:description" content="Mapa interactivo de sincronización en tiempo real entre Factusol y eCommerce en las principales áreas industriales de España.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -512,29 +564,301 @@ function renderHubPage(cities: CityData[], currentVersion: string): string {
 
 ${renderHeader(currentVersion)}
 
-  <main class="py-16 md:py-24 px-6 flex-1 bg-[#09090b]">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-6">
-          RED DE COBERTURA NACIONAL
+  <main class="py-12 md:py-20 px-4 sm:px-6 flex-1 bg-[#09090b]">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Encabezado Hero -->
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide mb-5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          RED DE COBERTURA NACIONAL (52 ÁREAS INDUSTRIALES)
         </div>
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-          Conector Factusol en las Principales Áreas Industriales de España
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-5">
+          Mapa de Cobertura Factusol en España
         </h1>
         <p class="text-base sm:text-lg text-zinc-400 leading-relaxed">
-          Diseñado para pymes, distribuidores y comercios con base de datos Factusol local en cualquier provincia. Selecciona tu ciudad para conocer polígonos compatibles y especificaciones.
+          Diseñado para pymes, distribuidores y mayoristas con base de datos Factusol local en cualquier provincia. Haz clic en el mapa o busca tu ciudad para consultar polígonos industriales y conectividad.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6">
+      <!-- MAPA INTERACTIVO DE ESPAÑA -->
+      <div class="mb-14 rounded-3xl bg-[#121215] border border-white/[0.08] p-4 sm:p-8 relative shadow-2xl overflow-hidden" id="map-container">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/[0.06]">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-ping"></div>
+            <span class="text-xs font-semibold text-white uppercase tracking-wider font-mono">Mapa Peninsular e Insular</span>
+            <span class="text-xs text-zinc-500">Pasa el ratón o pulsa sobre un nodo para explorar</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> 52 Nodos Locales</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> 100% OLEDB Local</span>
+          </div>
+        </div>
+
+        <!-- SVG Map Graphic -->
+        <div class="relative w-full aspect-[920/620] max-h-[580px] flex items-center justify-center">
+          <svg viewBox="0 0 920 620" class="w-full h-full select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="spain-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#18181b" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#0e0e11" stop-opacity="0.9" />
+              </linearGradient>
+              <radialGradient id="radar-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15" />
+                <stop offset="100%" stop-color="#6366f1" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+
+            <!-- Grid Radar Background -->
+            <circle cx="430" cy="280" r="280" fill="url(#radar-glow)" />
+            <circle cx="430" cy="280" r="180" fill="none" stroke="#27272a" stroke-dasharray="3 6" stroke-width="1" />
+            <circle cx="430" cy="280" r="280" fill="none" stroke="#27272a" stroke-dasharray="4 8" stroke-width="1" />
+
+            <!-- Silueta estilizada Península Ibérica -->
+            <path d="M 115,75 L 170,55 L 280,50 L 390,60 L 460,75 L 530,95 L 610,135 L 690,165 L 735,160 L 730,195 L 685,250 L 650,290 L 590,340 L 570,390 L 530,440 L 470,470 L 390,500 L 310,510 L 250,500 L 230,480 L 190,440 L 175,380 L 155,320 L 140,250 L 130,180 L 115,130 Z" 
+                  fill="url(#spain-bg)" stroke="#3f3f46" stroke-width="1.8" />
+
+            <!-- Frontera Portugal estilizada -->
+            <path d="M 190,440 L 175,380 L 155,320 L 140,250 L 130,180 L 175,180 L 210,240 L 230,320 L 250,400 L 230,480" 
+                  fill="none" stroke="#27272a" stroke-dasharray="4 4" stroke-width="1.5" />
+            <text x="180" y="310" class="text-[10px] fill-zinc-600 font-mono tracking-widest pointer-events-none select-none">PORTUGAL</text>
+
+            <!-- Islas Baleares -->
+            <!-- Mallorca -->
+            <path d="M 680,270 L 710,260 L 720,280 L 690,295 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+            <!-- Menorca -->
+            <path d="M 730,245 L 750,240 L 745,255 L 730,255 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+            <!-- Ibiza / Formentera -->
+            <path d="M 645,305 L 660,295 L 665,315 L 650,320 Z" fill="#18181b" stroke="#3f3f46" stroke-width="1.5" />
+
+            <!-- Inset Islas Canarias -->
+            <g transform="translate(25, 450)">
+              <rect width="185" height="135" rx="14" fill="#0d0d10" stroke="#27272a" stroke-width="1.5" />
+              <text x="16" y="24" class="text-[10px] font-mono fill-zinc-400 font-semibold tracking-wider uppercase">Islas Canarias</text>
+              <ellipse cx="75" cy="85" rx="18" ry="12" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+              <ellipse cx="135" cy="95" rx="16" ry="14" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+            </g>
+
+            <!-- Pines de Ciudades -->
+            ${pinsHtml}
+          </svg>
+
+          <!-- Floating Tooltip Card -->
+          <div id="map-tooltip" class="hidden absolute pointer-events-auto z-30 transform -translate-x-1/2 -translate-y-full mb-3 w-72 p-4 rounded-xl bg-[#09090b]/95 backdrop-blur-md border border-indigo-500/40 shadow-2xl transition-all duration-150">
+            <div class="flex items-center justify-between mb-1.5">
+              <span id="tooltip-title" class="text-sm font-bold text-white">Ciudad</span>
+              <span id="tooltip-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300">Activo</span>
+            </div>
+            <div id="tooltip-meta" class="text-[11px] font-mono text-zinc-400 mb-2">Provincia • Región</div>
+            <p id="tooltip-desc" class="text-xs text-zinc-300 line-clamp-2 mb-3 leading-relaxed">Descripción del área industrial...</p>
+            <a id="tooltip-link" href="#" class="inline-flex items-center justify-center w-full py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-sm">
+              Ver conector y polígonos &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUSCADOR EN TIEMPO REAL Y FILTROS POR COMUNIDAD -->
+      <div class="mb-10 space-y-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <!-- Input Buscador -->
+          <div class="relative w-full md:max-w-md">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-zinc-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </span>
+            <input type="text" id="city-search" placeholder="Busca por ciudad, provincia o polígono..." class="w-full pl-10 pr-10 py-3 bg-[#121215] border border-white/[0.08] focus:border-indigo-500 focus:outline-none rounded-xl text-sm text-white placeholder-zinc-500 transition">
+            <button id="search-clear" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-500 hover:text-white transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Contador de Resultados -->
+          <div id="visible-count" class="text-xs font-mono text-zinc-400">
+            ${cities.length} ciudades disponibles
+          </div>
+        </div>
+
+        <!-- Filtros por Comunidad Autónoma -->
+        <div class="flex flex-wrap items-center gap-2 pt-2">
+          ${filterChipsHtml}
+        </div>
+      </div>
+
+      <!-- LISTADO DE CIUDADES EN GRID -->
+      <div id="cities-grid" class="grid md:grid-cols-3 gap-6">
         ${cardsHtml}
       </div>
+
     </div>
   </main>
 
   <footer class="border-t border-white/[0.08] py-8 text-center text-xs text-zinc-500 bg-[#09090b]">
-    <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
+      <p>&copy; 2026 Bentian ERP Bridge. Conexión nativa Factusol para España.</p>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <a href="/" class="hover:text-white transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-white transition">Factusol WooCommerce</a>
+        <a href="/docs/" class="hover:text-white transition">Documentación</a>
+      </div>
+    </div>
   </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('city-search');
+    const clearBtn = document.getElementById('search-clear');
+    const chips = document.querySelectorAll('.filter-chip');
+    const cards = document.querySelectorAll('.city-card');
+    const pins = document.querySelectorAll('.city-pin');
+    const tooltip = document.getElementById('map-tooltip');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipMeta = document.getElementById('tooltip-meta');
+    const tooltipDesc = document.getElementById('tooltip-desc');
+    const tooltipLink = document.getElementById('tooltip-link');
+    const countBadge = document.getElementById('visible-count');
+    const mapContainer = document.getElementById('map-container');
+
+    let activeRegion = 'all';
+    let searchTerm = '';
+
+    function filterAll() {
+      let visibleCount = 0;
+      const term = searchTerm.trim().toLowerCase();
+
+      cards.forEach(card => {
+        const name = card.dataset.name || '';
+        const province = card.dataset.province || '';
+        const region = card.dataset.region || '';
+
+        const matchRegion = activeRegion === 'all' || region === activeRegion;
+        const matchSearch = !term || name.includes(term) || province.includes(term) || region.includes(term);
+
+        if (matchRegion && matchSearch) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      pins.forEach(pin => {
+        const name = (pin.dataset.name || '').toLowerCase();
+        const province = (pin.dataset.province || '').toLowerCase();
+        const region = (pin.dataset.region || '').toLowerCase();
+
+        const matchRegion = activeRegion === 'all' || region === activeRegion;
+        const matchSearch = !term || name.includes(term) || province.includes(term) || region.includes(term);
+
+        const core = pin.querySelector('.city-core');
+        const halo = pin.querySelector('.city-halo');
+        const label = pin.querySelector('.city-label');
+
+        if (matchRegion && matchSearch) {
+          pin.style.opacity = '1';
+          if (term && (name.includes(term) || province.includes(term))) {
+            core.setAttribute('fill', '#10b981');
+            halo.style.opacity = '0.7';
+            halo.setAttribute('fill', '#10b981');
+            if (label) {
+              label.style.fill = '#ffffff';
+              label.style.fontWeight = 'bold';
+            }
+          } else {
+            core.setAttribute('fill', '#6366f1');
+            halo.style.opacity = '0';
+            halo.setAttribute('fill', '#6366f1');
+            if (label) {
+              label.style.fill = '#a1a1aa';
+              label.style.fontWeight = 'normal';
+            }
+          }
+        } else {
+          pin.style.opacity = '0.2';
+          core.setAttribute('fill', '#52525b');
+          halo.style.opacity = '0';
+          if (label) {
+            label.style.fill = '#3f3f46';
+          }
+        }
+      });
+
+      if (countBadge) {
+        countBadge.textContent = visibleCount + ' ciudades mostradas';
+      }
+    }
+
+    // Pins Tooltip & Navegación
+    pins.forEach(pin => {
+      function showTooltip() {
+        const name = pin.dataset.name;
+        const province = pin.dataset.province;
+        const region = pin.dataset.region;
+        const tagline = pin.dataset.tagline;
+        const slug = pin.dataset.slug;
+
+        tooltipTitle.textContent = name;
+        tooltipMeta.textContent = province + ' • ' + region;
+        tooltipDesc.textContent = tagline;
+        tooltipLink.href = '/conector-factusol/' + slug + '/';
+
+        const rect = pin.getBoundingClientRect();
+        const containerRect = mapContainer.getBoundingClientRect();
+
+        let left = rect.left - containerRect.left + (rect.width / 2);
+        let top = rect.top - containerRect.top;
+
+        if (left < 150) left = 150;
+        if (left > containerRect.width - 150) left = containerRect.width - 150;
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+        tooltip.classList.remove('hidden');
+      }
+
+      pin.addEventListener('mouseenter', showTooltip);
+      pin.addEventListener('click', () => {
+        window.location.href = '/conector-factusol/' + pin.dataset.slug + '/';
+      });
+    });
+
+    mapContainer.addEventListener('mouseleave', () => {
+      tooltip.classList.add('hidden');
+    });
+
+    // Buscador
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        if (clearBtn) clearBtn.style.display = searchTerm ? 'flex' : 'none';
+        filterAll();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchTerm = '';
+        clearBtn.style.display = 'none';
+        filterAll();
+      });
+    }
+
+    // Chips
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => {
+          c.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+          c.classList.add('bg-[#18181b]', 'text-zinc-400');
+        });
+        chip.classList.remove('bg-[#18181b]', 'text-zinc-400');
+        chip.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+
+        activeRegion = chip.dataset.region;
+        filterAll();
+      });
+    });
+  });
+  </script>
 
   <script src="/js/version-sync.js"></script>
 </body>

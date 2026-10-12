@@ -3,6 +3,7 @@ import path from 'path';
 import { Logger } from '@erp-bridge/shared';
 import {
   AgentFactusolSettings,
+  AgentSimplyGestSettings,
   AgentWooCommerceSettings,
   AgentUniversalBridgeSettings,
   AgentShopifySettings,
@@ -14,12 +15,17 @@ import {
 } from '../config';
 import { LicenseService } from '../license';
 import { FactusolService, FactusolPathResolver } from '../factusol';
+import { SoftwareErpConfig, ErpProviderRegistry } from '../erp';
+import { SimplyGestService, SimplyGestDetector } from '../simplygest';
 import { LocalSyncEngine } from '../sync';
 import { EventBus } from '../diagnostics';
 import { isSecretMaskedOrEmpty } from '../channels/channel-tester.service';
 
 export interface FullConfigUpdates {
+  erpType?: 'factusol' | 'simplygest';
+  softwareErp?: SoftwareErpConfig;
   factusol?: AgentFactusolSettings;
+  simplygest?: AgentSimplyGestSettings;
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
@@ -39,7 +45,9 @@ export class ConfigApplierService {
     private readonly licenseService: LicenseService,
     private readonly factusolService: FactusolService,
     private readonly syncEngine: LocalSyncEngine,
-    private readonly eventBus: EventBus
+    private readonly eventBus: EventBus,
+    private readonly simplygestService?: SimplyGestService,
+    private readonly erpRegistry?: ErpProviderRegistry
   ) {}
 
   public async saveFullConfig(
@@ -47,6 +55,43 @@ export class ConfigApplierService {
     isRunning: () => boolean
   ): Promise<{ success: boolean; message: string }> {
     const cfg = this.configManager.get();
+
+    // Validación estricta anti-inyección de rutas de base de datos
+    const invalidPathRegex = /[\x00-\x1f;'"\x60]/;
+    const pathCandidates = [
+      updates.factusol?.databasePath,
+      updates.simplygest?.databasePath,
+      updates.softwareErp?.providers?.factusol?.databasePath,
+      updates.softwareErp?.providers?.simplygest?.databasePath,
+    ];
+    for (const p of pathCandidates) {
+      if (typeof p === 'string' && invalidPathRegex.test(p)) {
+        return {
+          success: false,
+          message: 'Ruta de base de datos no válida: contiene caracteres prohibidos (; \' " ` o caracteres de control).',
+        };
+      }
+    }
+
+    // Sincronización de softwareErp hacia factusol y simplygest
+    if (updates.softwareErp?.providers?.factusol) {
+      updates.factusol = { ...(updates.factusol || {}), ...updates.softwareErp.providers.factusol };
+    }
+    if (updates.softwareErp?.providers?.simplygest) {
+      updates.simplygest = { ...(updates.simplygest || {}), ...updates.softwareErp.providers.simplygest };
+    }
+
+    if (updates.softwareErp?.activeProvider) {
+      cfg.erpType = updates.softwareErp.activeProvider;
+      if (this.erpRegistry) {
+        this.erpRegistry.setActiveProvider(updates.softwareErp.activeProvider);
+      }
+    } else if (updates.erpType) {
+      cfg.erpType = updates.erpType;
+      if (this.erpRegistry) {
+        this.erpRegistry.setActiveProvider(updates.erpType);
+      }
+    }
     if (updates.factusol) {
       cfg.factusol = { ...(cfg.factusol || {}), ...updates.factusol };
       if (updates.factusol.databasePath !== undefined) {
@@ -58,6 +103,36 @@ export class ConfigApplierService {
         updates.factusol.databasePath = finalPath;
       }
     }
+    if (updates.simplygest) {
+      cfg.simplygest = { ...(cfg.simplygest || {}), ...updates.simplygest };
+      if (updates.simplygest.databasePath !== undefined) {
+        const cleaned = SimplyGestDetector.cleanPath(updates.simplygest.databasePath);
+        const resolved = SimplyGestDetector.resolve(cleaned);
+        const finalPath = (resolved.success && resolved.resolvedPath) ? resolved.resolvedPath : cleaned;
+        cfg.simplygestDbPath = finalPath;
+        cfg.simplygest.databasePath = finalPath;
+        updates.simplygest.databasePath = finalPath;
+      }
+    }
+
+    // Consolidación de softwareErp retrocompatible
+    const finalActive = updates.softwareErp?.activeProvider || updates.erpType || cfg.softwareErp?.activeProvider || cfg.erpType || 'factusol';
+    const isProvisioned = updates.softwareErp?.provisioned !== undefined
+      ? updates.softwareErp.provisioned
+      : (cfg.softwareErp?.provisioned !== undefined
+        ? cfg.softwareErp.provisioned
+        : Boolean(cfg.factusolDbPath || cfg.simplygestDbPath));
+
+    cfg.erpType = finalActive;
+    cfg.softwareErp = {
+      activeProvider: finalActive,
+      provisioned: isProvisioned,
+      providers: {
+        ...(cfg.softwareErp?.providers || {}),
+        factusol: { ...(cfg.factusol || {}) },
+        simplygest: { ...(cfg.simplygest || {}) },
+      },
+    };
     if (updates.woocommerce) {
       const existingSecret = cfg.woocommerce?.consumerSecret;
       cfg.woocommerce = { ...(cfg.woocommerce || {}), ...updates.woocommerce };
@@ -133,7 +208,24 @@ export class ConfigApplierService {
 
     this.syncEngine.startAutoSyncLoop(isRunning);
 
-    if (cfg.factusolDbPath) {
+    if (cfg.erpType === 'simplygest') {
+      await this.factusolService.disconnect().catch(() => null);
+      if (cfg.simplygestDbPath) {
+        let activeSgPath = cfg.simplygestDbPath;
+        if (!fs.existsSync(activeSgPath)) {
+          const resolved = SimplyGestDetector.resolve(activeSgPath);
+          if (resolved.success && resolved.resolvedPath) activeSgPath = resolved.resolvedPath;
+        }
+        if (fs.existsSync(activeSgPath)) {
+          await this.simplygestService?.connect(activeSgPath).catch(() => null);
+        } else {
+          this.logger.warn(`Ruta de SimplyGest guardada pero no accesible inmediatamente (Desconectado/Offline): ${cfg.simplygestDbPath}`);
+        }
+      }
+    } else if (cfg.erpType === 'factusol' && cfg.factusolDbPath) {
+      if (this.simplygestService) {
+        await this.simplygestService.disconnect().catch(() => null);
+      }
       let activePath = cfg.factusolDbPath;
       if (!fs.existsSync(activePath)) {
         const unc = FactusolPathResolver.resolveMappedDriveToUnc(activePath);

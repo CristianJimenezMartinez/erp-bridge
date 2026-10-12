@@ -360,5 +360,163 @@ export const arquitecturaArticles: DocArticle[] = [
       </ul>
     `,
   },
+  {
+    slug: 'arquitectura/arquitectura-polimorfica-multi-erp',
+    categorySlug: 'arquitectura',
+    title: 'Arquitectura Polimórfica Multi-ERP y Modelo Single Active ERP',
+    subtitle: 'Patrón Strategy, interfaz canónica IErpConnector, aislamiento anti-wiping en AppData y selector comercial 3x2.',
+    badge: 'Arquitectura del Sistema',
+    readingTime: '7 min de lectura',
+    metaTitle: 'Arquitectura Multi-ERP y Aprovisionamiento Exclusivo | Bentian ERP',
+    metaDescription: 'Especificación de ingeniería de la arquitectura polimórfica de Bentian. Interfaz IErpConnector, ErpProviderRegistry, cero colisiones y compatibilidad con 6 ERPs.',
+    keywords: 'arquitectura multi erp, ierpconnector, erpproviderregistry, single active erp, factusol simplygest sage holded odoo a3erp, bentian arquitectura',
+    toc: [
+      { id: 'patron-strategy', label: '1. El Patrón Strategy y el Contrato IErpConnector', level: 2 },
+      { id: 'erp-registry', label: '2. ErpProviderRegistry y Resolución Determinista', level: 2 },
+      { id: 'single-active-erp', label: '3. Modelo Single Active ERP (Cero Coexistencia Destructiva)', level: 2 },
+      { id: 'aislamiento-appdata', label: '4. Aislamiento Anti-Wiping en AppData', level: 2 },
+      { id: 'matriz-erps', label: '5. Matriz de los 6 ERPs Comerciales Estándar', level: 2 },
+    ],
+    image: '/assets/screenshots/02-multi-erp-selector.png',
+    contentHtml: `
+      <p class="text-base text-zinc-300 leading-relaxed mb-6">
+        Bentian ERP Bridge fue concebido originalmente con un conector dedicado para Factusol. Sin embargo, para responder a las necesidades de empresas con software de gestión heterogéneo y facilitar migraciones comerciales sin fricción, el motor del Agente ha evolucionado hacia una <strong>arquitectura polimórfica desacoplada</strong> basada en el patrón Strategy.
+      </p>
+
+      <h2 id="patron-strategy" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Patrón Strategy y el Contrato IErpConnector</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Todo el motor de sincronización (<code class="text-indigo-300 font-mono">LocalSyncEngine</code>) y las interfaces de usuario interactúan exclusivamente contra el contrato canónico <code class="text-emerald-400 font-mono">IErpConnector</code>:
+      </p>
+      <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono space-y-1.5 text-zinc-300 mb-6">
+        <div><strong class="text-emerald-400">Contrato Canónico (apps/agent/src/erp/erp-connector.interface.ts):</strong></div>
+        <div class="text-zinc-400">export interface IErpConnector {</div>
+        <div class="text-zinc-400 pl-4">readonly providerId: SupportedErpProviderId;</div>
+        <div class="text-zinc-400 pl-4">connect(dbPath?: string): Promise&lt;void&gt;;</div>
+        <div class="text-zinc-400 pl-4">disconnect(): Promise&lt;void&gt;;</div>
+        <div class="text-zinc-400 pl-4">testConnection(dbPath?: string): Promise&lt;ErpConnectionTestResult&gt;;</div>
+        <div class="text-zinc-400 pl-4">reconnect(dbPath?: string): Promise&lt;ErpConnectionTestResult&gt;;</div>
+        <div class="text-zinc-400 pl-4">isConnected(): boolean;</div>
+        <div class="text-zinc-400 pl-4">getMetadata(): Promise&lt;ErpProviderMetadata&gt;;</div>
+        <div class="text-zinc-400 pl-4">getStockMap(options?: { warehouseCode?: string }): Promise&lt;Map&lt;string, number&gt;&gt;;</div>
+        <div class="text-zinc-400 pl-4">createOrder(order: CanonicalOrder): Promise&lt;ErpOrderCreationResult&gt;;</div>
+        <div class="text-zinc-400">}</div>
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Este desacoplamiento permite que los adaptadores especializados (<code class="text-indigo-300 font-mono">FactusolAdapter</code>, <code class="text-emerald-400 font-mono">SimplyGestAdapter</code>, etc.) traduzcan las particularidades de cada base de datos (por ejemplo, <code class="text-zinc-300 font-mono">F_ART</code>/<code class="text-zinc-300 font-mono">F_PCL</code> en Factusol vs <code class="text-zinc-300 font-mono">ARTICULOS</code>/<code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> en SimplyGest) sin modificar el núcleo de sincronización ni violar los módulos sellados (Code Freeze).
+      </p>
+
+      <h2 id="erp-registry" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. ErpProviderRegistry y Resolución Determinista</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        El registro central de proveedores (<code class="text-indigo-300 font-mono">ErpProviderRegistry</code>) gestiona el ciclo de vida de los adaptadores registrados. Resuelve el software activo de forma determinista siguiendo una jerarquía estricta:
+      </p>
+      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+        <li>Configuración moderna SSoT: <code class="text-emerald-400 font-mono">softwareErp.activeProvider</code>.</li>
+        <li>Fallback retrocompatible legacy: <code class="text-zinc-300 font-mono">cfg.erpType</code>.</li>
+        <li>Heurística de rutas: si solo una base de datos está configurada en disco, se selecciona automáticamente.</li>
+        <li>Proveedor predeterminado del sistema: Factusol.</li>
+      </ol>
+
+      <h2 id="single-active-erp" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Modelo Single Active ERP (Cero Coexistencia Destructiva)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        En entornos empresariales, permitir que dos ERPs distintos sincronicen existencias simultáneamente hacia la misma tienda online provocaría <strong>colisiones críticas de stock, sobreventas y duplicidad de pedidos</strong>. Bentian aplica una regla de ingeniería inmutable:
+      </p>
+      <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 mb-6 leading-relaxed">
+        <strong>Principio de Aprovisionamiento Exclusivo:</strong> En tiempo de ejecución solo existe UN proveedor de ERP activo a la vez (<code class="text-zinc-100 font-mono">activeProvider</code>). Al conmutar de ERP en la GUI, el conector previo se desconecta de forma limpia y cede el control exclusivo del motor de sincronización y del file watcher al nuevo proveedor seleccionado. La interfaz gráfica oculta por completo los controles del software inactivo para evitar confusión operativa.
+      </div>
+
+      <h2 id="aislamiento-appdata" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Aislamiento Anti-Wiping en AppData</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Para que el usuario pueda probar o alternar de software sin perder sus parámetros de trabajo, la configuración de cada ERP se almacena en espacios de nombres estrictamente aislados dentro de <code class="text-indigo-300 font-mono">%APPDATA%\Bentian Agent\agent-config.json</code>:
+      </p>
+      <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono space-y-1 text-zinc-300 mb-6">
+        <div>"softwareErp": {</div>
+        <div class="pl-4">"activeProvider": "simplygest",</div>
+        <div class="pl-4">"provisioned": true,</div>
+        <div class="pl-4">"providers": {</div>
+        <div class="pl-8 text-emerald-400">"factusol": { "databasePath": "C:\\Software DELSOL\\Datos\\FS\\0012026.accdb", "tariffCode": "1" },</div>
+        <div class="pl-8 text-sky-400">"simplygest": { "databasePath": "C:\\SimplyGest\\Datos.mdb", "orderSeries": "1" }</div>
+        <div class="pl-4">}</div>
+        <div>}</div>
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Gracias a esta estructura, al cambiar de SimplyGest a Factusol (o viceversa), las rutas NAS, series de facturación y tarifas del software anterior se conservan al 100% en disco sin borrados destructivos.
+      </p>
+
+      <h2 id="matriz-erps" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Matriz de los 6 ERPs Comerciales Estándar</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        El panel de escritorio de Bentian incorpora un diálogo de selección en cuadrícula 3x2 con las 6 soluciones ERP comerciales líderes en el mercado de la pyme española:
+      </p>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Selector de Conectores ERP</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/02-multi-erp-selector.webp" type="image/webp">
+          <img src="/assets/screenshots/02-multi-erp-selector.png" alt="Conmutador Multi-ERP en Bentian ERP Bridge: Factusol, SimplyGest, Sage 50, Holded, Odoo y A3ERP" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Selector comercial 3x2 de Bentian ERP Bridge para alternar entre sistemas ERP con aislamiento anti-wiping en AppData.
+        </figcaption>
+      </figure>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Software ERP</th>
+              <th class="px-4 py-3 font-semibold">Fabricante</th>
+              <th class="px-4 py-3 font-semibold">Protocolo de Conexión</th>
+              <th class="px-4 py-3 font-semibold">Estado en Bentian</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">Factusol</td>
+              <td class="px-4 py-2.5 text-zinc-300">Software DELSOL</td>
+              <td class="px-4 py-2.5 font-mono text-emerald-400">OLEDB Nativo (.accdb / .mdb)</td>
+              <td class="px-4 py-2.5 font-semibold text-emerald-400">Producción Certificada (Stable)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">SimplyGest Desktop</td>
+              <td class="px-4 py-2.5 text-zinc-300">SimplyGest Software</td>
+              <td class="px-4 py-2.5 font-mono text-emerald-400">OLEDB Local (Datos.mdb)</td>
+              <td class="px-4 py-2.5 font-semibold text-emerald-400">Producción Certificada (Stable)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">Holded Cloud ERP</td>
+              <td class="px-4 py-2.5 text-zinc-300">Holded Technologies</td>
+              <td class="px-4 py-2.5 font-mono text-sky-400">REST API v1 / Webhooks</td>
+              <td class="px-4 py-2.5 font-semibold text-emerald-400">Producción Certificada (Stable)</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">Sage 50 / Sage 200</td>
+              <td class="px-4 py-2.5 text-zinc-300">Sage Group plc</td>
+              <td class="px-4 py-2.5 font-mono text-sky-400">ODBC / Sage Connected API</td>
+              <td class="px-4 py-2.5 font-semibold text-sky-400">En Certificación</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">Odoo ERP</td>
+              <td class="px-4 py-2.5 text-zinc-300">Odoo S.A.</td>
+              <td class="px-4 py-2.5 font-mono text-purple-400">XML-RPC / JSON-RPC</td>
+              <td class="px-4 py-2.5 font-semibold text-purple-400">En Integración</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-white">A3ERP</td>
+              <td class="px-4 py-2.5 text-zinc-300">Wolters Kluwer</td>
+              <td class="px-4 py-2.5 font-mono text-amber-400">SQL Server Nativo / SDK</td>
+              <td class="px-4 py-2.5 font-semibold text-amber-400">En Integración</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `,
+  },
 ];
 

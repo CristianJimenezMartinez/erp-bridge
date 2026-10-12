@@ -15,6 +15,7 @@ import {
   LicenseController,
   SystemController,
   SalesOrdersController,
+  SimplyGestController,
 } from './router/controllers';
 
 const logger = new Logger('LocalGuiServer');
@@ -102,6 +103,13 @@ export class LocalGuiServer {
     router.get('/api/local/factusol/metadata', FactusolController.getMetadata(this.agent));
     router.get('/api/local/factusol/preview', FactusolController.getPreview(this.agent));
     router.post('/api/local/resolve-factusol-path', FactusolController.resolvePath(this.agent));
+
+    // 3b. SimplyGest
+    router.any(['GET', 'POST'], '/api/local/open-file-dialog-simplygest', SimplyGestController.openNativeFileDialog(this.agent));
+    router.post('/api/local/detect-simplygest', SimplyGestController.detectSimplyGest(this.agent));
+    router.post('/api/local/test-simplygest', SimplyGestController.testSimplyGest(this.agent));
+    router.get('/api/local/simplygest/preview', SimplyGestController.getPreview(this.agent));
+    router.post('/api/local/resolve-simplygest-path', SimplyGestController.resolvePath(this.agent));
 
     // 4. Channels
     router.post('/api/local/test-woocommerce', ChannelController.testWooCommerce(this.agent));

@@ -38,6 +38,13 @@ import {
 import { AgentLicenseStatus, LicenseValidationStatus, LicenseService } from './license';
 import { FactusolMetadata, ArticlePreviewItem, PathResolutionResult, FactusolService, FactusolPathResolver } from './factusol';
 import {
+  SimplyGestDetectedInstance,
+  SimplyGestArticlePreviewItem,
+  SimplyGestTestResult,
+  SimplyGestService,
+  SimplyGestDetector,
+} from './simplygest';
+import {
   WooCommerceTestResult,
   UniversalBridgeTestResult,
   ShopifyTestResult,
@@ -62,6 +69,13 @@ import {
 } from './orders';
 import { StatusAggregatorService, HeartbeatService } from './status';
 import { PairingService, ConfigApplierService, FileWatcherCoordinatorService, FullConfigUpdates } from './lifecycle';
+import {
+  ErpProviderRegistry,
+  FactusolAdapter,
+  SimplyGestAdapter,
+  IErpConnector,
+  SupportedErpProviderId,
+} from './erp';
 
 // Re-exportar tipos y submódulos para 100% de compatibilidad externa
 export * from './config';
@@ -70,6 +84,8 @@ export * from './orders';
 export * from './diagnostics';
 export * from './license';
 export * from './factusol';
+export * from './simplygest';
+export * from './erp';
 export * from './channels';
 export * from './sync';
 export * from './update';
@@ -95,6 +111,10 @@ export class LocalAgent {
   public readonly eventBus: EventBus;
   public readonly licenseService: LicenseService;
   public readonly factusolService: FactusolService;
+  public readonly simplygestService: SimplyGestService;
+  public readonly factusolAdapter: FactusolAdapter;
+  public readonly simplygestAdapter: SimplyGestAdapter;
+  public readonly erpRegistry: ErpProviderRegistry;
   public readonly fileWatcherService: FileWatcherService;
   public readonly syncEngine: LocalSyncEngine;
   public readonly autoUpdater: AutoUpdater;
@@ -126,6 +146,10 @@ export class LocalAgent {
     this.eventBus = new EventBus(80);
     this.licenseService = new LicenseService(this.configManager, this.eventBus, customStoreDir);
     this.factusolService = new FactusolService(this.configManager, this.eventBus);
+    this.simplygestService = new SimplyGestService(this.configManager, this.eventBus);
+    this.factusolAdapter = new FactusolAdapter(this.configManager, this.factusolService, this.eventBus);
+    this.simplygestAdapter = new SimplyGestAdapter(this.configManager, this.simplygestService, this.eventBus);
+    this.erpRegistry = new ErpProviderRegistry(this.configManager, [this.factusolAdapter, this.simplygestAdapter]);
     this.fileWatcherService = new FileWatcherService();
     this.syncEngine = new LocalSyncEngine(
       this.configManager,
@@ -133,23 +157,42 @@ export class LocalAgent {
       this.historyManager,
       this.eventBus,
       () => this.licenseService.getLicenseStatus(),
-      this.salesLedgerManager
+      this.salesLedgerManager,
+      this.erpRegistry
     );
     this.autoStartService = new AutoStartService();
 
     const cfg = this.configManager.get();
-    if (!cfg.shopify) {
+    if (!cfg.shopify || !cfg.simplygest || !cfg.erpType || !cfg.softwareErp) {
       try {
         const cfgPath = this.configManager.getConfigFilePath();
         if (fs.existsSync(cfgPath)) {
           const raw = fs.readFileSync(cfgPath, 'utf8').replace(/^\uFEFF/, '');
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.shopify) cfg.shopify = parsed.shopify;
+          if (parsed) {
+            if (parsed.shopify && !cfg.shopify) cfg.shopify = parsed.shopify;
+            if (parsed.prestashop && !cfg.prestashop) cfg.prestashop = parsed.prestashop;
+            if (parsed.holded && !cfg.holded) cfg.holded = parsed.holded;
+            if (parsed.notifications && !cfg.notifications) cfg.notifications = parsed.notifications;
+            if (parsed.erpType && !cfg.erpType) cfg.erpType = parsed.erpType;
+            if (parsed.simplygest && !cfg.simplygest) cfg.simplygest = parsed.simplygest;
+            if (parsed.simplygestDbPath && !cfg.simplygestDbPath) cfg.simplygestDbPath = parsed.simplygestDbPath;
+            if (parsed.softwareErp && !cfg.softwareErp) cfg.softwareErp = parsed.softwareErp;
+          }
         }
       } catch {}
     }
     if (customConfig?.shopify) {
       cfg.shopify = { ...(cfg.shopify || {}), ...customConfig.shopify };
+    }
+    if (customConfig?.simplygest) {
+      cfg.simplygest = { ...(cfg.simplygest || {}), ...customConfig.simplygest };
+    }
+    if (customConfig?.erpType) {
+      cfg.erpType = customConfig.erpType;
+    }
+    if (customConfig?.softwareErp) {
+      cfg.softwareErp = customConfig.softwareErp;
     }
     this.preflightHealthService = new PreflightHealthService({
       apiBaseUrl: cfg.apiBaseUrl || 'https://bridge.cristianjm.com',
@@ -176,6 +219,7 @@ export class LocalAgent {
       configManager: this.configManager,
       licenseService: this.licenseService,
       factusolService: this.factusolService,
+      simplygestService: this.simplygestService,
       fileWatcherService: this.fileWatcherService,
       historyManager: this.historyManager,
       eventBus: this.eventBus,
@@ -198,7 +242,15 @@ export class LocalAgent {
       isUpdating: () => this.updateOrchestrator.getIsUpdating(),
     });
     this.pairingService = new PairingService(this.configManager);
-    this.configApplierService = new ConfigApplierService(this.configManager, this.licenseService, this.factusolService, this.syncEngine, this.eventBus);
+    this.configApplierService = new ConfigApplierService(
+      this.configManager,
+      this.licenseService,
+      this.factusolService,
+      this.syncEngine,
+      this.eventBus,
+      this.simplygestService,
+      this.erpRegistry
+    );
     this.notificationTester = new NotificationTesterService(this.configManager);
     this.fileWatcherCoordinator = new FileWatcherCoordinatorService(this.configManager, this.licenseService, this.syncEngine, this.eventBus);
 
@@ -282,6 +334,29 @@ export class LocalAgent {
     return this.factusolService.getPreviewArticles(undefined, limit);
   }
   public resolveFactusolPath(inputPath: string): PathResolutionResult { return FactusolPathResolver.resolve(inputPath); }
+
+  // --- Métodos de SimplyGest ---
+  public async testSimplyGestConnection(dbPath: string): Promise<SimplyGestTestResult> {
+    return this.simplygestService.testConnection(dbPath);
+  }
+  public async getSimplyGestPreviewArticles(limit = 25): Promise<{ articles: SimplyGestArticlePreviewItem[]; total?: number }> {
+    const articles = await this.simplygestService.getPreviewArticles(undefined, limit);
+    return { articles, total: articles.length };
+  }
+  public detectSimplyGest(): SimplyGestDetectedInstance[] {
+    const additional: string[] = [];
+    const current = this.configManager.get().simplygest?.databasePath || this.configManager.get().simplygestDbPath;
+    if (current) additional.push(current);
+    return SimplyGestDetector.detectAll(additional);
+  }
+  public resolveSimplyGestPath(inputPath: string) {
+    return SimplyGestDetector.resolve(inputPath);
+  }
+
+  // --- Métodos de Gestión Multi-ERP Unificada ---
+  public getActiveErpConnector(): IErpConnector { return this.erpRegistry.getActiveConnector(); }
+  public getErpRegistry(): ErpProviderRegistry { return this.erpRegistry; }
+  public switchActiveErp(providerId: SupportedErpProviderId) { return this.erpRegistry.setActiveProvider(providerId); }
 
   // --- Métodos de Canales Web Delegados ---
   public async testWooCommerceConnection(settings: { storeUrl: string; consumerKey: string; consumerSecret: string }): Promise<WooCommerceTestResult> {

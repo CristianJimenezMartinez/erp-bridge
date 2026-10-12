@@ -63,6 +63,10 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
   Servidor web local (puerto fijo 39281) con interfaz responsive y bandeja nativa C# (`BentianTray.exe`), control de instancia única mediante sondeo activo de `/health` y debounce de 2.5s (sin named pipe).
 * **`connectors.woocommerce` (`packages/connectors/woocommerce`):**  
   Conector REST API certificado contra WooCommerce v3.
+* **`connectors.simplygest` (`packages/connectors/simplygest`):**  
+  Conector local OLEDB nativo para SimplyGest Desktop (`Datos.mdb`). Sincronización de catálogo, stock multi-tarifa, variantes de tallas/colores e inyección atómica de pedidos en `PEDIDOS_VENTA`.
+* **`agent.erp` (`apps/agent/src/erp`):**  
+  Registro y adaptadores polimórficos de proveedores ERP mediante el patrón Strategy (`IErpConnector`, `ErpProviderRegistry`). Desacopla el motor de sincronización de las bases de datos relacionales subyacentes, garantizando el modelo de aprovisionamiento exclusivo (*Single Active ERP*) y persistencia aislada en AppData.
 
 ---
 
@@ -71,9 +75,9 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 * **Dualidad de Motores de Sincronización:**
   1. **`LocalSyncEngine` (`apps/agent/src/sync/sync.engine.ts`):** Motor de producción exclusivo para puestos de clientes en Windows. Interactúa directamente con el driver OLEDB 32 bits de Factusol (`F_ART`, `F_STO`, `F_PCL`), observador reactivo de archivos (`AccdbFileWatcher`) y el conector universal web.
   2. **Motores de Sincronización en Core (`packages/core/src/engine`):** Preservados como la infraestructura base desacoplada para futuros ERPs sobre Linux o APIs cloud-to-cloud (Odoo, Holded, SAP).
-* **Conectores como Extensiones Experimentales:**
-  - **`connectors.prestashop` (`packages/connectors/prestashop`):** Conector Webservice XML preservado para clientes futuros con tiendas PrestaShop.
-  - **`connectors.simplygest` (`packages/connectors/simplygest`):** Conector para SimplyGest preservado para clientes futuros.
+* **Conectores como Extensiones:**
+  - **`connectors.prestashop` (`packages/connectors/prestashop`):** Conector Webservice XML preservado para clientes con tiendas PrestaShop.
+  - **Conectores Multi-ERP en Roadmap:** Sage 50 / 200, Odoo y A3ERP (Wolters Kluwer).
 
 ---
 

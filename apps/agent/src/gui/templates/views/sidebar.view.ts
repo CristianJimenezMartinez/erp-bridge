@@ -17,9 +17,12 @@ export function renderSidebar(agentVersion: string = '0.2.0'): string {
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
         <span>Estado General</span>
       </li>
-      <li class="nav-item" data-tab="factusol" onclick="switchTab('factusol')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
-        <span>Factusol ERP</span>
+      <li class="nav-item" data-tab="factusol" onclick="switchTab('factusol')" style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: inline-flex; align-items: center; gap: 8px;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+          <span id="sidebar-erp-title">Software ERP</span>
+        </div>
+        <span id="sidebar-erp-badge" class="tag tag-blue" style="font-size: 9px; padding: 1px 5px; font-weight: 700; margin-left: auto;">Factusol</span>
       </li>
       <li class="nav-item" data-tab="channel" onclick="switchTab('channel')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>

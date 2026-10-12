@@ -44,6 +44,9 @@ importers:
       '@erp-bridge/connector-shopify':
         specifier: workspace:*
         version: link:../../packages/connectors/shopify
+      '@erp-bridge/connector-simplygest':
+        specifier: workspace:*
+        version: link:../../packages/connectors/simplygest
       '@erp-bridge/core':
         specifier: workspace:*
         version: link:../../packages/core

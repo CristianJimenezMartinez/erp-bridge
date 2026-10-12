@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector SimplyGest WooCommerce — Sincronización en Tiempo Real | Bentian</title>
+  <meta name="description" content="Conecta SimplyGest con WooCommerce automáticamente. Sincroniza stock, catálogo de Datos.mdb, familias, variaciones de tallas y pedidos web sin plugins lentos.">
+  <meta name="keywords" content="conector simplygest woocommerce, sincronizar simplygest woocommerce, conectar simplygest con woocommerce, pedidos woocommerce simplygest, sincronizacion stock simplygest datos.mdb">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/simplygest-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/simplygest-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector SimplyGest WooCommerce en Tiempo Real — Bentian ERP Bridge">
+  <meta property="og:description" content="Sincroniza tu ERP SimplyGest con WordPress y WooCommerce de forma local y ultrarrápida. Compatible con Datos.mdb, TPV de mostrador y pedidos automáticos.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector SimplyGest WooCommerce en Tiempo Real — Bentian ERP Bridge">
+  <meta name="twitter:description" content="Sincroniza tu ERP SimplyGest con WordPress y WooCommerce de forma local y ultrarrápida. Compatible con Datos.mdb, TPV de mostrador y pedidos automáticos.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector SimplyGest WooCommerce", "item": "https://bridge.cristianjm.com/simplygest-woocommerce/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian Conector SimplyGest WooCommerce",
+        "softwareVersion": "0.4.7",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/simplygest-woocommerce/",
+        "description": "Conector local-first en tiempo real entre SimplyGest Desktop (Datos.mdb) y tiendas WooCommerce.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-SIMPLYGEST",
+        "mpn": "EB-SG-01",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 14,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo se conecta Bentian con SimplyGest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian se ejecuta en segundo plano en Windows y se conecta de forma nativa vía OLEDB a Datos.mdb (en C:\\SimplyGest o recurso de red local). No requiere APIs de terceros ni pasarelas intermedias."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Afecta al funcionamiento del TPV en mostrador de SimplyGest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Bentian utiliza consultas OLEDB en modo compartido con tiempos de ejecución inferiores a 50 milisegundos, evitando cualquier tipo de bloqueo sobre el TPV o terminal de caja."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo entran los pedidos de WooCommerce en SimplyGest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Los pedidos confirmados en WooCommerce se descargan por HTTPS y se insertan atómicamente en PEDIDOS_VENTA y LINEAS_PEDIDOS con el cliente, líneas, impuestos y número de pedido web."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| SimplyGest WooCommerce</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20">Descargar Agente Windows</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span>SimplyGest Desktop (Datos.mdb) ↔ WooCommerce 8.x / 9.x</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector Local-First de Alto Rendimiento entre <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">SimplyGest y WooCommerce</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Sincroniza stock real, tarifas, familias de artículos y pedidos en tiempo real entre tu base de datos de SimplyGest (<code class="text-zinc-300 font-mono">Datos.mdb</code>) y tu tienda online WooCommerce. Sin módulos lentos, sin cuotas por pedido y con compatibilidad total para tu TPV en tienda física.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Descargar Instalador Windows (.exe)</span>
+      </a>
+      <a href="/#pricing" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Planes y Licencias (199 €/año)
+      </a>
+    </div>
+
+    <!-- Comparativa Problemas vs Solución -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> El Problema de Sincronizar SimplyGest
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Exportaciones e importaciones manuales por ficheros CSV o Excel.</li>
+          <li>• Descuadres diarios de existencias entre tienda online y caja TPV.</li>
+          <li>• Bloqueos de la base de datos Access si se lee mientras se cobra.</li>
+          <li>• Doble picado de pedidos web en el programa de facturación.</li>
+          <li>• Dependencia de plugins costosos de terceros con soporte deficiente.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> La Solución Bentian ERP Bridge
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• Conexión directa OLEDB con <code>Datos.mdb</code> en lectura y escritura.</li>
+          <li>• Actualización diferencial ultrarrápida: < 50 ms por consulta.</li>
+          <li>• Cero bloqueos en caja: consultas concurrentes de lectura segura.</li>
+          <li>• Inyección atómica en <code>PEDIDOS_VENTA</code> y <code>LINEAS_PEDIDOS</code>.</li>
+          <li>• Gestión de stock real por almacén y tarifas comerciales 1 a 5.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Funcionalidades Específicas -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Funcionalidades Específicas para SimplyGest</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">1</div>
+          <h4 class="font-semibold text-white mb-1.5">Detección Automática</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">El Agente detecta automáticamente tu instalación de SimplyGest en <code class="text-zinc-300 font-mono">C:\SimplyGest\Datos.mdb</code> o unidades de red mapeadas.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">2</div>
+          <h4 class="font-semibold text-white mb-1.5">Pedidos Web en PEDIDOS_VENTA</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Cada pedido recibido en WooCommerce se registra de inmediato con su serie configurada, líneas de artículo, IVA y datos de facturación.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">3</div>
+          <h4 class="font-semibold text-white mb-1.5">Familias y Variantes</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Mapeo de familias de producto de SimplyGest a categorías de WooCommerce, y soporte para tallas y colores de catálogo.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">4</div>
+          <h4 class="font-semibold text-white mb-1.5">Tarifas de Venta Seleccionables</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Selecciona qué tarifa de venta (1, 2, 3...) deseas publicar en tu tienda web con cálculo exacto de impuestos.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">5</div>
+          <h4 class="font-semibold text-white mb-1.5">Compatible con HPOS & REST v3</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Totalmente compatible con la arquitectura High-Performance Order Storage de WooCommerce y firmado HMAC.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">6</div>
+          <h4 class="font-semibold text-white mb-1.5">Tolerancia a Caídas de Red</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Si el ordenador de SimplyGest se apaga, la cola local Store-and-Forward retiene los pedidos y los inyecta al encender el equipo.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre SimplyGest y WooCommerce</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Dónde debe estar instalado el Agente de Bentian?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            El Agente se instala en cualquier equipo con Windows 10, 11 o Windows Server que tenga acceso al archivo <code class="text-zinc-300 font-mono">Datos.mdb</code> de SimplyGest (bien sea el equipo principal de caja o un ordenador de oficina conectado a la red local).
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo tener Factusol y SimplyGest en la misma máquina?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. El Agente implementa un modelo de aprovisionamiento exclusivo (Single Active ERP). Puedes tener instalados ambos programas en el sistema operativo y seleccionar en el panel de control de Bentian cuál es el ERP activo, manteniendo la configuración y rutas de ambos totalmente intactas y aisladas en AppData.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cómo gestiona los clientes nuevos de la tienda online?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Al recibir un pedido web, Bentian busca si el cliente existe por su NIF/CIF o correo electrónico en la tabla <code class="text-zinc-300 font-mono">CLIENTES</code>. Si no existe, lo da de alta automáticamente con su dirección de facturación y envío antes de vincular el pedido.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-teal-950/60 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Conecta tu SimplyGest con WooCommerce Hoy Mismo</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm">
+        Descarga el agente para Windows, detecta tu archivo Datos.mdb en un clic y sincroniza existencias y pedidos sin errores de stock.
+      </p>
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        Descargar Instalador Oficial Windows (.exe)
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol WooCommerce</a>
+        <a href="/docs/simplygest/localizacion-base-datos/" class="hover:text-zinc-300 transition">Documentación SimplyGest</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

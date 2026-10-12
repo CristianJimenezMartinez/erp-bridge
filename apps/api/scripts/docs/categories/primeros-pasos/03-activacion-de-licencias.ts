@@ -18,6 +18,7 @@ export const activacionDeLicenciasArticle: DocArticle = {
     { id: 'amarre-hardware', label: '5. Amarre Criptográfico a Hardware (HWID) y Privacidad', level: 2 },
     { id: 'tolerancia-offline', label: '6. Tolerancia a Caídas de Red y Modo Offline Seguro', level: 2 },
   ],
+  image: '/assets/screenshots/01-dashboard-overview.png',
   contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         El sistema de licencias de Bentian ERP Bridge está diseñado para ofrecer la máxima flexibilidad y confianza técnica. Permite probar el producto de forma completa durante 60 días sin necesidad de introducir tarjeta de crédito ni comprometerse a ningún pago, con un proceso de activación ultrarrápido diseñado para eliminar cualquier tipo de fricción comercial.
@@ -99,6 +100,25 @@ export const activacionDeLicenciasArticle: DocArticle = {
         <li><strong>Comprobar el rendimiento:</strong> Verifica la fluidez de la interfaz en tu equipo sin registrar ninguna cuenta.</li>
         <li><strong>Activar cuando estés listo:</strong> Cuando decidas poner en marcha la sincronización, podrás activar tu clave Beta en 1 clic en cualquier momento haciendo clic en la pestaña <strong class="text-white">Licencia del Equipo</strong> o pulsando en <strong class="text-white">Asistente de Inicio</strong> en la barra lateral.</li>
       </ul>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Estado General</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/01-dashboard-overview.webp" type="image/webp">
+          <img src="/assets/screenshots/01-dashboard-overview.png" alt="Panel de Control Local con Factusol Conectado y Licencia Activa" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Panel de control de Bentian ERP Bridge mostrando el estado general del enlace, telemetría y licencia activa en tiempo real.
+        </figcaption>
+      </figure>
 
       <h2 id="solicitar-beta-manual" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Solicitud Web y Activación Manual de Claves (EB-XXXXX)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">

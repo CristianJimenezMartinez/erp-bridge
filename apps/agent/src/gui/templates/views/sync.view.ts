@@ -12,8 +12,8 @@ export function renderSyncTab(): string {
           <label class="checkbox-row">
             <input type="checkbox" id="check-watcher-enabled" checked>
             <div>
-              <div class="checkbox-label">Activar Vigilante en Tiempo Real de Factusol</div>
-              <div class="checkbox-desc">Sincroniza al instante cada vez que Factusol guarda un albarán, factura o modifica stock.</div>
+              <div class="checkbox-label">Activar Vigilante en Tiempo Real del Software ERP</div>
+              <div class="checkbox-desc">Sincroniza al instante cada vez que tu ERP guarda un albarán, factura o modifica existencias.</div>
             </div>
           </label>
 
@@ -29,7 +29,7 @@ export function renderSyncTab(): string {
             <div class="form-group">
               <label class="form-label">Tiempo de estabilización (segundos):</label>
               <input type="number" id="input-debounce-sec" class="form-control" value="5" min="1" max="60">
-              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Espera a que Factusol libere el archivo antes de leer datos.</div>
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Espera a que el software ERP libere el archivo antes de leer datos.</div>
             </div>
             <div class="form-group">
               <label class="form-label">Sincronización Periódica de Seguridad:</label>
@@ -45,7 +45,7 @@ export function renderSyncTab(): string {
           <div class="section-header" style="margin-top: 20px;">
             <div>
               <div class="section-title">Datos a Sincronizar</div>
-              <div class="section-desc">Selecciona qué campos de Factusol se publican en tu web.</div>
+              <div class="section-desc">Selecciona qué campos de tu ERP se publican en tu web.</div>
             </div>
           </div>
 
@@ -53,7 +53,7 @@ export function renderSyncTab(): string {
             <input type="checkbox" id="check-sync-stock" checked>
             <div>
               <div class="checkbox-label">Sincronizar Existencias de Stock</div>
-              <div class="checkbox-desc">Actualiza el stock real disponible tomando las unidades de Factusol.</div>
+              <div class="checkbox-desc">Actualiza el stock real disponible tomando las unidades de tu software ERP.</div>
             </div>
           </label>
 
@@ -69,7 +69,7 @@ export function renderSyncTab(): string {
             <input type="checkbox" id="check-sync-desc">
             <div>
               <div class="checkbox-label">Sincronizar Nombres y Descripciones</div>
-              <div class="checkbox-desc">Sobreescribe el título del producto en la tienda con la descripción de Factusol.</div>
+              <div class="checkbox-desc">Sobreescribe el título del producto en la tienda con la descripción de tu software ERP.</div>
             </div>
           </label>
 

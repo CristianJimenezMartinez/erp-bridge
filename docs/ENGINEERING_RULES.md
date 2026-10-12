@@ -101,3 +101,11 @@
   - Las licencias de evaluación y Beta tienen una caducidad criptográfica garantizada de 60 días sin prórroga desatendida.
   - El límite de desconexión offline para versiones de prueba es de un máximo de **48 horas**.
   - Al vencer la licencia, el conector debe **detener de forma inmediata** la sincronización automática y reactiva, sin alterar ni borrar jamás las rutas de Factusol ni la configuración de la tienda del usuario (Reglas Mandatarias 1 y 2).
+
+---
+
+### Regla 13: Contrato Polimórfico de Conectores ERP y Aislamiento de Estado (Single Active ERP)
+- **Directriz:** Todo conector o adaptador de software ERP debe implementar estrictamente el contrato canónico `IErpConnector` gestionado por `ErpProviderRegistry`.
+- **Aislamiento Multi-ERP en AppData:** La configuración de cada ERP debe residir en su propio bloque `config.softwareErp.providers[id]` dentro de `%APPDATA%\Bentian Agent\agent-config.json`. Al cambiar de software en el selector 3x2 del panel de escritorio, las rutas, tarifas y series del ERP previo jamás deben ser sobrescritas o destruidas (Principio Anti-Wiping).
+- **Aprovisionamiento Exclusivo (Single Active ERP):** En tiempo de ejecución solo puede existir UN proveedor de ERP activo a la vez (`activeProvider`). El Agente desconectará limpiamente el conector previo para prevenir condiciones de carrera, colisiones de stock y duplicidad de pedidos sobre la tienda online.
+

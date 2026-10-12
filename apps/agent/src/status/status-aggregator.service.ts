@@ -3,6 +3,7 @@ import path from 'path';
 import { ConfigManager } from '../config';
 import { LicenseService, LicenseValidationStatus } from '../license';
 import { FactusolService, FactusolPathResolver } from '../factusol';
+import { SimplyGestService, SimplyGestDetector } from '../simplygest';
 import { FileWatcherService } from '../sync';
 import { HistoryManager } from '../history';
 import {
@@ -20,6 +21,7 @@ export interface StatusAggregatorOptions {
   configManager: ConfigManager;
   licenseService: LicenseService;
   factusolService: FactusolService;
+  simplygestService?: SimplyGestService;
   fileWatcherService: FileWatcherService;
   historyManager: HistoryManager;
   eventBus: EventBus;
@@ -32,6 +34,7 @@ export class StatusAggregatorService {
   private readonly configManager: ConfigManager;
   private readonly licenseService: LicenseService;
   private readonly factusolService: FactusolService;
+  private readonly simplygestService?: SimplyGestService;
   private readonly fileWatcherService: FileWatcherService;
   private readonly historyManager: HistoryManager;
   private readonly eventBus: EventBus;
@@ -51,6 +54,7 @@ export class StatusAggregatorService {
     this.configManager = options.configManager;
     this.licenseService = options.licenseService;
     this.factusolService = options.factusolService;
+    this.simplygestService = options.simplygestService;
     this.fileWatcherService = options.fileWatcherService;
     this.historyManager = options.historyManager;
     this.eventBus = options.eventBus;
@@ -138,6 +142,48 @@ export class StatusAggregatorService {
       }
     }
 
+    // SimplyGest Status
+    const rawSgPath = cfg.simplygest?.databasePath || cfg.simplygestDbPath || '';
+    const sgDbPath = SimplyGestDetector.cleanPath(rawSgPath);
+    let sgArticleCount: number | undefined;
+    let sgFileSizeBytes: number | undefined;
+    let sgConnected = false;
+    let sgStatusMessage = sgDbPath ? 'Desconectado / Offline (Ruta de red o disco no accesible)' : 'No configurado';
+
+    let effectiveSgPath = sgDbPath;
+    if (effectiveSgPath && !fs.existsSync(effectiveSgPath)) {
+      const sgRes = SimplyGestDetector.resolve(effectiveSgPath);
+      if (sgRes.success && sgRes.resolvedPath) {
+        effectiveSgPath = sgRes.resolvedPath;
+      }
+    }
+
+    if (effectiveSgPath && fs.existsSync(effectiveSgPath)) {
+      try {
+        const stats = fs.statSync(effectiveSgPath);
+        sgFileSizeBytes = stats.size;
+        if (this.simplygestService) {
+          const connector = this.simplygestService.getConnector();
+          if (connector) {
+            const health = await connector.healthCheck();
+            sgConnected = health.status === 'HEALTHY';
+            sgStatusMessage = health.message || '';
+            if (sgConnected) {
+              sgArticleCount = await this.simplygestService.getArticleCount(effectiveSgPath);
+            }
+          } else {
+            sgConnected = true;
+            sgStatusMessage = 'Base de datos Datos.mdb accesible';
+          }
+        } else {
+          sgConnected = true;
+          sgStatusMessage = 'Base de datos Datos.mdb accesible';
+        }
+      } catch (err) {
+        sgStatusMessage = err instanceof Error ? err.message : String(err);
+      }
+    }
+
     const safeWoo = cfg.woocommerce ? {
       ...cfg.woocommerce,
       consumerSecret: cfg.woocommerce.consumerSecret ? SECRET_MASK : '',
@@ -166,6 +212,8 @@ export class StatusAggregatorService {
       licenseKey: cfg.licenseKey,
       hwid,
       license,
+      erpType: cfg.erpType || 'factusol',
+      softwareErp: cfg.softwareErp,
       factusol: {
         configured: Boolean(dbPath),
         databasePath: dbPath || '',
@@ -177,6 +225,16 @@ export class StatusAggregatorService {
         statusMessage,
       },
       factusolSettings: cfg.factusol,
+      simplygest: {
+        configured: Boolean(sgDbPath),
+        databasePath: sgDbPath || '',
+        fileName: sgDbPath ? path.basename(sgDbPath) : '',
+        connected: sgConnected,
+        articleCount: sgArticleCount,
+        fileSizeBytes: sgFileSizeBytes,
+        statusMessage: sgStatusMessage,
+      },
+      simplygestSettings: cfg.simplygest,
       woocommerceSettings: safeWoo,
       universalBridgeSettings: safeUniv,
       shopifySettings: safeShopify,

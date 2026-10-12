@@ -12,7 +12,7 @@
       "operatingSystem": "Windows 10, Windows 11, Windows Server",
       "applicationCategory": "BusinessApplication",
       "applicationSubCategory": "ERP Integration Software",
-      "description": "Infraestructura de software de integración continua y sincronización bidireccional entre Factusol ERP, plataformas eCommerce (Shopify, WooCommerce, PrestaShop) y ERPs Cloud (Holded) con arquitectura Zero-Knowledge y Edge Processing.",
+      "description": "Infraestructura de software de integración continua y sincronización bidireccional entre ERPs locales (Factusol, SimplyGest), plataformas eCommerce (Shopify, WooCommerce, PrestaShop) y ERPs Cloud (Holded) con arquitectura Zero-Knowledge y Edge Processing.",
       "url": "https://bridge.cristianjm.com",
       "softwareVersion": "0.4.7",
       "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
@@ -22,6 +22,14 @@
       },
       "sku": "BENTIAN-ERP-BRIDGE",
       "mpn": "EB-047",
+      "screenshot": [
+        "https://bridge.cristianjm.com/assets/screenshots/01-dashboard-overview.webp",
+        "https://bridge.cristianjm.com/assets/screenshots/02-multi-erp-selector.webp",
+        "https://bridge.cristianjm.com/assets/screenshots/03-ecommerce-channels.webp",
+        "https://bridge.cristianjm.com/assets/screenshots/04-automation-sync.webp",
+        "https://bridge.cristianjm.com/assets/screenshots/05-sales-order-history.webp",
+        "https://bridge.cristianjm.com/assets/screenshots/06-setup-wizard.webp"
+      ],
       "offers": [
         {
           "@type": "Offer",
@@ -147,6 +155,8 @@
         }
       ],
       "featureList": [
+        "Conector nativo SimplyGest Desktop vía OLEDB local (Datos.mdb) para WooCommerce, PrestaShop y Shopify",
+        "Arquitectura Polimórfica Multi-ERP (Single Active ERP) con selección 3x2 y aislamiento anti-wiping en AppData",
         "Conector nativo Factusol Shopify vía Admin GraphQL API con Webhooks reactivos en tiempo real",
         "Integración bidireccional Factusol Holded Cloud ERP para facturación automática y enlace contable",
         "Arquitectura Tripartita: Tienda Online (Shopify/WooCommerce) + Almacén Físico (Factusol) + Facturación Cloud (Holded)",
@@ -295,6 +305,22 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Durante el año 2026, ofrecemos la Beta Pública Gratuita 2026 (válida sin coste hasta el 31 de Diciembre de 2026, con 60 días completos de garantía de soporte sin necesidad de tarjeta de crédito). Puedes conectar tu Factusol, sincronizar artículos reales y recibir pedidos sin coste ni compromiso. Finalizado el periodo, decides libremente si deseas continuar con las tarifas bonificadas de Fundador o desinstalar la herramienta con total soberanía sobre tus datos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Es compatible con SimplyGest Desktop y qué bases de datos soporta?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Bentian incluye soporte nativo certificado para SimplyGest Desktop. Se conecta directamente al archivo de base de datos Datos.mdb mediante el proveedor OLEDB local de Windows. Sincroniza catálogo de productos, familias, stock disponible por almacén, tarifas de venta, tallas/colores e inyecta pedidos web en PEDIDOS_VENTA sin interrumpir el funcionamiento del TPV en mostrador."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo cambiar de Factusol a SimplyGest u otro ERP sin perder mi configuración?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. El Centro de Control de Bentian incorpora una arquitectura polimórfica con modelo de aprovisionamiento exclusivo (Single Active ERP). Desde el selector 3x2 puedes cambiar de Factusol a SimplyGest (u otros ERPs estándar como Holded, Sage 50/200, Odoo o A3ERP). Las rutas de red, series y tarifas de cada software se almacenan de forma aislada en %APPDATA%\\Bentian Agent\\agent-config.json con protección anti-wiping, garantizando que nunca se produzcan lecturas cruzadas ni se sobrescriban tus ajustes."
           }
         },
         {

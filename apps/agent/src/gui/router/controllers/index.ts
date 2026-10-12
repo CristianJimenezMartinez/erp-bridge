@@ -5,3 +5,4 @@ export * from './sync.controller';
 export * from './license.controller';
 export * from './system.controller';
 export * from './sales-orders.controller';
+export * from './simplygest.controller';

@@ -19,6 +19,7 @@ export const shopifyArticle: DocArticle = {
     { id: 'recargo-equivalencia-espana', label: '6. Mapeo Fiscal Español: IVA Desglosado y Recargo de Equivalencia (R.E.)', level: 2 },
     { id: 'verificacion-bentian-e2e', label: '7. Verificación en Bentian ERP Bridge y Pruebas E2E', level: 2 },
   ],
+  image: '/assets/screenshots/03-ecommerce-channels.png',
   contentHtml: `
     <p class="text-base text-zinc-300 leading-relaxed mb-6">
       Muchas empresas que eligen Shopify para su tienda online descubren con frustración que los conectores habituales cobran entre 90 € y 250 € al mes por alojar un puente en la nube que además copia toda la base de datos a servidores externos. <strong>Bentian ERP Bridge</strong> revoluciona este escenario: se comunica de forma <strong>directa y privada desde tu PC con Factusol hacia la API oficial de Shopify</strong> mediante GraphQL y Webhooks reactivos, eliminando intermediarios cloud, latencias y costes recurrentes por pedido.
@@ -141,5 +142,24 @@ export const shopifyArticle: DocArticle = {
       <li>Selecciona la tarifa de precios de Factusol (Tarifa 1, 2, etc.) que se publicará en Shopify.</li>
       <li>Haz clic en <strong class="text-indigo-400">Probar Conexión</strong>. El agente validará los tokens, listará tus ubicaciones de inventario y realizará un test de sincronización sin alterar pedidos existentes.</li>
     </ol>
+
+    <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+      <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+          <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Canales Web y Tiendas Online</span>
+        </div>
+        <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+      </div>
+      <picture>
+        <source srcset="/assets/screenshots/03-ecommerce-channels.webp" type="image/webp">
+        <img src="/assets/screenshots/03-ecommerce-channels.png" alt="Configuración de Canales: Conector Universal HTTPS, WooCommerce, Shopify y PrestaShop" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+      </picture>
+      <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+        Configuración de canal Shopify en Bentian ERP Bridge mediante Admin GraphQL API y gestión reactiva de inventario.
+      </figcaption>
+    </figure>
   `,
 };

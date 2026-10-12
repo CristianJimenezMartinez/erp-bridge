@@ -20,6 +20,7 @@ export const canalesArticles: DocArticle[] = [
       { id: 'enlaces-permanentes', label: '4. Configuración de Enlaces Permanentes (Permalinks)', level: 2 },
       { id: 'verificacion-conexion', label: '5. Verificación de Conexión en Bentian', level: 2 },
     ],
+    image: '/assets/screenshots/03-ecommerce-channels.png',
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         Bentian ERP Bridge se comunica con WooCommerce de forma nativa a través de su <strong>REST API oficial</strong>. A diferencia de los plugins de sincronización de terceros que deben instalarse en WordPress y consumen recursos PHP de tu hosting, Bentian no requiere instalar ningún plugin invasivo en tu web: se comunica directamente mediante llamadas HTTP seguras y autenticadas con OAuth 1.0a / Basic Auth sobre TLS 1.3.
@@ -74,6 +75,25 @@ export const canalesArticles: DocArticle[] = [
         <li>Haz clic en <strong class="text-indigo-400">Probar Conexión</strong>.</li>
         <li>El agente validará las credenciales y mostrará una tarjeta de confirmación en verde indicando la versión de WooCommerce detectada.</li>
       </ol>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Canales Web y Tiendas Online</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/03-ecommerce-channels.webp" type="image/webp">
+          <img src="/assets/screenshots/03-ecommerce-channels.png" alt="Configuración de Canales: Conector Universal HTTPS, WooCommerce, Shopify y PrestaShop" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Panel de configuración de canales eCommerce en Bentian ERP Bridge con soporte nativo para WooCommerce REST API y HPOS.
+        </figcaption>
+      </figure>
     `,
   },
   {
@@ -194,6 +214,7 @@ export const canalesArticles: DocArticle[] = [
       { id: 'matriz-codigos-http', label: '9. Matriz de Códigos de Respuesta HTTP y Rate Limiting', level: 2 },
       { id: 'script-php-produccion', label: '10. Implementación de Referencia en PHP (Plesk / cPanel)', level: 2 },
     ],
+    image: '/assets/screenshots/03-ecommerce-channels.png',
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         No todos los comercios electrónicos operan sobre plataformas cerradas o plugins prefabricados. Miles de empresas gestionan sus ventas mediante plataformas B2B y B2C a medida desarrolladas en PHP nativo, Laravel, Symfony, Node.js, Python o arquitecturas desacopladas (Angular, React, Vue, Next.js) alojadas en servidores Plesk, cPanel o VPS dedicados. El <strong>Endpoint Universal de Bentian ERP Bridge</strong> define el estándar formal de comunicación HTTP/JSON para integrar cualquier aplicación web personalizada con Factusol con garantías transaccionales corporativas.
@@ -210,6 +231,25 @@ export const canalesArticles: DocArticle[] = [
       <p class="text-sm text-zinc-300 leading-relaxed mb-6">
         El servidor web de la tienda solo necesita exponer un script HTTPS (por ejemplo, <code class="text-indigo-300 font-mono">erp-bridge-endpoint.php</code> o una ruta de API en su framework) capaz de responder a consultas de lectura de pedidos y recibir actualizaciones de inventario y confirmaciones de estado.
       </p>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Canales Web y Tiendas Online</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/03-ecommerce-channels.webp" type="image/webp">
+          <img src="/assets/screenshots/03-ecommerce-channels.png" alt="Configuración de Canales Web en Bentian ERP Bridge: Endpoint Universal HTTPS, WooCommerce y Shopify" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Configuración centralizada de canales de comercio electrónico y Endpoint Universal HTTPS en la consola de Bentian ERP Bridge.
+        </figcaption>
+      </figure>
 
       <h2 id="protocolo-bidireccional" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Protocolo Bidireccional de Comunicación (Polling & Flujo ACK)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">

@@ -1,6 +1,7 @@
 import { DocCategory, DocArticle } from './types';
 import { primerosPasosArticles } from './categories/01-primeros-pasos';
 import { factusolArticles } from './categories/02-factusol';
+import { simplygestArticles } from './categories/simplygest';
 import { canalesArticles } from './categories/03-canales';
 import { arquitecturaArticles } from './categories/04-arquitectura';
 import { benchmarkArticle } from './categories/arquitectura-benchmark';
@@ -26,52 +27,60 @@ export const DOC_CATEGORIES: DocCategory[] = [
     order: 2,
   },
   {
+    slug: 'simplygest',
+    title: 'SimplyGest Desktop',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>',
+    description: 'Conexión con Datos.mdb, tablas ARTICULOS/CLIENTES, tarifas 1 a 5 y TPV sin bloqueos.',
+    order: 3,
+  },
+  {
     slug: 'canales',
     title: 'Canales eCommerce',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     description: 'Sincronización con WooCommerce (HPOS), PrestaShop, Shopify, Holded Cloud ERP y Endpoint Universal.',
-    order: 3,
+    order: 4,
   },
   {
     slug: 'arquitectura',
     title: 'Arquitectura & Sincronización',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
     description: 'Filosofía Local-First, cola JSON atómico estructurado con reemplazo seguro anti-wiping y backup defensivo Store-and-Forward, arquitectura tripartita y monitoreo en tiempo real.',
-    order: 4,
+    order: 5,
   },
   {
     slug: 'fiscalidad',
     title: 'Fiscalidad & Facturación',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>',
     description: 'Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.',
-    order: 5,
+    order: 6,
   },
   {
     slug: 'troubleshooting',
     title: 'Resolución de Incidencias',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
     description: 'Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.',
-    order: 6,
+    order: 7,
   },
   {
     slug: 'seguridad',
     title: 'Seguridad & Redes',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>',
     description: 'Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.',
-    order: 7,
+    order: 8,
   },
   {
     slug: 'api',
     title: 'API REST & Esquemas',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
     description: 'Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.',
-    order: 8,
+    order: 9,
   },
 ];
 
 export const DOC_ARTICLES: DocArticle[] = [
   ...primerosPasosArticles,
   ...factusolArticles,
+  ...simplygestArticles,
   ...canalesArticles,
   ...arquitecturaArticles,
   benchmarkArticle,

@@ -15,7 +15,7 @@ export function renderWizardModal(): string {
       <div class="modal-body">
         <div class="wizard-steps-bar">
           <div id="w-step-1" class="wizard-step-item active">1. Licencia</div>
-          <div id="w-step-2" class="wizard-step-item">2. Factusol</div>
+          <div id="w-step-2" class="wizard-step-item">2. ERP</div>
           <div id="w-step-3" class="wizard-step-item">3. Tienda Web</div>
           <div id="w-step-4" class="wizard-step-item">4. ¡Listo!</div>
         </div>
@@ -70,104 +70,170 @@ export function renderWizardModal(): string {
           </div>
         </div>
 
-        <!-- PASO 2: FACTUSOL -->
+        <!-- PASO 2: ERP (FACTUSOL O SIMPLYGEST) -->
         <div id="wizard-pane-2" style="display: none;">
-          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 2: Conecta tu Factusol</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Selecciona la base de datos de tu empresa. El conector la detectará automáticamente.</p>
-          
-          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-            <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-secondary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <span>Auto-detectar Factusol</span>
-            </button>
-            <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
-              <span>Examinar en Windows (Local / Red / NAS)</span>
-            </button>
-          </div>
+          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 2: Conecta tu Software de Gestión (ERP)</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Elige el programa que utilizas en tu empresa para sincronizar productos y ventas.</p>
 
-          <div id="wiz-fact-detected-box" style="display: none; margin-bottom: 14px;">
-            <div id="wiz-fact-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
-          </div>
-
-          <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-              <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta):</label>
-              <span style="font-size: 11px; color: #818cf8; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('wiz-input-fact-path').focus()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                <span>Escribir o pegar directamente</span>
-              </span>
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
-              Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\...</code> o <code>\\\\NAS\\Datos\\...</code>), puedes pegarla directamente aquí.
-            </div>
-            <input type="text" id="wiz-input-fact-path" oninput="cleanPathInput(this)" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb  o  X:\\\\...  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
-            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px; display: inline-flex; align-items: center; gap: 5px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
-            </div>
-            <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
-          </div>
-
-          <div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#fde68a;">🧪 ¿No tienes Factusol en este ordenador?</div><div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Puedes continuar para configurar tu tienda web o explorar el panel en modo demostración.</div></div><button type="button" onclick="wizSkipFactusolStep()" class="btn btn-secondary btn-sm" style="white-space:nowrap;border-color:rgba(245,158,11,0.4);color:#fbbf24;">Continuar sin Factusol →</button></div>
-
-          <!-- BLOQUE PEDAGÓGICO: SERIE PARA PEDIDOS WEB EN FACTUSOL -->
-          <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <div>
-                <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;">
-                  <span>Serie para Pedidos Web en Factusol</span>
-                  <span style="font-size: 10px; background: rgba(255, 255, 255, 0.08); color: #e4e4e7; border: 1px solid rgba(255, 255, 255, 0.12); padding: 2px 7px; border-radius: 999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <span>Recomendado: Serie 1 Directo</span>
-                  </span>
+          <div class="channel-select-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 18px;">
+            <div id="wiz-erp-choice-factusol" class="channel-card selected" onclick="wizSelectErp('factusol')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <div class="channel-icon" style="color: #60a5fa; margin-bottom: 0;">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
                 </div>
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                  Define en qué serie de Factusol se registrarán las ventas de tu tienda online.
-                </div>
+                <span id="wiz-badge-erp-factusol" class="tag tag-blue" style="font-size: 9.5px;">● Activo en este equipo</span>
               </div>
-              <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                <label for="wiz-input-fact-order-series" style="font-size: 11px; color: var(--text-muted); margin: 0;">Serie:</label>
-                <input type="text" id="wiz-input-fact-order-series" value="1" maxlength="1" oninput="this.value = this.value.toUpperCase(); onWizOrderSeriesInput(this.value);" class="form-control" style="width: 44px; text-align: center; font-weight: 700; font-size: 14px; text-transform: uppercase; padding: 4px 6px;">
-              </div>
+              <div style="font-weight: 700; font-size: 13px; color: #fff;">Factusol (DELSOL)</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Bases de datos .accdb y .mdb</div>
             </div>
 
-            <!-- Opciones rápidas de selección interactiva -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-              <button type="button" id="wiz-btn-series-1" onclick="setWizOrderSeries('1')" class="btn" style="text-align: left; padding: 10px 12px; background: rgba(99, 102, 241, 0.18); border: 2px solid #6366f1; border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <span style="font-weight: 700; font-size: 12px; color: #e4e4e7; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <span>Serie 1 (Directo a Bandeja Principal)</span>
-                  </span>
-                  <span id="wiz-badge-series-1" style="font-size: 10px; background: #6366f1; color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: 600;">Recomendado</span>
+            <div id="wiz-erp-choice-simplygest" class="channel-card" onclick="wizSelectErp('simplygest')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <div class="channel-icon" style="color: #34d399; margin-bottom: 0;">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 9h18"/><path d="M7 15h4"/><path d="M15 15h2"/></svg>
                 </div>
-                <span style="font-size: 11px; color: #cbd5e1; line-height: 1.3;">Entran en la bandeja principal. Abres Factusol y el pedido está el primero a la vista. Cero despistes.</span>
+                <span id="wiz-badge-erp-simplygest" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Guardado / En pausa</span>
+              </div>
+              <div style="font-weight: 700; font-size: 13px; color: #fff;">SimplyGest Desktop</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Base de datos Datos.mdb</div>
+            </div>
+          </div>
+
+          <!-- PANEL FACTUSOL EN WIZARD -->
+          <div id="wiz-panel-factusol">
+            <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+              <button onclick="detectFactusol(true)" id="wiz-btn-detect-fact" class="btn btn-secondary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Auto-detectar Factusol</span>
               </button>
-
-              <button type="button" id="wiz-btn-series-w" onclick="setWizOrderSeries('W')" class="btn" style="text-align: left; padding: 10px 12px; background: #18181f; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                  <span style="font-weight: 700; font-size: 12px; color: var(--text-muted);">Serie W (Separada para Web)</span>
-                  <span id="wiz-badge-series-w" style="font-size: 10px; background: rgba(255,255,255,0.08); color: var(--text-subtle); padding: 1px 6px; border-radius: 10px; font-weight: 500;">Contabilidad aislada</span>
-                </div>
-                <span style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Quedan separados, pero requiere cambiar el filtro de Factusol a "Todas" o "Serie W" para verlos.</span>
+              <button onclick="openNativeWindowsDialog(true)" id="wiz-btn-browse-native" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #1d4ed8, #2563eb); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+                <span>Examinar en Windows (Local / Red / NAS)</span>
               </button>
             </div>
 
-            <!-- Card visual pedagógico: ¿Por qué recomendamos la Serie 1? -->
-            <div style="padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
-              <div style="font-weight: 700; color: #e4e4e7; margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <span>¿Por qué recomendamos la Serie 1?</span>
-              </div>
-              <p style="margin: 0 0 6px 0; color: #cbd5e1; font-size: 11.5px;">
-                En Factusol, cada documento tiene una Serie. La pantalla de <strong>Comercial → Pedidos de cliente</strong> suele abrirse por defecto filtrada en la <strong>Serie 1</strong>:
-              </p>
-              <ul style="margin: 0; padding-left: 18px; color: #94a3b8; font-size: 11px; line-height: 1.45;">
-                <li style="margin-bottom: 4px;"><strong style="color: #38bdf8;">Si entran en la Serie 1 (Directo):</strong> Entran en la bandeja principal de Factusol. Abres Factusol y el pedido web está el primero de la lista a la vista de cualquiera. No hay que tocar filtros, ni desplegables, ni configurar series nuevas en Factusol. <em>Cero líos.</em></li>
-                <li><strong style="color: #cbd5e1;">Si llegan con la Serie W (Web):</strong> Contablemente quedan separados de la tienda física, pero si un usuario entra a Factusol y ve la Serie 1 vacía, pensará que el pedido no ha entrado, cuando en realidad está en la pestaña/filtro de la Serie W.</li>
-              </ul>
+            <div id="wiz-fact-detected-box" style="display: none; margin-bottom: 14px;">
+              <div id="wiz-fact-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
+
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+                <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (o carpeta):</label>
+                <span style="font-size: 11px; color: #818cf8; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('wiz-input-fact-path').focus()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  <span>Escribir o pegar directamente</span>
+                </span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+                Si tu Factusol está en un <strong>NAS, servidor o unidad de red</strong> (ej: <code>X:\\Datos\\FS\\...</code> o <code>\\\\NAS\\Datos\\...</code>), puedes pegarla directamente aquí.
+              </div>
+              <input type="text" id="wiz-input-fact-path" oninput="cleanPathInput(this)" onblur="handleFactusolInputBlur('wiz-input-fact-path'); wizTestFactusolConnection();" class="form-control" placeholder="C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb  o  X:\\\\...  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px; display: inline-flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente al pegar.</span>
+              </div>
+              <div id="wiz-fact-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#fde68a;">🧪 ¿No tienes Factusol en este ordenador?</div><div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Puedes continuar para configurar tu tienda web o explorar el panel en modo demostración.</div></div><button type="button" onclick="wizSkipFactusolStep()" class="btn btn-secondary btn-sm" style="white-space:nowrap;border-color:rgba(245,158,11,0.4);color:#fbbf24;">Continuar sin Factusol →</button></div>
+
+            <!-- BLOQUE PEDAGÓGICO: SERIE PARA PEDIDOS WEB EN FACTUSOL -->
+            <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <div>
+                  <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <span>Serie para Pedidos Web en Factusol</span>
+                    <span style="font-size: 10px; background: rgba(255, 255, 255, 0.08); color: #e4e4e7; border: 1px solid rgba(255, 255, 255, 0.12); padding: 2px 7px; border-radius: 999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Recomendado: Serie 1 Directo</span>
+                    </span>
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                    Define en qué serie de Factusol se registrarán las ventas de tu tienda online.
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+                  <label for="wiz-input-fact-order-series" style="font-size: 11px; color: var(--text-muted); margin: 0;">Serie:</label>
+                  <input type="text" id="wiz-input-fact-order-series" value="1" maxlength="1" oninput="this.value = this.value.toUpperCase(); onWizOrderSeriesInput(this.value);" class="form-control" style="width: 44px; text-align: center; font-weight: 700; font-size: 14px; text-transform: uppercase; padding: 4px 6px;">
+                </div>
+              </div>
+
+              <!-- Opciones rápidas de selección interactiva -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <button type="button" id="wiz-btn-series-1" onclick="setWizOrderSeries('1')" class="btn" style="text-align: left; padding: 10px 12px; background: rgba(99, 102, 241, 0.18); border: 2px solid #6366f1; border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span style="font-weight: 700; font-size: 12px; color: #e4e4e7; display: inline-flex; align-items: center; gap: 6px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span>Serie 1 (Directo a Bandeja Principal)</span>
+                    </span>
+                    <span id="wiz-badge-series-1" style="font-size: 10px; background: #6366f1; color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: 600;">Recomendado</span>
+                  </div>
+                  <span style="font-size: 11px; color: #cbd5e1; line-height: 1.3;">Entran en la bandeja principal. Abres Factusol y el pedido está el primero a la vista. Cero despistes.</span>
+                </button>
+
+                <button type="button" id="wiz-btn-series-w" onclick="setWizOrderSeries('W')" class="btn" style="text-align: left; padding: 10px 12px; background: #18181f; border: 1px solid var(--card-border); border-radius: 8px; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span style="font-weight: 700; font-size: 12px; color: var(--text-muted);">Serie W (Separada para Web)</span>
+                    <span id="wiz-badge-series-w" style="font-size: 10px; background: rgba(255,255,255,0.08); color: var(--text-subtle); padding: 1px 6px; border-radius: 10px; font-weight: 500;">Contabilidad aislada</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">Quedan separados, pero requiere cambiar el filtro de Factusol a "Todas" o "Serie W" para verlos.</span>
+                </button>
+              </div>
+
+              <!-- Card visual pedagógico: ¿Por qué recomendamos la Serie 1? -->
+              <div style="padding: 12px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 12px; line-height: 1.5; color: #e2e8f0;">
+                <div style="font-weight: 700; color: #e4e4e7; margin-bottom: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>¿Por qué recomendamos la Serie 1?</span>
+                </div>
+                <p style="margin: 0 0 6px 0; color: #cbd5e1; font-size: 11.5px;">
+                  En Factusol, cada documento tiene una Serie. La pantalla de <strong>Comercial → Pedidos de cliente</strong> suele abrirse por defecto filtrada en la <strong>Serie 1</strong>:
+                </p>
+                <ul style="margin: 0; padding-left: 18px; color: #94a3b8; font-size: 11px; line-height: 1.45;">
+                  <li style="margin-bottom: 4px;"><strong style="color: #38bdf8;">Si entran en la Serie 1 (Directo):</strong> Entran en la bandeja principal de Factusol. Abres Factusol y el pedido web está el primero de la lista a la vista de cualquiera. No hay que tocar filtros, ni desplegables, ni configurar series nuevas en Factusol. <em>Cero líos.</em></li>
+                  <li><strong style="color: #cbd5e1;">Si llegan con la Serie W (Web):</strong> Contablemente quedan separados de la tienda física, pero si un usuario entra a Factusol y ve la Serie 1 vacía, pensará que el pedido no ha entrado, cuando en realidad está en la pestaña/filtro de la Serie W.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL SIMPLYGEST EN WIZARD -->
+          <div id="wiz-panel-simplygest" style="display: none;">
+            <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+              <button onclick="detectSimplyGest(true)" id="wiz-btn-detect-simplygest" class="btn btn-secondary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Auto-detectar SimplyGest</span>
+              </button>
+              <button onclick="openNativeWindowsDialogSimplyGest(true)" id="wiz-btn-browse-native-simplygest" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, #059669, #10b981); border: none; font-weight: 600;" title="Abre el selector nativo de Windows (Local / Red / NAS)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+                <span>Examinar en Windows (Local / Red / NAS)</span>
+              </button>
+            </div>
+
+            <div id="wiz-simplygest-detected-box" style="display: none; margin-bottom: 14px;">
+              <div id="wiz-simplygest-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+                <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (Datos.mdb):</label>
+                <span style="font-size: 11px; color: #34d399; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('wiz-input-simplygest-path').focus()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  <span>Escribir o pegar directamente</span>
+                </span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+                Si tu SimplyGest está en un servidor, NAS o unidad de red (ej: <code>Z:\\SimplyGest\\Datos.mdb</code> o <code>\\\\NAS\\...</code>), puedes pegarla directamente aquí.
+              </div>
+              <input type="text" id="wiz-input-simplygest-path" oninput="cleanPathInput(this)" onblur="handleSimplyGestInputBlur('wiz-input-simplygest-path'); wizTestSimplyGestConnection();" class="form-control" placeholder="C:\\\\SimplyGest\\\\Datos.mdb  o  Z:\\\\SimplyGest\\\\Datos.mdb  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
+              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px; display: inline-flex; align-items: center; gap: 5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>
+                <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente.</span>
+              </div>
+              <div id="wiz-simplygest-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#fde68a;">🧪 ¿No tienes SimplyGest en este ordenador?</div><div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Puedes continuar para configurar tu tienda web o explorar el panel en modo demostración.</div></div><button type="button" onclick="wizSkipFactusolStep()" class="btn btn-secondary btn-sm" style="white-space:nowrap;border-color:rgba(245,158,11,0.4);color:#fbbf24;">Continuar sin SimplyGest →</button></div>
           </div>
         </div>
 
@@ -245,8 +311,8 @@ export function renderWizardModal(): string {
               <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;">¡Todo Listo para Sincronizar!</h2>
-            <p style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto 24px;">
-              Tu equipo ha quedado configurado con éxito. El agente comenzará a vigilar Factusol y a procesar los pedidos de tu web de forma 100% autónoma.
+            <p id="wiz-ready-desc" style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto 24px;">
+              Tu equipo ha quedado configurado con éxito. El agente comenzará a sincronizar tu catálogo y existencias y a procesar los pedidos de tu web de forma 100% autónoma.
             </p>
             <button onclick="finishWizardAndStart()" class="btn btn-primary btn-lg" style="width: 100%; max-width: 320px; box-shadow: 0 4px 20px var(--primary-glow); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>

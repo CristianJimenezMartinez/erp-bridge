@@ -2,7 +2,8 @@ import { CanonicalCustomer, CanonicalAddress } from '@erp-bridge/shared';
 import { sanitizeSql } from './article.queries';
 
 export function getCustomersQuery(limit?: number): string {
-  const topClause = limit && limit > 0 ? `TOP ${limit}` : '';
+  const safeLimit = limit && !isNaN(Number(limit)) ? Math.max(1, Math.min(50000, Math.floor(Number(limit)))) : undefined;
+  const topClause = safeLimit ? `TOP ${safeLimit}` : '';
   return `
     SELECT ${topClause}
       CODIGO, NOMBRE, CIF, DIRECCION, CP, POBLACION, PROVINCIA, EMAIL, TELEFONO

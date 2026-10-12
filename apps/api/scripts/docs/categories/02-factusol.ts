@@ -260,6 +260,7 @@ export const factusolArticles: DocArticle[] = [
       { id: 'cuando-usar-serie-w', label: '4. ¿Cuándo Conviene Usar la Serie W?', level: 2 },
       { id: 'configuracion-agente', label: '5. Cómo Cambiar la Serie en Bentian', level: 2 },
     ],
+    image: '/assets/screenshots/05-sales-order-history.png',
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         En Factusol, cada documento comercial (presupuestos, pedidos de clientes, albaranes y facturas) se organiza mediante una <strong>Serie</strong> de facturación identificada por un único carácter (por ejemplo: <code class="text-zinc-200">1</code>, <code class="text-zinc-200">2</code>, <code class="text-zinc-200">W</code>, <code class="text-zinc-200">B</code>...). La elección de la serie para los pedidos de tu tienda online determina cómo los visualizará tu equipo en el día a día.
@@ -302,6 +303,25 @@ export const factusolArticles: DocArticle[] = [
         <li>En el campo <strong>Serie para Pedidos Web</strong>, introduce el carácter deseado (ej: <code class="text-zinc-200">1</code> o <code class="text-zinc-200">W</code>).</li>
         <li>Haz clic en <strong>Guardar Configuración</strong>. Los siguientes pedidos utilizarán la serie elegida.</li>
       </ol>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Historial de Pedidos de Venta</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/05-sales-order-history.webp" type="image/webp">
+          <img src="/assets/screenshots/05-sales-order-history.png" alt="Historial de Pedidos Sincronizados con Números de Serie Factusol" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Panel de historial de pedidos de venta en Bentian ERP Bridge reflejando la trazabilidad de series y numeración asignada en Factusol.
+        </figcaption>
+      </figure>
     `,
   },
   {
@@ -321,6 +341,7 @@ export const factusolArticles: DocArticle[] = [
       { id: 'soporte-multialmacen', label: '4. Soporte Multialmacén', level: 2 },
       { id: 'comparativa-practica', label: '5. Caso Práctico: Venta en Tienda vs Venta Online', level: 2 },
     ],
+    image: '/assets/screenshots/04-automation-sync.png',
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
         Uno de los mayores dolores de cabeza para cualquier comercio que vende simultáneamente en tienda física y tienda online es la <strong>rotura de stock por sobreventa</strong>. Vender en la web un producto que un cliente del mostrador ya tiene reservado genera cancelaciones, devoluciones y pérdida de reputación comercial.
@@ -366,6 +387,25 @@ export const factusolArticles: DocArticle[] = [
         <p><strong>10:15:30 AM:</strong> Bentian detecta el cambio en Factusol y actualiza WooCommerce a <code class="text-emerald-400 font-bold">Stock = 2</code>.</p>
         <p class="text-emerald-300 font-semibold pt-1">Resultado: Ningún cliente online puede comprar más de 2 unidades. Cero sobreventas y cero cancelaciones.</p>
       </div>
+
+      <figure class="my-8 rounded-xl overflow-hidden border border-white/[0.1] bg-[#0c0c0e] shadow-xl">
+        <div class="px-4 py-2 bg-[#141418] border-b border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-zinc-300 font-sans">Bentian Agent GUI — Reglas de Automatización y Vigilante</span>
+          </div>
+          <span class="text-zinc-500 text-[10px]">127.0.0.1:39281</span>
+        </div>
+        <picture>
+          <source srcset="/assets/screenshots/04-automation-sync.webp" type="image/webp">
+          <img src="/assets/screenshots/04-automation-sync.png" alt="Vigilante en Tiempo Real OLEDB y Reglas de Stock DISSTO" class="w-full h-auto object-contain" loading="lazy" width="1280" height="820">
+        </picture>
+        <figcaption class="px-4 py-2.5 bg-[#101014] border-t border-white/[0.04] text-xs text-zinc-400 text-center">
+          Monitorización de cambios en tiempo real y reglas de cálculo de stock disponible (DISSTO) en Bentian ERP Bridge.
+        </figcaption>
+      </figure>
     `,
   },
   {

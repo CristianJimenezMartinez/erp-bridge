@@ -149,6 +149,9 @@ function renderDocArticlePage(article: DocArticle): string {
   const nextArticle = currentIndex < DOC_ARTICLES.length - 1 ? DOC_ARTICLES[currentIndex + 1] : null;
 
   const pageUrl = `https://bridge.cristianjm.com/docs/${article.slug}/`;
+  const articleImage = article.image
+    ? (article.image.startsWith('http') ? article.image : `https://bridge.cristianjm.com${article.image}`)
+    : 'https://bridge.cristianjm.com/assets/og-preview.png';
 
   return `<!DOCTYPE html>
 <html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
@@ -171,8 +174,15 @@ function renderDocArticlePage(article: DocArticle): string {
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="${article.metaTitle}">
   <meta property="og:description" content="${article.metaDescription}">
-  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:image" content="${articleImage}">
+  <meta property="og:image:secure_url" content="${articleImage}">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="820">
   <meta property="og:locale" content="es_ES">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${article.metaTitle}">
+  <meta name="twitter:description" content="${article.metaDescription}">
+  <meta name="twitter:image" content="${articleImage}">
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -185,6 +195,7 @@ function renderDocArticlePage(article: DocArticle): string {
         "@id": "${pageUrl}#article",
         "headline": ${JSON.stringify(article.title)},
         "description": ${JSON.stringify(article.metaDescription)},
+        "image": ${JSON.stringify(articleImage)},
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",

@@ -492,9 +492,15 @@ export const coreScript = `
         navItem.classList.add('active');
       }
 
+      const isSimplyGest = (typeof currentErpType !== 'undefined' && currentErpType === 'simplygest') ||
+                            (typeof currentStatus !== 'undefined' && currentStatus && (
+                              (currentStatus.softwareErp && currentStatus.softwareErp.activeProvider === 'simplygest') ||
+                              currentStatus.erpType === 'simplygest'
+                            ));
+
       const titles = {
         overview: 'Estado General',
-        factusol: 'Factusol ERP (Acceso Local)',
+        factusol: isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP',
         channel: 'Canal Web / Tienda Online',
         sync: 'Automatización y Reglas',
         notifications: 'Centro de Notificaciones & Alertas',
@@ -507,9 +513,15 @@ export const coreScript = `
         titleEl.textContent = titles[tabId] || 'Bentian ERP Bridge';
       }
 
-      if (tabId === 'factusol' && allArticles.length === 0) {
-        loadArticlePreview();
-        loadFactusolMetadata();
+      if (tabId === 'factusol') {
+        if (isSimplyGest) {
+          if (typeof loadSimplyGestPreview === 'function') loadSimplyGestPreview();
+        } else {
+          if (typeof loadArticlePreview === 'function' && allArticles.length === 0) {
+            loadArticlePreview();
+            loadFactusolMetadata();
+          }
+        }
       } else if (tabId === 'history') {
         if (typeof loadSalesOrders === 'function') loadSalesOrders();
       }

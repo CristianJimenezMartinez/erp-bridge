@@ -24,6 +24,17 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/factusol-woocommerce/" />
   </url>
 
+  <!-- Página Pilar: Conector SimplyGest WooCommerce -->
+  <url>
+    <loc>https://bridge.cristianjm.com/simplygest-woocommerce/</loc>
+    <lastmod>2026-10-11T19:40:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/simplygest-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/simplygest-woocommerce/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/simplygest-woocommerce/" />
+  </url>
+
   <!-- PÃ¡gina Pilar: Conector Factusol PrestaShop -->
   <url>
     <loc>https://bridge.cristianjm.com/factusol-prestashop/</loc>
@@ -1185,5 +1196,49 @@
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-factusol/santa-cruz-de-tenerife/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-factusol/santa-cruz-de-tenerife/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-factusol/santa-cruz-de-tenerife/" />
+  </url>
+
+  <!-- Doc: Localización de la Base de Datos de SimplyGest (Datos.mdb) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+  </url>
+
+  <!-- Doc: Configuración de Series, Almacenes y Tarifas en SimplyGest -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+  </url>
+
+  <!-- Doc: Sincronización de Stock y Descarga de Pedidos en SimplyGest -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+  </url>
+
+  <!-- Doc: Arquitectura Polimórfica Multi-ERP y Modelo Single Active ERP -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
   </url>
 </urlset>

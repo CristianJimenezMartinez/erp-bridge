@@ -61,7 +61,7 @@ export function renderOverviewTab(): string {
             <div class="card-header">
               <span class="card-title">
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg>
-                Factusol ERP
+                <span id="card-erp-name">Factusol ERP</span>
               </span>
               <span id="card-f-badge" class="tag tag-amber">Comprobando...</span>
             </div>

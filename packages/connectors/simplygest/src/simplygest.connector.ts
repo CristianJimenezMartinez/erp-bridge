@@ -202,10 +202,17 @@ export class SimplyGestConnector implements Connector {
 
     const skus = options?.skus;
     let rawArticles: SimplyGestArticleRaw[];
-    if (skus && skus.length > 0) {
-      const escaped = skus.map((s) => `'${String(s).replace(/'/g, "''").trim()}'`).join(',');
-      const sql = `SELECT CODIGO, STOCK FROM ARTICULOS WHERE CODIGO IN (${escaped})`;
-      rawArticles = await this.driver.query<SimplyGestArticleRaw>(sql);
+    if (skus && Array.isArray(skus) && skus.length > 0) {
+      const validSkus = skus
+        .map((s) => String(s || '').replace(/[\x00-\x1f]/g, '').trim())
+        .filter((s) => s.length > 0 && s.length <= 100);
+      if (validSkus.length > 0) {
+        const escaped = validSkus.map((s) => `'${s.replace(/'/g, "''")}'`).join(',');
+        const sql = `SELECT CODIGO, STOCK FROM ARTICULOS WHERE CODIGO IN (${escaped})`;
+        rawArticles = await this.driver.query<SimplyGestArticleRaw>(sql);
+      } else {
+        rawArticles = [];
+      }
     } else {
       const sql = 'SELECT CODIGO, STOCK FROM ARTICULOS WHERE CODIGO IS NOT NULL';
       rawArticles = await this.driver.query<SimplyGestArticleRaw>(sql);

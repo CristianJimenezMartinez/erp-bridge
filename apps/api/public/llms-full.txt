@@ -11,15 +11,16 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
 ## 2. Compatibilidad y Requisitos de Entorno
 
 ### ERPs Soportados:
-- **FactuSOL**: Versiones 2024, 2025 y 2026.
-- **Formato de datos de FactuSOL**: Bases de datos Microsoft Access (`.accdb` y `.mdb`).
-- **Tablas principales de Factusol gestionadas:**
-  - `F_ART` (Artículos, descripciones, tarifas, estado, peso, dimensiones).
-  - `F_STO` (Stock real `ACTSTO` y stock disponible `DISSTO`).
-  - `F_TAR` (Tarifas especiales y precios por cliente).
-  - `F_PCL` (Cabeceras de pedidos de clientes web).
-  - `F_LPC` (Líneas de detalle de pedidos de clientes web).
-  - `F_CLI` (Ficha de clientes y datos fiscales para facturación).
+- **FactuSOL**: Versiones 2018 a 2026.
+  - Bases de datos Microsoft Access (`.accdb` y `.mdb`).
+  - Tablas: `F_ART` (artículos), `F_STO` (stock `DISSTO`), `F_TAR` (tarifas 1 a 5), `F_PCL` y `F_LPC` (pedidos), `F_CLI` (clientes y R.E.).
+- **SimplyGest Desktop**: Versiones Estándar, Profesional y TPV.
+  - Base de datos Microsoft Access (`Datos.mdb`) en `C:\SimplyGest` o red local.
+  - Tablas: `ARTICULOS` (catálogo y stock), `CLIENTES`, `PEDIDOS_VENTA` y `LINEAS_PEDIDOS`.
+  - Conexión OLEDB no bloqueante tolerante al TPV de mostrador en tiempo real.
+- **Holded Cloud ERP**: REST API v1 bidireccional (facturación contable y CRM).
+- **Sage 50 / 200, Odoo y A3ERP**: En hoja de ruta e integración estandarizada.
+- **Arquitectura Polimórfica (Single Active ERP)**: Aprovisionamiento guiado exclusivo con conmutación dinámica 3x2 y aislamiento anti-wiping en `%APPDATA%\Bentian Agent\agent-config.json`.
 
 ### Sistemas Operativos del Agente:
 - Windows 10 (64-bit)
@@ -62,12 +63,17 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
 
 - **Portal Web:** https://bridge.cristianjm.com
 - **Factusol WooCommerce:** https://bridge.cristianjm.com/factusol-woocommerce/
+- **SimplyGest WooCommerce:** https://bridge.cristianjm.com/simplygest-woocommerce/
 - **Factusol PrestaShop:** https://bridge.cristianjm.com/factusol-prestashop/
 - **Factusol Shopify:** https://bridge.cristianjm.com/factusol-shopify/
 - **Factusol Tallas y Colores:** https://bridge.cristianjm.com/factusol-tallas-colores/
 - **Ferreterías y Suministros Industriales:** https://bridge.cristianjm.com/factusol-ferreterias-suministros/
 - **Factusol y Recargo de Equivalencia:** https://bridge.cristianjm.com/factusol-recargo-equivalencia/
 - **Alternativa a DELSOL Conecta:** https://bridge.cristianjm.com/alternativa-delsol-conecta/
+- **Docs - Arquitectura Polimórfica Multi-ERP:** https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/
+- **Docs - SimplyGest Localización BD:** https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/
+- **Docs - SimplyGest Series y Almacenes:** https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/
+- **Docs - SimplyGest Sincronización Stock:** https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/
 - **Guía Conectar Factusol Local con WooCommerce:** https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/
 - **Guía Solucionar Bloqueo de Archivos .ldb:** https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/
 - **Guía Pedidos WooCommerce a Factusol con Recargo:** https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/

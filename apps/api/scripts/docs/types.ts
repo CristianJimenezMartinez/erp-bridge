@@ -17,6 +17,7 @@ export interface DocArticle {
   toc: TocItem[];
   contentHtml: string;
   relatedSlugs?: string[];
+  image?: string;
 }
 
 export interface DocCategory {

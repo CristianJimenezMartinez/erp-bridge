@@ -157,17 +157,31 @@
     },
     {
       "id": "connectors.simplygest",
-      "name": "Conector SimplyGest ERP (Extensión Experimental)",
-      "status": "EXPERIMENTAL",
-      "certifiedAt": "2026-09-21",
+      "name": "Conector SimplyGest Desktop (Datos.mdb OLEDB Nativo)",
+      "status": "STABLE",
+      "certifiedAt": "2026-10-11",
       "certifiedCommit": "d82c20a",
-      "description": "Extensión experimental para integración de artículos, familias y existencias de SimplyGest.",
+      "description": "Conector local OLEDB nativo para SimplyGest Desktop. Mapeo de ARTICULOS, CLIENTES, tarifas 1 a 5, familias y variantes, e inyección atómica de pedidos en PEDIDOS_VENTA sin bloquear TPV.",
       "paths": [
         "packages/connectors/simplygest/src"
       ],
       "publicContract": "packages/connectors/simplygest/src/index.ts",
       "testSuites": [
-        "packages/connectors/simplygest/test/simplygest-connector.test.ts"
+        "packages/connectors/simplygest/test/read-products.spec.ts"
+      ]
+    },
+    {
+      "id": "agent.erp",
+      "name": "Registro y Adaptadores Polimórficos de Proveedores ERP (Strategy Pattern)",
+      "status": "STABLE",
+      "certifiedAt": "2026-10-11",
+      "description": "Patrón Strategy desacoplado (IErpConnector y ErpProviderRegistry) con modelo de aprovisionamiento exclusivo (Single Active ERP) y persistencia anti-wiping en AppData.",
+      "paths": [
+        "apps/agent/src/erp"
+      ],
+      "publicContract": "apps/agent/src/erp/index.ts",
+      "testSuites": [
+        "apps/agent/test/erp-provider-strategy.test.ts"
       ]
     },
     {

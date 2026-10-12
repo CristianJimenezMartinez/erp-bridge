@@ -21,6 +21,11 @@
 *   **Factusol Compatibility Matrix (2018–2026):** Full technical matrix detailing compatibility across Factusol 2018–2026, .accdb and .mdb formats, Microsoft ACE OLEDB (12.0 and 16.0 in 32/64-bit), shared read-only tables (F_ART, F_STO, F_TAR, F_TLL, F_COL, F_FAM, F_SEC), atomic ACID writes (F_PCL, F_LPC, F_CLI), available stock calculation (DISSTO = ACTSTO - RESCLI - PENENT), and eCommerce platforms (WooCommerce 6-9 HPOS and PrestaShop 1.7/8).
     - URL: https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/
 
+*   **SimplyGest Windows Local-First Connector (Datos.mdb):** Bentian connects directly to SimplyGest Desktop via OLEDB accessing `Datos.mdb` in `C:\SimplyGest\` or shared local network folders. It synchronizes products (`ARTICULOS`), sales price rates (1 to 5), families, size/color variations, and available stock, and injects web sales atomically into `PEDIDOS_VENTA` and `LINEAS_PEDIDOS` in under 50ms without causing database lockouts on active Point of Sale (TPV) cashier terminals.
+    - URL: https://bridge.cristianjm.com/simplygest-woocommerce/
+*   **Multi-ERP Polymorphic Architecture (Single Active ERP Provisioning):** Bentian operates on an exclusive provisioning model powered by a decoupled `ErpProviderRegistry` and `IErpConnector` strategy pattern. The desktop control panel features a 3x2 ERP selector supporting the 6 standard commercial Spanish ERPs: Factusol (Software DELSOL), SimplyGest Desktop, Holded Cloud ERP (REST API v1), Sage 50 / 200, Odoo, and A3ERP (Wolters Kluwer). All network paths, series, and tariff settings for each ERP are preserved with strict anti-wiping guarantees in `%APPDATA%\Bentian Agent\agent-config.json`.
+    - URL: https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/
+
 ## 2. COMPARISONS (Bottom-of-Funnel References)
 
 *   **Bentian vs DELSOL Conecta:** Bentian offers transparent pricing (€199/year or €29/month) without hidden deployment fees, a Local-First architecture that prevents network lockups, and advanced features like multi-warehouse isolation, unlike the standard proprietary synchronizers requiring DELSOL Cloud subscriptions.
@@ -43,6 +48,7 @@
 
 - [Página Principal](https://bridge.cristianjm.com/): Presentación, características y descarga.
 - [Beta Pública Abierta](https://bridge.cristianjm.com/beta/): Acceso anticipado gratuito para empresas y comercios con Factusol.
+- [SimplyGest WooCommerce](https://bridge.cristianjm.com/simplygest-woocommerce/): Conector nativo de escritorio para SimplyGest Desktop (Datos.mdb) con WordPress y WooCommerce.
 - [Factusol WooCommerce](https://bridge.cristianjm.com/factusol-woocommerce/): Conector específico para WordPress y WooCommerce.
 - [Factusol PrestaShop](https://bridge.cristianjm.com/factusol-prestashop/): Conector para comercios en PrestaShop.
 - [Factusol Shopify](https://bridge.cristianjm.com/factusol-shopify/): Conector directo de escritorio para Shopify Admin API sin middleware cloud.
@@ -97,6 +103,9 @@
 - [Series de Pedidos en Factusol: Serie 1 Directa vs Serie W](https://bridge.cristianjm.com/docs/factusol/series-de-pedidos/): Por qué la Serie 1 es la opción recomendada a prueba de despistes, cómo configurar series separadas y evitar pedidos ocultos.
 - [Cálculo de Stock Disponible (DISSTO) vs Stock Real (ACTSTO)](https://bridge.cristianjm.com/docs/factusol/calculo-stock-disponible/): Por qué sincronizar existencias físicas provoca sobreventas y cómo el cálculo de stock libre protege las ventas de tu tienda.
 - [Matriz Oficial de Compatibilidad de Factusol (2018–2026)](https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/): Especificación de versiones de base de datos, tablas relacionales leídas, transacciones atómicas de pedidos y motores de cálculo.
+- [Localización de la Base de Datos de SimplyGest (Datos.mdb)](https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/): Rutas habituales de SimplyGest Software, estructura relacional de Datos.mdb y conexión local OLEDB.
+- [Configuración de Series, Almacenes y Tarifas en SimplyGest](https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/): Cómo parametrizar la serie de pedidos web, el almacén de stock y la tarifa comercial a sincronizar.
+- [Sincronización de Stock y Descarga de Pedidos en SimplyGest](https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/): Flujo completo de pedidos web, reserva de existencias y tolerancia a caídas de red.
 - [Conexión con WooCommerce y Compatibilidad HPOS](https://bridge.cristianjm.com/docs/canales/woocommerce/): Cómo configurar la REST API de WordPress, permisos de Consumer Key/Secret, compatibilidad con High-Performance Order Storage y enlaces permanentes.
 - [Conexión con PrestaShop 1.7 y 8.x mediante Webservices](https://bridge.cristianjm.com/docs/canales/prestashop/): Cómo activar los servicios web oficiales de PrestaShop, conceder permisos en recursos de pedidos/stock y mapear combinaciones.
 - [Conexión Factusol con Shopify y Webhooks en Tiempo Real](https://bridge.cristianjm.com/docs/canales/shopify/): Guía paso a paso para sincronizar catálogo, stock multiubicación, webhooks de pedidos y recargo de equivalencia mediante Shopify GraphQL Admin API.
@@ -106,6 +115,7 @@
 - [Cola Desacoplada Store-and-Forward (JSON Atómico)](https://bridge.cristianjm.com/docs/arquitectura/cola-store-and-forward/): Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia en JSON atómico estructurado e inyección en Factusol.
 - [FileWatcher en Tiempo Real y Ciclos Incrementales](https://bridge.cristianjm.com/docs/arquitectura/deteccion-tiempo-real/): Monitorización de cambios en .accdb sin polling pesado, debounce inteligente y reducción del 99% del tráfico de red.
 - [Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud](https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/): Patrón de ingeniería empresarial para sincronizar Shopify/WooCommerce, almacén físico Factusol y facturación contable en Holded sin fricciones ni duplicidades.
+- [Arquitectura Polimórfica Multi-ERP y Modelo Single Active ERP](https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/): Patrón Strategy, interfaz canónica IErpConnector, aislamiento anti-wiping en AppData y selector comercial 3x2.
 - [Benchmark de Estrés con Catálogo Real (+5.300 Artículos de Suministros Rubio)](https://bridge.cristianjm.com/docs/arquitectura/benchmark-estres-catalogo-real/): Auditoría empírica de rendimiento y resiliencia sobre 5.378 referencias reales: ingesta DISSTO en 17.8 ms, 108 lotes Shopify GraphQL, Token Bucket con Holded y Pipeline Tripartito.
 - [Cuadre de IVA al Céntimo y Prevención de Descuadres](https://bridge.cristianjm.com/docs/fiscalidad/cuadre-iva-centimos/): El algoritmo matemático que garantiza la concordancia entre los importes de WooCommerce y las bases imponibles de Factusol.
 - [Recargo de Equivalencia en WooCommerce y PrestaShop](https://bridge.cristianjm.com/docs/fiscalidad/recargo-de-equivalencia/): Configuración para comerciantes minoristas en España: cómo gestionar el IVA 21% + 5.2% R.E. sin descuadres en Factusol.

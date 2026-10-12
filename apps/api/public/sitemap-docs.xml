@@ -123,6 +123,39 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/factusol/matriz-compatibilidad/" />
   </url>
 
+  <!-- Doc: Localización de la Base de Datos de SimplyGest (Datos.mdb) -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/localizacion-base-datos/" />
+  </url>
+
+  <!-- Doc: Configuración de Series, Almacenes y Tarifas en SimplyGest -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/configuracion-series-almacenes/" />
+  </url>
+
+  <!-- Doc: Sincronización de Stock y Descarga de Pedidos en SimplyGest -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/simplygest/sincronizacion-stock-pedidos/" />
+  </url>
+
   <!-- Doc: Conexión con WooCommerce y Compatibilidad HPOS -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/woocommerce/</loc>
@@ -220,6 +253,17 @@
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-tripartita/" />
+  </url>
+
+  <!-- Doc: Arquitectura Polimórfica Multi-ERP y Modelo Single Active ERP -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/</loc>
+    <lastmod>2026-10-11T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/arquitectura/arquitectura-polimorfica-multi-erp/" />
   </url>
 
   <!-- Doc: Benchmark de Estrés con Catálogo Real (+5.300 Artículos de Suministros Rubio) -->

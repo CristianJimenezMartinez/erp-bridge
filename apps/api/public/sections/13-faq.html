@@ -133,6 +133,26 @@
 
           <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
             <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Es compatible con SimplyGest Desktop y qué bases de datos soporta?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. Bentian incluye soporte nativo certificado para <strong>SimplyGest Desktop</strong>. Se conecta directamente al archivo de base de datos <code class="text-zinc-300 font-mono">Datos.mdb</code> (ubicado habitualmente en <code class="text-zinc-300 font-mono">C:\SimplyGest</code> o en una carpeta de red compartida) mediante el proveedor OLEDB local de Windows. Sincroniza catálogo de productos, familias, stock disponible por almacén, tarifas de venta, tallas/colores e inyecta pedidos web en <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> sin interrumpir el funcionamiento del TPV en mostrador.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Puedo cambiar de Factusol a SimplyGest u otro ERP sin perder mi configuración?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. El Centro de Control de Bentian incorpora una <strong>arquitectura polimórfica con modelo de aprovisionamiento exclusivo (Single Active ERP)</strong>. Desde el selector 3x2 puedes cambiar de Factusol a SimplyGest (u otros ERPs estándar como Holded, Sage 50/200, Odoo o A3ERP). Las rutas de red, series y tarifas de cada software se almacenan de forma aislada en <code class="text-zinc-300 font-mono">%APPDATA%\Bentian Agent\agent-config.json</code> con protección anti-wiping, garantizando que nunca se produzcan lecturas cruzadas ni se sobrescriban tus ajustes.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
               <span>¿Puedo cancelar la suscripción si no la necesito?</span>
               <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
             </summary>

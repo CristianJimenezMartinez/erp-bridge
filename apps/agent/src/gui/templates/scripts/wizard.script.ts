@@ -19,6 +19,11 @@ export const wizardScript = `
             existingSeries = mainInput.value;
           }
         }
+        if (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.erpType) {
+          if (typeof wizSelectErp === 'function') {
+            wizSelectErp(currentStatus.erpType);
+          }
+        }
       } catch (e) {}
       setWizOrderSeries(existingSeries);
 
@@ -28,6 +33,15 @@ export const wizardScript = `
         const mainFactInput = document.getElementById('input-factusol-db');
         if (wizFactInput && !wizFactInput.value && mainFactInput && mainFactInput.value) {
           wizFactInput.value = mainFactInput.value;
+        }
+      } catch (e) {}
+
+      // Pre-cargar ruta si ya existe en la pantalla de SimplyGest
+      try {
+        const wizSgInput = document.getElementById('wiz-input-simplygest-path');
+        const mainSgInput = document.getElementById('input-simplygest-db');
+        if (wizSgInput && !wizSgInput.value && mainSgInput && mainSgInput.value) {
+          wizSgInput.value = mainSgInput.value;
         }
       } catch (e) {}
     }
@@ -475,13 +489,34 @@ export const wizardScript = `
       const orderSeriesInput = document.getElementById('wiz-input-fact-order-series');
       const orderSeriesVal = (orderSeriesInput ? orderSeriesInput.value : '1').trim().toUpperCase().substring(0, 1) || '1';
 
+      const sgInput = document.getElementById('wiz-input-simplygest-path');
+      const sgPath = sgInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(sgInput) : sgInput.value.trim()) : '';
+      const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'factusol';
+
       // Guardar todo
       const payload = {
         licenseKey: document.getElementById('wiz-input-lic').value.trim() || undefined,
         channelType: currentChannelType,
+        erpType: activeErp,
+        softwareErp: {
+          activeProvider: activeErp,
+          provisioned: true,
+          providers: {
+            factusol: {
+              databasePath: factPath || undefined,
+              orderSeries: orderSeriesVal
+            },
+            simplygest: {
+              databasePath: sgPath || undefined,
+            }
+          }
+        },
         factusol: {
           databasePath: factPath || undefined,
           orderSeries: orderSeriesVal
+        },
+        simplygest: {
+          databasePath: sgPath || undefined,
         },
         universalBridge: {
           storeUrl: document.getElementById('wiz-input-univ-url').value.trim() || undefined,

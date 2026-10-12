@@ -111,9 +111,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           const completed = localStorage.getItem('bentian_onboarding_completed');
           const lic = data.license || {};
           const isLicValid = lic.valid === true || lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
-          const isFactConfigured = !!(data.factusol && data.factusol.configured);
+          const isErpConfigured = data.erpType === 'simplygest'
+            ? !!(data.simplygest && data.simplygest.configured)
+            : !!(data.factusol && data.factusol.configured);
 
-          if (!completed && (!isLicValid || !isFactConfigured)) {
+          if (!completed && (!isLicValid || !isErpConfigured)) {
             setTimeout(function() {
               if (typeof openWizardModal === 'function') {
                 openWizardModal();
@@ -133,29 +135,52 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       document.getElementById('sidebar-hostname').textContent = (data.system && data.system.hostname) ? data.system.hostname : 'Local';
       document.getElementById('sidebar-hwid').textContent = data.hwid ? (data.hwid.substring(0, 12) + '...') : '---';
 
-      // Factusol
-      const fact = data.factusol || {};
+      // ERP Type & Labels
+      const erpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
+      const isSimplyGest = erpType === 'simplygest';
+
+      const sidebarErpTitle = document.getElementById('sidebar-erp-title');
+      if (sidebarErpTitle) {
+        sidebarErpTitle.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP';
+      }
+      const sidebarErpBadge = document.getElementById('sidebar-erp-badge');
+      if (sidebarErpBadge) {
+        sidebarErpBadge.textContent = isSimplyGest ? 'SimplyGest' : 'Factusol';
+        sidebarErpBadge.className = isSimplyGest ? 'tag tag-green' : 'tag tag-blue';
+      }
+
+      const cardErpName = document.getElementById('card-erp-name');
+      if (cardErpName) {
+        cardErpName.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol Desktop';
+      }
+
+      // ERP Card Status
+      const erpInfo = isSimplyGest ? (data.simplygest || {}) : (data.factusol || {});
       const cardFBadge = document.getElementById('card-f-badge');
       const cardFMetric = document.getElementById('card-f-metric');
       const cardFPath = document.getElementById('card-f-path');
       const cardFWatcher = document.getElementById('card-f-watcher');
 
-      if (fact.configured && fact.connected) {
+      if (erpInfo.configured && erpInfo.connected) {
         cardFBadge.className = 'tag tag-green';
         cardFBadge.textContent = 'Conectado';
-        cardFMetric.textContent = (fact.articleCount !== undefined ? fact.articleCount.toLocaleString('es-ES') : '0') + ' arts.';
-        cardFPath.textContent = fact.fileName || fact.databasePath;
-        cardFWatcher.textContent = fact.watcherActive ? '● Vigilante activo' : '○ En pausa';
-      } else if (fact.configured) {
+        cardFMetric.textContent = (erpInfo.articleCount !== undefined ? erpInfo.articleCount.toLocaleString('es-ES') : '0') + ' arts.';
+        cardFPath.textContent = erpInfo.fileName || erpInfo.databasePath;
+        if (cardFWatcher) {
+          cardFWatcher.textContent = isSimplyGest ? '● Conexión activa' : (erpInfo.watcherActive ? '● Vigilante activo' : '○ En pausa');
+        }
+      } else if (erpInfo.configured) {
         cardFBadge.className = 'tag tag-amber';
         cardFBadge.textContent = 'Sin Conexión';
         cardFMetric.textContent = 'Revisando';
-        cardFPath.textContent = fact.databasePath || 'Sin ruta';
+        cardFPath.textContent = erpInfo.databasePath || 'Sin ruta';
+        if (cardFWatcher) cardFWatcher.textContent = '○ Desconectado';
       } else {
         cardFBadge.className = 'tag tag-rose';
         cardFBadge.textContent = 'No Configurado';
         cardFMetric.textContent = 'Sin Base';
         cardFPath.textContent = 'Pulsa en Ajustar para seleccionar tu archivo';
+        if (cardFWatcher) cardFWatcher.textContent = '○ Pendiente';
       }
 
       const chType = data.channelType || 'universal_bridge';
@@ -323,7 +348,12 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
     function renderZenHeroAndAlerts(data) {
       if (!data) return;
 
-      const fact = data.factusol || {};
+      const isSimplyGest = (data.erpType === 'simplygest');
+      const erpInfo = isSimplyGest ? (data.simplygest || {}) : (data.factusol || {});
+      const erpName = isSimplyGest ? 'SimplyGest' : 'Factusol';
+      const erpFileExt = isSimplyGest ? 'Datos.mdb' : '.accdb';
+      const targetErpInput = isSimplyGest ? 'input-simplygest-db' : 'input-factusol-db';
+
       const chType = data.channelType || 'universal_bridge';
       const univ = data.universalBridgeSettings || {};
       const wc = data.woocommerceSettings || {};
@@ -348,8 +378,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const primaryBtnText = document.getElementById('zen-primary-btn-text');
       const primaryBtnIcon = document.getElementById('zen-primary-btn-icon');
 
-      const isFactMissing = !fact.configured;
-      const isFactOffline = fact.configured && !fact.connected;
+      const isErpMissing = !erpInfo.configured;
+      const isErpOffline = erpInfo.configured && !erpInfo.connected;
 
       const isChannelConfigured = chType === 'universal_bridge' 
         ? !!(univ.storeUrl && univ.storeUrl.trim())
@@ -363,21 +393,21 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       const isLicenseActive = lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
 
-      // 1. Caso Factusol Desconectado
-      if (isFactOffline) {
+      // 1. Caso ERP Desconectado
+      if (isErpOffline) {
         if (banner) {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(255, 255, 255, 0.03)';
           banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con Factusol ERP';
+          if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con ' + erpName + ' ERP';
           if (bannerDesc) bannerDesc.textContent = 'La ruta está registrada pero la base de datos no responde. Comprueba si la unidad de red o NAS está encendida y accesible.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en Factusol ERP →';
+          if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
           if (bannerIconBox) {
             bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#f87171';
           }
           _currentZenAlertAction = function() {
-            navigateToResolution('factusol', 'input-factusol-db');
+            navigateToResolution('factusol', targetErpInput);
           };
         }
 
@@ -391,37 +421,37 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           badge.style.color = '#f87171';
         }
         if (badgeDot) badgeDot.style.background = '#f87171';
-        if (badgeText) badgeText.textContent = 'Factusol Desconectado';
-        if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de Factusol';
-        if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo .accdb. Revisa la ruta o reconecta tu unidad de red para continuar.';
+        if (badgeText) badgeText.textContent = erpName + ' Desconectado';
+        if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de ' + erpName;
+        if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo ' + erpFileExt + '. Revisa la ruta o reconecta tu unidad de red para continuar.';
         if (primaryBtn) {
           primaryBtn.className = 'btn btn-primary btn-lg';
           primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
           primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
         }
-        if (primaryBtnText) primaryBtnText.textContent = 'Solucionar en Factusol ERP →';
+        if (primaryBtnText) primaryBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
         if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
         _currentZenPrimaryAction = function() {
-          navigateToResolution('factusol', 'input-factusol-db');
+          navigateToResolution('factusol', targetErpInput);
         };
         return;
       }
 
-      // 2. Caso Factusol Sin Configurar
-      if (isFactMissing) {
+      // 2. Caso ERP Sin Configurar
+      if (isErpMissing) {
         if (banner) {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(255, 255, 255, 0.03)';
           banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = 'Factusol ERP pendiente de configurar';
-          if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (.accdb) para que el agente empiece a trabajar.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Configurar Factusol ERP →';
+          if (bannerTitle) bannerTitle.textContent = erpName + ' ERP pendiente de configurar';
+          if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (' + erpFileExt + ') para que el agente empiece a trabajar.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
           if (bannerIconBox) {
             bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
             bannerIconBox.style.color = '#fbbf24';
           }
           _currentZenAlertAction = function() {
-            navigateToResolution('factusol', 'input-factusol-db');
+            navigateToResolution('factusol', targetErpInput);
           };
         }
 
@@ -436,17 +466,17 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
         if (badgeDot) badgeDot.style.background = '#fbbf24';
         if (badgeText) badgeText.textContent = 'Configuración Inicial';
-        if (zenTitle) zenTitle.textContent = 'Conecta tu Factusol para comenzar a sincronizar';
-        if (zenSub) zenSub.textContent = 'Selecciona tu archivo de Factusol con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
+        if (zenTitle) zenTitle.textContent = 'Conecta tu ' + erpName + ' para comenzar a sincronizar';
+        if (zenSub) zenSub.textContent = 'Selecciona tu archivo de ' + erpName + ' con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
         if (primaryBtn) {
           primaryBtn.className = 'btn btn-primary btn-lg';
           primaryBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
           primaryBtn.style.boxShadow = '0 4px 20px rgba(245,158,11,0.35)';
         }
-        if (primaryBtnText) primaryBtnText.textContent = 'Configurar Factusol ERP →';
+        if (primaryBtnText) primaryBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
         if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
         _currentZenPrimaryAction = function() {
-          navigateToResolution('factusol', 'input-factusol-db');
+          navigateToResolution('factusol', targetErpInput);
         };
         return;
       }
@@ -459,7 +489,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           banner.style.background = 'rgba(255, 255, 255, 0.03)';
           banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
           if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
-          if (bannerDesc) bannerDesc.textContent = 'Factusol está preparado con ' + (fact.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
+          if (bannerDesc) bannerDesc.textContent = erpName + ' está preparado con ' + (erpInfo.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
           if (bannerBtnText) bannerBtnText.textContent = 'Vincular Tienda Web →';
           if (bannerIconBox) {
             bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
@@ -482,7 +512,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         if (badgeDot) badgeDot.style.background = '#60a5fa';
         if (badgeText) badgeText.textContent = 'Tienda Online sin vincular';
         if (zenTitle) zenTitle.textContent = 'Enlaza tu tienda web para publicar tu catálogo';
-        if (zenSub) zenSub.textContent = 'Tu Factusol está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
+        if (zenSub) zenSub.textContent = 'Tu ' + erpName + ' está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
         if (primaryBtn) {
           primaryBtn.className = 'btn btn-primary btn-lg';
           primaryBtn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
@@ -562,8 +592,10 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       }
       if (badgeDot) badgeDot.style.background = '#34d399';
       if (badgeText) badgeText.textContent = 'Sincronización Activa — Todo al día';
-      if (zenTitle) zenTitle.textContent = 'Tu tienda web y Factusol están sincronizados';
-      if (zenSub) zenSub.textContent = 'El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.';
+      if (zenTitle) zenTitle.textContent = 'Tu tienda web y ' + erpName + ' están sincronizados';
+      if (zenSub) zenSub.textContent = isSimplyGest
+        ? 'El conector de SimplyGest lee existencias y precios en tiempo real para mantener tu tienda online completamente actualizada.'
+        : 'El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.';
       if (primaryBtn) {
         primaryBtn.className = 'btn btn-primary btn-lg';
         primaryBtn.style.background = 'var(--primary)';
@@ -580,6 +612,12 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
     function updateFormInputs(data, force) {
       if (!data) return;
       if (!window.__formInputsInitialized || force) {
+        // Activar pestaña ERP activa
+        const effectiveErp = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
+        if (typeof selectErpType === 'function') {
+          selectErpType(effectiveErp);
+        }
+
         const fact = data.factusol || {};
         const fSettings = data.factusolSettings || {};
 
@@ -609,6 +647,33 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inOrderSeries = document.getElementById('input-factusol-order-series');
         if (inOrderSeries && (force || !inOrderSeries.value || document.activeElement !== inOrderSeries)) {
           inOrderSeries.value = fSettings.orderSeries || '1';
+        }
+
+        // SimplyGest Settings
+        const sg = data.simplygest || {};
+        const sgSettings = data.simplygestSettings || {};
+
+        const inputSgDb = document.getElementById('input-simplygest-db');
+        if (inputSgDb && (force || !inputSgDb.value || document.activeElement !== inputSgDb)) {
+          const dbVal = sg.databasePath || sgSettings.databasePath || '';
+          if (dbVal) {
+            inputSgDb.value = dbVal;
+          }
+        }
+
+        const selSgTariff = document.getElementById('select-simplygest-tariff');
+        if (selSgTariff && sgSettings.tariffCode && (force || document.activeElement !== selSgTariff)) {
+          selSgTariff.value = String(sgSettings.tariffCode);
+        }
+
+        const selSgWh = document.getElementById('select-simplygest-warehouse');
+        if (selSgWh && sgSettings.warehouseCode && (force || document.activeElement !== selSgWh)) {
+          selSgWh.value = sgSettings.warehouseCode;
+        }
+
+        const inSgOrderSeries = document.getElementById('input-simplygest-order-series');
+        if (inSgOrderSeries && (force || !inSgOrderSeries.value || document.activeElement !== inSgOrderSeries)) {
+          inSgOrderSeries.value = sgSettings.orderSeries || '1';
         }
 
         const chType = data.channelType || 'universal_bridge';
