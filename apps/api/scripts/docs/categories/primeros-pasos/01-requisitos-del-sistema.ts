@@ -20,7 +20,7 @@ export const requisitosDelSistemaArticle: DocArticle = {
   ],
   contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        Bentian ERP Bridge es una aplicación de escritorio nativa de <strong>arquitectura x64</strong> diseñada específicamente para entornos empresariales Windows. A diferencia de plugins web o scripts PHP que sobrecargan el servidor de la tienda, el agente de Bentian opera como un servicio local de alto rendimiento que consulta directamente el motor relacional de Factusol en memoria, garantizando sincronizaciones en milisegundos con cero impacto en el mostrador.
+        Bentian ERP Bridge es una aplicación de escritorio nativa de <strong>arquitectura x64</strong> diseñada específicamente para entornos empresariales Windows. A diferencia de plugins web o scripts PHP que sobrecargan el servidor de la tienda, el agente de Bentian opera como un servicio local de alto rendimiento que consulta directamente el motor relacional de Factusol o SimplyGest en memoria, garantizando sincronizaciones en milisegundos con cero impacto en el mostrador.
       </p>
 
       <!-- Callout Certificación Softpedia 100% Clean -->
@@ -57,7 +57,7 @@ export const requisitosDelSistemaArticle: DocArticle = {
         <svg class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <div>
           <strong class="font-semibold text-white block mb-0.5">Arquitectura 100% Local-First</strong>
-          El agente puede instalarse en el mismo equipo donde reside Factusol o en cualquier estación de trabajo Windows que disponga de acceso por red local (LAN / SMB / NAS) a la base de datos de la empresa.
+          El agente puede instalarse en el mismo equipo donde reside Factusol o SimplyGest o en cualquier estación de trabajo Windows que disponga de acceso por red local (LAN / SMB / NAS) a la base de datos de la empresa.
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export const requisitosDelSistemaArticle: DocArticle = {
 
       <h2 id="sistemas-operativos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Sistemas Operativos Compatibles (x64 Exclusivo)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge está compilado para <strong>arquitecturas nativas de 64 bits (x64)</strong>. No es compatible con sistemas de 32 bits (x86), dado que el motor relacional de Factusol y el controlador Microsoft ACE OLEDB de 64 bits exigen espacio de direccionamiento completo de memoria. Es compatible con las siguientes versiones de Windows:
+        Bentian ERP Bridge está compilado para <strong>arquitecturas nativas de 64 bits (x64)</strong>. No es compatible con sistemas de 32 bits (x86), dado que los motores relacionales de Factusol/SimplyGest y el controlador Microsoft ACE OLEDB de 64 bits exigen espacio de direccionamiento completo de memoria. Es compatible con las siguientes versiones de Windows:
       </p>
       <div class="overflow-x-auto mb-6">
         <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
@@ -141,7 +141,7 @@ export const requisitosDelSistemaArticle: DocArticle = {
             <li><strong>CPU:</strong> Intel Core i5 / AMD Ryzen 5 o superior (4 núcleos o más).</li>
             <li><strong>RAM:</strong> 8 GB o 16 GB de RAM física (óptimo para catálogos masivos &gt;30.000 referencias y sincronizaciones multitarea).</li>
             <li><strong>Almacenamiento:</strong> Unidad SSD NVMe para acceso instantáneo a la base de datos <code class="text-indigo-300">.accdb</code> en menos de 5 ms.</li>
-            <li><strong>Red:</strong> Tarjeta de red Gigabit Ethernet (1 Gbps) si Factusol se aloja en un servidor NAS o recurso compartido SMB.</li>
+            <li><strong>Red:</strong> Tarjeta de red Gigabit Ethernet (1 Gbps) si los datos del ERP (Factusol o SimplyGest) se alojan en un servidor NAS o recurso compartido SMB.</li>
           </ul>
         </div>
       </div>
@@ -201,12 +201,12 @@ export const requisitosDelSistemaArticle: DocArticle = {
 
       <h2 id="software-adicional" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Motor Relacional y Controlador OLEDB Requerido</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Factusol almacena internamente toda la información empresarial en bases de datos relacionales Microsoft Access (<code class="text-zinc-200">.accdb</code>). Para que el agente de Bentian interactúe con el catálogo y pedidos con arquitectura nativa de 64 bits sin depender de la GUI de Factusol, el equipo debe contar con el proveedor OLEDB oficial de Microsoft:
+        Tanto Factusol como SimplyGest Desktop almacenan internamente su información empresarial en bases de datos relacionales Microsoft Access / Jet (<code class="text-zinc-200">.accdb</code> o <code class="text-zinc-200">Datos.mdb</code>). Para que el agente de Bentian interactúe con el catálogo y pedidos con arquitectura nativa de 64 bits sin depender de la GUI del ERP, el equipo debe contar con el proveedor OLEDB oficial de Microsoft:
       </p>
       <div class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08] mb-6">
         <h4 class="text-sm font-semibold text-white mb-1">Microsoft Access Database Engine 2016 Redistributable (64 bits)</h4>
         <p class="text-xs text-zinc-400 mb-3">
-          Proporciona el proveedor relacional <code class="text-zinc-200 font-mono">Microsoft.ACE.OLEDB.16.0</code> (o superior). Si Factusol ya se encuentra instalado en el ordenador, este controlador suele venir preconfigurado. Si el asistente inicial de Bentian reportara una alerta de OLEDB ausente, puedes instalarlo en 1 minuto de forma totalmente gratuita.
+          Proporciona el proveedor relacional <code class="text-zinc-200 font-mono">Microsoft.ACE.OLEDB.16.0</code> (o superior) compatible con Factusol y SimplyGest. Si el ERP ya se encuentra instalado en el ordenador, este controlador suele venir preconfigurado. Si el asistente inicial de Bentian reportara una alerta de OLEDB ausente, puedes instalarlo en 1 minuto de forma totalmente gratuita.
         </p>
         <div class="flex items-center gap-3 flex-wrap">
           <a href="/docs/troubleshooting/error-oledb-no-registrado/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">
@@ -216,6 +216,10 @@ export const requisitosDelSistemaArticle: DocArticle = {
           <a href="/docs/factusol/controladores-oledb-ace/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition">
             <span>Comparativa técnica: OLEDB vs ODBC →</span>
           </a>
+          <span class="text-zinc-600">·</span>
+          <a href="/docs/simplygest/conexion-mdb/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition">
+            <span>Conexión a Datos.mdb en SimplyGest →</span>
+          </a>
         </div>
       </div>
     `,
@@ -224,5 +228,6 @@ export const requisitosDelSistemaArticle: DocArticle = {
     'primeros-pasos/asistente-de-configuracion',
     'seguridad/certificacion-softpedia-100-clean',
     'factusol/controladores-oledb-ace',
+    'simplygest/conexion-mdb',
   ],
 };

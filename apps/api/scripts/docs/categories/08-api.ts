@@ -13,10 +13,11 @@ export const apiArticles: DocArticle[] = [
     keywords: 'api rest factusol local, endpoints bentian 39281, api local conector factusol, json factusol local, telemetria conector factusol',
     toc: [
       { id: 'arquitectura-api-local', label: '1. Arquitectura de la API Local', level: 2 },
-      { id: 'endpoint-status', label: '2. GET /api/local/status (Telemetría y Estado)', level: 2 },
-      { id: 'endpoint-sync-now', label: '3. POST /api/local/sync-now (Forzar Sincronización)', level: 2 },
-      { id: 'endpoint-save-config', label: '4. POST /api/local/save-full-config', level: 2 },
-      { id: 'endpoint-test-notificaciones', label: '5. POST /api/local/test-email, test-telegram y test-discord', level: 2 },
+      { id: 'endpoint-status', label: '2. GET /api/local/status (Telemetría y Estado Multi-ERP)', level: 2 },
+      { id: 'endpoint-health', label: '3. GET /health (Control de Instancia Única y Health Check)', level: 2 },
+      { id: 'endpoint-sync-now', label: '4. POST /api/local/sync-now (Forzar Sincronización)', level: 2 },
+      { id: 'endpoint-save-config', label: '5. POST /api/local/save-full-config (Persistencia JSON Atómica)', level: 2 },
+      { id: 'endpoint-test-notificaciones', label: '6. POST /api/local/test-email, test-telegram y test-discord', level: 2 },
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
@@ -28,9 +29,9 @@ export const apiArticles: DocArticle[] = [
         Por seguridad estricta, la API local solo acepta conexiones originadas desde la propia máquina (<code class="text-zinc-200">127.0.0.1</code> o <code class="text-zinc-200">localhost</code>). Cualquier intento de conexión desde otra IP de la red local o desde Internet es rechazado inmediatamente.
       </p>
 
-      <h2 id="endpoint-status" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. GET /api/local/status (Telemetría y Estado)</h2>
+      <h2 id="endpoint-status" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. GET /api/local/status (Telemetría y Estado Multi-ERP)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Devuelve el estado de salud en tiempo real de todos los subsistemas (conexión Factusol, tienda web, licencia y cola de pedidos):
+        Devuelve el estado de salud en tiempo real de todos los subsistemas (conexión con el ERP activo —Factusol o SimplyGest—, tienda web, licencia y cola de pedidos):
       </p>
       <pre class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 overflow-x-auto mb-6"><code>GET http://127.0.0.1:39281/api/local/status
 
@@ -39,8 +40,16 @@ Content-Type: application/json
 
 {
   "running": true,
-  "version": "0.3.8",
+  "version": "0.4.7",
   "uptimeSeconds": 1420,
+  "erp": {
+    "activeProvider": "factusol",
+    "connected": true,
+    "configured": true,
+    "dbPath": "C:\\\\Software DELSOL\\\\Factusol\\\\Datos\\\\FS\\\\0012026.accdb",
+    "orderSeries": "1",
+    "latencyMs": 18
+  },
   "factusol": {
     "connected": true,
     "configured": true,
@@ -64,8 +73,30 @@ Content-Type: application/json
     "failed": 0
   }
 }</code></pre>
+      <p class="text-xs text-zinc-400 mb-6">
+        <em>Nota Multi-ERP:</em> Si el conector activo es <strong>SimplyGest</strong>, el bloque <code class="text-zinc-200">"erp"</code> refleja <code class="text-zinc-200">"activeProvider": "simplygest"</code> junto con los datos de <code class="text-zinc-200">Datos.mdb</code>, almacén seleccionado y tarifa configurada.
+      </p>
 
-      <h2 id="endpoint-sync-now" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. POST /api/local/sync-now (Forzar Sincronización)</h2>
+      <h2 id="endpoint-health" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. GET /health (Control de Instancia Única y Health Check)</h2>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+        Endpoint ligero de ultra-baja latencia (&lt;2 ms) para comprobación de disponibilidad y control de instancia única:
+      </p>
+      <pre class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-zinc-300 overflow-x-auto mb-4"><code>GET http://127.0.0.1:39281/health
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "status": "healthy",
+  "version": "0.4.7",
+  "pid": 4820,
+  "timestamp": 1728734000000
+}</code></pre>
+      <p class="text-xs text-zinc-300 leading-relaxed mb-6">
+        <strong>Mecanismo de Instancia Única (Single Instance):</strong> Al arrancar, el instalador o ejecutable del agente sondea activamente el puerto HTTP local <code class="text-indigo-300 font-mono">127.0.0.1:39281/health</code>. Si responde, enfoca la ventana existente y sale de inmediato sin duplicar procesos. Este control opera estrictamente por verificación de proceso y puerto HTTP local, <strong>sin requerir Named Pipes</strong> ni mecanismos propietarios de Windows.
+      </p>
+
+      <h2 id="endpoint-sync-now" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. POST /api/local/sync-now (Forzar Sincronización)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         Fuerza la ejecución inmediata de una pasada de sincronización de stock y comprobación de nuevos pedidos en la tienda web sin esperar al temporizador automático:
       </p>
@@ -80,19 +111,22 @@ HTTP/1.1 200 OK
   "message": "Sincronización manual completada en 245 ms."
 }</code></pre>
 
-      <h2 id="endpoint-save-config" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. POST /api/local/save-full-config</h2>
+      <h2 id="endpoint-save-config" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. POST /api/local/save-full-config (Persistencia JSON Atómica)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Guarda de forma atómica la configuración completa del sistema en <code class="text-indigo-300 font-mono">%APPDATA%\\Bentian Agent\\agent-config.json</code> y reinicializa los adaptadores de Factusol y canal de ventas en caliente sin necesidad de reiniciar el proceso.
+        Guarda de forma atómica la configuración completa del sistema en <code class="text-indigo-300 font-mono">%APPDATA%\\Bentian Agent\\agent-config.json</code> y reinicializa los adaptadores del ERP configurado (Factusol o SimplyGest) y del canal de ventas en caliente sin necesidad de reiniciar el proceso.
+      </p>
+      <p class="text-xs text-zinc-300 leading-relaxed mb-6">
+        <strong>Arquitectura de Almacenamiento Local:</strong> La persistencia de Bentian utiliza <strong>JSON atómico en AppData</strong> con reemplazo seguro vía archivo temporal (<code class="text-zinc-300 font-mono">agent-config.json.tmp</code>), sustitución atómica (<code class="text-zinc-300 font-mono">fs.renameSync</code>) y copia de seguridad defensiva <code class="text-zinc-300 font-mono">agent-config.json.bak</code>. No se emplean bases de datos SQLite incrustadas, garantizando total portabilidad, cero dependencias nativas y blindaje anti-corrupción ante cortes de energía.
       </p>
 
-      <h2 id="endpoint-test-notificaciones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Endpoints de Test de Notificaciones (Email, Telegram y Discord)</h2>
+      <h2 id="endpoint-test-notificaciones" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Endpoints de Test de Notificaciones (Email, Telegram y Discord)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
         Permiten validar la recepción en tiempo real de alertas de nuevos pedidos para cada canal configurado de forma independiente:
       </p>
       <ul class="text-xs text-zinc-300 space-y-2 list-disc list-inside mb-6">
         <li><code class="text-indigo-300 font-mono">POST /api/local/test-email</code>: Envía un correo de prueba conectando directamente con el servidor SMTP propio configurado (Gmail, Outlook, hosting cPanel/Plesk).</li>
         <li><code class="text-indigo-300 font-mono">POST /api/local/test-telegram</code>: Envía un mensaje de prueba al chat o canal de Telegram mediante el Bot API (<code class="text-zinc-300 font-mono">api.telegram.org</code>).</li>
-        <li><code class="text-indigo-300 font-mono">POST /api/local/test-discord</code>: Envía un embed interactivo con formato de pedido de Factusol al canal de Discord mediante el Webhook oficial configurado.</li>
+        <li><code class="text-indigo-300 font-mono">POST /api/local/test-discord</code>: Envía un embed interactivo con formato de pedido al canal de Discord mediante el Webhook oficial configurado.</li>
       </ul>
     `,
   },

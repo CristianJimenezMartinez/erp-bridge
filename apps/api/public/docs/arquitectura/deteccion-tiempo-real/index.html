@@ -221,7 +221,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web">
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol simplygest, configuracion paso a paso bentian, conectar factusol simplygest, continuar sin factusol, serie 1 factusol pedidos web">
                       <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Guía del Asistente de Configuración (Onboarding Wizard)
                       </a>
@@ -355,13 +355,13 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce">
+                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol simplygest, seguridad datos erp, rgpd factusol nube, sincronizacion directa erp woocommerce">
                       <a href="/docs/arquitectura/arquitectura-local-first/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Arquitectura Local-First y Privacidad de Datos
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol">
+                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol simplygest, cola store and forward pedidos erp, ciclo de vida pedidos erp, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico erp">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Cola Desacoplada Store-and-Forward (JSON Atómico)
                       </a>
@@ -594,7 +594,7 @@
 
       <h2 id="debounce-inteligente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. El Algoritmo de Debounce (5 Segundos)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Cuando un usuario guarda un albarán con 20 líneas en Factusol, el archivo <code class="text-zinc-200">.accdb</code> recibe docenas de modificaciones por segundo. Si el conector reaccionara a cada una, colapsaría la cola.
+        Cuando un usuario guarda un albarán con 20 líneas en Factusol o un ticket en SimplyGest, el archivo de datos (<code class="text-zinc-200">.accdb</code> / <code class="text-zinc-200">Datos.mdb</code>) recibe docenas de modificaciones por segundo. Si el conector reaccionara a cada una, colapsaría la cola.
       </p>
       <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6">
         <strong>Filtro de Debounce de 5 Segundos:</strong> Cuando se detecta un cambio en disco, Bentian inicia una cuenta atrás de 5 segundos. Si durante ese lapso se producen nuevos cambios (por ejemplo, el operario sigue añadiendo líneas al albarán), el contador se reinicia. En cuanto el archivo queda en reposo, se dispara <strong>una única lectura consolidada</strong> en memoria.
@@ -602,7 +602,7 @@
 
       <h2 id="ciclos-delta-incrementales" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Sincronización Delta Incremental</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian mantiene en su base de datos local un hash SHA-256 del estado de cada artículo y su stock. En cada ciclo, compara el nuevo cálculo con el previo y <strong>solo transmite a tu tienda online los productos que han cambiado realmente</strong>. Esto reduce en más de un 99% el ancho de banda transferido y permite sincronizar catálogos de 50.000 referencias en apenas 40 milisegundos.
+        Bentian mantiene en su memoria de proceso y archivo JSON atómico en AppData un hash SHA-256 del estado de cada artículo y su stock. En cada ciclo, compara el nuevo cálculo con el previo y <strong>solo transmite a tu tienda online los productos que han cambiado realmente</strong>. Esto reduce en más de un 99% el ancho de banda transferido y permite sincronizar catálogos de 50.000 referencias en apenas 40 milisegundos.
       </p>
     
         </article>
@@ -670,7 +670,7 @@
         <!-- Action Card -->
         <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
           <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
-          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol, SimplyGest y tiendas web.</p>
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
             Descargar v0.4.7
           </a>

@@ -221,7 +221,7 @@
                       </a>
                     </li>
                   
-                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web">
+                    <li data-title="guía del asistente de configuración (onboarding wizard)" data-keywords="asistente bentian, wizard factusol simplygest, configuracion paso a paso bentian, conectar factusol simplygest, continuar sin factusol, serie 1 factusol pedidos web">
                       <a href="/docs/primeros-pasos/asistente-de-configuracion/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Guía del Asistente de Configuración (Onboarding Wizard)
                       </a>
@@ -355,13 +355,13 @@
               </div>
               <ul class="space-y-0.5 border-l border-white/[0.06] ml-3 pl-2">
                 
-                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce">
+                    <li data-title="arquitectura local-first y privacidad de datos" data-keywords="local first erp bridge, privacidad factusol simplygest, seguridad datos erp, rgpd factusol nube, sincronizacion directa erp woocommerce">
                       <a href="/docs/arquitectura/arquitectura-local-first/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Arquitectura Local-First y Privacidad de Datos
                       </a>
                     </li>
                   
-                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol">
+                    <li data-title="cola desacoplada store-and-forward (json atómico)" data-keywords="store and forward factusol simplygest, cola store and forward pedidos erp, ciclo de vida pedidos erp, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico erp">
                       <a href="/docs/arquitectura/cola-store-and-forward/" class="block px-2.5 py-1.5 text-xs transition leading-snug text-zinc-400 hover:text-white hover:bg-white/[0.03] rounded-md">
                         Cola Desacoplada Store-and-Forward (JSON Atómico)
                       </a>
@@ -588,7 +588,7 @@
           <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2 inline-block">Fase de Evaluación</span>
           <h3 class="text-base font-bold text-white mb-1">Beta Pública Gratuita (60 Días)</h3>
           <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
-            Acceso al 100% de las funciones: sincronización de pedidos a Factusol, stock bidireccional, recargo de equivalencia, tallas/colores y cola Store-and-Forward offline en JSON atómico.
+            Acceso al 100% de las funciones: sincronización de pedidos a Factusol o SimplyGest, stock bidireccional, recargo de equivalencia, tallas/colores y cola Store-and-Forward offline en JSON atómico.
           </p>
           <div class="text-sm font-bold text-emerald-400 font-mono">0 € / 60 días completos (Sin tarjeta)</div>
         </div>
@@ -654,7 +654,7 @@
         Al hacer clic en esta opción, el asistente se cerrará temporalmente y accederás directamente al panel de control en <strong>Modo Exploración</strong>:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Explorar todas las pantallas:</strong> Podrás ver la pestaña de Estado General, revisar los gráficos de telemetría de CPU y memoria, examinar la pantalla de configuración de Factusol y consultar el visor de eventos (Logs).</li>
+        <li><strong>Explorar todas las pantallas:</strong> Podrás ver la pestaña de Estado General, revisar los gráficos de telemetría de CPU y memoria, examinar la pantalla de configuración del ERP (Factusol / SimplyGest) y consultar el visor de eventos (Logs).</li>
         <li><strong>Comprobar el rendimiento:</strong> Verifica la fluidez de la interfaz en tu equipo sin registrar ninguna cuenta.</li>
         <li><strong>Activar cuando estés listo:</strong> Cuando decidas poner en marcha la sincronización, podrás activar tu clave Beta en 1 clic en cualquier momento haciendo clic en la pestaña <strong class="text-white">Licencia del Equipo</strong> o pulsando en <strong class="text-white">Asistente de Inicio</strong> en la barra lateral.</li>
       </ul>
@@ -707,7 +707,7 @@
         Bentian ERP Bridge está diseñado para la realidad operativa de pymes y almacenes, donde la conexión a Internet puede experimentar microcortes o caídas temporales:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Periodo de gracia offline criptográfico:</strong> Si se interrumpe la conexión a Internet, el conector sigue operando y registrando pedidos localmente en Factusol durante el periodo de gracia establecido sin bloquearse.</li>
+        <li><strong>Periodo de gracia offline criptográfico:</strong> Si se interrumpe la conexión a Internet, el conector sigue operando y registrando pedidos localmente en Factusol o SimplyGest durante el periodo de gracia establecido sin bloquearse.</li>
         <li><strong>Prueba criptográfica Ed25519:</strong> La validez offline se certifica mediante una firma asimétrica de Bentian Cloud, inmune a caídas de DNS.</li>
         <li><strong>Protección contra alteración de fecha (Anti Clock-Rollback):</strong> El agente mantiene un registro monotónico cifrado (<code class="text-zinc-200 font-mono">clock.enc</code>). Retrasar la fecha en Windows no elude la expiración ni desestabiliza el motor.</li>
       </ul>
@@ -789,7 +789,7 @@
         <!-- Action Card -->
         <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
           <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
-          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol, SimplyGest y tiendas web.</p>
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
             Descargar v0.4.7
           </a>

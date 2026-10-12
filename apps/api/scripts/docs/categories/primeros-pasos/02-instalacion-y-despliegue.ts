@@ -26,7 +26,7 @@ export const instalacionYDespliegueArticle: DocArticle = {
 
       <h2 id="modalidades-despliegue" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Modalidades de Despliegue: Instalador Oficial vs Versión Portable</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Ambas versiones incorporan exactamente el mismo motor de sincronización de alta fidelidad, la misma interfaz gráfica y soporte para bases de datos Factusol tanto en disco local como en servidores de red o NAS:
+        Ambas versiones incorporan exactamente el mismo motor de sincronización de alta fidelidad, la misma interfaz gráfica y soporte para bases de datos Factusol y SimplyGest tanto en disco local como en servidores de red o NAS:
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -221,9 +221,15 @@ export const instalacionYDespliegueArticle: DocArticle = {
             Diagnóstico, Errores y Soporte
           </div>
           <p class="text-xs text-zinc-400 leading-relaxed">
-            En la pestaña <strong class="text-white">Diagnóstico y Ayuda (Logs)</strong> encontrarás el catálogo de guías recomendadas (Factusol OLEDB, red NAS, tiendas) y los botones para <strong class="text-white">Reportar Incidencia</strong> o descargar el informe técnico del sistema.
+            En la pestaña <strong class="text-white">Diagnóstico y Ayuda (Logs)</strong> encontrarás el catálogo de guías recomendadas (Factusol OLEDB, SimplyGest MDB, red NAS, tiendas) y los botones para <strong class="text-white">Reportar Incidencia</strong> o descargar el informe técnico del sistema.
           </p>
         </div>
       </div>
     `,
+  relatedSlugs: [
+    'primeros-pasos/requisitos-del-sistema',
+    'primeros-pasos/asistente-de-configuracion',
+    'seguridad/criptografia-y-actualizaciones',
+    'simplygest/conexion-mdb',
+  ],
 };

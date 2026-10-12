@@ -227,6 +227,11 @@ export const evidenciasTecnicasArticle: DocArticle = {
             <td class="px-4 py-2 text-emerald-400 font-sans">✓ Anti-Tamper & Anti-Brick</td>
           </tr>
           <tr>
+            <td class="px-4 py-2 text-white font-sans font-medium">Control de Instancia Única</td>
+            <td class="px-4 py-2">Sondeo HTTP local 127.0.0.1:39281/health (cero Named Pipes)</td>
+            <td class="px-4 py-2 text-emerald-400 font-sans">✓ Prevención de Duplicados & Debounce 2.5s</td>
+          </tr>
+          <tr>
             <td class="px-4 py-2 text-white font-sans font-medium">Privilegios sobre Factusol</td>
             <td class="px-4 py-2">Share Deny None OLEDB + F_PCL atómico</td>
             <td class="px-4 py-2 text-emerald-400 font-sans">✓ Veri*Factu y F_FAC Intactos</td>
@@ -403,7 +408,7 @@ export const antivirusEdrSmartscreenArticle: DocArticle = {
     <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
       <li><strong>Tráfico 100% Saliente Cifrado:</strong> El agente solo realiza peticiones HTTPS salientes estándar por el puerto TCP 443 hacia la tienda web del cliente (TLS 1.3) y la API central (<code>bridge.cristianjm.com</code>).</li>
       <li><strong>Cero Puertos Entrantes:</strong> No expone ningún servicio hacia la red local ni hacia Internet; no requiere reglas NAT ni aperturas en el firewall perimetral.</li>
-      <li><strong>Aislamiento Local (Loopback):</strong> La interfaz gráfica del agente escucha estrictamente en la interfaz interna <code>127.0.0.1:39281</code>, completamente inaccesible desde otros equipos de la red corporativa.</li>
+      <li><strong>Aislamiento Local (Loopback) y Control de Instancia Única:</strong> La interfaz gráfica del agente escucha estrictamente en la interfaz interna <code class="text-indigo-300 font-mono">127.0.0.1:39281</code>, completamente inaccesible desde otros equipos de la red corporativa. Para el control de instancia única, el agente realiza un sondeo HTTP local a <code class="text-indigo-300 font-mono">http://127.0.0.1:39281/health</code> con un debounce defensivo de 2.5 segundos (sin utilizar Named Pipes ni sockets IPC globales), garantizando que no se dupliquen procesos en segundo plano.</li>
       <li><strong>Delimitación de Datos Salientes:</strong> Solo se transmiten SKU, descripciones, precios con IVA y stock disponible calculado (<code>DISSTO</code>). Cero balances contables, cero facturas de compras y cero datos bancarios.</li>
       <li><strong>Modo OLEDB Share Deny None:</strong> Consultas de catálogo en modo compartido sin bloquear las ventas físicas en mostrador, e inserción atómica de pedidos exclusivamente en <code>F_PCL</code> sin tocar facturación emitida ni registros Veri*Factu.</li>
     </ul>

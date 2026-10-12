@@ -30,7 +30,7 @@ export const activacionDeLicenciasArticle: DocArticle = {
           <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2 inline-block">Fase de Evaluación</span>
           <h3 class="text-base font-bold text-white mb-1">Beta Pública Gratuita (60 Días)</h3>
           <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
-            Acceso al 100% de las funciones: sincronización de pedidos a Factusol, stock bidireccional, recargo de equivalencia, tallas/colores y cola Store-and-Forward offline en JSON atómico.
+            Acceso al 100% de las funciones: sincronización de pedidos a Factusol o SimplyGest, stock bidireccional, recargo de equivalencia, tallas/colores y cola Store-and-Forward offline en JSON atómico.
           </p>
           <div class="text-sm font-bold text-emerald-400 font-mono">0 € / 60 días completos (Sin tarjeta)</div>
         </div>
@@ -96,7 +96,7 @@ export const activacionDeLicenciasArticle: DocArticle = {
         Al hacer clic en esta opción, el asistente se cerrará temporalmente y accederás directamente al panel de control en <strong>Modo Exploración</strong>:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Explorar todas las pantallas:</strong> Podrás ver la pestaña de Estado General, revisar los gráficos de telemetría de CPU y memoria, examinar la pantalla de configuración de Factusol y consultar el visor de eventos (Logs).</li>
+        <li><strong>Explorar todas las pantallas:</strong> Podrás ver la pestaña de Estado General, revisar los gráficos de telemetría de CPU y memoria, examinar la pantalla de configuración del ERP (Factusol / SimplyGest) y consultar el visor de eventos (Logs).</li>
         <li><strong>Comprobar el rendimiento:</strong> Verifica la fluidez de la interfaz en tu equipo sin registrar ninguna cuenta.</li>
         <li><strong>Activar cuando estés listo:</strong> Cuando decidas poner en marcha la sincronización, podrás activar tu clave Beta en 1 clic en cualquier momento haciendo clic en la pestaña <strong class="text-white">Licencia del Equipo</strong> o pulsando en <strong class="text-white">Asistente de Inicio</strong> en la barra lateral.</li>
       </ul>
@@ -149,9 +149,14 @@ export const activacionDeLicenciasArticle: DocArticle = {
         Bentian ERP Bridge está diseñado para la realidad operativa de pymes y almacenes, donde la conexión a Internet puede experimentar microcortes o caídas temporales:
       </p>
       <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-6">
-        <li><strong>Periodo de gracia offline criptográfico:</strong> Si se interrumpe la conexión a Internet, el conector sigue operando y registrando pedidos localmente en Factusol durante el periodo de gracia establecido sin bloquearse.</li>
+        <li><strong>Periodo de gracia offline criptográfico:</strong> Si se interrumpe la conexión a Internet, el conector sigue operando y registrando pedidos localmente en Factusol o SimplyGest durante el periodo de gracia establecido sin bloquearse.</li>
         <li><strong>Prueba criptográfica Ed25519:</strong> La validez offline se certifica mediante una firma asimétrica de Bentian Cloud, inmune a caídas de DNS.</li>
         <li><strong>Protección contra alteración de fecha (Anti Clock-Rollback):</strong> El agente mantiene un registro monotónico cifrado (<code class="text-zinc-200 font-mono">clock.enc</code>). Retrasar la fecha en Windows no elude la expiración ni desestabiliza el motor.</li>
       </ul>
     `,
+  relatedSlugs: [
+    'primeros-pasos/asistente-de-configuracion',
+    'primeros-pasos/requisitos-del-sistema',
+    'seguridad/evidencias-tecnicas-y-auditoria',
+  ],
 };

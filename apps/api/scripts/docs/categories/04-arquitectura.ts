@@ -5,12 +5,12 @@ export const arquitecturaArticles: DocArticle[] = [
     slug: 'arquitectura/arquitectura-local-first',
     categorySlug: 'arquitectura',
     title: 'Arquitectura Local-First y Privacidad de Datos',
-    subtitle: 'Por qué la base de datos de Factusol nunca se sube a la nube de Bentian, cumplimiento estricto del RGPD y seguridad punto a punto.',
+    subtitle: 'Por qué la base de datos de tu ERP (Factusol o SimplyGest) nunca se sube a la nube de Bentian, cumplimiento estricto del RGPD y seguridad punto a punto.',
     badge: 'Arquitectura de Datos',
     readingTime: '4 min de lectura',
     metaTitle: 'Arquitectura Local-First de Bentian ERP Bridge | Privacidad Total',
-    metaDescription: 'Por qué Bentian es 100% Local-First: tus datos de Factusol nunca salen de tu red local ni se copian en servidores de terceros. Cumplimiento RGPD nativo.',
-    keywords: 'local first erp bridge, privacidad factusol, seguridad datos factusol, rgpd factusol nube, sincronizacion directa factusol woocommerce',
+    metaDescription: 'Por qué Bentian es 100% Local-First: tus datos de Factusol o SimplyGest nunca salen de tu red local ni se copian en servidores de terceros. Cumplimiento RGPD nativo.',
+    keywords: 'local first erp bridge, privacidad factusol simplygest, seguridad datos erp, rgpd factusol nube, sincronizacion directa erp woocommerce',
     toc: [
       { id: 'que-es-local-first', label: '1. ¿Qué es la Arquitectura Local-First?', level: 2 },
       { id: 'el-riesgo-nube-terceros', label: '2. El Riesgo de los Conectores Cloud Centralizados', level: 2 },
@@ -24,7 +24,7 @@ export const arquitecturaArticles: DocArticle[] = [
 
       <h2 id="que-es-local-first" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. ¿Qué es la Arquitectura Local-First?</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Local-First significa que el ordenador de tu empresa es el propietario soberano y exclusivo de la información. Tu archivo de base de datos de Factusol (<code class="text-zinc-200">.accdb</code>), tus listas de precios de coste, los datos de facturación de tus clientes y tus márgenes comerciales <strong>permanecen siempre dentro de tu red local</strong>.
+        Local-First significa que el ordenador de tu empresa es el propietario soberano y exclusivo de la información. Tu archivo de base de datos de Factusol (<code class="text-zinc-200">.accdb</code> / <code class="text-zinc-200">.mdb</code>) o de SimplyGest (<code class="text-zinc-200">Datos.mdb</code>), tus listas de precios de coste, los datos de facturación de tus clientes y tus márgenes comerciales <strong>permanecen siempre dentro de tu red local</strong>.
       </p>
 
       <h2 id="el-riesgo-nube-terceros" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. El Riesgo de los Conectores Cloud Centralizados</h2>
@@ -39,10 +39,10 @@ export const arquitecturaArticles: DocArticle[] = [
 
       <h2 id="flujo-punto-a-punto" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Flujo de Sincronización Punto a Punto</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Con Bentian, la sincronización se realiza <strong>punto a punto y en memoria</strong> directamente entre tu equipo de Factusol y tu tienda online mediante HTTPS / TLS 1.3:
+        Con Bentian, la sincronización se realiza <strong>punto a punto y en memoria</strong> directamente entre tu equipo de gestión (Factusol o SimplyGest) y tu tienda online mediante HTTPS / TLS 1.3:
       </p>
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6">
-        [ PC Factusol (Almacén) ] ──(HTTPS Directo)──▶ [ Tu Tienda Online (WooCommerce / PrestaShop) ]
+        [ PC ERP Local (Factusol / SimplyGest) ] ──(HTTPS Directo)──▶ [ Tu Tienda Online (WooCommerce / PrestaShop / Shopify) ]
         <div class="text-[10px] text-emerald-400 mt-2">✓ Cero intermediarios · Cero copias de datos en la nube · Cero exposición</div>
       </div>
 
@@ -56,19 +56,19 @@ export const arquitecturaArticles: DocArticle[] = [
     slug: 'arquitectura/cola-store-and-forward',
     categorySlug: 'arquitectura',
     title: 'Cola Desacoplada Store-and-Forward (JSON Atómico)',
-    subtitle: 'Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia en JSON atómico estructurado e inyección en Factusol.',
+    subtitle: 'Delimitación rigurosa del ciclo de vida del pedido en 4 fases: retención web, recuperación, custodia en JSON atómico estructurado e inyección en el ERP (Factusol o SimplyGest).',
     badge: 'Resiliencia Transaccional',
     readingTime: '6 min de lectura',
-    metaTitle: 'Cola Store-and-Forward JSON Atómico para Factusol | Bentian ERP Bridge',
-    metaDescription: 'Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia en JSON atómico e inyección en Factusol.',
-    keywords: 'store and forward factusol, cola store and forward pedidos factusol, ciclo de vida pedidos factusol, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico factusol',
+    metaTitle: 'Cola Store-and-Forward JSON Atómico para ERP | Bentian ERP Bridge',
+    metaDescription: 'Cómo funciona la arquitectura Store-and-Forward de Bentian: delimitación técnica en 4 fases, retención web con PC apagado, custodia en JSON atómico e inyección en Factusol o SimplyGest.',
+    keywords: 'store and forward factusol simplygest, cola store and forward pedidos erp, ciclo de vida pedidos erp, pc almacen apagado pedidos web, resiliencia pedidos erp bridge, json atomico erp',
     toc: [
       { id: 'el-problema-del-pc-apagado', label: '1. La Realidad Operativa: El PC del Almacén se Apaga', level: 2 },
       { id: 'delimitacion-4-fases', label: '2. Delimitación Rigurosa del Ciclo de Vida en 4 Fases', level: 2 },
       { id: 'fase-1-tienda-online', label: '3. Fase 1: Retención Inmutable en la Tienda Online (PC Apagado)', level: 2 },
       { id: 'fase-2-descarga-agente', label: '4. Fase 2: Recuperación Automática por el Agente (Arranque y Polling)', level: 2 },
       { id: 'fase-3-custodia-local', label: '5. Fase 3: Custodia en Cola Local en JSON Atómico', level: 2 },
-      { id: 'fase-4-inyeccion-factusol', label: '6. Fase 4: Inyección Atómica en Factusol y Confirmación ACK', level: 2 },
+      { id: 'fase-4-inyeccion-erp', label: '6. Fase 4: Inyección Atómica en el ERP (Factusol / SimplyGest) y Confirmación ACK', level: 2 },
       { id: 'tolerancia-bloqueos', label: '7. Tolerancia a Bloqueos (.laccdb) y Reintentos Exponenciales', level: 2 },
       { id: 'garantia-idempotencia', label: '8. Garantía de Entrega e Idempotencia Extremo a Extremo', level: 2 },
     ],
@@ -79,7 +79,7 @@ export const arquitecturaArticles: DocArticle[] = [
 
       <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 leading-relaxed mb-6">
         <strong class="text-white font-semibold block mb-1">Aclaración Mandataria de Arquitectura:</strong>
-        Si el ordenador del almacén está físicamente apagado, ningún software local puede ejecutar instrucciones ni capturar datos directamente. La promesa técnica de Bentian radica en una <strong>arquitectura de custodia desacoplada en dos niveles</strong>: los pedidos permanecen disponibles y seguros en la base de datos de la tienda online mientras el PC permanezca inactivo; en el instante en que el agente vuelve a estar operativo, recupera los pedidos automáticamente y los custodia en su cola local Store-and-Forward con persistencia en JSON atómico estructurado, blindando su posterior inyección en Factusol aunque la base de datos esté temporalmente bloqueada o la tienda web sufra una caída posterior.
+        Si el ordenador del almacén está físicamente apagado, ningún software local puede ejecutar instrucciones ni capturar datos directamente. La promesa técnica de Bentian radica en una <strong>arquitectura de custodia desacoplada en dos niveles</strong>: los pedidos permanecen disponibles y seguros en la base de datos de la tienda online mientras el PC permanezca inactivo; en el instante en que el agente vuelve a estar operativo, recupera los pedidos automáticamente y los custodia en su cola local Store-and-Forward con persistencia en JSON atómico estructurado, blindando su posterior inyección en el ERP (Factusol o SimplyGest) aunque la base de datos esté temporalmente bloqueada o la tienda web sufra una caída posterior.
       </div>
 
       <h2 id="el-problema-del-pc-apagado" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. La Realidad Operativa: El PC del Almacén se Apaga</h2>
@@ -131,7 +131,7 @@ export const arquitecturaArticles: DocArticle[] = [
             </tr>
             <tr>
               <td class="px-4 py-2 text-white font-bold font-sans">Fase 4: Inyección ERP</td>
-              <td class="px-4 py-2 text-indigo-300">Factusol OLEDB (F_PCL / F_LPC)</td>
+              <td class="px-4 py-2 text-indigo-300">Factusol OLEDB (F_PCL) / SimplyGest (PEDIDOS_VENTA)</td>
               <td class="px-4 py-2 text-emerald-300">SYNCED (Confirmado)</td>
               <td class="px-4 py-2 font-sans text-zinc-300">Transacción relacional atómica y confirmación ACK bidireccional a la web.</td>
             </tr>
@@ -140,7 +140,7 @@ export const arquitecturaArticles: DocArticle[] = [
       </div>
 
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.08] text-xs font-mono text-center my-6">
-        [ Fase 1: Web Hosting ] ──(HTTPS Poll / Fase 2)──▶ [ Fase 3: JSON Atómico Local ] ──(Transacción OLEDB)──▶ [ Fase 4: Factusol F_PCL ]
+        [ Fase 1: Web Hosting ] ──(HTTPS Poll / Fase 2)──▶ [ Fase 3: JSON Atómico Local ] ──(Transacción OLEDB)──▶ [ Fase 4: ERP (Factusol / SimplyGest) ]
         <div class="text-[10px] text-emerald-400 mt-2">▲ Retención en Web (PC Apagado) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Blindaje Local Offline en Disco &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ▲ Inyección & Flujo ACK</div>
       </div>
 
@@ -178,18 +178,35 @@ export const arquitecturaArticles: DocArticle[] = [
         <li><strong>Integridad garantizada sin bloqueos:</strong> La separación entre el estado de configuración, la cola y las copias de seguridad (.bak) asegura máxima solidez y prevención anti-wiping sin dependencias externas de drivers ni bloqueos de base de datos.</li>
       </ul>
 
-      <h2 id="fase-4-inyeccion-factusol" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Fase 4: Inyección Atómica en Factusol y Confirmación ACK</h2>
+      <h2 id="fase-4-inyeccion-erp" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Fase 4: Inyección Atómica en el ERP (Factusol / SimplyGest) y Confirmación ACK</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Con el pedido custodiado en la cola local de AppData, el motor <code>LocalSyncEngine</code> procede a su inyección en la base de datos de Factusol (<code>.accdb</code>):
+        Con el pedido custodiado en la cola local de AppData, el motor <code>LocalSyncEngine</code> procede a su inyección atómica en la base de datos del ERP activo:
       </p>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li><strong>Apertura de Transacción OLEDB:</strong> Se inicia una transacción atómica agrupada (<code>BeginTrans</code>) en el motor OLEDB de 32 bits de Microsoft ACE.</li>
-        <li><strong>Resolución de Cliente:</strong> Se busca la ficha del cliente por CIF/NIF en <code>F_CLI</code>. Si no existe, se crea automáticamente una nueva ficha con su código de provincia, tarifa y datos de contacto.</li>
-        <li><strong>Inserción de Cabecera (F_PCL):</strong> Se obtiene el siguiente número correlativo disponible para la serie seleccionada (ej. serie <em>"1"</em> o <em>"W"</em>) y se inserta el registro del pedido con sus totales netos, brutos y fecha.</li>
-        <li><strong>Inserción de Líneas (F_LPC):</strong> Se insertan secuencialmente todas las líneas de productos con sus códigos de artículo (<code>ARTLPC</code>), descripción, cantidad, precio unitario sin IVA y porcentaje de recargo si procede.</li>
-        <li><strong>Commit Transaccional:</strong> Si todas las líneas se escriben correctamente, se ejecuta <code>CommitTrans</code>. Si ocurriera cualquier error, se ejecuta <code>RollbackTrans</code>, dejando Factusol intacto.</li>
-        <li><strong>Confirmación ACK a la Tienda Online:</strong> Tras el commit exitoso, el agente envía una llamada de confirmación (flujo ACK) a la tienda web, informando del número de pedido asignado por Factusol y marcando el pedido web como <strong>SYNCED</strong>.</li>
-      </ol>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
+          <h4 class="text-xs font-bold text-indigo-400 mb-2">Flujo en Factusol (.accdb / .mdb)</h4>
+          <ol class="text-xs text-zinc-300 space-y-1.5 list-decimal list-inside">
+            <li>Transacción OLEDB (<code>BeginTrans</code>).</li>
+            <li>Resolución/alta de cliente en <code>F_CLI</code> por CIF/NIF.</li>
+            <li>Inserción de cabecera en <code>F_PCL</code> con correlativo.</li>
+            <li>Inserción de líneas en <code>F_LPC</code> con precios e IVA.</li>
+            <li><code>CommitTrans</code> transaccional atómico.</li>
+          </ol>
+        </div>
+        <div class="p-4 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
+          <h4 class="text-xs font-bold text-emerald-400 mb-2">Flujo en SimplyGest (Datos.mdb)</h4>
+          <ol class="text-xs text-zinc-300 space-y-1.5 list-decimal list-inside">
+            <li>Comprobación/alta de cliente en <code>CLIENTES</code>.</li>
+            <li>Cabecera en <code>PEDIDOS_VENTA</code> con correlativo y serie.</li>
+            <li>Líneas en <code>LINEAS_PEDIDOS</code> con precios e impuestos.</li>
+            <li>Descuento de existencias en el almacén asignado.</li>
+            <li>Escritura confirmada sin bloqueos en el TPV.</li>
+          </ol>
+        </div>
+      </div>
+      <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+        <strong>Confirmación ACK a la Tienda Online:</strong> Tras completarse la inyección en el ERP, el agente emite una confirmación de vuelta (flujo ACK) a la tienda web, transmitiendo el número oficial asignado y marcando el pedido web como <strong>SYNCED</strong>.
+      </p>
 
       <h2 id="tolerancia-bloqueos" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Tolerancia a Bloqueos (.laccdb) y Reintentos Exponenciales</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
@@ -248,7 +265,7 @@ export const arquitecturaArticles: DocArticle[] = [
 
       <h2 id="debounce-inteligente" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. El Algoritmo de Debounce (5 Segundos)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Cuando un usuario guarda un albarán con 20 líneas en Factusol, el archivo <code class="text-zinc-200">.accdb</code> recibe docenas de modificaciones por segundo. Si el conector reaccionara a cada una, colapsaría la cola.
+        Cuando un usuario guarda un albarán con 20 líneas en Factusol o un ticket en SimplyGest, el archivo de datos (<code class="text-zinc-200">.accdb</code> / <code class="text-zinc-200">Datos.mdb</code>) recibe docenas de modificaciones por segundo. Si el conector reaccionara a cada una, colapsaría la cola.
       </p>
       <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-6">
         <strong>Filtro de Debounce de 5 Segundos:</strong> Cuando se detecta un cambio en disco, Bentian inicia una cuenta atrás de 5 segundos. Si durante ese lapso se producen nuevos cambios (por ejemplo, el operario sigue añadiendo líneas al albarán), el contador se reinicia. En cuanto el archivo queda en reposo, se dispara <strong>una única lectura consolidada</strong> en memoria.
@@ -256,7 +273,7 @@ export const arquitecturaArticles: DocArticle[] = [
 
       <h2 id="ciclos-delta-incrementales" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Sincronización Delta Incremental</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian mantiene en su base de datos local un hash SHA-256 del estado de cada artículo y su stock. En cada ciclo, compara el nuevo cálculo con el previo y <strong>solo transmite a tu tienda online los productos que han cambiado realmente</strong>. Esto reduce en más de un 99% el ancho de banda transferido y permite sincronizar catálogos de 50.000 referencias en apenas 40 milisegundos.
+        Bentian mantiene en su memoria de proceso y archivo JSON atómico en AppData un hash SHA-256 del estado de cada artículo y su stock. En cada ciclo, compara el nuevo cálculo con el previo y <strong>solo transmite a tu tienda online los productos que han cambiado realmente</strong>. Esto reduce en más de un 99% el ancho de banda transferido y permite sincronizar catálogos de 50.000 referencias en apenas 40 milisegundos.
       </p>
     `,
   },
@@ -264,11 +281,11 @@ export const arquitecturaArticles: DocArticle[] = [
     slug: 'arquitectura/arquitectura-tripartita',
     categorySlug: 'arquitectura',
     title: 'Arquitectura Tripartita: Tienda Online + Almacén Local + Facturación Cloud',
-    subtitle: 'Patrón de ingeniería empresarial para sincronizar Shopify/WooCommerce, almacén físico Factusol y facturación contable en Holded sin fricciones ni duplicidades.',
+    subtitle: 'Patrón de ingeniería empresarial para sincronizar Shopify/WooCommerce, almacén físico (Factusol o SimplyGest) y facturación contable en Holded sin fricciones ni duplicidades.',
     badge: 'Patrón Enterprise Tripartito',
     readingTime: '7 min de lectura',
     metaTitle: 'Arquitectura Tripartita: Shopify + Factusol + Holded ERP | Bentian',
-    metaDescription: 'Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.',
+    metaDescription: 'Guía completa de la arquitectura tripartita: conecta tu tienda online (Shopify), tu almacén físico (Factusol o SimplyGest) y tu facturación cloud (Holded) con cero errores y sincronización en tiempo real.',
     keywords: 'arquitectura tripartita shopify factusol holded, facturacion holded pedidos shopify factusol, conectar tienda online almacen fisico gestoria nube, sincronizar shopify factusol holded, flujo pedidos ecommerce almacen erp cloud, automatizar facturas holded pedidos factusol',
     toc: [
       { id: 'el-reto-omnicanal', label: '1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud', level: 2 },
@@ -281,7 +298,7 @@ export const arquitecturaArticles: DocArticle[] = [
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        La mayoría de empresas comerciales en España operan hoy con un ecosistema híbrido: venden online en plataformas líderes como <strong>Shopify</strong> o <strong>WooCommerce</strong>, gestionan la logística, compras y almacén físico en <strong>Factusol</strong> en sus servidores locales de empresa, y coordinan la contabilidad, impuestos y facturación electrónica con su gestoría a través de <strong>Holded Cloud ERP</strong>. La <strong>Arquitectura Tripartita de Bentian ERP Bridge</strong> es el patrón de ingeniería distribuida que sincroniza estos tres pilares en un ciclo continuo, automatizado y a prueba de fallos.
+        La mayoría de empresas comerciales en España operan hoy con un ecosistema híbrido: venden online en plataformas líderes como <strong>Shopify</strong> o <strong>WooCommerce</strong>, gestionan la logística, compras y almacén físico en <strong>Factusol</strong> o <strong>SimplyGest</strong> en sus servidores locales de empresa, y coordinan la contabilidad, impuestos y facturación electrónica con su gestoría a través de <strong>Holded Cloud ERP</strong>. La <strong>Arquitectura Tripartita de Bentian ERP Bridge</strong> es el patrón de ingeniería distribuida que sincroniza estos tres pilares en un ciclo continuo, automatizado y a prueba de fallos.
       </p>
 
       <h2 id="el-reto-omnicanal" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. El Reto Omnicanal: Ventas Web, Almacén Físico y Gestoría Cloud</h2>

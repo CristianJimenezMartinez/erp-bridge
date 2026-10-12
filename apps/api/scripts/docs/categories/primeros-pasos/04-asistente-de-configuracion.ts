@@ -4,17 +4,17 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
   slug: 'primeros-pasos/asistente-de-configuracion',
   categorySlug: 'primeros-pasos',
   title: 'Guía del Asistente de Configuración (Onboarding Wizard)',
-  subtitle: 'Configuración guiada paso a paso en 5 minutos: activación en 1 clic, modo sin Factusol para evaluadores, selección de serie contable y soporte integrado.',
+  subtitle: 'Configuración guiada paso a paso en 5 minutos: activación en 1 clic, selección Multi-ERP (Factusol y SimplyGest), modo sin ERP para evaluadores y soporte integrado.',
   badge: 'Onboarding Zero-Touch',
   readingTime: '6 min de lectura',
   metaTitle: 'Guía del Asistente de Inicio de Bentian ERP Bridge | Paso a Paso',
-  metaDescription: 'Manual completo del Asistente de Configuración de Bentian ERP Bridge. Activación en 1 clic, modo continuar sin Factusol, Serie 1 vs W y documentación integrada.',
-  keywords: 'asistente bentian, wizard factusol woocommerce, configuracion paso a paso bentian, conectar factusol facil, continuar sin factusol, serie 1 factusol pedidos web',
+  metaDescription: 'Manual completo del Asistente de Configuración de Bentian ERP Bridge. Activación en 1 clic, selector Multi-ERP (Factusol y SimplyGest), Serie 1 vs W y documentación integrada.',
+  keywords: 'asistente bentian, wizard factusol simplygest, configuracion paso a paso bentian, conectar factusol simplygest, continuar sin factusol, serie 1 factusol pedidos web',
   toc: [
     { id: 'vision-general-asistente', label: '1. Visión General del Asistente Zero-Touch (4 Pasos)', level: 2 },
     { id: 'paso-1-licencia', label: '2. Paso 1: Licencia (Activación en 1 Clic o Modo Exploración)', level: 2 },
-    { id: 'paso-2-factusol', label: '3. Paso 2: Conexión con Factusol y Modo Continuar sin Factusol', level: 2 },
-    { id: 'serie-factusol-recomendada', label: '4. Configuración Clave: Serie 1 Directo vs Serie W en Factusol', level: 2 },
+    { id: 'paso-2-erp', label: '3. Paso 2: Selección y Conexión con tu ERP (Factusol o SimplyGest)', level: 2 },
+    { id: 'serie-factusol-recomendada', label: '4. Configuración Clave: Series Contables, Tarifas y Almacén', level: 2 },
     { id: 'paso-3-tienda', label: '5. Paso 3: Conexión con la Tienda Web (Universal o WooCommerce)', level: 2 },
     { id: 'paso-4-listo', label: '6. Paso 4: ¡Todo Listo!, Spotlight Tour y Documentación Integrada', level: 2 },
     { id: 'notificaciones-multicanal', label: '7. Centro de Notificaciones Multi-Canal (Email SMTP Propio, Telegram y Discord)', level: 2 },
@@ -36,7 +36,7 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
         </div>
         <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
           <div class="font-bold text-indigo-400 mb-0.5">Paso 2</div>
-          <div class="text-zinc-300">Factusol ERP</div>
+          <div class="text-zinc-300">Software ERP</div>
         </div>
         <div class="p-2.5 rounded-xl bg-zinc-900/60 border border-white/[0.08]">
           <div class="font-bold text-indigo-400 mb-0.5">Paso 3</div>
@@ -105,41 +105,71 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
         </p>
       </div>
 
-      <h2 id="paso-2-factusol" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Paso 2: Conexión con Factusol y Modo Continuar sin Factusol</h2>
+      <h2 id="paso-2-erp" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Paso 2: Selección y Conexión con tu ERP (Factusol o SimplyGest)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En este paso se selecciona la base de datos de tu empresa en Factusol (archivo con extensión <code class="text-indigo-300 font-mono">.accdb</code>, por ejemplo <code class="text-zinc-200 font-mono">0012026.accdb</code>):
+        En este paso eliges el software de gestión instalado en tu empresa y vinculas su base de datos relacional local:
       </p>
 
-      <ul class="text-sm text-zinc-300 space-y-2 list-disc list-inside mb-4">
-        <li><strong>Auto-detectar Factusol:</strong> Examina automáticamente las rutas habituales del disco <code class="text-zinc-200">C:\\Software DELSOL\\Factusol\\Datos\\FS\\</code> y muestra las empresas encontradas en un clic.</li>
-        <li><strong>Examinar en Windows (Local / Red / NAS):</strong> Abre el selector oficial nativo de Windows (OpenFileDialog en STA thread) para navegar por carpetas locales, unidades de red mapeadas (<code class="text-zinc-300">Z:\\...</code>) o rutas UNC (<code class="text-zinc-300">\\\\NAS\\Datos\\...</code>) sin modales web lentos.</li>
-        <li><strong>Pegar ruta directamente:</strong> Puedes copiar la ruta desde el Explorador de Windows con <em>Copiar como ruta de acceso</em>; el conector limpia automáticamente las comillas al pegar.</li>
-      </ul>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <!-- Bloque Factusol -->
+        <div class="p-4 rounded-xl bg-zinc-900/60 border border-indigo-500/30">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>📊</span>
+              <span>Factusol (DELSOL)</span>
+            </span>
+            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-500/20 text-indigo-300">.accdb / .mdb</span>
+          </div>
+          <p class="text-xs text-zinc-400 mb-3">Conexión OLEDB de 64 bits para versiones 2018 a 2026.</p>
+          <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+            <li><strong>Auto-detectar Factusol:</strong> Examina automáticamente <code class="text-zinc-200">C:\\Software DELSOL\\Factusol\\Datos\\FS\\</code>.</li>
+            <li><strong>Examinar en Windows (Local / NAS):</strong> Abre el selector oficial nativo de Windows (STA thread) para seleccionar el archivo <code class="text-indigo-300">0012026.accdb</code> en disco o rutas UNC (<code class="text-zinc-400">\\\\NAS\\...</code>).</li>
+            <li><strong>Pegar ruta directamente:</strong> Soporta pegar rutas de red con limpieza automática de comillas.</li>
+          </ul>
+        </div>
 
-      <!-- Card Continuar sin Factusol Evaluadores -->
+        <!-- Bloque SimplyGest -->
+        <div class="p-4 rounded-xl bg-zinc-900/60 border border-emerald-500/30">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span>🏬</span>
+              <span>SimplyGest Desktop</span>
+            </span>
+            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300">Datos.mdb</span>
+          </div>
+          <p class="text-xs text-zinc-400 mb-3">Conexión OLEDB directa con tablas ARTICULOS y PEDIDOS_VENTA.</p>
+          <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+            <li><strong>Auto-detectar SimplyGest:</strong> Escanea <code class="text-zinc-200">C:\\SimplyGest\\Datos.mdb</code> y subcarpetas multiempresa.</li>
+            <li><strong>Examinar en Windows (Local / Red):</strong> Selector nativo para unidades locales o mapeadas (<code class="text-emerald-300">Z:\\...</code>).</li>
+            <li><strong>Aislamiento Comercial:</strong> Permite asignar empresa, tarifa (1 a 5) y almacén de servicio.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Card Continuar sin ERP Evaluadores -->
       <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 mb-6 flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
         <div>
           <div class="text-xs font-bold text-amber-300 mb-1 flex items-center gap-1.5">
             <span>🧪</span>
-            <span>¿No tienes Factusol en este ordenador?</span>
+            <span>¿No tienes Factusol ni SimplyGest en este ordenador?</span>
           </div>
           <p class="text-xs text-zinc-300 leading-relaxed">
-            Si estás evaluando Bentian en tu portátil personal o en un equipo donde Factusol no está instalado físicamente (porque reside en el servidor del almacén), no te preocupes: pulsa en <strong class="text-amber-300">Continuar sin Factusol →</strong>. Podrás continuar configurando tu tienda web o explorar el panel en modo demostración. Podrás vincular tu Factusol en cualquier momento posterior desde la pestaña <em>Factusol ERP</em>.
+            Si estás evaluando Bentian en tu portátil personal o en un equipo donde el ERP reside en el servidor del almacén, pulsa en <strong class="text-amber-300">Continuar sin Factusol / sin ERP →</strong>. Podrás continuar configurando tu tienda web o explorar el panel en modo demostración. Podrás vincular tu base de datos en cualquier momento posterior desde el selector Multi-ERP.
           </p>
         </div>
       </div>
 
-      <h2 id="serie-factusol-recomendada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Configuración Clave: Serie 1 Directo vs Serie W en Factusol</h2>
+      <h2 id="serie-factusol-recomendada" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Configuración Clave: Series Contables, Tarifas y Almacén</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En el mismo Paso 2 encontrarás el selector pedagógico de <strong>Serie para Pedidos Web en Factusol</strong>. Este parámetro define en qué serie contable de Factusol se registrarán las ventas procedentes de tu web:
+        Este parámetro define en qué serie contable del ERP se registrarán las ventas procedentes de tu web y qué tarifa comercial se publicará:
       </p>
 
       <div class="overflow-x-auto mb-6">
         <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
           <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
             <tr>
-              <th class="px-4 py-3 font-semibold">Configuración de Serie</th>
-              <th class="px-4 py-3 font-semibold">Comportamiento en Factusol</th>
+              <th class="px-4 py-3 font-semibold">ERP / Configuración</th>
+              <th class="px-4 py-3 font-semibold">Comportamiento en el Programa</th>
               <th class="px-4 py-3 font-semibold">Visibilidad para el Personal</th>
               <th class="px-4 py-3 font-semibold">Veredicto Oficial</th>
             </tr>
@@ -147,11 +177,11 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
           <tbody class="divide-y divide-white/[0.06] text-zinc-400">
             <tr>
               <td class="px-4 py-3 font-medium text-white">
-                <span class="font-bold text-indigo-400 block">Serie 1 (Directo)</span>
+                <span class="font-bold text-indigo-400 block">Factusol: Serie 1 (Directo)</span>
                 <span class="text-[10px] text-zinc-500">Valor por defecto '1'</span>
               </td>
               <td class="px-4 py-3 text-zinc-300">
-                Los pedidos web entran en la bandeja principal de Factusol (<code class="text-zinc-200">Comercial → Pedidos de cliente</code>).
+                Los pedidos web entran en la bandeja principal (<code class="text-zinc-200">Comercial → Pedidos de cliente</code>).
               </td>
               <td class="px-4 py-3 text-emerald-400 font-medium">
                 Inmediata. Abres Factusol y el pedido web está el primero a la vista de cualquiera. Cero despistes.
@@ -162,7 +192,7 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
             </tr>
             <tr>
               <td class="px-4 py-3 font-medium text-white">
-                <span class="font-bold text-zinc-300 block">Serie W (Web)</span>
+                <span class="font-bold text-zinc-300 block">Factusol: Serie W (Web)</span>
                 <span class="text-[10px] text-zinc-500">Separada para ecommerce</span>
               </td>
               <td class="px-4 py-3 text-zinc-400">
@@ -175,12 +205,27 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-800 text-zinc-400 border border-white/[0.08]">Opcional Contable</span>
               </td>
             </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium text-white">
+                <span class="font-bold text-emerald-400 block">SimplyGest: Serie 1 o W</span>
+                <span class="text-[10px] text-zinc-500">Almacén + Tarifa 1 a 5</span>
+              </td>
+              <td class="px-4 py-3 text-zinc-300">
+                Ingesta en <code class="text-zinc-200">PEDIDOS_VENTA</code> vinculando la tarifa seleccionada y descontando el stock del almacén configurado.
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-medium">
+                Inmediata. TPV y mostrador siguen operativos sin interferencias ni bloqueos de base de datos.
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">Multi-Tarifa Nativo</span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mb-8">
-        <strong class="font-semibold text-white block mb-0.5">¿Por qué recomendamos mantener la Serie 1?</strong>
+        <strong class="font-semibold text-white block mb-0.5">¿Por qué recomendamos mantener la Serie 1 en Factusol?</strong>
         En muchas empresas, los dependientes o administrativos abren Factusol y miran directamente la lista de pedidos. Si la pantalla se abre filtrada en la Serie 1 y los pedidos entran en la Serie W, pueden creer erróneamente que no hay ventas nuevas. Con la <strong>Serie 1</strong>, cualquier pedido web entra directo a la vista de todos: cero líos, cero llamadas a soporte.
       </div>
 

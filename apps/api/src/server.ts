@@ -428,6 +428,9 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/simplygest-woocommerce', (_req, res) => {
     res.redirect(301, '/simplygest-woocommerce/');
   });
+  app.get('/press', (_req, res) => {
+    res.redirect(301, '/press/');
+  });
 
   // Redirecciones canónicas 301 para páginas pilar SEO y guías
   app.get('/factusol-woocommerce', (_req, res) => {

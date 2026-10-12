@@ -23,7 +23,7 @@ function getCanonicalVersion(): string {
       if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
     } catch {}
   }
-  return '0.4.0';
+  return '0.4.7';
 }
 
 function renderSidebar(currentSlug?: string): string {
@@ -378,7 +378,7 @@ function renderDocArticlePage(article: DocArticle): string {
         <!-- Action Card -->
         <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
           <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
-          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol, SimplyGest y tiendas web.</p>
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
             Descargar v${version}
           </a>
@@ -477,8 +477,8 @@ function renderDocsHub(): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Centro de Documentación Técnica y Manuales Oficiales | Bentian ERP Bridge</title>
-  <meta name="description" content="Portal oficial de documentación técnica de Bentian ERP Bridge. Guías de conexión con Factusol, WooCommerce, PrestaShop, Shopify, resolución de incidencias OLEDB y arquitectura local-first.">
-  <meta name="keywords" content="documentacion bentian, manual factusol woocommerce, guia conectar factusol, api factusol prestashop, soporte tecnico factusol">
+  <meta name="description" content="Portal oficial de documentación técnica de Bentian ERP Bridge. Guías de conexión con Factusol, SimplyGest, WooCommerce, PrestaShop, Shopify, resolución de incidencias OLEDB y arquitectura local-first.">
+  <meta name="keywords" content="documentacion bentian, manual factusol woocommerce, manual simplygest woocommerce, guia conectar factusol, api factusol prestashop, soporte tecnico factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
   <link rel="canonical" href="https://bridge.cristianjm.com/docs/">
 
@@ -491,7 +491,7 @@ function renderDocsHub(): string {
   <meta property="og:url" content="https://bridge.cristianjm.com/docs/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
   <meta property="og:title" content="Centro de Documentación Técnica | Bentian ERP Bridge">
-  <meta property="og:description" content="Manuales y guías de arquitectura para conectar Factusol con el comercio electrónico de forma local-first.">
+  <meta property="og:description" content="Manuales y guías de arquitectura para conectar Factusol y SimplyGest con el comercio electrónico de forma local-first.">
   <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
   <meta property="og:locale" content="es_ES">
 
@@ -563,7 +563,7 @@ function renderDocsHub(): string {
             Documentación Técnica de Bentian ERP Bridge
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Arquitectura de sincronización local-first, conexión punto a punto con Factusol en Windows y mapeo de pedidos, existencias e impuestos en tiempo real.
+            Arquitectura de sincronización local-first, conexión punto a punto con Factusol y SimplyGest en Windows y mapeo de pedidos, existencias e impuestos en tiempo real.
           </p>
         </div>
 
@@ -597,8 +597,8 @@ function renderDocsHub(): string {
             <a href="/docs/factusol/localizacion-base-datos/" class="p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition group flex flex-col justify-between">
               <div>
                 <div class="text-xs font-mono text-indigo-400 font-semibold mb-1">Paso 2</div>
-                <h3 class="text-xs font-bold text-white group-hover:text-indigo-300 transition mb-1">Conectar Factusol</h3>
-                <p class="text-[11px] text-zinc-400 leading-snug">Rutas locales vs NAS y Serie 1.</p>
+                <h3 class="text-xs font-bold text-white group-hover:text-indigo-300 transition mb-1">Conectar tu ERP</h3>
+                <p class="text-[11px] text-zinc-400 leading-snug">Factusol o SimplyGest (local / NAS).</p>
               </div>
               <span class="text-[10px] text-indigo-400 mt-3 font-semibold group-hover:underline">Leer guía &rarr;</span>
             </a>
@@ -724,7 +724,7 @@ function renderDocsHub(): string {
         <!-- Action Card -->
         <div class="mt-8 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
           <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
-          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol y tiendas web.</p>
+          <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol, SimplyGest y tiendas web.</p>
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition">
             Descargar v${version}
           </a>
