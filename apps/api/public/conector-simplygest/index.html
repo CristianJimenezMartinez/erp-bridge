@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector SimplyGest con WooCommerce, PrestaShop y Shopify — Bentian ERP Bridge</title>
+  <meta name="description" content="Conector oficial Local-First en tiempo real para SimplyGest (Estándar, Profesional, TPV). Sincroniza catálogo, stock disponible con reservas, tallas, colores y pedidos con WooCommerce, PrestaShop y Shopify vía OLEDB nativo sin bloqueos ni nubes intermedias.">
+  <meta name="keywords" content="conector simplygest, sincronizar simplygest woocommerce, conector simplygest prestashop, conector simplygest shopify, datos.mdb oledb, simplygest tpv stock, sincronizar stock simplygest, tallas y colores simplygest, simplygest pedidos venta">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/conector-simplygest/">
+
+  <!-- Favicon y Assets de Marca -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+  <link rel="apple-touch-icon" href="/assets/icon.png">
+
+  <!-- Directivas de Rastreo e Indexación -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large">
+
+  <!-- Open Graph / Redes Sociales -->
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bridge.cristianjm.com/conector-simplygest/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector SimplyGest con WooCommerce, PrestaShop y Shopify — Bentian ERP Bridge">
+  <meta property="og:description" content="Sincronización profesional en tiempo real entre SimplyGest Desktop y tus canales eCommerce. Conexión nativa OLEDB a Datos.mdb, control anti-sobreventas y registro automático de pedidos.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:image:secure_url" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bentian Conector SimplyGest en Tiempo Real">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://bridge.cristianjm.com/conector-simplygest/">
+  <meta name="twitter:title" content="Conector SimplyGest con WooCommerce, PrestaShop y Shopify — Bentian ERP Bridge">
+  <meta name="twitter:description" content="Conecta tu SimplyGest con tiendas online en tiempo real. Sin nubes intermedias, sin comisiones por pedido y sin bloquear la caja de tu TPV físico.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tipografía Oficial: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS & Estilos de Producción -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+
+  <!-- Metadatos de Web App -->
+  <meta name="theme-color" content="#09090b">
+  <meta name="application-name" content="Bentian ERP Bridge">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://bridge.cristianjm.com/conector-simplygest/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://bridge.cristianjm.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Conector SimplyGest",
+            "item": "https://bridge.cristianjm.com/conector-simplygest/"
+          }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://bridge.cristianjm.com/conector-simplygest/#software",
+        "name": "Bentian Conector SimplyGest",
+        "alternateName": "Bentian ERP Bridge for SimplyGest",
+        "softwareVersion": "0.4.7",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server (x64)",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "ERP eCommerce Integration",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/conector-simplygest/",
+        "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
+        "description": "Conector local-first en tiempo real para SimplyGest (Estándar, Profesional, TPV) con WooCommerce, PrestaShop y Shopify. Lectura OLEDB de Datos.mdb en menos de 15ms sin bloqueos de TPV ni costes cloud.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-SIMPLYGEST",
+        "mpn": "EB-SG-047",
+        "screenshot": [
+          "https://bridge.cristianjm.com/assets/screenshots/02-multi-erp-selector.webp",
+          "https://bridge.cristianjm.com/assets/screenshots/06-setup-wizard.webp"
+        ],
+        "featureList": [
+          "Conexión nativa OLEDB/ACE a Datos.mdb y Tablas.mdb en C:\\SimplyGest o recurso compartido LAN",
+          "Compatibilidad certificada con SimplyGest Estándar, Profesional, TPV y TPV Visual",
+          "Control de stock disponible en tiempo real con reservas (Stock Disponible = Actual - Reservas)",
+          "Sincronización de familias, subfamilias y variantes (tallas y colores)",
+          "Inserción atómica de pedidos en PEDIDOS_VENTA y LINEAS_PEDIDOS",
+          "Asignación automática de cliente por CIF/NIF o email en tabla CLIENTES",
+          "Desglose exacto de IVA (21%, 10%, 4%) y Recargo de Equivalencia (5,2%, 1,4%, 0,5%)",
+          "Mapeo de series de facturación exclusivas para ventas web y almacenes independientes",
+          "Conexión directa con WooCommerce (HPOS), PrestaShop (Webservices) y Shopify (GraphQL)",
+          "Cola persistente Store-and-Forward tolerante a apagados y pérdidas de red"
+        ],
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Licencia Anual Conector SimplyGest",
+            "price": "199.00",
+            "priceCurrency": "EUR",
+            "priceValidUntil": "2027-12-31",
+            "url": "https://bridge.cristianjm.com/#pricing",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Bentian",
+              "url": "https://bridge.cristianjm.com"
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "0.00",
+                "currency": "EUR"
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "ES"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 0,
+                  "maxValue": 0,
+                  "unitCode": "DAY"
+                }
+              }
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "ES",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 60,
+              "returnMethod": "https://schema.org/ReturnOnline",
+              "returnFees": "https://schema.org/FreeReturn"
+            }
+          }
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "18",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://bridge.cristianjm.com/conector-simplygest/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Qué versiones y ediciones de SimplyGest son compatibles con Bentian?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian ERP Bridge es compatible con SimplyGest Estándar, SimplyGest Profesional y SimplyGest TPV (incluidas las versiones TPV Visual). Se conecta al motor Access/Jet nativo a través de Datos.mdb y Tablas.mdb de forma compatible con versiones 2020 a 2026."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo evita Bentian el bloqueo del archivo Datos.mdb mientras se cobra en caja?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian abre la conexión OLEDB local en modo compartido no exclusivo (adModeShareDenyNone) con transacciones de lectura ultrarrápida (menos de 15 ms). De este modo, el terminal TPV de SimplyGest puede emitir tickets y cobrar en mostrador sin advertencias de archivos bloqueados ni interferencias con los ficheros de bloqueo .ldb."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Dónde debe instalarse el Agente Bentian?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Debe instalarse en un único equipo con Windows 10, Windows 11 o Windows Server de 64 bits que tenga acceso local o mediante red de área local (SMB/UNC) a la carpeta de SimplyGest donde reside Datos.mdb. No es necesario instalarlo en todos los puestos ni terminales secundarios de la empresa."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo se sincronizan las tallas y colores de SimplyGest con la tienda online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian lee la estructura de tallajes y combinaciones de SimplyGest y las proyecta como atributos y variaciones en WooCommerce (atributos globales y variaciones en producto variable) o combinaciones en PrestaShop y Shopify, vinculando el código de barras y stock exacto a cada SKU secundario."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué ocurre si entra un pedido de un cliente nuevo que no existe en SimplyGest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "El Agente verifica primero si el cliente ya existe en la tabla CLIENTES buscando por NIF/CIF o correo electrónico. Si es un cliente nuevo, genera automáticamente su ficha con los datos de facturación y dirección de envío antes de registrar el pedido en PEDIDOS_VENTA."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Es necesario abrir puertos en el router o contratar una IP estática?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Bentian opera con arquitectura Local-First y conexiones salientes cifradas HTTPS (puerto 443 estándar). La base de datos de SimplyGest nunca se expone a internet, no requiere abrir puertos en el cortafuegos ni configurar IP fija."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Puedo mapear series de facturación y almacenes independientes para las ventas web?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Puedes configurar una serie de pedidos exclusiva para la tienda online (por ejemplo, serie 'W') y asignar un almacén específico de SimplyGest. De esta forma la numeración y el control contable permanecen ordenados y separados de las ventas presenciales de mostrador."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Puedo cambiar entre Factusol y SimplyGest si cambio de ERP en mi empresa?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Bentian incorpora una arquitectura polimórfica (Single Active ERP). Desde el panel de control del agente puedes cambiar entre Factusol y SimplyGest conservando intactas las rutas, series y parámetros de cada sistema en archivos de configuración aislados con protección anti-wiping."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-emerald-500/30 selection:text-emerald-200 font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- ========================================================================= -->
+  <!-- 1. HEADER CANÓNICO BENTIAN CON NAVEGACIÓN Y BADGE DE VERSIÓN               -->
+  <!-- ========================================================================= -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 h-20 flex items-center justify-between">
+      
+      <!-- Marca Principal Bentian + Badge SimplyGest -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-xl py-1.5 px-2 hover:bg-white/[0.03] transition shrink-0">
+        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0 group-hover:scale-105 transition-transform" width="36" height="36">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-lg sm:text-xl tracking-tight text-white group-hover:text-emerald-300 transition">Bentian</span>
+          <span class="hidden sm:inline-flex text-[11px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/60 px-2 py-0.5 rounded-full font-semibold">
+            Conector SimplyGest
+          </span>
+        </div>
+      </a>
+
+      <!-- Navegación alineada a la derecha -->
+      <nav class="flex items-center gap-2 sm:gap-5 lg:gap-7 text-xs sm:text-[13px] font-medium shrink-0">
+        <a href="#caracteristicas" class="text-zinc-400 hover:text-white transition hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Prestaciones</a>
+        <a href="#arquitectura" class="text-zinc-400 hover:text-white transition hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Arquitectura OLEDB</a>
+        <a href="#canales" class="text-zinc-400 hover:text-white transition hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Canales</a>
+        <a href="#comparativa" class="text-zinc-400 hover:text-white transition hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Comparativa</a>
+        <a href="#documentacion" class="text-zinc-400 hover:text-white transition hidden xl:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Manuales</a>
+        <a href="#faq" class="text-zinc-400 hover:text-white transition hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">FAQ</a>
+        <a href="/docs/simplygest/localizacion-base-datos/" class="text-zinc-400 hover:text-white transition hidden 2xl:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap">Docs Técnicos</a>
+        
+        <!-- Botón de Descarga SSoT -->
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/35 transition flex items-center gap-2 whitespace-nowrap text-xs sm:text-[13px] shrink-0">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
+          <span>Descargar Agente</span>
+          <span class="text-[10px] font-mono bg-emerald-950/70 border border-emerald-400/30 px-1.5 py-0.5 rounded text-emerald-200 hidden sm:inline" data-app-version>v0.4.7</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. HERO SECTION CANÓNICA SIMPLYGEST                                       -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 bg-[#09090b]">
+    <section class="relative pt-12 sm:pt-16 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <!-- Glow ambiental de fondo -->
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-indigo-500/10 blur-[120px] pointer-events-none -z-10"></div>
+
+      <div class="max-w-6xl mx-auto text-center">
+        
+        <!-- Badge de Soporte Oficial y Versión -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs sm:text-[13px] font-medium tracking-wide mb-8 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-semibold">Soporte Nativo SimplyGest + Factusol en Bentian <span data-app-version>v0.4.7</span></span>
+          <span class="text-zinc-500 hidden sm:inline">|</span>
+          <span class="text-zinc-400 hidden sm:inline">Ediciones Estándar, Profesional & TPV</span>
+        </div>
+
+        <!-- Título H1 de Alto Rendimiento SEO -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15] mb-6">
+          Sincronización en Tiempo Real entre <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400">SimplyGest Desktop</span> y tu Tienda Online
+        </h1>
+
+        <!-- Subtítulo técnico y propuesta de valor -->
+        <p class="text-base sm:text-lg lg:text-xl text-zinc-300 max-w-3xl mx-auto leading-relaxed mb-10">
+          Conecta tu base de datos <code class="text-emerald-300 font-mono font-medium">Datos.mdb</code> con WooCommerce, PrestaShop y Shopify de forma autónoma. Arquitectura <strong class="text-white font-semibold">Local-First</strong>, motor OLEDB de lectura en <strong class="text-emerald-300">&lt;15 ms</strong>, sin comisiones por pedido y con tolerancia total para tu terminal TPV en caja física.
+        </p>
+
+        <!-- Bloque de CTAs de Conversión Directa -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-12">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="w-full sm:w-auto px-7 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/40 transition flex items-center justify-center gap-2.5">
+            <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
+            <span>Descargar Instalador Windows (.exe)</span>
+          </a>
+          <a href="#arquitectura" class="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#121215] hover:bg-[#18181b] border border-white/[0.1] text-zinc-300 hover:text-white font-semibold text-sm transition flex items-center justify-center gap-2">
+            <span>Ver Arquitectura OLEDB</span>
+            <span aria-hidden="true">&darr;</span>
+          </a>
+        </div>
+
+        <!-- Píldoras de Seguridad & Rendimiento -->
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-mono text-zinc-400">
+          <div class="flex items-center gap-2 bg-[#121215] border border-white/[0.06] px-3.5 py-1.5 rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Motor OLEDB &lt;15 ms</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#121215] border border-white/[0.06] px-3.5 py-1.5 rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Cero Bloqueo de TPV / Ficheros .ldb</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#121215] border border-white/[0.06] px-3.5 py-1.5 rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Local-First & Zero-Knowledge</span>
+          </div>
+          <div class="flex items-center gap-2 bg-[#121215] border border-white/[0.06] px-3.5 py-1.5 rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Sin Puertos Abiertos ni IP Fija</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 3. DEMOSTRACIÓN VISUAL: SELECTOR MULTI-ERP Y SETUP WIZARD                   -->
+    <!-- ========================================================================= -->
+    <section class="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-y border-white/[0.06] bg-[#0c0c0f]">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Interfaz Oficial del Agente</span>
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mt-2 tracking-tight">
+            Diseñado para Correr Limpio y Rápido en Windows
+          </h2>
+          <p class="text-zinc-400 text-sm mt-3 leading-relaxed">
+            Sin consolas oscuras ni configuraciones crípticas. Selecciona SimplyGest en el selector de conectores y sigue el asistente interactivo para vincular tu archivo <code class="text-zinc-300 font-mono">Datos.mdb</code> en menos de 2 minutos.
+          </p>
+        </div>
+
+        <!-- Selector de Pestañas Interactivo -->
+        <div class="flex justify-center gap-3 mb-6" id="sg-gallery-tabs">
+          <button type="button" onclick="switchSgPreview('multi-erp')" id="tab-btn-multi-erp" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition flex items-center gap-2 bg-emerald-500/20 border-emerald-500/50 text-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Selector Multi-ERP (SimplyGest Activo)</span>
+          </button>
+          <button type="button" onclick="switchSgPreview('wizard')" id="tab-btn-wizard" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition flex items-center gap-2 bg-[#141419] border-white/[0.08] text-zinc-400 hover:text-white">
+            <span class="w-2 h-2 rounded-full bg-zinc-600"></span>
+            <span>Asistente Inicial de Configuración</span>
+          </button>
+        </div>
+
+        <!-- Marco de Ventana Estilizada Windows -->
+        <div class="rounded-2xl bg-[#0e0e12] border border-white/[0.12] shadow-2xl overflow-hidden max-w-5xl mx-auto">
+          <!-- Barra superior simulada -->
+          <div class="flex items-center justify-between px-4 py-3 bg-[#16161c] border-b border-white/[0.06] text-xs font-mono text-zinc-400">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              <span class="ml-2 text-zinc-300 text-xs font-sans font-medium" id="sg-preview-title">Bentian ERP Bridge — Selector de Conectores ERP</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-[11px] text-zinc-500 hidden sm:inline">127.0.0.1:39281 (Loopback Seguro)</span>
+              <a id="sg-preview-full-link" href="/assets/screenshots/02-multi-erp-selector.png" target="_blank" rel="noopener" class="text-emerald-400 hover:text-emerald-300 text-xs font-sans flex items-center gap-1 transition">
+                <span>Ver Alta Resolución ↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Imagen con Picture (WebP + fallback PNG) -->
+          <div class="relative aspect-[16/10.25] bg-[#09090b] flex items-center justify-center p-2 sm:p-4">
+            <picture id="sg-preview-picture">
+              <source id="sg-preview-source" srcset="/assets/screenshots/02-multi-erp-selector.webp" type="image/webp">
+              <img id="sg-preview-img" src="/assets/screenshots/02-multi-erp-selector.png" alt="Selector Multi-ERP con SimplyGest Desktop activo en Bentian ERP Bridge" width="1280" height="820" class="w-full h-full object-contain rounded-lg" loading="eager" />
+            </picture>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Script de Cambio de Pestañas Visuales -->
+    <script>
+      function switchSgPreview(screenKey) {
+        var screens = {
+          'multi-erp': {
+            title: 'Bentian ERP Bridge — Selector de Conectores ERP (SimplyGest Activo)',
+            webp: '/assets/screenshots/02-multi-erp-selector.webp',
+            png: '/assets/screenshots/02-multi-erp-selector.png',
+            alt: 'Selector Multi-ERP con SimplyGest Desktop activo en Bentian ERP Bridge',
+            btnActive: 'tab-btn-multi-erp',
+            btnInactive: 'tab-btn-wizard'
+          },
+          'wizard': {
+            title: 'Bentian ERP Bridge — Asistente de Conexión de Base de Datos Datos.mdb',
+            webp: '/assets/screenshots/06-setup-wizard.webp',
+            png: '/assets/screenshots/06-setup-wizard.png',
+            alt: 'Asistente de configuración guiada paso a paso para SimplyGest Datos.mdb',
+            btnActive: 'tab-btn-wizard',
+            btnInactive: 'tab-btn-multi-erp'
+          }
+        };
+
+        var target = screens[screenKey];
+        if (!target) return;
+
+        var titleEl = document.getElementById('sg-preview-title');
+        var fullLinkEl = document.getElementById('sg-preview-full-link');
+        var sourceEl = document.getElementById('sg-preview-source');
+        var imgEl = document.getElementById('sg-preview-img');
+
+        if (titleEl) titleEl.textContent = target.title;
+        if (fullLinkEl) fullLinkEl.href = target.png;
+        if (sourceEl) sourceEl.srcset = target.webp;
+        if (imgEl) {
+          imgEl.src = target.png;
+          imgEl.alt = target.alt;
+        }
+
+        var activeBtn = document.getElementById(target.btnActive);
+        var inactiveBtn = document.getElementById(target.btnInactive);
+
+        if (activeBtn) {
+          activeBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition flex items-center gap-2 bg-emerald-500/20 border-emerald-500/50 text-emerald-300';
+          var dotA = activeBtn.querySelector('span');
+          if (dotA) dotA.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        }
+        if (inactiveBtn) {
+          inactiveBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition flex items-center gap-2 bg-[#141419] border-white/[0.08] text-zinc-400 hover:text-white';
+          var dotI = inactiveBtn.querySelector('span');
+          if (dotI) dotI.className = 'w-2 h-2 rounded-full bg-zinc-600';
+        }
+      }
+    </script>
+
+    <!-- ========================================================================= -->
+    <!-- 4. ARQUITECTURA LOCAL-FIRST Y MOTORES OLEDB PARA SIMPLYGEST                -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] scroll-mt-20" id="arquitectura">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-950/60 border border-emerald-700/40 text-xs font-mono text-emerald-300 font-semibold mb-3">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>TECNOLOGÍA OLEDB NATIVA DE BAJO NIVEL</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Lectura y Escritura Directa en Datos.mdb sin Bloqueos de Mostrador
+            </h2>
+            <p class="mt-4 text-zinc-400 text-sm sm:text-base leading-relaxed">
+              SimplyGest almacena el corazón de su operativa en archivos Microsoft Access (<code class="text-zinc-200 font-mono">Datos.mdb</code> y <code class="text-zinc-200 font-mono">Tablas.mdb</code>). Cuando dos programas intentan acceder simultáneamente sin el protocolo adecuado, el TPV se congela o lanza errores de bloqueo de archivo (<code class="text-rose-400 font-mono">.ldb</code>).
+            </p>
+            <p class="mt-3 text-zinc-400 text-sm sm:text-base leading-relaxed">
+              Bentian resuelve este reto de raíz: implementa un proveedor OLEDB local configurado en modo compartido transaccional (<code class="text-emerald-400 font-mono">adModeShareDenyNone</code>). Las consultas de stock diferencial se completan en <strong class="text-white">&lt;15 milisegundos</strong>, permitiendo que tus dependientes cobren tickets en caja a máxima velocidad mientras la web actualiza existencias sin colisiones.
+            </p>
+
+            <div class="mt-8 space-y-3.5 text-xs sm:text-sm font-mono text-zinc-300">
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Compatible con <strong class="text-white font-sans">SimplyGest Estándar, Profesional y TPV</strong></span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Detección automática en <code class="text-zinc-200 font-mono">C:\SimplyGest</code> o carpetas compartidas de red LAN (SMB/NAS)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Consultas OLEDB/ACE de lectura atómica compartida (cero bloqueos en caja)</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span>Cola de pedidos <strong class="text-white font-sans">Store-and-Forward</strong> si el equipo local se apaga</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagrama Arquitectónico Visual -->
+          <div class="p-6 sm:p-8 rounded-2xl bg-[#121215] border border-white/[0.08] shadow-2xl relative overflow-hidden">
+            <div class="text-xs font-mono text-zinc-400 mb-6 flex items-center justify-between pb-3 border-b border-white/[0.06]">
+              <span class="text-white font-semibold flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Flujo Local-First de Datos
+              </span>
+              <span class="text-emerald-400">Latencia &lt;15 ms</span>
+            </div>
+
+            <!-- Nodos del Diagrama -->
+            <div class="space-y-4">
+              
+              <!-- Nodo 1: eCommerce -->
+              <div class="p-4 rounded-xl bg-[#181820] border border-white/[0.08] flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xs">WEB</div>
+                  <div>
+                    <h3 class="text-xs font-semibold text-white">Tienda Online (WooCommerce / PrestaShop / Shopify)</h3>
+                    <p class="text-[11px] text-zinc-400">Webhooks y REST API v3 con cifrado TLS 1.3</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">HTTPS 443</span>
+              </div>
+
+              <!-- Flecha de Conexión -->
+              <div class="flex justify-center text-zinc-600 text-xs font-mono py-1">
+                <span>⇅ Saliente cifrado TLS — Cero puertos abiertos en router ⇅</span>
+              </div>
+
+              <!-- Nodo 2: Agente Bentian -->
+              <div class="p-4 rounded-xl bg-[#16221c] border border-emerald-500/30 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-xs">AGENT</div>
+                  <div>
+                    <h3 class="text-xs font-semibold text-emerald-200">Bentian Agent en Windows (Proceso Local)</h3>
+                    <p class="text-[11px] text-emerald-400/80">Motor de dirty-checking, reservas de stock y cola Store-and-Forward</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-300 bg-emerald-900/50 px-2 py-0.5 rounded">x64 Local</span>
+              </div>
+
+              <!-- Flecha de Conexión Local -->
+              <div class="flex justify-center text-emerald-500/70 text-xs font-mono py-1">
+                <span>⇅ Conexión OLEDB Nativa Compartida (&lt;15 ms) ⇅</span>
+              </div>
+
+              <!-- Nodo 3: SimplyGest -->
+              <div class="p-4 rounded-xl bg-[#181820] border border-white/[0.08] flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 font-bold text-xs">MDB</div>
+                  <div>
+                    <h3 class="text-xs font-semibold text-white">SimplyGest Desktop (<code class="text-emerald-300">Datos.mdb</code> + <code class="text-emerald-300">Tablas.mdb</code>)</h3>
+                    <p class="text-[11px] text-zinc-400">Tablas ARTICULOS, PEDIDOS_VENTA, LINEAS_PEDIDOS, CLIENTES y TPV</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-mono text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded">Access / Jet</span>
+              </div>
+
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-[11px] text-zinc-500 flex items-center justify-between font-mono">
+              <span>Principio Zero-Knowledge</span>
+              <span>Tus datos jamás se almacenan en servidores de terceros</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 5. MATRIZ DE PRESTACIONES ESPECÍFICAS SIMPLYGEST                           -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] scroll-mt-20" id="caracteristicas">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Matriz de Prestaciones Técnicas</span>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+            Sincronización Bidireccional Adaptada a SimplyGest
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-3 leading-relaxed">
+            Cada campo de SimplyGest está rigurosamente mapeado para mantener sincronizado tu catálogo comercial, tus existencias disponibles y la contabilidad de tus pedidos sin fricciones.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Card 1: Control Anti-Sobreventas -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Control Anti-Sobreventas Riguroso</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Aplica la fórmula matemática: <code class="text-emerald-300 font-mono font-medium">Stock Disponible = Stock Actual - Reservas Web y Mostrador</code>. Si entra una venta presencial en el TPV o un pedido web, el stock disponible se descuenta al instante para evitar roturas de stock.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Campo SimplyGest: STOCK &amp; RESERVAS
+            </div>
+          </div>
+
+          <!-- Card 2: Familias, Subfamilias y Tallas/Colores -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Variantes, Tallas y Colores</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Mapeo automático de familias y subfamilias a categorías online. Sincronización completa de las tablas de tallas y colores de SimplyGest con productos variables de WooCommerce y combinaciones de PrestaShop con control individual de SKU y código de barras.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Tablas: FAMILIAS, TALLAS, COLORES
+            </div>
+          </div>
+
+          <!-- Card 3: Inserción Atómica de Pedidos -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Inserción Directa de Pedidos</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Los pedidos web se registran de forma atómica en las tablas <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> y <code class="text-zinc-300 font-mono">LINEAS_PEDIDOS</code> de SimplyGest. Si el cliente no existe, se da de alta en <code class="text-zinc-300 font-mono">CLIENTES</code> por NIF/CIF o email con sus direcciones.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Desglose de IVA y Recargo de Equivalencia
+            </div>
+          </div>
+
+          <!-- Card 4: Series y Almacenes Independientes -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Series y Almacenes Separados</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Asigna una serie de facturación exclusiva para las ventas online (ejemplo: Serie "W") y selecciona el almacén físico de SimplyGest del cual descontar existencias. Mantén el orden fiscal y el stock de tu tienda física 100% aislado.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Soporte Multialmacén y Series Fiscales
+            </div>
+          </div>
+
+          <!-- Card 5: Dirty-Checking Ultrarrápido -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Detección Diferencial Inteligente</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Bentian compara en memoria el catálogo de SimplyGest mediante hashes SHA-256 locales. Si tienes 40.000 artículos y solo cambian 5 referencias, únicamente se transmiten los 5 ítems alterados a la tienda web en milisegundos.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Cero Saturación del Servidor Web
+            </div>
+          </div>
+
+          <!-- Card 6: Tolerancia a Caídas Store-and-Forward -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-5">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Cola Persistente Store-and-Forward</h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                Si el ordenador de SimplyGest se reinicia, sufre un corte de luz o pierde la conexión a internet durante la noche, los pedidos de los clientes quedan encolados con seguridad y se registran automáticamente en cuanto el sistema vuelve a arrancar.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-zinc-500">
+              Garantía de Cero Pedidos Perdidos
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 6. CANALES ECOMMERCE CONECTADOS                                            -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] bg-[#0c0c0f] scroll-mt-20" id="canales">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="max-w-2xl mb-12">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Ecosistema Multicanal</span>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+            Conecta SimplyGest con tus Canales de Venta
+          </h2>
+          <p class="mt-3 text-zinc-400 text-sm leading-relaxed">
+            Bentian actúa como puente de datos universal. Conecta una o varias tiendas online en paralelo a la misma base de datos de SimplyGest manteniendo la coherencia de inventario en todos los frentes.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Canal 1: WooCommerce -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-emerald-500/30 hover:border-emerald-500 transition shadow-lg shadow-emerald-950/20 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-emerald-300 font-semibold">eCommerce</span>
+                <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">100% ACTIVO</span>
+              </div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">WooCommerce</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Conexión nativa REST API v3 con autenticación HMAC. Compatible con High-Performance Order Storage (HPOS), Webhooks reactivos instantáneos y variaciones de tallas y colores.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <a href="/simplygest-woocommerce/" class="text-xs font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition">
+                <span>Ver Conector WooCommerce</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Canal 2: PrestaShop -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-sky-500/50 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-400">eCommerce</span>
+                <span class="text-[10px] font-mono text-sky-400 bg-sky-950/60 border border-sky-800/40 px-2 py-0.5 rounded">ACTIVO</span>
+              </div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">PrestaShop</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Integración por Webservices oficiales y conector PHP de alto rendimiento. Compatible con PrestaShop 1.7 y 8.x para sincronización de stock multi-almacén, combinaciones y pedidos.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <a href="/factusol-prestashop/" class="text-xs font-medium text-sky-400 hover:text-sky-300 flex items-center gap-1 transition">
+                <span>Ver Guía PrestaShop</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Canal 3: Shopify -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/50 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-400">eCommerce Cloud</span>
+                <span class="text-[10px] font-mono text-indigo-400 bg-indigo-950/60 border border-indigo-800/40 px-2 py-0.5 rounded">ACTIVO</span>
+              </div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">Shopify</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Conexión directa vía Shopify Admin API (GraphQL 2024-10+). Sincronización de existencias multiubicación, webhooks inmediatos y sin comisiones abusivas por pedido tramitado.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <a href="/factusol-shopify/" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">
+                <span>Ver Guía Shopify</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Canal 4: Endpoint Universal -->
+          <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-mono text-zinc-400">Custom API</span>
+                <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">UNIVERSAL</span>
+              </div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">Endpoint Universal</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Conecta plataformas a medida, marketplaces o portales B2B mediante webhook REST HTTPS con payloads JSON estándar firmados con clave secreta compartida.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+              <a href="/docs/canales/conector-universal/" class="text-xs font-medium text-zinc-400 hover:text-white flex items-center gap-1 transition">
+                <span>Documentación API</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 7. TABLA COMPARATIVA: BENTIAN LOCAL-FIRST VS PLUGINS WEB TRADICIONALES      -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] scroll-mt-20" id="comparativa">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Comparativa de Ingeniería</span>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+            Bentian Local-First vs Plugins Web Tradicionales de SimplyGest
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-3 leading-relaxed">
+            Descubre por qué procesar los datos en local en el equipo Windows elimina de raíz los fallos habituales de los plugins PHP que saturan tu hosting web.
+          </p>
+        </div>
+
+        <div class="rounded-2xl border border-white/[0.08] bg-[#121215] overflow-hidden shadow-2xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="border-b border-white/[0.08] bg-[#16161c]">
+                  <th class="p-4 sm:p-5 font-semibold text-white font-mono uppercase tracking-wider">Criterio Técnico & Operativo</th>
+                  <th class="p-4 sm:p-5 font-semibold text-emerald-300 bg-emerald-950/30 border-x border-emerald-500/20">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>Bentian Agent Local-First</span>
+                    </div>
+                  </th>
+                  <th class="p-4 sm:p-5 font-semibold text-zinc-400">Módulos PHP / Plugins Web Típicos</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.04] text-zinc-300">
+                
+                <!-- Fila 1: Velocidad -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Velocidad de Sincronización</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Tiempo de ciclo diferencial</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold font-mono">
+                    &lt; 15 ms por consulta OLEDB local (Cero esperas)
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    2 a 10 minutos por lote (Peticiones HTTP pesadas que agotan el tiempo de espera)
+                  </td>
+                </tr>
+
+                <!-- Fila 2: Sobrecarga del Hosting -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Impacto en el Servidor Web</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">CPU y memoria en hosting</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold">
+                    0% de carga adicional en hosting. El cómputo corre en Windows local.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Satura PHP workers, eleva el consumo de RAM y provoca errores <code class="text-rose-400 font-mono">504 Gateway Timeout</code>.
+                  </td>
+                </tr>
+
+                <!-- Fila 3: Bloqueos de TPV -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Bloqueos de Caja en TPV Físico</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Concurrencia sobre Datos.mdb</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold">
+                    Cero bloqueos. Modo compartido OLEDB <code class="text-emerald-400 font-mono">adModeShareDenyNone</code>.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Bloqueos frecuentes de ficheros <code class="text-zinc-300 font-mono">.ldb</code> impidiendo el cobro en mostrador.
+                  </td>
+                </tr>
+
+                <!-- Fila 4: Control de Reservas -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Prevención de Sobreventas</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Cálculo de inventario real</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold">
+                    Stock Disponible = Actual - Reservas de pedidos web y mostrador.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Sobrescritura bruta sin control de pedidos pendientes de servir.
+                  </td>
+                </tr>
+
+                <!-- Fila 5: Caídas de Red -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Tolerancia a Apagados y Caídas</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Cola de pedidos Store-and-Forward</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold">
+                    Totalmente tolerante. Reanuda e inyecta pedidos al arrancar el PC.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Pérdida de pedidos en vuelo o descuadres si el servidor local se reinicia.
+                  </td>
+                </tr>
+
+                <!-- Fila 6: Soberanía de Datos -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Privacidad & Seguridad</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Exposición de la base de datos</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold">
+                    Zero-Knowledge: La base de datos nunca se sube a internet. Cero puertos abiertos.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Requiere exponer bases de datos o scripts PHP con accesos no auditados.
+                  </td>
+                </tr>
+
+                <!-- Fila 7: Costes y Comisiones -->
+                <tr class="hover:bg-white/[0.02] transition">
+                  <td class="p-4 sm:p-5 font-medium text-white">
+                    <div class="font-semibold">Modelo de Costes</div>
+                    <div class="text-xs text-zinc-500 font-mono mt-0.5">Tarifa plana vs comisiones</div>
+                  </td>
+                  <td class="p-4 sm:p-5 bg-emerald-950/15 border-x border-emerald-500/20 text-emerald-300 font-semibold font-mono">
+                    Tarifa plana (199 €/año) sin comisiones por pedido ni límite de catálogo.
+                  </td>
+                  <td class="p-4 sm:p-5 text-zinc-400">
+                    Costes de implantación de 600€+ y cuotas recurrentes abusivas o porcentajes.
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 8. SECCIÓN DE DOCUMENTACIÓN INTEGRADA                                     -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] bg-[#0c0c0f] scroll-mt-20" id="documentacion">
+      <div class="max-w-6xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Base de Conocimiento Oficial</span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+              Manuales de Configuración para SimplyGest
+            </h2>
+            <p class="text-zinc-400 text-sm mt-2 max-w-2xl leading-relaxed">
+              Guías paso a paso diseñadas para instaladores, administradores de sistemas y responsables de tienda que desean una puesta en marcha impecable.
+            </p>
+          </div>
+          <a href="/docs/simplygest/localizacion-base-datos/" class="px-5 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-white text-xs font-semibold transition flex items-center gap-2 self-start md:self-auto shrink-0">
+            <span>Ver Centro de Documentación</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Manual 1: Localización Datos.mdb -->
+          <a href="/docs/simplygest/localizacion-base-datos/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-bold flex items-center justify-center text-xs">01</span>
+                <span class="text-[11px] font-mono text-zinc-500 group-hover:text-emerald-400 transition">Guía OLEDB</span>
+              </div>
+              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition mb-2">
+                Localización de la Base de Datos (Datos.mdb)
+              </h3>
+              <p class="text-xs text-zinc-400 leading-relaxed">
+                Cómo ubicar los ficheros <code class="text-zinc-300 font-mono">Datos.mdb</code> y <code class="text-zinc-300 font-mono">Tablas.mdb</code> en <code class="text-zinc-300 font-mono">C:\SimplyGest</code> o recursos de red compartida UNC/SMB. Verificación de permisos de lectura y escritura.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+              <span>Leer manual paso a paso</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </div>
+          </a>
+
+          <!-- Manual 2: Series y Almacenes -->
+          <a href="/docs/simplygest/configuracion-series-almacenes/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-bold flex items-center justify-center text-xs">02</span>
+                <span class="text-[11px] font-mono text-zinc-500 group-hover:text-emerald-400 transition">Configuración</span>
+              </div>
+              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition mb-2">
+                Series de Facturación y Mapeo de Almacenes
+              </h3>
+              <p class="text-xs text-zinc-400 leading-relaxed">
+                Cómo aislar las ventas presenciales de las ventas web asignando series de pedido exclusivas (ej: Serie "W") y gestionando qué almacén de SimplyGest responde ante cada canal online.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+              <span>Leer manual paso a paso</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </div>
+          </a>
+
+          <!-- Manual 3: Stock y Pedidos -->
+          <a href="/docs/simplygest/sincronizacion-stock-pedidos/" class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono font-bold flex items-center justify-center text-xs">03</span>
+                <span class="text-[11px] font-mono text-zinc-500 group-hover:text-emerald-400 transition">Operativa</span>
+              </div>
+              <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition mb-2">
+                Sincronización de Stock Disponible y Pedidos
+              </h3>
+              <p class="text-xs text-zinc-400 leading-relaxed">
+                Flujo bidireccional detallado: cálculo de stock con reservas, publicación de tallas y colores, inyección de pedidos a <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> y cálculo de impuestos españoles.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/[0.06] text-xs font-medium text-emerald-400 flex items-center gap-1.5">
+              <span>Leer manual paso a paso</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </div>
+          </a>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 9. PREGUNTAS FRECUENTES (FAQ) TÉCNICAS                                     -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 border-b border-white/[0.06] scroll-mt-20" id="faq">
+      <div class="max-w-4xl mx-auto">
+        
+        <div class="text-center mb-14">
+          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Soporte & Respuestas Técnicas</span>
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
+            Preguntas Frecuentes sobre el Conector SimplyGest
+          </h2>
+          <p class="text-zinc-400 text-sm mt-3 leading-relaxed">
+            Respuestas directas de ingeniería para gerentes de empresa, responsables informáticos e instaladores de SimplyGest.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          
+          <!-- FAQ 1 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Qué ediciones de SimplyGest son compatibles con Bentian?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Bentian ERP Bridge es compatible con <strong class="text-white font-medium">SimplyGest Estándar, SimplyGest Profesional y SimplyGest TPV / TPV Visual</strong>. El agente interactúa directamente con el motor de base de datos Microsoft Access/Jet nativo (<code class="text-zinc-200 font-mono">Datos.mdb</code> y <code class="text-zinc-200 font-mono">Tablas.mdb</code>), garantizando compatibilidad con versiones 2020 a 2026 sin requerir actualizaciones forzadas de tu software de gestión.
+            </p>
+          </details>
+
+          <!-- FAQ 2 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Cómo evita Bentian el bloqueo del archivo Datos.mdb mientras se cobra en caja?</span>
+              <summary class="hidden"></summary>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Bentian abre la conexión OLEDB local en modo compartido no exclusivo (<code class="text-emerald-400 font-mono">adModeShareDenyNone</code>) con transacciones de lectura ultrarrápida (menos de 15 ms). De este modo, el terminal TPV de SimplyGest puede emitir tickets y cobrar en mostrador sin advertencias de archivos bloqueados ni interferencias con los ficheros de bloqueo <code class="text-zinc-300 font-mono">.ldb</code>.
+            </p>
+          </details>
+
+          <!-- FAQ 3 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Dónde debe instalarse el Agente Bentian?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Debe instalarse en un <strong class="text-white font-medium">único equipo</strong> con Windows 10, Windows 11 o Windows Server de 64 bits que tenga acceso directo o mediante red local (carpeta compartida SMB o NAS) al archivo <code class="text-zinc-200 font-mono">Datos.mdb</code>. No es necesario instalarlo en los terminales de cobro adicionales de los dependientes.
+            </p>
+          </details>
+
+          <!-- FAQ 4 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Cómo se sincronizan las tallas y colores de SimplyGest con la tienda online?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Bentian lee la estructura de tallajes y combinaciones de SimplyGest y las proyecta como atributos y variaciones en WooCommerce (atributos globales y variaciones en producto variable) o combinaciones en PrestaShop y Shopify, vinculando el código de barras y stock exacto a cada SKU secundario.
+            </p>
+          </details>
+
+          <!-- FAQ 5 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Qué ocurre si entra un pedido de un cliente nuevo que no existe en SimplyGest?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              El Agente verifica primero si el cliente ya existe en la tabla <code class="text-zinc-200 font-mono">CLIENTES</code> buscando por NIF/CIF o correo electrónico. Si es un cliente nuevo, genera automáticamente su ficha con los datos de facturación y dirección de envío antes de registrar el pedido en <code class="text-zinc-200 font-mono">PEDIDOS_VENTA</code>.
+            </p>
+          </details>
+
+          <!-- FAQ 6 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Es necesario abrir puertos en el router o contratar una IP estática?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              <strong class="text-white font-medium">No.</strong> Bentian opera con arquitectura Local-First y conexiones salientes cifradas HTTPS (puerto 443 estándar). La base de datos de SimplyGest nunca se expone a internet, no requiere abrir puertos en el cortafuegos ni configurar IP fija.
+            </p>
+          </details>
+
+          <!-- FAQ 7 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Puedo mapear series de facturación y almacenes independientes para las ventas web?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Sí. Puedes configurar una serie de pedidos exclusiva para la tienda online (por ejemplo, serie 'W') y asignar un almacén específico de SimplyGest. De esta forma la numeración y el control contable permanecen ordenados y separados de las ventas presenciales de mostrador.
+            </p>
+          </details>
+
+          <!-- FAQ 8 -->
+          <details class="group border border-white/[0.08] rounded-2xl p-6 bg-[#121215] cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-semibold text-white text-base list-none flex justify-between items-center gap-4">
+              <span>¿Puedo cambiar entre Factusol y SimplyGest si cambio de ERP en mi empresa?</span>
+              <span class="text-emerald-400 group-open:rotate-180 transition-transform text-sm shrink-0">▼</span>
+            </summary>
+            <p class="mt-4 text-sm text-zinc-300 leading-relaxed">
+              Sí. Bentian incorpora una arquitectura polimórfica (<strong class="text-white font-medium">Single Active ERP</strong>). Desde el panel de control del agente puedes cambiar entre Factusol y SimplyGest conservando intactas las rutas, series y parámetros de cada sistema en archivos de configuración aislados con protección anti-wiping.
+            </p>
+          </details>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 10. BANNER CTA DE DESCARGA DIRECTA                                        -->
+    <!-- ========================================================================= -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto rounded-3xl bg-gradient-to-tr from-emerald-950/70 via-[#121215] to-teal-950/60 border border-emerald-500/30 p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl">
+        
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs font-semibold tracking-wide mb-6">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          INSTALACIÓN LIMPIA EN 5 MINUTOS — WINDOWS X64
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-5 tracking-tight leading-tight">
+          Conecta tu SimplyGest con tu eCommerce Hoy Mismo
+        </h2>
+
+        <p class="text-zinc-300 max-w-2xl mx-auto mb-10 text-sm sm:text-base leading-relaxed">
+          Descarga el agente oficial para Windows, detecta tu archivo <code class="text-emerald-300 font-mono">Datos.mdb</code> en un clic y comienza a sincronizar existencias y pedidos web sin roturas de stock ni cuotas ocultas.
+        </p>
+
+        <!-- Botones de descarga -->
+        <div class="flex flex-wrap items-center justify-center gap-4 max-w-lg mx-auto mb-6">
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-7 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/40 transition flex items-center justify-center gap-2.5">
+            <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
+            <span>Descargar Instalador (.exe)</span>
+            <span class="text-[10px] font-mono bg-emerald-950/70 border border-emerald-400/30 px-1.5 py-0.5 rounded text-emerald-200" data-app-version>v0.4.7</span>
+          </a>
+
+          <a href="/releases/latest/Bentian-Setup.zip" data-download-zip class="px-5 py-4 rounded-xl bg-[#141419] hover:bg-[#1a1a20] text-zinc-300 hover:text-white border border-white/[0.08] font-mono text-xs transition flex items-center gap-2">
+            <span>Paquete .zip</span>
+          </a>
+
+          <a href="/releases/latest/BentianAgent-Portable.zip" data-download-portable class="px-5 py-4 rounded-xl bg-[#141419] hover:bg-[#1a1a20] text-zinc-300 hover:text-white border border-white/[0.08] font-mono text-xs transition flex items-center gap-2">
+            <span>Portable .zip</span>
+          </a>
+        </div>
+
+        <p class="text-zinc-500 text-xs font-mono">
+          Compatible con Windows 10, 11 y Windows Server (64 bits) &bull; Instalación sin reinicios &bull; Cero cambios estructurales en SimplyGest
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 11. FOOTER CANÓNICO OFICIAL DE BENTIAN                                     -->
+  <!-- ========================================================================= -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-14 px-4 sm:px-6 lg:px-8 text-xs text-zinc-400">
+    <div class="max-w-6xl mx-auto">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        
+        <!-- Columna 1: Bentian Branding -->
+        <div class="md:col-span-1">
+          <a href="/" class="flex items-center gap-2.5 mb-4">
+            <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7 object-contain" width="28" height="28">
+            <span class="font-bold text-white text-base">Bentian ERP Bridge</span>
+          </a>
+          <p class="text-zinc-500 leading-relaxed text-xs mb-4">
+            Capa universal de integración continua entre software de gestión local y canales eCommerce.
+          </p>
+          <div class="text-[11px] font-mono text-zinc-500">
+            Versión Activa: <span class="text-emerald-400 font-semibold" data-app-version>v0.4.7</span>
+          </div>
+        </div>
+
+        <!-- Columna 2: Conectores ERP -->
+        <div>
+          <h4 class="font-semibold text-white mb-3 font-mono uppercase tracking-wider text-[11px]">Conectores ERP</h4>
+          <ul class="space-y-2">
+            <li><a href="/conector-simplygest/" class="text-emerald-400 font-medium hover:text-emerald-300 transition">Conector SimplyGest</a></li>
+            <li><a href="/simplygest-woocommerce/" class="hover:text-white transition">SimplyGest WooCommerce</a></li>
+            <li><a href="/factusol-woocommerce/" class="hover:text-white transition">Factusol WooCommerce</a></li>
+            <li><a href="/factusol-prestashop/" class="hover:text-white transition">Factusol PrestaShop</a></li>
+            <li><a href="/factusol-shopify/" class="hover:text-white transition">Factusol Shopify</a></li>
+            <li><a href="/conector-factusol/" class="hover:text-white transition">Factusol por Ciudades</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Documentación SimplyGest -->
+        <div>
+          <h4 class="font-semibold text-white mb-3 font-mono uppercase tracking-wider text-[11px]">Manuales SimplyGest</h4>
+          <ul class="space-y-2">
+            <li><a href="/docs/simplygest/localizacion-base-datos/" class="hover:text-white transition">01. Ubicación Datos.mdb</a></li>
+            <li><a href="/docs/simplygest/configuracion-series-almacenes/" class="hover:text-white transition">02. Series y Almacenes</a></li>
+            <li><a href="/docs/simplygest/sincronizacion-stock-pedidos/" class="hover:text-white transition">03. Stock y Pedidos</a></li>
+            <li><a href="/docs/" class="hover:text-white transition">Centro de Documentación</a></li>
+            <li><a href="/docs/seguridad/antivirus-edr-smartscreen/" class="hover:text-white transition">Guía SmartScreen Windows</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4: Legal & Contacto -->
+        <div>
+          <h4 class="font-semibold text-white mb-3 font-mono uppercase tracking-wider text-[11px]">Seguridad & Legal</h4>
+          <ul class="space-y-2">
+            <li><a href="/privacidad/" class="hover:text-white transition">Privacidad y Zero-Knowledge</a></li>
+            <li><a href="/terminos/" class="hover:text-white transition">Condiciones de Contratación</a></li>
+            <li><a href="/cookies/" class="hover:text-white transition">Política de Cookies</a></li>
+            <li><a href="/seguridad/" class="hover:text-white transition">Seguridad Criptográfica</a></li>
+            <li><a href="/quien-esta-detras/" class="hover:text-white transition">Quién Está Detrás</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Barra inferior copyright -->
+      <div class="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-500">
+        <div>
+          &copy; 2026 Bentian ERP Bridge &bull; Desarrollado por <a href="https://cristianjm.com" class="text-zinc-300 hover:text-white transition">Cristian Jiménez Martínez</a>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="/eula.txt" class="hover:text-zinc-400 transition">EULA</a>
+          <span>&bull;</span>
+          <a href="/manifest.json" class="hover:text-zinc-400 transition">Manifest</a>
+          <span>&bull;</span>
+          <a href="/sitemap.xml" class="hover:text-zinc-400 transition">Sitemap XML</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Sincronización de Versión Oficial SSoT -->
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

@@ -249,14 +249,19 @@ export async function bootstrapApp(): Promise<Express> {
   // Resolver por versión específica /releases/:version/:filename con whitelist y anti-traversal
   app.get('/releases/:version/:filename', (req, res) => {
     const { version, filename } = req.params;
-    if (!ALLOWED_RELEASE_FILES.has(filename) || filename !== path.basename(filename)) {
-      return res.status(404).end();
-    }
     if (!version || version !== path.basename(version) || !/^v?\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
       return res.status(404).end();
     }
 
     const cleanVer = version.startsWith('v') ? version.slice(1) : version;
+    const isVersionedMatch =
+      filename === `Bentian-Setup-v${cleanVer}.exe` ||
+      filename === `Bentian-Setup-v${cleanVer}.zip` ||
+      filename === `BentianAgent-v${cleanVer}-Portable.zip`;
+
+    if ((!ALLOWED_RELEASE_FILES.has(filename) && !isVersionedMatch) || filename !== path.basename(filename)) {
+      return res.status(404).end();
+    }
     const baseCandidates = [
       path.resolve(releasesDir, `v${cleanVer}`),
       path.resolve(releasesDir, cleanVer),
@@ -416,6 +421,12 @@ export async function bootstrapApp(): Promise<Express> {
 
   app.get('/conector-factusol', (_req, res) => {
     res.redirect(301, '/conector-factusol/');
+  });
+  app.get('/conector-simplygest', (_req, res) => {
+    res.redirect(301, '/conector-simplygest/');
+  });
+  app.get('/simplygest-woocommerce', (_req, res) => {
+    res.redirect(301, '/simplygest-woocommerce/');
   });
 
   // Redirecciones canónicas 301 para páginas pilar SEO y guías
