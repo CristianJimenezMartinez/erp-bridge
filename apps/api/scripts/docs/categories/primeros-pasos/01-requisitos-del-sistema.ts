@@ -217,7 +217,7 @@ export const requisitosDelSistemaArticle: DocArticle = {
             <span>Comparativa técnica: OLEDB vs ODBC →</span>
           </a>
           <span class="text-zinc-600">·</span>
-          <a href="/docs/simplygest/conexion-mdb/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition">
+          <a href="/docs/simplygest/localizacion-base-datos/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition">
             <span>Conexión a Datos.mdb en SimplyGest →</span>
           </a>
         </div>
@@ -228,6 +228,6 @@ export const requisitosDelSistemaArticle: DocArticle = {
     'primeros-pasos/asistente-de-configuracion',
     'seguridad/certificacion-softpedia-100-clean',
     'factusol/controladores-oledb-ace',
-    'simplygest/conexion-mdb',
+    'simplygest/localizacion-base-datos',
   ],
 };

@@ -154,8 +154,11 @@ export class LocalSyncEngine {
       config.channelType === 'universal_bridge' ||
       (Boolean(config.universalBridge?.storeUrl) && !woo.storeUrl);
 
+    const isRealFactusolFile = isFactusol && Boolean(dbPath && fs.existsSync(dbPath));
+    const isErpAccessible = Boolean(dbPath && (isRealFactusolFile || erpConnector.isDatabaseAccessible()));
+
     if (isUniversalBridge) {
-      if (!dbPath || !fs.existsSync(dbPath)) {
+      if (!isErpAccessible) {
         const msg = `Base de datos de ${erpDisplayName} no configurada o inaccesible (${dbPath || 'Sin ruta'}).`;
         this.eventBus.addEvent('error', `❌ ${msg}`);
         return { success: false, message: msg };
@@ -168,19 +171,19 @@ export class LocalSyncEngine {
       (Boolean(config.shopify?.shopSubdomain) && !woo.storeUrl);
 
     if (isShopify) {
-      if (!dbPath || !fs.existsSync(dbPath)) {
+      if (!isErpAccessible) {
         const msg = `Base de datos de ${erpDisplayName} no configurada o inaccesible (${dbPath || 'Sin ruta'}).`;
         this.eventBus.addEvent('error', `❌ ${msg}`);
         return { success: false, message: msg };
       }
-      return this.syncShopify(dbPath, config, start, isManual);
+      return this.syncShopify(dbPath, config, start, isManual, erpConnector);
     }
 
     try {
-      if (dbPath && fs.existsSync(dbPath) && woo.storeUrl && woo.consumerKey && woo.consumerSecret) {
+      if (isErpAccessible && woo.storeUrl && woo.consumerKey && woo.consumerSecret) {
         const cleanUrl = woo.storeUrl.trim().replace(/\/+$/, '');
         const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
-        const driver = new AccessDriver({ databasePath: dbPath });
+        const driver = isRealFactusolFile ? new AccessDriver({ databasePath: dbPath }) : null;
         const timings: Record<string, number> = {};
         let knownWcSkus: Set<string> | undefined;
 
@@ -319,12 +322,16 @@ export class LocalSyncEngine {
 
         // 2. SINCRONIZACIÓN DE PEDIDOS (WooCommerce -> ERP)
         try {
-          const series = (erpConnector.providerId === 'simplygest')
-            ? (config.softwareErp?.providers?.simplygest?.orderSeries || config.simplygest?.orderSeries || '1')
-            : (config.softwareErp?.providers?.factusol?.orderSeries || config.factusol?.orderSeries || '1');
-          const warehouse = (erpConnector.providerId === 'simplygest')
-            ? (config.softwareErp?.providers?.simplygest?.warehouseCode || config.simplygest?.warehouseCode || '1')
-            : (config.softwareErp?.providers?.factusol?.warehouseCode || config.factusol?.warehouseCode || 'GEN');
+          const series = (
+            config.softwareErp?.providers?.[erpConnector.providerId]?.orderSeries ||
+            (erpConnector.providerId === 'simplygest' ? config.simplygest?.orderSeries : config.factusol?.orderSeries) ||
+            '1'
+          );
+          const warehouse = (
+            config.softwareErp?.providers?.[erpConnector.providerId]?.warehouseCode ||
+            (erpConnector.providerId === 'simplygest' ? config.simplygest?.warehouseCode : config.factusol?.warehouseCode) ||
+            'GEN'
+          );
 
           let wcOrderPage = 1;
           const MAX_WC_PAGES = 10;
@@ -451,7 +458,7 @@ export class LocalSyncEngine {
         }
 
         // 3. SINCRONIZACIÓN INVERSA DE PEDIDOS CANCELADOS/REEMBOLSADOS (WooCommerce -> Factusol)
-        if (isFactusol) {
+        if (isRealFactusolFile && driver) {
           try {
             const cancelSeries = config.factusol?.orderSeries || '1';
             const cancelWarehouse = config.factusol?.warehouseCode || 'GEN';
@@ -483,7 +490,7 @@ export class LocalSyncEngine {
         }
 
         // 4. Subida Progresiva de Catálogo (Factusol -> WooCommerce)
-        if (isFactusol) {
+        if (isRealFactusolFile) {
           try {
             await ProgressiveCatalogHelper.processProgressiveUpload(
               this.createProgressiveContext(),
@@ -501,7 +508,7 @@ export class LocalSyncEngine {
         }
       } else {
         // Modo Standalone sin WooCommerce configurado
-        if (dbPath && fs.existsSync(dbPath)) {
+        if (isErpAccessible) {
           const count = await erpConnector.getArticleCount();
           if (count) itemsUpdated = Math.min(count, 50);
         }
@@ -579,7 +586,8 @@ export class LocalSyncEngine {
         config.channelType === 'shopify' ||
         (Boolean(config.shopify?.shopSubdomain) && !woo?.storeUrl);
 
-      if (!dbPath || !fs.existsSync(dbPath) || (!isBridge && !isWoo && !isShopify)) {
+      const isErpAccessible = Boolean(dbPath && (erpConnector.isDatabaseAccessible() || fs.existsSync(dbPath)));
+      if (!isErpAccessible || (!isBridge && !isWoo && !isShopify)) {
         return;
       }
 
@@ -638,6 +646,7 @@ export class LocalSyncEngine {
         {
           configManager: this.configManager,
           factusolService: this.factusolService,
+          erpConnector: this.getActiveErpConnector(),
           historyManager: this.historyManager,
           eventBus: this.eventBus,
           logger: this.logger,
@@ -961,8 +970,9 @@ export class LocalSyncEngine {
       }
 
       // 3. Sincronización inversa de pedidos cancelados (Universal Bridge -> Factusol)
+      const isRealFactusolFile = isFactusol && Boolean(dbPath && fs.existsSync(dbPath));
       let ordersCancelled = 0;
-      if (isFactusol) {
+      if (isRealFactusolFile) {
         try {
           this.logger.debug('Comprobando pedidos cancelados en la tienda online...');
           const tCancelStart = performance.now();
@@ -996,7 +1006,7 @@ export class LocalSyncEngine {
       }
 
       // 4. Subida Progresiva de Catálogo (Universal Bridge)
-      if (isFactusol) {
+      if (isRealFactusolFile) {
         try {
           await ProgressiveCatalogHelper.processProgressiveUpload(
             this.createProgressiveContext(),
@@ -1049,14 +1059,25 @@ export class LocalSyncEngine {
     dbPath: string,
     config: any,
     start: number,
-    isManual: boolean = true
+    isManual: boolean = true,
+    erpConnector?: IErpConnector
   ): Promise<SyncManualResult> {
     try {
-      const driver = new AccessDriver({ databasePath: dbPath });
-      const warehouse = config.factusol?.warehouseCode || 'GEN';
-      const series = config.factusol?.orderSeries || '1';
+      const connector = erpConnector || this.getActiveErpConnector();
+      const isRealFactusolFile = connector.providerId === 'factusol' && Boolean(dbPath && fs.existsSync(dbPath));
+      const driver = isRealFactusolFile ? new AccessDriver({ databasePath: dbPath }) : (null as any);
+      const warehouse = (
+        config.softwareErp?.providers?.[connector.providerId]?.warehouseCode ||
+        (connector.providerId === 'simplygest' ? config.simplygest?.warehouseCode : config.factusol?.warehouseCode) ||
+        'GEN'
+      );
+      const series = (
+        config.softwareErp?.providers?.[connector.providerId]?.orderSeries ||
+        (connector.providerId === 'simplygest' ? config.simplygest?.orderSeries : config.factusol?.orderSeries) ||
+        '1'
+      );
 
-      const stockRes = await ShopifySyncHelper.syncStockToShopify(driver, config, warehouse);
+      const stockRes = await ShopifySyncHelper.syncStockToShopify(driver, config, warehouse, { erpConnector: connector });
       const orderRes = await ShopifySyncHelper.importShopifyOrders(driver, config, {
         plausibilityAdapter: OrderPlausibilityAdapter,
         orderNotifier: OrderNotifierService,
@@ -1064,6 +1085,7 @@ export class LocalSyncEngine {
         eventBus: this.eventBus,
         series,
         warehouse,
+        erpConnector: connector,
       });
 
       const itemsUpdated = stockRes.itemsUpdated;

@@ -1,6 +1,6 @@
 {
   "name": "bentian-agent-builder",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Standalone builder and packager for Bentian Agent (Windows)",
   "main": "build.js",
   "scripts": {

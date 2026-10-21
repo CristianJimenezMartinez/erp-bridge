@@ -7,12 +7,14 @@ import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService } from '../factusol/factusol.service';
 import { FactusolPathResolver } from '../factusol/factusol.resolver';
+import { IErpConnector } from '../erp';
 import { CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
 
 export interface CatalogUploadContext {
   configManager: ConfigManager;
   factusolService: FactusolService;
+  erpConnector?: IErpConnector;
   historyManager: HistoryManager;
   eventBus: EventBus;
   logger: Logger;
@@ -21,18 +23,93 @@ export interface CatalogUploadContext {
 }
 
 export class CatalogUploadHelper {
+  private static async readProductsPolymorphic(
+    ctx: CatalogUploadContext,
+    dbPath: string,
+    config: any,
+    options?: { limit?: number; onlyMissing?: boolean }
+  ): Promise<any[]> {
+    const erpConnector = ctx.erpConnector;
+    const isFactusol = !erpConnector || erpConnector.providerId === 'factusol';
+    const isRealFactusolFile = isFactusol && Boolean(dbPath && fs.existsSync(dbPath));
+
+    if (isRealFactusolFile) {
+      let factusolConnector = ctx.factusolService.getConnector();
+      if (!factusolConnector) {
+        factusolConnector = new FactusolConnector();
+        await factusolConnector.connect({
+          configuration: {
+            databasePath: dbPath,
+            orderSeries: config.factusol?.orderSeries || '1',
+            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+            tariffCode: config.factusol?.tariffCode || '1',
+            saleTariffCode: config.factusol?.saleTariffCode,
+          },
+        });
+      }
+
+      const activeOnlyConfig = config.factusol?.activeOnly;
+      let factusolProducts = await factusolConnector.readProducts({
+        limit: options?.limit,
+        activeOnly: activeOnlyConfig !== false,
+      });
+
+      if ((!factusolProducts || factusolProducts.length === 0) && activeOnlyConfig !== false) {
+        const allProducts = await factusolConnector.readProducts({
+          limit: options?.limit,
+          activeOnly: false,
+        });
+        if (allProducts && allProducts.length > 0) {
+          ctx.logger.info(`ℹ No se detectaron artículos con casilla web (SUWART) activa, pero sí ${allProducts.length} en Factusol. Sincronizando catálogo...`);
+          ctx.eventBus.addEvent('info', `ℹ Incluyendo ${allProducts.length} artículos del catálogo de Factusol...`);
+          factusolProducts = allProducts;
+        }
+      }
+      return factusolProducts || [];
+    }
+
+    if (erpConnector) {
+      const catalogArticles = await erpConnector.getArticlesForCatalog(options?.limit || 5000);
+      return (catalogArticles || []).map((a) => ({
+        sku: a.code,
+        name: a.description,
+        description: a.description || '',
+        shortDescription: a.description || '',
+        regularPrice: Number(a.salePrice || 0),
+        salePrice: a.offerPrice && a.offerPrice > 0 ? Number(a.offerPrice) : undefined,
+        stockQuantity: Number(a.stock || 0),
+        taxRate: Number(a.taxRate ?? 21),
+        categories: a.family ? [{ id: a.family, name: a.family }] : [],
+        barcode: a.ean,
+        weight: a.weight,
+        status: 'published',
+        attributes: {
+          imgart: a.imagePath,
+          unit: 'UNIDADES',
+        },
+      }));
+    }
+
+    return [];
+  }
+
   public static async uploadCatalog(
     ctx: CatalogUploadContext,
     options?: { limit?: number; onlyMissing?: boolean }
   ): Promise<CatalogUploadResult> {
     const start = Date.now();
-    ctx.eventBus.addEvent('info', 'Iniciando proceso de importación/subida de catálogo Factusol ➔ WooCommerce...');
+    const erpConnector = ctx.erpConnector;
+    const erpDisplayName = erpConnector?.displayName || 'Factusol';
+    const isFactusol = !erpConnector || erpConnector.providerId === 'factusol';
+    ctx.eventBus.addEvent('info', `Iniciando proceso de importación/subida de catálogo ${erpDisplayName} ➔ Tienda Web...`);
 
     const config = ctx.configManager.get();
-    let dbPath = FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || '');
+    let dbPath = isFactusol
+      ? FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || erpConnector?.getDatabasePath() || '')
+      : (erpConnector?.getDatabasePath() || '');
     const woo = config.woocommerce || {};
 
-    if (dbPath && !fs.existsSync(dbPath)) {
+    if (isFactusol && dbPath && !dbPath.startsWith('DEMO://') && !fs.existsSync(dbPath)) {
       const uncFallback = FactusolPathResolver.resolveMappedDriveToUnc(dbPath);
       if (uncFallback && fs.existsSync(uncFallback)) {
         ctx.logger.info(`Unidad de red no accesible directamente, usando ruta UNC equivalente: ${uncFallback}`);
@@ -40,7 +117,7 @@ export class CatalogUploadHelper {
       }
     }
 
-    if (dbPath) {
+    if (isFactusol && dbPath && fs.existsSync(dbPath)) {
       try {
         const rollover = FactusolYearResolver.resolveActiveDatabase(dbPath);
         if (rollover.switched && rollover.activePath && rollover.activePath !== dbPath) {
@@ -65,8 +142,13 @@ export class CatalogUploadHelper {
       }
     }
 
-    if (!dbPath || !fs.existsSync(dbPath)) {
-      const msg = 'Base de datos de Factusol no configurada o inaccesible.';
+    const isErpAccessible = Boolean(
+      (dbPath && fs.existsSync(dbPath)) ||
+      (erpConnector && erpConnector.isDatabaseAccessible())
+    );
+
+    if (!isErpAccessible) {
+      const msg = `Base de datos de ${erpDisplayName} no configurada o inaccesible.`;
       ctx.eventBus.addEvent('error', `❌ ${msg}`);
       return { success: false, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
     }
@@ -89,41 +171,9 @@ export class CatalogUploadHelper {
     const authHeader = 'Basic ' + Buffer.from(`${woo.consumerKey.trim()}:${woo.consumerSecret.trim()}`).toString('base64');
 
     try {
-      // 1. Conectar a Factusol y leer artículos canónicos
-      let factusolConnector = ctx.factusolService.getConnector();
-      if (!factusolConnector) {
-        factusolConnector = new FactusolConnector();
-        await factusolConnector.connect({
-          configuration: {
-            databasePath: dbPath,
-            orderSeries: config.factusol?.orderSeries || '1',
-            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-            tariffCode: config.factusol?.tariffCode || '1',
-            saleTariffCode: config.factusol?.saleTariffCode,
-          },
-        });
-      }
-
-      ctx.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
+      ctx.eventBus.addEvent('info', `Extrayendo catálogo de artículos desde ${erpDisplayName}...`);
       const tReadCatalogStart = performance.now();
-      const activeOnlyConfig = config.factusol?.activeOnly;
-      let factusolProducts = await factusolConnector.readProducts({
-        limit: options?.limit,
-        activeOnly: activeOnlyConfig !== false,
-      });
-
-      // Fallback inteligente: si con activeOnly no hay artículos pero en Factusol sí existen
-      if ((!factusolProducts || factusolProducts.length === 0) && activeOnlyConfig !== false) {
-        const allProducts = await factusolConnector.readProducts({
-          limit: options?.limit,
-          activeOnly: false,
-        });
-        if (allProducts && allProducts.length > 0) {
-          ctx.logger.info(`ℹ No se detectaron artículos con casilla web (SUWART) activa, pero sí ${allProducts.length} en Factusol. Sincronizando catálogo...`);
-          ctx.eventBus.addEvent('info', `ℹ Incluyendo ${allProducts.length} artículos del catálogo de Factusol...`);
-          factusolProducts = allProducts;
-        }
-      }
+      const factusolProducts = await this.readProductsPolymorphic(ctx, dbPath, config, options);
       const readCatalogMs = Math.round(performance.now() - tReadCatalogStart);
 
       if (!factusolProducts || factusolProducts.length === 0) {
@@ -332,71 +382,45 @@ export class CatalogUploadHelper {
 
     const endpointUrl = ctx.resolveBridgeEndpoint(bridgeSettings.storeUrl);
     const secretKey = bridgeSettings.secretKey;
+    const erpConnector = ctx.erpConnector;
+    const erpDisplayName = erpConnector?.displayName || 'Factusol';
+    const isFactusol = !erpConnector || erpConnector.providerId === 'factusol';
+    const isRealFactusolFile = isFactusol && Boolean(dbPath && fs.existsSync(dbPath));
 
     try {
-      // 1. Conectar a Factusol y leer artículos canónicos
-      let factusolConnector = ctx.factusolService.getConnector();
-      if (!factusolConnector) {
-        factusolConnector = new FactusolConnector();
-        await factusolConnector.connect({
-          configuration: {
-            databasePath: dbPath,
-            orderSeries: config.factusol?.orderSeries || '1',
-            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-            tariffCode: config.factusol?.tariffCode || '1',
-            saleTariffCode: config.factusol?.saleTariffCode,
-          },
-        });
-      }
-
-      ctx.eventBus.addEvent('info', 'Extrayendo catálogo de artículos desde Factusol...');
+      ctx.eventBus.addEvent('info', `Extrayendo catálogo de artículos desde ${erpDisplayName}...`);
       const tReadCatalogStart = performance.now();
-      const activeOnlyConfig = config.factusol?.activeOnly;
-      let factusolProducts = await factusolConnector.readProducts({
-        limit: options?.limit,
-        activeOnly: activeOnlyConfig !== false,
-      });
-
-      // Fallback inteligente: si con activeOnly no hay artículos pero en Factusol sí existen
-      if ((!factusolProducts || factusolProducts.length === 0) && activeOnlyConfig !== false) {
-        const allProducts = await factusolConnector.readProducts({
-          limit: options?.limit,
-          activeOnly: false,
-        });
-        if (allProducts && allProducts.length > 0) {
-          ctx.logger.info(`ℹ No se detectaron artículos con casilla web (SUWART) activa, pero sí ${allProducts.length} en Factusol. Sincronizando catálogo...`);
-          ctx.eventBus.addEvent('info', `ℹ Incluyendo ${allProducts.length} artículos del catálogo de Factusol...`);
-          factusolProducts = allProducts;
-        }
-      }
+      const factusolProducts = await this.readProductsPolymorphic(ctx, dbPath, config, options);
       const readCatalogMs = Math.round(performance.now() - tReadCatalogStart);
 
       if (!factusolProducts || factusolProducts.length === 0) {
-        const msg = 'No se encontraron artículos en Factusol para subir.';
+        const msg = `No se encontraron artículos en ${erpDisplayName} para subir.`;
         ctx.eventBus.addEvent('warn', msg);
         return { success: true, totalArticles: 0, uploadedCount: 0, skippedCount: 0, failedCount: 0, message: msg };
       }
 
-      ctx.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de Factusol en ${readCatalogMs}ms.`);
+      ctx.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de ${erpDisplayName} en ${readCatalogMs}ms.`);
 
       // 2. Sincronización Directa y Automática de Fotos por HTTPS
       let imgSyncMs = 0;
-      try {
-        const tImgSyncStart = performance.now();
-        const imageSync = new ImageSyncService(
-          {
-            endpointUrl,
-            secretKey,
-            databasePath: dbPath,
-          },
-          ctx.eventBus
-        );
-        ctx.eventBus.addEvent('info', '📸 Comprobando y subiendo fotos de Factusol por HTTPS...');
-        await imageSync.syncImages(factusolProducts);
-        imgSyncMs = Math.round(performance.now() - tImgSyncStart);
-      } catch (imgSyncErr) {
-        ctx.logger.warn(`Aviso durante la sincronización de imágenes: ${String(imgSyncErr)}`);
-        ctx.eventBus.addEvent('warn', `Aviso en subida de imágenes: ${String(imgSyncErr)}`);
+      if (isRealFactusolFile) {
+        try {
+          const tImgSyncStart = performance.now();
+          const imageSync = new ImageSyncService(
+            {
+              endpointUrl,
+              secretKey,
+              databasePath: dbPath,
+            },
+            ctx.eventBus
+          );
+          ctx.eventBus.addEvent('info', '📸 Comprobando y subiendo fotos de Factusol por HTTPS...');
+          await imageSync.syncImages(factusolProducts);
+          imgSyncMs = Math.round(performance.now() - tImgSyncStart);
+        } catch (imgSyncErr) {
+          ctx.logger.warn(`Aviso durante la sincronización de imágenes: ${String(imgSyncErr)}`);
+          ctx.eventBus.addEvent('warn', `Aviso en subida de imágenes: ${String(imgSyncErr)}`);
+        }
       }
 
       // 3. Formatear y enviar productos a push_catalog
@@ -471,22 +495,39 @@ export class CatalogUploadHelper {
       let pushStockMs = 0;
       try {
         const tPushStockStart = performance.now();
-        const warehouse = (config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
-        const driver = new AccessDriver({ databasePath: dbPath });
-        const stockRows = await driver
-          .query<{ ARTSTO: any; totalStock: any }>(
-            `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-          )
-          .catch(() => null);
+        const warehouse = (
+          config.softwareErp?.providers?.[erpConnector?.providerId || 'factusol']?.warehouseCode ||
+          (erpConnector?.providerId === 'simplygest' ? config.simplygest?.warehouseCode : config.factusol?.warehouseCode) ||
+          'GEN'
+        ).replace(/'/g, "''").trim();
 
-        if (stockRows && stockRows.length > 0) {
-          const stockUpdates = stockRows
-            .map((r) => ({
-              code: String(r.ARTSTO || '').trim(),
-              stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
+        let stockUpdates: Array<{ code: string; stock: number }> = [];
+        if (isRealFactusolFile) {
+          const driver = new AccessDriver({ databasePath: dbPath });
+          const stockRows = await driver
+            .query<{ ARTSTO: any; totalStock: any }>(
+              `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
+            )
+            .catch(() => null);
+          if (stockRows && stockRows.length > 0) {
+            stockUpdates = stockRows
+              .map((r) => ({
+                code: String(r.ARTSTO || '').trim(),
+                stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
+              }))
+              .filter((u) => u.code);
+          }
+        } else if (erpConnector) {
+          const stockMap = await erpConnector.getStockMap(warehouse).catch(() => new Map<string, number>());
+          stockUpdates = Array.from(stockMap.entries())
+            .map(([code, stock]) => ({
+              code: String(code || '').trim(),
+              stock: Math.max(0, Math.round(Number(stock) || 0)),
             }))
             .filter((u) => u.code);
+        }
 
+        if (stockUpdates.length > 0) {
           const STOCK_BATCH = 500;
           for (let i = 0; i < stockUpdates.length; i += STOCK_BATCH) {
             const chunk = stockUpdates.slice(i, i + STOCK_BATCH);

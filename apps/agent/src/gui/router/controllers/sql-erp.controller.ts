@@ -5,7 +5,12 @@ import { SqlServerBaseAdapter, SupportedErpProviderId } from '../../../erp';
 export class SqlErpController {
   public static detectSqlInstances(): RouteHandler {
     return async (_req, res) => {
-      const instances = await SqlServerBaseAdapter.detectLocalSqlInstances();
+      const rawInstances = await SqlServerBaseAdapter.detectLocalSqlInstances();
+      const instances = rawInstances.map((inst: any) =>
+        typeof inst === 'string'
+          ? { serverInstance: inst, label: inst, databases: [] }
+          : inst
+      );
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, instances }));
     };
@@ -15,7 +20,8 @@ export class SqlErpController {
     return async (_req, res, ctx) => {
       const body = ctx.body || {};
       const providerId = (body.providerId || body.erpType || 'agora') as SupportedErpProviderId;
-      const evaluationMode = Boolean(body.evaluationMode);
+      const rawDbInput = String(body.databaseName || body.databasePath || '').trim();
+      const evaluationMode = Boolean(body.evaluationMode) || rawDbInput.toUpperCase().startsWith('DEMO');
 
       if (providerId === 'factusol' || providerId === 'simplygest') {
         const connector = agent.erpRegistry.getConnector(providerId);
@@ -28,14 +34,22 @@ export class SqlErpController {
           cfg.softwareErp.providers[providerId] = {
             ...(cfg.softwareErp.providers[providerId] || {}),
             evaluationMode: true,
-            databasePath: testRes.resolvedPath || 'DEMO',
+            databasePath: testRes.resolvedPath || `DEMO://${providerId}`,
           };
+          (cfg as any).evaluationMode = { enabled: true, providerId };
           agent.configManager.saveConfigToDisk();
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(testRes));
         return;
       }
+
+      const defaultDbs: Record<string, string> = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
+      const defaultInsts: Record<string, string> = { agora: '.\\SQLEXPRESS', sage50: '.\\SAGE50', a3erp: '.\\SQLEXPRESS' };
+      const serverInstance = String(body.serverInstance || body.sqlInstance || defaultInsts[providerId] || '.\\SQLEXPRESS').trim();
+      const databaseName = (!evaluationMode && rawDbInput && !rawDbInput.startsWith('mssql://'))
+        ? rawDbInput
+        : (defaultDbs[providerId] || 'AgoraDB');
 
       const adapter = providerId === 'sage50'
         ? agent.sage50Adapter
@@ -44,10 +58,10 @@ export class SqlErpController {
           : agent.agoraAdapter;
 
       const testRes = await adapter.reconnect(
-        evaluationMode ? 'DEMO' : `mssql://${body.serverInstance || '.\\SQLEXPRESS'}/${body.databaseName || ''}`,
+        evaluationMode ? 'DEMO' : `mssql://${serverInstance}/${databaseName}`,
         {
-          serverInstance: body.serverInstance,
-          databaseName: body.databaseName,
+          serverInstance,
+          databaseName,
           authMode: body.authMode || 'windows',
           username: body.username,
           password: body.password,
@@ -57,6 +71,18 @@ export class SqlErpController {
 
       if (testRes.success) {
         agent.erpRegistry.setActiveProvider(providerId);
+        const cfg = agent.configManager.get();
+        (cfg as any).evaluationMode = { enabled: evaluationMode, providerId };
+        if (cfg.softwareErp?.providers?.[providerId]) {
+          (cfg.softwareErp.providers[providerId] as any).sqlInstance = serverInstance;
+          cfg.softwareErp.providers[providerId]!.serverInstance = serverInstance;
+          cfg.softwareErp.providers[providerId]!.databaseName = databaseName;
+          cfg.softwareErp.providers[providerId]!.databasePath = evaluationMode
+            ? `DEMO://${providerId}`
+            : `mssql://${serverInstance}/${databaseName}`;
+          cfg.softwareErp.providers[providerId]!.evaluationMode = evaluationMode;
+        }
+        agent.configManager.saveConfigToDisk();
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -67,7 +93,7 @@ export class SqlErpController {
   public static getPreview(agent: LocalAgent): RouteHandler {
     return async (req, res) => {
       const url = new URL(req.url || '/', 'http://127.0.0.1');
-      const providerId = (url.searchParams.get('provider') || agent.erpRegistry.getActiveProviderId()) as SupportedErpProviderId;
+      const providerId = (url.searchParams.get('provider') || url.searchParams.get('erpType') || agent.erpRegistry.getActiveProviderId()) as SupportedErpProviderId;
       const connector = agent.erpRegistry.getConnector(providerId);
       const articles = await connector.getPreviewArticles(25);
       res.writeHead(200, { 'Content-Type': 'application/json' });

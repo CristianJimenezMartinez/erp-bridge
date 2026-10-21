@@ -508,7 +508,7 @@ export const arquitecturaArticles: DocArticle[] = [
               <td class="px-4 py-2.5 font-bold text-white">SimplyGest Desktop</td>
               <td class="px-4 py-2.5 text-zinc-300">SimplyGest (Access OLEDB)</td>
               <td class="px-4 py-2.5 font-mono text-emerald-400">SimplyGestAdapter (ARTICULOS, PEDIDOS_VENTA)</td>
-              <td class="px-4 py-2.5"><a href="/docs/simplygest/localizacion-base-datos-mdb/" class="text-indigo-400 hover:underline font-semibold">Guía SimplyGest →</a></td>
+              <td class="px-4 py-2.5"><a href="/docs/simplygest/localizacion-base-datos/" class="text-indigo-400 hover:underline font-semibold">Guía SimplyGest →</a></td>
             </tr>
             <tr>
               <td class="px-4 py-2.5 font-bold text-white">Ágora Retail / POS</td>

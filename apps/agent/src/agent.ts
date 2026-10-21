@@ -165,6 +165,7 @@ export class LocalAgent {
       this.sage50Adapter,
       this.a3erpAdapter,
     ]);
+    this.enhanceErpAdapters();
     this.fileWatcherService = new FileWatcherService();
     this.syncEngine = new LocalSyncEngine(
       this.configManager,
@@ -227,8 +228,8 @@ export class LocalAgent {
     this.updateClient = new UpdateClient(updateOptions, this.eventBus);
 
     // Inicialización de delegados especializados
-    this.salesOrderManager = new SalesOrderManager(this.salesLedgerManager, this.configManager, this.factusolService, this.eventBus);
-    this.testOrderSimulator = new TestOrderSimulatorService(this.configManager, this.eventBus, this.salesLedgerManager, this.factusolService);
+    this.salesOrderManager = new SalesOrderManager(this.salesLedgerManager, this.configManager, this.factusolService, this.eventBus, this.erpRegistry);
+    this.testOrderSimulator = new TestOrderSimulatorService(this.configManager, this.eventBus, this.salesLedgerManager, this.factusolService, undefined, this.erpRegistry);
     this.channelTester = new ChannelTesterService(this.configManager);
     this.statusAggregator = new StatusAggregatorService({
       configManager: this.configManager,
@@ -489,6 +490,70 @@ export class LocalAgent {
       this.addEvent('info', enabled ? '✓ Arranque automático con Windows activado' : 'Arranque automático con Windows desactivado');
     }
     return success;
+  }
+
+  private enhanceErpAdapters(): void {
+    // 1. Asegurar que FactusolAdapter y SimplyGestAdapter expongan ruta y accesibilidad válidas en Modo Evaluación
+    for (const fileAdapter of [this.factusolAdapter, this.simplygestAdapter]) {
+      const origGetPath = fileAdapter.getDatabasePath.bind(fileAdapter);
+      const origIsAcc = fileAdapter.isDatabaseAccessible.bind(fileAdapter);
+      fileAdapter.getDatabasePath = () => {
+        if ((fileAdapter as any).isEvaluationMode?.()) {
+          return `DEMO://${fileAdapter.providerId}`;
+        }
+        return origGetPath();
+      };
+      fileAdapter.isDatabaseAccessible = () => {
+        if ((fileAdapter as any).isEvaluationMode?.()) {
+          return true;
+        }
+        return origIsAcc();
+      };
+    }
+
+    // 2. Extender createOrder en los adaptadores SQL Server (Ágora, Sage 50, a3ERP) para insertar también las líneas de pedido (insertOrderLine)
+    for (const sqlAdapter of [this.agoraAdapter, this.sage50Adapter, this.a3erpAdapter]) {
+      const origCreateOrder = sqlAdapter.createOrder.bind(sqlAdapter);
+      sqlAdapter.createOrder = async (order: any, series: string | number = 1, warehouse = '1') => {
+        const res = await origCreateOrder(order, series, warehouse);
+        if (
+          res.success &&
+          res.orderNumber &&
+          !(sqlAdapter as any).isEvaluationMode?.() &&
+          Array.isArray(order?.lines) &&
+          order.lines.length > 0
+        ) {
+          const lineTemplate: string | undefined = (sqlAdapter as any).profile?.queries?.insertOrderLine;
+          const execNonQuery = (sqlAdapter as any).executeNonQuery?.bind(sqlAdapter);
+          if (lineTemplate && typeof execNonQuery === 'function') {
+            const safeSeries = String(series ?? 1).replace(/'/g, "''");
+            const safeWh = String(warehouse || '1').replace(/'/g, "''");
+            for (let idx = 0; idx < order.lines.length; idx++) {
+              const l = order.lines[idx] || {};
+              const sku = String(l.sku || '').replace(/'/g, "''").substring(0, 50);
+              const desc = String(l.name || l.description || sku).replace(/'/g, "''").substring(0, 120);
+              const qty = Number(l.quantity) || 1;
+              const unitPrice = Number(l.unitPrice) || 0;
+              const totalLine = Number(l.total) || Number((qty * unitPrice).toFixed(2));
+              const lineSql = lineTemplate
+                .replace(/@series/g, safeSeries)
+                .replace(/@orderNumber/g, String(res.orderNumber))
+                .replace(/@lineIndex/g, String(l.position || idx + 1))
+                .replace(/@sku/g, sku)
+                .replace(/@description/g, desc)
+                .replace(/@quantity/g, String(qty))
+                .replace(/@unitPrice/g, String(unitPrice))
+                .replace(/@totalLine/g, String(totalLine))
+                .replace(/@warehouse/g, safeWh);
+              await execNonQuery(lineSql).catch((err: unknown) => {
+                this.logger.warn(`Aviso al insertar línea ${idx + 1} en ${sqlAdapter.displayName}: ${String(err)}`);
+              });
+            }
+          }
+        }
+        return res;
+      };
+    }
   }
 
   public setGuiServer(server: AgentGuiServer | null): void {

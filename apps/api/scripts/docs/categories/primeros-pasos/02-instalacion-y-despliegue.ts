@@ -230,6 +230,6 @@ export const instalacionYDespliegueArticle: DocArticle = {
     'primeros-pasos/requisitos-del-sistema',
     'primeros-pasos/asistente-de-configuracion',
     'seguridad/criptografia-y-actualizaciones',
-    'simplygest/conexion-mdb',
+    'simplygest/localizacion-base-datos',
   ],
 };

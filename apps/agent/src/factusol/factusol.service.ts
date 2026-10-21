@@ -79,7 +79,22 @@ export class FactusolService {
     }
   }
 
+  private isDemoMode(dbPathInput?: string): boolean {
+    const cfg = this.configManager.get();
+    const raw = String(dbPathInput || cfg.factusol?.databasePath || cfg.factusolDbPath || '').trim().toUpperCase();
+    return raw.startsWith('DEMO') || Boolean(cfg.softwareErp?.providers?.factusol?.evaluationMode);
+  }
+
   public async testConnection(dbPathInput: string): Promise<{ success: boolean; message: string; articleCount?: number; fileSizeBytes?: number; resolvedPath?: string }> {
+    if (this.isDemoMode(dbPathInput)) {
+      return {
+        success: true,
+        message: '🧪 Modo Evaluación Activo (Factusol): 6 artículos de demostración en memoria.',
+        articleCount: 6,
+        fileSizeBytes: 0,
+        resolvedPath: 'DEMO://factusol',
+      };
+    }
     let dbPath = FactusolPathResolver.cleanPath(dbPathInput);
     if (!dbPath) {
       return { success: false, message: 'La ruta especificada no existe en el sistema.' };
@@ -143,6 +158,7 @@ export class FactusolService {
   }
 
   public async getArticleCount(customDbPath?: string): Promise<number | undefined> {
+    if (this.isDemoMode(customDbPath)) return 6;
     const config = this.configManager.get();
     let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
     if (!dbPath) return undefined;
@@ -221,6 +237,17 @@ export class FactusolService {
     articles: ArticlePreviewItem[];
     total?: number;
   }> {
+    if (this.isDemoMode(customDbPath)) {
+      const demo: ArticlePreviewItem[] = [
+        { code: 'DEMO-001', description: 'Taladro Percutor Profesional 850W (Demo)', family: 'HER', costPrice: 45, salePrice: 79.9, stock: 24, ean: '8412345678901' },
+        { code: 'DEMO-002', description: 'Juego de Destornilladores Aislados 1000V (Demo)', family: 'HER', costPrice: 14, salePrice: 24.5, stock: 40, ean: '8412345678902' },
+        { code: 'DEMO-003', description: 'Disco de Corte Diamante 115mm Turbo (Demo)', family: 'ABR', costPrice: 5.2, salePrice: 9.95, stock: 120, ean: '8412345678903' },
+        { code: 'DEMO-004', description: 'Guantes de Protección Nitrilo Talla L (Demo)', family: 'EPI', costPrice: 1.8, salePrice: 3.5, stock: 200, ean: '8412345678904' },
+        { code: 'DEMO-005', description: 'Silicona Neutra Profesional Blanca 300ml (Demo)', family: 'QUI', costPrice: 3.1, salePrice: 5.9, stock: 85, ean: '8412345678905' },
+        { code: 'DEMO-006', description: 'Flexómetro Magnético 5m x 25mm (Demo)', family: 'MED', costPrice: 4.5, salePrice: 8.75, stock: 60, ean: '8412345678906' },
+      ].slice(0, limit);
+      return { articles: demo, total: demo.length };
+    }
     const config = this.configManager.get();
     let dbPath = FactusolPathResolver.cleanPath(customDbPath || config.factusol?.databasePath || config.factusolDbPath || '');
     if (!dbPath) return { articles: [], total: 0 };

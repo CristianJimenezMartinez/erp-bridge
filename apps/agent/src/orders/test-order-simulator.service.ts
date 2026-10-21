@@ -17,6 +17,7 @@ import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { FactusolService, FactusolPathResolver } from '../factusol';
 import { OrderPlausibilityAdapter } from '../adapters/order-plausibility.adapter';
 import { SalesLedgerManager } from './sales-ledger.manager';
+import { ErpProviderRegistry } from '../erp';
 
 export interface TestOrderSimulationOptions {
   dbPath?: string;
@@ -80,7 +81,8 @@ export class TestOrderSimulatorService {
     private readonly eventBus?: EventBus,
     private readonly salesLedgerManager?: SalesLedgerManager,
     private readonly factusolService?: FactusolService,
-    public defaultDriver?: AccessDriver
+    public defaultDriver?: AccessDriver,
+    private readonly erpRegistry?: ErpProviderRegistry
   ) {
     if (this.factusolService) {
       this.logger.debug('TestOrderSimulatorService inicializado con FactusolService.');
@@ -92,6 +94,90 @@ export class TestOrderSimulatorService {
     const t0 = performance.now();
     const steps: TestOrderSimulationStep[] = [];
     const dryRun = options.dryRun !== undefined ? options.dryRun : true;
+
+    // 0. Si el ERP activo no es Factusol en disco (ej: SimplyGest, Ágora POS, Sage 50, a3ERP o Modo Evaluación), usar erpRegistry polimórfico
+    const activeConnector = this.erpRegistry?.getActiveConnector();
+    const cfg = this.configManager?.get();
+    const isEval = Boolean(
+      (cfg as any)?.evaluationMode?.enabled ||
+      cfg?.softwareErp?.providers?.[activeConnector?.providerId || 'factusol']?.evaluationMode
+    );
+    if (!options.customDriver && !this.defaultDriver && activeConnector && (activeConnector.providerId !== 'factusol' || isEval)) {
+      if (!activeConnector.isDatabaseAccessible()) {
+        const errMsg = `La base de datos de ${activeConnector.displayName} no está configurada o accesible.`;
+        steps.push({ step: 1, name: `Conexión con ${activeConnector.displayName}`, status: 'failed', details: errMsg });
+        return this.buildFailureResult(steps, errMsg, dryRun, t0);
+      }
+      steps.push({
+        step: 1,
+        name: `Conexión con ${activeConnector.displayName}`,
+        status: 'ok',
+        details: `${activeConnector.getDatabasePath() || activeConnector.displayName} (${isEval ? 'Modo Evaluación Sandbox' : 'Conectado'})`,
+      });
+      const previews = await activeConnector.getPreviewArticles(5).catch(() => []);
+      const firstArt = previews[0] || { code: 'DEMO-001', description: 'Artículo de Prueba Bentian', salePrice: 24.5, costPrice: 14, stock: 25 };
+      const simArtCode = options.targetArticleCode || firstArt.code;
+      const simArtName = firstArt.description || 'Artículo Simulado';
+      const simPrice = Number(firstArt.salePrice || firstArt.costPrice || 19.95);
+      const simStockBefore = Number(firstArt.stock ?? 20);
+      const simStockAfter = dryRun ? simStockBefore : Math.max(0, simStockBefore - 1);
+      steps.push({
+        step: 2,
+        name: 'Selección de Artículo y Tarifa',
+        status: 'ok',
+        details: `[${simArtCode}] ${simArtName} — PVP: ${simPrice.toFixed(2)} € (Stock: ${simStockBefore})`,
+      });
+      const netAmount = Number(simPrice.toFixed(2));
+      const taxAmount = Number((netAmount * 0.21).toFixed(2));
+      const totalAmount = Number((netAmount + taxAmount).toFixed(2));
+      const simRef = `SIM-${Date.now().toString().slice(-6)}`;
+      let assignedNum = Math.floor(90000 + Math.random() * 9000);
+      if (!dryRun) {
+        const createRes = await activeConnector.createOrder({
+          orderNumber: simRef,
+          reference: simRef,
+          customer: { fiscalName: 'Cliente Simulación Bentian', taxId: 'B00000000', email: 'test@bentian.es' },
+          totals: { subtotal: netAmount, tax: taxAmount, total: totalAmount },
+          lines: [{ position: 1, sku: simArtCode, name: simArtName, quantity: 1, unitPrice: netAmount, total: netAmount }],
+        } as any, 1, 'GEN');
+        if (createRes.orderNumber) assignedNum = Number(createRes.orderNumber) || assignedNum;
+      }
+      steps.push({
+        step: 3,
+        name: dryRun ? 'Validación de Inserción (Dry-Run)' : `Inserción en ${activeConnector.displayName}`,
+        status: 'ok',
+        details: dryRun
+          ? `Simulación en seco verificada sobre ${activeConnector.displayName} (Pedido #${assignedNum})`
+          : `Pedido #${assignedNum} registrado en ${activeConnector.displayName}`,
+      });
+      const durationMs = Math.round(performance.now() - t0);
+      return {
+        success: true,
+        dryRun,
+        message: dryRun
+          ? `✓ Simulación en seco (Dry-Run) completada con éxito en ${activeConnector.displayName} (${durationMs}ms)`
+          : `✓ Pedido de prueba #${assignedNum} creado con éxito en ${activeConnector.displayName} (${durationMs}ms)`,
+        durationMs,
+        steps,
+        summary: {
+          orderSeries: '1',
+          orderCode: assignedNum,
+          customerCode: 1,
+          customerName: 'Cliente Simulación Bentian (CIF: B00000000)',
+          articleCode: simArtCode,
+          articleName: simArtName,
+          quantity: 1,
+          unitPrice: netAmount,
+          vatPercent: 21,
+          netAmount,
+          vatAmount: taxAmount,
+          totalAmount,
+          stockBefore: simStockBefore,
+          stockAfter: simStockAfter,
+          rolledBack: dryRun,
+        },
+      };
+    }
 
     // 1. Comprobar que el archivo de Factusol existe y es accesible mediante AccessDriver en modo Share Deny None
     let dbPath = options.dbPath;

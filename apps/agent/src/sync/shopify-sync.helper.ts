@@ -52,6 +52,7 @@ export interface ShopifyImportOrdersOptions {
   series?: string;
   warehouse?: string;
   rawOrders?: any[];
+  erpConnector?: any;
 }
 
 /**
@@ -84,30 +85,42 @@ export class ShopifySyncHelper {
     driver: AccessDriver,
     config: any,
     warehouseCode: string,
-    options?: { connector?: ShopifyConnector; client?: ShopifyClient }
+    options?: { connector?: ShopifyConnector; client?: ShopifyClient; erpConnector?: any }
   ): Promise<ShopifySyncStockResult> {
     const start = performance.now();
     const warehouse = (warehouseCode || config.factusol?.warehouseCode || 'GEN').replace(/'/g, "''").trim();
 
-    // 1. Consulta de existencias en Factusol F_STO
-    let stockRows = await driver
-      .query<{ ARTSTO: any; totalStock: any }>(
-        `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-      )
-      .catch((err) => {
-        ShopifySyncHelper.logger.warn('Error al consultar stock en Factusol', { error: (err as any)?.message || String(err) });
-        return null;
-      });
+    // 1. Consulta de existencias en ERP (Polimórfica o Factusol F_STO)
+    let stockRows: Array<{ ARTSTO: any; totalStock: any }> | null = null;
+    const erpConn = options?.erpConnector;
+    const usePolymorphicErp = Boolean(
+      erpConn &&
+      (!driver || erpConn.providerId !== 'factusol' || String(erpConn.getDatabasePath?.() || '').startsWith('DEMO://'))
+    );
 
-    // Fallback inteligente: si con el almacén configurado devolvió 0 registros, intentar agrupar por todos los almacenes de F_STO
-    if ((!stockRows || stockRows.length === 0) && warehouse) {
-      const fallbackRows = await driver
+    if (usePolymorphicErp) {
+      const stockMap: Map<string, number> = await erpConn.getStockMap(warehouse).catch(() => new Map());
+      stockRows = Array.from(stockMap.entries()).map(([ARTSTO, totalStock]) => ({ ARTSTO, totalStock }));
+    } else if (driver) {
+      stockRows = await driver
         .query<{ ARTSTO: any; totalStock: any }>(
-          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO GROUP BY ARTSTO`
+          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
         )
-        .catch(() => null);
-      if (fallbackRows && fallbackRows.length > 0) {
-        stockRows = fallbackRows;
+        .catch((err) => {
+          ShopifySyncHelper.logger.warn('Error al consultar stock en Factusol', { error: (err as any)?.message || String(err) });
+          return null;
+        });
+
+      // Fallback inteligente: si con el almacén configurado devolvió 0 registros, intentar agrupar por todos los almacenes de F_STO
+      if ((!stockRows || stockRows.length === 0) && warehouse) {
+        const fallbackRows = await driver
+          .query<{ ARTSTO: any; totalStock: any }>(
+            `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO GROUP BY ARTSTO`
+          )
+          .catch(() => null);
+        if (fallbackRows && fallbackRows.length > 0) {
+          stockRows = fallbackRows;
+        }
       }
     }
 
@@ -325,56 +338,73 @@ export class ShopifySyncHelper {
           safeOrder = check.sanitizedOrder;
         }
 
-        // Idempotencia: comprobar si ya fue registrado previamente en Factusol F_PCL
+        // Idempotencia e Inserción: Polimórfico (Multi-ERP / Demo) o Factusol F_PCL
         const ref = safeOrder.reference || safeOrder.orderNumber;
-        const existing = await driver.query<any>(findOrderByReferenceQuery(ref)).catch(() => []);
-        if (existing && existing.length > 0) {
-          ShopifySyncHelper.logger.info(`Pedido ${ref} ya existente en Factusol (CODPCL=${existing[0].CODPCL})`);
-          continue;
-        }
-
-        // Resolución de cliente en F_CLI
-        let customerCode = 1;
-        const normalizedTaxId = normalizeTaxId(safeOrder.customer?.taxId);
-        if (normalizedTaxId) {
-          const found = await driver
-            .query<any>(`SELECT CODCLI FROM F_CLI WHERE NIFCLI = '${sanitizeSql(normalizedTaxId)}'`)
-            .catch(() => []);
-          if (found && found.length > 0 && found[0].CODCLI) {
-            customerCode = Number(found[0].CODCLI);
-          }
-        }
-
-        // Desglose multi-tramo de IVA y Recargo de Equivalencia
-        const vatBreakdown = calculateOrderVatBreakdown(safeOrder);
-
-        // Decremento de stock F_STO
-        const stockSqls = (safeOrder.lines || []).map((l: CanonicalOrderLine) =>
-          decrementStockQuery(l.sku, warehouse, l.quantity)
+        const erpConn = options?.erpConnector;
+        const usePolymorphicErp = Boolean(
+          erpConn &&
+          (!driver || erpConn.providerId !== 'factusol' || String(erpConn.getDatabasePath?.() || '').startsWith('DEMO://'))
         );
 
-        // 3. Inserción en Factusol F_PCL y F_LPC mediante transacción atómica con correlativo
-        const MAX_RETRIES = 5;
         let createdOrderNumber = 0;
         let orderCreated = false;
 
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-          try {
-            const maxRows = await driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
-            const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
-            const headerSql = insertOrderHeaderQuery(safeOrder, nextOrderCode, customerCode, vatBreakdown, series);
-            const lineSqls = safeOrder.lines.map((l: CanonicalOrderLine, idx: number) =>
-              insertOrderLineQuery(l, nextOrderCode, series, l.position || (idx + 1))
-            );
-
-            await driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
-            createdOrderNumber = nextOrderCode;
+        if (usePolymorphicErp) {
+          const mutRes = await erpConn.createOrder(safeOrder, series, warehouse);
+          if (mutRes && mutRes.success) {
+            createdOrderNumber = Number(String(mutRes.orderNumber || mutRes.externalId || '1').replace(/\D/g, '')) || 1;
             orderCreated = true;
-            break;
-          } catch (err) {
-            ShopifySyncHelper.logger.warn(`Intento ${attempt}/${MAX_RETRIES} de inserción en Factusol falló`, { error: (err as any)?.message || String(err) });
-            if (attempt < MAX_RETRIES) {
-              await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, attempt - 1)));
+          } else {
+            ShopifySyncHelper.logger.error(`No se pudo insertar el pedido ${ref} en ${erpConn.displayName || 'ERP'}: ${mutRes?.error || 'Error desconocido'}`);
+            continue;
+          }
+        } else {
+          const existing = await driver.query<any>(findOrderByReferenceQuery(ref)).catch(() => []);
+          if (existing && existing.length > 0) {
+            ShopifySyncHelper.logger.info(`Pedido ${ref} ya existente en Factusol (CODPCL=${existing[0].CODPCL})`);
+            continue;
+          }
+
+          // Resolución de cliente en F_CLI
+          let customerCode = 1;
+          const normalizedTaxId = normalizeTaxId(safeOrder.customer?.taxId);
+          if (normalizedTaxId) {
+            const found = await driver
+              .query<any>(`SELECT CODCLI FROM F_CLI WHERE NIFCLI = '${sanitizeSql(normalizedTaxId)}'`)
+              .catch(() => []);
+            if (found && found.length > 0 && found[0].CODCLI) {
+              customerCode = Number(found[0].CODCLI);
+            }
+          }
+
+          // Desglose multi-tramo de IVA y Recargo de Equivalencia
+          const vatBreakdown = calculateOrderVatBreakdown(safeOrder);
+
+          // Decremento de stock F_STO
+          const stockSqls = (safeOrder.lines || []).map((l: CanonicalOrderLine) =>
+            decrementStockQuery(l.sku, warehouse, l.quantity)
+          );
+
+          // 3. Inserción en Factusol F_PCL y F_LPC mediante transacción atómica con correlativo
+          const MAX_RETRIES = 5;
+          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+              const maxRows = await driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
+              const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
+              const headerSql = insertOrderHeaderQuery(safeOrder, nextOrderCode, customerCode, vatBreakdown, series);
+              const lineSqls = safeOrder.lines.map((l: CanonicalOrderLine, idx: number) =>
+                insertOrderLineQuery(l, nextOrderCode, series, l.position || (idx + 1))
+              );
+
+              await driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
+              createdOrderNumber = nextOrderCode;
+              orderCreated = true;
+              break;
+            } catch (err) {
+              ShopifySyncHelper.logger.warn(`Intento ${attempt}/${MAX_RETRIES} de inserción en Factusol falló`, { error: (err as any)?.message || String(err) });
+              if (attempt < MAX_RETRIES) {
+                await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, attempt - 1)));
+              }
             }
           }
         }

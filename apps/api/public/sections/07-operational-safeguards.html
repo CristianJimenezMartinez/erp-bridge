@@ -76,7 +76,7 @@
             </div>
             <h4 class="text-base font-bold text-white group-hover:text-emerald-300 transition">Pedidos Protegidos Offline</h4>
             <p class="text-xs text-zinc-400 mt-2.5 leading-relaxed">
-              Cola de mensajería persistente Store-and-Forward en base de datos local SQLite. Retiene las ventas aunque el PC del almacén esté apagado o se corte la fibra óptica de la oficina. Al reconectar, se vuelcan cronológicamente sin duplicidades.
+              Cola de mensajería persistente Store-and-Forward con almacenamiento local JSON atómico en AppData. Retiene las ventas aunque el PC del almacén esté apagado o se corte la fibra óptica de la oficina. Al reconectar, se vuelcan cronológicamente sin duplicidades.
             </p>
           </div>
           <div class="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
@@ -265,7 +265,7 @@
           <ul class="space-y-3 text-xs text-zinc-300">
             <li class="flex items-start gap-2">
               <span class="text-emerald-400 font-bold shrink-0">✓</span>
-              <span><strong>Retención persistente en SQLite:</strong> Los eventos y pedidos se encolan de forma inmutable. Nada se pierde aunque el enlace caiga durante horas.</span>
+              <span><strong>Retención persistente con JSON atómico en AppData:</strong> Los eventos y pedidos se encolan de forma inmutable. Nada se pierde aunque el enlace caiga durante horas.</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-emerald-400 font-bold shrink-0">✓</span>

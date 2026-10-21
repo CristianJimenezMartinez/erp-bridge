@@ -111,9 +111,15 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           const completed = localStorage.getItem('bentian_onboarding_completed');
           const lic = data.license || {};
           const isLicValid = lic.valid === true || lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
-          const isErpConfigured = data.erpType === 'simplygest'
-            ? !!(data.simplygest && data.simplygest.configured)
-            : !!(data.factusol && data.factusol.configured);
+          const activeErpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
+          const evalEnabled = Boolean(data.evaluationMode && data.evaluationMode.enabled);
+          const isErpConfigured = evalEnabled ? true : (
+            activeErpType === 'simplygest'
+              ? !!(data.simplygest && data.simplygest.configured)
+              : ((activeErpType === 'agora' || activeErpType === 'sage50' || activeErpType === 'a3erp')
+                ? Boolean((data.softwareErp && data.softwareErp.sqlConnection && data.softwareErp.sqlConnection.serverInstance) || (data.softwareErp && data.softwareErp.provisioned))
+                : !!(data.factusol && data.factusol.configured))
+          );
 
           if (!completed && (!isLicValid || !isErpConfigured)) {
             setTimeout(function() {
@@ -128,8 +134,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       }
     }
 
+    const _loadedTemplateVersion = '${agentVersion}';
+
     function renderStatus(data) {
       if (!data) return;
+
+      if (data.agentVersion && _loadedTemplateVersion && data.agentVersion !== _loadedTemplateVersion && !window.__reloadingForNewVersion) {
+        window.__reloadingForNewVersion = true;
+        window.location.reload();
+        return;
+      }
 
       document.getElementById('brand-version').textContent = 'v' + (data.agentVersion || '${agentVersion}');
       document.getElementById('sidebar-hostname').textContent = (data.system && data.system.hostname) ? data.system.hostname : 'Local';
@@ -144,8 +158,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const erpMetaMap = {
         factusol: { sidebarTitle: 'Factusol ERP', badge: 'Factusol', tagClass: 'tag tag-blue', cardName: 'Factusol Desktop', shortName: 'Factusol', ext: '.accdb', inputId: 'input-factusol-db' },
         simplygest: { sidebarTitle: 'SimplyGest Desktop', badge: 'SimplyGest', tagClass: 'tag tag-green', cardName: 'SimplyGest Desktop', shortName: 'SimplyGest', ext: 'Datos.mdb', inputId: 'input-simplygest-db' },
-        agora: { sidebarTitle: 'Ágora POS', badge: 'Ágora POS', tagClass: 'tag tag-amber', cardName: 'Ágora Retail / POS', shortName: 'Ágora POS', ext: 'SQL Server (AgoraPOS)', inputId: 'input-sql-erp-instance' },
-        sage50: { sidebarTitle: 'Sage 50 ERP', badge: 'Sage 50', tagClass: 'tag tag-green', cardName: 'Sage 50 Local', shortName: 'Sage 50', ext: 'SQL Server (SAGE50)', inputId: 'input-sql-erp-instance' },
+        agora: { sidebarTitle: 'Ágora POS', badge: 'Ágora POS', tagClass: 'tag tag-amber', cardName: 'Ágora Retail / POS', shortName: 'Ágora POS', ext: 'SQL Server (AgoraDB)', inputId: 'input-sql-erp-instance' },
+        sage50: { sidebarTitle: 'Sage 50 ERP', badge: 'Sage 50', tagClass: 'tag tag-green', cardName: 'Sage 50 Local', shortName: 'Sage 50', ext: 'SQL Server (GESTION)', inputId: 'input-sql-erp-instance' },
         a3erp: { sidebarTitle: 'a3ERP', badge: 'a3ERP', tagClass: 'tag tag-amber', cardName: 'Wolters Kluwer a3ERP', shortName: 'a3ERP', ext: 'SQL Server (A3ERP)', inputId: 'input-sql-erp-instance' }
       };
       const activeMeta = erpMetaMap[erpType] || erpMetaMap.factusol;
@@ -402,8 +416,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const erpExtMap = {
         factusol: '.accdb',
         simplygest: 'Datos.mdb',
-        agora: 'SQL Server (AgoraPOS)',
-        sage50: 'SQL Server (SAGE50)',
+        agora: 'SQL Server (AgoraDB)',
+        sage50: 'SQL Server (GESTION)',
         a3erp: 'SQL Server (A3ERP)'
       };
       const erpName = evalMode ? 'Modo Evaluación Demo' : (erpNameMap[erpType] || 'Factusol');
@@ -649,9 +663,13 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (badgeDot) badgeDot.style.background = '#34d399';
       if (badgeText) badgeText.textContent = 'Sincronización Activa — Todo al día';
       if (zenTitle) zenTitle.textContent = 'Tu tienda web y ' + erpName + ' están sincronizados';
-      if (zenSub) zenSub.textContent = isSimplyGest
-        ? 'El conector de SimplyGest lee existencias y precios en tiempo real para mantener tu tienda online completamente actualizada.'
-        : 'El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.';
+      if (zenSub) zenSub.textContent = evalMode
+        ? 'El Modo Evaluación Sandbox simula en memoria lecturas de stock e inyección de pedidos de prueba sin necesitar un ERP real instalado.'
+        : (isSimplyGest
+          ? 'El conector de SimplyGest lee existencias y precios en tiempo real para mantener tu tienda online completamente actualizada.'
+          : (isSqlErp
+            ? 'El conector SQL Server de ' + erpName + ' lee existencias, tarifas y pedidos en tiempo real (<5s) directamente sobre tu base de datos local.'
+            : 'El vigilante de Factusol detecta cualquier cambio en existencias o precios en tiempo real y actualiza tu web inmediatamente.'));
       if (primaryBtn) {
         primaryBtn.className = 'btn btn-primary btn-lg';
         primaryBtn.style.background = 'var(--primary)';
@@ -730,6 +748,40 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         const inSgOrderSeries = document.getElementById('input-simplygest-order-series');
         if (inSgOrderSeries && (force || !inSgOrderSeries.value || document.activeElement !== inSgOrderSeries)) {
           inSgOrderSeries.value = sgSettings.orderSeries || '1';
+        }
+
+        // SQL ERP Settings (Ágora, Sage 50, a3ERP)
+        const sqlProviders = (data.softwareErp && data.softwareErp.providers) || {};
+        const sqlConn = (data.softwareErp && data.softwareErp.sqlConnection) || {};
+        const activeSqlCfg = sqlProviders[effectiveErp] || {};
+        const inSqlInst = document.getElementById('input-sql-erp-instance');
+        if (inSqlInst && (force || !inSqlInst.value || document.activeElement !== inSqlInst)) {
+          const valInst = activeSqlCfg.serverInstance || activeSqlCfg.sqlInstance || sqlConn.serverInstance || '';
+          if (valInst) inSqlInst.value = valInst;
+        }
+        const inSqlDb = document.getElementById('input-sql-erp-db');
+        if (inSqlDb && (force || !inSqlDb.value || document.activeElement !== inSqlDb)) {
+          const valDb = activeSqlCfg.databaseName || activeSqlCfg.databasePath || sqlConn.databaseName || '';
+          if (valDb) inSqlDb.value = valDb;
+        }
+        const selSqlAuth = document.getElementById('select-sql-erp-auth');
+        if (selSqlAuth && activeSqlCfg.authMode && (force || document.activeElement !== selSqlAuth)) {
+          selSqlAuth.value = activeSqlCfg.authMode;
+          if (typeof toggleSqlAuthFields === 'function') {
+            toggleSqlAuthFields(activeSqlCfg.authMode === 'sql', false);
+          }
+        }
+        const inSqlUser = document.getElementById('input-sql-erp-user');
+        if (inSqlUser && activeSqlCfg.username && (force || document.activeElement !== inSqlUser)) {
+          inSqlUser.value = activeSqlCfg.username;
+        }
+        const inSqlWh = document.getElementById('input-sql-erp-warehouse');
+        if (inSqlWh && activeSqlCfg.warehouseCode && (force || document.activeElement !== inSqlWh)) {
+          inSqlWh.value = activeSqlCfg.warehouseCode;
+        }
+        const inSqlSeries = document.getElementById('input-sql-erp-series');
+        if (inSqlSeries && activeSqlCfg.orderSeries && (force || document.activeElement !== inSqlSeries)) {
+          inSqlSeries.value = activeSqlCfg.orderSeries;
         }
 
         const chType = data.channelType || 'universal_bridge';

@@ -127,18 +127,22 @@ export const sqlErpsArticles: DocArticle[] = [
       </p>
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-zinc-300 mb-6 overflow-x-auto leading-relaxed">
 <pre>{
-  "activeErp": "sage50",
-  "sandboxMode": false,
-  "sage50": {
-    "server": "localhost\\\\SAGE50",
-    "database": "2026AA",
-    "companyCode": "01",
-    "integratedSecurity": true,
-    "orderLetter": "W",
-    "warehouseCode": "01",
-    "tariffCode": "01",
-    "safetyStockBuffer": 1,
-    "applyEquivalenceSurcharge": true
+  "erpType": "sage50",
+  "evaluationMode": { "enabled": false, "simulatedErp": "sage50" },
+  "softwareErp": {
+    "activeProvider": "sage50",
+    "provisioned": true,
+    "providers": {
+      "sage50": {
+        "serverInstance": ".\\\\SAGE50",
+        "databaseName": "GESTION",
+        "authMode": "windows",
+        "orderSeries": "1",
+        "warehouseCode": "01",
+        "tariffCode": "1",
+        "evaluationMode": false
+      }
+    }
   }
 }</pre>
       </div>
@@ -260,17 +264,22 @@ export const sqlErpsArticles: DocArticle[] = [
       </p>
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-zinc-300 mb-6 overflow-x-auto leading-relaxed">
 <pre>{
-  "activeErp": "agora",
-  "sandboxMode": false,
-  "agora": {
-    "server": "localhost\\\\SQLEXPRESS",
-    "database": "AgoraRetail",
-    "integratedSecurity": true,
-    "warehouseId": 1,
-    "priceListId": 1,
-    "orderSeries": "WEB",
-    "matchByBarcode": false,
-    "safetyStockBuffer": 1
+  "erpType": "agora",
+  "evaluationMode": { "enabled": false, "simulatedErp": "agora" },
+  "softwareErp": {
+    "activeProvider": "agora",
+    "provisioned": true,
+    "providers": {
+      "agora": {
+        "serverInstance": ".\\\\SQLEXPRESS",
+        "databaseName": "AgoraDB",
+        "authMode": "windows",
+        "warehouseCode": "1",
+        "tariffCode": "1",
+        "orderSeries": "W",
+        "evaluationMode": false
+      }
+    }
   }
 }</pre>
       </div>
@@ -392,17 +401,22 @@ export const sqlErpsArticles: DocArticle[] = [
       </p>
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono text-zinc-300 mb-6 overflow-x-auto leading-relaxed">
 <pre>{
-  "activeErp": "a3erp",
-  "sandboxMode": false,
-  "a3erp": {
-    "server": "SERVIDOR_SQL\\\\A3ERP",
-    "database": "A3ERP_EMPRESA",
-    "integratedSecurity": true,
-    "orderSeries": "WEB",
-    "warehouseCode": "ALG",
-    "tariffCode": "01",
-    "safetyStockBuffer": 2,
-    "autoCreateCustomers": true
+  "erpType": "a3erp",
+  "evaluationMode": { "enabled": false, "simulatedErp": "a3erp" },
+  "softwareErp": {
+    "activeProvider": "a3erp",
+    "provisioned": true,
+    "providers": {
+      "a3erp": {
+        "serverInstance": ".\\\\SQLEXPRESS",
+        "databaseName": "A3ERP",
+        "authMode": "windows",
+        "orderSeries": "W",
+        "warehouseCode": "GEN",
+        "tariffCode": "1",
+        "evaluationMode": false
+      }
+    }
   }
 }</pre>
       </div>

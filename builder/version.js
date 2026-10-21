@@ -195,6 +195,20 @@ function syncPublicTemplates(targetVer) {
             changed = true;
           }
         }
+        if (content.includes('"softwareVersion"')) {
+          const updated = content.replace(/"softwareVersion":\s*"[^"]+"/g, `"softwareVersion": "${targetVer}"`);
+          if (updated !== content) {
+            content = updated;
+            changed = true;
+          }
+        }
+        if (content.includes('"mpn": "EB-')) {
+          const updated = content.replace(/"mpn":\s*"EB-[^"]+"/g, `"mpn": "EB-${targetVer.replace(/\./g, '')}"`);
+          if (updated !== content) {
+            content = updated;
+            changed = true;
+          }
+        }
         if (changed) {
           fs.writeFileSync(fullPath, content, 'utf8');
         }

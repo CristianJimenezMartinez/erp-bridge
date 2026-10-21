@@ -1,6 +1,7 @@
 import { Logger } from '@erp-bridge/shared';
 import { ConfigManager } from '../config';
 import { FactusolService } from '../factusol';
+import { ErpProviderRegistry } from '../erp';
 import { EventBus } from '../diagnostics/event-bus';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { OrderPlausibilityAdapter } from '../adapters/order-plausibility.adapter';
@@ -20,7 +21,8 @@ export class SalesOrderManager {
     private readonly salesLedgerManager: SalesLedgerManager,
     private readonly configManager: ConfigManager,
     private readonly factusolService: FactusolService,
-    private readonly eventBus: EventBus
+    private readonly eventBus: EventBus,
+    private readonly erpRegistry?: ErpProviderRegistry
   ) {}
 
   public getSalesOrders(options?: GetSalesOrdersOptions): PaginatedSalesOrdersResult {
@@ -115,6 +117,40 @@ export class SalesOrderManager {
       warehouse,
     };
 
+    const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
+    if (!plausibility.valid || !plausibility.sanitizedOrder) {
+      const err = `Pedido descartado por validación de seguridad: ${plausibility.error}`;
+      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
+      return { success: false, message: err };
+    }
+    const safeOrder = plausibility.sanitizedOrder;
+
+    const activeConnector = this.erpRegistry?.getActiveConnector();
+    const isEval = Boolean((config as any).evaluationMode?.enabled || config.softwareErp?.providers?.[activeConnector?.providerId || 'factusol']?.evaluationMode);
+
+    if (activeConnector && (activeConnector.providerId !== 'factusol' || isEval)) {
+      try {
+        const res = await activeConnector.createOrder(safeOrder as any, series, warehouse);
+        if (res.success) {
+          const assignedNum = String(res.orderNumber || res.orderId || order.webOrderId);
+          const updated = this.salesLedgerManager.markOrderRetried(id, 'synced', undefined, assignedNum);
+          this.eventBus.addEvent('success', `✓ Pedido #${order.orderNumber} reintentado y registrado en ${activeConnector.displayName} (Nº ${assignedNum})`);
+          return {
+            success: true,
+            message: `Pedido #${order.orderNumber} registrado correctamente en ${activeConnector.displayName} (Nº ${assignedNum}).`,
+            order: updated || undefined,
+          };
+        }
+        const err = res.errorMessage || `Fallo al insertar pedido en ${activeConnector.displayName}.`;
+        this.salesLedgerManager.markOrderRetried(id, 'failed', err);
+        return { success: false, message: err };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.salesLedgerManager.markOrderRetried(id, 'failed', msg);
+        return { success: false, message: `Error al reintentar pedido: ${msg}` };
+      }
+    }
+
     let connector = this.factusolService.getConnector();
     if (!connector) {
       const connected = await this.factusolService.connect();
@@ -130,14 +166,6 @@ export class SalesOrderManager {
       this.salesLedgerManager.markOrderRetried(id, 'failed', err);
       return { success: false, message: err };
     }
-
-    const plausibility = OrderPlausibilityAdapter.validateAndSanitize(canonicalOrder);
-    if (!plausibility.valid || !plausibility.sanitizedOrder) {
-      const err = `Pedido descartado por validación de seguridad: ${plausibility.error}`;
-      this.salesLedgerManager.markOrderRetried(id, 'failed', err);
-      return { success: false, message: err };
-    }
-    const safeOrder = plausibility.sanitizedOrder;
 
     try {
       const res = await connector.createOrder(safeOrder as any);

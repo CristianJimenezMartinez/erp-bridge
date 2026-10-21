@@ -22,8 +22,20 @@ export interface AgentStatusDetails {
   hwid: string;
   licenseKey?: string;
   license: { status: AgentLicenseStatus; plan?: string; message?: string };
-  erpType?: 'factusol' | 'simplygest';
-  softwareErp?: SoftwareErpConfig;
+  erpType?: 'factusol' | 'simplygest' | 'agora' | 'sage50' | 'a3erp';
+  softwareErp?: SoftwareErpConfig & {
+    sqlConnection?: {
+      connected: boolean;
+      serverInstance: string;
+      databaseName: string;
+      articleCount?: number;
+      statusMessage?: string;
+    };
+  };
+  evaluationMode?: {
+    enabled: boolean;
+    providerId?: string;
+  };
   factusol: {
     configured: boolean;
     databasePath: string;

@@ -19,7 +19,7 @@ A diferencia de los conectores web tradicionales basados en plugins PHP pesados 
   - Tablas: `ARTICULOS` (catálogo y stock), `CLIENTES`, `PEDIDOS_VENTA` y `LINEAS_PEDIDOS`.
   - Conexión OLEDB no bloqueante tolerante al TPV de mostrador en tiempo real.
 - **Holded Cloud ERP**: REST API v1 bidireccional (facturación contable y CRM).
-- **Sage 50 / 200, Odoo y A3ERP**: En hoja de ruta e integración estandarizada.
+- **Ágora POS / Retail, Sage 50 y Wolters Kluwer a3ERP**: Conectores locales nativos sobre Microsoft SQL Server / SQL Express (`SqlServerBaseAdapter` con lecturas `WITH (NOLOCK)` y transacciones atómicas) más Modo Evaluación Sandbox en memoria (`DEMO://`).
 - **Arquitectura Polimórfica (Single Active ERP)**: Aprovisionamiento guiado exclusivo con conmutación dinámica 3x2 y aislamiento anti-wiping en `%APPDATA%\Bentian Agent\agent-config.json`.
 
 ### Sistemas Operativos del Agente:

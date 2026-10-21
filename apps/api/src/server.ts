@@ -322,6 +322,9 @@ export async function bootstrapApp(): Promise<Express> {
     'error-proveedor-oledb-factusol-microsoft-ace': '/docs/troubleshooting/error-oledb-no-registrado/',
     'sincronizar-pedidos-woocommerce-factusol': '/docs/canales/woocommerce/',
     'evitar-roturas-stock-factusol-dissto': '/docs/factusol/calculo-stock-disponible/',
+    'canales/conector-universal': '/docs/canales/endpoint-universal/',
+    'simplygest/localizacion-base-datos-mdb': '/docs/simplygest/localizacion-base-datos/',
+    'simplygest/conexion-mdb': '/docs/simplygest/localizacion-base-datos/',
   };
 
   for (const [legacySlug, canonicalTarget] of Object.entries(legacyDocsMap)) {
@@ -422,11 +425,29 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/conector-factusol', (_req, res) => {
     res.redirect(301, '/conector-factusol/');
   });
+  app.get(['/conector-factusol/elche', '/conector-factusol/elche/'], (_req, res) => {
+    res.redirect(301, '/conector-factusol/alicante/');
+  });
+  app.get(['/conector-factusol/sabadell', '/conector-factusol/sabadell/', '/conector-factusol/terrassa', '/conector-factusol/terrassa/'], (_req, res) => {
+    res.redirect(301, '/conector-factusol/barcelona/');
+  });
+  app.get(['/precios', '/precios/', '/precios.html'], (_req, res) => {
+    res.redirect(301, '/#precios');
+  });
   app.get('/conector-simplygest', (_req, res) => {
     res.redirect(301, '/conector-simplygest/');
   });
   app.get('/simplygest-woocommerce', (_req, res) => {
     res.redirect(301, '/simplygest-woocommerce/');
+  });
+  app.get('/agora-pos-woocommerce', (_req, res) => {
+    res.redirect(301, '/agora-pos-woocommerce/');
+  });
+  app.get('/sage50-woocommerce', (_req, res) => {
+    res.redirect(301, '/sage50-woocommerce/');
+  });
+  app.get('/a3erp-woocommerce', (_req, res) => {
+    res.redirect(301, '/a3erp-woocommerce/');
   });
   app.get('/press', (_req, res) => {
     res.redirect(301, '/press/');

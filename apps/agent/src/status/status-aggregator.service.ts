@@ -204,6 +204,54 @@ export class StatusAggregatorService {
     const safePrestashop = cfg.prestashop ? { ...cfg.prestashop, apiKey: cfg.prestashop.apiKey ? SECRET_MASK : '' } : cfg.prestashop;
     const safeHolded = cfg.holded ? { ...cfg.holded, apiKey: cfg.holded.apiKey ? SECRET_MASK : '' } : cfg.holded;
 
+    const activeErp = (cfg.softwareErp?.activeProvider || cfg.erpType || 'factusol') as 'factusol' | 'simplygest' | 'agora' | 'sage50' | 'a3erp';
+    const activeProviderCfg = (cfg.softwareErp?.providers as any)?.[activeErp] || {};
+    const factEval = Boolean(cfg.softwareErp?.providers?.factusol?.evaluationMode || rawDbPath.toUpperCase().startsWith('DEMO'));
+    const sgEval = Boolean(cfg.softwareErp?.providers?.simplygest?.evaluationMode || rawSgPath.toUpperCase().startsWith('DEMO'));
+    const isEvalActive = Boolean(
+      activeProviderCfg.evaluationMode ||
+      String(activeProviderCfg.databasePath || '').toUpperCase().startsWith('DEMO') ||
+      (activeErp === 'factusol' && factEval) ||
+      (activeErp === 'simplygest' && sgEval) ||
+      (cfg as any).evaluationMode?.enabled
+    );
+
+    if (factEval) {
+      connected = true;
+      articleCount = 6;
+      statusMessage = '🧪 Modo Evaluación Activo (Datos Demo en memoria)';
+    }
+    if (sgEval) {
+      sgConnected = true;
+      sgArticleCount = 6;
+      sgStatusMessage = '🧪 Modo Evaluación Activo (Datos Demo en memoria)';
+    }
+
+    let sqlConnection: { connected: boolean; serverInstance: string; databaseName: string; articleCount?: number; statusMessage?: string } | undefined;
+    if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
+      const sqlDefaults: Record<string, { inst: string; db: string }> = {
+        agora: { inst: '.\\SQLEXPRESS', db: 'AgoraDB' },
+        sage50: { inst: '.\\SAGE50', db: 'GESTION' },
+        a3erp: { inst: '.\\SQLEXPRESS', db: 'A3ERP' },
+      };
+      const srv = activeProviderCfg.serverInstance || activeProviderCfg.sqlInstance || sqlDefaults[activeErp].inst;
+      const rawDb = String(activeProviderCfg.databaseName || activeProviderCfg.databasePath || '').trim();
+      const dbName = (!isEvalActive && rawDb && !rawDb.startsWith('mssql://') && !rawDb.toUpperCase().startsWith('DEMO'))
+        ? rawDb
+        : (activeProviderCfg.databaseName || sqlDefaults[activeErp].db);
+      sqlConnection = {
+        connected: Boolean(isEvalActive || activeProviderCfg.serverInstance || activeProviderCfg.sqlInstance || cfg.softwareErp?.provisioned),
+        serverInstance: srv,
+        databaseName: isEvalActive ? 'DEMO' : dbName,
+        articleCount: isEvalActive ? 6 : undefined,
+        statusMessage: isEvalActive ? '🧪 Modo Evaluación Activo' : `Conectado a ${srv} (${dbName})`,
+      };
+    }
+
+    const enrichedSoftwareErp = cfg.softwareErp
+      ? { ...cfg.softwareErp, sqlConnection }
+      : (sqlConnection ? { activeProvider: activeErp, provisioned: true, sqlConnection } : undefined);
+
     return {
       agentName: cfg.agentName || 'Bentian Agent',
       agentVersion: this.configManager.getVersion(),
@@ -212,13 +260,13 @@ export class StatusAggregatorService {
       licenseKey: cfg.licenseKey,
       hwid,
       license,
-      erpType: cfg.erpType || 'factusol',
-      softwareErp: cfg.softwareErp,
-      evaluationMode: cfg.evaluationMode,
+      erpType: activeErp,
+      softwareErp: enrichedSoftwareErp,
+      evaluationMode: { enabled: isEvalActive, providerId: activeErp },
       factusol: {
-        configured: Boolean(dbPath),
-        databasePath: dbPath || '',
-        fileName: dbPath ? path.basename(dbPath) : '',
+        configured: Boolean(dbPath || factEval),
+        databasePath: factEval ? 'DEMO://factusol' : (dbPath || ''),
+        fileName: factEval ? 'Catálogo Demo (En memoria)' : (dbPath ? path.basename(dbPath) : ''),
         connected,
         watcherActive: this.fileWatcherService.isActive(),
         articleCount,
@@ -227,9 +275,9 @@ export class StatusAggregatorService {
       },
       factusolSettings: cfg.factusol,
       simplygest: {
-        configured: Boolean(sgDbPath),
-        databasePath: sgDbPath || '',
-        fileName: sgDbPath ? path.basename(sgDbPath) : '',
+        configured: Boolean(sgDbPath || sgEval),
+        databasePath: sgEval ? 'DEMO://simplygest' : (sgDbPath || ''),
+        fileName: sgEval ? 'Catálogo Demo (En memoria)' : (sgDbPath ? path.basename(sgDbPath) : ''),
         connected: sgConnected,
         articleCount: sgArticleCount,
         fileSizeBytes: sgFileSizeBytes,

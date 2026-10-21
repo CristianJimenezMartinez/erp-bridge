@@ -553,8 +553,9 @@ export const wizardScript = `
 
     async function wizTestSqlErpConnection() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || '.\\SQLEXPRESS';
-      const databasePath = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || 'AgoraPOS';
+      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
+      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('wiz-select-sql-auth') ? document.getElementById('wiz-select-sql-auth').value : 'windows';
       const username = document.getElementById('wiz-input-sql-user') ? document.getElementById('wiz-input-sql-user').value.trim() : 'sa';
       const password = document.getElementById('wiz-input-sql-pass') ? document.getElementById('wiz-input-sql-pass').value : '';
@@ -572,7 +573,9 @@ export const wizardScript = `
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             erpType: activeErp,
+            serverInstance: sqlInstance,
             sqlInstance: sqlInstance,
+            databaseName: databasePath,
             databasePath: databasePath,
             authMode: authMode,
             username: username,
@@ -605,8 +608,9 @@ export const wizardScript = `
 
     async function testMainSqlErpConnection() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || '.\\SQLEXPRESS';
-      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || 'AgoraPOS';
+      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
       const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
       const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
@@ -624,7 +628,9 @@ export const wizardScript = `
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             erpType: activeErp,
+            serverInstance: sqlInstance,
             sqlInstance: sqlInstance,
+            databaseName: databasePath,
             databasePath: databasePath,
             authMode: authMode,
             username: username,
@@ -695,8 +701,9 @@ export const wizardScript = `
 
     async function saveSqlErpSettings() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || '.\\SQLEXPRESS';
-      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || 'AgoraPOS';
+      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
       const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
       const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
@@ -705,7 +712,9 @@ export const wizardScript = `
       const isDemo = databasePath.toUpperCase() === 'DEMO';
 
       const providerCfg = {
+        serverInstance: sqlInstance,
         sqlInstance: sqlInstance,
+        databaseName: databasePath,
         databasePath: databasePath,
         authMode: authMode,
         username: username,
@@ -719,6 +728,10 @@ export const wizardScript = `
 
       const payload = {
         erpType: activeErp,
+        evaluationMode: {
+          enabled: isDemo,
+          simulatedErp: activeErp
+        },
         softwareErp: {
           activeProvider: activeErp,
           provisioned: true,
@@ -791,14 +804,18 @@ export const wizardScript = `
       };
 
       if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
+        const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
+        const effectiveDbName = sqlDbName || defaultDbMap[activeErp] || 'AgoraDB';
         providers[activeErp] = {
+          serverInstance: sqlInstance,
           sqlInstance: sqlInstance,
-          databasePath: sqlDbName || undefined,
+          databaseName: effectiveDbName,
+          databasePath: effectiveDbName,
           authMode: sqlAuthMode,
           username: sqlUser,
           password: sqlPass || undefined,
           orderSeries: sqlSeries,
-          evaluationMode: sqlDbName.toUpperCase() === 'DEMO' ? true : undefined
+          evaluationMode: effectiveDbName.toUpperCase() === 'DEMO' ? true : undefined
         };
       }
 

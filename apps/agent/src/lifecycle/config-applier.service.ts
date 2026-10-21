@@ -137,13 +137,41 @@ export class ConfigApplierService {
       providers: {
         ...(cfg.softwareErp?.providers || {}),
         ...(updates.softwareErp?.providers || {}),
-        factusol: { ...(cfg.softwareErp?.providers?.factusol || {}), ...(cfg.factusol || {}) },
-        simplygest: { ...(cfg.softwareErp?.providers?.simplygest || {}), ...(cfg.simplygest || {}) },
+        factusol: { ...(cfg.softwareErp?.providers?.factusol || {}), ...(cfg.factusol || {}), ...(updates.softwareErp?.providers?.factusol || {}) },
+        simplygest: { ...(cfg.softwareErp?.providers?.simplygest || {}), ...(cfg.simplygest || {}), ...(updates.softwareErp?.providers?.simplygest || {}) },
         agora: { ...(cfg.softwareErp?.providers?.agora || {}), ...(cfg.agora || {}), ...(updates.softwareErp?.providers?.agora || {}) },
         sage50: { ...(cfg.softwareErp?.providers?.sage50 || {}), ...(cfg.sage50 || {}), ...(updates.softwareErp?.providers?.sage50 || {}) },
         a3erp: { ...(cfg.softwareErp?.providers?.a3erp || {}), ...(cfg.a3erp || {}), ...(updates.softwareErp?.providers?.a3erp || {}) },
       },
     };
+    const sqlDefaults: Record<string, { inst: string; db: string }> = {
+      agora: { inst: '.\\SQLEXPRESS', db: 'AgoraDB' },
+      sage50: { inst: '.\\SAGE50', db: 'GESTION' },
+      a3erp: { inst: '.\\SQLEXPRESS', db: 'A3ERP' },
+    };
+    for (const sqlId of ['agora', 'sage50', 'a3erp'] as const) {
+      const pObj = cfg.softwareErp.providers?.[sqlId] as any;
+      if (pObj) {
+        const srv = pObj.serverInstance || pObj.sqlInstance || sqlDefaults[sqlId].inst;
+        const rawDb = String(pObj.databaseName || pObj.databasePath || '').trim();
+        const isEval = Boolean(pObj.evaluationMode) || rawDb.toUpperCase().startsWith('DEMO');
+        const dbName = (!isEval && rawDb && !rawDb.startsWith('mssql://') && !rawDb.toUpperCase().startsWith('DEMO'))
+          ? rawDb
+          : (pObj.databaseName || sqlDefaults[sqlId].db);
+        pObj.serverInstance = srv;
+        pObj.sqlInstance = srv;
+        pObj.databaseName = dbName;
+        pObj.evaluationMode = isEval;
+        pObj.databasePath = isEval ? `DEMO://${sqlId}` : `mssql://${srv}/${dbName}`;
+      }
+    }
+    const activeProvId = cfg.softwareErp.activeProvider || cfg.erpType || 'factusol';
+    const activeProvCfg = (cfg.softwareErp.providers as any)?.[activeProvId];
+    const isEvalActive = Boolean(
+      activeProvCfg?.evaluationMode ||
+      String(activeProvCfg?.databasePath || '').toUpperCase().startsWith('DEMO')
+    );
+    (cfg as any).evaluationMode = { enabled: isEvalActive, providerId: activeProvId };
     if (updates.woocommerce) {
       const existingSecret = cfg.woocommerce?.consumerSecret;
       cfg.woocommerce = { ...(cfg.woocommerce || {}), ...updates.woocommerce };

@@ -246,9 +246,58 @@ async function runTests() {
         ],
       });
       assert.strictEqual(orderRes.success, true, `createOrder debe funcionar en modo evaluación para ${providerId}`);
-      assert.ok(orderRes.factusolOrderNumber && orderRes.factusolOrderNumber > 0);
-      console.log(`   ✓ [${providerId}] Evaluación verificada (${preview.length} arts., pedido #${orderRes.factusolOrderNumber})`);
+      assert.ok((orderRes.orderNumber || orderRes.externalId));
+      console.log(`   ✓ [${providerId}] Evaluación verificada (${preview.length} arts., pedido #${orderRes.orderNumber || orderRes.externalId})`);
     }
+
+    // Test 9: Simulador de Pedidos de Prueba y Reintento Polimórfico (SalesOrderManager + TestOrderSimulatorService)
+    console.log('10. Verificando TestOrderSimulatorService y SalesOrderManager polimórficos...');
+    const { TestOrderSimulatorService } = await import('../src/orders/test-order-simulator.service');
+    const { SalesOrderManager } = await import('../src/orders/sales-order.manager');
+    const simulator = new TestOrderSimulatorService(configManager, factusolService, eventBus, salesLedgerManager, registry);
+    const salesOrderMgr = new SalesOrderManager(configManager, salesLedgerManager, eventBus, registry);
+
+    for (const providerId of ['agora', 'sage50', 'a3erp', 'simplygest'] as const) {
+      configManager.update({
+        erpType: providerId,
+        evaluationMode: { enabled: true, simulatedErp: providerId },
+        softwareErp: {
+          activeProvider: providerId,
+          provisioned: true,
+          providers: {
+            [providerId]: {
+              databasePath: 'DEMO',
+              databaseName: 'DEMO',
+              serverInstance: '.\\SQLEXPRESS',
+              sqlInstance: '.\\SQLEXPRESS',
+              evaluationMode: true,
+              orderSeries: '1',
+            },
+          },
+        },
+      });
+      const simRes = await simulator.simulateOrder({ dryRun: false });
+      assert.strictEqual(simRes.success, true, `Simulador de pedidos debe tener éxito en ${providerId}`);
+      assert.ok(simRes.steps.length >= 4);
+
+      // Registrar un pedido fallido y reintentarlo vía SalesOrderManager
+      const failedRecord = salesLedgerManager.recordOrder({
+        channel: 'woocommerce',
+        webOrderId: `RETRY-${providerId}-99`,
+        orderNumber: `RETRY-${providerId}-99`,
+        date: new Date().toISOString(),
+        factusolSeries: '1',
+        customerName: 'Cliente Reintento',
+        totalAmount: 60.5,
+        currency: 'EUR',
+        status: 'failed',
+        error: 'Simulación fallo temporal',
+        lines: [{ sku: 'DEMO-01', name: 'Artículo Demo', quantity: 1, unitPrice: 50, total: 50 }],
+      });
+      const retryRes = await salesOrderMgr.retrySalesOrder(failedRecord.id);
+      assert.strictEqual(retryRes.success, true, `retrySalesOrder debe tener éxito en ${providerId}`);
+    }
+    console.log('   ✓ TestOrderSimulatorService y SalesOrderManager verificados en los motores Multi-ERP');
 
     console.log('\n======================================================================');
     console.log('✅ TODAS LAS PRUEBAS DE ESTRATEGIA ERP PASARON CON ÉXITO');

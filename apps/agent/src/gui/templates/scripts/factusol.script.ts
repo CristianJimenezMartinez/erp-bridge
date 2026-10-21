@@ -456,7 +456,7 @@ export const factusolScript = `
         color: '#f472b6',
         bg: 'rgba(244,114,182,0.15)',
         desc: 'Sincronización rápida (<5s) con Ágora Retail / POS sobre Microsoft SQL Server Express.',
-        defaultDb: 'AgoraPOS',
+        defaultDb: 'AgoraDB',
         defaultInstance: '.\\SQLEXPRESS'
       },
       sage50: {
@@ -467,7 +467,7 @@ export const factusolScript = `
         color: '#4ade80',
         bg: 'rgba(34,197,94,0.15)',
         desc: 'Sincronización directa con tablas articulo, stocks, pvp y c_pediven/d_pediven en SQL Server.',
-        defaultDb: 'SAGE50',
+        defaultDb: 'GESTION',
         defaultInstance: '.\\SAGE50'
       },
       a3erp: {
