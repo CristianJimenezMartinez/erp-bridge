@@ -28,6 +28,7 @@ const BetaClaimSchema = z.object({
   taxId: z.string().trim().max(50).optional(),
   consentTerms: z.boolean().optional(),
   consentMarketing: z.boolean().optional(),
+  skipEmail: z.boolean().optional(),
 });
 
 const UpdateAliasSchema = z.object({
@@ -264,7 +265,7 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       return res.status(400).json({ error: { message: 'El correo electrónico es obligatorio para solicitar la clave de la Beta.' } });
     }
 
-    const { email, companyName, taxId, consentTerms, consentMarketing } = parsed.data;
+    const { email, companyName, taxId, consentTerms, consentMarketing, skipEmail } = parsed.data;
     const normalizedEmail = email.trim().toLowerCase();
 
     if (consentTerms !== true) {
@@ -355,18 +356,20 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       const expiresAtDate = rawExpiresAt ? new Date(rawExpiresAt) : betaExpiresAt;
       const daysRemaining = Math.max(0, Math.ceil((expiresAtDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 
-      const resend = consumeRateLimit('beta-claim-resend', normalizedEmail, 60 * 60 * 1000, 1);
-      if (resend.allowed && existingLicense.key) {
-        try {
-          await MailerService.sendLicenseWelcomeEmail({
-            customerEmail: normalizedEmail,
-            licenseKey: existingLicense.key,
-            planName: 'Tu clave de activación de Bentian (Beta Pública hasta 31/12/2026)',
-            alias: existingLicense.alias || 'Licencia Bentian',
-            companyName: existingLicense.alias || cleanCompanyName,
-          });
-        } catch (_mailErr) {
-          // Si el servicio de correo no está disponible, continuar sin fallar la petición
+      if (!skipEmail) {
+        const resend = consumeRateLimit('beta-claim-resend', normalizedEmail, 60 * 60 * 1000, 1);
+        if (resend.allowed && existingLicense.key) {
+          try {
+            await MailerService.sendLicenseWelcomeEmail({
+              customerEmail: normalizedEmail,
+              licenseKey: existingLicense.key,
+              planName: 'Tu clave de activación de Bentian (Beta Pública hasta 31/12/2026)',
+              alias: existingLicense.alias || 'Licencia Bentian',
+              companyName: existingLicense.alias || cleanCompanyName,
+            });
+          } catch (_mailErr) {
+            // Si el servicio de correo no está disponible, continuar sin fallar la petición
+          }
         }
       }
 
@@ -416,15 +419,17 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
       `, [license.key, license.id, normalizedEmail]).catch(() => {});
     }
 
-    // 6. Enviar email transaccional de bienvenida con la clave al usuario
+    // 6. Enviar email transaccional de bienvenida con la clave al usuario (salvo skipEmail en flujo post-llamada)
     try {
-      await MailerService.sendLicenseWelcomeEmail({
-        customerEmail: normalizedEmail,
-        licenseKey: license.key,
-        planName: 'Beta Pública Gratuita (Acceso completo hasta el 31 de Diciembre de 2026)',
-        alias: license.alias || `Beta 2026 - ${cleanCompanyName}`,
-        companyName: cleanCompanyName,
-      });
+      if (!skipEmail) {
+        await MailerService.sendLicenseWelcomeEmail({
+          customerEmail: normalizedEmail,
+          licenseKey: license.key,
+          planName: 'Beta Pública Gratuita (Acceso completo hasta el 31 de Diciembre de 2026)',
+          alias: license.alias || `Beta 2026 - ${cleanCompanyName}`,
+          companyName: cleanCompanyName,
+        });
+      }
 
       // 6.1 Notificación urgente al administrador (Cristian Jiménez)
       const mailtoUrl = `mailto:${normalizedEmail}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%2C%20PrestaShop%20o%20Shopify)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez`;

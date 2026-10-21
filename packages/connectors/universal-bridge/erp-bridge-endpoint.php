@@ -614,6 +614,23 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
         $payStatus = $rawPayStatus;
     }
 
+    $payRef = substr(trim(strval($payload['paymentReference'] ?? $payload['paymentMethodId'] ?? '')), 0, 100);
+    if (!empty($payRef)) {
+        $dupStmt = $pdo->prepare("SELECT `id`, `order_number` FROM `eb_orders` WHERE `payment_reference` = :payRef LIMIT 1");
+        $dupStmt->execute([':payRef' => $payRef]);
+        $existingOrder = $dupStmt->fetch();
+        if ($existingOrder) {
+            echo json_encode([
+                'success' => true,
+                'pedidoId' => intval($existingOrder['id']),
+                'orderNumber' => $existingOrder['order_number'],
+                'idempotent' => true,
+                'message' => 'Pedido ya registrado previamente en espera de Factusol',
+            ]);
+            exit;
+        }
+    }
+
     $orderNumber = 'WEB-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
 
     $stmt = $pdo->prepare("
@@ -629,7 +646,7 @@ if ($mainAction === 'create_order' || $mainAction === 'order') {
         ':linesData' => json_encode($lines, JSON_UNESCAPED_UNICODE),
         ':payMethod' => substr($payload['paymentMethod'] ?? $payload['paymentMethodType'] ?? 'paypal', 0, 50),
         ':payStatus' => substr($payStatus, 0, 50),
-        ':payRef' => substr($payload['paymentReference'] ?? $payload['paymentMethodId'] ?? '', 0, 100),
+        ':payRef' => $payRef,
         ':subtotal' => $subtotal,
         ':taxTotal' => $taxTotal,
         ':shipCost' => $shippingCost,
@@ -1090,7 +1107,12 @@ if ($mainAction === 'push_stock') {
 // ----------------------------------------------------------------------------
 if ($mainAction === 'pull_orders' || $mainAction === 'get_orders') {
     $limit = isset($_GET['limit']) ? max(1, min(100, intval($_GET['limit']))) : 50;
-    $stmt = $pdo->prepare("SELECT * FROM `eb_orders` WHERE `status` = 'PENDING' ORDER BY `id` ASC LIMIT :lim");
+    $statusFilter = isset($_GET['status']) ? strtoupper(trim($_GET['status'])) : 'PENDING';
+    if ($statusFilter === 'ALL') {
+        $stmt = $pdo->prepare("SELECT * FROM `eb_orders` ORDER BY `id` DESC LIMIT :lim");
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM `eb_orders` WHERE `status` = 'PENDING' ORDER BY `id` ASC LIMIT :lim");
+    }
     $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
     $stmt->execute();
     $rows = $stmt->fetchAll();
@@ -1112,8 +1134,11 @@ if ($mainAction === 'pull_orders' || $mainAction === 'get_orders') {
             'tax_total' => floatval($r['tax_total'] ?? 0),
             'shipping_cost' => floatval($r['shipping_cost'] ?? 0),
             'total' => floatval($r['total']),
+            'factusol_order_number' => isset($r['factusol_order_number']) && $r['factusol_order_number'] !== null ? intval($r['factusol_order_number']) : null,
+            'factusol_series' => $r['factusol_series'] ?? null,
             'created_at' => $r['created_at'],
             'createdAt' => $r['created_at'],
+            'synced_at' => $r['synced_at'] ?? null,
         ];
     }
     echo json_encode(['success' => true, 'orders' => $orders]);

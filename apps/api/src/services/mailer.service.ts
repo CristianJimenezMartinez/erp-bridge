@@ -6,6 +6,7 @@ import { getLatestReleasedVersion, getLatestInstallerUrl } from '../utils/versio
 export interface EmailOptions {
   to: string;
   from?: string;
+  replyTo?: string;
   subject: string;
   html: string;
   text?: string;
@@ -200,7 +201,7 @@ export class MailerService {
           <tr>
             <td style="padding: 24px 30px; background-color: #0d0d11; border-top: 1px solid #27272a; font-size: 12px; color: #71717a; text-align: center; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               <p style="margin: 0 0 6px 0; color: #a1a1aa; font-weight: 600;">
-                Bentian ERP Bridge — Conector Autónomo y Local-First para Factusol
+                Bentian ERP Bridge - Conector Autónomo y Local-First para Factusol
               </p>
               <p style="margin: 0 0 8px 0;">
                 Plataforma oficial: <a href="https://bridge.cristianjm.com" target="_blank" style="color: #818cf8; text-decoration: underline;">bridge.cristianjm.com</a> | Titular: Cristian Jiménez Martínez
@@ -226,6 +227,37 @@ export class MailerService {
     `.trim();
   }
 
+  /**
+   * Convierte HTML a texto plano limpio reemplazando entidades HTML (&rarr;, &bull;, &copy;, &nbsp;)
+   * y caracteres fuera de Latin-1 (⇄, ↔, —) por equivalentes ASCII limpios antes de eliminar etiquetas.
+   */
+  private static sanitizePlainText(input: string, isHtmlFallback = false): string {
+    let out = input
+      .replace(/&rarr;|&#8594;|&#x2192;/gi, '->')
+      .replace(/&larr;|&#8592;|&#x2190;/gi, '<-')
+      .replace(/&bull;|&#8226;|&#x2022;/gi, '*')
+      .replace(/&copy;|&#169;|&#xa9;/gi, '(c)')
+      .replace(/&nbsp;|&#160;|&#xa0;/gi, ' ')
+      .replace(/&mdash;|&#8212;|&#x2014;/gi, '-')
+      .replace(/&ndash;|&#8211;|&#x2013;/gi, '-')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;|&apos;/gi, "'")
+      .replace(/[⇄↔]/g, '-')
+      .replace(/[—–]/g, '-');
+
+    if (isHtmlFallback) {
+      out = out
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]*>?/gm, '');
+    }
+
+    return out;
+  }
+
   public static async sendEmail(options: EmailOptions): Promise<{ success: boolean; provider: string; error?: string }> {
     if (process.env['NODE_ENV'] === 'test' || process.env['DISABLE_MAILING'] === 'true') {
       this.logger.info(`[TEST MODE] Email omitido en pruebas a ${options.to}: ${options.subject}`);
@@ -233,6 +265,10 @@ export class MailerService {
     }
 
     const from = options.from || process.env['MAIL_FROM'] || process.env['SMTP_FROM'] || 'Bentian ERP Bridge <soporte@cristianjm.com>';
+    const cleanSubject = this.sanitizePlainText(options.subject, false);
+    const cleanText = options.text
+      ? this.sanitizePlainText(options.text, false)
+      : this.sanitizePlainText(options.html, true);
 
     // 1. Prioridad: Resend API (Gratis 3.000 emails/mes de por vida)
     const resendKey = process.env['RESEND_API_KEY'];
@@ -243,14 +279,15 @@ export class MailerService {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${resendKey}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
           },
           body: JSON.stringify({
             from,
             to: options.to,
-            subject: options.subject,
+            subject: cleanSubject,
             html: options.html,
-            text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
+            text: cleanText,
+            ...(options.replyTo ? { reply_to: options.replyTo } : {}),
           }),
         });
 
@@ -275,14 +312,14 @@ export class MailerService {
           method: 'POST',
           headers: {
             'api-key': brevoKey,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
           },
           body: JSON.stringify({
             sender: { email: from.includes('<') ? from.replace(/.*<([^>]+)>.*/, '$1') : from, name: 'Bentian ERP Bridge' },
             to: [{ email: options.to }],
-            subject: options.subject,
+            subject: cleanSubject,
             htmlContent: options.html,
-            textContent: options.text || options.html.replace(/<[^>]*>?/gm, ''),
+            textContent: cleanText,
           }),
         });
 
@@ -311,9 +348,9 @@ export class MailerService {
           pass: smtpPass,
           from,
           to: options.to,
-          subject: options.subject,
+          subject: cleanSubject,
           html: options.html,
-          text: options.text || options.html.replace(/<[^>]*>?/gm, ''),
+          text: cleanText,
         });
         this.logger.info(`✓ Email despachado exitosamente vía SMTP propio.`);
         return { success: true, provider: 'native_smtp' };
@@ -325,7 +362,7 @@ export class MailerService {
     // 4. Fallback Seguro / Modo Simulación Local
     this.logger.info(`[SIMULADOR EMAIL] No hay SMTP_HOST ni RESEND_API_KEY configurados.`);
     this.logger.info(`[SIMULADOR EMAIL] Correo para: ${options.to}`);
-    this.logger.info(`[SIMULADOR EMAIL] Asunto: ${options.subject}`);
+    this.logger.info(`[SIMULADOR EMAIL] Asunto: ${cleanSubject}`);
     return { success: true, provider: 'simulation' };
   }
 
@@ -339,7 +376,7 @@ export class MailerService {
 
     const text = [
       '====================================================================',
-      ' BENTIAN ERP BRIDGE — CÓDIGO DE ACCESO',
+      ' BENTIAN ERP BRIDGE - CÓDIGO DE ACCESO',
       '====================================================================',
       '',
       'Has solicitado entrar a tu Panel de Control de Bentian ERP Bridge para consultar',
@@ -348,7 +385,7 @@ export class MailerService {
       'TU CÓDIGO DE ACCESO DE 6 DÍGITOS:',
       `>>> ${data.otp} <<<`,
       '',
-      `⏱ Este código es válido durante ${validity} minutos y para un único acceso.`,
+      `* Este código es válido durante ${validity} minutos y para un único acceso.`,
       '',
       'Puedes introducir este código directamente en:',
       `${dashboardUrl}`,
@@ -358,7 +395,7 @@ export class MailerService {
       'nadie puede acceder a tus licencias sin este código.',
       '',
       '---',
-      'Bentian ERP Bridge — Tecnología Local-First para Factusol',
+      'Bentian ERP Bridge - Tecnología Local-First para Factusol',
       `Soporte técnico: ${this.SUPPORT_EMAIL}`,
     ].join('\n');
 
@@ -395,13 +432,13 @@ export class MailerService {
           <td style="padding: 16px;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
               <tr>
-                <td width="26" valign="top" style="font-size: 16px; vertical-align: top; padding-right: 8px;">⏱</td>
+                <td width="26" valign="top" style="font-size: 16px; vertical-align: top; padding-right: 8px;">*</td>
                 <td style="font-size: 12px; line-height: 1.5; color: #a1a1aa; vertical-align: top;">
                   Este código caduca automáticamente en <strong>${validity} minutos</strong> y quedará invalidado tras su primer uso.
                 </td>
               </tr>
               <tr>
-                <td width="26" valign="top" style="font-size: 16px; vertical-align: top; padding-top: 8px; padding-right: 8px;">🛡️</td>
+                <td width="26" valign="top" style="font-size: 16px; vertical-align: top; padding-top: 8px; padding-right: 8px;">*</td>
                 <td style="font-size: 12px; line-height: 1.5; color: #71717a; vertical-align: top; padding-top: 8px;">
                   Si no has solicitado este acceso, no te preocupes: nadie puede acceder a tu cuenta sin este código. Puedes ignorar este correo con total tranquilidad.
                 </td>
@@ -439,7 +476,7 @@ export class MailerService {
     const latestVersion = getLatestReleasedVersion();
     const downloadUrl = data.downloadUrl || ('https://bridge.cristianjm.com' + getLatestInstallerUrl());
     const dashboardUrl = data.dashboardUrl || `${this.DASHBOARD_BASE}?key=${encodeURIComponent(data.licenseKey)}`;
-    const planLabel = data.planName || 'Plan Base Todo Incluido (Factusol ⇄ Tienda Web)';
+    const planLabel = (data.planName || 'Plan Base Todo Incluido (Factusol y SimplyGest - Tienda Web)').replace(/[⇄↔]/g, '-');
 
     const isBeta = Boolean(
       (data.planName && /beta/i.test(data.planName)) ||
@@ -482,7 +519,7 @@ export class MailerService {
       `¿Necesitas soporte técnico? Responde a este correo o escríbenos a ${this.SUPPORT_EMAIL}.`,
       '',
       '---',
-      'Bentian ERP Bridge — Tecnología Local-First y Edge Processing',
+      'Bentian ERP Bridge - Tecnología Local-First y Edge Processing',
     ].join('\n') : [
       '====================================================================',
       ' ¡BIENVENIDO A BENTIAN ERP BRIDGE!',
@@ -514,7 +551,7 @@ export class MailerService {
       `¿Necesitas soporte técnico? Responde a este correo o escríbenos a ${this.SUPPORT_EMAIL}.`,
       '',
       '---',
-      'Bentian ERP Bridge — Tecnología Local-First y Edge Processing',
+      'Bentian ERP Bridge - Tecnología Local-First y Edge Processing',
     ].join('\n');
 
     const badgeText = isBeta ? 'BETA PÚBLICA 2026' : 'LICENCIA ACTIVA';
