@@ -492,15 +492,24 @@ export const coreScript = `
         navItem.classList.add('active');
       }
 
-      const isSimplyGest = (typeof currentErpType !== 'undefined' && currentErpType === 'simplygest') ||
-                            (typeof currentStatus !== 'undefined' && currentStatus && (
-                              (currentStatus.softwareErp && currentStatus.softwareErp.activeProvider === 'simplygest') ||
-                              currentStatus.erpType === 'simplygest'
-                            ));
+      const activeProvider = (typeof currentErpType !== 'undefined' && currentErpType) ||
+                             (typeof currentStatus !== 'undefined' && currentStatus && (
+                               (currentStatus.softwareErp && currentStatus.softwareErp.activeProvider) ||
+                               currentStatus.erpType
+                             )) || 'factusol';
+      const isSimplyGest = activeProvider === 'simplygest';
+      const isSqlErp = activeProvider === 'agora' || activeProvider === 'sage50' || activeProvider === 'a3erp';
+      const erpTabTitles = {
+        factusol: 'Factusol ERP',
+        simplygest: 'SimplyGest Desktop',
+        agora: 'Ágora Retail / POS',
+        sage50: 'Sage 50 ERP',
+        a3erp: 'Wolters Kluwer a3ERP'
+      };
 
       const titles = {
         overview: 'Estado General',
-        factusol: isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP',
+        factusol: erpTabTitles[activeProvider] || 'Factusol ERP',
         channel: 'Canal Web / Tienda Online',
         sync: 'Automatización y Reglas',
         notifications: 'Centro de Notificaciones & Alertas',
@@ -516,6 +525,8 @@ export const coreScript = `
       if (tabId === 'factusol') {
         if (isSimplyGest) {
           if (typeof loadSimplyGestPreview === 'function') loadSimplyGestPreview();
+        } else if (isSqlErp) {
+          if (typeof loadSqlErpPreview === 'function') loadSqlErpPreview();
         } else {
           if (typeof loadArticlePreview === 'function' && allArticles.length === 0) {
             loadArticlePreview();

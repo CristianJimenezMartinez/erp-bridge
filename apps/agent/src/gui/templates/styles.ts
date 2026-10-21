@@ -154,11 +154,12 @@ export const dashboardStyles = `
     .wizard-step-item.done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
 
     /* Channel Cards */
-    .channel-select-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px; }
-    .channel-card { border: 2px solid var(--card-border); background: #17171e; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .channel-select-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 980px) { .channel-select-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .channel-card { border: 2px solid var(--card-border); background: #17171e; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; user-select: none; }
     .channel-card:hover { border-color: var(--card-hover); }
     .channel-card.selected { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }
-    .channel-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+    .channel-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
 
     /* Toast */
     #toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #fff; background: #18181f; border: 1px solid var(--card-border); box-shadow: 0 14px 40px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.2); transform: translateY(100px); opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); z-index: 3000; display: flex; align-items: center; justify-content: space-between; gap: 14px; max-width: 460px; min-width: 320px; }

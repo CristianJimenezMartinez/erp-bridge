@@ -194,7 +194,7 @@ export class AutoUpdater {
     let fileWritten = false;
     try {
       const res = await fetch(fullUrl, {
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(300000),
       });
       if (!res.ok) {
         throw new Error(`Error en la descarga: HTTP ${res.status}`);

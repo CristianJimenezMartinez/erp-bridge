@@ -9,47 +9,64 @@ export function renderChannelTab(): string {
             </div>
           </div>
 
-          <!-- Selector de Canal -->
+          <!-- Selector de Canal (4 Plataformas de Tienda Online + Conector Cloud Secundario) -->
           <div class="channel-select-grid">
             <div id="card-choice-universal" class="channel-card selected" onclick="selectChannelType('universal_bridge')">
-              <div class="channel-icon" style="color: #38bdf8;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="channel-icon" style="color: #38bdf8; margin-bottom: 0;">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+                </div>
+                <span class="tag tag-blue" style="font-size:10px;padding:2px 6px;">Recomendado</span>
               </div>
-              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Conector Web Universal (Recomendado)</div>
-              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Para cualquier web a medida (Angular, React, PHP), hosting (cPanel, Plesk, Nginx, Apache) o WordPress propio por micro-puente HTTPS.</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #fff; margin-bottom: 4px;">Conector Web Universal</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Web a medida (Angular, React, PHP), Plesk/cPanel o WordPress por micro-puente HTTPS.</div>
             </div>
 
             <div id="card-choice-woo" class="channel-card" onclick="selectChannelType('woocommerce')">
-              <div class="channel-icon" style="color: #a78bfa;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="channel-icon" style="color: #a78bfa; margin-bottom: 0;">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                </div>
+                <span class="tag" style="font-size:10px;padding:2px 6px;background:rgba(255,255,255,0.06);color:var(--text-muted);">REST API</span>
               </div>
-              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">WooCommerce / WordPress</div>
-              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Conexión directa mediante claves de la API REST oficial de WooCommerce (Consumer Key / Consumer Secret).</div>
-            </div>
-
-            <div id="card-choice-shopify" class="channel-card" onclick="selectChannelType('shopify')">
-              <div class="channel-icon" style="color: #96bf48;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-              </div>
-              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Shopify Store</div>
-              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización directa vía GraphQL Admin API oficial.</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #fff; margin-bottom: 4px;">WooCommerce / WP</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Conexión directa mediante claves oficiales de WooCommerce (Consumer Key / Secret).</div>
             </div>
 
             <div id="card-choice-prestashop" class="channel-card" onclick="selectChannelType('prestashop')">
-              <div class="channel-icon" style="color: #ea1b75;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 16l2 2 4-4M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="channel-icon" style="color: #ea1b75; margin-bottom: 0;">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 16l2 2 4-4M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+                </div>
+                <span class="tag" style="font-size:10px;padding:2px 6px;background:rgba(255,255,255,0.06);color:var(--text-muted);">Webservice</span>
               </div>
-              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">PrestaShop</div>
-              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">PrestaShop 1.7 / 8.x - Conexión directa mediante claves Webservices API oficial de PrestaShop.</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #fff; margin-bottom: 4px;">PrestaShop 1.7 / 8.x</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Enlace directo con el Webservice API oficial de PrestaShop para catálogo y pedidos.</div>
             </div>
 
-            <div id="card-choice-holded" class="channel-card" onclick="selectChannelType('holded')">
-              <div class="channel-icon" style="color: #ff5a5f;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <div id="card-choice-shopify" class="channel-card" onclick="selectChannelType('shopify')">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="channel-icon" style="color: #96bf48; margin-bottom: 0;">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <span class="tag" style="font-size:10px;padding:2px 6px;background:rgba(255,255,255,0.06);color:var(--text-muted);">GraphQL</span>
               </div>
-              <div style="font-weight: 600; font-size: 14px; color: #fff; margin-bottom: 4px;">Holded Cloud ERP</div>
-              <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Sincronización cloud bidireccional con Holded Invoicing API (Stock, Catálogo y Pedidos).</div>
+              <div style="font-weight: 600; font-size: 13.5px; color: #fff; margin-bottom: 4px;">Shopify Store</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Sincronización de inventario multi-sede y pedidos vía GraphQL Admin API.</div>
             </div>
+          </div>
+
+          <div id="card-choice-holded" class="channel-card" onclick="selectChannelType('holded')" style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;margin-bottom:18px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="channel-icon" style="color: #ff5a5f; margin-bottom: 0; width: 34px; height: 34px; flex-shrink: 0;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight: 600; font-size: 13px; color: #fff;">Holded Cloud ERP (Puente Híbrido Local ↔ Nube)</div>
+                <div style="font-size: 11.5px; color: var(--text-muted);">¿Usas Holded en la nube como canal secundario o facturación? Sincroniza stock, catálogo y pedidos con Holded Invoicing API.</div>
+              </div>
+            </div>
+            <span class="tag" style="font-size:10.5px;padding:3px 8px;background:rgba(255,90,95,0.12);color:#fda4af;border:1px solid rgba(255,90,95,0.25);flex-shrink:0;">Cloud API</span>
           </div>
 
           <!-- OPCIÓN A: CONECTOR WEB UNIVERSAL (HTTPS 443) -->

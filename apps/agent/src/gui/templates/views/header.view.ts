@@ -24,9 +24,8 @@ export function renderHeader(): string {
           <svg id="update-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span id="btn-update-text">Reiniciar para Actualizar</span>
         </button>
-        <button onclick="window.location.reload(true)" id="btn-refresh-header" class="btn btn-secondary btn-sm" title="Refrescar interfaz y sincronizar datos" style="display:inline-flex;align-items:center;gap:6px;">
-          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          <span>Refrescar</span>
+        <button onclick="window.location.reload(true)" id="btn-refresh-header" class="btn btn-secondary btn-sm" title="Refrescar interfaz y sincronizar datos" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;min-width:30px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
         <button onclick="triggerManualSync()" id="btn-sync-header" class="btn btn-primary">
           <svg id="sync-icon-header" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -35,10 +34,6 @@ export function renderHeader(): string {
         <button onclick="openIncidentModal()" id="btn-header-incident" class="btn btn-secondary btn-sm" title="Enviar incidencia o consulta a soporte técnico" style="display:inline-flex;align-items:center;gap:6px;border-color:rgba(239,68,68,0.35);color:#fca5a5;">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           <span>Reportar Incidencia</span>
-        </button>
-        <button onclick="window.open('https://bridge.cristianjm.com/docs/', '_blank')" class="btn btn-secondary btn-sm" title="Consultar documentación oficial y manuales de integración" style="display:inline-flex;align-items:center;gap:6px;">
-          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>Documentación</span>
         </button>
         <button onclick="openCloudDashboard(event)" class="btn btn-secondary btn-sm" title="Gestión de Licencias y Facturación Cloud">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>

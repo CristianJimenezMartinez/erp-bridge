@@ -330,21 +330,27 @@ async function runMasterBuild() {
   }
   fs.writeFileSync(path.resolve(versionReleaseDir, 'checksums.txt'), checksumsContent, 'utf8');
 
-  // Firma digital Ed25519 del ejecutable
-  // Orden de búsqueda de la clave privada (nunca debe vivir en una carpeta sincronizada):
-  // 1) BENTIAN_UPDATE_PRIVATE_KEY_PATH  2) ~/.bentian-secrets/update-private-v2.pem  3) ~/.bentian-secrets/update-private.pem (legado)
+  // Firma digital Ed25519 del ejecutable (Modo Puente Dual-Key: compatible con <= v0.4.7 y >= v0.4.8)
+  const secretsDir = path.join(require('os').homedir(), '.bentian-secrets');
+  const v1KeyPath = path.join(secretsDir, 'update-private.pem');
+  const v2KeyPath = path.join(secretsDir, 'update-private-v2.pem');
   const privateKeyCandidates = [
     process.env.BENTIAN_UPDATE_PRIVATE_KEY_PATH,
-    path.join(require('os').homedir(), '.bentian-secrets', 'update-private-v2.pem'),
-    path.join(require('os').homedir(), '.bentian-secrets', 'update-private.pem')
+    v1KeyPath,
+    v2KeyPath
   ].filter(Boolean);
   const privateKeyPath = privateKeyCandidates.find(p => fs.existsSync(p));
   let exeSignature = '';
+  let exeSignatureV2 = '';
   if (privateKeyPath) {
-    const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
     const exeBuffer = fs.readFileSync(targetExe);
+    const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
     exeSignature = crypto.sign(null, exeBuffer, privateKeyPem).toString('base64');
-    console.log('  🔒 Firma digital Ed25519 generada correctamente.');
+    if (fs.existsSync(v2KeyPath)) {
+      const v2Pem = fs.readFileSync(v2KeyPath, 'utf8');
+      exeSignatureV2 = crypto.sign(null, exeBuffer, v2Pem).toString('base64');
+    }
+    console.log('  🔒 Firma digital Ed25519 generada correctamente (Dual-Key Bridge).');
   } else if (shouldDeploy) {
     console.error('  ❌ Clave privada de actualización no encontrada (' + privateKeyCandidates.join(' | ') + '). Se aborta el despliegue: no se publica una release sin firma real.');
     process.exit(1);
@@ -362,6 +368,7 @@ async function runMasterBuild() {
     downloadUrl: `${downloadBase}/v${version}/BentianAgent.exe`,
     sha256: exeHash,
     signature: exeSignature,
+    ...(exeSignatureV2 ? { signatureV2: exeSignatureV2 } : {}),
     fileSize: exeStats.size,
     releaseNotes: `Lanzamiento oficial Bentian Agent v${version} - Sincronización Factusol & WooCommerce`,
     mandatory: false,

@@ -380,79 +380,100 @@ export class UpdateClient {
     }
 
     try {
-      let existingBytes = 0;
-      if (fs.existsSync(partFilePath)) {
-        existingBytes = fs.statSync(partFilePath).size;
-      }
+      const maxAttempts = 3;
+      let downloadedBytes = 0;
 
-      const headers: Record<string, string> = {};
-      if (existingBytes > 0) {
-        headers['Range'] = `bytes=${existingBytes}-`;
-        this.logger.info(`Reanudando descarga de v${update.version} desde byte ${existingBytes}...`);
-      } else {
-        this.logger.info(`Iniciando descarga de actualización v${update.version} desde ${fullUrl}...`);
-      }
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        let writeStream: fs.WriteStream | null = null;
+        try {
+          let existingBytes = 0;
+          if (fs.existsSync(partFilePath)) {
+            existingBytes = fs.statSync(partFilePath).size;
+          }
 
-      let res = await fetch(fullUrl, { headers, signal: AbortSignal.timeout(60000) });
+          const headers: Record<string, string> = {};
+          if (existingBytes > 0) {
+            headers['Range'] = `bytes=${existingBytes}-`;
+            this.logger.info(`Reanudando descarga de v${update.version} desde byte ${existingBytes} (intento ${attempt}/${maxAttempts})...`);
+          } else {
+            this.logger.info(`Iniciando descarga de actualización v${update.version} desde ${fullUrl} (intento ${attempt}/${maxAttempts})...`);
+          }
 
-      // Si el servidor devuelve 416 Range Not Satisfiable, reiniciar la descarga desde cero
-      if (res.status === 416) {
-        this.logger.warn('Rango no válido (416). Reiniciando descarga completa...');
-        if (fs.existsSync(partFilePath)) fs.unlinkSync(partFilePath);
-        existingBytes = 0;
-        res = await fetch(fullUrl, { signal: AbortSignal.timeout(60000) });
-      }
+          let res = await fetch(fullUrl, { headers, signal: AbortSignal.timeout(300000) });
 
-      if (!res.ok) {
-        throw new Error(`Fallo en descarga: HTTP ${res.status} ${res.statusText}`);
-      }
+          // Si el servidor devuelve 416 Range Not Satisfiable, reiniciar la descarga desde cero
+          if (res.status === 416) {
+            this.logger.warn('Rango no válido (416). Reiniciando descarga completa...');
+            if (fs.existsSync(partFilePath)) fs.unlinkSync(partFilePath);
+            existingBytes = 0;
+            res = await fetch(fullUrl, { signal: AbortSignal.timeout(300000) });
+          }
 
-      const isPartial = res.status === 206;
-      const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
-      const totalBytes = isPartial ? existingBytes + contentLength : (contentLength || update.fileSize || 0);
+          if (!res.ok) {
+            throw new Error(`Fallo en descarga: HTTP ${res.status} ${res.statusText}`);
+          }
 
-      if (totalBytes > 150 * 1024 * 1024) {
-        throw new Error(`Tamaño de descarga excede el límite permitido de 150 MB (${totalBytes} bytes)`);
-      }
+          const isPartial = res.status === 206;
+          const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
+          const totalBytes = isPartial ? existingBytes + contentLength : (contentLength || update.fileSize || 0);
 
-      let downloadedBytes = isPartial ? existingBytes : 0;
-      const writeStream = fs.createWriteStream(partFilePath, { flags: isPartial ? 'a' : 'w' });
+          if (totalBytes > 150 * 1024 * 1024) {
+            throw new Error(`Tamaño de descarga excede el límite permitido de 150 MB (${totalBytes} bytes)`);
+          }
 
-      if (res.body) {
-        const nodeStream = Readable.fromWeb(res.body as any);
+          downloadedBytes = isPartial ? existingBytes : 0;
+          writeStream = fs.createWriteStream(partFilePath, { flags: isPartial ? 'a' : 'w' });
 
-        for await (const chunk of nodeStream) {
-          writeStream.write(chunk);
-          downloadedBytes += (chunk as Buffer).length;
-          const percentage = totalBytes > 0 ? Math.min(100, Math.round((downloadedBytes / totalBytes) * 100)) : 0;
+          if (res.body) {
+            const nodeStream = Readable.fromWeb(res.body as any);
 
-          const progress: DownloadProgress = {
-            bytesDownloaded: downloadedBytes,
-            totalBytes,
-            percentage,
-          };
+            for await (const chunk of nodeStream) {
+              writeStream.write(chunk);
+              downloadedBytes += (chunk as Buffer).length;
+              const percentage = totalBytes > 0 ? Math.min(100, Math.round((downloadedBytes / totalBytes) * 100)) : 0;
 
-          this.state.downloadProgress = progress;
-          update.downloadProgress = percentage;
+              const progress: DownloadProgress = {
+                bytesDownloaded: downloadedBytes,
+                totalBytes,
+                percentage,
+              };
 
-          this.emitUpdateEvent('update:downloading', {
-            version: update.version,
-            ...progress,
+              this.state.downloadProgress = progress;
+              update.downloadProgress = percentage;
+
+              this.emitUpdateEvent('update:downloading', {
+                version: update.version,
+                ...progress,
+              });
+            }
+          } else {
+            const arrayBuf = await res.arrayBuffer();
+            const buf = Buffer.from(arrayBuf);
+            writeStream.write(buf);
+            downloadedBytes += buf.length;
+          }
+
+          const streamToClose = writeStream;
+          await new Promise<void>((resolve, reject) => {
+            streamToClose.end((err?: Error) => {
+              if (err) reject(err);
+              else resolve();
+            });
           });
+          writeStream = null;
+          break;
+        } catch (attemptErr: any) {
+          if (writeStream) {
+            try { writeStream.destroy(); } catch {}
+          }
+          if (attempt < maxAttempts) {
+            this.logger.warn(`Intento ${attempt}/${maxAttempts} de descarga interrumpido (${attemptErr?.message || attemptErr}). Reintentando con reanudación HTTP Range...`);
+            await new Promise((r) => setTimeout(r, 1500 * attempt));
+          } else {
+            throw attemptErr;
+          }
         }
-      } else {
-        const arrayBuf = await res.arrayBuffer();
-        const buf = Buffer.from(arrayBuf);
-        writeStream.write(buf);
-        downloadedBytes += buf.length;
       }
-
-      await new Promise<void>((resolve, reject) => {
-        writeStream.end((err?: Error) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
 
       // Mover el archivo .part al archivo binario final
       if (fs.existsSync(destFilePath)) {
@@ -475,7 +496,8 @@ export class UpdateClient {
       if (!verification.valid) {
         const errorReason = verification.reason || 'Fallo de verificación criptográfica';
         this.logger.error(`Seguridad de actualización vulnerada: ${errorReason}`);
-        try { fs.unlinkSync(destFilePath); } catch {}
+        try { if (fs.existsSync(destFilePath)) fs.unlinkSync(destFilePath); } catch {}
+        try { if (fs.existsSync(partFilePath)) fs.unlinkSync(partFilePath); } catch {}
         throw new Error(errorReason);
       }
 
@@ -497,9 +519,7 @@ export class UpdateClient {
 
       return destFilePath;
     } catch (err: any) {
-      if (fs.existsSync(partFilePath)) {
-        try { fs.unlinkSync(partFilePath); } catch {}
-      }
+      // Preservamos partFilePath (.part) si fue un corte de red o timeout para que el siguiente reintento reanude vía Range
       if (fs.existsSync(destFilePath)) {
         try { fs.unlinkSync(destFilePath); } catch {}
       }

@@ -214,6 +214,7 @@ export class StatusAggregatorService {
       license,
       erpType: cfg.erpType || 'factusol',
       softwareErp: cfg.softwareErp,
+      evaluationMode: cfg.evaluationMode,
       factusol: {
         configured: Boolean(dbPath),
         databasePath: dbPath || '',

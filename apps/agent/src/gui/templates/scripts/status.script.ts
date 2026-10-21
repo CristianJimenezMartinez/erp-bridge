@@ -135,33 +135,66 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       document.getElementById('sidebar-hostname').textContent = (data.system && data.system.hostname) ? data.system.hostname : 'Local';
       document.getElementById('sidebar-hwid').textContent = data.hwid ? (data.hwid.substring(0, 12) + '...') : '---';
 
-      // ERP Type & Labels
+      // ERP Type & Labels (5 Motores ERP + Modo Evaluación Sandbox)
       const erpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
+      const evalMode = data.evaluationMode && data.evaluationMode.enabled;
       const isSimplyGest = erpType === 'simplygest';
+      const isSqlErp = erpType === 'agora' || erpType === 'sage50' || erpType === 'a3erp';
+
+      const erpMetaMap = {
+        factusol: { sidebarTitle: 'Factusol ERP', badge: 'Factusol', tagClass: 'tag tag-blue', cardName: 'Factusol Desktop', shortName: 'Factusol', ext: '.accdb', inputId: 'input-factusol-db' },
+        simplygest: { sidebarTitle: 'SimplyGest Desktop', badge: 'SimplyGest', tagClass: 'tag tag-green', cardName: 'SimplyGest Desktop', shortName: 'SimplyGest', ext: 'Datos.mdb', inputId: 'input-simplygest-db' },
+        agora: { sidebarTitle: 'Ágora POS', badge: 'Ágora POS', tagClass: 'tag tag-amber', cardName: 'Ágora Retail / POS', shortName: 'Ágora POS', ext: 'SQL Server (AgoraPOS)', inputId: 'input-sql-erp-instance' },
+        sage50: { sidebarTitle: 'Sage 50 ERP', badge: 'Sage 50', tagClass: 'tag tag-green', cardName: 'Sage 50 Local', shortName: 'Sage 50', ext: 'SQL Server (SAGE50)', inputId: 'input-sql-erp-instance' },
+        a3erp: { sidebarTitle: 'a3ERP', badge: 'a3ERP', tagClass: 'tag tag-amber', cardName: 'Wolters Kluwer a3ERP', shortName: 'a3ERP', ext: 'SQL Server (A3ERP)', inputId: 'input-sql-erp-instance' }
+      };
+      const activeMeta = erpMetaMap[erpType] || erpMetaMap.factusol;
 
       const sidebarErpTitle = document.getElementById('sidebar-erp-title');
       if (sidebarErpTitle) {
-        sidebarErpTitle.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP';
+        sidebarErpTitle.textContent = evalMode ? 'Modo Evaluación' : activeMeta.sidebarTitle;
       }
       const sidebarErpBadge = document.getElementById('sidebar-erp-badge');
       if (sidebarErpBadge) {
-        sidebarErpBadge.textContent = isSimplyGest ? 'SimplyGest' : 'Factusol';
-        sidebarErpBadge.className = isSimplyGest ? 'tag tag-green' : 'tag tag-blue';
+        sidebarErpBadge.textContent = evalMode ? 'Demo' : activeMeta.badge;
+        sidebarErpBadge.className = evalMode ? 'tag tag-green' : activeMeta.tagClass;
       }
 
       const cardErpName = document.getElementById('card-erp-name');
       if (cardErpName) {
-        cardErpName.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol Desktop';
+        cardErpName.textContent = evalMode ? 'Sandbox Demo Activo' : activeMeta.cardName;
       }
 
       // ERP Card Status
       const erpInfo = isSimplyGest ? (data.simplygest || {}) : (data.factusol || {});
+      const sqlConn = (data.softwareErp && data.softwareErp.sqlConnection) || {};
       const cardFBadge = document.getElementById('card-f-badge');
       const cardFMetric = document.getElementById('card-f-metric');
       const cardFPath = document.getElementById('card-f-path');
       const cardFWatcher = document.getElementById('card-f-watcher');
 
-      if (erpInfo.configured && erpInfo.connected) {
+      if (evalMode) {
+        cardFBadge.className = 'tag tag-green';
+        cardFBadge.textContent = 'Modo Demo';
+        cardFMetric.textContent = '10 arts. demo';
+        cardFPath.textContent = 'Catálogo virtual en memoria (Sin ERP real)';
+        if (cardFWatcher) cardFWatcher.textContent = '● Sandbox activo';
+      } else if (isSqlErp) {
+        const sqlConfigured = Boolean(sqlConn.serverInstance || (data.softwareErp && data.softwareErp.provisioned));
+        if (sqlConfigured) {
+          cardFBadge.className = 'tag tag-green';
+          cardFBadge.textContent = 'SQL Local';
+          cardFMetric.textContent = sqlConn.databaseName || activeMeta.badge;
+          cardFPath.textContent = (sqlConn.serverInstance || '.\\SQLEXPRESS') + ' → ' + (sqlConn.databaseName || activeMeta.badge);
+          if (cardFWatcher) cardFWatcher.textContent = '● Motor SQL activo';
+        } else {
+          cardFBadge.className = 'tag tag-amber';
+          cardFBadge.textContent = 'Pendiente SQL';
+          cardFMetric.textContent = activeMeta.badge;
+          cardFPath.textContent = 'Pulsa en Ajustar para detectar tu instancia SQL Server';
+          if (cardFWatcher) cardFWatcher.textContent = '○ Pendiente';
+        }
+      } else if (erpInfo.configured && erpInfo.connected) {
         cardFBadge.className = 'tag tag-green';
         cardFBadge.textContent = 'Conectado';
         cardFMetric.textContent = (erpInfo.articleCount !== undefined ? erpInfo.articleCount.toLocaleString('es-ES') : '0') + ' arts.';
@@ -287,7 +320,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const bannerDesc = document.getElementById('update-banner-desc');
       const bannerBtnText = document.getElementById('btn-update-banner-text');
 
-      if (upd && (upd.status === 'ready' || upd.status === 'available' || upd.status === 'downloading' || upd.pendingUpdate)) {
+      if (upd && (upd.status === 'ready' || upd.status === 'available' || upd.status === 'downloading' || upd.status === 'failed' || upd.pendingUpdate)) {
         const targetVer = upd.pendingUpdate ? ('v' + upd.pendingUpdate.version) : '';
         let btnLabel = 'Actualizar ' + targetVer;
         let bannerText = 'Hay una nueva versión disponible para instalar.';
@@ -302,6 +335,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         } else if (upd.status === 'applying') {
           btnLabel = 'Aplicando actualización...';
           bannerText = 'Instalando actualización y reiniciando el servicio...';
+        } else if (upd.status === 'failed') {
+          btnLabel = 'Reintentar actualización ' + targetVer;
+          bannerText = 'La descarga anterior se interrumpió. Haz clic para reanudar e instalar ' + targetVer + '.';
         }
 
         if (btnHeader) {
@@ -348,11 +384,31 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
     function renderZenHeroAndAlerts(data) {
       if (!data) return;
 
-      const isSimplyGest = (data.erpType === 'simplygest');
+      const erpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
+      const evalMode = Boolean(data.evaluationMode && data.evaluationMode.enabled);
+      const isSimplyGest = (erpType === 'simplygest');
+      const isSqlErp = (erpType === 'agora' || erpType === 'sage50' || erpType === 'a3erp');
       const erpInfo = isSimplyGest ? (data.simplygest || {}) : (data.factusol || {});
-      const erpName = isSimplyGest ? 'SimplyGest' : 'Factusol';
-      const erpFileExt = isSimplyGest ? 'Datos.mdb' : '.accdb';
-      const targetErpInput = isSimplyGest ? 'input-simplygest-db' : 'input-factusol-db';
+      const sqlConn = (data.softwareErp && data.softwareErp.sqlConnection) || {};
+      const sqlConfigured = Boolean(sqlConn.serverInstance || (data.softwareErp && data.softwareErp.provisioned));
+
+      const erpNameMap = {
+        factusol: 'Factusol',
+        simplygest: 'SimplyGest',
+        agora: 'Ágora POS',
+        sage50: 'Sage 50',
+        a3erp: 'a3ERP'
+      };
+      const erpExtMap = {
+        factusol: '.accdb',
+        simplygest: 'Datos.mdb',
+        agora: 'SQL Server (AgoraPOS)',
+        sage50: 'SQL Server (SAGE50)',
+        a3erp: 'SQL Server (A3ERP)'
+      };
+      const erpName = evalMode ? 'Modo Evaluación Demo' : (erpNameMap[erpType] || 'Factusol');
+      const erpFileExt = erpExtMap[erpType] || '.accdb';
+      const targetErpInput = isSimplyGest ? 'input-simplygest-db' : (isSqlErp ? 'input-sql-erp-instance' : 'input-factusol-db');
 
       const chType = data.channelType || 'universal_bridge';
       const univ = data.universalBridgeSettings || {};
@@ -378,8 +434,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const primaryBtnText = document.getElementById('zen-primary-btn-text');
       const primaryBtnIcon = document.getElementById('zen-primary-btn-icon');
 
-      const isErpMissing = !erpInfo.configured;
-      const isErpOffline = erpInfo.configured && !erpInfo.connected;
+      const isErpMissing = evalMode ? false : (isSqlErp ? !sqlConfigured : !erpInfo.configured);
+      const isErpOffline = evalMode ? false : (isSqlErp ? false : (erpInfo.configured && !erpInfo.connected));
 
       const isChannelConfigured = chType === 'universal_bridge' 
         ? !!(univ.storeUrl && univ.storeUrl.trim())
