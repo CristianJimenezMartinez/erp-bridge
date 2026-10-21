@@ -2,6 +2,7 @@ import { DocCategory, DocArticle } from './types';
 import { primerosPasosArticles } from './categories/01-primeros-pasos';
 import { factusolArticles } from './categories/02-factusol';
 import { simplygestArticles } from './categories/simplygest';
+import { sqlErpsArticles } from './categories/sql-erps';
 import { canalesArticles } from './categories/03-canales';
 import { arquitecturaArticles } from './categories/04-arquitectura';
 import { benchmarkArticle } from './categories/arquitectura-benchmark';
@@ -34,46 +35,53 @@ export const DOC_CATEGORIES: DocCategory[] = [
     order: 3,
   },
   {
+    slug: 'sql-erps',
+    title: 'Sage 50, Ágora y a3ERP (SQL)',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>',
+    description: 'Integración SQL Server local no bloqueante para Sage 50, Ágora POS / Retail y Wolters Kluwer a3ERP.',
+    order: 4,
+  },
+  {
     slug: 'canales',
     title: 'Canales eCommerce',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     description: 'Sincronización con WooCommerce (HPOS), PrestaShop, Shopify, Holded Cloud ERP y Endpoint Universal.',
-    order: 4,
+    order: 5,
   },
   {
     slug: 'arquitectura',
     title: 'Arquitectura & Sincronización',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
     description: 'Filosofía Local-First, cola JSON atómico estructurado con reemplazo seguro anti-wiping y backup defensivo Store-and-Forward, arquitectura tripartita y monitoreo en tiempo real.',
-    order: 5,
+    order: 6,
   },
   {
     slug: 'fiscalidad',
     title: 'Fiscalidad & Facturación',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>',
     description: 'Cuadre de IVA al céntimo, Recargo de Equivalencia y compatibilidad Veri*Factu.',
-    order: 6,
+    order: 7,
   },
   {
     slug: 'troubleshooting',
     title: 'Resolución de Incidencias',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
     description: 'Solución a bases de datos bloqueadas (.laccdb), OLEDB no registrado y errores 401.',
-    order: 7,
+    order: 8,
   },
   {
     slug: 'seguridad',
     title: 'Seguridad & Redes',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>',
     description: 'Configuración de antivirus/EDR, Windows SmartScreen y criptografía Ed25519.',
-    order: 8,
+    order: 9,
   },
   {
     slug: 'api',
     title: 'API REST & Esquemas',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
     description: 'Endpoints HTTP locales (39281), esquemas JSON validados y webhooks transaccionales.',
-    order: 9,
+    order: 10,
   },
 ];
 
@@ -81,6 +89,7 @@ export const DOC_ARTICLES: DocArticle[] = [
   ...primerosPasosArticles,
   ...factusolArticles,
   ...simplygestArticles,
+  ...sqlErpsArticles,
   ...canalesArticles,
   ...arquitecturaArticles,
   benchmarkArticle,

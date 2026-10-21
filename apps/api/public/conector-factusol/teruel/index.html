@@ -95,14 +95,15 @@
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
         "softwareVersion": "0.4.8",
+        "dateModified": "2026-10-21T19:00:00+02:00",
         "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
-        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "image": "https://bridge.cristianjm.com/assets/screenshots/01-dashboard-overview.png",
         "brand": {
           "@type": "Brand",
           "name": "Bentian"
         },
-        "sku": "BENTIAN-ERP-BRIDGE-ANNUAL",
-        "mpn": "EB-037",
+        "sku": "BENTIAN-ERP-BRIDGE-TERUEL",
+        "mpn": "EB-048-TERUEL",
         "offers": {
           "@type": "Offer",
           "price": "199.00",
@@ -322,28 +323,78 @@
       </div>
     </section>
 
-    <!-- Cómo Funciona (Arquitectura Local-First) -->
+    <!-- Cómo Funciona y Matriz Técnica Local en Teruel -->
     <section class="py-16 md:py-20 px-6 border-b border-white/[0.08] bg-[#09090b]">
       <div class="max-w-5xl mx-auto">
-        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First: Máxima Privacidad y Cero Caídas</h2>
-        <p class="text-sm text-zinc-400 text-center max-w-2xl mx-auto mb-12">
-          A diferencia de los conectores que exigen subir tu base de datos contable a servidores de terceros, Bentian se ejecuta en tu propio ordenador en Teruel.
+        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First para Empresas de Teruel (Teruel)</h2>
+        <p class="text-sm text-zinc-400 text-center max-w-3xl mx-auto mb-10">
+          A diferencia de los plugins PHP o conectores cloud que exigen exponer tu servidor, Bentian opera directamente dentro de la red local de tu nave o comercio en <strong>Plataforma Logística e Industrial Platea (Teruel), Polígono Industrial La Paz (Teruel), Área Industrial de Alcañiz y Calamocha (Bajo Aragón / Jiloca)</strong>, manteniendo la base de datos de Factusol blindada en tus equipos Windows.
         </p>
-        <div class="grid md:grid-cols-3 gap-8">
+
+        <div class="mb-12 rounded-2xl overflow-hidden border border-white/[0.1] bg-[#121215] shadow-2xl">
+          <img src="/assets/screenshots/01-dashboard-overview.png" alt="Panel de control del conector Factusol Bentian ERP Bridge en Teruel (Teruel)" class="w-full h-auto block" loading="lazy">
+          <div class="px-4 py-2.5 bg-zinc-900/90 border-t border-white/[0.06] text-[11px] text-zinc-400 font-mono flex flex-wrap items-center justify-between gap-2">
+            <span>Monitor de telemetría OLEDB y cola Store-and-Forward para instalaciones en Teruel (Aragón)</span>
+            <span class="text-emerald-400 font-semibold">Latencia local &lt;15 ms • Cero bloqueos .laccdb</span>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">1</div>
-            <h3 class="text-base font-semibold text-white mb-2">Lectura Directa Factusol</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente se conecta directamente al archivo .accdb o .mdb mediante OLEDB en menos de 100 ms. Cero lentitud.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Lectura Directa OLEDB (F_ART y F_LTA)</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente consulta el archivo <code class="text-zinc-300 font-mono">.accdb</code> en disco local o servidor NAS (<a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-indigo-400 hover:underline">protección Anti-Wiping UNC</a>) en modo <code class="text-zinc-300 font-mono">Share Deny None</code> sin bloquear los puestos de mostrador en Teruel.</p>
           </div>
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">2</div>
-            <h3 class="text-base font-semibold text-white mb-2">Detección Inteligente de Stock</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula el stock disponible real (DISSTO) excluyendo mercancía reservada o pendiente de servir para evitar sobreventas.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Stock Disponible Real (DISSTO)</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula la <a href="/docs/factusol/calculo-stock-disponible/" class="text-indigo-400 hover:underline">fórmula oficial DISSTO en F_STO</a> descontando mercancía reservada por clientes de almacén y pedidos pendientes de servir para impedir roturas de stock.</p>
           </div>
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">3</div>
-            <h3 class="text-base font-semibold text-white mb-2">Buffer Store-and-Forward</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la conexión de internet de tu nave o polígono sufre cortes, los pedidos se retienen y se vuelcan automáticamente al volver la red.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Cola Store-and-Forward e IVA/Recargo</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la fibra del polígono sufre microcortes o el PC se apaga por la noche, la <a href="/docs/arquitectura/cola-store-and-forward/" class="text-indigo-400 hover:underline">cola persistente</a> retiene los pedidos web y los inyecta en <code class="text-zinc-300 font-mono">F_PCL / F_LPC</code> con cuadre al céntimo de IVA y <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-indigo-400 hover:underline">Recargo de Equivalencia</a>.</p>
+          </div>
+        </div>
+
+        <!-- Tabla de Especificaciones Técnicas para Implantadores y Pymes en Teruel -->
+        <div class="rounded-2xl border border-white/[0.08] bg-[#121215] overflow-hidden">
+          <div class="px-6 py-4 bg-zinc-900/80 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h3 class="text-sm font-bold text-white">Especificaciones de Integración ERP y Red Local en Teruel</h3>
+            <span class="text-[11px] font-mono text-indigo-400">Compatible Multi-ERP Windows (v0.4.8)</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-zinc-900/40 text-zinc-400 border-b border-white/[0.06]">
+                <tr>
+                  <th class="px-5 py-3 font-semibold">Parámetro Técnico</th>
+                  <th class="px-5 py-3 font-semibold">Soporte Nativo en Teruel (Teruel)</th>
+                  <th class="px-5 py-3 font-semibold">Referencia de Ingeniería</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.06] text-zinc-300">
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">ERPs de Escritorio Soportados</td>
+                  <td class="px-5 py-3">Factusol (<code class="font-mono text-indigo-300">.accdb</code>), SimplyGest (<code class="font-mono text-emerald-300">Datos.mdb</code>), Ágora POS, Sage 50 y a3ERP (SQL Server Local)</td>
+                  <td class="px-5 py-3"><a href="/docs/arquitectura/arquitectura-polimorfica-multi-erp/" class="text-indigo-400 hover:underline">Arquitectura Multi-ERP &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Topologías de Red en Aragón</td>
+                  <td class="px-5 py-3">Monopuesto Windows 10/11, Windows Server en nave industrial (Plataforma Logística e Industrial Platea (Teruel), Polígono Industrial La Paz (Teruel), Área Industrial de Alcañiz y Calamocha (Bajo Aragón / Jiloca)) y rutas UNC en NAS</td>
+                  <td class="px-5 py-3"><a href="/docs/factusol/localizacion-base-datos/" class="text-indigo-400 hover:underline">Rutas Factusol y NAS &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Canales eCommerce Conectados</td>
+                  <td class="px-5 py-3">WooCommerce (HPOS REST v3), PrestaShop 1.7 / 8.x, Shopify GraphQL y Endpoint PHP Universal en Plesk</td>
+                  <td class="px-5 py-3"><a href="/docs/canales/woocommerce/" class="text-indigo-400 hover:underline">Guía WooCommerce &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Cumplimiento Fiscal y Veri*Factu</td>
+                  <td class="px-5 py-3">Inyección exclusiva en pedidos de cliente (<code class="font-mono text-indigo-300">F_PCL</code> Serie 1), 100% respetuoso con RD 1007/2023 Veri*Factu</td>
+                  <td class="px-5 py-3"><a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-indigo-400 hover:underline">Normativa Veri*Factu &rarr;</a></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -369,6 +420,101 @@
           <h4 class="text-sm sm:text-base font-semibold text-white mb-2">¿Funciona en ordenadores con Windows estándar sin necesidad de software adicional?</h4>
           <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Sí. Bentian incluye todo lo necesario para conectarse a Factusol sin requerir software de terceros ni instalaciones complejas.</p>
         </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Malla de Enlazado Regional y Corredores Industriales -->
+    <section class="py-14 px-6 border-b border-white/[0.08] bg-[#09090b]">
+      <div class="max-w-5xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 font-semibold">Red Logística en Aragón y España</span>
+            <h2 class="text-xl md:text-2xl font-bold text-white mt-1">Conector Factusol en Ciudades Cercanas y Polígonos Conectados</h2>
+          </div>
+          <a href="/conector-factusol/" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">Explorar las 52 áreas industriales &rarr;</a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          
+        <a href="/conector-factusol/zaragoza/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Zaragoza</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Zaragoza • Aragón</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/huesca/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Huesca</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Huesca • Aragón</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/madrid/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Madrid</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Madrid • Comunidad de Madrid</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/barcelona/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Barcelona</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Barcelona • Cataluña</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/valencia/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Valencia</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Valencia • Comunidad Valenciana</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/sevilla/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Sevilla</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Sevilla • Andalucía</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/malaga/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Málaga</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Málaga • Andalucía</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/bilbao/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Bilbao</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Bizkaia • País Vasco</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/murcia/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">Murcia</span>
+            <span class="text-[10px] text-zinc-500 font-mono">Murcia • Región de Murcia</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="/conector-factusol/coruna/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">A Coruña</span>
+            <span class="text-[10px] text-zinc-500 font-mono">A Coruña • Galicia</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>
         </div>
       </div>
     </section>

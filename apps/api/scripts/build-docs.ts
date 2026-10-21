@@ -23,7 +23,7 @@ function getCanonicalVersion(): string {
       if (data.latestVersion) return String(data.latestVersion).replace(/^v/, '').trim();
     } catch {}
   }
-  return '0.4.7';
+  return '0.4.8';
 }
 
 function renderSidebar(currentSlug?: string): string {
@@ -212,7 +212,7 @@ function renderDocArticlePage(article: DocArticle): string {
           }
         },
         "datePublished": "2026-10-04T20:00:00+02:00",
-        "dateModified": "2026-10-05T00:00:00+02:00"
+        "dateModified": "2026-10-21T14:00:00+02:00"
       },
       {
         "@type": "BreadcrumbList",
@@ -233,7 +233,7 @@ function renderDocArticlePage(article: DocArticle): string {
             "@type": "ListItem",
             "position": 3,
             "name": ${JSON.stringify(category ? category.title : 'Guías')},
-            "item": "https://bridge.cristianjm.com/docs/"
+            "item": "https://bridge.cristianjm.com/docs/#cat-${article.categorySlug}"
           },
           {
             "@type": "ListItem",
@@ -303,7 +303,7 @@ function renderDocArticlePage(article: DocArticle): string {
           <span>/</span>
           <a href="/docs/" class="hover:text-zinc-300 transition">Docs</a>
           <span>/</span>
-          <span class="text-zinc-400">${category ? category.title : 'Guía'}</span>
+          <a href="/docs/#cat-${article.categorySlug}" class="text-zinc-400 hover:text-zinc-200 transition">${category ? category.title : 'Guía'}</a>
           <span>/</span>
           <span class="text-indigo-400 font-medium truncate max-w-xs">${article.title}</span>
         </nav>
@@ -353,7 +353,7 @@ function renderDocArticlePage(article: DocArticle): string {
         <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-indigo-950/30 via-[#121215] to-[#121215] border border-indigo-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h4 class="text-sm font-bold text-white mb-1">¿Tienes dudas sobre la configuración en tu empresa?</h4>
-            <p class="text-xs text-zinc-400">Nuestro equipo de ingeniería te asiste con tu base de datos Factusol o red local.</p>
+            <p class="text-xs text-zinc-400">Nuestro equipo de ingeniería te asiste con tu base de datos ${article.categorySlug === 'simplygest' ? 'SimplyGest (Datos.mdb)' : 'Factusol, SimplyGest, SQL Server'} o red local.</p>
           </div>
           <a href="mailto:cristianjimeneztrabajo@gmail.com" class="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-white shrink-0 transition">
             Contactar con Soporte
@@ -634,7 +634,7 @@ function renderDocsHub(): string {
             ${DOC_CATEGORIES.map((cat) => {
               const articles = getArticlesByCategory(cat.slug);
               return `
-                <div class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between">
+                <div id="cat-${cat.slug}" class="group p-4 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-zinc-700/60 transition flex flex-col justify-between scroll-mt-20">
                   <div>
                     <div class="flex items-center gap-2 mb-2">
                       <span class="w-4 h-4 inline-flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-white transition">${cat.icon}</span>
@@ -882,9 +882,9 @@ function updateSitemap(articles: DocArticle[]) {
   </url>
 `;
       sitemap = sitemap.replace('</urlset>', `${entry}</urlset>`);
-    } else if (['canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita', 'seguridad/certificacion-softpedia-100-clean', 'arquitectura/benchmark-estres-catalogo-real', 'seguridad/evidencias-tecnicas-y-auditoria', 'primeros-pasos/requisitos-del-sistema'].includes(art.slug)) {
+    } else if (['simplygest/configuracion-series-almacenes', 'simplygest/localizacion-base-datos', 'simplygest/sincronizacion-stock-pedidos', 'canales/shopify', 'canales/holded', 'arquitectura/arquitectura-tripartita', 'seguridad/certificacion-softpedia-100-clean', 'arquitectura/benchmark-estres-catalogo-real', 'seguridad/evidencias-tecnicas-y-auditoria', 'primeros-pasos/requisitos-del-sistema'].includes(art.slug)) {
       const reg = new RegExp(`(<loc>https:\\/\\/bridge\\.cristianjm\\.com\\/docs\\/${art.slug}\\/<\\/loc>\\s*<lastmod>)[^<]+(<\\/lastmod>)`, 'i');
-      sitemap = sitemap.replace(reg, `$12026-10-11T12:00:00+02:00$2`);
+      sitemap = sitemap.replace(reg, `$12026-10-21T14:00:00+02:00$2`);
     }
   }
 
@@ -911,7 +911,7 @@ function updateSitemap(articles: DocArticle[]) {
 function updateSitemapDocs(articles: DocArticle[]) {
   const SITEMAP_DOCS_FILE = path.resolve(PUBLIC_DIR, 'sitemap-docs.xml');
   const hubUrl = 'https://bridge.cristianjm.com/docs/';
-  const currentDate = '2026-10-11T12:00:00+02:00';
+  const currentDate = '2026-10-21T14:00:00+02:00';
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
@@ -950,7 +950,7 @@ function updateSitemapDocs(articles: DocArticle[]) {
   const SITEMAP_INDEX_FILE = path.resolve(PUBLIC_DIR, 'sitemap-index.xml');
   if (fs.existsSync(SITEMAP_INDEX_FILE)) {
     let indexXml = fs.readFileSync(SITEMAP_INDEX_FILE, 'utf8');
-    indexXml = indexXml.replace(/(<loc>https:\/\/bridge\.cristianjm\.com\/sitemap-docs\.xml<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i, `$12026-10-11$2`);
+    indexXml = indexXml.replace(/(<loc>https:\/\/bridge\.cristianjm\.com\/sitemap-docs\.xml<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i, `$12026-10-21$2`);
     fs.writeFileSync(SITEMAP_INDEX_FILE, indexXml, 'utf8');
     console.log(`✓ [sitemap-index] Actualizado lastmod de sitemap-docs.xml en sitemap-index.xml.`);
   }

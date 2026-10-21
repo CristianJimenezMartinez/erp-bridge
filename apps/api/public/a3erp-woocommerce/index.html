@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector a3ERP Wolters Kluwer con WooCommerce, PrestaShop y Shopify | Bentian</title>
+  <meta name="description" content="Integra Wolters Kluwer a3ERP (SQL Server local) con WooCommerce, PrestaShop y Shopify. Sincroniza tablas ARTICULO, STOCKALM, tarifas B2B/B2C y pedidos CABEPEV / LINEPEV sin bloqueos.">
+  <meta name="keywords" content="conector a3erp woocommerce, sincronizar a3erp prestashop, conector a3erp shopify, wolters kluwer a3erp tienda online, integracion sql server a3erp cabepev linepev">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/a3erp-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/a3erp-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector a3ERP Wolters Kluwer con WooCommerce, PrestaShop y Shopify | Bentian">
+  <meta property="og:description" content="Sincroniza tu ERP Wolters Kluwer a3ERP sobre SQL Server con WooCommerce, PrestaShop y Shopify. Tablas ARTICULO, STOCKALM, CABEPEV y LINEPEV en tiempo real.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector a3ERP Wolters Kluwer con WooCommerce, PrestaShop y Shopify | Bentian">
+  <meta name="twitter:description" content="Sincroniza tu ERP Wolters Kluwer a3ERP sobre SQL Server con WooCommerce, PrestaShop y Shopify. Tablas ARTICULO, STOCKALM, CABEPEV y LINEPEV en tiempo real.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector a3ERP Wolters Kluwer", "item": "https://bridge.cristianjm.com/a3erp-woocommerce/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian Conector a3ERP Wolters Kluwer con WooCommerce, PrestaShop y Shopify",
+        "softwareVersion": "0.4.8",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/a3erp-woocommerce/",
+        "description": "Conector empresarial local-first sobre Microsoft SQL Server entre Wolters Kluwer a3ERP y tiendas online WooCommerce, PrestaShop y Shopify.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-A3ERP",
+        "mpn": "EB-048-A3ERP",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 14,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo se integra Bentian con la base de datos de Wolters Kluwer a3ERP?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian se instala en tu servidor o puesto Windows y conecta localmente a la instancia SQL Server de a3ERP mediante ADO/SQLOLEDB. Lee de forma no bloqueante las tablas ARTICULO y STOCKALM y registra los pedidos entrantes en CABEPEV y LINEPEV."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Consume licencias concurrentes de usuario o requiere módulos enlace adicionales de a3ERP?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Opera directamente a nivel de motor relacional SQL Server con transacciones parametrizadas y lecturas WITH (NOLOCK), lo que garantiza una latencia inferior a 30 ms sin ralentizar a los usuarios de oficina ni depender de pesadas pasarelas web."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué ocurre si el servidor de a3ERP se reinicia mientras entran pedidos en la web?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "La cola persistente Store-and-Forward con escritura JSON atómica en AppData retiene los pedidos recibidos durante cualquier mantenimiento del servidor SQL y los inyecta en CABEPEV y LINEPEV automáticamente en cuanto vuelve a estar online."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| a3ERP Wolters Kluwer</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="hidden sm:inline text-sm text-zinc-400 hover:text-white transition">Manual Técnico SQL</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20">
+          Descargar <span data-app-version>v0.4.8</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span>Wolters Kluwer a3ERP (SQL Server) ↔ WooCommerce · PrestaShop · Shopify</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Integración SQL Server de Alto Rendimiento entre <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">a3ERP y tu Comercio Electrónico</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Conecta tu base de datos corporativa de <strong>Wolters Kluwer a3ERP</strong> con WooCommerce, PrestaShop y Shopify sin desarrollos a medida de miles de euros. Sincronización diferencial sobre <code class="text-zinc-300 font-mono">ARTICULO</code> y <code class="text-zinc-300 font-mono">STOCKALM</code>, tarifas B2B/B2C e inyección atómica de pedidos de venta en <code class="text-zinc-300 font-mono">CABEPEV</code> y <code class="text-zinc-300 font-mono">LINEPEV</code>.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Descargar Instalador Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+      <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Explorar Manual Técnico de a3ERP &rarr;
+      </a>
+    </div>
+
+    <!-- Comparativa Problemas vs Solución -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> Fricciones Habituales al Conectar a3ERP con la Web
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Presupuestos de consultoría de 3.000 € a 8.000 € por desarrollos ad-hoc frágiles.</li>
+          <li>• Conectores que saturan el servidor SQL Server leyendo decenas de miles de filas cada minuto.</li>
+          <li>• Incapacidad para separar stock físico de almacén frente a unidades reservadas en pedidos.</li>
+          <li>• Pérdida de pedidos web durante reinicios nocturnos o ventanas de backup del servidor Windows.</li>
+          <li>• Errores en el cálculo de tipos de IVA, descuentos por línea y Recargo de Equivalencia B2B.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> Arquitectura Bentian Local-First para a3ERP
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• Agente nativo Windows listo para producción por 199 €/año (o 29 €/mes).</li>
+          <li>• Lecturas SQL con <code>WITH (NOLOCK)</code> y Dirty-Checking SHA-256 en memoria RAM.</li>
+          <li>• Mapeo directo de las tablas maestras <code>ARTICULO</code>, <code>STOCKALM</code>, <code>CLIENTES</code>, <code>CABEPEV</code> y <code>LINEPEV</code>.</li>
+          <li>• Cola transaccional <strong>Store-and-Forward</strong> inmune a reinicios de SQL Server.</li>
+          <li>• <strong>Modo Evaluación Sandbox</strong> incluido para pruebas inmediatas sin tocar producción.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Captura del Selector Multi-ERP -->
+    <div class="mb-16 rounded-2xl overflow-hidden border border-white/[0.1] bg-[#121215] shadow-2xl">
+      <img src="/assets/screenshots/02-multi-erp-selector.png" alt="Configuración de Wolters Kluwer a3ERP SQL Server en Bentian ERP Bridge" class="w-full h-auto block" loading="lazy">
+      <div class="px-6 py-3.5 bg-zinc-900/90 border-t border-white/[0.06] text-xs text-zinc-400 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <span>Panel de configuración local del conector a3ERP Wolters Kluwer y Modo Evaluación Sandbox</span>
+        <span class="text-emerald-400 font-semibold">SQL Server Local-First · <span data-app-version>v0.4.8</span></span>
+      </div>
+    </div>
+
+    <!-- Mapeo Técnico de Tablas SQL de a3ERP -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Ingeniería de Datos SQL</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Mapeo de Tablas Maestras en Wolters Kluwer a3ERP</h2>
+        </div>
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">CABEPEV · LINEPEV · STOCKALM</span>
+      </div>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-6">
+        El adaptador polimórfico de Bentian para a3ERP estructura las lecturas de catálogo y las escrituras de pedidos respetando las claves primarias, series analíticas y almacenes de Wolters Kluwer:
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/90 text-zinc-200 border-b border-white/[0.08]">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Tabla SQL a3ERP</th>
+              <th class="px-4 py-3 font-semibold">Campos Clave Mapeados</th>
+              <th class="px-4 py-3 font-semibold">Comportamiento en el Conector</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">dbo.ARTICULO</td>
+              <td class="px-4 py-3 font-mono">CODART, DESCART, FAMILIA, PRCVENTA, TIPIVA, BLOQUEADO, PESO</td>
+              <td class="px-4 py-3 text-zinc-300">Sincronización de referencias activas, descripciones comerciales, tipos de IVA y precios base o tarifas asociadas.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-sky-400 font-bold">dbo.STOCKALM</td>
+              <td class="px-4 py-3 font-mono">CODART, CODALM, UNIDADES, RESERVADO, PENDIENTE</td>
+              <td class="px-4 py-3 text-zinc-300">Cálculo preciso del stock disponible por código de almacén (<code class="font-mono">CODALM</code>), descontando reservas activas.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-amber-400 font-bold">dbo.CLIENTES</td>
+              <td class="px-4 py-3 font-mono">CODCLI, NOMCLI, NIFCLI, DIRCLI, DTOCLI, CODPOSTAL, EMAIL, RECARGO</td>
+              <td class="px-4 py-3 text-zinc-300">Resolución de clientes existentes por NIF/CIF o alta automática con asignación de cuenta y régimen de IVA/Recargo.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-violet-400 font-bold">dbo.CABEPEV</td>
+              <td class="px-4 py-3 font-mono">IDPEDV, SERIE, NUMDOC, FECHA, CODCLI, CODALM, TOTDOC, REFERENCIA</td>
+              <td class="px-4 py-3 text-zinc-300">Creación transaccional de la cabecera de pedido de venta con referencia externa del eCommerce anti-duplicados.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-rose-400 font-bold">dbo.LINEPEV</td>
+              <td class="px-4 py-3 font-mono">IDPEDV, NUMLIN, CODART, DESCLIN, UNIDADES, PRECIO, DESC1, TIPIVA, RECARGO</td>
+              <td class="px-4 py-3 text-zinc-300">Inserción de líneas de detalle, portes de transporte e impuestos cuadrando al céntimo con el pago de pasarela.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6 Ventajas Clave -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Ventajas Arquitectónicas para Empresas con a3ERP</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">1</div>
+          <h4 class="font-semibold text-white mb-1.5">Aislamiento SQL WITH (NOLOCK)</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Tus departamentos de compras, logística y contabilidad operan en a3ERP a máxima velocidad mientras Bentian lee el catálogo en segundo plano.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">2</div>
+          <h4 class="font-semibold text-white mb-1.5">Control Multialmacén en STOCKALM</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Filtra por el almacén logístico central o suma las existencias de las delegaciones que autorices para la venta online.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">3</div>
+          <h4 class="font-semibold text-white mb-1.5">Tarifas B2B y B2C</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Sincroniza tanto precios de venta al público con IVA incluido como tarifas mayoristas para portales B2B de distribuidores.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">4</div>
+          <h4 class="font-semibold text-white mb-1.5">Cola Store-and-Forward</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Resiliencia total ante paradas de red o mantenimiento de Windows Server: ningún pedido pagado en la web se pierde jamás.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">5</div>
+          <h4 class="font-semibold text-white mb-1.5">Modo Evaluación Sandbox</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Valida la integración con tu agencia web o equipo IT en un entorno simulado de a3ERP antes de conectar la base de datos corporativa.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">6</div>
+          <h4 class="font-semibold text-white mb-1.5">Seguridad Criptográfica Ed25519</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Tus credenciales SQL nunca salen de tu servidor local: se almacenan en <code class="text-zinc-300 font-mono">%APPDATA%</code> con blindaje anti-wiping.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precios Transparentes y Llave en Mano -->
+    <div class="border border-emerald-500/25 rounded-2xl p-8 bg-gradient-to-br from-emerald-950/20 via-[#121215] to-[#121215] mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Coste Predecible · Sin Sorpresas</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Planes de Licencia e Implantación para a3ERP</h2>
+        <p class="text-sm text-zinc-400 mt-2">Sustituye desarrollos a medida de miles de euros por un puente industrial probado.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-xl bg-[#09090b] border border-white/[0.08] flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-zinc-400 uppercase">Suscripción Mensual</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">29 € <span class="text-sm font-normal text-zinc-400">/ mes + IVA</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Sin permanencia, ideal para validación en entorno real.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Conector a3ERP SQL Server completo</li>
+              <li>✓ Catálogo, stock y pedidos ilimitados</li>
+              <li>✓ Compatible con WooCommerce, PrestaShop y Shopify</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold transition">Elegir Plan Mensual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-emerald-950/25 border-2 border-emerald-500/40 flex flex-col justify-between relative">
+          <div>
+            <span class="text-xs font-mono text-emerald-300 uppercase font-bold">Licencia Anual (Ahorra 43%)</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">199 € <span class="text-sm font-normal text-zinc-300">/ año + IVA</span></div>
+            <p class="text-xs text-zinc-300 mb-4">Licencia empresarial completa con soporte prioritario.</p>
+            <ul class="space-y-2 text-xs text-zinc-200 mb-6">
+              <li>✓ Todo lo incluido en el plan mensual</li>
+              <li>✓ Soporte directo de ingeniería y actualizaciones</li>
+              <li>✓ Cuadre fiscal B2B/B2C y cola Store-and-Forward</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/20">Activar Licencia Anual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-[#09090b] border border-indigo-500/30 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-indigo-400 uppercase font-semibold">Servicio Opcional de Ingeniería</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">350 € <span class="text-sm font-normal text-zinc-400">pago único</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Puesta en Marcha Llave en Mano en tu servidor SQL.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Conexión asistida al SQL Server de a3ERP</li>
+              <li>✓ Parametrización de serie en <code>CABEPEV</code> y <code>CODALM</code></li>
+              <li>✓ Auditoría de ciclo completo de stock y pedido</li>
+            </ul>
+          </div>
+          <a href="mailto:cristianjimeneztrabajo@gmail.com?subject=Implantacion%20Llave%20en%20Mano%20a3ERP" class="block text-center py-2.5 px-4 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition">Solicitar Llave en Mano</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentación Técnica Oficial SQL Server -->
+    <div class="mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Manuales de Ingeniería</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Documentación Técnica Oficial de a3ERP y SQL Server</h2>
+        </div>
+        <a href="/docs/#cat-sql-erps" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">Ver categoría SQL ERPs en /docs/ &rarr;</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="p-5 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 bg-emerald-950/[0.15] hover:bg-emerald-950/[0.25] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Manual Oficial · a3ERP</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Conector Wolters Kluwer a3ERP: Tablas SQL y Pedidos</h3>
+            <p class="text-xs text-zinc-300 leading-relaxed">Guía completa de mapeo para ARTICULO, STOCKALM, CABEPEV y LINEPEV, permisos SQL Server y configuración JSON.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Leer manual de a3ERP &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-sage50-sql-server/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · Sage 50</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Arquitectura SQL Server en Sage 50 España</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Sincronización de tablas articulo, stocks, pvp, c_pediven y d_pediven con soporte multi-ejercicio.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual Sage 50 &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-agora-pos-retail/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · Ágora POS</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Sincronización Omnicanal con Ágora POS / Retail</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Conexión local .\SQLEXPRESS y actualización delta en menos de 5 segundos tras cada cobro en TPV.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual Ágora POS &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Wolters Kluwer a3ERP</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cómo gestiona Bentian las series de pedidos de venta en CABEPEV?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Puedes asignar una serie exclusiva para el canal online (por ejemplo, <code class="text-zinc-300 font-mono">WEB</code> o <code class="text-zinc-300 font-mono">EC</code>) en la configuración del Agente. Bentian calcula de forma transaccional el siguiente número de documento (<code class="text-zinc-300 font-mono">NUMDOC</code>) dentro de esa serie e inserta tanto la cabecera en <code class="text-zinc-300 font-mono">CABEPEV</code> como las líneas en <code class="text-zinc-300 font-mono">LINEPEV</code>.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Es compatible con autenticación de Windows y autenticación SQL Server?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. El conector soporta tanto <strong>Windows Integrated Security (SSPI)</strong> cuando el Agente corre en el propio servidor de a3ERP, como autenticación mediante usuario y contraseña de SQL Server con permisos acotados a la base de datos de la empresa.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Podemos validar el conector antes de pedir permisos al administrador de sistemas?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Por supuesto. Activa el <strong>Modo Evaluación Sandbox</strong> tras instalar el Agente en cualquier PC Windows y podrás probar el ciclo completo de artículos, stock y pedidos contra tu tienda online usando el dataset simulado de a3ERP.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-teal-950/60 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Conecta Wolters Kluwer a3ERP con tu Tienda Online Hoy</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm">
+        Descarga el instalador para Windows, valida el flujo en Modo Sandbox o conéctate a tu instancia SQL Server local con soporte directo de ingeniería.
+      </p>
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <span>Descargar Instalador Oficial Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol</a>
+        <a href="/simplygest-woocommerce/" class="hover:text-zinc-300 transition">SimplyGest</a>
+        <a href="/sage50-woocommerce/" class="hover:text-zinc-300 transition">Sage 50</a>
+        <a href="/agora-pos-woocommerce/" class="hover:text-zinc-300 transition">Ágora POS</a>
+        <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="hover:text-zinc-300 transition">Manual SQL a3ERP</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

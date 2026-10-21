@@ -54,7 +54,7 @@
       {
         "@type": "SoftwareApplication",
         "name": "Bentian Conector SimplyGest WooCommerce",
-        "softwareVersion": "0.4.7",
+        "softwareVersion": "0.4.8",
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
         "image": "https://bridge.cristianjm.com/assets/og-preview.png",
@@ -255,6 +255,45 @@
       </div>
     </div>
 
+    <!-- Documentación Técnica Oficial de SimplyGest -->
+    <div class="mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Manuales de Ingeniería</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Documentación Técnica Oficial de SimplyGest</h2>
+        </div>
+        <a href="/docs/#cat-simplygest" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">Ver todos los manuales en /docs/ &rarr;</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <a href="/docs/simplygest/localizacion-base-datos/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía #1 · Base de Datos</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Localización de Datos.mdb y Conexión OLEDB</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Rutas estándar en disco C: y red local, esquema de tablas ARTICULOS, CLIENTES y PEDIDOS_VENTA sin bloqueos.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Leer manual técnico &rarr;</span>
+        </a>
+
+        <a href="/docs/simplygest/configuracion-series-almacenes/" class="p-5 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 bg-emerald-950/[0.15] hover:bg-emerald-950/[0.25] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Guía #2 · Parametrización</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Series de Pedidos, Almacenes y Tarifas (1 a 5)</h3>
+            <p class="text-xs text-zinc-300 leading-relaxed">Cómo parametrizar la serie de facturación web en PEDIDOS_VENTA, tarifas PVP con IVA/Recargo y reserva de stock frente al TPV.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Configurar series y tarifas &rarr;</span>
+        </a>
+
+        <a href="/docs/simplygest/sincronizacion-stock-pedidos/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía #3 · Operaciones</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Sincronización de Stock y Descarga de Pedidos</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Flujo transaccional de pedidos web, cola local Store-and-Forward con el PC apagado y protección contra sobreventas.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver flujo operativo &rarr;</span>
+        </a>
+      </div>
+    </div>
+
     <!-- FAQ Section -->
     <div class="mb-16">
       <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre SimplyGest y WooCommerce</h2>
@@ -308,10 +347,12 @@
   <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 flex-wrap">
         <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
         <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol WooCommerce</a>
-        <a href="/docs/simplygest/localizacion-base-datos/" class="hover:text-zinc-300 transition">Documentación SimplyGest</a>
+        <a href="/docs/simplygest/localizacion-base-datos/" class="hover:text-zinc-300 transition">Datos.mdb SimplyGest</a>
+        <a href="/docs/simplygest/configuracion-series-almacenes/" class="hover:text-zinc-300 transition">Series y Tarifas SimplyGest</a>
+        <a href="/docs/simplygest/sincronizacion-stock-pedidos/" class="hover:text-zinc-300 transition">Stock y Pedidos SimplyGest</a>
         <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
       </div>
     </div>

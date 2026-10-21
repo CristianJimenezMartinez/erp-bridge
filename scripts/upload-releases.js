@@ -333,8 +333,8 @@ async function uploadReleases(options = {}) {
             const isLatestOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/releases/latest.json');
             console.log(`  GET https://bridge.cristianjm.com/releases/latest.json: ${isLatestOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
 
-            const isDocHtmlOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html');
-            console.log(`  GET https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.html: ${isDocHtmlOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
+            const isDocHtmlOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/');
+            console.log(`  GET https://bridge.cristianjm.com/docs/seguridad/antivirus-edr-smartscreen/: ${isDocHtmlOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);
 
             const isDocMdOk = await verifyHttpEndpoint('https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.md');
             console.log(`  GET https://bridge.cristianjm.com/docs/windows-antivirus-smartscreen-guide.md: ${isDocMdOk ? '✓ 200 OK' : '⚠️ Falló verificación'}`);

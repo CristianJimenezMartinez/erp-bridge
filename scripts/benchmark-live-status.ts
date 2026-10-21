@@ -113,7 +113,7 @@ async function runBenchmark() {
     { name: '2. Ping Servidor Web & Caddy', url: `${baseUrl}/health`, method: 'GET' },
     { name: '3. Healthcheck Completo (API + PostgreSQL Supabase)', url: `${baseUrl}/api/v1/health`, method: 'GET' },
     { name: '4. Manifiesto Releases & Actualización', url: `${baseUrl}/releases/latest.json`, method: 'GET' },
-    { name: '5. Guía Web SmartScreen & Antivirus', url: `${baseUrl}/docs/windows-antivirus-smartscreen-guide.html`, method: 'GET' },
+    { name: '5. Guía Web SmartScreen & Antivirus', url: `${baseUrl}/docs/seguridad/antivirus-edr-smartscreen/`, method: 'GET' },
     { name: '6. Sitemap SEO Googlebot', url: `${baseUrl}/sitemap.xml`, method: 'GET' },
     { name: '7. Script SSoT de Versionado Dinámico', url: `${baseUrl}/js/version-sync.js`, method: 'GET' },
     { 

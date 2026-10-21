@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Ágora POS / Retail con WooCommerce y Shopify en Tiempo Real | Bentian</title>
+  <meta name="description" content="Sincroniza tu TPV Ágora POS / Retail (SQL Server Express local) con WooCommerce, Shopify y PrestaShop en menos de 5 segundos. Evita sobreventas entre mostrador físico y tienda online.">
+  <meta name="keywords" content="conector agora pos woocommerce, sincronizar agora retail shopify, agora tpv tienda online, conectar agora sql express woocommerce, stock tiempo real agora pos">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/agora-pos-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/agora-pos-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Ágora POS / Retail con WooCommerce y Shopify en Tiempo Real | Bentian">
+  <meta property="og:description" content="Conecta tu TPV Ágora Retail (.\SQLEXPRESS) con WooCommerce y Shopify. Sincronización delta en menos de 5 segundos para evitar sobreventas entre caja física y web.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Ágora POS / Retail con WooCommerce y Shopify en Tiempo Real | Bentian">
+  <meta name="twitter:description" content="Conecta tu TPV Ágora Retail (.\SQLEXPRESS) con WooCommerce y Shopify. Sincronización delta en menos de 5 segundos para evitar sobreventas entre caja física y web.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector Ágora POS WooCommerce y Shopify", "item": "https://bridge.cristianjm.com/agora-pos-woocommerce/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian Conector Ágora POS / Retail con WooCommerce y Shopify",
+        "softwareVersion": "0.4.8",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/agora-pos-woocommerce/",
+        "description": "Conector omnicanal local-first sobre SQL Server Express entre Ágora POS / Retail y tiendas WooCommerce, Shopify y PrestaShop.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-AGORA",
+        "mpn": "EB-048-AGORA",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 14,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo evita Bentian las sobreventas entre el mostrador de Ágora POS y la tienda online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian ejecuta una monitorización diferencial sobre las tablas Stock y WarehouseStock de la instancia local .\\SQLEXPRESS o .\\AGORA. En cuanto un cajero cobra un ticket en el TPV, el cambio de existencias se detecta y se propaga a WooCommerce o Shopify en menos de 5 segundos."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Afecta la sincronización a la velocidad de cobro en las pantallas táctiles TPV?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "En absoluto. El conector utiliza consultas SQL Server con aislamiento no bloqueante WITH (NOLOCK) y filtrado por huella criptográfica en memoria, consumiendo menos del 1% de CPU en el terminal o servidor central de Ágora."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Soy distribuidor de TPV Ágora: puedo hacer una demostración sin conectar una caja real?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. El Agente incorpora un Modo Evaluación Sandbox diseñado para distribuidores e integradores de TPV que emula un entorno completo de Ágora Retail y permite realizar pruebas de sincronización en vivo con cualquier tienda online."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Ágora POS / Retail</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/sql-erps/conector-agora-pos-retail/" class="hidden sm:inline text-sm text-zinc-400 hover:text-white transition">Manual Técnico SQL</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20">
+          Descargar <span data-app-version>v0.4.8</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span>Ágora POS / Retail (.\SQLEXPRESS) ↔ WooCommerce · Shopify · PrestaShop</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Sincronización Omnicanal en &lt;5s entre <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Ágora POS / Retail y tu eCommerce</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Conecta el motor SQL Server local de tu TPV <strong>Ágora Retail / POS</strong> (<code class="text-zinc-300 font-mono">.\SQLEXPRESS</code> o <code class="text-zinc-300 font-mono">.\AGORA</code>) con WooCommerce, Shopify y PrestaShop. Descuenta en la web cada unidad vendida por lector de código de barras en mostrador en menos de 5 segundos y recibe pedidos online listos para preparar en tienda.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Descargar Instalador Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+      <a href="/docs/sql-erps/conector-agora-pos-retail/" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Arquitectura SQL de Ágora POS &rarr;
+      </a>
+    </div>
+
+    <!-- Comparativa Problemas vs Solución -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> El Riesgo del Retail Físico sin Sincronización Real
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Sobreventas de fin de semana: un cliente compra en web un artículo recién agotado en caja.</li>
+          <li>• Sincronizadores por tareas programadas cada hora que llegan tarde en horas punta de tienda.</li>
+          <li>• Ralentización de las pantallas táctiles del TPV por consultas SQL mal optimizadas.</li>
+          <li>• Tarifas de tienda física y ofertas web desalineadas en cambios masivos de precios.</li>
+          <li>• Dependencia de integraciones a medida caras de mantener ante actualizaciones del TPV.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> El Puente Reactivo Bentian para Ágora POS
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• Detección delta ultrarrápida (&lt;5s) tras cada ticket emitido en el mostrador TPV.</li>
+          <li>• Conexión directa a <code>.\SQLEXPRESS</code> / <code>.\AGORA</code> con lecturas <code>WITH (NOLOCK)</code>.</li>
+          <li>• Mapeo nativo de <code>Product</code> / <code>SaleItem</code>, <code>PriceList</code>, <code>WarehouseStock</code> y <code>CustomerOrder</code>.</li>
+          <li>• Buffer de seguridad configurable para proteger la última unidad expuesta en tienda.</li>
+          <li>• <strong>Modo Evaluación Sandbox</strong> ideal para distribuidores oficiales de TPV y comercios.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Captura del Selector Multi-ERP -->
+    <div class="mb-16 rounded-2xl overflow-hidden border border-white/[0.1] bg-[#121215] shadow-2xl">
+      <img src="/assets/screenshots/02-multi-erp-selector.png" alt="Selector Multi-ERP con perfil Ágora POS / Retail en Bentian ERP Bridge" class="w-full h-auto block" loading="lazy">
+      <div class="px-6 py-3.5 bg-zinc-900/90 border-t border-white/[0.06] text-xs text-zinc-400 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <span>Configuración de Ágora POS / Retail sobre SQL Server Express en el Agente Windows</span>
+        <span class="text-emerald-400 font-semibold">Delta Sync &lt;5s · <span data-app-version>v0.4.8</span></span>
+      </div>
+    </div>
+
+    <!-- Mapeo Técnico de Tablas SQL de Ágora POS -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Esquema Relacional TPV</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Entidades SQL Server Mapeadas en Ágora POS / Retail</h2>
+        </div>
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">.\SQLEXPRESS · .\AGORA</span>
+      </div>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-6">
+        El conector opera directamente sobre la base de datos SQL Server de Ágora sin alterar el esquema propietario del fabricante ni requerir paradas del servicio de caja:
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/90 text-zinc-200 border-b border-white/[0.08]">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Tabla SQL Ágora</th>
+              <th class="px-4 py-3 font-semibold">Columnas y Relaciones Clave</th>
+              <th class="px-4 py-3 font-semibold">Función en la Sincronización Omnicanal</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">Product / SaleItem</td>
+              <td class="px-4 py-3 font-mono">Id, Code (SKU / Barcode), Name, FamilyId, VatId, IsActive</td>
+              <td class="px-4 py-3 text-zinc-300">Identificación unívoca por SKU o código EAN-13, formatos de venta, tallas/colores y estado de visibilidad web.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-sky-400 font-bold">PriceList / PriceListItem</td>
+              <td class="px-4 py-3 font-mono">PriceListId, SaleItemId, MainPrice, AddinPrice</td>
+              <td class="px-4 py-3 text-zinc-300">Extracción de la tarifa PVP asignada al canal online o tarifa general de tienda con impuestos incluidos.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-indigo-400 font-bold">Stock / WarehouseStock</td>
+              <td class="px-4 py-3 font-mono">WarehouseId, ProductId, Quantity, MinStock</td>
+              <td class="px-4 py-3 text-zinc-300">Lectura en tiempo real del inventario del almacén de tienda o almacén central tras cada cobro de ticket o recepción.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-violet-400 font-bold">CustomerOrder / Document</td>
+              <td class="px-4 py-3 font-mono">Serie, Number, BusinessDay, CustomerId, TotalAmount, Lines</td>
+              <td class="px-4 py-3 text-zinc-300">Registro de pedidos web entrantes con serie dedicada, desglose de impuestos y bloqueo inmediato de las unidades vendidas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6 Ventajas Clave -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Diseñado para Comercios Minoristas y Distribuidores de TPV</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">1</div>
+          <h4 class="font-semibold text-white mb-1.5">Sincronización Delta &lt;5s</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Solo se transmiten a WooCommerce o Shopify las referencias cuyo stock haya cambiado en los últimos segundos gracias al motor Dirty-Checking SHA-256.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">2</div>
+          <h4 class="font-semibold text-white mb-1.5">Cero Impacto en Pantalla Táctil</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Las lecturas no bloqueantes <code class="text-zinc-300 font-mono">WITH (NOLOCK)</code> garantizan que la apertura de cajón portamonedas e impresión de tickets sea instantánea.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">3</div>
+          <h4 class="font-semibold text-white mb-1.5">Códigos de Barras EAN-13 y SKU</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Emparejamiento flexible por código interno de artículo o código de barras comercial para boutiques, alimentación gourmet, tiendas de deporte y electrónica.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">4</div>
+          <h4 class="font-semibold text-white mb-1.5">Sandbox para Distribuidores TPV</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Los instaladores y distribuidores de Ágora pueden demostrar la integración en portátil usando el Modo Evaluación Sandbox sin necesitar base de datos real.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">5</div>
+          <h4 class="font-semibold text-white mb-1.5">Click &amp; Collect y Envío a Domicilio</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Recibe en el TPV o administración tanto los pedidos para envío por mensajería como las órdenes de recogida en tienda física.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">6</div>
+          <h4 class="font-semibold text-white mb-1.5">Persistencia Nocturna Offline</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Si apagas el TPV al cerrar la persiana del local, los pedidos nocturnos se almacenan de forma segura y entran automáticamente al encender la caja por la mañana.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precios Transparentes y Llave en Mano -->
+    <div class="border border-emerald-500/25 rounded-2xl p-8 bg-gradient-to-br from-emerald-950/20 via-[#121215] to-[#121215] mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Rentabilidad para Comercios y Canal TPV</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Precios Claros para Ágora POS / Retail</h2>
+        <p class="text-sm text-zinc-400 mt-2">Sin límites de artículos ni recargos por volumen de tickets o pedidos web.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-xl bg-[#09090b] border border-white/[0.08] flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-zinc-400 uppercase">Suscripción Mensual</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">29 € <span class="text-sm font-normal text-zinc-400">/ mes + IVA</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Flexibilidad total mes a mes para campañas estacionales.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Conector Ágora POS SQL Server completo</li>
+              <li>✓ Sincronización delta &lt;5s ilimitada</li>
+              <li>✓ Soporte para WooCommerce, Shopify y PrestaShop</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold transition">Elegir Plan Mensual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-emerald-950/25 border-2 border-emerald-500/40 flex flex-col justify-between relative">
+          <div>
+            <span class="text-xs font-mono text-emerald-300 uppercase font-bold">Licencia Anual (Ahorra 43%)</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">199 € <span class="text-sm font-normal text-zinc-300">/ año + IVA</span></div>
+            <p class="text-xs text-zinc-300 mb-4">La opción preferida por tiendas físicas y franquicias retail.</p>
+            <ul class="space-y-2 text-xs text-zinc-200 mb-6">
+              <li>✓ Todo lo incluido en el plan mensual</li>
+              <li>✓ Soporte técnico prioritario y actualizaciones OTA</li>
+              <li>✓ Condiciones especiales para distribuidores TPV</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/20">Activar Licencia Anual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-[#09090b] border border-indigo-500/30 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-indigo-400 uppercase font-semibold">Servicio Opcional de Ingeniería</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">350 € <span class="text-sm font-normal text-zinc-400">pago único</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Puesta en Marcha Llave en Mano en tu TPV o servidor.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Vinculación con tu instancia <code>.\SQLEXPRESS</code></li>
+              <li>✓ Configuración de almacén, tarifa y buffer de stock</li>
+              <li>✓ Test de venta en mostrador y pedido web en vivo</li>
+            </ul>
+          </div>
+          <a href="mailto:cristianjimeneztrabajo@gmail.com?subject=Implantacion%20Llave%20en%20Mano%20Agora%20POS" class="block text-center py-2.5 px-4 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition">Solicitar Llave en Mano</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentación Técnica Oficial SQL Server -->
+    <div class="mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Manuales de Ingeniería</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Documentación Técnica Oficial de Ágora POS y SQL Server</h2>
+        </div>
+        <a href="/docs/#cat-sql-erps" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">Ver categoría SQL ERPs en /docs/ &rarr;</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <a href="/docs/sql-erps/conector-agora-pos-retail/" class="p-5 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 bg-emerald-950/[0.15] hover:bg-emerald-950/[0.25] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Manual Oficial · Ágora POS</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Conector Ágora POS / Retail: SQL Express y Stock Omnicanal</h3>
+            <p class="text-xs text-zinc-300 leading-relaxed">Parámetros de conexión a .\SQLEXPRESS, tablas Product, PriceList y WarehouseStock, y sincronización delta en menos de 5 segundos.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Leer manual de Ágora POS &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-sage50-sql-server/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · Sage 50</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Arquitectura SQL Server en Sage 50 España</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Mapeo de tablas articulo, stocks, pvp, c_pediven y d_pediven con soporte de IVA y Recargo de Equivalencia.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual Sage 50 &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · a3ERP</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Integración Wolters Kluwer a3ERP con Tiendas Online</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Sincronización sobre ARTICULO, STOCKALM, CABEPEV y LINEPEV para proyectos B2B e industriales.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual a3ERP &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Ágora POS / Retail</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿En qué equipo se instala el Agente de Bentian cuando tenemos varios terminales TPV?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Solo necesitas instalar el Agente en el terminal TPV principal que actúa como servidor de base de datos (<code class="text-zinc-300 font-mono">.\SQLEXPRESS</code> o <code class="text-zinc-300 font-mono">.\AGORA</code>) o en cualquier ordenador de backoffice dentro de la misma red local. Todos los cobros realizados desde los TPV secundarios se consolidan en esa instancia SQL y se sincronizan automáticamente con la web.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cómo reservo stock para que la web no venda la última unidad expuesta en vitrina?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Desde la configuración local de Bentian puedes establecer un <strong>Buffer de Stock de Seguridad</strong> (por ejemplo, 1 o 2 unidades) o bien sincronizar exclusivamente contra el almacén secundario de reserva, manteniendo el stock de vitrina protegido para el cliente presencial.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Ofrecéis acuerdos para distribuidores e instaladores de TPV Ágora?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Sí. Contamos con un programa de partners y licencias Reseller multi-tenant que permite gestionar las tiendas conectadas de tus clientes desde un único panel centralizado y hacer demostraciones comerciales con el Modo Evaluación Sandbox.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-teal-950/60 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Unifica tu Mostrador Ágora POS con tu Tienda Online</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm">
+        Descarga el agente oficial para Windows, conéctate a tu instancia SQL Express en minutos y olvídate para siempre de las roturas de stock omnicanal.
+      </p>
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <span>Descargar Instalador Oficial Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol</a>
+        <a href="/simplygest-woocommerce/" class="hover:text-zinc-300 transition">SimplyGest</a>
+        <a href="/sage50-woocommerce/" class="hover:text-zinc-300 transition">Sage 50</a>
+        <a href="/a3erp-woocommerce/" class="hover:text-zinc-300 transition">a3ERP</a>
+        <a href="/docs/sql-erps/conector-agora-pos-retail/" class="hover:text-zinc-300 transition">Manual SQL Ágora</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Sage 50 WooCommerce, PrestaShop y Shopify — SQL Server Local | Bentian</title>
+  <meta name="description" content="Conecta Sage 50 (SQL Server local) con WooCommerce, PrestaShop y Shopify en tiempo real. Sincroniza tablas articulo, stocks, tarifas pvp y pedidos c_pediven sin bloqueos ni cuotas por pedido.">
+  <meta name="keywords" content="conector sage 50 woocommerce, sincronizar sage 50 prestashop, conector sage 50 shopify, sage 50 sql server ecommerce, integracion sage 50 tienda online, c_pediven d_pediven sage 50">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/sage50-woocommerce/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/sage50-woocommerce/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Sage 50 WooCommerce, PrestaShop y Shopify — SQL Server Local | Bentian">
+  <meta property="og:description" content="Sincroniza tu instancia SQL Server de Sage 50 con WooCommerce, PrestaShop y Shopify en tiempo real. Lecturas no bloqueantes WITH (NOLOCK), tarifas multiescalón, Recargo de Equivalencia y Modo Sandbox.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Sage 50 WooCommerce, PrestaShop y Shopify — SQL Server Local | Bentian">
+  <meta name="twitter:description" content="Sincroniza tu instancia SQL Server de Sage 50 con WooCommerce, PrestaShop y Shopify en tiempo real. Lecturas no bloqueantes WITH (NOLOCK), tarifas multiescalón, Recargo de Equivalencia y Modo Sandbox.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://bridge.cristianjm.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Conector Sage 50 WooCommerce", "item": "https://bridge.cristianjm.com/sage50-woocommerce/" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Bentian Conector Sage 50 WooCommerce, PrestaShop y Shopify",
+        "softwareVersion": "0.4.8",
+        "operatingSystem": "Windows 10, Windows 11, Windows Server",
+        "applicationCategory": "BusinessApplication",
+        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "url": "https://bridge.cristianjm.com/sage50-woocommerce/",
+        "description": "Conector local-first sobre SQL Server en tiempo real entre Sage 50 España y tiendas WooCommerce, PrestaShop y Shopify.",
+        "brand": {
+          "@type": "Brand",
+          "name": "Bentian"
+        },
+        "sku": "BENTIAN-ERP-BRIDGE-SAGE50",
+        "mpn": "EB-048-SAGE50",
+        "offers": {
+          "@type": "Offer",
+          "price": "199.00",
+          "priceCurrency": "EUR",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://bridge.cristianjm.com/#pricing",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Bentian"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": "0.00",
+              "currency": "EUR"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "ES"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 0,
+                "unitCode": "DAY"
+              }
+            }
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "ES",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 14,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Cómo se conecta Bentian con la base de datos SQL Server de Sage 50?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bentian se ejecuta localmente en tu servidor o puesto Windows y conecta de forma directa mediante ADO/SQLOLEDB o SQL Server Native Client a la instancia local de Sage 50 (.\\SAGE50 o .\\SQLEXPRESS) sobre la base de datos del ejercicio activo, sin abrir puertos al exterior."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Bloquea las tablas de Sage 50 mientras facturamos o contabilizamos?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Todas las lecturas de catálogo y existencias utilizan hints explícitos WITH (NOLOCK) y aislamiento no bloqueante en SQL Server, completando las consultas diferenciales en menos de 25 milisegundos sin interferir con el trabajo de oficina ni TPV."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿En qué tablas de Sage 50 se registran los pedidos web y clientes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "El conector verifica o da de alta al comprador en la tabla clientes y registra atómicamente la cabecera del pedido en c_pediven y las líneas de detalle en d_pediven, respetando el IVA (21%, 10%, 4%) y el Recargo de Equivalencia."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Puedo probar la integración si aún no tengo acceso al servidor de Sage 50?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. El Agente incluye un Modo Evaluación Sandbox integrado que simula un entorno completo de Sage 50 con artículos, stock multialmacén, tarifas PVP y recepción de pedidos reales desde tu WooCommerce, PrestaShop o Shopify de pruebas."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Sage 50 SQL Server</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/docs/sql-erps/conector-sage50-sql-server/" class="hidden sm:inline text-sm text-zinc-400 hover:text-white transition">Manual Técnico SQL</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20">
+          Descargar <span data-app-version>v0.4.8</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+    
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-6">
+      <span>Sage 50 España (SQL Server Local) ↔ WooCommerce · PrestaShop · Shopify</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector SQL Server Local-First entre <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Sage 50 y tu Tienda Online</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-10 leading-relaxed">
+      Sincroniza existencias multialmacén, tarifas comerciales y pedidos en tiempo real directamente contra la instancia Microsoft SQL Server de <strong>Sage 50</strong> (<code class="text-zinc-300 font-mono">articulo</code>, <code class="text-zinc-300 font-mono">stocks</code>, <code class="text-zinc-300 font-mono">pvp</code>, <code class="text-zinc-300 font-mono">c_pediven</code> y <code class="text-zinc-300 font-mono">d_pediven</code>). Lecturas no bloqueantes <code class="text-emerald-400 font-mono">WITH (NOLOCK)</code>, sin pasarelas cloud intermedias y sin comisiones por pedido.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Descargar Instalador Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+      <a href="/docs/sql-erps/conector-sage50-sql-server/" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">
+        Ver Esquema SQL y Manual de Ingeniería &rarr;
+      </a>
+    </div>
+
+    <!-- Comparativa Problemas vs Solución -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <div class="p-6 rounded-2xl border border-red-500/20 bg-red-500/[0.03]">
+        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center gap-2">
+          <span>❌</span> Cuellos de Botella en Conectores Tradicionales para Sage 50
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-400">
+          <li>• Conectores web que exigen abrir el puerto TCP <code>1433</code> de SQL Server a Internet.</li>
+          <li>• Bloqueos de tabla (<em>Table Locks</em>) cuando administración factura mientras la web sincroniza.</li>
+          <li>• Descuadres de IVA y Recargo de Equivalencia al importar pedidos de distribuidores B2B.</li>
+          <li>• Problemas al cambiar de ejercicio contable en Sage 50 o gestionar múltiples almacenes.</li>
+          <li>• Cuotas mensuales abusivas por volumen de referencias o número de pedidos sincronizados.</li>
+        </ul>
+      </div>
+
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h3 class="text-lg font-bold text-emerald-400 mb-3 flex items-center gap-2">
+          <span>✅</span> Ingeniería Bentian SQL Server Local-First
+        </h3>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+          <li>• Conexión interna en LAN (<code>.\SAGE50</code> o <code>.\SQLEXPRESS</code>) con 0 puertos expuestos.</li>
+          <li>• Consultas diferenciales con hint <code>WITH (NOLOCK)</code> en menos de 25 ms sin bloqueos.</li>
+          <li>• Mapeo nativo de <code>articulo</code>, <code>stocks</code>, <code>pvp</code>, <code>clientes</code>, <code>c_pediven</code> y <code>d_pediven</code>.</li>
+          <li>• Cuadre fiscal al céntimo: IVA 21% / 10% / 4% y Recargo de Equivalencia (5,2% / 1,4% / 0,5%).</li>
+          <li>• Incluye <strong>Modo Evaluación Sandbox</strong> para probar sin tener Sage 50 instalado.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Captura del Selector Multi-ERP -->
+    <div class="mb-16 rounded-2xl overflow-hidden border border-white/[0.1] bg-[#121215] shadow-2xl">
+      <img src="/assets/screenshots/02-multi-erp-selector.png" alt="Configuración de Sage 50 SQL Server y Modo Evaluación Sandbox en Bentian ERP Bridge" class="w-full h-auto block" loading="lazy">
+      <div class="px-6 py-3.5 bg-zinc-900/90 border-t border-white/[0.06] text-xs text-zinc-400 font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <span>Interfaz local del Agente Windows (http://127.0.0.1:39281) con soporte nativo para Sage 50 y Modo Sandbox</span>
+        <span class="text-emerald-400 font-semibold">Motor Polimórfico SQL Server · <span data-app-version>v0.4.8</span></span>
+      </div>
+    </div>
+
+    <!-- Mapeo Técnico de Tablas SQL de Sage 50 -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Arquitectura Relacional</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Mapeo Directo sobre el Esquema SQL de Sage 50</h2>
+        </div>
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">WITH (NOLOCK) · Transacción ACID</span>
+      </div>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-6">
+        El adaptador <code class="text-zinc-200 font-mono">SqlServerBaseAdapter</code> para Sage 50 se comunica directamente con la base de datos del ejercicio activo de tu empresa en Microsoft SQL Server, manteniendo la integridad referencial en todo momento:
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/90 text-zinc-200 border-b border-white/[0.08]">
+            <tr>
+              <th class="px-4 py-3 font-semibold">Tabla SQL Sage 50</th>
+              <th class="px-4 py-3 font-semibold">Columnas Principales Mapeadas</th>
+              <th class="px-4 py-3 font-semibold">Operación en Bentian ERP Bridge</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">dbo.articulo</td>
+              <td class="px-4 py-3 font-mono">CODIGO, NOMBRE, FAMILIA, TIPO_IVA, BAJA, PESO</td>
+              <td class="px-4 py-3 text-zinc-300">Lectura del maestro de artículos, agrupación por familias y filtrado de referencias activas para el catálogo web.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-sky-400 font-bold">dbo.stocks</td>
+              <td class="px-4 py-3 font-mono">ARTICULO, ALMACEN, FINAL, RESERVADO, DISPONIBLE</td>
+              <td class="px-4 py-3 text-zinc-300">Cálculo en vivo de existencias por almacén específico o consolidado multialmacén, aplicando buffer de seguridad.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-indigo-400 font-bold">dbo.pvp</td>
+              <td class="px-4 py-3 font-mono">ARTICULO, TARIFA, PVP, IVA_INC</td>
+              <td class="px-4 py-3 text-zinc-300">Sincronización de tarifas multiescalón (Tarifa General B2C, Tarifa Web o Tarifas Mayoristas B2B).</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-amber-400 font-bold">dbo.clientes</td>
+              <td class="px-4 py-3 font-mono">CODIGO, CIF, NOMBRE, DIRECCION, CODPOST, EMAIL, RECARGO</td>
+              <td class="px-4 py-3 text-zinc-300">Identificación automática por NIF/CIF o email y alta contable inmediata de nuevos compradores online.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-violet-400 font-bold">dbo.c_pediven</td>
+              <td class="px-4 py-3 font-mono">EMPRESA, NUMERO, LETRA, FECHA, CLIENTE, TOTALPED, OBSERVACIO</td>
+              <td class="px-4 py-3 text-zinc-300">Inyección transaccional de la cabecera del pedido de venta con control de idempotencia anti-duplicados.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-rose-400 font-bold">dbo.d_pediven</td>
+              <td class="px-4 py-3 font-mono">EMPRESA, NUMERO, LETRA, LINIA, ARTICULO, UNIDADES, PRECIO, DTO1, IVA, RECARGO</td>
+              <td class="px-4 py-3 text-zinc-300">Inserción del desglose de líneas de productos, gastos de envío, tipos de IVA (21%/10%/4%) y Recargo de Equivalencia.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6 Ventajas Clave -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Capacidades de Ingeniería para Sage 50</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">1</div>
+          <h4 class="font-semibold text-white mb-1.5">Lecturas WITH (NOLOCK)</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Consultas SQL optimizadas que jamás bloquean los cierres de caja, albaranes ni asientos contables de los usuarios en red local.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">2</div>
+          <h4 class="font-semibold text-white mb-1.5">Tarifas Multiescalón PVP</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Publica en WooCommerce, PrestaShop o Shopify la tarifa exacta de la tabla <code class="text-zinc-300 font-mono">pvp</code> que corresponda a tu estrategia comercial.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">3</div>
+          <h4 class="font-semibold text-white mb-1.5">IVA y Recargo de Equivalencia</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Desglose automático de tipos impositivos españoles (21%, 10%, 4%) y recargos (5,2%, 1,4%, 0,5%) en <code class="text-zinc-300 font-mono">d_pediven</code> sin descuadres de céntimos.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">4</div>
+          <h4 class="font-semibold text-white mb-1.5">Modo Evaluación Sandbox</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Prueba todo el flujo bidireccional en tu propio PC Windows aunque no tengas Sage 50 ni SQL Server instalados todavía.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">5</div>
+          <h4 class="font-semibold text-white mb-1.5">Cola Store-and-Forward</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Si el servidor de Sage 50 entra en mantenimiento o copia de seguridad nocturna, los pedidos web se encolan y se inyectan automáticamente al reconectar.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">6</div>
+          <h4 class="font-semibold text-white mb-1.5">Soporte Multi-Ejercicio</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Cambio limpio de base de datos SQL al iniciar un nuevo año fiscal en Sage 50 conservando intacto el mapeo de productos y series.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precios Transparentes y Llave en Mano -->
+    <div class="border border-emerald-500/25 rounded-2xl p-8 bg-gradient-to-br from-emerald-950/20 via-[#121215] to-[#121215] mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Tarifa Plana B2B · Sin Comisiones por Pedido</span>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Planes de Licencia y Puesta en Marcha para Sage 50</h2>
+        <p class="text-sm text-zinc-400 mt-2">Catálogo e inventario ilimitados. Cancela o cambia de modalidad cuando quieras.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-xl bg-[#09090b] border border-white/[0.08] flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-zinc-400 uppercase">Suscripción Mensual</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">29 € <span class="text-sm font-normal text-zinc-400">/ mes + IVA</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Ideal para validar en producción sin compromiso anual.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Conector Sage 50 SQL Server completo</li>
+              <li>✓ Sincronización ilimitada de stock y pedidos</li>
+              <li>✓ Actualizaciones firmadas Ed25519 incluidas</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-white text-xs font-semibold transition">Elegir Plan Mensual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-emerald-950/25 border-2 border-emerald-500/40 flex flex-col justify-between relative">
+          <div>
+            <span class="text-xs font-mono text-emerald-300 uppercase font-bold">Licencia Anual (Ahorra 43%)</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">199 € <span class="text-sm font-normal text-zinc-300">/ año + IVA</span></div>
+            <p class="text-xs text-zinc-300 mb-4">El estándar para pymes y distribuidores con Sage 50.</p>
+            <ul class="space-y-2 text-xs text-zinc-200 mb-6">
+              <li>✓ Todo lo incluido en el plan mensual</li>
+              <li>✓ Soporte técnico prioritario directo con ingeniería</li>
+              <li>✓ Multi-tarifa PVP y Recargo de Equivalencia</li>
+            </ul>
+          </div>
+          <a href="/#pricing" class="block text-center py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/20">Activar Licencia Anual</a>
+        </div>
+
+        <div class="p-6 rounded-xl bg-[#09090b] border border-indigo-500/30 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-mono text-indigo-400 uppercase font-semibold">Servicio Opcional de Ingeniería</span>
+            <div class="text-3xl font-extrabold text-white mt-2 mb-1">350 € <span class="text-sm font-normal text-zinc-400">pago único</span></div>
+            <p class="text-xs text-zinc-400 mb-4">Puesta en Marcha Llave en Mano en tu servidor.</p>
+            <ul class="space-y-2 text-xs text-zinc-300 mb-6">
+              <li>✓ Conexión asistida a tu SQL Server de Sage 50</li>
+              <li>✓ Mapeo de series (<code>LETRA</code>), almacenes y tarifas</li>
+              <li>✓ Pruebas reales de pedido e impuestos en vivo</li>
+            </ul>
+          </div>
+          <a href="mailto:cristianjimeneztrabajo@gmail.com?subject=Implantacion%20Llave%20en%20Mano%20Sage%2050" class="block text-center py-2.5 px-4 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition">Solicitar Llave en Mano</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentación Técnica Oficial SQL Server -->
+    <div class="mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Manuales de Ingeniería</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Documentación Técnica Oficial de Conectores SQL Server</h2>
+        </div>
+        <a href="/docs/#cat-sql-erps" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">Ver categoría SQL ERPs en /docs/ &rarr;</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <a href="/docs/sql-erps/conector-sage50-sql-server/" class="p-5 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 bg-emerald-950/[0.15] hover:bg-emerald-950/[0.25] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Manual Oficial · Sage 50</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Arquitectura SQL Server en Sage 50: Tablas y Pedidos</h3>
+            <p class="text-xs text-zinc-300 leading-relaxed">Instancia local SQL, mapeo de articulo, stocks, pvp, c_pediven y d_pediven, credenciales de mínimo privilegio y JSON de configuración.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Leer manual de Sage 50 &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-agora-pos-retail/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · Ágora POS</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Sincronización en Tiempo Real con Ágora POS / Retail</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Conexión con .\SQLEXPRESS, actualización delta en menos de 5 segundos tras cobro en TPV y prevención de sobreventas omnicanal.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual Ágora POS &rarr;</span>
+        </a>
+
+        <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition group flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Guía SQL · a3ERP</span>
+            <h3 class="text-sm font-bold text-white group-hover:text-emerald-300 transition mt-3 mb-2">Integración Wolters Kluwer a3ERP sobre SQL Server</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Mapeo de tablas ARTICULO, STOCKALM, CABEPEV y LINEPEV, tarifas B2B/B2C y cola transaccional Store-and-Forward.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4 group-hover:underline">Ver manual a3ERP &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas Frecuentes sobre Sage 50 y Comercio Electrónico</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Necesito abrir puertos en el router o exponer SQL Server a Internet?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            No. El Agente de Bentian se instala dentro de tu red local Windows y lee tu instancia de SQL Server localmente. Toda la comunicación con WooCommerce, PrestaShop o Shopify se realiza mediante peticiones salientes HTTPS autenticadas con firma criptográfica.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Qué ocurre cuando creamos un nuevo ejercicio contable en Sage 50?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            En Sage 50 cada ejercicio o grupo de empresa suele corresponder a una base de datos SQL Server (por ejemplo, <code class="text-zinc-300 font-mono">2026AA</code>). Desde el panel local de Bentian puedes actualizar el nombre de la base de datos activa en un clic sin perder la configuración de series, almacenes ni el historial de pedidos sincronizados.
+          </p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cómo funciona el Modo Evaluación Sandbox para Sage 50?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">
+            Al activar el switch <strong>Modo Evaluación (Sandbox Demo)</strong> en el panel del Agente (<code class="text-zinc-300 font-mono">http://127.0.0.1:39281</code>), Bentian emula en memoria las tablas <code class="text-zinc-300 font-mono">articulo</code>, <code class="text-zinc-300 font-mono">stocks</code>, <code class="text-zinc-300 font-mono">pvp</code> y <code class="text-zinc-300 font-mono">c_pediven</code> con un catálogo de prueba realista. Así puedes verificar la sincronización con tu tienda online antes de introducir las credenciales SQL de producción.
+          </p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Final CTA Banner -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-teal-950/60 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Conecta Sage 50 con WooCommerce, PrestaShop o Shopify Hoy</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm">
+        Descarga el instalador para Windows, pruébalo en Modo Sandbox en menos de 2 minutos o conéctalo a tu SQL Server local sin comprometer el rendimiento de tu empresa.
+      </p>
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <span>Descargar Instalador Oficial Windows (<span data-app-version>v0.4.8</span>)</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol</a>
+        <a href="/simplygest-woocommerce/" class="hover:text-zinc-300 transition">SimplyGest</a>
+        <a href="/agora-pos-woocommerce/" class="hover:text-zinc-300 transition">Ágora POS</a>
+        <a href="/a3erp-woocommerce/" class="hover:text-zinc-300 transition">a3ERP</a>
+        <a href="/docs/sql-erps/conector-sage50-sql-server/" class="hover:text-zinc-300 transition">Manual SQL Sage 50</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

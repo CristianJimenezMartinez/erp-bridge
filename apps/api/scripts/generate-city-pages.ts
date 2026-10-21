@@ -86,7 +86,27 @@ function renderHeader(currentVersion: string): string {
   </header>`;
 }
 
-function renderCityPage(city: CityData, currentVersion: string): string {
+function renderCityPage(city: CityData, allCities: CityData[], currentVersion: string): string {
+  const sameRegionCities = allCities.filter((c) => c.region === city.region && c.slug !== city.slug);
+  const topNationalCorridors = allCities
+    .filter((c) => c.region !== city.region && c.slug !== city.slug && ['madrid', 'barcelona', 'valencia', 'sevilla', 'bilbao', 'zaragoza', 'malaga', 'murcia', 'coruna', 'gijon', 'castellon', 'burgos', 'cordoba', 'granada'].includes(c.slug))
+    .slice(0, Math.max(4, 10 - sameRegionCities.length));
+  const relatedCities = [...sameRegionCities, ...topNationalCorridors].slice(0, 12);
+
+  const relatedCitiesHtml = relatedCities
+    .map(
+      (rc) => `
+        <a href="/conector-factusol/${rc.slug}/" class="px-3.5 py-2.5 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 hover:bg-zinc-900 transition flex items-center justify-between gap-2 group">
+          <div>
+            <span class="text-xs font-semibold text-white group-hover:text-indigo-300 transition block">${rc.name}</span>
+            <span class="text-[10px] text-zinc-500 font-mono">${rc.province} • ${rc.region}</span>
+          </div>
+          <span class="text-xs text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+        </a>`
+    )
+    .join('\n');
+
+  const hubNamesInline = city.industrialHubs.map((h) => h.name).join(', ');
   const hubsHtml = city.industrialHubs
     .map(
       (hub) => `
@@ -231,14 +251,15 @@ function renderCityPage(city: CityData, currentVersion: string): string {
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
         "softwareVersion": "${currentVersion}",
+        "dateModified": "2026-10-21T19:00:00+02:00",
         "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
-        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "image": "https://bridge.cristianjm.com/assets/screenshots/01-dashboard-overview.png",
         "brand": {
           "@type": "Brand",
           "name": "Bentian"
         },
-        "sku": "BENTIAN-ERP-BRIDGE-ANNUAL",
-        "mpn": "EB-037",
+        "sku": "BENTIAN-ERP-BRIDGE-${city.slug.toUpperCase()}",
+        "mpn": "EB-${currentVersion.replace(/\./g, '')}-${city.slug.toUpperCase()}",
         "offers": {
           "@type": "Offer",
           "price": "199.00",
@@ -365,28 +386,78 @@ ${renderHeader(currentVersion)}
       </div>
     </section>
 
-    <!-- Cómo Funciona (Arquitectura Local-First) -->
+    <!-- Cómo Funciona y Matriz Técnica Local en ${city.name} -->
     <section class="py-16 md:py-20 px-6 border-b border-white/[0.08] bg-[#09090b]">
       <div class="max-w-5xl mx-auto">
-        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First: Máxima Privacidad y Cero Caídas</h2>
-        <p class="text-sm text-zinc-400 text-center max-w-2xl mx-auto mb-12">
-          A diferencia de los conectores que exigen subir tu base de datos contable a servidores de terceros, Bentian se ejecuta en tu propio ordenador en ${city.name}.
+        <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-4">Arquitectura Local-First para Empresas de ${city.name} (${city.province})</h2>
+        <p class="text-sm text-zinc-400 text-center max-w-3xl mx-auto mb-10">
+          A diferencia de los plugins PHP o conectores cloud que exigen exponer tu servidor, Bentian opera directamente dentro de la red local de tu nave o comercio en <strong>${hubNamesInline}</strong>, manteniendo la base de datos de Factusol blindada en tus equipos Windows.
         </p>
-        <div class="grid md:grid-cols-3 gap-8">
+
+        <div class="mb-12 rounded-2xl overflow-hidden border border-white/[0.1] bg-[#121215] shadow-2xl">
+          <img src="/assets/screenshots/01-dashboard-overview.png" alt="Panel de control del conector Factusol Bentian ERP Bridge en ${city.name} (${city.province})" class="w-full h-auto block" loading="lazy">
+          <div class="px-4 py-2.5 bg-zinc-900/90 border-t border-white/[0.06] text-[11px] text-zinc-400 font-mono flex flex-wrap items-center justify-between gap-2">
+            <span>Monitor de telemetría OLEDB y cola Store-and-Forward para instalaciones en ${city.name} (${city.region})</span>
+            <span class="text-emerald-400 font-semibold">Latencia local &lt;15 ms • Cero bloqueos .laccdb</span>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-12">
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">1</div>
-            <h3 class="text-base font-semibold text-white mb-2">Lectura Directa Factusol</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente se conecta directamente al archivo .accdb o .mdb mediante OLEDB en menos de 100 ms. Cero lentitud.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Lectura Directa OLEDB (F_ART y F_LTA)</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">El agente consulta el archivo <code class="text-zinc-300 font-mono">.accdb</code> en disco local o servidor NAS (<a href="/docs/factusol/rutas-red-nas-anti-wiping/" class="text-indigo-400 hover:underline">protección Anti-Wiping UNC</a>) en modo <code class="text-zinc-300 font-mono">Share Deny None</code> sin bloquear los puestos de mostrador en ${city.name}.</p>
           </div>
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">2</div>
-            <h3 class="text-base font-semibold text-white mb-2">Detección Inteligente de Stock</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula el stock disponible real (DISSTO) excluyendo mercancía reservada o pendiente de servir para evitar sobreventas.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Stock Disponible Real (DISSTO)</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Calcula la <a href="/docs/factusol/calculo-stock-disponible/" class="text-indigo-400 hover:underline">fórmula oficial DISSTO en F_STO</a> descontando mercancía reservada por clientes de almacén y pedidos pendientes de servir para impedir roturas de stock.</p>
           </div>
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold mb-4">3</div>
-            <h3 class="text-base font-semibold text-white mb-2">Buffer Store-and-Forward</h3>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la conexión de internet de tu nave o polígono sufre cortes, los pedidos se retienen y se vuelcan automáticamente al volver la red.</p>
+            <h3 class="text-base font-semibold text-white mb-2">Cola Store-and-Forward e IVA/Recargo</h3>
+            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Si la fibra del polígono sufre microcortes o el PC se apaga por la noche, la <a href="/docs/arquitectura/cola-store-and-forward/" class="text-indigo-400 hover:underline">cola persistente</a> retiene los pedidos web y los inyecta en <code class="text-zinc-300 font-mono">F_PCL / F_LPC</code> con cuadre al céntimo de IVA y <a href="/docs/fiscalidad/recargo-de-equivalencia/" class="text-indigo-400 hover:underline">Recargo de Equivalencia</a>.</p>
+          </div>
+        </div>
+
+        <!-- Tabla de Especificaciones Técnicas para Implantadores y Pymes en ${city.name} -->
+        <div class="rounded-2xl border border-white/[0.08] bg-[#121215] overflow-hidden">
+          <div class="px-6 py-4 bg-zinc-900/80 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h3 class="text-sm font-bold text-white">Especificaciones de Integración ERP y Red Local en ${city.name}</h3>
+            <span class="text-[11px] font-mono text-indigo-400">Compatible Multi-ERP Windows (v${currentVersion})</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-zinc-900/40 text-zinc-400 border-b border-white/[0.06]">
+                <tr>
+                  <th class="px-5 py-3 font-semibold">Parámetro Técnico</th>
+                  <th class="px-5 py-3 font-semibold">Soporte Nativo en ${city.name} (${city.province})</th>
+                  <th class="px-5 py-3 font-semibold">Referencia de Ingeniería</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.06] text-zinc-300">
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">ERPs de Escritorio Soportados</td>
+                  <td class="px-5 py-3">Factusol (<code class="font-mono text-indigo-300">.accdb</code>), SimplyGest (<code class="font-mono text-emerald-300">Datos.mdb</code>), Ágora POS, Sage 50 y a3ERP (SQL Server Local)</td>
+                  <td class="px-5 py-3"><a href="/docs/arquitectura/arquitectura-polimorfica-multi-erp/" class="text-indigo-400 hover:underline">Arquitectura Multi-ERP &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Topologías de Red en ${city.region}</td>
+                  <td class="px-5 py-3">Monopuesto Windows 10/11, Windows Server en nave industrial (${hubNamesInline}) y rutas UNC en NAS</td>
+                  <td class="px-5 py-3"><a href="/docs/factusol/localizacion-base-datos/" class="text-indigo-400 hover:underline">Rutas Factusol y NAS &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Canales eCommerce Conectados</td>
+                  <td class="px-5 py-3">WooCommerce (HPOS REST v3), PrestaShop 1.7 / 8.x, Shopify GraphQL y Endpoint PHP Universal en Plesk</td>
+                  <td class="px-5 py-3"><a href="/docs/canales/woocommerce/" class="text-indigo-400 hover:underline">Guía WooCommerce &rarr;</a></td>
+                </tr>
+                <tr>
+                  <td class="px-5 py-3 font-medium text-white">Cumplimiento Fiscal y Veri*Factu</td>
+                  <td class="px-5 py-3">Inyección exclusiva en pedidos de cliente (<code class="font-mono text-indigo-300">F_PCL</code> Serie 1), 100% respetuoso con RD 1007/2023 Veri*Factu</td>
+                  <td class="px-5 py-3"><a href="/docs/fiscalidad/verifactu-ley-antifraude/" class="text-indigo-400 hover:underline">Normativa Veri*Factu &rarr;</a></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -398,6 +469,22 @@ ${renderHeader(currentVersion)}
         <h2 class="text-2xl md:text-3xl font-bold text-white text-center mb-10">Preguntas Frecuentes en ${city.name}</h2>
         <div class="space-y-4">
           ${faqsHtml}
+        </div>
+      </div>
+    </section>
+
+    <!-- Malla de Enlazado Regional y Corredores Industriales -->
+    <section class="py-14 px-6 border-b border-white/[0.08] bg-[#09090b]">
+      <div class="max-w-5xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 font-semibold">Red Logística en ${city.region} y España</span>
+            <h2 class="text-xl md:text-2xl font-bold text-white mt-1">Conector Factusol en Ciudades Cercanas y Polígonos Conectados</h2>
+          </div>
+          <a href="/conector-factusol/" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">Explorar las 52 áreas industriales &rarr;</a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          ${relatedCitiesHtml}
         </div>
       </div>
     </section>
@@ -866,21 +953,18 @@ ${renderHeader(currentVersion)}
 }
 
 function updateSitemap(cities: CityData[]) {
-  if (!fs.existsSync(SITEMAP_FILE)) {
-    console.warn(`[cities] Sitemap no encontrado en ${SITEMAP_FILE}`);
-    return;
-  }
-
-  let sitemap = fs.readFileSync(SITEMAP_FILE, 'utf8');
-
-  // Asegurar entrada del Hub central
+  const currentDate = '2026-10-21T19:00:00+02:00';
   const hubUrl = 'https://bridge.cristianjm.com/conector-factusol/';
-  if (!sitemap.includes(hubUrl)) {
-    const hubEntry = `
+
+  if (fs.existsSync(SITEMAP_FILE)) {
+    let sitemap = fs.readFileSync(SITEMAP_FILE, 'utf8');
+
+    if (!sitemap.includes(hubUrl)) {
+      const hubEntry = `
   <!-- Hub Nacional: Conector Factusol por Ciudades -->
   <url>
     <loc>${hubUrl}</loc>
-    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="${hubUrl}" />
@@ -888,18 +972,22 @@ function updateSitemap(cities: CityData[]) {
     <xhtml:link rel="alternate" hreflang="x-default" href="${hubUrl}" />
   </url>
 `;
-    sitemap = sitemap.replace('</urlset>', `${hubEntry}</urlset>`);
-  }
+      sitemap = sitemap.replace('</urlset>', `${hubEntry}</urlset>`);
+    } else {
+      sitemap = sitemap.replace(
+        /(<loc>https:\/\/bridge\.cristianjm\.com\/conector-factusol\/<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i,
+        `$1${currentDate}$2`
+      );
+    }
 
-  // Asegurar cada ciudad
-  for (const c of cities) {
-    const cityUrl = `https://bridge.cristianjm.com/conector-factusol/${c.slug}/`;
-    if (!sitemap.includes(cityUrl)) {
-      const cityEntry = `
+    for (const c of cities) {
+      const cityUrl = `https://bridge.cristianjm.com/conector-factusol/${c.slug}/`;
+      if (!sitemap.includes(cityUrl)) {
+        const cityEntry = `
   <!-- Conector Factusol: ${c.name} (${c.province}) -->
   <url>
     <loc>${cityUrl}</loc>
-    <lastmod>2026-10-04T09:30:00+02:00</lastmod>
+    <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="es-ES" href="${cityUrl}" />
@@ -907,12 +995,60 @@ function updateSitemap(cities: CityData[]) {
     <xhtml:link rel="alternate" hreflang="x-default" href="${cityUrl}" />
   </url>
 `;
-      sitemap = sitemap.replace('</urlset>', `${cityEntry}</urlset>`);
+        sitemap = sitemap.replace('</urlset>', `${cityEntry}</urlset>`);
+      } else {
+        const reg = new RegExp(`(<loc>https:\\/\\/bridge\\.cristianjm\\.com\\/conector-factusol\\/${c.slug}\\/<\\/loc>\\s*<lastmod>)[^<]+(<\\/lastmod>)`, 'i');
+        sitemap = sitemap.replace(reg, `$1${currentDate}$2`);
+      }
     }
+
+    fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
+    console.log(`✓ [sitemap] Sitemap principal actualizado con lastmod ${currentDate} para las ${cities.length} ciudades.`);
   }
 
-  fs.writeFileSync(SITEMAP_FILE, sitemap, 'utf8');
-  console.log(`✓ [sitemap] Sitemap actualizado con URLs de ciudades`);
+  // Regenerar sitemap-ciudades.xml y actualizar sitemap-index.xml
+  const SITEMAP_CITIES_FILE = path.resolve(PUBLIC_DIR, 'sitemap-ciudades.xml');
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;
+  xml += `        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n\n`;
+  xml += `  <!-- Hub Nacional: Conector Factusol por Ciudades -->\n`;
+  xml += `  <url>\n`;
+  xml += `    <loc>${hubUrl}</loc>\n`;
+  xml += `    <lastmod>${currentDate}</lastmod>\n`;
+  xml += `    <changefreq>weekly</changefreq>\n`;
+  xml += `    <priority>0.8</priority>\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="es-ES" href="${hubUrl}" />\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="es" href="${hubUrl}" />\n`;
+  xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${hubUrl}" />\n`;
+  xml += `  </url>\n\n`;
+
+  for (const c of cities) {
+    const cityUrl = `https://bridge.cristianjm.com/conector-factusol/${c.slug}/`;
+    xml += `  <!-- Conector Factusol: ${c.name} (${c.province}) -->\n`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${cityUrl}</loc>\n`;
+    xml += `    <lastmod>${currentDate}</lastmod>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>0.8</priority>\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="es-ES" href="${cityUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="es" href="${cityUrl}" />\n`;
+    xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${cityUrl}" />\n`;
+    xml += `  </url>\n\n`;
+  }
+  xml += `</urlset>\n`;
+  fs.writeFileSync(SITEMAP_CITIES_FILE, xml, 'utf8');
+  console.log(`✓ [sitemap-ciudades] Regenerado sitemap-ciudades.xml con lastmod ${currentDate}.`);
+
+  const SITEMAP_INDEX_FILE = path.resolve(PUBLIC_DIR, 'sitemap-index.xml');
+  if (fs.existsSync(SITEMAP_INDEX_FILE)) {
+    let idxXml = fs.readFileSync(SITEMAP_INDEX_FILE, 'utf8');
+    idxXml = idxXml.replace(
+      /(<loc>https:\/\/bridge\.cristianjm\.com\/sitemap-ciudades\.xml<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i,
+      `$12026-10-21$2`
+    );
+    fs.writeFileSync(SITEMAP_INDEX_FILE, idxXml, 'utf8');
+    console.log(`✓ [sitemap-index] Actualizado lastmod de sitemap-ciudades.xml a 2026-10-21.`);
+  }
 }
 
 export function generateCityPages() {
@@ -935,7 +1071,7 @@ export function generateCityPages() {
     if (!fs.existsSync(cityDir)) {
       fs.mkdirSync(cityDir, { recursive: true });
     }
-    const html = renderCityPage(city, currentVersion);
+    const html = renderCityPage(city, cities, currentVersion);
     const outFile = path.join(cityDir, 'index.html');
     fs.writeFileSync(outFile, html, 'utf8');
     console.log(`✓ [cities] Generada página para ${city.name} -> ${outFile}`);
