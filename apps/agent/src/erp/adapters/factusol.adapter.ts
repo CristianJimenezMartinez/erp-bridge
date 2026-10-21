@@ -6,6 +6,7 @@ import { EventBus } from '../../diagnostics/event-bus';
 import { FactusolService } from '../../factusol/factusol.service';
 import { FactusolPathResolver } from '../../factusol/factusol.resolver';
 import { IErpConnector } from '../erp-connector.interface';
+import { DEMO_ARTICLES_BY_ERP } from '../sql-server-profiles';
 import {
   SupportedErpProviderId,
   ErpTestResult,
@@ -19,6 +20,13 @@ export class FactusolAdapter implements IErpConnector {
   public readonly providerId: SupportedErpProviderId = 'factusol';
   public readonly displayName = 'Factusol ERP';
   private readonly logger = new Logger('FactusolAdapter');
+
+  public isEvaluationMode(customDbPath?: string): boolean {
+    const cfg = this.configManager.get();
+    if (cfg.softwareErp?.providers?.factusol?.evaluationMode) return true;
+    const spec = (customDbPath || cfg.softwareErp?.providers?.factusol?.databasePath || cfg.factusol?.databasePath || cfg.factusolDbPath || '').trim().toUpperCase();
+    return spec === 'DEMO' || spec.startsWith('DEMO://');
+  }
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -37,6 +45,15 @@ export class FactusolAdapter implements IErpConnector {
   }
 
   public async testConnection(dbPath: string): Promise<ErpTestResult> {
+    if (this.isEvaluationMode(dbPath)) {
+      return {
+        success: true,
+        evaluationMode: true,
+        articleCount: DEMO_ARTICLES_BY_ERP.factusol.length,
+        resolvedPath: 'DEMO://FACTUSOL/0012026.accdb',
+        message: `Modo Evaluación activo para Factusol (${DEMO_ARTICLES_BY_ERP.factusol.length} artículos demo listos sin Factusol instalado).`,
+      };
+    }
     const res = await this.factusolService.testConnection(dbPath);
     return {
       success: res.success,
@@ -80,15 +97,28 @@ export class FactusolAdapter implements IErpConnector {
   }
 
   public isDatabaseAccessible(): boolean {
+    if (this.isEvaluationMode()) return true;
     const p = this.getDatabasePath();
     return Boolean(p && fs.existsSync(p));
   }
 
   public async getArticleCount(customDbPath?: string): Promise<number | undefined> {
+    if (this.isEvaluationMode(customDbPath)) return DEMO_ARTICLES_BY_ERP.factusol.length;
     return this.factusolService.getArticleCount(customDbPath);
   }
 
   public async getPreviewArticles(limit = 25): Promise<ErpArticlePreviewItem[]> {
+    if (this.isEvaluationMode()) {
+      return DEMO_ARTICLES_BY_ERP.factusol.slice(0, limit).map((a) => ({
+        code: a.code,
+        description: a.name,
+        family: a.family,
+        stock: a.stock,
+        salePrice: a.price,
+        costPrice: a.costPrice,
+        ean: a.barcode,
+      }));
+    }
     const res = await this.factusolService.getPreviewArticles(undefined, limit);
     return res.articles.map((a) => ({
       code: a.code,
@@ -106,6 +136,11 @@ export class FactusolAdapter implements IErpConnector {
   }
 
   public async getStockMap(warehouseCode?: string): Promise<Map<string, number>> {
+    if (this.isEvaluationMode()) {
+      const demoMap = new Map<string, number>();
+      for (const a of DEMO_ARTICLES_BY_ERP.factusol) demoMap.set(a.code.toUpperCase(), a.stock);
+      return demoMap;
+    }
     const dbPath = this.getDatabasePath();
     if (!dbPath || !fs.existsSync(dbPath)) {
       return new Map();
@@ -155,6 +190,10 @@ export class FactusolAdapter implements IErpConnector {
   }
 
   public async createOrder(order: CanonicalOrder, series?: string, warehouse?: string): Promise<ErpOrderResult> {
+    if (this.isEvaluationMode()) {
+      const demoNum = Math.floor(Date.now() / 1000) % 100000;
+      return { success: true, orderNumber: demoNum, externalId: `${series || '1'}-${demoNum}` };
+    }
     const cfg = this.configManager.get();
     const dbPath = this.getDatabasePath();
     const orderSeries = series ||
@@ -199,6 +238,7 @@ export class FactusolAdapter implements IErpConnector {
   }
 
   public async getArticlesForCatalog(limit?: number, onlyActive?: boolean): Promise<ErpCatalogArticle[]> {
+    if (this.isEvaluationMode()) return [...DEMO_ARTICLES_BY_ERP.factusol];
     const dbPath = this.getDatabasePath();
     if (!dbPath || !fs.existsSync(dbPath)) return [];
 

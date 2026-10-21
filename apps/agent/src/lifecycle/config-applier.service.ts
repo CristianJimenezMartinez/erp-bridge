@@ -15,17 +15,20 @@ import {
 } from '../config';
 import { LicenseService } from '../license';
 import { FactusolService, FactusolPathResolver } from '../factusol';
-import { SoftwareErpConfig, ErpProviderRegistry } from '../erp';
+import { SoftwareErpConfig, ErpProviderRegistry, SupportedErpProviderId, ErpProviderConfigState } from '../erp';
 import { SimplyGestService, SimplyGestDetector } from '../simplygest';
 import { LocalSyncEngine } from '../sync';
 import { EventBus } from '../diagnostics';
 import { isSecretMaskedOrEmpty } from '../channels/channel-tester.service';
 
 export interface FullConfigUpdates {
-  erpType?: 'factusol' | 'simplygest';
+  erpType?: SupportedErpProviderId;
   softwareErp?: SoftwareErpConfig;
   factusol?: AgentFactusolSettings;
   simplygest?: AgentSimplyGestSettings;
+  agora?: ErpProviderConfigState;
+  sage50?: ErpProviderConfigState;
+  a3erp?: ErpProviderConfigState;
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;
@@ -116,12 +119,16 @@ export class ConfigApplierService {
     }
 
     // Consolidación de softwareErp retrocompatible
+    if (updates.agora) cfg.agora = { ...(cfg.agora || {}), ...updates.agora };
+    if (updates.sage50) cfg.sage50 = { ...(cfg.sage50 || {}), ...updates.sage50 };
+    if (updates.a3erp) cfg.a3erp = { ...(cfg.a3erp || {}), ...updates.a3erp };
+
     const finalActive = updates.softwareErp?.activeProvider || updates.erpType || cfg.softwareErp?.activeProvider || cfg.erpType || 'factusol';
     const isProvisioned = updates.softwareErp?.provisioned !== undefined
       ? updates.softwareErp.provisioned
       : (cfg.softwareErp?.provisioned !== undefined
         ? cfg.softwareErp.provisioned
-        : Boolean(cfg.factusolDbPath || cfg.simplygestDbPath));
+        : Boolean(cfg.factusolDbPath || cfg.simplygestDbPath || cfg.agora?.serverInstance || cfg.sage50?.serverInstance || cfg.a3erp?.serverInstance));
 
     cfg.erpType = finalActive;
     cfg.softwareErp = {
@@ -129,8 +136,12 @@ export class ConfigApplierService {
       provisioned: isProvisioned,
       providers: {
         ...(cfg.softwareErp?.providers || {}),
-        factusol: { ...(cfg.factusol || {}) },
-        simplygest: { ...(cfg.simplygest || {}) },
+        ...(updates.softwareErp?.providers || {}),
+        factusol: { ...(cfg.softwareErp?.providers?.factusol || {}), ...(cfg.factusol || {}) },
+        simplygest: { ...(cfg.softwareErp?.providers?.simplygest || {}), ...(cfg.simplygest || {}) },
+        agora: { ...(cfg.softwareErp?.providers?.agora || {}), ...(cfg.agora || {}), ...(updates.softwareErp?.providers?.agora || {}) },
+        sage50: { ...(cfg.softwareErp?.providers?.sage50 || {}), ...(cfg.sage50 || {}), ...(updates.softwareErp?.providers?.sage50 || {}) },
+        a3erp: { ...(cfg.softwareErp?.providers?.a3erp || {}), ...(cfg.a3erp || {}), ...(updates.softwareErp?.providers?.a3erp || {}) },
       },
     };
     if (updates.woocommerce) {

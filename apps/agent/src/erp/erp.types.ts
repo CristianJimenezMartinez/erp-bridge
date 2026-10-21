@@ -1,7 +1,13 @@
-export type SupportedErpProviderId = 'factusol' | 'simplygest';
+export type SupportedErpProviderId = 'factusol' | 'simplygest' | 'agora' | 'sage50' | 'a3erp';
 
 export interface ErpProviderConfigState {
   databasePath?: string;
+  serverInstance?: string;
+  databaseName?: string;
+  authMode?: 'windows' | 'sql';
+  username?: string;
+  password?: string;
+  evaluationMode?: boolean;
   tariffCode?: string;
   warehouseCode?: string;
   orderSeries?: string;
@@ -17,6 +23,9 @@ export interface SoftwareErpConfig {
   providers?: {
     factusol?: ErpProviderConfigState;
     simplygest?: ErpProviderConfigState;
+    agora?: ErpProviderConfigState;
+    sage50?: ErpProviderConfigState;
+    a3erp?: ErpProviderConfigState;
     [key: string]: any;
   };
 }
@@ -37,6 +46,7 @@ export interface ErpTestResult {
   articleCount?: number;
   fileSizeBytes?: number;
   resolvedPath?: string;
+  evaluationMode?: boolean;
 }
 
 export interface ErpOrderResult {

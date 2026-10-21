@@ -172,13 +172,15 @@
     },
     {
       "id": "agent.erp",
-      "name": "Registro y Adaptadores Polimórficos de Proveedores ERP (Strategy Pattern)",
-      "status": "STABLE",
-      "certifiedAt": "2026-10-11",
-      "description": "Patrón Strategy desacoplado (IErpConnector y ErpProviderRegistry) con modelo de aprovisionamiento exclusivo (Single Active ERP) y persistencia anti-wiping en AppData.",
+      "name": "Registro, Motor SQL Server Local y Adaptadores Polimórficos Multi-ERP (Strategy Pattern)",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-21",
+      "certifiedCommit": "633f724",
+      "description": "Patrón Strategy desacoplado (IErpConnector, ErpProviderRegistry y SqlServerBaseAdapter) para los 5 ERPs oficiales en España (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) con Modo Evaluación Sandbox.",
       "paths": [
         "apps/agent/src/erp"
       ],
+      "integrityTreeHash": "677f991869840a6421b21654e64f001fcadb96eb695b43036df0d13d0a47d22b",
       "publicContract": "apps/agent/src/erp/index.ts",
       "testSuites": [
         "apps/agent/test/erp-provider-strategy.test.ts"

@@ -70,33 +70,133 @@ export function renderWizardModal(): string {
           </div>
         </div>
 
-        <!-- PASO 2: ERP (FACTUSOL O SIMPLYGEST) -->
+        <!-- PASO 2: ERP LOCAL EN WINDOWS (5 ERPs SOPORTADOS) -->
         <div id="wizard-pane-2" style="display: none;">
-          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 2: Conecta tu Software de Gestión (ERP)</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Elige el programa que utilizas en tu empresa para sincronizar productos y ventas.</p>
+          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">Paso 2: Conecta tu Software de Gestión (ERP Local)</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Elige cualquiera de los 5 ERPs locales de escritorio en Windows o activa el Modo Evaluación en 1 clic.</p>
 
-          <div class="channel-select-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 18px;">
-            <div id="wiz-erp-choice-factusol" class="channel-card selected" onclick="wizSelectErp('factusol')">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                <div class="channel-icon" style="color: #60a5fa; margin-bottom: 0;">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
-                </div>
-                <span id="wiz-badge-erp-factusol" class="tag tag-blue" style="font-size: 9.5px;">● Activo en este equipo</span>
+          <!-- BOTÓN DESTACADO: PROBAR EN MODO EVALUACIÓN (SIN ERP INSTALADO) -->
+          <div style="margin-bottom: 16px; padding: 12px 14px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(16, 185, 129, 0.10)); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fde68a; display: flex; align-items: center; gap: 6px;">
+                <span>🧪 ¿Estás probando en un PC sin el ERP instalado?</span>
+                <span class="tag tag-amber" style="font-size: 9.5px;">Sandbox Multi-ERP</span>
               </div>
-              <div style="font-weight: 700; font-size: 13px; color: #fff;">Factusol (DELSOL)</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Bases de datos .accdb y .mdb</div>
+              <div style="font-size: 11.5px; color: #e2e8f0; margin-top: 2px;">
+                Activa datos de demostración realistas para Factusol, SimplyGest, Ágora POS, Sage 50 o a3ERP y simula pedidos y stock reales.
+              </div>
+            </div>
+            <button type="button" id="wiz-btn-eval-mode" onclick="wizEnableEvaluationMode()" class="btn btn-primary btn-sm" style="white-space: nowrap; background: linear-gradient(135deg, #d97706, #f59e0b); border: none; color: #fff; font-weight: 700; padding: 7px 13px;">
+              🧪 Probar en Modo Evaluación (Sin ERP instalado)
+            </button>
+          </div>
+
+          <!-- SELECTOR DE LOS 5 ERPs LOCALES SOPORTADOS -->
+          <div class="channel-select-grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 18px;">
+            <div id="wiz-erp-choice-factusol" class="channel-card selected" style="padding: 11px 12px;" onclick="wizSelectErp('factusol')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #60a5fa;">Factusol</span>
+                <span id="wiz-badge-erp-factusol" class="tag tag-blue" style="font-size: 9px;">● Activo</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">Access .accdb / SQL</div>
             </div>
 
-            <div id="wiz-erp-choice-simplygest" class="channel-card" onclick="wizSelectErp('simplygest')">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                <div class="channel-icon" style="color: #34d399; margin-bottom: 0;">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 9h18"/><path d="M7 15h4"/><path d="M15 15h2"/></svg>
-                </div>
-                <span id="wiz-badge-erp-simplygest" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Guardado / En pausa</span>
+            <div id="wiz-erp-choice-simplygest" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('simplygest')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #34d399;">SimplyGest</span>
+                <span id="wiz-badge-erp-simplygest" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
               </div>
-              <div style="font-weight: 700; font-size: 13px; color: #fff;">SimplyGest Desktop</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Base de datos Datos.mdb</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">MySQL / SQL Local</div>
             </div>
+
+            <div id="wiz-erp-choice-agora" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('agora')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #f472b6;">Ágora Retail / POS</span>
+                <span id="wiz-badge-erp-agora" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+            </div>
+
+            <div id="wiz-erp-choice-sage50" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('sage50')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #4ade80;">Sage 50</span>
+                <span id="wiz-badge-erp-sage50" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+            </div>
+
+            <div id="wiz-erp-choice-a3erp" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('a3erp')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #fbbf24;">a3ERP</span>
+                <span id="wiz-badge-erp-a3erp" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+            </div>
+          </div>
+
+          <!-- PANEL SQL SERVER LOCAL EN WIZARD (ÁGORA POS, SAGE 50, A3ERP) -->
+          <div id="wiz-panel-sql-erp" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+              <div>
+                <div id="wiz-sql-erp-title" style="font-weight: 700; font-size: 14px; color: #fff;">Conexión Local MS SQL Server</div>
+                <div id="wiz-sql-erp-subtitle" style="font-size: 11.5px; color: var(--text-muted);">Lectura no bloqueante WITH (NOLOCK) sin interferir con el TPV ni el ERP.</div>
+              </div>
+              <button type="button" onclick="wizDetectSqlInstances(true)" id="wiz-btn-detect-sql" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Autodetectar instancias SQL locales</span>
+              </button>
+            </div>
+
+            <div id="wiz-sql-detected-box" style="display: none; margin-bottom: 12px;">
+              <div id="wiz-sql-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Instancia SQL Server Local:</label>
+                <input type="text" id="wiz-input-sql-instance" class="form-control" value=".\\SQLEXPRESS" placeholder="localhost, 127.0.0.1:1433, .\\SQLEXPRESS, .\\AGORA, .\\SAGE50" style="font-family: monospace; font-size: 12.5px;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Base de Datos / Ejercicio Activo:</label>
+                <input type="text" id="wiz-input-sql-dbname" class="form-control" value="AgoraPOS" placeholder="AgoraPOS / SAGE50 / A3ERP" style="font-family: monospace; font-size: 12.5px;">
+              </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 120px; gap: 12px; margin-bottom: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Modo de Autenticación SQL Server:</label>
+                <select id="wiz-select-sql-auth" class="form-control form-select" onchange="wizToggleSqlAuthFields(this.value)" style="font-size: 12.5px;">
+                  <option value="windows">Autenticación Integrada de Windows (Recomendado)</option>
+                  <option value="sql">Usuario SQL Server (sa y contraseña)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Serie Pedidos:</label>
+                <input type="text" id="wiz-input-sql-series" class="form-control" value="1" maxlength="4" style="text-align: center; font-weight: 700; text-transform: uppercase;">
+              </div>
+            </div>
+
+            <div id="wiz-sql-credentials-row" class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; display: none;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Usuario SQL Server:</label>
+                <input type="text" id="wiz-input-sql-user" class="form-control" value="sa" placeholder="sa" style="font-family: monospace; font-size: 12.5px;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 11.5px;">Contraseña SQL Server:</label>
+                <input type="password" id="wiz-input-sql-pass" class="form-control" placeholder="••••••••" style="font-size: 12.5px;">
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px;">
+              <button type="button" onclick="wizTestSqlErpConnection()" id="wiz-btn-test-sql" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
+                <span>Comprobar Conexión SQL Server</span>
+              </button>
+              <button type="button" onclick="wizEnableEvaluationMode()" class="btn btn-secondary btn-sm" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">
+                🧪 Activar Datos Demo para este ERP
+              </button>
+            </div>
+            <div id="wiz-sql-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
           </div>
 
           <!-- PANEL FACTUSOL EN WIZARD -->

@@ -1,4 +1,4 @@
-import type { SoftwareErpConfig } from '../erp/erp.types';
+import type { SoftwareErpConfig, SupportedErpProviderId, ErpProviderConfigState } from '../erp/erp.types';
 
 export interface AgentFactusolSettings {
   databasePath?: string;
@@ -94,10 +94,13 @@ export interface AgentConfigFile {
   factusolDbPath?: string;
   heartbeatIntervalMs?: number;
   licenseKey?: string;
-  erpType?: 'factusol' | 'simplygest';
+  erpType?: SupportedErpProviderId;
   simplygestDbPath?: string;
   factusol?: AgentFactusolSettings;
   simplygest?: AgentSimplyGestSettings;
+  agora?: ErpProviderConfigState;
+  sage50?: ErpProviderConfigState;
+  a3erp?: ErpProviderConfigState;
   woocommerce?: AgentWooCommerceSettings;
   universalBridge?: AgentUniversalBridgeSettings;
   shopify?: AgentShopifySettings;

@@ -43,7 +43,13 @@ export class ErpProviderRegistry {
     }
 
     // 2. Campo legacy erpType
-    if (cfg.erpType === 'simplygest' || cfg.erpType === 'factusol') {
+    if (
+      cfg.erpType === 'simplygest' ||
+      cfg.erpType === 'factusol' ||
+      cfg.erpType === 'agora' ||
+      cfg.erpType === 'sage50' ||
+      cfg.erpType === 'a3erp'
+    ) {
       return cfg.erpType;
     }
 

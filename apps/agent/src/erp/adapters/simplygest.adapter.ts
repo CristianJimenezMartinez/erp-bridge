@@ -6,6 +6,7 @@ import { EventBus } from '../../diagnostics/event-bus';
 import { SimplyGestService } from '../../simplygest/simplygest.service';
 import { SimplyGestDetector } from '../../simplygest/simplygest.detector';
 import { IErpConnector } from '../erp-connector.interface';
+import { DEMO_ARTICLES_BY_ERP } from '../sql-server-profiles';
 import {
   SupportedErpProviderId,
   ErpTestResult,
@@ -19,6 +20,13 @@ export class SimplyGestAdapter implements IErpConnector {
   public readonly providerId: SupportedErpProviderId = 'simplygest';
   public readonly displayName = 'SimplyGest Desktop';
   private readonly logger = new Logger('SimplyGestAdapter');
+
+  public isEvaluationMode(customDbPath?: string): boolean {
+    const cfg = this.configManager.get();
+    if (cfg.softwareErp?.providers?.simplygest?.evaluationMode) return true;
+    const spec = (customDbPath || cfg.softwareErp?.providers?.simplygest?.databasePath || cfg.simplygest?.databasePath || cfg.simplygestDbPath || '').trim().toUpperCase();
+    return spec === 'DEMO' || spec.startsWith('DEMO://');
+  }
 
   constructor(
     private readonly configManager: ConfigManager,
@@ -35,6 +43,15 @@ export class SimplyGestAdapter implements IErpConnector {
   }
 
   public async testConnection(dbPath: string): Promise<ErpTestResult> {
+    if (this.isEvaluationMode(dbPath)) {
+      return {
+        success: true,
+        evaluationMode: true,
+        articleCount: DEMO_ARTICLES_BY_ERP.simplygest.length,
+        resolvedPath: 'DEMO://SIMPLYGEST/Datos.mdb',
+        message: `Modo Evaluación activo para SimplyGest (${DEMO_ARTICLES_BY_ERP.simplygest.length} artículos demo listos sin SimplyGest instalado).`,
+      };
+    }
     const res = await this.simplygestService.testConnection(dbPath);
     return {
       success: res.success,
@@ -95,15 +112,28 @@ export class SimplyGestAdapter implements IErpConnector {
   }
 
   public isDatabaseAccessible(): boolean {
+    if (this.isEvaluationMode()) return true;
     const p = this.getDatabasePath();
     return Boolean(p && fs.existsSync(p));
   }
 
   public async getArticleCount(customDbPath?: string): Promise<number | undefined> {
+    if (this.isEvaluationMode(customDbPath)) return DEMO_ARTICLES_BY_ERP.simplygest.length;
     return this.simplygestService.getArticleCount(customDbPath);
   }
 
   public async getPreviewArticles(limit = 25): Promise<ErpArticlePreviewItem[]> {
+    if (this.isEvaluationMode()) {
+      return DEMO_ARTICLES_BY_ERP.simplygest.slice(0, limit).map((a) => ({
+        code: a.code,
+        description: a.name,
+        family: a.family,
+        stock: a.stock,
+        salePrice: a.price,
+        costPrice: a.costPrice,
+        ean: a.barcode,
+      }));
+    }
     const articles = await this.simplygestService.getPreviewArticles(undefined, limit);
     return articles.map((a) => ({
       code: a.code,
@@ -135,6 +165,11 @@ export class SimplyGestAdapter implements IErpConnector {
   }
 
   public async getStockMap(warehouseCode?: string): Promise<Map<string, number>> {
+    if (this.isEvaluationMode()) {
+      const demoMap = new Map<string, number>();
+      for (const a of DEMO_ARTICLES_BY_ERP.simplygest) demoMap.set(a.code.toUpperCase(), a.stock);
+      return demoMap;
+    }
     const dbPath = this.getDatabasePath();
     if (!dbPath || !fs.existsSync(dbPath)) {
       return new Map();
@@ -169,6 +204,10 @@ export class SimplyGestAdapter implements IErpConnector {
   }
 
   public async createOrder(order: CanonicalOrder, series?: string, warehouse?: string): Promise<ErpOrderResult> {
+    if (this.isEvaluationMode()) {
+      const demoNum = Math.floor(Date.now() / 1000) % 100000;
+      return { success: true, orderNumber: demoNum, externalId: `${series || '1'}-${demoNum}` };
+    }
     const dbPath = this.getDatabasePath();
     if (!dbPath || !fs.existsSync(dbPath)) {
       return { success: false, error: 'Base de datos de SimplyGest no configurada o inaccesible.' };
@@ -210,6 +249,7 @@ export class SimplyGestAdapter implements IErpConnector {
   }
 
   public async getArticlesForCatalog(limit?: number): Promise<ErpCatalogArticle[]> {
+    if (this.isEvaluationMode()) return [...DEMO_ARTICLES_BY_ERP.simplygest];
     const dbPath = this.getDatabasePath();
     if (!dbPath || !fs.existsSync(dbPath)) return [];
 

@@ -73,6 +73,9 @@ import {
   ErpProviderRegistry,
   FactusolAdapter,
   SimplyGestAdapter,
+  AgoraErpAdapter,
+  Sage50ErpAdapter,
+  A3ErpAdapter,
   IErpConnector,
   SupportedErpProviderId,
 } from './erp';
@@ -114,6 +117,9 @@ export class LocalAgent {
   public readonly simplygestService: SimplyGestService;
   public readonly factusolAdapter: FactusolAdapter;
   public readonly simplygestAdapter: SimplyGestAdapter;
+  public readonly agoraAdapter: AgoraErpAdapter;
+  public readonly sage50Adapter: Sage50ErpAdapter;
+  public readonly a3erpAdapter: A3ErpAdapter;
   public readonly erpRegistry: ErpProviderRegistry;
   public readonly fileWatcherService: FileWatcherService;
   public readonly syncEngine: LocalSyncEngine;
@@ -149,7 +155,16 @@ export class LocalAgent {
     this.simplygestService = new SimplyGestService(this.configManager, this.eventBus);
     this.factusolAdapter = new FactusolAdapter(this.configManager, this.factusolService, this.eventBus);
     this.simplygestAdapter = new SimplyGestAdapter(this.configManager, this.simplygestService, this.eventBus);
-    this.erpRegistry = new ErpProviderRegistry(this.configManager, [this.factusolAdapter, this.simplygestAdapter]);
+    this.agoraAdapter = new AgoraErpAdapter(this.configManager, this.eventBus);
+    this.sage50Adapter = new Sage50ErpAdapter(this.configManager, this.eventBus);
+    this.a3erpAdapter = new A3ErpAdapter(this.configManager, this.eventBus);
+    this.erpRegistry = new ErpProviderRegistry(this.configManager, [
+      this.factusolAdapter,
+      this.simplygestAdapter,
+      this.agoraAdapter,
+      this.sage50Adapter,
+      this.a3erpAdapter,
+    ]);
     this.fileWatcherService = new FileWatcherService();
     this.syncEngine = new LocalSyncEngine(
       this.configManager,

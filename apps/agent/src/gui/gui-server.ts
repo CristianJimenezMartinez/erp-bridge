@@ -16,6 +16,7 @@ import {
   SystemController,
   SalesOrdersController,
   SimplyGestController,
+  SqlErpController,
 } from './router/controllers';
 
 const logger = new Logger('LocalGuiServer');
@@ -110,6 +111,11 @@ export class LocalGuiServer {
     router.post('/api/local/test-simplygest', SimplyGestController.testSimplyGest(this.agent));
     router.get('/api/local/simplygest/preview', SimplyGestController.getPreview(this.agent));
     router.post('/api/local/resolve-simplygest-path', SimplyGestController.resolvePath(this.agent));
+
+    // 3c. SQL Server ERPs (Agora POS, Sage 50, a3ERP) & Evaluation Mode
+    router.any(['GET', 'POST'], '/api/local/detect-sql-instances', SqlErpController.detectSqlInstances());
+    router.post('/api/local/test-sql-erp', SqlErpController.testSqlErp(this.agent));
+    router.get('/api/local/erp/preview', SqlErpController.getPreview(this.agent));
 
     // 4. Channels
     router.post('/api/local/test-woocommerce', ChannelController.testWooCommerce(this.agent));

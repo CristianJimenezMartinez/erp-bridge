@@ -425,24 +425,88 @@ export const factusolScript = `
     }
     window.selectModalErp = selectModalErp;
 
-    function updateModalErpUI(type) {
-      const isSg = (type === 'simplygest');
-      const cardF = document.getElementById('modal-choice-factusol');
-      const cardS = document.getElementById('modal-choice-simplygest');
-      const badgeF = document.getElementById('modal-badge-factusol');
-      const badgeS = document.getElementById('modal-badge-simplygest');
-
-      if (isSg) {
-        if (cardF) cardF.classList.remove('selected');
-        if (cardS) cardS.classList.add('selected');
-        if (badgeF) { badgeF.className = 'tag'; badgeF.textContent = 'Disponible'; badgeF.style.background = 'rgba(255,255,255,0.06)'; badgeF.style.color = 'var(--text-muted)'; }
-        if (badgeS) { badgeS.className = 'tag tag-green'; badgeS.textContent = 'Seleccionado'; badgeS.style.background = ''; badgeS.style.color = ''; }
-      } else {
-        if (cardF) cardF.classList.add('selected');
-        if (cardS) cardS.classList.remove('selected');
-        if (badgeF) { badgeF.className = 'tag tag-blue'; badgeF.textContent = 'Seleccionado'; badgeF.style.background = ''; badgeF.style.color = ''; }
-        if (badgeS) { badgeS.className = 'tag'; badgeS.textContent = 'Disponible'; badgeS.style.background = 'rgba(255,255,255,0.06)'; badgeS.style.color = 'var(--text-muted)'; }
+    const ERP_UI_META = {
+      factusol: {
+        title: 'Factusol (Software DELSOL)',
+        sidebarTitle: 'Factusol ERP',
+        sidebarBadge: 'Factusol',
+        tagClass: 'tag-blue',
+        color: '#60a5fa',
+        bg: 'rgba(59,130,246,0.12)',
+        desc: 'Sincronización directa mediante motor OLEDB de Factusol (.accdb / .mdb).',
+        defaultDb: '0012026.accdb',
+        defaultInstance: ''
+      },
+      simplygest: {
+        title: 'SimplyGest Desktop',
+        sidebarTitle: 'SimplyGest Desktop',
+        sidebarBadge: 'SimplyGest',
+        tagClass: 'tag-green',
+        color: '#34d399',
+        bg: 'rgba(16,185,129,0.12)',
+        desc: 'Sincronización directa con base de datos Datos.mdb de SimplyGest.',
+        defaultDb: 'Datos.mdb',
+        defaultInstance: ''
+      },
+      agora: {
+        title: 'Ágora Retail / POS (MS SQL Server Local)',
+        sidebarTitle: 'Ágora POS',
+        sidebarBadge: 'Ágora POS',
+        tagClass: 'tag-amber',
+        color: '#f472b6',
+        bg: 'rgba(244,114,182,0.15)',
+        desc: 'Sincronización rápida (<5s) con Ágora Retail / POS sobre Microsoft SQL Server Express.',
+        defaultDb: 'AgoraPOS',
+        defaultInstance: '.\\SQLEXPRESS'
+      },
+      sage50: {
+        title: 'Sage 50 (MS SQL Server Local)',
+        sidebarTitle: 'Sage 50 ERP',
+        sidebarBadge: 'Sage 50',
+        tagClass: 'tag-green',
+        color: '#4ade80',
+        bg: 'rgba(34,197,94,0.15)',
+        desc: 'Sincronización directa con tablas articulo, stocks, pvp y c_pediven/d_pediven en SQL Server.',
+        defaultDb: 'SAGE50',
+        defaultInstance: '.\\SAGE50'
+      },
+      a3erp: {
+        title: 'Wolters Kluwer a3ERP (MS SQL Server Local)',
+        sidebarTitle: 'a3ERP',
+        sidebarBadge: 'a3ERP',
+        tagClass: 'tag-amber',
+        color: '#fbbf24',
+        bg: 'rgba(245,158,11,0.15)',
+        desc: 'Sincronización directa con tablas maestras ARTICULO, STOCKALM, CABEPEV y LINEPEV en SQL Server.',
+        defaultDb: 'A3ERP',
+        defaultInstance: '.\\SQLEXPRESS'
       }
+    };
+
+    function updateModalErpUI(type) {
+      const allErps = ['factusol', 'simplygest', 'agora', 'sage50', 'a3erp'];
+      allErps.forEach(function(id) {
+        const card = document.getElementById('modal-choice-' + id);
+        const badge = document.getElementById('modal-badge-' + id);
+        const meta = ERP_UI_META[id] || ERP_UI_META.factusol;
+        if (id === type) {
+          if (card) card.classList.add('selected');
+          if (badge) {
+            badge.className = 'tag ' + meta.tagClass;
+            badge.textContent = 'Seleccionado';
+            badge.style.background = '';
+            badge.style.color = '';
+          }
+        } else {
+          if (card) card.classList.remove('selected');
+          if (badge) {
+            badge.className = 'tag';
+            badge.textContent = 'Disponible';
+            badge.style.background = 'rgba(255,255,255,0.06)';
+            badge.style.color = 'var(--text-muted)';
+          }
+        }
+      });
     }
 
     async function confirmSwitchErp() {
@@ -450,7 +514,7 @@ export const factusolScript = `
       closeSwitchErpModal();
       selectErpType(targetErp);
 
-      const friendlyName = targetErp === 'simplygest' ? 'SimplyGest Desktop' : 'Factusol ERP';
+      const meta = ERP_UI_META[targetErp] || ERP_UI_META.factusol;
       if (typeof submitConfigUpdates === 'function') {
         await submitConfigUpdates({
           erpType: targetErp,
@@ -458,14 +522,15 @@ export const factusolScript = `
             activeProvider: targetErp,
             provisioned: true
           }
-        }, 'Software ERP cambiado a ' + friendlyName + ' con éxito.');
+        }, 'Software ERP cambiado a ' + meta.title + ' con éxito.');
       }
     }
     window.confirmSwitchErp = confirmSwitchErp;
 
     function selectErpType(type) {
       currentErpType = type || 'factusol';
-      const isSimplyGest = currentErpType === 'simplygest';
+      const meta = ERP_UI_META[currentErpType] || ERP_UI_META.factusol;
+      const isSqlErp = (currentErpType === 'agora' || currentErpType === 'sage50' || currentErpType === 'a3erp');
 
       const iconFact = document.getElementById('erp-active-icon-factusol');
       const iconSg = document.getElementById('erp-active-icon-simplygest');
@@ -475,87 +540,120 @@ export const factusolScript = `
       const activeBadge = document.getElementById('erp-active-status-badge');
       const panelFact = document.getElementById('panel-erp-factusol');
       const panelSg = document.getElementById('panel-erp-simplygest');
+      const panelSql = document.getElementById('panel-erp-sql');
       const sidebarLabel = document.getElementById('sidebar-erp-title');
       const sidebarBadge = document.getElementById('sidebar-erp-badge');
       const headerTitle = document.getElementById('header-page-title');
 
-      if (sidebarLabel) {
-        sidebarLabel.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP';
-      }
-
+      if (sidebarLabel) sidebarLabel.textContent = meta.sidebarTitle;
       const activeTabPane = document.querySelector('.tab-pane.active');
       if (headerTitle && activeTabPane && activeTabPane.id === 'tab-factusol') {
-        headerTitle.textContent = isSimplyGest ? 'SimplyGest Desktop' : 'Factusol ERP';
+        headerTitle.textContent = meta.sidebarTitle;
+      }
+      if (iconContainer) {
+        iconContainer.style.background = meta.bg;
+        iconContainer.style.color = meta.color;
+      }
+      if (activeTitle) activeTitle.textContent = meta.title;
+      if (activeDesc) activeDesc.textContent = meta.desc;
+      if (activeBadge) {
+        activeBadge.className = 'tag ' + meta.tagClass;
+        activeBadge.textContent = '● Activo';
+      }
+      if (sidebarBadge) {
+        sidebarBadge.textContent = meta.sidebarBadge;
+        sidebarBadge.className = 'tag ' + meta.tagClass;
       }
 
-      if (isSimplyGest) {
+      if (currentErpType === 'simplygest') {
         if (iconFact) iconFact.style.display = 'none';
         if (iconSg) iconSg.style.display = 'block';
-        if (iconContainer) {
-          iconContainer.style.background = 'rgba(16,185,129,0.12)';
-          iconContainer.style.color = '#34d399';
-        }
-        if (activeTitle) activeTitle.textContent = 'SimplyGest Desktop';
-        if (activeDesc) activeDesc.textContent = 'Sincronización directa con base de datos Datos.mdb de SimplyGest.';
-        if (activeBadge) {
-          activeBadge.className = 'tag tag-green';
-          activeBadge.textContent = '● Activo';
-        }
         if (panelFact) panelFact.style.display = 'none';
         if (panelSg) panelSg.style.display = 'block';
-        if (sidebarBadge) {
-          sidebarBadge.textContent = 'SimplyGest';
-          sidebarBadge.className = 'tag tag-green';
-        }
+        if (panelSql) panelSql.style.display = 'none';
         if (typeof loadSimplyGestPreview === 'function') loadSimplyGestPreview();
+      } else if (isSqlErp) {
+        if (iconFact) iconFact.style.display = 'block';
+        if (iconSg) iconSg.style.display = 'none';
+        if (panelFact) panelFact.style.display = 'none';
+        if (panelSg) panelSg.style.display = 'none';
+        if (panelSql) panelSql.style.display = 'block';
+        const sqlMainTitle = document.getElementById('main-sql-erp-title');
+        const sqlPreviewTitle = document.getElementById('sql-erp-preview-title');
+        if (sqlMainTitle) sqlMainTitle.textContent = meta.title;
+        if (sqlPreviewTitle) sqlPreviewTitle.textContent = 'Vista Previa de Artículos — ' + meta.sidebarTitle;
+        const dbInput = document.getElementById('input-sql-erp-db');
+        const instInput = document.getElementById('input-sql-erp-instance');
+        if (dbInput && (!dbInput.value || dbInput.value === 'AgoraPOS' || dbInput.value === 'SAGE50' || dbInput.value === 'A3ERP')) {
+          dbInput.value = meta.defaultDb;
+        }
+        if (instInput && (!instInput.value || instInput.value === '.\\SQLEXPRESS' || instInput.value === '.\\SAGE50')) {
+          instInput.value = meta.defaultInstance;
+        }
+        if (typeof loadSqlErpPreview === 'function') loadSqlErpPreview();
       } else {
         if (iconFact) iconFact.style.display = 'block';
         if (iconSg) iconSg.style.display = 'none';
-        if (iconContainer) {
-          iconContainer.style.background = 'rgba(59,130,246,0.12)';
-          iconContainer.style.color = '#60a5fa';
-        }
-        if (activeTitle) activeTitle.textContent = 'Factusol (Software DELSOL)';
-        if (activeDesc) activeDesc.textContent = 'Sincronización directa mediante motor OLEDB de Factusol (.accdb / .mdb).';
-        if (activeBadge) {
-          activeBadge.className = 'tag tag-blue';
-          activeBadge.textContent = '● Activo';
-        }
         if (panelFact) panelFact.style.display = 'block';
         if (panelSg) panelSg.style.display = 'none';
-        if (sidebarBadge) {
-          sidebarBadge.textContent = 'Factusol';
-          sidebarBadge.className = 'tag tag-blue';
-        }
+        if (panelSql) panelSql.style.display = 'none';
         if (typeof loadArticlePreview === 'function') loadArticlePreview();
       }
     }
     window.selectErpType = selectErpType;
 
     function wizSelectErp(type) {
-      const cardFact = document.getElementById('wiz-erp-choice-factusol');
-      const cardSg = document.getElementById('wiz-erp-choice-simplygest');
-      const badgeFact = document.getElementById('wiz-badge-erp-factusol');
-      const badgeSg = document.getElementById('wiz-badge-erp-simplygest');
+      const target = type || 'factusol';
+      const allErps = ['factusol', 'simplygest', 'agora', 'sage50', 'a3erp'];
+      allErps.forEach(function(id) {
+        const card = document.getElementById('wiz-erp-choice-' + id);
+        const badge = document.getElementById('wiz-badge-erp-' + id);
+        const meta = ERP_UI_META[id] || ERP_UI_META.factusol;
+        if (id === target) {
+          if (card) card.classList.add('selected');
+          if (badge) {
+            badge.className = 'tag ' + meta.tagClass;
+            badge.textContent = '● Activo';
+            badge.style.background = '';
+            badge.style.color = '';
+          }
+        } else {
+          if (card) card.classList.remove('selected');
+          if (badge) {
+            badge.className = 'tag';
+            badge.textContent = '○ Disponible';
+            badge.style.background = 'rgba(255,255,255,0.06)';
+            badge.style.color = 'var(--text-muted)';
+          }
+        }
+      });
+
       const panelFact = document.getElementById('wiz-panel-factusol');
       const panelSg = document.getElementById('wiz-panel-simplygest');
+      const panelSql = document.getElementById('wiz-panel-sql-erp');
+      const isSqlErp = (target === 'agora' || target === 'sage50' || target === 'a3erp');
 
-      if (type === 'simplygest') {
-        if (cardFact) cardFact.classList.remove('selected');
-        if (cardSg) cardSg.classList.add('selected');
-        if (badgeFact) { badgeFact.className = 'tag'; badgeFact.textContent = '○ Guardado / En pausa'; badgeFact.style.background = 'rgba(255,255,255,0.06)'; badgeFact.style.color = 'var(--text-muted)'; }
-        if (badgeSg) { badgeSg.className = 'tag tag-green'; badgeSg.textContent = '● Activo en este equipo'; badgeSg.style.background = ''; badgeSg.style.color = ''; }
+      if (target === 'simplygest') {
         if (panelFact) panelFact.style.display = 'none';
         if (panelSg) panelSg.style.display = 'block';
+        if (panelSql) panelSql.style.display = 'none';
+      } else if (isSqlErp) {
+        if (panelFact) panelFact.style.display = 'none';
+        if (panelSg) panelSg.style.display = 'none';
+        if (panelSql) panelSql.style.display = 'block';
+        const meta = ERP_UI_META[target] || ERP_UI_META.agora;
+        const titleEl = document.getElementById('wiz-sql-erp-title');
+        if (titleEl) titleEl.textContent = 'Conexión Local: ' + meta.title;
+        const instEl = document.getElementById('wiz-input-sql-instance');
+        const dbEl = document.getElementById('wiz-input-sql-dbname');
+        if (instEl) instEl.value = meta.defaultInstance;
+        if (dbEl) dbEl.value = meta.defaultDb;
       } else {
-        if (cardFact) cardFact.classList.add('selected');
-        if (cardSg) cardSg.classList.remove('selected');
-        if (badgeFact) { badgeFact.className = 'tag tag-blue'; badgeFact.textContent = '● Activo en este equipo'; badgeFact.style.background = ''; badgeFact.style.color = ''; }
-        if (badgeSg) { badgeSg.className = 'tag'; badgeSg.textContent = '○ Guardado / En pausa'; badgeSg.style.background = 'rgba(255,255,255,0.06)'; badgeSg.style.color = 'var(--text-muted)'; }
         if (panelFact) panelFact.style.display = 'block';
         if (panelSg) panelSg.style.display = 'none';
+        if (panelSql) panelSql.style.display = 'none';
       }
-      selectErpType(type);
+      selectErpType(target);
     }
     window.wizSelectErp = wizSelectErp;
 

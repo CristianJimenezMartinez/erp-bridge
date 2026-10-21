@@ -7,6 +7,7 @@ import { FactusolService } from '../src/factusol/factusol.service';
 import { SimplyGestService } from '../src/simplygest/simplygest.service';
 import { FactusolAdapter } from '../src/erp/adapters/factusol.adapter';
 import { SimplyGestAdapter } from '../src/erp/adapters/simplygest.adapter';
+import { AgoraErpAdapter, Sage50ErpAdapter, A3ErpAdapter } from '../src/erp/adapters/sql-erp.adapters';
 import { ErpProviderRegistry } from '../src/erp/erp-provider.registry';
 import { ConfigApplierService } from '../src/lifecycle/config-applier.service';
 import { LocalSyncEngine } from '../src/sync/sync.engine';
@@ -38,7 +39,16 @@ async function runTests() {
     const simplygestService = new SimplyGestService(configManager, eventBus);
     const factusolAdapter = new FactusolAdapter(configManager, factusolService, eventBus);
     const simplygestAdapter = new SimplyGestAdapter(configManager, simplygestService, eventBus);
-    const registry = new ErpProviderRegistry(configManager, [factusolAdapter, simplygestAdapter]);
+    const agoraAdapter = new AgoraErpAdapter(configManager, eventBus);
+    const sage50Adapter = new Sage50ErpAdapter(configManager, eventBus);
+    const a3erpAdapter = new A3ErpAdapter(configManager, eventBus);
+    const registry = new ErpProviderRegistry(configManager, [
+      factusolAdapter,
+      simplygestAdapter,
+      agoraAdapter,
+      sage50Adapter,
+      a3erpAdapter,
+    ]);
     const historyManager = new HistoryManager(tempDir);
     const salesLedgerManager = new SalesLedgerManager(tempDir);
 
@@ -181,6 +191,64 @@ async function runTests() {
     }
 
     console.log('   ✓ Métodos y metadatos de IErpConnector verificados');
+
+    // Test 8: Multi-ERP SQL Server (Ágora POS, Sage 50, a3ERP) + Modo Evaluación en los 5 ERPs
+    console.log('9. Verificando los 5 ERPs oficiales en Modo Evaluación (Sandbox)...');
+    const allFiveProviders = ['factusol', 'simplygest', 'agora', 'sage50', 'a3erp'] as const;
+    for (const providerId of allFiveProviders) {
+      configManager.update({
+        erpType: providerId,
+        softwareErp: {
+          activeProvider: providerId,
+          provisioned: true,
+          providers: {
+            [providerId]: {
+              databasePath: 'DEMO',
+              sqlInstance: '.\\SQLEXPRESS',
+              evaluationMode: true,
+              orderSeries: '1',
+            },
+          },
+        },
+      });
+      assert.strictEqual(registry.getActiveProviderId(), providerId);
+      const activeConn = registry.getActiveConnector();
+      assert.strictEqual(activeConn.providerId, providerId);
+
+      const evalConnRes = await activeConn.testConnection('DEMO');
+      assert.strictEqual(evalConnRes.success, true, `testConnection(DEMO) debe tener éxito en ${providerId}`);
+
+      const preview = await activeConn.getPreviewArticles(10);
+      assert.ok(preview.length >= 3, `${providerId} debe devolver artículos demo en getPreviewArticles`);
+
+      const stockMap = await activeConn.getStockMap();
+      assert.ok(Object.keys(stockMap).length >= 3, `${providerId} debe devolver stockMap en modo evaluación`);
+
+      const orderRes = await activeConn.createOrder({
+        orderNumber: `WEB-${providerId.toUpperCase()}-001`,
+        customerName: 'Agencia Test Beta',
+        customerTaxId: 'B12345678',
+        customerAddress: 'Calle Mayor 1',
+        customerCity: 'Elche',
+        customerPostalCode: '03201',
+        customerProvince: 'Alicante',
+        customerEmail: 'test@agencia.es',
+        totalAmount: 121,
+        taxAmount: 21,
+        items: [
+          {
+            sku: preview[0].code,
+            name: preview[0].description,
+            quantity: 2,
+            unitPrice: 50,
+            taxRate: 21,
+          },
+        ],
+      });
+      assert.strictEqual(orderRes.success, true, `createOrder debe funcionar en modo evaluación para ${providerId}`);
+      assert.ok(orderRes.factusolOrderNumber && orderRes.factusolOrderNumber > 0);
+      console.log(`   ✓ [${providerId}] Evaluación verificada (${preview.length} arts., pedido #${orderRes.factusolOrderNumber})`);
+    }
 
     console.log('\n======================================================================');
     console.log('✅ TODAS LAS PRUEBAS DE ESTRATEGIA ERP PASARON CON ÉXITO');

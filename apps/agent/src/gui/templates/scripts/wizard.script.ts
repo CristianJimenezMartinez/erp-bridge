@@ -483,6 +483,284 @@ export const wizardScript = `
       }
     }
 
+    function wizToggleSqlAuthFields(mode) {
+      const row = document.getElementById('wiz-sql-credentials-row');
+      if (row) {
+        row.style.display = (mode === 'sql') ? 'grid' : 'none';
+      }
+    }
+
+    function toggleMainSqlAuthFields(mode) {
+      const row = document.getElementById('main-sql-credentials-row');
+      if (row) {
+        row.style.display = (mode === 'sql') ? 'grid' : 'none';
+      }
+    }
+
+    async function wizDetectSqlInstances(isWizard) {
+      const btn = document.getElementById(isWizard ? 'wiz-btn-detect-sql' : 'btn-detect-sql-main');
+      const box = document.getElementById(isWizard ? 'wiz-sql-detected-box' : 'sql-main-detected-box');
+      const list = document.getElementById(isWizard ? 'wiz-sql-detected-list' : 'sql-main-detected-list');
+      const originalHtml = btn ? btn.innerHTML : '';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px;vertical-align:middle;"></span> Escaneando SQL Server local...';
+      }
+
+      try {
+        const res = await fetch('/api/local/detect-sql-instances', { method: 'POST' });
+        const data = await res.json();
+        if (box) box.style.display = 'block';
+        const esc = window.escapeHtml || function(s) { return String(s || ''); };
+
+        if (data.instances && data.instances.length > 0 && list) {
+          list.innerHTML = data.instances.map(function(inst) {
+            const safeServer = esc(inst.serverInstance).split('"').join('&quot;');
+            const firstDb = (inst.databases && inst.databases[0]) ? esc(inst.databases[0]).split('"').join('&quot;') : '';
+            const dbBadges = (inst.databases && inst.databases.length > 0)
+              ? inst.databases.slice(0, 5).map(function(d) { return '<span class="tag tag-blue" style="font-size:10px;margin-right:4px;">' + esc(d) + '</span>'; }).join('')
+              : '<span style="color:var(--text-muted);font-size:11px;">Instancia activa</span>';
+            return '<div data-server="' + safeServer + '" data-db="' + firstDb + '" data-wiz="' + (isWizard ? 'true' : 'false') + '" onclick="selectDetectedSqlInstance(this.getAttribute(&quot;data-server&quot;), this.getAttribute(&quot;data-db&quot;), this.getAttribute(&quot;data-wiz&quot;) === &quot;true&quot;)" style="background:#1e1e26;border:1px solid var(--card-border);padding:9px 12px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:12px;">' +
+              '<div><strong>' + esc(inst.label || inst.serverInstance) + '</strong><div style="margin-top:4px;">' + dbBadges + '</div></div>' +
+              '<span class="tag tag-green">Usar instancia</span>' +
+            '</div>';
+          }).join('');
+        } else if (list) {
+          list.innerHTML = '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);padding:10px 12px;border-radius:8px;font-size:12px;color:#cbd5e1;">No se detectaron instancias SQL locales con Autenticación de Windows automática. Puedes indicar manualmente la instancia (ej: <code>.\\SQLEXPRESS</code>) o pulsar en <strong>🧪 Probar en Modo Evaluación</strong>.</div>';
+        }
+      } catch (err) {
+        if (typeof showToast === 'function') showToast('Error al detectar instancias SQL', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+    }
+
+    function selectDetectedSqlInstance(serverInstance, dbName, isWizard) {
+      const instEl = document.getElementById(isWizard ? 'wiz-input-sql-instance' : 'input-sql-erp-instance');
+      const dbEl = document.getElementById(isWizard ? 'wiz-input-sql-dbname' : 'input-sql-erp-db');
+      if (instEl && serverInstance) instEl.value = serverInstance;
+      if (dbEl && dbName) dbEl.value = dbName;
+      if (isWizard) {
+        wizTestSqlErpConnection();
+      } else {
+        testMainSqlErpConnection();
+      }
+    }
+
+    async function wizTestSqlErpConnection() {
+      const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
+      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || '.\\SQLEXPRESS';
+      const databasePath = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || 'AgoraPOS';
+      const authMode = document.getElementById('wiz-select-sql-auth') ? document.getElementById('wiz-select-sql-auth').value : 'windows';
+      const username = document.getElementById('wiz-input-sql-user') ? document.getElementById('wiz-input-sql-user').value.trim() : 'sa';
+      const password = document.getElementById('wiz-input-sql-pass') ? document.getElementById('wiz-input-sql-pass').value : '';
+      const orderSeries = (document.getElementById('wiz-input-sql-series') ? document.getElementById('wiz-input-sql-series').value.trim() : '1') || '1';
+      const alertBox = document.getElementById('wiz-sql-alert');
+
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;">⏳ Comprobando conexión local con SQL Server...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/test-sql-erp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            erpType: activeErp,
+            sqlInstance: sqlInstance,
+            databasePath: databasePath,
+            authMode: authMode,
+            username: username,
+            password: password,
+            orderSeries: orderSeries,
+            evaluationMode: databasePath.toUpperCase() === 'DEMO'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderWizardSuccessCard(alertBox, data.message || 'Conexión SQL Server verificada con éxito.');
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({ title: 'ERP SQL Conectado', message: data.message, type: 'success' });
+          }
+        } else {
+          renderWizardErrorCard(alertBox, {
+            title: 'No se pudo conectar al servidor SQL local',
+            cause: data.message || 'Instancia SQL no accesible.',
+            suggestion: 'Verifica que el servicio SQL Server esté iniciado o activa el Modo Evaluación (Sin ERP instalado) para hacer pruebas.'
+          }, '<button type="button" onclick="wizEnableEvaluationMode()" class="smart-error-btn smart-error-btn-primary">🧪 Activar Modo Evaluación</button>');
+        }
+      } catch (err) {
+        renderWizardErrorCard(alertBox, {
+          title: 'Error al probar SQL Server',
+          cause: String(err),
+          suggestion: 'Puedes activar el Modo Evaluación en 1 clic si estás en un equipo de pruebas.'
+        });
+      }
+    }
+
+    async function testMainSqlErpConnection() {
+      const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || '.\\SQLEXPRESS';
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || 'AgoraPOS';
+      const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
+      const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
+      const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
+      const orderSeries = (document.getElementById('input-sql-erp-series') ? document.getElementById('input-sql-erp-series').value.trim() : '1') || '1';
+      const alertBox = document.getElementById('sql-main-test-alert');
+
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.innerHTML = '<div style="color:var(--text-muted);padding:6px 0;font-size:12px;">⏳ Verificando conexión SQL Server...</div>';
+      }
+
+      try {
+        const res = await fetch('/api/local/test-sql-erp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            erpType: activeErp,
+            sqlInstance: sqlInstance,
+            databasePath: databasePath,
+            authMode: authMode,
+            username: username,
+            password: password,
+            orderSeries: orderSeries,
+            evaluationMode: databasePath.toUpperCase() === 'DEMO'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderWizardSuccessCard(alertBox, data.message || 'Conexión SQL Server verificada.');
+          loadSqlErpPreview();
+        } else {
+          renderWizardErrorCard(alertBox, {
+            title: 'Error de conexión SQL Server',
+            cause: data.message,
+            suggestion: 'Comprueba la instancia SQL o activa el Modo Evaluación (Datos Demo).'
+          });
+        }
+      } catch (err) {
+        renderWizardErrorCard(alertBox, { title: 'Error SQL', cause: String(err) });
+      }
+    }
+
+    async function wizEnableEvaluationMode() {
+      const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'factusol';
+      try {
+        const factInput = document.getElementById('wiz-input-fact-path');
+        const sgInput = document.getElementById('wiz-input-simplygest-path');
+        const sqlDbInput = document.getElementById('wiz-input-sql-dbname');
+        if (activeErp === 'factusol' && factInput) factInput.value = 'DEMO';
+        if (activeErp === 'simplygest' && sgInput) sgInput.value = 'DEMO';
+        if (sqlDbInput && (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp')) sqlDbInput.value = 'DEMO';
+
+        const res = await fetch('/api/local/test-sql-erp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            erpType: activeErp,
+            databasePath: 'DEMO',
+            evaluationMode: true
+          })
+        });
+        const data = await res.json();
+        const alertId = activeErp === 'simplygest' ? 'wiz-simplygest-alert' : ((activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') ? 'wiz-sql-alert' : 'wiz-fact-alert');
+        const alertBox = document.getElementById(alertId);
+        if (alertBox) {
+          renderWizardSuccessCard(alertBox, data.message || 'Modo Evaluación (Datos Demo) activado con éxito.');
+        }
+        if (typeof showSmartToast === 'function') {
+          showSmartToast({
+            title: '🧪 Modo Evaluación Activado',
+            message: (data.message || 'Datos Demo cargados') + '. Puedes avanzar al Paso 3.',
+            type: 'success'
+          });
+        }
+      } catch (err) {
+        if (typeof showToast === 'function') showToast('Modo Evaluación activado', 'info');
+      }
+    }
+
+    async function enableSqlEvaluationModeMain() {
+      const dbInput = document.getElementById('input-sql-erp-db');
+      if (dbInput) dbInput.value = 'DEMO';
+      await testMainSqlErpConnection();
+      await saveSqlErpSettings();
+    }
+
+    async function saveSqlErpSettings() {
+      const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || '.\\SQLEXPRESS';
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || 'AgoraPOS';
+      const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
+      const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
+      const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
+      const warehouseCode = (document.getElementById('input-sql-erp-warehouse') ? document.getElementById('input-sql-erp-warehouse').value.trim() : '1') || '1';
+      const orderSeries = (document.getElementById('input-sql-erp-series') ? document.getElementById('input-sql-erp-series').value.trim() : '1') || '1';
+      const isDemo = databasePath.toUpperCase() === 'DEMO';
+
+      const providerCfg = {
+        sqlInstance: sqlInstance,
+        databasePath: databasePath,
+        authMode: authMode,
+        username: username,
+        password: password || undefined,
+        warehouseCode: warehouseCode,
+        orderSeries: orderSeries,
+        evaluationMode: isDemo
+      };
+      const providersMap = {};
+      providersMap[activeErp] = providerCfg;
+
+      const payload = {
+        erpType: activeErp,
+        softwareErp: {
+          activeProvider: activeErp,
+          provisioned: true,
+          providers: providersMap
+        }
+      };
+      payload[activeErp] = providerCfg;
+      await submitConfigUpdates(payload, 'Ajustes de ' + activeErp.toUpperCase() + ' guardados con éxito.');
+      loadSqlErpPreview();
+    }
+
+    async function loadSqlErpPreview() {
+      const tbody = document.getElementById('sql-erp-articles-table-body');
+      if (!tbody) return;
+      try {
+        const res = await fetch('/api/local/erp/preview');
+        const data = await res.json();
+        const articles = data.articles || [];
+        const tag = document.getElementById('sql-erp-article-count-tag');
+        if (tag) tag.textContent = articles.length + ' arts. mostrados';
+        if (articles.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Sin artículos cargados. Conecta tu SQL Server o pulsa en "Activar Modo Evaluación (Datos Demo)".</td></tr>';
+          return;
+        }
+        const esc = window.escapeHtml || function(s) { return String(s || ''); };
+        tbody.innerHTML = articles.map(function(a) {
+          const stockColor = a.stock > 0 ? '#34d399' : '#f87171';
+          const displayPrice = (a.salePrice !== undefined && a.salePrice > 0) ? a.salePrice : a.costPrice;
+          return '<tr>' +
+            '<td><span class="tag tag-blue">' + esc(a.code) + '</span></td>' +
+            '<td style="font-weight:500;">' + esc(a.description || 'Sin descripción') + '</td>' +
+            '<td><span class="tag tag-amber">' + esc(a.family || 'GEN') + '</span></td>' +
+            '<td style="text-align:right;font-weight:700;color:' + stockColor + '">' + Number(a.stock || 0) + '</td>' +
+            '<td style="text-align:right;font-family:monospace;font-weight:600;color:#fff;">' + Number(displayPrice || 0).toFixed(2) + ' €</td>' +
+            '<td style="color:var(--text-subtle);font-family:monospace;">' + esc(a.ean || '---') + '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--rose);padding:20px;">Error al consultar vista previa del ERP SQL.</td></tr>';
+      }
+    }
+
     async function finishWizardAndStart() {
       const factInput = document.getElementById('wiz-input-fact-path');
       const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
@@ -493,6 +771,37 @@ export const wizardScript = `
       const sgPath = sgInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(sgInput) : sgInput.value.trim()) : '';
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'factusol';
 
+      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || '.\\SQLEXPRESS';
+      const sqlDbName = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || '';
+      const sqlAuthMode = document.getElementById('wiz-select-sql-auth') ? document.getElementById('wiz-select-sql-auth').value : 'windows';
+      const sqlUser = document.getElementById('wiz-input-sql-user') ? document.getElementById('wiz-input-sql-user').value.trim() : 'sa';
+      const sqlPass = document.getElementById('wiz-input-sql-pass') ? document.getElementById('wiz-input-sql-pass').value : '';
+      const sqlSeries = (document.getElementById('wiz-input-sql-series') ? document.getElementById('wiz-input-sql-series').value.trim() : '1') || '1';
+
+      const providers = {
+        factusol: {
+          databasePath: factPath || undefined,
+          orderSeries: orderSeriesVal,
+          evaluationMode: factPath.toUpperCase() === 'DEMO' ? true : undefined
+        },
+        simplygest: {
+          databasePath: sgPath || undefined,
+          evaluationMode: sgPath.toUpperCase() === 'DEMO' ? true : undefined
+        }
+      };
+
+      if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
+        providers[activeErp] = {
+          sqlInstance: sqlInstance,
+          databasePath: sqlDbName || undefined,
+          authMode: sqlAuthMode,
+          username: sqlUser,
+          password: sqlPass || undefined,
+          orderSeries: sqlSeries,
+          evaluationMode: sqlDbName.toUpperCase() === 'DEMO' ? true : undefined
+        };
+      }
+
       // Guardar todo
       const payload = {
         licenseKey: document.getElementById('wiz-input-lic').value.trim() || undefined,
@@ -501,15 +810,7 @@ export const wizardScript = `
         softwareErp: {
           activeProvider: activeErp,
           provisioned: true,
-          providers: {
-            factusol: {
-              databasePath: factPath || undefined,
-              orderSeries: orderSeriesVal
-            },
-            simplygest: {
-              databasePath: sgPath || undefined,
-            }
-          }
+          providers: providers
         },
         factusol: {
           databasePath: factPath || undefined,
@@ -528,6 +829,9 @@ export const wizardScript = `
           consumerSecret: document.getElementById('wiz-input-wc-secret').value.trim() || undefined,
         }
       };
+      if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
+        payload[activeErp] = providers[activeErp];
+      }
       await submitConfigUpdates(payload, '¡Configuración completada con éxito!');
       localStorage.setItem('bentian_onboarding_completed', 'true');
       closeWizardModal();
@@ -569,6 +873,16 @@ export const wizardScript = `
     window.wizTestUniversal = wizTestUniversal;
     window.wizTestWooCommerce = wizTestWooCommerce;
     window.wizTestFactusolConnection = wizTestFactusolConnection;
+    window.wizToggleSqlAuthFields = wizToggleSqlAuthFields;
+    window.toggleMainSqlAuthFields = toggleMainSqlAuthFields;
+    window.wizDetectSqlInstances = wizDetectSqlInstances;
+    window.selectDetectedSqlInstance = selectDetectedSqlInstance;
+    window.wizTestSqlErpConnection = wizTestSqlErpConnection;
+    window.testMainSqlErpConnection = testMainSqlErpConnection;
+    window.wizEnableEvaluationMode = wizEnableEvaluationMode;
+    window.enableSqlEvaluationModeMain = enableSqlEvaluationModeMain;
+    window.saveSqlErpSettings = saveSqlErpSettings;
+    window.loadSqlErpPreview = loadSqlErpPreview;
     window.setWizOrderSeries = setWizOrderSeries;
     window.onWizOrderSeriesInput = onWizOrderSeriesInput;
     window.finishWizardAndStart = finishWizardAndStart;

@@ -287,7 +287,118 @@ export function renderFactusolTab(): string {
           </div>
         </div>
 
-        <!-- ================= MODAL: CAMBIAR ERP CON CONFIRMACIÓN (GRID 3x2) ================= -->
+        <!-- ================= PANEL 3: MS SQL SERVER LOCAL (ÁGORA POS, SAGE 50, A3ERP) ================= -->
+        <div id="panel-erp-sql" style="display: none;">
+          <div class="form-section">
+            <div class="section-header">
+              <div>
+                <div id="main-sql-erp-title" class="section-title">Base de Datos MS SQL Server Local</div>
+                <div id="main-sql-erp-desc" class="section-desc">Conexión local de alta velocidad a Microsoft SQL Server con lecturas no bloqueantes <code>WITH (NOLOCK)</code> y transacciones atómicas de pedidos.</div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="wizDetectSqlInstances(false)" id="btn-detect-sql-main" class="btn btn-secondary btn-sm">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <span>Autodetectar Instancias SQL</span>
+                </button>
+                <button onclick="enableSqlEvaluationModeMain()" id="btn-eval-mode-sql-main" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #d97706, #f59e0b); border: none; font-weight: 600;">
+                  <span>🧪 Activar Modo Evaluación (Datos Demo)</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="sql-main-detected-box" class="form-group" style="display: none;">
+              <label class="form-label">Instancias locales de SQL Server detectadas:</label>
+              <div id="sql-main-detected-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="form-group">
+                <label class="form-label">Servidor / Instancia SQL Server Local:</label>
+                <input type="text" id="input-sql-erp-instance" class="form-control" value=".\\SQLEXPRESS" placeholder="localhost, 127.0.0.1:1433, .\\SQLEXPRESS, .\\AGORA, .\\SAGE50" style="font-family: monospace; font-size: 13px;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nombre de la Base de Datos / Ejercicio:</label>
+                <div class="input-with-button">
+                  <input type="text" id="input-sql-erp-db" class="form-control" value="AgoraPOS" placeholder="AgoraPOS / SAGE50 / A3ERP  o  DEMO" style="font-family: monospace; font-size: 13px;">
+                  <button onclick="testMainSqlErpConnection()" id="btn-test-sql-main" class="btn btn-secondary" style="white-space: nowrap;">
+                    <span>Probar Conexión SQL</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr 120px; gap: 14px;">
+              <div class="form-group">
+                <label class="form-label">Modo de Autenticación:</label>
+                <select id="select-sql-erp-auth" class="form-control form-select" onchange="toggleMainSqlAuthFields(this.value)">
+                  <option value="windows">Autenticación Integrada de Windows (Recomendado)</option>
+                  <option value="sql">Usuario SQL Server (sa y contraseña)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Almacén de Stock:</label>
+                <input type="text" id="input-sql-erp-warehouse" class="form-control" value="1" placeholder="1 o GEN">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Serie Pedidos Web:</label>
+                <input type="text" id="input-sql-erp-series" class="form-control" value="1" maxlength="4" style="text-transform: uppercase; font-weight: 700;">
+              </div>
+            </div>
+
+            <div id="main-sql-credentials-row" class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 14px; display: none;">
+              <div class="form-group">
+                <label class="form-label">Usuario SQL Server:</label>
+                <input type="text" id="input-sql-erp-user" class="form-control" value="sa" placeholder="sa" style="font-family: monospace;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contraseña SQL Server:</label>
+                <input type="password" id="input-sql-erp-pass" class="form-control" placeholder="••••••••">
+              </div>
+            </div>
+
+            <div id="sql-main-test-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <button onclick="saveSqlErpSettings()" class="btn btn-primary">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Guardar Ajustes SQL Server</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table-toolbar">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="sql-erp-preview-title" style="font-size: 14px; font-weight: 600; color: #fff;">Vista Previa de Artículos ERP SQL</span>
+                <span id="sql-erp-article-count-tag" class="tag tag-blue">0 arts.</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button onclick="loadSqlErpPreview()" class="btn btn-secondary btn-sm">
+                  <span>Recargar Catálogo</span>
+                </button>
+              </div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 110px;">Código</th>
+                  <th>Descripción del Artículo</th>
+                  <th style="width: 90px;">Familia</th>
+                  <th style="width: 90px; text-align: right;">Stock Real</th>
+                  <th style="width: 90px; text-align: right;">Precio Venta</th>
+                  <th style="width: 120px;">Código EAN</th>
+                </tr>
+              </thead>
+              <tbody id="sql-erp-articles-table-body">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Cargando catálogo del ERP SQL...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ================= MODAL: CAMBIAR ERP CON CONFIRMACIÓN (5 ERPs OFICIALES) ================= -->
         <div id="modal-switch-erp" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeSwitchErpModal()">
           <div class="modal-card" style="max-width: 960px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px 28px;">
             <div class="modal-header" style="margin-bottom: 8px;">
@@ -296,8 +407,8 @@ export function renderFactusolTab(): string {
                   <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 3 4 4-4 4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 21-4-4 4-4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17h16"/></svg>
                 </div>
                 <div>
-                  <div style="font-weight: 700; font-size: 16px; color: #fff;">Cambiar Software ERP Activo</div>
-                  <div style="font-size: 12px; color: var(--text-muted);">Selecciona el programa con el que sincronizarás ventas, precios y existencias. Cada software conserva sus rutas y ajustes guardados de forma independiente.</div>
+                  <div style="font-weight: 700; font-size: 16px; color: #fff;">Cambiar Software ERP Local Activo</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">Selecciona cualquiera de los 5 ERPs locales de escritorio en Windows incluidos en tu licencia única.</div>
                 </div>
               </div>
               <button onclick="closeSwitchErpModal()" class="btn btn-secondary btn-sm" style="padding: 0; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px;">
@@ -306,7 +417,6 @@ export function renderFactusolTab(): string {
             </div>
 
             <div class="modal-body" style="padding-top: 14px;">
-              <!-- GRID DE 6 TARJETAS EN 3x2 -->
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin-bottom: 20px;">
                 
                 <!-- 1. FACTUSOL -->
@@ -321,8 +431,8 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-factusol" class="tag tag-blue" style="font-size: 9.5px;">Seleccionado</span>
                     </div>
-                    <div style="font-size: 11px; color: #93c5fd; margin-bottom: 4px; font-weight: 600;">Software DELSOL (Local o Red)</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Bases de datos Access (.accdb y .mdb). Versiones 2018 a 2026, unidades de red y NAS.</div>
+                    <div style="font-size: 11px; color: #93c5fd; margin-bottom: 4px; font-weight: 600;">Software DELSOL (Access .accdb / SQL)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas F_ART, F_STO, F_LTA y pedidos en F_PCL / F_LPC. Unidades locales, red y NAS.</div>
                   </div>
                 </div>
 
@@ -338,76 +448,59 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-simplygest" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #6ee7b7; margin-bottom: 4px; font-weight: 600;">SimplyGest Software</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Base de datos Datos.mdb. Acceso directo a tarifas, existencias y pedidos comerciales.</div>
+                    <div style="font-size: 11px; color: #6ee7b7; margin-bottom: 4px; font-weight: 600;">SimplyGest Desktop (MySQL / Datos.mdb)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Acceso directo a artículos, familias, tarifas, existencias e inyección de pedidos.</div>
                   </div>
                 </div>
 
-                <!-- 3. SAGE 50 / 200 -->
-                <div class="channel-card" style="cursor: pointer; opacity: 0.65; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;" onclick="showSmartToast({ title: 'Sage 50 / 200', message: 'Conector en fase de desarrollo en el roadmap de Bentian. ¡Próximamente disponible!', type: 'info' })">
+                <!-- 3. ÁGORA RETAIL / POS -->
+                <div id="modal-choice-agora" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('agora')">
                   <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                       <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(34,197,94,0.12); display: flex; align-items: center; justify-content: center; color: #4ade80;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(244,114,182,0.15); display: flex; align-items: center; justify-content: center; color: #f472b6;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Ágora Retail / POS</span>
+                      </div>
+                      <span id="modal-badge-agora" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #f9a8d4; margin-bottom: 4px; font-weight: 600;">MS SQL Server Express Local</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Sincronización TPV de mostrador y tienda web (&lt;5s) sobre Product, PriceList, Stock y CustomerOrder.</div>
+                  </div>
+                </div>
+
+                <!-- 4. SAGE 50 -->
+                <div id="modal-choice-sage50" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('sage50')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; color: #4ade80;">
                           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.5L19 7.5V19a2 2 0 0 1-2 2z"/></svg>
                         </div>
-                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Sage 50 / 200</span>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Sage 50</span>
                       </div>
-                      <span class="tag tag-amber" style="font-size: 9px;">Próximamente</span>
+                      <span id="modal-badge-sage50" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #86efac; margin-bottom: 4px; font-weight: 600;">Sage Connected</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Integración con contabilidad y gestión comercial Sage para empresas y despachos.</div>
+                    <div style="font-size: 11px; color: #86efac; margin-bottom: 4px; font-weight: 600;">MS SQL Server Local (Ejercicio Activo)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas SQL articulo, stocks, pvp/tarifas y pedidos de venta c_pediven y d_pediven.</div>
                   </div>
                 </div>
 
-                <!-- 4. HOLDED CLOUD ERP -->
-                <div class="channel-card" style="cursor: pointer; opacity: 0.65; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;" onclick="showSmartToast({ title: 'Holded ERP Cloud', message: 'Conector Cloud en fase de pruebas beta. Estará disponible en la siguiente versión.', type: 'info' })">
-                  <div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(168,85,247,0.15); display: flex; align-items: center; justify-content: center; color: #c084fc;">
-                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 0 0 4 4h9a5 5 0 1 0-.1-9.999 5.002 5.002 0 0 0-9.78 2.096A4.001 4.001 0 0 0 3 15z"/></svg>
-                        </div>
-                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Holded Cloud</span>
-                      </div>
-                      <span class="tag" style="font-size: 9px; background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3);">En Desarrollo</span>
-                    </div>
-                    <div style="font-size: 11px; color: #d8b4fe; margin-bottom: 4px; font-weight: 600;">Holded Technologies</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Sincronización API cloud-to-cloud de inventario en tiempo real y facturación automática.</div>
-                  </div>
-                </div>
-
-                <!-- 5. ODOO ERP -->
-                <div class="channel-card" style="cursor: pointer; opacity: 0.65; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;" onclick="showSmartToast({ title: 'Odoo ERP', message: 'Conector Odoo Community & Enterprise en roadmap oficial.', type: 'info' })">
-                  <div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                      <div style="display: flex; align-items: center; gap: 8px;">
-                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(20,184,166,0.15); display: flex; align-items: center; justify-content: center; color: #2dd4bf;">
-                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/></svg>
-                        </div>
-                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Odoo Community / Ent.</span>
-                      </div>
-                      <span class="tag tag-blue" style="font-size: 9px;">Próximamente</span>
-                    </div>
-                    <div style="font-size: 11px; color: #99f6e4; margin-bottom: 4px; font-weight: 600;">Odoo S.A.</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Conexión XML-RPC / JSON-RPC para artículos, existencias multialmacén y ventas.</div>
-                  </div>
-                </div>
-
-                <!-- 6. A3ERP (WOLTERS KLUWER) -->
-                <div class="channel-card" style="cursor: pointer; opacity: 0.65; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px;" onclick="showSmartToast({ title: 'A3ERP', message: 'Conector para A3ERP (Wolters Kluwer) en roadmap oficial de Bentian.', type: 'info' })">
+                <!-- 5. A3ERP (WOLTERS KLUWER) -->
+                <div id="modal-choice-a3erp" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('a3erp')">
                   <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                       <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(245,158,11,0.15); display: flex; align-items: center; justify-content: center; color: #fbbf24;">
                           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4"/></svg>
                         </div>
-                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">A3ERP</span>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">a3ERP</span>
                       </div>
-                      <span class="tag tag-amber" style="font-size: 9px;">Próximamente</span>
+                      <span id="modal-badge-a3erp" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #fde68a; margin-bottom: 4px; font-weight: 600;">Wolters Kluwer</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Software estándar de gestión empresarial y contabilidad integral para PYMES.</div>
+                    <div style="font-size: 11px; color: #fde68a; margin-bottom: 4px; font-weight: 600;">Wolters Kluwer (MS SQL Server Local)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas maestras SQL ARTICULO, STOCKALM, tarifas y cabeceras/líneas CABEPEV y LINEPEV.</div>
                   </div>
                 </div>
 
