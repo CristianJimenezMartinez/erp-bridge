@@ -4,16 +4,16 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
   slug: 'primeros-pasos/asistente-de-configuracion',
   categorySlug: 'primeros-pasos',
   title: 'Guía del Asistente de Configuración (Onboarding Wizard)',
-  subtitle: 'Configuración guiada paso a paso en 5 minutos: activación en 1 clic, selección Multi-ERP (Factusol y SimplyGest), modo sin ERP para evaluadores y soporte integrado.',
+  subtitle: 'Configuración guiada paso a paso en 5 minutos: activación en 1 clic, selección Multi-ERP (Factusol, SimplyGest, Ágora POS, Sage 50 y a3ERP), modo de Evaluación Sandbox sin ERP y soporte integrado.',
   badge: 'Onboarding Zero-Touch',
-  readingTime: '6 min de lectura',
+  readingTime: '7 min de lectura',
   metaTitle: 'Guía del Asistente de Inicio de Bentian ERP Bridge | Paso a Paso',
-  metaDescription: 'Manual completo del Asistente de Configuración de Bentian ERP Bridge. Activación en 1 clic, selector Multi-ERP (Factusol y SimplyGest), Serie 1 vs W y documentación integrada.',
-  keywords: 'asistente bentian, wizard factusol simplygest, configuracion paso a paso bentian, conectar factusol simplygest, continuar sin factusol, serie 1 factusol pedidos web',
+  metaDescription: 'Manual completo del Asistente de Configuración de Bentian ERP Bridge. Activación en 1 clic, selector Multi-ERP (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP), SQL Server Local y Modo Evaluación Sandbox.',
+  keywords: 'asistente bentian, wizard factusol simplygest sage50 agora a3erp, configuracion paso a paso bentian, conectar sql server local erp, modo evaluacion sandbox bentian, serie 1 factusol pedidos web',
   toc: [
     { id: 'vision-general-asistente', label: '1. Visión General del Asistente Zero-Touch (4 Pasos)', level: 2 },
     { id: 'paso-1-licencia', label: '2. Paso 1: Licencia (Activación en 1 Clic o Modo Exploración)', level: 2 },
-    { id: 'paso-2-erp', label: '3. Paso 2: Selección y Conexión con tu ERP (Factusol o SimplyGest)', level: 2 },
+    { id: 'paso-2-erp', label: '3. Paso 2: Selección y Conexión con los 5 ERPs Locales (OLEDB y SQL Server)', level: 2 },
     { id: 'serie-factusol-recomendada', label: '4. Configuración Clave: Series Contables, Tarifas y Almacén', level: 2 },
     { id: 'paso-3-tienda', label: '5. Paso 3: Conexión con la Tienda Web (Universal o WooCommerce)', level: 2 },
     { id: 'paso-4-listo', label: '6. Paso 4: ¡Todo Listo!, Spotlight Tour y Documentación Integrada', level: 2 },
@@ -105,9 +105,9 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
         </p>
       </div>
 
-      <h2 id="paso-2-erp" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Paso 2: Selección y Conexión con tu ERP (Factusol o SimplyGest)</h2>
+      <h2 id="paso-2-erp" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Paso 2: Selección y Conexión con los 5 ERPs Locales (OLEDB y SQL Server)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En este paso eliges el software de gestión instalado en tu empresa y vinculas su base de datos relacional local:
+        En este paso seleccionas uno de los <strong>5 ERPs de escritorio en Windows</strong> soportados oficialmente por Bentian ERP Bridge y vinculas su motor relacional local (archivos Access OLEDB o instancia Microsoft SQL Server):
       </p>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -146,15 +146,54 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
         </div>
       </div>
 
-      <!-- Card Continuar sin ERP Evaluadores -->
+      <!-- Bloque SQL Server Local: Agora, Sage 50, a3ERP -->
+      <div class="p-5 rounded-xl bg-zinc-900/70 border border-sky-500/30 mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+          <span class="text-xs font-bold text-white flex items-center gap-2">
+            <span>🗄️</span>
+            <span>ERPs sobre Microsoft SQL Server Local: Ágora Retail / POS, Sage 50 y a3ERP</span>
+          </span>
+          <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">SqlServerBaseAdapter (SQLOLEDB / MSOLEDBSQL)</span>
+        </div>
+        <p class="text-xs text-zinc-300 leading-relaxed mb-4">
+          Cuando seleccionas <strong>Ágora Retail / POS</strong>, <strong>Sage 50 (c50 / Eurowin)</strong> o <strong>a3ERP (Wolters Kluwer)</strong> en el selector 5-ERP, el asistente despliega automáticamente el formulario de conexión a <strong>SQL Server Local</strong>:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 text-xs">
+          <div class="p-3 rounded-lg bg-black/40 border border-white/[0.06]">
+            <div class="font-bold text-amber-400 mb-1">🛒 Ágora Retail / POS</div>
+            <p class="text-zinc-400 leading-snug mb-1.5">Instancia predeterminada <code class="text-zinc-200">localhost\\AGORA</code> o <code class="text-zinc-200">.\\SQLEXPRESS</code>.</p>
+            <a href="/docs/sql-erps/conector-agora-pos-retail/" class="text-[11px] text-amber-300 hover:underline font-semibold">Ver guía Ágora POS →</a>
+          </div>
+          <div class="p-3 rounded-lg bg-black/40 border border-white/[0.06]">
+            <div class="font-bold text-emerald-400 mb-1">📈 Sage 50 (Eurowin)</div>
+            <p class="text-zinc-400 leading-snug mb-1.5">Instancia <code class="text-zinc-200">localhost\\SAGE50</code> con tablas <code class="text-zinc-200">articulo</code>, <code class="text-zinc-200">stocks</code>, <code class="text-zinc-200">c_pedive</code> y <code class="text-zinc-200">d_pedive</code>.</p>
+            <a href="/docs/sql-erps/conector-sage50-sql-server/" class="text-[11px] text-emerald-300 hover:underline font-semibold">Ver guía Sage 50 →</a>
+          </div>
+          <div class="p-3 rounded-lg bg-black/40 border border-white/[0.06]">
+            <div class="font-bold text-sky-400 mb-1">🏢 a3ERP (Wolters Kluwer)</div>
+            <p class="text-zinc-400 leading-snug mb-1.5">Instancia <code class="text-zinc-200">localhost\\A3ERP</code> con tablas <code class="text-zinc-200">ARTICULO</code>, <code class="text-zinc-200">CABEPEV</code> y <code class="text-zinc-200">LINEPEV</code>.</p>
+            <a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="text-[11px] text-sky-300 hover:underline font-semibold">Ver guía a3ERP →</a>
+          </div>
+        </div>
+        <ul class="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+          <li><strong>Botón Autodetectar instancias SQL:</strong> Escanea servicios locales de Windows (<code class="text-zinc-200">Get-Service MSSQL*</code>) y prueba conectividad TCP en <code class="text-sky-300">localhost:1433</code>, <code class="text-sky-300">.\\SQLEXPRESS</code>, <code class="text-sky-300">.\\AGORA</code>, <code class="text-sky-300">.\\SAGE50</code> y <code class="text-sky-300">.\\A3ERP</code> rellenando el servidor en un clic.</li>
+          <li><strong>Autenticación Dual:</strong> Permite alternar entre <em>Autenticación Integrada de Windows (SSPI)</em> (sin usuario ni contraseña) o <em>Autenticación SQL Server</em> (<code class="text-zinc-200">sa</code> o usuario dedicado).</li>
+          <li><strong>Serie y Almacén:</strong> Configura la serie contable de pedidos web y el código de almacén para cada proveedor SQL de forma aislada en <code class="text-zinc-200">%APPDATA%</code>.</li>
+        </ul>
+      </div>
+
+      <!-- Card Continuar sin ERP / Modo Evaluacion Sandbox -->
       <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 mb-6 flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
         <div>
           <div class="text-xs font-bold text-amber-300 mb-1 flex items-center gap-1.5">
             <span>🧪</span>
-            <span>¿No tienes Factusol ni SimplyGest en este ordenador?</span>
+            <span>Modo Evaluación Sandbox: ¿No tienes ningún ERP instalado en este ordenador?</span>
           </div>
-          <p class="text-xs text-zinc-300 leading-relaxed">
-            Si estás evaluando Bentian en tu portátil personal o en un equipo donde el ERP reside en el servidor del almacén, pulsa en <strong class="text-amber-300">Continuar sin Factusol / sin ERP →</strong>. Podrás continuar configurando tu tienda web o explorar el panel en modo demostración. Podrás vincular tu base de datos en cualquier momento posterior desde el selector Multi-ERP.
+          <p class="text-xs text-zinc-300 leading-relaxed mb-2">
+            Si estás probando Bentian en tu portátil personal o quieres hacer una demostración comercial antes de instalarlo en el servidor del almacén, pulsa el botón <strong class="text-amber-300">Probar en Modo Evaluación (Sin ERP instalado)</strong>.
+          </p>
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            El agente activará el motor en memoria <code class="text-amber-200 font-mono">EvaluationSandboxAdapter</code> con <strong>25 artículos de ferretería y suministro industrial pre-cargados</strong> (stock real simulado, precios e IVA) y permitirá inyectar pedidos de prueba completos sin tocar ninguna base de datos externa. En la cabecera verás el indicador <span class="text-amber-300 font-semibold">MODO EVALUACIÓN (DATOS DEMO)</span> con acceso directo para conectar tu ERP real cuando quieras.
           </p>
         </div>
       </div>
@@ -218,6 +257,21 @@ export const asistenteDeConfiguracionArticle: DocArticle = {
               </td>
               <td class="px-4 py-3">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">Multi-Tarifa Nativo</span>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium text-white">
+                <span class="font-bold text-sky-400 block">Sage 50 / Ágora / a3ERP</span>
+                <span class="text-[10px] text-zinc-500">SQL Server Local (Serie + Almacén)</span>
+              </td>
+              <td class="px-4 py-3 text-zinc-300">
+                Transacción ACID en <code class="text-zinc-200">c_pedive</code> (Sage 50), <code class="text-zinc-200">SaleOrder</code> (Ágora) o <code class="text-zinc-200">CABEPEV</code> (a3ERP) con numeración correlativa <code class="text-zinc-200">UPDLOCK</code>.
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-medium">
+                Inmediata. Lecturas de stock con <code class="text-zinc-200">WITH (NOLOCK)</code> para cero bloqueos en terminales TPV.
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/10 text-sky-300 border border-sky-500/25">SQL Transaccional</span>
               </td>
             </tr>
           </tbody>
