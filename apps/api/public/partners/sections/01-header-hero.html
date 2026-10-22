@@ -1,0 +1,101 @@
+  <!-- HEADER EN 1 SOLA LÍNEA (ANTI-WRAP) -->
+  <header class="sticky top-0 z-50 border-b border-white/[0.14] bg-[#0b0d13]/95 backdrop-blur-md">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2.5 group shrink-0 whitespace-nowrap">
+        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-8 h-8 object-contain shrink-0 group-hover:scale-105 transition-transform" width="32" height="32" />
+        <span class="font-bold text-lg text-white tracking-tight whitespace-nowrap shrink-0">Bentian</span>
+        <span class="text-[11px] font-mono font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-md whitespace-nowrap shrink-0">Partners B2B</span>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-[13px] text-slate-300 font-medium shrink-0">
+        <a href="#perfiles" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Perfiles de Partner</a>
+        <a href="#matriz-erp" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">5 ERPs + Fotos Auto</a>
+        <a href="#calculadora" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Calculadora 25%</a>
+        <a href="#piloto" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Piloto Asistido</a>
+        <a href="/docs/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Docs Técnicos</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <button onclick="window.print()" class="no-print hidden xl:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/[0.16] bg-[#161a26] hover:bg-[#1e2436] text-xs font-medium text-slate-200 transition whitespace-nowrap shrink-0" title="Guardar o imprimir como Dossier PDF">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Dossier PDF</span>
+        </button>
+        <a href="/dashboard" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-white/[0.16] bg-[#161a26] hover:bg-[#1e2436] text-xs font-medium text-slate-200 hover:text-white transition whitespace-nowrap shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+          <span>Acceso Partner</span>
+        </a>
+        <a href="#alta-partner" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/25 whitespace-nowrap shrink-0">
+          Alta Partner + Licencia NFR →
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+
+    <!-- BREADCRUMB LIMPIO -->
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs font-medium text-slate-400 flex items-center gap-2">
+      <a href="/" class="hover:text-white transition">Inicio</a>
+      <span class="text-slate-600">/</span>
+      <span class="text-emerald-400 font-semibold">Programa Oficial de Partners, Agentes Digitalizadores e Implantadores ERP</span>
+    </nav>
+
+    <!-- HERO SECTION / PORTADA DEL DOSSIER CON ALTO CONTRASTE -->
+    <section class="p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-[#171d2e] via-[#141927] to-[#111520] border border-emerald-500/40 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.65)] relative overflow-hidden print-surface">
+      <div class="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+      <div class="relative z-10 flex flex-wrap items-center gap-2.5 mb-5">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-semibold whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          COMISIÓN 25% RECURRENTE VITALICIA + 100% SETUP FEE PARA TI
+        </span>
+        <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-200 text-xs font-mono font-semibold whitespace-nowrap">
+          Versión <span data-app-version class="ml-1">v0.4.12</span>
+        </span>
+      </div>
+
+      <h1 class="relative z-10 text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-[1.16] max-w-5xl">
+        El Puente ERP Local que desbloquea tus proyectos de <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-300 to-indigo-300">WooCommerce, Shopify, PrestaShop y Holded</span>.
+      </h1>
+
+      <p class="relative z-10 mt-5 text-sm sm:text-base text-slate-200 leading-relaxed max-w-4xl">
+        Deja de perder semanas programando integraciones a medida o peleándote con archivos <code class="px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-mono text-xs">.accdb</code>, tablas DBISAM <code class="px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-mono text-xs">.dat</code> o servidores SQL cerrados. Instala <strong class="text-white">Bentian ERP Bridge</strong> en el Windows del cliente en 15 minutos, sincroniza catálogo, stock, pedidos y <strong class="text-white">fotografías 100% automáticas</strong> sin abrir puertos en el router, y genera ingresos pasivos recurrentes con cada cliente.
+      </p>
+
+      <!-- KPIs Rápidos con Superficie Elevada (#1e2436) -->
+      <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-emerald-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">25%</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">Comisión Recurrente Vitalicia</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Cobras cada año que el cliente renueva su licencia.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-indigo-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-indigo-300 font-mono">100%</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">Tus Honorarios de Setup</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Factura 250 €–600 € por la puesta en marcha y quédate el 100%.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-sky-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-sky-300 font-mono">5 ERPs</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">+ Holded Cloud en 1 Agente</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Factusol, SimplyGest, Sage 50, a3ERP y Ágora POS.</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-amber-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-amber-300 font-mono">0 €</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">1º Cliente Piloto Asistido</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Ingeniería se conecta contigo gratis en tu primera implantación.</p>
+        </div>
+      </div>
+
+      <div class="relative z-10 no-print mt-8 pt-6 border-t border-white/[0.14] flex flex-wrap items-center gap-3.5">
+        <a href="#alta-partner" class="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 whitespace-nowrap">
+          ⚡ Activar Código PT-XXXX + Licencia NFR en 1 Clic →
+        </a>
+        <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20somos%20una%20agencia/implantador%20y%20queremos%20activar%20nuestro%20codigo%20de%20Partner%20en%20Bentian" target="_blank" rel="noopener noreferrer" class="px-5 py-3.5 rounded-xl bg-[#1e2436] hover:bg-[#262d42] border border-white/[0.18] text-white font-semibold text-sm transition whitespace-nowrap">
+          💬 Hablar por WhatsApp con Ingeniería
+        </a>
+        <button onclick="window.print()" class="px-5 py-3.5 rounded-xl bg-[#161b28] hover:bg-[#1e2436] border border-white/[0.15] text-slate-200 font-medium text-xs transition flex items-center gap-2 whitespace-nowrap">
+          <span>🖨️ Imprimir / Guardar Dossier PDF (A4)</span>
+        </button>
+      </div>
+    </section>

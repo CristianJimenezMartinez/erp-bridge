@@ -1,3 +1,7 @@
+<!-- ========================================================================================= -->
+<!-- ⚠️ AVISO: PORTAL PARTNERS COMPILADO AUTOMÁTICAMENTE — NO EDITAR DIRECTAMENTE              -->
+<!-- El código fuente modular (<= 250 LOC) reside en apps/api/public/partners/sections/        -->
+<!-- ========================================================================================= -->
 <!DOCTYPE html>
 <html lang="es" class="dark scroll-smooth">
 <head>
@@ -92,117 +96,114 @@
 
   <style>
     body { background-color: #0b0d13; color: #f8fafc; }
-    .bg-\[\#09090b\] { background-color: #0b0d13 !important; }
-    .bg-\[\#121215\] { background-color: #151822 !important; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07); }
-    .bg-\[\#18181b\] { background-color: #1e2230 !important; }
-    .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
-    .border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
-    .text-zinc-500 { color: #a1a8b8 !important; }
-    .text-zinc-400 { color: #cbd5e1 !important; }
-    .text-zinc-300 { color: #e2e8f0 !important; }
     @media print {
       body { background: #ffffff !important; color: #111827 !important; }
       header, .no-print, footer { display: none !important; }
       .print-surface { background: #ffffff !important; border: 1px solid #d1d5db !important; color: #111827 !important; box-shadow: none !important; }
-      .text-white, .text-zinc-200, .text-zinc-300, .text-zinc-400 { color: #1f2937 !important; }
+      .text-white, .text-slate-200, .text-slate-300, .text-slate-400 { color: #1f2937 !important; }
       a { text-decoration: none !important; color: #111827 !important; }
     }
   </style>
 </head>
-<body class="bg-[#09090b] text-zinc-200 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-[#0b0d13] text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
 
-  <!-- HEADER -->
-  <header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#09090b]/90 backdrop-blur-md">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3 group">
-        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-8 h-8 object-contain" width="32" height="32" />
-        <div>
-          <span class="font-bold text-lg text-white tracking-tight">Bentian</span>
-          <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded ml-1.5">Canal Partners B2B</span>
-        </div>
+  <!-- HEADER EN 1 SOLA LÍNEA (ANTI-WRAP) -->
+  <header class="sticky top-0 z-50 border-b border-white/[0.14] bg-[#0b0d13]/95 backdrop-blur-md">
+    <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2.5 group shrink-0 whitespace-nowrap">
+        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-8 h-8 object-contain shrink-0 group-hover:scale-105 transition-transform" width="32" height="32" />
+        <span class="font-bold text-lg text-white tracking-tight whitespace-nowrap shrink-0">Bentian</span>
+        <span class="text-[11px] font-mono font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-0.5 rounded-md whitespace-nowrap shrink-0">Partners B2B</span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-medium">
-        <a href="#perfiles" class="hover:text-white transition">Perfiles de Partner</a>
-        <a href="#matriz-erp" class="hover:text-white transition">5 ERPs + Fotos Auto</a>
-        <a href="#calculadora" class="hover:text-white transition">Calculadora 25%</a>
-        <a href="#piloto" class="hover:text-white transition">1º Piloto Asistido</a>
-        <a href="/docs/" class="hover:text-white transition">Docs Técnicos</a>
+      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-[13px] text-slate-300 font-medium shrink-0">
+        <a href="#perfiles" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Perfiles de Partner</a>
+        <a href="#matriz-erp" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">5 ERPs + Fotos Auto</a>
+        <a href="#calculadora" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Calculadora 25%</a>
+        <a href="#piloto" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Piloto Asistido</a>
+        <a href="/docs/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.06] transition whitespace-nowrap shrink-0">Docs Técnicos</a>
       </nav>
 
-      <div class="flex items-center gap-2.5">
-        <button onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/[0.12] bg-[#121215] hover:bg-[#1a1a20] text-xs font-medium text-zinc-200 transition" title="Guardar o imprimir como Dossier PDF">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          <span>Guardar Dossier PDF</span>
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <button onclick="window.print()" class="no-print hidden xl:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/[0.16] bg-[#161a26] hover:bg-[#1e2436] text-xs font-medium text-slate-200 transition whitespace-nowrap shrink-0" title="Guardar o imprimir como Dossier PDF">
+          <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Dossier PDF</span>
         </button>
-        <a href="#alta-partner" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/20">
-          Alta Instantánea + Licencia NFR →
+        <a href="/dashboard" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-white/[0.16] bg-[#161a26] hover:bg-[#1e2436] text-xs font-medium text-slate-200 hover:text-white transition whitespace-nowrap shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+          <span>Acceso Partner</span>
+        </a>
+        <a href="#alta-partner" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/25 whitespace-nowrap shrink-0">
+          Alta Partner + Licencia NFR →
         </a>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
 
-    <!-- BREADCRUMB -->
-    <nav aria-label="Breadcrumb" class="mb-8 text-xs font-mono text-zinc-500 flex items-center gap-2">
-      <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
-      <span>/</span>
-      <span class="text-emerald-400">Programa de Partners, Agentes Digitalizadores e Implantadores ERP</span>
+    <!-- BREADCRUMB LIMPIO -->
+    <nav aria-label="Breadcrumb" class="mb-6 text-xs font-medium text-slate-400 flex items-center gap-2">
+      <a href="/" class="hover:text-white transition">Inicio</a>
+      <span class="text-slate-600">/</span>
+      <span class="text-emerald-400 font-semibold">Programa Oficial de Partners, Agentes Digitalizadores e Implantadores ERP</span>
     </nav>
 
-    <!-- HERO SECTION / PORTADA DEL DOSSIER -->
-    <section class="p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-[#13131a] to-[#0c0c10] border border-emerald-500/30 shadow-2xl relative overflow-hidden print-surface">
-      <div class="flex flex-wrap items-center gap-2 mb-4">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <!-- HERO SECTION / PORTADA DEL DOSSIER CON ALTO CONTRASTE -->
+    <section class="p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-[#171d2e] via-[#141927] to-[#111520] border border-emerald-500/40 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.65)] relative overflow-hidden print-surface">
+      <div class="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+      <div class="relative z-10 flex flex-wrap items-center gap-2.5 mb-5">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-semibold whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
           COMISIÓN 25% RECURRENTE VITALICIA + 100% SETUP FEE PARA TI
         </span>
-        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
+        <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-indigo-200 text-xs font-mono font-semibold whitespace-nowrap">
           Versión <span data-app-version class="ml-1">v0.4.12</span>
         </span>
       </div>
 
-      <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight max-w-4xl">
-        El Puente ERP Local que desbloquea tus proyectos de <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-sky-300 to-indigo-400">WooCommerce, Shopify, PrestaShop y Holded</span>.
+      <h1 class="relative z-10 text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-[1.16] max-w-5xl">
+        El Puente ERP Local que desbloquea tus proyectos de <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-sky-300 to-indigo-300">WooCommerce, Shopify, PrestaShop y Holded</span>.
       </h1>
 
-      <p class="mt-5 text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
-        Deja de perder semanas programando integraciones a medida o peleándote con archivos <code class="text-emerald-300 font-mono">.accdb</code>, tablas DBISAM <code class="text-emerald-300 font-mono">.dat</code> o servidores SQL cerrados. Instala <strong>Bentian ERP Bridge</strong> en el Windows del cliente en 15 minutos, sincroniza catálogo, stock, pedidos y <strong>fotografías 100% automáticas</strong> sin abrir puertos en el router, y genera ingresos pasivos recurrentes con cada cliente.
+      <p class="relative z-10 mt-5 text-sm sm:text-base text-slate-200 leading-relaxed max-w-4xl">
+        Deja de perder semanas programando integraciones a medida o peleándote con archivos <code class="px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-mono text-xs">.accdb</code>, tablas DBISAM <code class="px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-mono text-xs">.dat</code> o servidores SQL cerrados. Instala <strong class="text-white">Bentian ERP Bridge</strong> en el Windows del cliente en 15 minutos, sincroniza catálogo, stock, pedidos y <strong class="text-white">fotografías 100% automáticas</strong> sin abrir puertos en el router, y genera ingresos pasivos recurrentes con cada cliente.
       </p>
 
-      <!-- KPIs Rápidos para el Partner -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.08] print-surface">
+      <!-- KPIs Rápidos con Superficie Elevada (#1e2436) -->
+      <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-emerald-500/35 shadow-md print-surface">
           <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">25%</div>
-          <div class="text-xs font-semibold text-white mt-1">Comisión Recurrente Vitalicia</div>
-          <p class="text-[11px] text-zinc-400 mt-0.5">Cobras cada año que el cliente renueva su licencia.</p>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">Comisión Recurrente Vitalicia</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Cobras cada año que el cliente renueva su licencia.</p>
         </div>
-        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.08] print-surface">
-          <div class="text-2xl sm:text-3xl font-extrabold text-indigo-400 font-mono">100%</div>
-          <div class="text-xs font-semibold text-white mt-1">Tus Honorarios de Setup</div>
-          <p class="text-[11px] text-zinc-400 mt-0.5">Factura 250 €–600 € por la puesta en marcha y quédate el 100%.</p>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-indigo-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-indigo-300 font-mono">100%</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">Tus Honorarios de Setup</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Factura 250 €–600 € por la puesta en marcha y quédate el 100%.</p>
         </div>
-        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.08] print-surface">
-          <div class="text-2xl sm:text-3xl font-extrabold text-sky-400 font-mono">5 ERPs</div>
-          <div class="text-xs font-semibold text-white mt-1">+ Holded Cloud en 1 Agente</div>
-          <p class="text-[11px] text-zinc-400 mt-0.5">Factusol, SimplyGest, Sage 50, a3ERP y Ágora POS.</p>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-sky-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-sky-300 font-mono">5 ERPs</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">+ Holded Cloud en 1 Agente</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Factusol, SimplyGest, Sage 50, a3ERP y Ágora POS.</p>
         </div>
-        <div class="p-4 rounded-2xl bg-black/40 border border-white/[0.08] print-surface">
-          <div class="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono">0 €</div>
-          <div class="text-xs font-semibold text-white mt-1">1º Cliente Piloto Asistido</div>
-          <p class="text-[11px] text-zinc-400 mt-0.5">Ingeniería se conecta contigo gratis en tu primera implantación.</p>
+        <div class="p-5 rounded-2xl bg-[#1e2436] border border-amber-500/35 shadow-md print-surface">
+          <div class="text-2xl sm:text-3xl font-extrabold text-amber-300 font-mono">0 €</div>
+          <div class="text-xs sm:text-sm font-bold text-white mt-1.5">1º Cliente Piloto Asistido</div>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">Ingeniería se conecta contigo gratis en tu primera implantación.</p>
         </div>
       </div>
 
-      <div class="no-print mt-8 pt-6 border-t border-white/[0.08] flex flex-wrap items-center gap-4">
-        <a href="#alta-partner" class="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25">
+      <div class="relative z-10 no-print mt-8 pt-6 border-t border-white/[0.14] flex flex-wrap items-center gap-3.5">
+        <a href="#alta-partner" class="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 whitespace-nowrap">
           ⚡ Activar Código PT-XXXX + Licencia NFR en 1 Clic →
         </a>
-        <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20somos%20una%20agencia/implantador%20y%20queremos%20activar%20nuestro%20codigo%20de%20Partner%20en%20Bentian" target="_blank" rel="noopener noreferrer" class="px-5 py-3.5 rounded-xl bg-[#18181f] hover:bg-[#22222c] border border-white/[0.12] text-zinc-200 font-semibold text-sm transition">
-          Hablar por WhatsApp con Ingeniería
+        <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20somos%20una%20agencia/implantador%20y%20queremos%20activar%20nuestro%20codigo%20de%20Partner%20en%20Bentian" target="_blank" rel="noopener noreferrer" class="px-5 py-3.5 rounded-xl bg-[#1e2436] hover:bg-[#262d42] border border-white/[0.18] text-white font-semibold text-sm transition whitespace-nowrap">
+          💬 Hablar por WhatsApp con Ingeniería
         </a>
-        <button onclick="window.print()" class="px-5 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 font-medium text-xs transition flex items-center gap-2">
+        <button onclick="window.print()" class="px-5 py-3.5 rounded-xl bg-[#161b28] hover:bg-[#1e2436] border border-white/[0.15] text-slate-200 font-medium text-xs transition flex items-center gap-2 whitespace-nowrap">
           <span>🖨️ Imprimir / Guardar Dossier PDF (A4)</span>
         </button>
       </div>
@@ -211,67 +212,67 @@
     <!-- SECCIÓN 1: LOS 3 PERFILES DE PARTNER IDEALES -->
     <section id="perfiles" class="mt-16 scroll-mt-24">
       <div class="max-w-3xl">
-        <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Alianzas B2B en España</span>
+        <span class="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-widest">Alianzas B2B en España</span>
         <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">¿Para quién está diseñado el Canal de Partners?</h2>
-        <p class="text-sm text-zinc-400 mt-2 leading-relaxed">
+        <p class="text-sm text-slate-300 mt-2 leading-relaxed">
           Convertimos el mayor freno técnico de las PYMEs españolas (tener el ERP encerrado en un ordenador del almacén) en una línea de ingresos recurrente y sin mantenimiento para tu empresa.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
         <!-- Perfil 1 -->
-        <div class="p-6 rounded-2xl bg-[#121215] border border-indigo-500/30 flex flex-col justify-between print-surface">
+        <div class="p-6 rounded-2xl bg-[#151926] border border-indigo-500/40 shadow-lg flex flex-col justify-between print-surface">
           <div>
-            <span class="text-[11px] font-mono text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 px-2.5 py-0.5 rounded font-semibold">PERFIL 1 · AGENCIAS E-COMMERCE</span>
-            <h3 class="text-lg font-bold text-white mt-3">Agentes Digitalizadores y Agencias Web</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              ¿Desarrollas tiendas en <strong>WooCommerce, Shopify o PrestaShop</strong> (con o sin Kit Digital) y el proyecto se atasca porque el cliente tiene Factusol, SimplyGest o Sage 50 en local?
+            <span class="text-[11px] font-mono text-indigo-300 bg-indigo-950/80 border border-indigo-500/40 px-2.5 py-1 rounded-md font-semibold">PERFIL 1 · AGENCIAS E-COMMERCE</span>
+            <h3 class="text-lg font-bold text-white mt-3.5">Agentes Digitalizadores y Agencias Web</h3>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              ¿Desarrollas tiendas en <strong class="text-white">WooCommerce, Shopify o PrestaShop</strong> (con o sin Kit Digital) y el proyecto se atasca porque el cliente tiene Factusol, SimplyGest o Sage 50 en local?
             </p>
-            <ul class="mt-4 space-y-2 text-xs text-zinc-300">
+            <ul class="mt-4 space-y-2.5 text-xs text-slate-200">
               <li>✓ Despliegue en 15 minutos sin desarrollar código a medida.</li>
-              <li>✓ Subida <strong>100% automática de fotografías</strong> desde el ERP para entregar el catálogo web completo el primer día.</li>
+              <li>✓ Subida <strong class="text-white">100% automática de fotografías</strong> desde el ERP para entregar el catálogo web completo el primer día.</li>
               <li>✓ Cuadre de IVA español y Recargo de Equivalencia certificado.</li>
             </ul>
           </div>
-          <div class="mt-5 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-indigo-400">
+          <div class="mt-5 pt-3.5 border-t border-white/[0.12] text-[11px] font-mono font-semibold text-indigo-300">
             Ideal para: Agencias WordPress, Shopify Partners y Consultoras TIC
           </div>
         </div>
 
         <!-- Perfil 2 -->
-        <div class="p-6 rounded-2xl bg-[#121215] border border-emerald-500/30 flex flex-col justify-between print-surface">
+        <div class="p-6 rounded-2xl bg-[#151926] border border-emerald-500/40 shadow-lg flex flex-col justify-between print-surface">
           <div>
-            <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2.5 py-0.5 rounded font-semibold">PERFIL 2 · SOPORTE IT & ERP</span>
-            <h3 class="text-lg font-bold text-white mt-3">Implantadores ERP y Mantenimiento Informático</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              ¿Llevas el mantenimiento de servidores Windows, redes NAS o implantas <strong>Factusol, SimplyGest, Sage 50, a3ERP o Ágora POS</strong> en comercios y polígonos industriales?
+            <span class="text-[11px] font-mono text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-md font-semibold">PERFIL 2 · SOPORTE IT & ERP</span>
+            <h3 class="text-lg font-bold text-white mt-3.5">Implantadores ERP y Mantenimiento Informático</h3>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              ¿Llevas el mantenimiento de servidores Windows, redes NAS o implantas <strong class="text-white">Factusol, SimplyGest, Sage 50, a3ERP o Ágora POS</strong> en comercios y polígonos industriales?
             </p>
-            <ul class="mt-4 space-y-2 text-xs text-zinc-300">
-              <li>✓ <strong>Cero puertos abiertos en el router:</strong> Tráfico 100% saliente HTTPS (TLS 1.3).</li>
-              <li>✓ <strong>Modo Evaluación Sandbox:</strong> Prueba en seco de solo lectura antes de escribir en la base de datos.</li>
-              <li>✓ Lecturas no bloqueantes (<code class="font-mono">Share Deny None</code> / <code class="font-mono">WITH (NOLOCK)</code>).</li>
+            <ul class="mt-4 space-y-2.5 text-xs text-slate-200">
+              <li>✓ <strong class="text-white">Cero puertos abiertos en el router:</strong> Tráfico 100% saliente HTTPS (TLS 1.3).</li>
+              <li>✓ <strong class="text-white">Modo Evaluación Sandbox:</strong> Prueba en seco de solo lectura antes de escribir en la base de datos.</li>
+              <li>✓ Lecturas no bloqueantes (<code class="font-mono text-emerald-300">Share Deny None</code> / <code class="font-mono text-emerald-300">WITH (NOLOCK)</code>).</li>
             </ul>
           </div>
-          <div class="mt-5 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-emerald-400">
+          <div class="mt-5 pt-3.5 border-t border-white/[0.12] text-[11px] font-mono font-semibold text-emerald-300">
             Ideal para: Distribuidores de ERP, Técnicos de Sistemas y TPV
           </div>
         </div>
 
         <!-- Perfil 3 -->
-        <div class="p-6 rounded-2xl bg-[#121215] border border-sky-500/30 flex flex-col justify-between print-surface">
+        <div class="p-6 rounded-2xl bg-[#151926] border border-sky-500/40 shadow-lg flex flex-col justify-between print-surface">
           <div>
-            <span class="text-[11px] font-mono text-sky-400 bg-sky-950/60 border border-sky-800/50 px-2.5 py-0.5 rounded font-semibold">PERFIL 3 · ASESORÍAS & GESTORÍAS</span>
-            <h3 class="text-lg font-bold text-white mt-3">Asesorías Fiscales y Partners de Holded Cloud</h3>
-            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-              ¿Quieres que tus clientes lleven la contabilidad y Veri*Factu contigo en <strong>Holded</strong>, pero su almacén se niega a abandonar Factusol o SimplyGest?
+            <span class="text-[11px] font-mono text-sky-300 bg-sky-950/80 border border-sky-500/40 px-2.5 py-1 rounded-md font-semibold">PERFIL 3 · ASESORÍAS & GESTORÍAS</span>
+            <h3 class="text-lg font-bold text-white mt-3.5">Asesorías Fiscales y Partners de Holded Cloud</h3>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              ¿Quieres que tus clientes lleven la contabilidad y Veri*Factu contigo en <strong class="text-white">Holded</strong>, pero su almacén se niega a abandonar Factusol o SimplyGest?
             </p>
-            <ul class="mt-4 space-y-2 text-xs text-zinc-300">
-              <li>✓ <strong>Arquitectura Tripartita:</strong> El almacén sigue en Factusol/SimplyGest y Bentian sube las facturas y asientos a Holded API v1.</li>
+            <ul class="mt-4 space-y-2.5 text-xs text-slate-200">
+              <li>✓ <strong class="text-white">Arquitectura Tripartita:</strong> El almacén sigue en Factusol/SimplyGest y Bentian sube las facturas y asientos a Holded API v1.</li>
               <li>✓ Cero picado manual de facturas de venta para la gestoría.</li>
-              <li>✓ Protección anti-duplicados con <code class="font-mono">customId</code>.</li>
+              <li>✓ Protección anti-duplicados con <code class="font-mono text-sky-300">customId</code>.</li>
             </ul>
           </div>
-          <div class="mt-5 pt-3 border-t border-white/[0.06] text-[11px] font-mono text-sky-400">
+          <div class="mt-5 pt-3.5 border-t border-white/[0.12] text-[11px] font-mono font-semibold text-sky-300">
             Ideal para: Asesorías Contables, Gestorías y Partners Holded
           </div>
         </div>
@@ -280,73 +281,73 @@
 
     <!-- SECCIÓN 2: MATRIZ TÉCNICA MULTI-ERP Y FOTOS AUTOMÁTICAS -->
     <section id="matriz-erp" class="mt-16 scroll-mt-24">
-      <div class="p-8 rounded-3xl bg-[#111116] border border-white/[0.08] print-surface">
+      <div class="p-8 rounded-3xl bg-[#151926] border border-white/[0.16] shadow-xl print-surface">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Ingeniería Real · Sin Humo Comercial</span>
+            <span class="text-xs font-mono font-semibold text-indigo-300 uppercase tracking-widest">Ingeniería Real · Sin Humo Comercial</span>
             <h2 class="text-2xl font-bold text-white mt-1">Matriz de Capacidades Técnicas para el Director Técnico</h2>
-            <p class="text-xs text-zinc-400 mt-1">
-              Todo incluido en un único ejecutable ligero para Windows (<code class="text-zinc-300 font-mono">Bentian-Setup.exe</code>) con persistencia aislada en <code class="text-zinc-300 font-mono">%APPDATA%</code>.
+            <p class="text-xs text-slate-300 mt-1">
+              Todo incluido en un único ejecutable ligero para Windows (<code class="text-white font-mono">Bentian-Setup.exe</code>) con persistencia aislada en <code class="text-white font-mono">%APPDATA%</code>.
             </p>
           </div>
-          <a href="/docs/arquitectura/arquitectura-polimorfica-multi-erp/" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition shrink-0">
+          <a href="/docs/arquitectura/arquitectura-polimorfica-multi-erp/" class="text-xs font-semibold text-indigo-300 hover:text-white px-3.5 py-2 rounded-lg bg-indigo-950/60 border border-indigo-500/30 transition shrink-0 whitespace-nowrap">
             Ver Especificación de Arquitectura →
           </a>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
-            <thead class="bg-zinc-900/90 text-zinc-200 border-b border-white/[0.08]">
+          <table class="w-full text-xs text-left border border-white/[0.14] rounded-xl overflow-hidden">
+            <thead class="bg-[#1e2436] text-white border-b border-white/[0.14]">
               <tr>
-                <th class="px-4 py-3 font-semibold">Software ERP</th>
-                <th class="px-4 py-3 font-semibold">Motores Soportados</th>
-                <th class="px-4 py-3 font-semibold">Inyección de Pedidos</th>
-                <th class="px-4 py-3 font-semibold">Fotos 100% Automáticas</th>
-                <th class="px-4 py-3 font-semibold">Guía Oficial</th>
+                <th class="px-4 py-3.5 font-semibold whitespace-nowrap">Software ERP</th>
+                <th class="px-4 py-3.5 font-semibold">Motores Soportados</th>
+                <th class="px-4 py-3.5 font-semibold">Inyección de Pedidos</th>
+                <th class="px-4 py-3.5 font-semibold">Fotos 100% Automáticas</th>
+                <th class="px-4 py-3.5 font-semibold whitespace-nowrap">Guía Oficial</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-white/[0.06] text-zinc-300">
-              <tr>
-                <td class="px-4 py-3 font-bold text-emerald-400"><a href="/factusol-woocommerce/" class="hover:underline">1. Factusol ERP</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">OLEDB (.accdb / .mdb) Local y NAS UNC</td>
-                <td class="px-4 py-3 font-mono text-[11px]">F_PCL + F_LPC + F_CLI (con R.E.)</td>
-                <td class="px-4 py-3 text-zinc-400">Campo <code class="font-mono text-zinc-200">IMGART</code> + carpeta <code class="font-mono text-zinc-200">Imagenes\</code></td>
-                <td class="px-4 py-3"><a href="/docs/factusol/localizacion-base-datos/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+            <tbody class="divide-y divide-white/[0.1] text-slate-200 bg-[#121622]">
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-emerald-400 whitespace-nowrap"><a href="/factusol-woocommerce/" class="hover:underline">1. Factusol ERP</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">OLEDB (.accdb / .mdb) Local y NAS UNC</td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">F_PCL + F_LPC + F_CLI (con R.E.)</td>
+                <td class="px-4 py-3.5 text-slate-300">Campo <code class="font-mono text-white">IMGART</code> + carpeta <code class="font-mono text-white">Imagenes\</code></td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/factusol/localizacion-base-datos/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-bold text-emerald-400"><a href="/simplygest-woocommerce/" class="hover:underline">2. SimplyGest</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">Triple: DBISAM (<code class="text-emerald-300">Emp1\articulos.dat</code>), API <code class="text-emerald-300">:56985</code> y <code class="text-emerald-300">Datos.mdb</code></td>
-                <td class="px-4 py-3 font-mono text-[11px]">PEDIDOSC / PEDIDOSL + PEDIDOS_VENTA + CSV</td>
-                <td class="px-4 py-3 text-zinc-400"><code class="font-mono text-zinc-200">IMAGEN/FOTO</code> + <code class="font-mono text-zinc-200">/api/articulos/:id/imagen</code></td>
-                <td class="px-4 py-3"><a href="/docs/simplygest/localizacion-base-datos/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-emerald-400 whitespace-nowrap"><a href="/simplygest-woocommerce/" class="hover:underline">2. SimplyGest</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">Triple: DBISAM (<code class="text-emerald-300">Emp1\articulos.dat</code>), API <code class="text-emerald-300">:56985</code> y <code class="text-emerald-300">Datos.mdb</code></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">PEDIDOSC / PEDIDOSL + PEDIDOS_VENTA + CSV</td>
+                <td class="px-4 py-3.5 text-slate-300"><code class="font-mono text-white">IMAGEN/FOTO</code> + <code class="font-mono text-white">/api/articulos/:id/imagen</code></td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/simplygest/localizacion-base-datos/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-bold text-emerald-400"><a href="/sage50-woocommerce/" class="hover:underline">3. Sage 50</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">SQL Server Auto-Ejercicio (<code class="text-emerald-300">2026XX</code> + <code class="text-emerald-300">COMUXX</code>)</td>
-                <td class="px-4 py-3 font-mono text-[11px]">c_pediven + d_pediven con <code class="text-emerald-300">guid_id</code></td>
-                <td class="px-4 py-3 text-zinc-400">Extracción BLOB SQL de <code class="font-mono text-zinc-200">dbo.d_albimg</code></td>
-                <td class="px-4 py-3"><a href="/docs/sql-erps/conector-sage50-sql-server/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-emerald-400 whitespace-nowrap"><a href="/sage50-woocommerce/" class="hover:underline">3. Sage 50</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">SQL Server Auto-Ejercicio (<code class="text-emerald-300">2026XX</code> + <code class="text-emerald-300">COMUXX</code>)</td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">c_pediven + d_pediven con <code class="text-emerald-300">guid_id</code></td>
+                <td class="px-4 py-3.5 text-slate-300">Extracción BLOB SQL de <code class="font-mono text-white">dbo.d_albimg</code></td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/sql-erps/conector-sage50-sql-server/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-bold text-amber-400"><a href="/a3erp-woocommerce/" class="hover:underline">4. a3ERP</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">ActiveX COM (<code class="text-amber-300">a3ERPActiveX.Pedido</code>) + SQL Server</td>
-                <td class="px-4 py-3 font-mono text-[11px]">COM Oficial o SQL con <code class="text-amber-300">IDPEDV</code> (CABEPEV/LINEPEV)</td>
-                <td class="px-4 py-3 text-zinc-400">Extracción binaria SQL de <code class="font-mono text-zinc-200">dbo.IMAGENES</code></td>
-                <td class="px-4 py-3"><a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-amber-400 whitespace-nowrap"><a href="/a3erp-woocommerce/" class="hover:underline">4. a3ERP</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">ActiveX COM (<code class="text-amber-300">a3ERPActiveX.Pedido</code>) + SQL Server</td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">COM Oficial o SQL con <code class="text-amber-300">IDPEDV</code> (CABEPEV/LINEPEV)</td>
+                <td class="px-4 py-3.5 text-slate-300">Extracción binaria SQL de <code class="font-mono text-white">dbo.IMAGENES</code></td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/sql-erps/conector-a3erp-wolters-kluwer/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-bold text-pink-400"><a href="/agora-pos-woocommerce/" class="hover:underline">5. Ágora POS</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">SQL Server Express + API HTTP Oficial <code class="text-pink-300">:8984</code></td>
-                <td class="px-4 py-3 font-mono text-[11px]">API <code class="text-pink-300">SaleInitialize / CustomerOrder</code> + SQL</td>
-                <td class="px-4 py-3 text-zinc-400">Extracción BLOB de <code class="font-mono text-zinc-200">Product.Image</code></td>
-                <td class="px-4 py-3"><a href="/docs/sql-erps/conector-agora-pos-retail/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-pink-400 whitespace-nowrap"><a href="/agora-pos-woocommerce/" class="hover:underline">5. Ágora POS</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">SQL Server Express + API HTTP Oficial <code class="text-pink-300">:8984</code></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">API <code class="text-pink-300">SaleInitialize / CustomerOrder</code> + SQL</td>
+                <td class="px-4 py-3.5 text-slate-300">Extracción BLOB de <code class="font-mono text-white">Product.Image</code></td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/sql-erps/conector-agora-pos-retail/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
-              <tr>
-                <td class="px-4 py-3 font-bold text-sky-400"><a href="/docs/canales/holded/" class="hover:underline">6. Holded Cloud</a></td>
-                <td class="px-4 py-3 font-mono text-[11px]">REST API v1 HTTPS (<a href="/docs/arquitectura/arquitectura-tripartita/" class="underline">Arquitectura Tripartita</a>)</td>
-                <td class="px-4 py-3 font-mono text-[11px]">Facturas de venta, contactos y Libro Diario</td>
-                <td class="px-4 py-3 text-zinc-400">Sincronización directa desde el ERP de almacén</td>
-                <td class="px-4 py-3"><a href="/docs/canales/holded/" class="text-indigo-400 hover:underline">Ver Docs</a></td>
+              <tr class="hover:bg-white/[0.03] transition">
+                <td class="px-4 py-3.5 font-bold text-sky-400 whitespace-nowrap"><a href="/docs/canales/holded/" class="hover:underline">6. Holded Cloud</a></td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">REST API v1 HTTPS (<a href="/docs/arquitectura/arquitectura-tripartita/" class="underline">Arquitectura Tripartita</a>)</td>
+                <td class="px-4 py-3.5 font-mono text-[11px]">Facturas de venta, contactos y Libro Diario</td>
+                <td class="px-4 py-3.5 text-slate-300">Sincronización directa desde el ERP de almacén</td>
+                <td class="px-4 py-3.5 whitespace-nowrap"><a href="/docs/canales/holded/" class="text-indigo-300 hover:underline font-medium">Ver Docs →</a></td>
               </tr>
             </tbody>
           </table>
@@ -356,25 +357,25 @@
 
     <!-- SECCIÓN 3: CALCULADORA INTERACTIVA DE COMISIONES PARA EL PARTNER -->
     <section id="calculadora" class="mt-16 scroll-mt-24">
-      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#121218] to-[#0d1512] border border-emerald-500/30 print-surface">
+      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#161c2a] to-[#111e19] border border-emerald-500/40 shadow-xl print-surface">
         <div class="max-w-3xl mb-8">
-          <span class="text-xs font-mono text-emerald-400 uppercase tracking-widest">Simulador Financiero para Agencias e Informáticos</span>
+          <span class="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-widest">Simulador Financiero para Agencias e Informáticos</span>
           <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">Calculadora de Ingresos del Partner (25% Recurrente + Setup Fee)</h2>
-          <p class="text-xs sm:text-sm text-zinc-300 mt-2">
+          <p class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed">
             Simula cuánto factura tu agencia o empresa de soporte combinando tus honorarios directos de puesta en marcha (100% para ti) más el 25% de comisión recurrente vitalicia sobre el Plan Anual (199 €/año).
           </p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <!-- Controles -->
-          <div class="space-y-6 p-6 rounded-2xl bg-black/40 border border-white/[0.08]">
+          <div class="space-y-6 p-6 rounded-2xl bg-[#1d2436] border border-white/[0.16] shadow-md">
             <div>
               <div class="flex justify-between text-xs font-mono mb-2">
-                <span class="text-zinc-300">Clientes conectados por tu agencia:</span>
+                <span class="text-slate-200 font-medium">Clientes conectados por tu agencia:</span>
                 <span id="calc-clients-label" class="text-emerald-400 font-bold text-base">15 clientes</span>
               </div>
               <input id="calc-clients" type="range" min="1" max="100" value="15" class="w-full accent-emerald-500 cursor-pointer" oninput="actualizarCalculadoraPartner()" />
-              <div class="flex justify-between text-[10px] font-mono text-zinc-500 mt-1">
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1.5">
                 <span>1 cliente</span>
                 <span>25 clientes</span>
                 <span>50 clientes</span>
@@ -384,11 +385,11 @@
 
             <div>
               <div class="flex justify-between text-xs font-mono mb-2">
-                <span class="text-zinc-300">Tus honorarios de implantación por cliente (Setup Fee 100% tuyo):</span>
-                <span id="calc-setup-label" class="text-indigo-400 font-bold text-base">300 € / cliente</span>
+                <span class="text-slate-200 font-medium">Tus honorarios de implantación por cliente (Setup Fee 100% tuyo):</span>
+                <span id="calc-setup-label" class="text-indigo-300 font-bold text-base">300 € / cliente</span>
               </div>
               <input id="calc-setup" type="range" min="150" max="600" step="50" value="300" class="w-full accent-indigo-500 cursor-pointer" oninput="actualizarCalculadoraPartner()" />
-              <div class="flex justify-between text-[10px] font-mono text-zinc-500 mt-1">
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1.5">
                 <span>150 €</span>
                 <span>300 € (Media mercado)</span>
                 <span>450 €</span>
@@ -399,20 +400,20 @@
 
           <!-- Resultados -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="p-5 rounded-2xl bg-[#14141c] border border-indigo-500/30">
-              <div class="text-[11px] font-mono text-indigo-300 uppercase">Tus Ingresos por Implantación</div>
-              <div id="res-setup-total" class="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1">4.500,00 €</div>
-              <p class="text-[11px] text-zinc-400 mt-1">100% facturado por ti al cliente final (~15 min de configuración con el Wizard).</p>
+            <div class="p-5 rounded-2xl bg-[#1d2336] border border-indigo-400/40 shadow-md">
+              <div class="text-[11px] font-mono font-semibold text-indigo-300 uppercase">Tus Ingresos por Implantación</div>
+              <div id="res-setup-total" class="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1.5">4.500,00 €</div>
+              <p class="text-xs text-slate-300 mt-1.5">100% facturado por ti al cliente final (~15 min de configuración con el Wizard).</p>
             </div>
-            <div class="p-5 rounded-2xl bg-[#141c18] border border-emerald-500/40">
-              <div class="text-[11px] font-mono text-emerald-300 uppercase">Tu Renta Pasiva Anual (25%)</div>
-              <div id="res-recurring-total" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono mt-1">746,25 € / año</div>
-              <p class="text-[11px] text-zinc-400 mt-1">Comisión vitalicia cada año que tus clientes renuevan la licencia.</p>
+            <div class="p-5 rounded-2xl bg-[#172620] border border-emerald-400/45 shadow-md">
+              <div class="text-[11px] font-mono font-semibold text-emerald-300 uppercase">Tu Renta Pasiva Anual (25%)</div>
+              <div id="res-recurring-total" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono mt-1.5">746,25 € / año</div>
+              <p class="text-xs text-slate-300 mt-1.5">Comisión vitalicia cada año que tus clientes renuevan la licencia.</p>
             </div>
-            <div class="sm:col-span-2 p-6 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-indigo-950/60 border border-emerald-400/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="sm:col-span-2 p-6 rounded-2xl bg-gradient-to-r from-emerald-900/50 to-indigo-900/50 border border-emerald-400/50 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div class="text-xs font-mono text-emerald-300 uppercase font-semibold">Beneficio Total Año 1 para tu Empresa</div>
-                <div class="text-[11px] text-zinc-300 mt-0.5">Suma de puesta en marcha + 1º año de comisiones recurrentes</div>
+                <div class="text-xs font-mono text-emerald-300 uppercase font-bold">Beneficio Total Año 1 para tu Empresa</div>
+                <div class="text-xs text-slate-200 mt-1">Suma de puesta en marcha + 1º año de comisiones recurrentes</div>
               </div>
               <div id="res-year1-total" class="text-3xl sm:text-4xl font-extrabold text-white font-mono">5.246,25 €</div>
             </div>
@@ -423,30 +424,30 @@
 
     <!-- SECCIÓN 4: PROGRAMA PARTNER PILOTO 2026 -->
     <section id="piloto" class="mt-16 scroll-mt-24">
-      <div class="p-8 rounded-3xl bg-[#121215] border border-amber-500/30 print-surface">
-        <span class="text-xs font-mono text-amber-400 uppercase tracking-widest">Cero Fricción Técnica</span>
+      <div class="p-8 rounded-3xl bg-[#151926] border border-amber-500/40 shadow-xl print-surface">
+        <span class="text-xs font-mono font-semibold text-amber-400 uppercase tracking-widest">Cero Fricción Técnica</span>
         <h2 class="text-2xl font-bold text-white mt-1">Programa "Partner Piloto 2026": Tu 1ª Implantación Asistida por Ingeniería</h2>
-        <p class="text-sm text-zinc-300 mt-2 leading-relaxed max-w-3xl">
+        <p class="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl">
           No te pedimos que compres licencias por adelantado ni que te enfrentes solo a la primera instalación. Cuando te das de alta como Partner Oficial (<code class="text-amber-300 font-mono">PT-XXXX</code>):
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div class="p-5 rounded-2xl bg-black/30 border border-white/[0.06]">
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
             <div class="text-sm font-bold text-white">1. Alta Instantánea y Panel Reseller</div>
-            <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-              Activamos tu cuenta con rol <code class="text-zinc-200 font-mono">RESELLER</code> en el <a href="/dashboard" class="text-indigo-400 hover:underline">Panel Multi-Tenant</a> para que puedas crear organizaciones clientes y emitir licencias Trial en 1 clic.
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Activamos tu cuenta con rol <code class="text-white font-mono">RESELLER</code> en el <a href="/dashboard" class="text-indigo-300 hover:underline font-semibold">Panel Multi-Tenant</a> para que puedas crear organizaciones clientes y emitir licencias Trial en 1 clic.
             </p>
           </div>
-          <div class="p-5 rounded-2xl bg-black/30 border border-white/[0.06]">
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
             <div class="text-sm font-bold text-white">2. Validación en Modo Sandbox</div>
-            <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
               En tu primer cliente de Factusol, SimplyGest, Sage 50, a3ERP o Ágora POS, nos conectamos contigo y probamos la lectura de catálogo, fotos y pedidos en modo simulación segura.
             </p>
           </div>
-          <div class="p-5 rounded-2xl bg-black/30 border border-white/[0.06]">
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
             <div class="text-sm font-bold text-white">3. Protección "Client-Lock" por CIF</div>
-            <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-              Cada empresa que registras queda vinculada por CIF/NIF a tu código <code class="text-zinc-200 font-mono">PT-XXXX</code>. Aunque el cliente renueve directamente por web en el futuro, tu 25% se liquida automáticamente.
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Cada empresa que registras queda vinculada por CIF/NIF a tu código <code class="text-white font-mono">PT-XXXX</code>. Aunque el cliente renueve directamente por web en el futuro, tu 25% se liquida automáticamente.
             </p>
           </div>
         </div>
@@ -455,45 +456,45 @@
 
     <!-- SECCIÓN 4.5: FORMULARIO DE ALTA INSTANTÁNEA DE PARTNER + EMISIÓN DE LICENCIA NFR -->
     <section id="alta-partner" class="no-print mt-16 scroll-mt-24">
-      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#131816] to-[#0d0d12] border-2 border-emerald-500/40 shadow-2xl">
+      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#15201c] to-[#121622] border-2 border-emerald-500/45 shadow-2xl">
         <div class="max-w-3xl">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-semibold">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-semibold">
             ⚡ EMISIÓN AUTOMÁTICA EN TIEMPO REAL
           </span>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">Solicita tu Código Oficial de Partner (<code class="text-emerald-400 font-mono">PT-XXXX</code>) y tu Licencia NFR Gratis</h2>
-          <p class="text-xs sm:text-sm text-zinc-300 mt-2 leading-relaxed">
-            Completa los datos de tu agencia, consultora o empresa de soporte informático. El sistema generará al instante en pantalla tu <strong>Código de Atribución del 25% Recurrente</strong> y una <strong>Licencia NFR de Demostración (2 puestos con Modo Evaluación Sandbox)</strong> para que la pruebes hoy mismo.
+          <p class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed">
+            Completa los datos de tu agencia, consultora o empresa de soporte informático. El sistema generará al instante en pantalla tu <strong class="text-white">Código de Atribución del 25% Recurrente</strong> y una <strong class="text-white">Licencia NFR de Demostración (2 puestos con Modo Evaluación Sandbox)</strong> para que la pruebes hoy mismo.
           </p>
         </div>
 
         <form id="partner-apply-form" onsubmit="submitPartnerApplication(event)" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label for="pt-agency-name" class="block text-xs font-mono text-zinc-300 mb-1.5">Nombre de la Agencia / Empresa IT *</label>
-            <input id="pt-agency-name" type="text" required minlength="2" placeholder="Ej: Agencia Digital Levante S.L." class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-agency-name" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Nombre de la Agencia / Empresa IT *</label>
+            <input id="pt-agency-name" type="text" required minlength="2" placeholder="Ej: Agencia Digital Levante S.L." class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
           <div>
-            <label for="pt-contact-name" class="block text-xs font-mono text-zinc-300 mb-1.5">Persona de Contacto / Cargo *</label>
-            <input id="pt-contact-name" type="text" required minlength="2" placeholder="Ej: Carlos Martínez (Director Técnico)" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-contact-name" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Persona de Contacto / Cargo *</label>
+            <input id="pt-contact-name" type="text" required minlength="2" placeholder="Ej: Carlos Martínez (Director Técnico)" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
           <div>
-            <label for="pt-email" class="block text-xs font-mono text-zinc-300 mb-1.5">Correo Electrónico Profesional *</label>
-            <input id="pt-email" type="email" required placeholder="carlos@tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-email" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Correo Electrónico Profesional *</label>
+            <input id="pt-email" type="email" required placeholder="carlos@tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
           <div>
-            <label for="pt-phone" class="block text-xs font-mono text-zinc-300 mb-1.5">Teléfono / WhatsApp Directo *</label>
-            <input id="pt-phone" type="tel" required minlength="6" placeholder="Ej: +34 600 000 000" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-phone" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Teléfono / WhatsApp Directo *</label>
+            <input id="pt-phone" type="tel" required minlength="6" placeholder="Ej: +34 600 000 000" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
           <div>
-            <label for="pt-type" class="block text-xs font-mono text-zinc-300 mb-1.5">Perfil Principal de Partner</label>
-            <select id="pt-type" class="w-full px-4 py-3 rounded-xl bg-[#111116] border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500">
+            <label for="pt-type" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Perfil Principal de Partner</label>
+            <select id="pt-type" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white text-sm focus:outline-none focus:border-emerald-400">
               <option value="agencia_ecommerce">Agente Digitalizador / Agencia WooCommerce, Shopify o PrestaShop</option>
               <option value="implantador_erp">Implantador ERP / Mantenimiento Informático y Redes</option>
               <option value="asesoria_holded">Asesoría Fiscal / Gestoría / Partner Holded</option>
             </select>
           </div>
           <div>
-            <label for="pt-clients" class="block text-xs font-mono text-zinc-300 mb-1.5">Clientes estimados a conectar en 12 meses</label>
-            <select id="pt-clients" class="w-full px-4 py-3 rounded-xl bg-[#111116] border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500">
+            <label for="pt-clients" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Clientes estimados a conectar en 12 meses</label>
+            <select id="pt-clients" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white text-sm focus:outline-none focus:border-emerald-400">
               <option value="1-5 clientes">1 a 5 clientes (Piloto inicial)</option>
               <option value="6-15 clientes">6 a 15 clientes</option>
               <option value="16-50 clientes">16 a 50 clientes</option>
@@ -501,67 +502,67 @@
             </select>
           </div>
           <div>
-            <label for="pt-erps" class="block text-xs font-mono text-zinc-300 mb-1.5">ERPs más habituales en vuestros clientes</label>
-            <input id="pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" placeholder="Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS..." class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-erps" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">ERPs más habituales en vuestros clientes</label>
+            <input id="pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" placeholder="Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS..." class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
           <div>
-            <label for="pt-website" class="block text-xs font-mono text-zinc-300 mb-1.5">Web de tu Agencia / Empresa (Opcional)</label>
-            <input id="pt-website" type="text" placeholder="https://www.tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/[0.12] text-white text-sm focus:outline-none focus:border-emerald-500" />
+            <label for="pt-website" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Web de tu Agencia / Empresa (Opcional)</label>
+            <input id="pt-website" type="text" placeholder="https://www.tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
           </div>
 
           <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-            <p class="text-[11px] text-zinc-400">
+            <p class="text-xs text-slate-300">
               🔒 Sin permanencia ni compra mínima de licencias. Recibirás tu código <code class="text-emerald-400 font-mono">PT-XXXX</code> y tu clave NFR al instante.
             </p>
-            <button id="pt-submit-btn" type="submit" class="px-7 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/25 shrink-0">
+            <button id="pt-submit-btn" type="submit" class="px-7 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 shrink-0 whitespace-nowrap">
               ⚡ Generar Código Partner + Licencia NFR Ahora
             </button>
           </div>
         </form>
 
         <!-- Tarjeta de Resultado Instantáneo -->
-        <div id="pt-result-box" class="hidden mt-8 p-6 sm:p-8 rounded-2xl bg-[#0b1511] border-2 border-emerald-400/50">
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+        <div id="pt-result-box" class="hidden mt-8 p-6 sm:p-8 rounded-2xl bg-[#13221c] border-2 border-emerald-400/50">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.14] pb-4">
             <div>
               <span class="text-xs font-mono text-emerald-400 uppercase font-bold">✓ ACREDITACIÓN OFICIAL DE PARTNER B2B ACTIVA</span>
               <h3 id="pt-res-title" class="text-xl font-extrabold text-white mt-1">¡Bienvenido al Canal de Partners de Bentian!</h3>
             </div>
-            <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-mono font-bold">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-bold">
               Comisión Asignada: 25% Recurrente Vitalicia
             </span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-            <div class="p-4 rounded-xl bg-black/50 border border-white/[0.1]">
-              <div class="text-[11px] font-mono text-zinc-400 uppercase">Tu Código Oficial de Atribución Partner (25%)</div>
+            <div class="p-4 rounded-xl bg-[#1b2132] border border-white/[0.18]">
+              <div class="text-[11px] font-mono text-slate-300 uppercase">Tu Código Oficial de Atribución Partner (25%)</div>
               <div class="flex items-center justify-between gap-3 mt-1.5">
                 <code id="pt-res-code" class="text-2xl font-extrabold text-emerald-400 font-mono tracking-wider">PT-XXXX-0000</code>
                 <button type="button" onclick="copyPartnerText('pt-res-code')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition">Copiar</button>
               </div>
-              <p class="text-[11px] text-zinc-400 mt-1.5">Indica este código en tus implantaciones para vincular el CIF del cliente a tu cuenta.</p>
+              <p class="text-[11px] text-slate-300 mt-1.5">Indica este código en tus implantaciones para vincular el CIF del cliente a tu cuenta.</p>
             </div>
 
-            <div class="p-4 rounded-xl bg-black/50 border border-white/[0.1]">
-              <div class="text-[11px] font-mono text-zinc-400 uppercase">Tu Licencia NFR de Demostración (2 Puestos · Modo Sandbox)</div>
+            <div class="p-4 rounded-xl bg-[#1b2132] border border-white/[0.18]">
+              <div class="text-[11px] font-mono text-slate-300 uppercase">Tu Licencia NFR de Demostración (2 Puestos · Modo Sandbox)</div>
               <div class="flex items-center justify-between gap-3 mt-1.5">
                 <code id="pt-res-key" class="text-base sm:text-lg font-bold text-indigo-300 font-mono break-all">EB-XXXX-XXXX-XXXX-XXXX</code>
                 <button type="button" onclick="copyPartnerText('pt-res-key')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition shrink-0">Copiar</button>
               </div>
-              <p class="text-[11px] text-zinc-400 mt-1.5">Úsala en tu propio PC para probar los 5 ERPs en Modo Evaluación y como tu <strong>Clave Secreta de Acceso Partner</strong> en el Dashboard Cloud.</p>
+              <p class="text-[11px] text-slate-300 mt-1.5">Úsala en tu propio PC para probar los 5 ERPs en Modo Evaluación y como tu <strong class="text-white">Clave Secreta de Acceso Partner</strong> en el Dashboard Cloud.</p>
             </div>
           </div>
 
           <div class="mt-6 flex flex-wrap items-center gap-3">
-            <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition">
+            <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition whitespace-nowrap">
               📥 Descargar Instalador Windows (Bentian-Setup.exe)
             </a>
-            <a href="/dashboard" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
+            <a href="/dashboard" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition whitespace-nowrap">
               🚀 Entrar al Portal de Partner (/dashboard)
             </a>
-            <button type="button" onclick="window.print()" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-200 font-semibold text-xs transition">
+            <button type="button" onclick="window.print()" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-xs transition whitespace-nowrap">
               🖨️ Guardar Dossier Ejecutivo PDF
             </button>
-            <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20acabo%20de%20generar%20mi%20codigo%20de%20Partner%20en%20la%20web%20y%20quiero%20comentar%20un%20caso%20de%20cliente" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-xl bg-emerald-700/60 hover:bg-emerald-700 border border-emerald-500/40 text-emerald-200 font-semibold text-xs transition">
+            <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20acabo%20de%20generar%20mi%20codigo%20de%20Partner%20en%20la%20web%20y%20quiero%20comentar%20un%20caso%20de%20cliente" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-xl bg-emerald-700/60 hover:bg-emerald-700 border border-emerald-500/40 text-emerald-200 font-semibold text-xs transition whitespace-nowrap">
               💬 Agendar 1º Piloto Asistido por WhatsApp
             </a>
           </div>
@@ -570,110 +571,37 @@
     </section>
 
     <!-- SECCIÓN 5: ENLACES RÁPIDOS DE APOYO COMERCIAL Y DOCUMENTACIÓN -->
-    <section class="mt-16 pt-10 border-t border-white/[0.08]">
+    <section class="mt-16 pt-10 border-t border-white/[0.14]">
       <h2 class="text-lg font-bold text-white mb-4">Recursos Técnicos y Páginas por Conector para Enviar a tus Clientes</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
-        <a href="/factusol-woocommerce/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 text-zinc-300 hover:text-white transition">Factusol ⇄ WooCommerce</a>
-        <a href="/factusol-shopify/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 text-zinc-300 hover:text-white transition">Factusol ⇄ Shopify</a>
-        <a href="/factusol-prestashop/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 text-zinc-300 hover:text-white transition">Factusol ⇄ PrestaShop</a>
-        <a href="/simplygest-woocommerce/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 text-zinc-300 hover:text-white transition">SimplyGest ⇄ WooCommerce</a>
-        <a href="/conector-simplygest/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 text-zinc-300 hover:text-white transition">Conector SimplyGest Triple</a>
-        <a href="/sage50-woocommerce/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 text-zinc-300 hover:text-white transition">Sage 50 ⇄ WooCommerce</a>
-        <a href="/a3erp-woocommerce/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-amber-500/40 text-zinc-300 hover:text-white transition">a3ERP ⇄ WooCommerce</a>
-        <a href="/agora-pos-woocommerce/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-pink-500/40 text-zinc-300 hover:text-white transition">Ágora POS ⇄ WooCommerce</a>
-        <a href="/docs/canales/holded/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-sky-500/40 text-zinc-300 hover:text-white transition">Integración Holded Cloud</a>
-        <a href="/conector-factusol/" class="p-3 rounded-xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 text-zinc-300 hover:text-white transition">Mapa 52 Ciudades España</a>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs font-medium">
+        <a href="/factusol-woocommerce/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-indigo-400/60 text-slate-200 hover:text-white transition">Factusol ⇄ WooCommerce</a>
+        <a href="/factusol-shopify/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-indigo-400/60 text-slate-200 hover:text-white transition">Factusol ⇄ Shopify</a>
+        <a href="/factusol-prestashop/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-indigo-400/60 text-slate-200 hover:text-white transition">Factusol ⇄ PrestaShop</a>
+        <a href="/simplygest-woocommerce/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-emerald-400/60 text-slate-200 hover:text-white transition">SimplyGest ⇄ WooCommerce</a>
+        <a href="/conector-simplygest/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-emerald-400/60 text-slate-200 hover:text-white transition">Conector SimplyGest Triple</a>
+        <a href="/sage50-woocommerce/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-emerald-400/60 text-slate-200 hover:text-white transition">Sage 50 ⇄ WooCommerce</a>
+        <a href="/a3erp-woocommerce/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-amber-400/60 text-slate-200 hover:text-white transition">a3ERP ⇄ WooCommerce</a>
+        <a href="/agora-pos-woocommerce/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-pink-400/60 text-slate-200 hover:text-white transition">Ágora POS ⇄ WooCommerce</a>
+        <a href="/docs/canales/holded/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-sky-400/60 text-slate-200 hover:text-white transition">Integración Holded Cloud</a>
+        <a href="/conector-factusol/" class="p-3.5 rounded-xl bg-[#151926] border border-white/[0.15] hover:border-indigo-400/60 text-slate-200 hover:text-white transition">Mapa 52 Ciudades España</a>
       </div>
     </section>
 
   </main>
 
-  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>© 2026 Bentian ERP Bridge · Canal Oficial de Partners y Agentes Digitalizadores · <a href="mailto:soporte@cristianjm.com" class="text-zinc-300 hover:underline">soporte@cristianjm.com</a> · Tel: <strong>617 205 053</strong></div>
+  <footer class="border-t border-white/[0.14] bg-[#0b0d13] py-8 px-6 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge · Canal Oficial de Partners y Agentes Digitalizadores · <a href="mailto:soporte@cristianjm.com" class="text-slate-200 hover:underline">soporte@cristianjm.com</a> · Tel: <strong class="text-white">617 205 053</strong></div>
       <div class="flex items-center gap-4">
-        <a href="/" class="hover:text-zinc-300">Inicio</a>
-        <a href="/docs/" class="hover:text-zinc-300">Documentación</a>
-        <a href="/beta/" class="hover:text-zinc-300">Beta Gratuita 2026</a>
-        <a href="/dashboard" class="hover:text-zinc-300">Panel Clientes / Partners</a>
+        <a href="/" class="hover:text-white whitespace-nowrap">Inicio</a>
+        <a href="/docs/" class="hover:text-white whitespace-nowrap">Documentación</a>
+        <a href="/beta/" class="hover:text-white whitespace-nowrap">Beta Gratuita 2026</a>
+        <a href="/dashboard" class="hover:text-white whitespace-nowrap">Panel Clientes / Partners</a>
       </div>
     </div>
   </footer>
 
   <script src="/js/version-sync.js" defer></script>
-  <script>
-    function actualizarCalculadoraPartner() {
-      var clients = parseInt(document.getElementById('calc-clients').value, 10) || 15;
-      var setup = parseInt(document.getElementById('calc-setup').value, 10) || 300;
-      var annualCommissionPerClient = 199 * 0.25; // 49.75 EUR
-      var setupTotal = clients * setup;
-      var recurringTotal = clients * annualCommissionPerClient;
-      var year1Total = setupTotal + recurringTotal;
-
-      document.getElementById('calc-clients-label').textContent = clients + (clients === 1 ? ' cliente' : ' clientes');
-      document.getElementById('calc-setup-label').textContent = setup + ' € / cliente';
-      document.getElementById('res-setup-total').textContent = setupTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-      document.getElementById('res-recurring-total').textContent = recurringTotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' € / año';
-      document.getElementById('res-year1-total').textContent = year1Total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-    }
-
-    function copyPartnerText(elId) {
-      var el = document.getElementById(elId);
-      if (!el) return;
-      navigator.clipboard.writeText(el.textContent.trim()).catch(function() {});
-    }
-
-    async function submitPartnerApplication(e) {
-      e.preventDefault();
-      var btn = document.getElementById('pt-submit-btn');
-      var origText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Generando Código Partner y Licencia NFR...';
-
-      try {
-        var payload = {
-          agencyName: document.getElementById('pt-agency-name').value.trim(),
-          contactName: document.getElementById('pt-contact-name').value.trim(),
-          email: document.getElementById('pt-email').value.trim(),
-          phone: document.getElementById('pt-phone').value.trim(),
-          partnerType: document.getElementById('pt-type').value,
-          estimatedClients: document.getElementById('pt-clients').value,
-          erps: document.getElementById('pt-erps').value.trim(),
-          website: document.getElementById('pt-website').value.trim()
-        };
-
-        var res = await fetch('/api/v1/partners/apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        var json = await res.json();
-        if (!res.ok || !json.success) {
-          alert((json.error && json.error.message) || 'No se pudo procesar la solicitud. Verifica los datos.');
-          return;
-        }
-
-        document.getElementById('pt-res-code').textContent = json.data.partnerCode || 'PT-BENTIAN';
-        document.getElementById('pt-res-key').textContent = json.data.nfrLicenseKey || 'Enviada por email';
-        document.getElementById('pt-res-title').textContent = json.alreadyRegistered
-          ? 'Tu Agencia (' + json.data.agencyName + ') ya está acreditada'
-          : '¡' + json.data.agencyName + ' acreditada como Partner Oficial!';
-        var box = document.getElementById('pt-result-box');
-        box.classList.remove('hidden');
-        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } catch (err) {
-        alert('Error de red al conectar con el servidor central. Inténtalo de nuevo.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = origText;
-      }
-    }
-
-    if (window.location.search.indexOf('print=1') !== -1) {
-      window.addEventListener('load', function() {
-        setTimeout(function() { window.print(); }, 500);
-      });
-    }
-  </script>
+  <script src="/partners/js/partners.js" defer></script>
 </body>
 </html>

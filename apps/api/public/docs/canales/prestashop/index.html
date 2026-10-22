@@ -138,40 +138,40 @@
 <body class="min-h-screen bg-[#09090b] text-[#f4f4f5] selection:bg-indigo-500/30 selection:text-indigo-200">
 
   
-    <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
-      <div class="flex items-center gap-3 sm:gap-4">
+    <header class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/[0.14] bg-[#0b0d13]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 sm:gap-4 shrink-0 whitespace-nowrap">
         <!-- Mobile hamburger toggle -->
-        <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition" aria-label="Abrir navegación">
+        <button id="mobile-menu-btn" class="lg:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition shrink-0" aria-label="Abrir navegación">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
-        <a href="/docs/" class="flex items-center gap-3">
-          <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7">
-          <span class="font-bold text-base text-white tracking-tight">Bentian <span class="text-zinc-500 font-normal">| Documentación</span></span>
+        <a href="/docs/" class="flex items-center gap-3 shrink-0 whitespace-nowrap">
+          <img src="/assets/icon.svg" alt="Bentian" class="w-7 h-7 shrink-0">
+          <span class="font-bold text-base text-white tracking-tight whitespace-nowrap">Bentian <span class="text-zinc-400 font-normal">| Documentación</span></span>
         </a>
       </div>
 
-      <div class="flex items-center gap-2.5 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
         <!-- Botón directo para regresar a la web principal -->
-        <a href="/" class="text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.16] bg-[#121215] transition flex items-center gap-1.5" title="Volver a la portada principal de Bentian">
-          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <a href="/" class="text-xs font-medium text-zinc-200 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.14] hover:border-white/[0.24] bg-[#151822] transition flex items-center gap-1.5 whitespace-nowrap shrink-0" title="Volver a la portada principal de Bentian">
+          <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
           <span class="hidden sm:inline">Web Principal</span>
         </a>
 
         <!-- Acceso directo al Programa de Partners -->
-        <a href="/partners/" class="text-xs font-medium text-emerald-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 transition hidden sm:flex items-center gap-1" title="Programa de Partners y Agentes Digitalizadores (25% Recurrente)">
+        <a href="/partners/" class="text-xs font-medium text-emerald-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 transition hidden sm:flex items-center gap-1 whitespace-nowrap shrink-0" title="Programa de Partners y Agentes Digitalizadores (25% Recurrente)">
           <span>Partners</span>
           <span class="text-[10px] font-mono text-emerald-400">25%</span>
         </a>
 
         <!-- Acceso directo al Dashboard de Clientes -->
-        <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] transition hidden md:flex items-center gap-1.5" title="Acceso a panel de clientes y licencias">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <a href="/dashboard" class="text-xs font-medium text-zinc-200 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.06] transition hidden md:flex items-center gap-1.5 whitespace-nowrap shrink-0" title="Acceso a panel de clientes y licencias">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           <span>Clientes</span>
         </a>
 
         <!-- Botón canónico de descarga oficial -->
-        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5 whitespace-nowrap shrink-0">
           <span>Descargar</span>
           <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.4.12</span>
         </a>

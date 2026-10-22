@@ -63,6 +63,9 @@ const dashboardModuleFiles = [
   ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/views'), ['.html']),
   ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/modals'), ['.html']),
   ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/layout'), ['.html']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/sections'), ['.html']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/partners/sections'), ['.html']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/partners/js'), ['.js']),
 ];
 
 const allSrcFiles = [
@@ -92,7 +95,7 @@ for (const f of allSrcFiles) {
   const lines = content.split(/\r?\n/).length;
   totalLoc += lines;
   const rel = path.relative(repoRoot, f).replace(/\\/g, '/');
-  const isDashboardModule = rel.startsWith('apps/api/public/dashboard/');
+  const isDashboardModule = rel.startsWith('apps/api/public/');
   if (isDashboardModule && lines > MAX_LOC_WARN) {
     locViolations.push({ rel, lines });
   } else if (lines > MAX_LOC_ERROR) {

@@ -1,19 +1,7 @@
 <!-- ========================================================================================= -->
 <!-- ⚠️ AVISO: ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR DIRECTAMENTE                      -->
-<!-- Este archivo es el bundle pre-renderizado compilado mediante: `npm run build:landing`     -->
-<!-- El código fuente modular y editable reside en:                                            -->
-<!--   • apps/api/public/sections/ (01-header.html a 14-footer.html)                          -->
-<!--   • apps/api/public/layout/   (base.html, schema-org.html)                               -->
-<!--   • apps/api/public/modals/   (modal-checkout.html, modal-legal.html)                     -->
-<!--   • apps/api/public/js/       (legal-modal.js, smooth-scroll.js, ...)                     -->
+<!-- El código fuente modular (<= 250 LOC) reside en apps/api/public/sections/                 -->
 <!-- ========================================================================================= -->
-<!-- ========================================================================= -->
-<!-- BENTIAN ERP BRIDGE — BUNDLE PÚBLICO COMPILADO AUTOMÁTICAMENTE            -->
-<!-- NO EDITAR DIRECTAMENTE ESTE ARCHIVO (apps/api/public/index.html)          -->
-<!-- El código fuente está 100% modularizado en apps/api/public/sections/     -->
-<!-- Para regenerar tras editar secciones, ejecuta: npm run build:landing      -->
-<!-- ========================================================================= -->
-
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
 <head>
@@ -189,7 +177,7 @@
   <main class="flex-1">
     <!-- 2. HERO EDITORIAL & DYNAMIC SYSTEM FLOW                                   -->
     <!-- ========================================================================= -->
-    <section class="relative pt-20 pb-24 px-6 overflow-hidden border-b border-white/[0.06]">
+    <section class="relative pt-20 pb-12 px-6 overflow-hidden">
       <div class="max-w-6xl mx-auto">
         
         <!-- Badge de Versión Oficial y Arquitectura -->
@@ -226,7 +214,6 @@
         <div class="mt-10 flex flex-wrap items-center gap-4">
           <a id="btn-hero-download" data-download-installer href="/releases/latest/Bentian-Setup.exe" download="Bentian-Setup.exe"
              class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm flex items-center gap-2.5 transition shadow-lg shadow-indigo-600/20">
-            <!-- Icono Windows SVG fino -->
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
               <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/>
             </svg>
@@ -261,7 +248,7 @@
           </a>
         </div>
 
-        <!-- Aviso Informativo Windows Defender SmartScreen (oculto en la vista inicial, visible tras hacer clic en descargar) -->
+        <!-- Aviso Informativo Windows Defender SmartScreen -->
         <div id="hero-smartscreen-notice" class="hidden mt-4 flex items-start gap-3 max-w-xl p-3.5 rounded-xl bg-amber-500/[0.08] border border-amber-500/25 text-xs text-zinc-300 transition-all">
           <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -286,43 +273,36 @@
         <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-4xl">
           <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Distribución &amp; Verificación:</span>
           <div class="flex flex-wrap items-center gap-2.5">
-            <!-- WinGet Badge -->
             <a href="https://github.com/microsoft/winget-pkgs/pull/446582" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-blue-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition group" title="Instalar vía Microsoft Windows Package Manager">
               <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
               <span>winget install <strong class="text-blue-300">Bentian.ERPBridge</strong></span>
             </a>
-
-            <!-- Softpedia Badge -->
             <a href="https://www.softpedia.com/get/Internet/Servers/Database-Utils/Bentian-ERP-Bridge.shtml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-blue-400/40 text-[11px] font-mono text-zinc-300 hover:text-white transition group" title="Verificado y certificado 100% Clean en Softpedia (Calificación 4.5/5)">
               <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded bg-blue-500/20 text-blue-400 font-bold text-[9px]">S</span>
               <span>Softpedia <strong class="text-emerald-400">★ 4.5/5</strong> <span class="text-[10px] text-zinc-500">100% Clean</span></span>
             </a>
-
-            <!-- AlternativeTo Badge -->
             <a href="https://alternativeto.net/software/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-emerald-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Ver ficha en AlternativeTo">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
               <span>AlternativeTo</span>
             </a>
-
-            <!-- Trustpilot Badge -->
             <a href="https://es.trustpilot.com/review/bridge.cristianjm.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-teal-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Ver opiniones en Trustpilot">
               <span class="text-emerald-400 text-xs">★</span>
               <span>Trustpilot</span>
             </a>
-
-            <!-- G2 Badge -->
             <a href="https://www.g2.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-red-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Verificado en G2 Marketplace">
               <span class="text-red-400 font-bold text-xs">G2</span>
               <span>Marketplace</span>
             </a>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- ========================================================================= -->
-        <!-- VISUALIZACIÓN CONCEPTUAL DE INTEGRACIÓN DE SISTEMAS                       -->
-        <!-- ========================================================================= -->
-        <div class="mt-16 rounded-2xl bg-[#121215] border border-white/[0.08] p-6 lg:p-8 relative overflow-hidden" id="arquitectura">
-          <!-- Fondo sutil con cuadrícula técnica -->
+  <!-- 2B. VISUALIZACIÓN CONCEPTUAL DE INTEGRACIÓN DE SISTEMAS                   -->
+    <!-- ========================================================================= -->
+    <section class="pb-24 px-6 border-b border-white/[0.06]">
+      <div class="max-w-6xl mx-auto">
+        <div class="mt-4 rounded-2xl bg-[#121215] border border-white/[0.08] p-6 lg:p-8 relative overflow-hidden" id="arquitectura">
           <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
           <!-- Cabecera de la Visualización -->
@@ -342,7 +322,6 @@
 
           <!-- Malla de los 3 Nodos del Flujo -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 relative z-10 items-stretch">
-            
             <!-- NODO A: FACTUSOL (Local System) -->
             <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
               <div>
@@ -372,7 +351,7 @@
               </div>
             </div>
 
-            <!-- NODO CENTRAL: CAPA DE INTEGRACIÓN (PRODUCT_NAME) -->
+            <!-- NODO CENTRAL: CAPA DE INTEGRACIÓN -->
             <div class="rounded-xl bg-[#18181b]/90 border border-indigo-500/30 p-5 flex flex-col justify-between shadow-lg shadow-indigo-950/20 relative">
               <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full shadow">
                 Sync Engine
@@ -439,13 +418,11 @@
                 </div>
               </div>
             </div>
-
           </div>
 
           <!-- Barra de Integridad Criptográfica y Estado -->
           <div class="rounded-lg bg-[#09090b] border border-white/[0.06] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-zinc-400">
             <div class="flex items-center gap-2">
-              <!-- Shield Check SVG -->
               <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
               <span>Seguridad de Red: <strong class="text-zinc-200">Conexiones Salientes Unidireccionales TLS 1.3 sin Apertura de Puertos</strong></span>
             </div>
@@ -454,11 +431,8 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
-
-    <!-- ========================================================================= -->
 
   <!-- 3. SECCIÓN EL PROBLEMA: LA FRAGMENTACIÓN OCULTA                           -->
     <!-- ========================================================================= -->
@@ -662,7 +636,7 @@
   <!-- ========================================================================= -->
 <!-- 5B / 07. SECCIÓN SALVAGUARDAS OPERATIVAS: RESILIENCIA EN EL MUNDO REAL     -->
 <!-- ========================================================================= -->
-<section class="py-24 px-6 border-b border-white/[0.06] bg-[#09090b] scroll-mt-24" id="salvaguardas">
+<section class="pt-24 pb-12 px-6 bg-[#09090b] scroll-mt-24" id="salvaguardas">
   <div class="max-w-6xl mx-auto">
 
     <!-- Cabecera de Sección -->
@@ -681,12 +655,9 @@
 
     <!-- Las 3 Grandes Promesas Comerciales -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-16">
-      
       <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-emerald-500/20 relative overflow-hidden">
         <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 font-mono font-bold text-sm">
-          01
-        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4 font-mono font-bold text-sm">01</div>
         <div class="text-xs font-mono text-emerald-400 uppercase tracking-wider">Promesa de Disponibilidad</div>
         <h3 class="text-lg font-bold text-white mt-1">Tus Pedidos Jamás se Pierden</h3>
         <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -696,9 +667,7 @@
 
       <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-indigo-500/20 relative overflow-hidden">
         <div class="absolute -top-12 -right-12 w-28 h-28 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
-          02
-        </div>
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">02</div>
         <div class="text-xs font-mono text-indigo-400 uppercase tracking-wider">Promesa de Precisión</div>
         <h3 class="text-lg font-bold text-white mt-1">Cero Descuadres Contables e IVA</h3>
         <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
@@ -708,16 +677,13 @@
 
       <div class="p-6 rounded-2xl bg-gradient-to-b from-[#18181b] to-[#121215] border border-purple-500/20 relative overflow-hidden">
         <div class="absolute -top-12 -right-12 w-28 h-28 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4 font-mono font-bold text-sm">
-          03
-        </div>
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4 font-mono font-bold text-sm">03</div>
         <div class="text-xs font-mono text-purple-400 uppercase tracking-wider">Promesa de Operatividad</div>
         <h3 class="text-lg font-bold text-white mt-1">Cero Fricción en el Día a Día</h3>
         <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
           Pedidos directos en la Bandeja Principal (Serie 1), sin bloqueos de archivo .ldb mientras se factura en mostrador y con resolución guiada de incidencias en 1 clic.
         </p>
       </div>
-
     </div>
 
     <!-- Las 8 Salvaguardas Operativas -->
@@ -727,8 +693,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-        <!-- 1. Pedidos protegidos offline -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -746,7 +710,6 @@
           </div>
         </div>
 
-        <!-- 2. Rutas NAS preservadas -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -764,7 +727,6 @@
           </div>
         </div>
 
-        <!-- 3. IVA y céntimos calculados con precisión -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -782,7 +744,6 @@
           </div>
         </div>
 
-        <!-- 4. Pedidos directos en Bandeja Principal (Serie 1) -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -800,7 +761,6 @@
           </div>
         </div>
 
-        <!-- 5. Errores explicados con resolución en 1 clic -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-purple-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -818,7 +778,6 @@
           </div>
         </div>
 
-        <!-- 6. Alertas transaccionales por email -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-purple-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -836,7 +795,6 @@
           </div>
         </div>
 
-        <!-- 7. Selector nativo de Windows (STA) -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-emerald-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -854,7 +812,6 @@
           </div>
         </div>
 
-        <!-- 8. Compatibilidad universal -->
         <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between mb-4">
@@ -871,12 +828,16 @@
             <a href="/docs/canales/endpoint-universal/" class="text-indigo-400 hover:text-indigo-300 font-sans font-semibold transition">Guía →</a>
           </div>
         </div>
-
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Comparativa Técnica: Store-and-Forward vs Conectores Síncronos Tradicionales -->
-    <div class="mt-14 p-8 rounded-3xl bg-[#121215] border border-white/[0.09] relative overflow-hidden">
+  <!-- 07B. COMPARATIVA TÉCNICA: STORE-AND-FORWARD VS CONECTORES TRADICIONALES   -->
+<!-- ========================================================================= -->
+<section class="pb-24 px-6 border-b border-white/[0.06] bg-[#09090b]">
+  <div class="max-w-6xl mx-auto">
+    <div class="p-8 rounded-3xl bg-[#121215] border border-white/[0.09] relative overflow-hidden">
       <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
         <div>
           <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Comparativa Arquitectónica</span>
@@ -894,7 +855,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-        
         <!-- Modelo Tradicional -->
         <div class="p-5 rounded-xl bg-black/40 border border-red-500/20">
           <div class="flex items-center gap-2 text-red-400 font-mono text-xs font-bold uppercase mb-3">
@@ -938,13 +898,10 @@
             </li>
           </ul>
         </div>
-
       </div>
     </div>
-
   </div>
 </section>
-<!-- ========================================================================= -->
 
   <!-- 6. SECCIÓN CÓMO FUNCIONA (CONNECT, SYNC, RECONCILE)                       -->
     <!-- ========================================================================= -->
@@ -1072,11 +1029,10 @@
 
   <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="agente-local">
+    <section class="pt-20 pb-12 px-6 scroll-mt-24" id="agente-local">
       <div id="descargas" class="scroll-mt-24"></div>
       <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
           <div>
             <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Agente de Escritorio</span>
             <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
@@ -1125,7 +1081,6 @@
               </a>
 
               <a id="btn-agent-wp-plugin" href="/releases/latest/bentian-erp-bridge-for-factusol.zip" download="bentian-erp-bridge-for-factusol.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-200 border border-indigo-500/30 hover:border-indigo-500/60 font-medium text-xs flex items-center gap-2 transition shadow-sm">
-                <!-- SVG oficial WordPress fino -->
                 <svg class="w-4 h-4 fill-current text-indigo-400" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312L3.92 8.784C4.856 6.892 6.81 5.568 9.068 5.568c1.07 0 2.05.32 2.87.87L7.42 18.84c3.08 1.76 6.94 1.44 9.71-.62l-4.72-12.8c.84-.45 1.8-.71 2.82-.71 1.86 0 3.52.88 4.59 2.26l-4.8 13.62c4.15-1.57 7.1-5.59 7.1-10.31 0-6.477-5.477-12-12-12z"/></svg>
                 <span>Plugin WordPress (.zip)</span>
               </a>
@@ -1186,7 +1141,6 @@
               </div>
             </div>
 
-            <!-- Pasos rápidos -->
             <div class="pt-4 border-t border-white/[0.06] text-xs text-zinc-400 space-y-2">
               <div class="font-semibold text-zinc-200">Puesta en marcha en 2 minutos:</div>
               <div class="flex items-start gap-2">
@@ -1198,11 +1152,15 @@
                 <span>Introduce tu clave de licencia desde el panel de la bandeja para activar la sincronización.</span>
               </div>
             </div>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- Galería Interactiva de Capturas de Pantalla del Agente Local -->
-      <div class="mt-16 pt-12 border-t border-white/[0.06] max-w-6xl mx-auto">
+  <!-- 8B. GALERÍA INTERACTIVA DE CAPTURAS DE PANTALLA DEL AGENTE LOCAL          -->
+    <!-- ========================================================================= -->
+    <section class="pb-20 px-6 border-b border-white/[0.06]">
+      <div class="pt-12 border-t border-white/[0.06] max-w-6xl mx-auto">
         <div class="text-center max-w-2xl mx-auto mb-8">
           <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Interfaz Gráfica Oficial</span>
           <h3 class="text-2xl sm:text-3xl font-bold text-white mt-2 tracking-tight">Centro de Control Local en Alta Resolución</h3>
@@ -1236,7 +1194,6 @@
 
         <!-- Marco de Ventana de la Captura -->
         <div class="rounded-2xl bg-[#0e0e12] border border-white/[0.12] shadow-2xl overflow-hidden max-w-5xl mx-auto">
-          <!-- Barra de título simulada -->
           <div class="flex items-center justify-between px-4 py-2.5 bg-[#16161c] border-b border-white/[0.06] text-xs font-mono text-zinc-400">
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
@@ -1252,7 +1209,6 @@
             </div>
           </div>
 
-          <!-- Contenedor de la Imagen Activa -->
           <div class="relative aspect-[16/10.25] bg-[#09090b] overflow-hidden">
             <picture id="gallery-picture">
               <source id="gallery-source-webp" srcset="/assets/screenshots/01-dashboard-overview.webp" type="image/webp">
@@ -1329,8 +1285,6 @@
       </script>
     </section>
 
-    <!-- ========================================================================= -->
-
   <!-- 9. SECCIÓN OBSERVABILIDAD Y REGISTRO DE AUDITORÍA                         -->
     <!-- ========================================================================= -->
     <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="observabilidad">
@@ -1386,7 +1340,7 @@
 
   <!-- 10. SECCIÓN CONECTORES (DISPONIBLES HOY VS EXPANSIÓN)                    -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="conectores">
+    <section class="pt-20 pb-10 px-6 scroll-mt-24" id="conectores">
       <div class="max-w-6xl mx-auto">
         <div class="max-w-2xl">
           <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">Ecosistema & Integraciones</span>
@@ -1399,7 +1353,6 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-          
           <!-- CONECTOR ACTIVO 1: FACTUSOL -->
           <div class="p-6 rounded-2xl bg-[#121215] border border-white/[0.1] hover:border-indigo-500/50 transition flex flex-col justify-between">
             <div>
@@ -1534,13 +1487,15 @@
               <a href="/docs/simplygest/localizacion-base-datos/" class="text-xs text-zinc-400 hover:text-zinc-200 transition">Docs</a>
             </div>
           </div>
-
         </div>
+      </div>
+    </section>
 
-        <!-- ========================================================================= -->
-        <!-- SUB-SECCIÓN: MATRIZ DE COMPATIBILIDAD MULTI-ERP ESTÁNDAR COMERCIAL        -->
-        <!-- ========================================================================= -->
-        <div class="mt-14 p-8 rounded-2xl bg-[#0f0f13] border border-white/[0.08] relative overflow-hidden">
+  <!-- 10B. MATRIZ DE COMPATIBILIDAD MULTI-ERP ESTÁNDAR COMERCIAL                -->
+    <!-- ========================================================================= -->
+    <section class="pb-10 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="p-8 rounded-2xl bg-[#0f0f13] border border-white/[0.08] relative overflow-hidden">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-950/60 border border-emerald-700/40 text-xs font-mono text-emerald-300 font-semibold mb-2">
@@ -1560,14 +1515,9 @@
             </a>
           </div>
 
-          <!-- Grid 3x2 de ERPs Comerciales Estándar -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            <!-- 1. Factusol -->
             <a href="/factusol-woocommerce/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">
-                FS
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">FS</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">Factusol ERP</h4>
@@ -1577,11 +1527,8 @@
               </div>
             </a>
 
-            <!-- 2. SimplyGest -->
             <a href="/simplygest-woocommerce/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">
-                SG
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">SG</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">SimplyGest Desktop</h4>
@@ -1591,11 +1538,8 @@
               </div>
             </a>
 
-            <!-- 3. Ágora Retail / POS -->
             <a href="/agora-pos-woocommerce/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-pink-950/60 border border-pink-600/40 flex items-center justify-center shrink-0 text-pink-400 font-bold text-sm">
-                AG
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-pink-950/60 border border-pink-600/40 flex items-center justify-center shrink-0 text-pink-400 font-bold text-sm">AG</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-pink-300 transition">Ágora Retail / POS</h4>
@@ -1605,11 +1549,8 @@
               </div>
             </a>
 
-            <!-- 4. Sage 50 -->
             <a href="/sage50-woocommerce/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">
-                S50
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">S50</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">Sage 50</h4>
@@ -1619,11 +1560,8 @@
               </div>
             </a>
 
-            <!-- 5. a3ERP Wolters Kluwer -->
             <a href="/a3erp-woocommerce/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-amber-950/60 border border-amber-600/40 flex items-center justify-center shrink-0 text-amber-400 font-bold text-sm">
-                A3
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-amber-950/60 border border-amber-600/40 flex items-center justify-center shrink-0 text-amber-400 font-bold text-sm">A3</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-amber-300 transition">a3ERP (Wolters Kluwer)</h4>
@@ -1633,11 +1571,8 @@
               </div>
             </a>
 
-            <!-- 6. Holded Cloud ERP (Facturación & Gestoría) -->
             <a href="/docs/canales/holded-cloud-erp/" class="p-4 rounded-xl bg-[#141419] border border-emerald-500/30 hover:border-emerald-400/60 transition flex items-start gap-3.5 group">
-              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">
-                HD
-              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-600/40 flex items-center justify-center shrink-0 text-emerald-400 font-bold text-sm">HD</div>
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">Holded Cloud (Finanzas)</h4>
@@ -1646,10 +1581,8 @@
                 <p class="text-[11px] text-zinc-400 mt-1">Enlace contable con el almacén local vía REST API v1. Facturación automática y Libro Diario.</p>
               </div>
             </a>
-
           </div>
 
-          <!-- Highlight: Motor Universal de Fotos Automáticas -->
           <div class="mt-5 pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-400">
             <div class="flex items-center gap-2">
               <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-700/50 text-[10px] font-mono text-indigo-300 font-semibold">FOTOS 100% AUTOMÁTICAS</span>
@@ -1657,13 +1590,15 @@
             </div>
             <a href="/partners/" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 underline shrink-0">¿Eres Agencia o Implantador ERP? Programa Partners (25%) →</a>
           </div>
-
         </div>
+      </div>
+    </section>
 
-        <!-- ========================================================================= -->
-        <!-- BLOQUE DESTACADO: CASO DE ÉXITO DE ARQUITECTURA TRIPARTITA                -->
-        <!-- ========================================================================= -->
-        <div class="mt-16 p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#121217] to-[#0a0a0d] border border-indigo-500/30 shadow-2xl relative overflow-hidden">
+  <!-- 10C. CASO DE ÉXITO DE ARQUITECTURA TRIPARTITA Y COBERTURA NACIONAL        -->
+    <!-- ========================================================================= -->
+    <section class="pb-20 px-6 border-b border-white/[0.06]">
+      <div class="max-w-6xl mx-auto">
+        <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#121217] to-[#0a0a0d] border border-indigo-500/30 shadow-2xl relative overflow-hidden">
           <div class="absolute -right-24 -top-24 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
           <div class="absolute -left-24 -bottom-24 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -1684,9 +1619,7 @@
               </p>
             </div>
 
-            <!-- Flow Diagram Cards (3 Pasos Conectados) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-              
               <!-- Paso 1: Shopify -->
               <div class="p-6 rounded-2xl bg-[#16161c] border border-white/[0.08] hover:border-indigo-500/40 transition flex flex-col justify-between">
                 <div>
@@ -1740,10 +1673,8 @@
                   <span>100% Sin doble picado manual</span>
                 </div>
               </div>
-
             </div>
 
-            <!-- Métricas y Enlace al Caso de Estudio -->
             <div class="mt-8 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div class="flex flex-wrap items-center gap-6 text-xs text-zinc-400 font-mono">
                 <div class="flex items-center gap-2">
@@ -1764,7 +1695,6 @@
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
             </div>
-
           </div>
         </div>
 
@@ -1789,11 +1719,8 @@
             <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
           </a>
         </div>
-
       </div>
     </section>
-
-    <!-- ========================================================================= -->
 
   <!-- 11. SECCIÓN SEGURIDAD Y CRIPTOGRAFÍA                                      -->
     <!-- ========================================================================= -->

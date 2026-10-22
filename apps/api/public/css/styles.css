@@ -1,15 +1,42 @@
 :root {
-  --bg: #09090b;
-  --surface: #121215;
-  --surface-elevated: #18181b;
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
+  --bg: #0b0d13;
+  --surface: #151822;
+  --surface-elevated: #1e2230;
+  --border-subtle: rgba(255, 255, 255, 0.14);
+  --border-medium: rgba(255, 255, 255, 0.22);
   --accent-indigo: #6366f1;
 }
 
 html, body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0b0d13;
+  color: #f8fafc;
 }
+
+/* =========================================================================
+   BLINDAJE GLOBAL DE CABECERAS Y NAVEGACIÓN (ANTI-WRAP EN 1 SOLA LÍNEA)
+   ========================================================================= */
+header nav a,
+header a[data-download-installer],
+header button {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* =========================================================================
+   SISTEMA GLOBAL DE ALTO CONTRASTE Y ELEVACIÓN DE SUPERFICIES
+   ========================================================================= */
+.bg-\[\#09090b\] { background-color: #0b0d13 !important; }
+.bg-\[\#121215\] {
+  background-color: #151822 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+}
+.bg-\[\#18181b\], .bg-\[\#141419\], .bg-\[\#16161c\] { background-color: #1e2230 !important; }
+.border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
+.border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
+.text-zinc-500 { color: #a1a8b8 !important; }
+.text-zinc-400 { color: #cbd5e1 !important; }
+.text-zinc-300 { color: #e2e8f0 !important; }
 
 /* Micro-animaciones sutiles y respetuosas */
 @keyframes pulse-signal {
@@ -30,7 +57,7 @@ html, body {
 
 /* Selección de texto limpia */
 ::selection {
-  background-color: rgba(99, 102, 241, 0.3);
+  background-color: rgba(99, 102, 241, 0.35);
   color: #ffffff;
 }
 
@@ -40,14 +67,14 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #0b0d13;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #2d3348;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #434c6b;
 }

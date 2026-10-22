@@ -1,10 +1,9 @@
 <!-- 8. SECCIÓN AGENTE DE ESCRITORIO WINDOWS                                   -->
     <!-- ========================================================================= -->
-    <section class="py-20 px-6 border-b border-white/[0.06] scroll-mt-24" id="agente-local">
+    <section class="pt-20 pb-12 px-6 scroll-mt-24" id="agente-local">
       <div id="descargas" class="scroll-mt-24"></div>
       <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
           <div>
             <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Agente de Escritorio</span>
             <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2 tracking-tight">
@@ -53,7 +52,6 @@
               </a>
 
               <a id="btn-agent-wp-plugin" href="/releases/latest/bentian-erp-bridge-for-factusol.zip" download="bentian-erp-bridge-for-factusol.zip" class="px-4 py-3 rounded-lg bg-[#121215] hover:bg-[#18181b] text-zinc-200 border border-indigo-500/30 hover:border-indigo-500/60 font-medium text-xs flex items-center gap-2 transition shadow-sm">
-                <!-- SVG oficial WordPress fino -->
                 <svg class="w-4 h-4 fill-current text-indigo-400" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312L3.92 8.784C4.856 6.892 6.81 5.568 9.068 5.568c1.07 0 2.05.32 2.87.87L7.42 18.84c3.08 1.76 6.94 1.44 9.71-.62l-4.72-12.8c.84-.45 1.8-.71 2.82-.71 1.86 0 3.52.88 4.59 2.26l-4.8 13.62c4.15-1.57 7.1-5.59 7.1-10.31 0-6.477-5.477-12-12-12z"/></svg>
                 <span>Plugin WordPress (.zip)</span>
               </a>
@@ -114,7 +112,6 @@
               </div>
             </div>
 
-            <!-- Pasos rápidos -->
             <div class="pt-4 border-t border-white/[0.06] text-xs text-zinc-400 space-y-2">
               <div class="font-semibold text-zinc-200">Puesta en marcha en 2 minutos:</div>
               <div class="flex items-start gap-2">
@@ -126,135 +123,7 @@
                 <span>Introduce tu clave de licencia desde el panel de la bandeja para activar la sincronización.</span>
               </div>
             </div>
-        </div>
-      </div>
-
-      <!-- Galería Interactiva de Capturas de Pantalla del Agente Local -->
-      <div class="mt-16 pt-12 border-t border-white/[0.06] max-w-6xl mx-auto">
-        <div class="text-center max-w-2xl mx-auto mb-8">
-          <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Interfaz Gráfica Oficial</span>
-          <h3 class="text-2xl sm:text-3xl font-bold text-white mt-2 tracking-tight">Centro de Control Local en Alta Resolución</h3>
-          <p class="text-zinc-400 text-xs sm:text-sm mt-2 leading-relaxed">
-            Diseñado en exclusiva para entornos Windows: tema oscuro nativo, cero parpadeos, métricas en tiempo real y panel accesible desde la bandeja del sistema.
-          </p>
-        </div>
-
-        <!-- Selector de Pestañas de Captura -->
-        <div class="flex flex-wrap justify-center gap-2 mb-6" id="agent-gallery-tabs">
-          <button type="button" onclick="showAgentPreview('overview')" class="agent-gallery-tab-btn active px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-indigo-600/20 border-indigo-500/50 text-indigo-200" data-preview="overview">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span>Estado General</span>
-          </button>
-          <button type="button" onclick="showAgentPreview('multi-erp')" class="agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white" data-preview="multi-erp">
-            <span>Selector Multi-ERP</span>
-          </button>
-          <button type="button" onclick="showAgentPreview('channels')" class="agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white" data-preview="channels">
-            <span>Canales & Tiendas</span>
-          </button>
-          <button type="button" onclick="showAgentPreview('sync')" class="agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white" data-preview="sync">
-            <span>Automatización & Reglas</span>
-          </button>
-          <button type="button" onclick="showAgentPreview('history')" class="agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white" data-preview="history">
-            <span>Historial de Ventas</span>
-          </button>
-          <button type="button" onclick="showAgentPreview('wizard')" class="agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white" data-preview="wizard">
-            <span>Asistente Inicial</span>
-          </button>
-        </div>
-
-        <!-- Marco de Ventana de la Captura -->
-        <div class="rounded-2xl bg-[#0e0e12] border border-white/[0.12] shadow-2xl overflow-hidden max-w-5xl mx-auto">
-          <!-- Barra de título simulada -->
-          <div class="flex items-center justify-between px-4 py-2.5 bg-[#16161c] border-b border-white/[0.06] text-xs font-mono text-zinc-400">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
-              <span class="ml-2 text-zinc-300 text-[11px] font-sans" id="gallery-window-title">Bentian ERP Bridge — Estado General</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-[10px] text-zinc-500">127.0.0.1:39281</span>
-              <a id="gallery-full-res-link" href="/assets/screenshots/01-dashboard-overview.png" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-[11px] font-sans flex items-center gap-1 transition">
-                <span>Ver en Alta Resolución ↗</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Contenedor de la Imagen Activa -->
-          <div class="relative aspect-[16/10.25] bg-[#09090b] overflow-hidden">
-            <picture id="gallery-picture">
-              <source id="gallery-source-webp" srcset="/assets/screenshots/01-dashboard-overview.webp" type="image/webp">
-              <img id="gallery-img" src="/assets/screenshots/01-dashboard-overview.png" alt="Bentian ERP Bridge — Panel de Control Local" width="1280" height="820" class="w-full h-full object-contain" loading="lazy" />
-            </picture>
           </div>
         </div>
       </div>
-
-      <script>
-        function showAgentPreview(tabKey) {
-          var screens = {
-            'overview': {
-              title: 'Bentian ERP Bridge — Estado General',
-              webp: '/assets/screenshots/01-dashboard-overview.webp',
-              png: '/assets/screenshots/01-dashboard-overview.png',
-              alt: 'Panel de Control Local con Factusol Conectado y Licencia Profesional'
-            },
-            'multi-erp': {
-              title: 'Bentian ERP Bridge — Selector de Conectores ERP',
-              webp: '/assets/screenshots/02-multi-erp-selector.webp',
-              png: '/assets/screenshots/02-multi-erp-selector.png',
-              alt: 'Conmutador Multi-ERP: Factusol, SimplyGest, Ágora POS, Sage 50 y a3ERP'
-            },
-            'channels': {
-              title: 'Bentian ERP Bridge — Canales Web y Tiendas Online',
-              webp: '/assets/screenshots/03-ecommerce-channels.webp',
-              png: '/assets/screenshots/03-ecommerce-channels.png',
-              alt: 'Configuración de Canales: Conector Universal HTTPS, WooCommerce, Shopify y PrestaShop'
-            },
-            'sync': {
-              title: 'Bentian ERP Bridge — Reglas de Automatización y Vigilante',
-              webp: '/assets/screenshots/04-automation-sync.webp',
-              png: '/assets/screenshots/04-automation-sync.png',
-              alt: 'Vigilante en Tiempo Real OLEDB y Reglas de Stock DISSTO'
-            },
-            'history': {
-              title: 'Bentian ERP Bridge — Historial de Pedidos de Venta',
-              webp: '/assets/screenshots/05-sales-order-history.webp',
-              png: '/assets/screenshots/05-sales-order-history.png',
-              alt: 'Historial de Pedidos Sincronizados con Números de Serie Factusol'
-            },
-            'wizard': {
-              title: 'Bentian ERP Bridge — Asistente de Inicio Guiado',
-              webp: '/assets/screenshots/06-setup-wizard.webp',
-              png: '/assets/screenshots/06-setup-wizard.png',
-              alt: 'Asistente de Configuración en 4 Pasos'
-            }
-          };
-
-          var item = screens[tabKey];
-          if (!item) return;
-
-          var sourceWebp = document.getElementById('gallery-source-webp');
-          var imgEl = document.getElementById('gallery-img');
-          var titleEl = document.getElementById('gallery-window-title');
-          var fullResLink = document.getElementById('gallery-full-res-link');
-
-          if (sourceWebp) sourceWebp.srcset = item.webp;
-          if (imgEl) {
-            imgEl.src = item.png;
-            imgEl.alt = item.alt;
-          }
-          if (titleEl) titleEl.textContent = item.title;
-          if (fullResLink) fullResLink.href = item.png;
-
-          document.querySelectorAll('.agent-gallery-tab-btn').forEach(function(btn) {
-            var isActive = btn.getAttribute('data-preview') === tabKey;
-            btn.className = isActive
-              ? 'agent-gallery-tab-btn active px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-indigo-600/20 border-indigo-500/50 text-indigo-200'
-              : 'agent-gallery-tab-btn px-3.5 py-2 rounded-lg text-xs font-medium border transition flex items-center gap-2 bg-[#121215] border-white/[0.08] text-zinc-400 hover:text-white';
-          });
-        }
-      </script>
     </section>
-
-    <!-- ========================================================================= -->

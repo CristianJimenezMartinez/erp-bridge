@@ -1,0 +1,98 @@
+    <!-- SECCIÓN 3: CALCULADORA INTERACTIVA DE COMISIONES PARA EL PARTNER -->
+    <section id="calculadora" class="mt-16 scroll-mt-24">
+      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#161c2a] to-[#111e19] border border-emerald-500/40 shadow-xl print-surface">
+        <div class="max-w-3xl mb-8">
+          <span class="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-widest">Simulador Financiero para Agencias e Informáticos</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">Calculadora de Ingresos del Partner (25% Recurrente + Setup Fee)</h2>
+          <p class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed">
+            Simula cuánto factura tu agencia o empresa de soporte combinando tus honorarios directos de puesta en marcha (100% para ti) más el 25% de comisión recurrente vitalicia sobre el Plan Anual (199 €/año).
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <!-- Controles -->
+          <div class="space-y-6 p-6 rounded-2xl bg-[#1d2436] border border-white/[0.16] shadow-md">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-2">
+                <span class="text-slate-200 font-medium">Clientes conectados por tu agencia:</span>
+                <span id="calc-clients-label" class="text-emerald-400 font-bold text-base">15 clientes</span>
+              </div>
+              <input id="calc-clients" type="range" min="1" max="100" value="15" class="w-full accent-emerald-500 cursor-pointer" oninput="actualizarCalculadoraPartner()" />
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1.5">
+                <span>1 cliente</span>
+                <span>25 clientes</span>
+                <span>50 clientes</span>
+                <span>100 clientes</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-2">
+                <span class="text-slate-200 font-medium">Tus honorarios de implantación por cliente (Setup Fee 100% tuyo):</span>
+                <span id="calc-setup-label" class="text-indigo-300 font-bold text-base">300 € / cliente</span>
+              </div>
+              <input id="calc-setup" type="range" min="150" max="600" step="50" value="300" class="w-full accent-indigo-500 cursor-pointer" oninput="actualizarCalculadoraPartner()" />
+              <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1.5">
+                <span>150 €</span>
+                <span>300 € (Media mercado)</span>
+                <span>450 €</span>
+                <span>600 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resultados -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-[#1d2336] border border-indigo-400/40 shadow-md">
+              <div class="text-[11px] font-mono font-semibold text-indigo-300 uppercase">Tus Ingresos por Implantación</div>
+              <div id="res-setup-total" class="text-2xl sm:text-3xl font-extrabold text-white font-mono mt-1.5">4.500,00 €</div>
+              <p class="text-xs text-slate-300 mt-1.5">100% facturado por ti al cliente final (~15 min de configuración con el Wizard).</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-[#172620] border border-emerald-400/45 shadow-md">
+              <div class="text-[11px] font-mono font-semibold text-emerald-300 uppercase">Tu Renta Pasiva Anual (25%)</div>
+              <div id="res-recurring-total" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono mt-1.5">746,25 € / año</div>
+              <p class="text-xs text-slate-300 mt-1.5">Comisión vitalicia cada año que tus clientes renuevan la licencia.</p>
+            </div>
+            <div class="sm:col-span-2 p-6 rounded-2xl bg-gradient-to-r from-emerald-900/50 to-indigo-900/50 border border-emerald-400/50 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div class="text-xs font-mono text-emerald-300 uppercase font-bold">Beneficio Total Año 1 para tu Empresa</div>
+                <div class="text-xs text-slate-200 mt-1">Suma de puesta en marcha + 1º año de comisiones recurrentes</div>
+              </div>
+              <div id="res-year1-total" class="text-3xl sm:text-4xl font-extrabold text-white font-mono">5.246,25 €</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: PROGRAMA PARTNER PILOTO 2026 -->
+    <section id="piloto" class="mt-16 scroll-mt-24">
+      <div class="p-8 rounded-3xl bg-[#151926] border border-amber-500/40 shadow-xl print-surface">
+        <span class="text-xs font-mono font-semibold text-amber-400 uppercase tracking-widest">Cero Fricción Técnica</span>
+        <h2 class="text-2xl font-bold text-white mt-1">Programa "Partner Piloto 2026": Tu 1ª Implantación Asistida por Ingeniería</h2>
+        <p class="text-sm text-slate-200 mt-2 leading-relaxed max-w-3xl">
+          No te pedimos que compres licencias por adelantado ni que te enfrentes solo a la primera instalación. Cuando te das de alta como Partner Oficial (<code class="text-amber-300 font-mono">PT-XXXX</code>):
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
+            <div class="text-sm font-bold text-white">1. Alta Instantánea y Panel Reseller</div>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Activamos tu cuenta con rol <code class="text-white font-mono">RESELLER</code> en el <a href="/dashboard" class="text-indigo-300 hover:underline font-semibold">Panel Multi-Tenant</a> para que puedas crear organizaciones clientes y emitir licencias Trial en 1 clic.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
+            <div class="text-sm font-bold text-white">2. Validación en Modo Sandbox</div>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              En tu primer cliente de Factusol, SimplyGest, Sage 50, a3ERP o Ágora POS, nos conectamos contigo y probamos la lectura de catálogo, fotos y pedidos en modo simulación segura.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-[#1e2436] border border-white/[0.15] shadow-md">
+            <div class="text-sm font-bold text-white">3. Protección "Client-Lock" por CIF</div>
+            <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+              Cada empresa que registras queda vinculada por CIF/NIF a tu código <code class="text-white font-mono">PT-XXXX</code>. Aunque el cliente renueve directamente por web en el futuro, tu 25% se liquida automáticamente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>

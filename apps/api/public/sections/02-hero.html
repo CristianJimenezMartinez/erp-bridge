@@ -1,6 +1,6 @@
 <!-- 2. HERO EDITORIAL & DYNAMIC SYSTEM FLOW                                   -->
     <!-- ========================================================================= -->
-    <section class="relative pt-20 pb-24 px-6 overflow-hidden border-b border-white/[0.06]">
+    <section class="relative pt-20 pb-12 px-6 overflow-hidden">
       <div class="max-w-6xl mx-auto">
         
         <!-- Badge de Versión Oficial y Arquitectura -->
@@ -37,7 +37,6 @@
         <div class="mt-10 flex flex-wrap items-center gap-4">
           <a id="btn-hero-download" data-download-installer href="/releases/latest/Bentian-Setup.exe" download="Bentian-Setup.exe"
              class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm flex items-center gap-2.5 transition shadow-lg shadow-indigo-600/20">
-            <!-- Icono Windows SVG fino -->
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
               <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/>
             </svg>
@@ -72,7 +71,7 @@
           </a>
         </div>
 
-        <!-- Aviso Informativo Windows Defender SmartScreen (oculto en la vista inicial, visible tras hacer clic en descargar) -->
+        <!-- Aviso Informativo Windows Defender SmartScreen -->
         <div id="hero-smartscreen-notice" class="hidden mt-4 flex items-start gap-3 max-w-xl p-3.5 rounded-xl bg-amber-500/[0.08] border border-amber-500/25 text-xs text-zinc-300 transition-all">
           <svg class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -97,176 +96,27 @@
         <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-4xl">
           <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Distribución &amp; Verificación:</span>
           <div class="flex flex-wrap items-center gap-2.5">
-            <!-- WinGet Badge -->
             <a href="https://github.com/microsoft/winget-pkgs/pull/446582" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-blue-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition group" title="Instalar vía Microsoft Windows Package Manager">
               <svg class="w-3.5 h-3.5 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
               <span>winget install <strong class="text-blue-300">Bentian.ERPBridge</strong></span>
             </a>
-
-            <!-- Softpedia Badge -->
             <a href="https://www.softpedia.com/get/Internet/Servers/Database-Utils/Bentian-ERP-Bridge.shtml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-blue-400/40 text-[11px] font-mono text-zinc-300 hover:text-white transition group" title="Verificado y certificado 100% Clean en Softpedia (Calificación 4.5/5)">
               <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded bg-blue-500/20 text-blue-400 font-bold text-[9px]">S</span>
               <span>Softpedia <strong class="text-emerald-400">★ 4.5/5</strong> <span class="text-[10px] text-zinc-500">100% Clean</span></span>
             </a>
-
-            <!-- AlternativeTo Badge -->
             <a href="https://alternativeto.net/software/bentian-erp-bridge/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-emerald-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Ver ficha en AlternativeTo">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
               <span>AlternativeTo</span>
             </a>
-
-            <!-- Trustpilot Badge -->
             <a href="https://es.trustpilot.com/review/bridge.cristianjm.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-teal-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Ver opiniones en Trustpilot">
               <span class="text-emerald-400 text-xs">★</span>
               <span>Trustpilot</span>
             </a>
-
-            <!-- G2 Badge -->
             <a href="https://www.g2.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 border border-white/[0.08] hover:border-red-500/40 text-[11px] font-mono text-zinc-300 hover:text-white transition" title="Verificado en G2 Marketplace">
               <span class="text-red-400 font-bold text-xs">G2</span>
               <span>Marketplace</span>
             </a>
           </div>
         </div>
-
-        <!-- ========================================================================= -->
-        <!-- VISUALIZACIÓN CONCEPTUAL DE INTEGRACIÓN DE SISTEMAS                       -->
-        <!-- ========================================================================= -->
-        <div class="mt-16 rounded-2xl bg-[#121215] border border-white/[0.08] p-6 lg:p-8 relative overflow-hidden" id="arquitectura">
-          <!-- Fondo sutil con cuadrícula técnica -->
-          <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
-
-          <!-- Cabecera de la Visualización -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06] relative z-10">
-            <div>
-              <span class="text-[11px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-950/40 border border-indigo-800/40 px-2 py-0.5 rounded">Arquitectura Canónica</span>
-              <h2 class="text-base font-semibold text-white mt-1">Integración Bidireccional de Sistemas</h2>
-            </div>
-            <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
-              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Autónomo</span>
-              <span class="text-zinc-600">|</span>
-              <span class="text-zinc-400">Canal: <strong class="text-zinc-200">Windows x64</strong></span>
-              <span class="text-zinc-600">|</span>
-              <span class="text-zinc-400">Tolerancia: <strong class="text-emerald-400 font-mono">Store-and-Forward</strong></span>
-            </div>
-          </div>
-
-          <!-- Malla de los 3 Nodos del Flujo -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 relative z-10 items-stretch">
-            
-            <!-- NODO A: FACTUSOL (Local System) -->
-            <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Sistema Origen (ERP)</span>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ON-PREMISE
-                  </span>
-                </div>
-                <div class="text-xl font-bold text-white tracking-tight">Factusol ERP</div>
-                <div class="text-xs text-zinc-400 mt-1">Base de datos local o red LAN (<code class="text-zinc-300 font-mono">.accdb</code>). Diseñado con consultas OLEDB en modo compartido para prevenir bloqueos .ldb.</div>
-              </div>
-
-              <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
-                <div class="flex justify-between text-zinc-400">
-                  <span>Acceso de datos:</span>
-                  <span class="text-indigo-300 font-semibold" title="Diseñado con Consultas OLEDB en Modo Compartido para Prevenir Bloqueos .ldb">OLEDB Modo Compartido (.ldb Free)</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Detección delta:</span>
-                  <span class="text-emerald-400">Hash de cambios inteligente</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Versiones soportadas:</span>
-                  <span class="text-zinc-200">2024, 2025 y 2026</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- NODO CENTRAL: CAPA DE INTEGRACIÓN (PRODUCT_NAME) -->
-            <div class="rounded-xl bg-[#18181b]/90 border border-indigo-500/30 p-5 flex flex-col justify-between shadow-lg shadow-indigo-950/20 relative">
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full shadow">
-                Sync Engine
-              </div>
-
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-mono text-indigo-300 uppercase tracking-wider" data-product-name>Bentian Sync Engine</span>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/40">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> CANÓNICO
-                  </span>
-                </div>
-                <div class="text-xl font-bold text-white tracking-tight">Normalización Fiscal</div>
-                <div class="text-xs text-zinc-400 mt-1">Gestión de IVA, Recargo de Eq. y series de pedidos</div>
-              </div>
-
-              <div class="my-4 py-2.5 px-3 rounded-lg bg-[#09090b] border border-white/[0.06] font-mono text-[11px]">
-                <div class="text-zinc-400 flex items-center justify-between">
-                  <span>Pipeline: <strong class="text-zinc-200">Bidireccional Seguro</strong></span>
-                  <span class="text-indigo-400 text-[10px]">TLS 1.3</span>
-                </div>
-                <div class="text-zinc-400 mt-1">
-                  Artículos • Tarifas • Stock • Pedidos Web
-                </div>
-              </div>
-
-              <div class="pt-3 border-t border-white/[0.06] space-y-2 font-mono text-xs">
-                <div class="flex justify-between text-zinc-400">
-                  <span>Persistencia:</span>
-                  <span class="text-emerald-400">Cola Offline Segura</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Arquitectura:</span>
-                  <span class="text-zinc-200">Zero-Knowledge Local-First</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- NODO B: WOOCOMMERCE (eCommerce Destination) -->
-            <div class="rounded-xl bg-[#18181b] border border-white/[0.08] p-5 flex flex-col justify-between hover:border-zinc-700 transition">
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-mono text-zinc-400 uppercase tracking-wider">Canal Online (Tienda)</span>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-blue-400 bg-blue-950/40 px-2 py-0.5 rounded border border-blue-800/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> E-COMMERCE
-                  </span>
-                </div>
-                <div class="text-xl font-bold text-white tracking-tight">WooCommerce, PrestaShop &amp; Shopify</div>
-                <div class="text-xs text-zinc-400 mt-1">Plataformas de venta online (<code class="text-zinc-300 font-mono">REST &amp; GraphQL</code>)</div>
-              </div>
-
-              <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-2 font-mono text-xs">
-                <div class="flex justify-between text-zinc-400">
-                  <span>Control de stock:</span>
-                  <span class="text-emerald-400 font-semibold" title="Cálculo Exacto de Stock Disponible (DISSTO) con Transacciones Atómicas">Cálculo DISSTO Atómico</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Recepción pedidos:</span>
-                  <span class="text-blue-300">Descarga e Ingesta Atómica</span>
-                </div>
-                <div class="flex justify-between text-zinc-400">
-                  <span>Protocolo:</span>
-                  <span class="text-zinc-200">HTTPS Cifrado End-to-End</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Barra de Integridad Criptográfica y Estado -->
-          <div class="rounded-lg bg-[#09090b] border border-white/[0.06] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-zinc-400">
-            <div class="flex items-center gap-2">
-              <!-- Shield Check SVG -->
-              <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Seguridad de Red: <strong class="text-zinc-200">Conexiones Salientes Unidireccionales TLS 1.3 sin Apertura de Puertos</strong></span>
-            </div>
-            <div class="text-zinc-500">
-              Certificado Ed25519 • Conexiones Salientes Cifradas
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
-
-    <!-- ========================================================================= -->

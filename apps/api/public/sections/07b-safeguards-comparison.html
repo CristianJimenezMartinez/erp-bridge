@@ -1,0 +1,69 @@
+<!-- 07B. COMPARATIVA TÉCNICA: STORE-AND-FORWARD VS CONECTORES TRADICIONALES   -->
+<!-- ========================================================================= -->
+<section class="pb-24 px-6 border-b border-white/[0.06] bg-[#09090b]">
+  <div class="max-w-6xl mx-auto">
+    <div class="p-8 rounded-3xl bg-[#121215] border border-white/[0.09] relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+        <div>
+          <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">Comparativa Arquitectónica</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white mt-1">
+            Por qué los conectores directos fallan donde Bentian triunfa
+          </h3>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+            Diferencias estructurales entre una llamada síncrona frágil y una cola persistente de grado industrial.
+          </p>
+        </div>
+        <div class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.08] text-xs font-mono text-zinc-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Arquitectura Asíncrona Garantizada</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        <!-- Modelo Tradicional -->
+        <div class="p-5 rounded-xl bg-black/40 border border-red-500/20">
+          <div class="flex items-center gap-2 text-red-400 font-mono text-xs font-bold uppercase mb-3">
+            <span class="w-2 h-2 rounded-full bg-red-400"></span>
+            Conectores Tradicionales (Llamada Síncrona Directa)
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-400">
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Pérdida en cortes de red:</strong> Si la fibra óptica parpadea durante la compra, la petición HTTP se pierde para siempre sin dejar rastro en el ERP.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Bloqueos de archivo .ldb:</strong> Intentan escribir en caliente mientras un operario factura en Factusol, provocando errores de colisión.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-400 font-bold shrink-0">✕</span>
+              <span><strong>Dependencia de PC Encendido:</strong> Si el ordenador de oficina se apaga a las 19:00, las ventas de la noche quedan congeladas o huérfanas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Modelo Bentian -->
+        <div class="p-5 rounded-xl bg-emerald-950/20 border border-emerald-500/30">
+          <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold uppercase mb-3">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Bentian ERP Bridge (Arquitectura Store-and-Forward)
+          </div>
+          <ul class="space-y-3 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Retención persistente con JSON atómico en AppData:</strong> Los eventos y pedidos se encolan de forma inmutable. Nada se pierde aunque el enlace caiga durante horas.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Microtransacciones Share Deny None:</strong> Inserciones OLEDB en &lt;15 ms que respetan el trabajo concurrente de los TPVs físicos sin bloquear Access.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold shrink-0">✓</span>
+              <span><strong>Reconciliación automática al arranque:</strong> Al encender el equipo por la mañana, todos los pedidos nocturnos se descargan ordenados y numerados.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
