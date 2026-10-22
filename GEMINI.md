@@ -250,6 +250,16 @@
   - En `status.script.ts`, `updateFormInputs(currentStatus, forceFormSync)` debe ejecutarse **SIEMPRE ANTES** que `handleStatusUpdate(currentStatus)` para que ningún modal o asistente se abra jamás con los campos vacíos.
   - En `StatusAggregatorService.getStatusDetails`, la caché `cachedLicenseVal` debe invalidarse de inmediato en cuanto `licenseService.getLicenseStatus().status` cambie, y `LicenseService.validateLicense()` debe auto-recuperar el token invocando `activateLicense(config.licenseKey)` si existe `licenseKey` en `agent-config.json` pero falta el token local.
 
+---
+
+## 23. Modularidad Estricta y Presupuesto Máximo por Archivo (`<= 250 LOC`)
+* **PROHIBICIÓN ESTRICTA DE ARCHIVOS MONOLÍTICOS ("God Files"):**
+  - Ningún módulo JavaScript, vista HTML, modal o layout del Cloud Dashboard (`apps/api/public/dashboard/{js,views,modals,layout}`) ni nuevos routers/servicios del software pueden superar las **250 líneas de código (`<= 250 LOC`)**.
+* **Aplicación y Bloqueo Automático:**
+  - El compilador del Dashboard (`apps/api/scripts/build-dashboard.ts` con `MAX_DASHBOARD_MODULE_LOC = 250`) y el Gate 1 del Quality Gate (`scripts/quality-gate.ts`) verifican automáticamente el número de líneas de cada componente modular y abortan la compilación si cualquier archivo de `apps/api/public/dashboard/{js,views,modals,layout}` supera las 250 líneas.
+  - Cuando una funcionalidad o vista crezca, debe dividirse obligatoriamente en submódulos cohesivos de responsabilidad única (ej: `auth.js` + `auth-otp.js`, `licenses.js` + `licenses-modals.js`, `organizations.js` + `partners-admin.js`, `multichannel.js` + `multichannel-actions.js`, `navigation.js` + `session-bootstrap.js`).
+
+
 
 
 

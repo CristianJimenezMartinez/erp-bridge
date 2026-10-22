@@ -37,19 +37,26 @@ export const DASHBOARD_MODALS = [
 ];
 
 /**
- * Orden estricto de scripts para empaquetado en dashboard.bundle.js
+ * Orden estricto de scripts para empaquetado en dashboard.bundle.js (Regla < 250 LOC por archivo)
  */
 export const DASHBOARD_SCRIPTS = [
   'utils.js',
   'auth.js',
+  'auth-otp.js',
   'client-portal.js',
   'licenses.js',
+  'licenses-modals.js',
   'fleet.js',
   'organizations.js',
+  'partners-admin.js',
   'audit-errors.js',
   'multichannel.js',
-  'navigation.js'
+  'multichannel-actions.js',
+  'navigation.js',
+  'session-bootstrap.js'
 ];
+
+export const MAX_DASHBOARD_MODULE_LOC = 250;
 
 /**
  * Obtiene la versión canónica centralizada (SSoT)
@@ -233,15 +240,36 @@ export function assembleDashboardPage(): string {
 export function buildDashboard(): void {
   console.log('[Dashboard Build] Starting modular assembly of Bentian Cloud Dashboard...');
 
-  // 1. Validar existencia física de cada módulo JavaScript
+  // 1. Validar existencia física y presupuesto estricto de líneas (< 250 LOC) de cada módulo
   const jsDir = path.join(DASHBOARD_DIR, 'js');
   for (const scriptName of DASHBOARD_SCRIPTS) {
     const scriptPath = path.join(jsDir, scriptName);
     if (!fs.existsSync(scriptPath)) {
       throw new Error(`[Dashboard Build] Required modular script missing: ${scriptPath}`);
     }
+    const loc = fs.readFileSync(scriptPath, 'utf8').split(/\r?\n/).length;
+    if (loc > MAX_DASHBOARD_MODULE_LOC) {
+      throw new Error(`[Dashboard Modularity Rule] JS module ${scriptName} exceeds ${MAX_DASHBOARD_MODULE_LOC} LOC (${loc} lines). Split it into smaller modules.`);
+    }
   }
-  console.log(`[Dashboard Build] Verified all ${DASHBOARD_SCRIPTS.length} modular JS components in dashboard/js/.`);
+
+  const allHtmlDirs = [
+    { dir: LAYOUT_DIR, files: ['base.html', 'head.html', 'header.html', 'footer.html'] },
+    { dir: VIEWS_DIR, files: ['01-login.html', ...DASHBOARD_VIEWS] },
+    { dir: MODALS_DIR, files: DASHBOARD_MODALS },
+  ];
+  for (const group of allHtmlDirs) {
+    for (const fileName of group.files) {
+      const filePath = path.join(group.dir, fileName);
+      if (fs.existsSync(filePath)) {
+        const loc = fs.readFileSync(filePath, 'utf8').split(/\r?\n/).length;
+        if (loc > MAX_DASHBOARD_MODULE_LOC) {
+          throw new Error(`[Dashboard Modularity Rule] HTML component ${fileName} exceeds ${MAX_DASHBOARD_MODULE_LOC} LOC (${loc} lines). Split or compact it.`);
+        }
+      }
+    }
+  }
+  console.log(`[Dashboard Build] Verified all ${DASHBOARD_SCRIPTS.length} JS modules and HTML views/modals are strictly <= ${MAX_DASHBOARD_MODULE_LOC} LOC.`);
 
   // 2. Ensamblar página HTML
   const html = assembleDashboardPage();
@@ -322,19 +350,24 @@ export function buildDashboard(): void {
     'id="modal-welcome-checkout"',
     'id="welcome-license-key"',
 
-    // Notificaciones, Logo y Scripts Modulares
+    // Notificaciones, Logo y Scripts Modulares (< 250 LOC por módulo)
     'id="toast"',
     'src="/assets/icon.svg',
     'src="/js/version-sync.js',
     'src="/dashboard/js/utils.js',
     'src="/dashboard/js/auth.js',
+    'src="/dashboard/js/auth-otp.js',
     'src="/dashboard/js/client-portal.js',
     'src="/dashboard/js/licenses.js',
+    'src="/dashboard/js/licenses-modals.js',
     'src="/dashboard/js/fleet.js',
     'src="/dashboard/js/organizations.js',
+    'src="/dashboard/js/partners-admin.js',
     'src="/dashboard/js/audit-errors.js',
     'src="/dashboard/js/multichannel.js',
-    'src="/dashboard/js/navigation.js'
+    'src="/dashboard/js/multichannel-actions.js',
+    'src="/dashboard/js/navigation.js',
+    'src="/dashboard/js/session-bootstrap.js'
   ];
 
   for (const req of requiredElements) {

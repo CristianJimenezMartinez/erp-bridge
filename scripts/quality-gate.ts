@@ -58,6 +58,13 @@ function getFiles(dir: string, exts = ['.ts', '.js']): string[] {
   return res;
 }
 
+const dashboardModuleFiles = [
+  ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/js'), ['.js']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/views'), ['.html']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/modals'), ['.html']),
+  ...getFiles(path.join(repoRoot, 'apps/api/public/dashboard/layout'), ['.html']),
+];
+
 const allSrcFiles = [
   ...getFiles(path.join(repoRoot, 'apps/agent/src')),
   ...getFiles(path.join(repoRoot, 'apps/api/src')),
@@ -69,10 +76,11 @@ const allSrcFiles = [
   ...getFiles(path.join(repoRoot, 'packages/connectors/simplygest/src')),
   ...getFiles(path.join(repoRoot, 'packages/connectors/woocommerce/src')),
   ...getFiles(path.join(repoRoot, 'packages/connectors/holded/src')),
+  ...dashboardModuleFiles,
 ];
 
 // ============================================================================
-// GATE 1: LOC GUARD & GOD-CLASS BUDGET
+// GATE 1: LOC GUARD & GOD-CLASS BUDGET (+ DASHBOARD STRICT < 250 LOC RULE)
 // ============================================================================
 console.log('▶ [Gate 1/6] Evaluando modularidad y límites de LOC por archivo...');
 const locViolations: { rel: string; lines: number }[] = [];
@@ -81,10 +89,13 @@ let totalLoc = 0;
 
 for (const f of allSrcFiles) {
   const content = fs.readFileSync(f, 'utf-8');
-  const lines = content.split('\n').length;
+  const lines = content.split(/\r?\n/).length;
   totalLoc += lines;
   const rel = path.relative(repoRoot, f).replace(/\\/g, '/');
-  if (lines > MAX_LOC_ERROR) {
+  const isDashboardModule = rel.startsWith('apps/api/public/dashboard/');
+  if (isDashboardModule && lines > MAX_LOC_WARN) {
+    locViolations.push({ rel, lines });
+  } else if (lines > MAX_LOC_ERROR) {
     locViolations.push({ rel, lines });
   } else if (lines > MAX_LOC_WARN) {
     locWarnings.push({ rel, lines });

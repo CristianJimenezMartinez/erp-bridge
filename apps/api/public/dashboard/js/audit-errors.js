@@ -40,9 +40,7 @@ async function loadAdminOverview() {
         seatsEl.innerText = `${d.baseSeats || 0} Licencias Base · ${d.additionalSeats || 0} Licencias 2ª Tienda`;
       }
     }
-  } catch (e) {
-    console.warn('Error cargando métricas de Superadmin:', e);
-  }
+  } catch (e) {}
 }
 
 async function loadFleetErrors() {

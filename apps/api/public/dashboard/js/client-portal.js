@@ -28,10 +28,7 @@ async function loadClientPortal(selectedKeyOrId) {
       }
     });
 
-    if (!res.ok) {
-      console.warn('[ClientPortal] No se pudieron cargar las licencias del cliente.');
-      return;
-    }
+    if (!res.ok) return;
 
     const json = await res.json();
     const licenses = json.data || [];
@@ -42,7 +39,6 @@ async function loadClientPortal(selectedKeyOrId) {
       return;
     }
 
-    // Configurar banner multi-licencia si hay más de 1
     const multiBanner = document.getElementById('client-multi-license-banner');
     const multiSelect = document.getElementById('client-license-select');
     const multiCount = document.getElementById('client-multi-count-badge');
@@ -58,11 +54,10 @@ async function loadClientPortal(selectedKeyOrId) {
           return `<option value="${_safeEscapeHtml(l.id)}" ${isSelected}>${_safeEscapeHtml(alias)} (${_safeEscapeHtml(host)})</option>`;
         }).join('');
       }
-    } else {
-      if (multiBanner) multiBanner.classList.add('hidden');
+    } else if (multiBanner) {
+      multiBanner.classList.add('hidden');
     }
 
-    // Seleccionar licencia activa
     let target = licenses[0];
     if (selectedKeyOrId) {
       const found = licenses.find(l => l.id === selectedKeyOrId || l.key === selectedKeyOrId);
@@ -70,7 +65,6 @@ async function loadClientPortal(selectedKeyOrId) {
     }
     _currentClientPortalLicense = target;
 
-    // Pintar datos de la clave
     const keyEl = document.getElementById('client-license-key');
     if (keyEl) keyEl.innerText = target.key;
 
@@ -94,18 +88,12 @@ async function loadClientPortal(selectedKeyOrId) {
         : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Estado: ' + _safeEscapeHtml(target.status);
     }
 
-    // Banner de upgrade al Plan Fundador si la licencia es BETA o está EXPIRADA
     const upgradeBanner = document.getElementById('client-upgrade-banner');
     if (upgradeBanner) {
       const isBetaOrExpired = (target.plan === 'BETA' || target.status === 'EXPIRED' || target.billingStatus === 'TRIALING');
-      if (isBetaOrExpired) {
-        upgradeBanner.classList.remove('hidden');
-      } else {
-        upgradeBanner.classList.add('hidden');
-      }
+      upgradeBanner.classList.toggle('hidden', !isBetaOrExpired);
     }
 
-    // Pintar datos del equipo vinculado
     const act = target.activations && target.activations.length > 0 ? target.activations[0] : null;
     const hostEl = document.getElementById('client-device-hostname');
     const badgeEl = document.getElementById('client-device-status-badge');
@@ -133,9 +121,7 @@ async function loadClientPortal(selectedKeyOrId) {
       if (hwidEl) hwidEl.innerText = 'HWID: —';
       if (unbindBtn) unbindBtn.classList.add('hidden');
     }
-  } catch (err) {
-    console.error('[ClientPortal] Error al cargar portal:', err);
-  }
+  } catch (err) {}
 }
 
 function copyClientKey() {
@@ -146,9 +132,7 @@ function copyClientKey() {
       window.copyToClipboard(key, '✓ Clave de licencia copiada al portapapeles');
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(key).then(() => {
-        if (typeof window.showToast === 'function') {
-          window.showToast('✓ Clave copiada al portapapeles', 'success');
-        }
+        if (typeof window.showToast === 'function') window.showToast('✓ Clave copiada al portapapeles', 'success');
       });
     }
   }
@@ -193,11 +177,7 @@ async function handleClientUpgradeFounder() {
       throw new Error(data?.error?.message || 'No se pudo generar la pasarela de pago.');
     }
   } catch (err) {
-    if (typeof window.showToast === 'function') {
-      window.showToast(err.message, 'error');
-    } else {
-      alert(err.message);
-    }
+    if (typeof window.showToast === 'function') window.showToast(err.message, 'error');
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = originalText || '<span>Activar Plan Fundador (139 €/año) ↗</span>';
@@ -205,7 +185,6 @@ async function handleClientUpgradeFounder() {
   }
 }
 
-// Exposición global
 window.loadClientPortal = loadClientPortal;
 window.copyClientKey = copyClientKey;
 window.handleClientUnbindClick = handleClientUnbindClick;

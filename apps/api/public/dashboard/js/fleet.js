@@ -92,12 +92,10 @@ async function loadFleetHealthData() {
       }).join('');
     }
   } catch (e) {
-    console.warn('Error cargando salud de agentes:', e);
     if (tbody) {
       tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-400 font-mono text-xs">Error al conectar con la telemetría de agentes.</td></tr>`;
     }
   }
 }
 
-// Exposición global
 window.loadFleetHealthData = loadFleetHealthData;

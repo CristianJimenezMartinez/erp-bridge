@@ -1,6 +1,6 @@
 /**
  * Bentian ERP Bridge — Dashboard Licenses Module
- * Gestión de licencias, puestos adicionales, vinculación/desvinculación HWID y portal de cliente.
+ * Gestión del listado de licencias, telemetría de parque activo y búsqueda filtrada.
  */
 
 function _safeEscapeHtml(str) {
@@ -17,17 +17,6 @@ function _safeEscapeHtml(str) {
 function _safeShowToast(msg, type) {
   if (typeof window.showToast === 'function') {
     window.showToast(msg, type);
-  } else {
-    console.log(`[Bentian Toast ${type || 'info'}]: ${msg}`);
-  }
-}
-
-function _safeCloseModal(id) {
-  if (typeof window.closeModal === 'function') {
-    window.closeModal(id);
-  } else {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('hidden');
   }
 }
 
@@ -146,20 +135,11 @@ function renderLicenses(list) {
         </td>
         <td class="p-3 text-right whitespace-nowrap"><button data-action="preview-client-license" data-license-id="${_safeEscapeHtml(lic.id)}" class="px-2 py-1 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] font-medium transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Ver cómo ve su portal este cliente">👁️ Portal</button>
           ${hasMachine ? `
-            <button 
-              data-action="unbind-license"
-              data-license-id="${_safeEscapeHtml(lic.id)}" 
-              data-key="${_safeEscapeHtml(lic.key)}" 
-              data-hostname="${_safeEscapeHtml(hostname)}" 
-              data-hwid="${_safeEscapeHtml(act.hwid || '')}" 
-              class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1"
-            >
+            <button data-action="unbind-license" data-license-id="${_safeEscapeHtml(lic.id)}" data-key="${_safeEscapeHtml(lic.key)}" data-hostname="${_safeEscapeHtml(hostname)}" data-hwid="${_safeEscapeHtml(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
               <span>Mudar PC</span>
             </button>
-          ` : `
-            <span class="text-[10px] text-zinc-500">Lista para usar</span>
-          `}
+          ` : `<span class="text-[10px] text-zinc-500">Lista para usar</span>`}
         </td>
       </tr>
     `;
@@ -178,7 +158,7 @@ function renderLicenses(list) {
       if (editBtn) {
         const id = editBtn.getAttribute('data-license-id') || '';
         const alias = editBtn.getAttribute('data-alias') || '';
-        openEditAliasModal(id, alias);
+        if (typeof window.openEditAliasModal === 'function') window.openEditAliasModal(id, alias);
         return;
       }
       const unbindBtn = e.target.closest('[data-action="unbind-license"]');
@@ -187,7 +167,7 @@ function renderLicenses(list) {
         const key = unbindBtn.getAttribute('data-key') || '';
         const hostname = unbindBtn.getAttribute('data-hostname') || '';
         const hwid = unbindBtn.getAttribute('data-hwid') || '';
-        openUnbindModal(id, key, hostname, hwid);
+        if (typeof window.openUnbindModal === 'function') window.openUnbindModal(id, key, hostname, hwid);
         return;
       }
       const copyBtn = e.target.closest('[data-action="copy-key"]');
@@ -236,159 +216,7 @@ async function loadFleetOverview() {
       const progBar = document.getElementById('kpi-progress-bar');
       if (progBar) progBar.style.width = pct + '%';
     }
-  } catch (e) {
-    console.warn('Error cargando KPIs:', e);
-  }
-}
-
-function openNewKeyModal() {
-  const aliasInput = document.getElementById('new-key-alias');
-  if (aliasInput) aliasInput.value = '';
-  const modal = document.getElementById('modal-new-key');
-  if (modal) modal.classList.remove('hidden');
-}
-
-function openEditAliasModal(id, currentAlias) {
-  const idEl = document.getElementById('edit-alias-id');
-  if (idEl) idEl.value = id;
-  const inputEl = document.getElementById('edit-alias-input');
-  if (inputEl) inputEl.value = currentAlias;
-  const modal = document.getElementById('modal-edit-alias');
-  if (modal) modal.classList.remove('hidden');
-}
-
-function openUnbindModal(licenseId, key, hostname, hwid) {
-  const idEl = document.getElementById('unbind-license-id');
-  if (idEl) idEl.value = licenseId;
-  const keyEl = document.getElementById('unbind-key-display');
-  if (keyEl) keyEl.innerText = key;
-  const hostEl = document.getElementById('unbind-machine-name');
-  if (hostEl) hostEl.innerText = hostname || 'PC Asignado';
-  const hwidEl = document.getElementById('unbind-hwid');
-  if (hwidEl) hwidEl.value = hwid;
-  const modal = document.getElementById('modal-unbind');
-  if (modal) modal.classList.remove('hidden');
-}
-
-async function handleCreateLicenseSubmit(e) {
-  e.preventDefault();
-  const aliasEl = document.getElementById('new-key-alias');
-  const seatTypeEl = document.getElementById('new-key-seat-type');
-  const alias = aliasEl ? aliasEl.value.trim() : '';
-  const seatType = seatTypeEl ? seatTypeEl.value : 'BASE_LICENSE';
-  const btn = document.getElementById('btn-submit-key');
-  if (btn) {
-    btn.innerText = 'Generando...';
-    btn.disabled = true;
-  }
-
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-  const orgId = window.currentOrgId || localStorage.getItem('bentian_cloud_org') || 'org_default';
-
-  try {
-    const res = await fetch('/api/v1/licenses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'x-organization-id': orgId
-      },
-      body: JSON.stringify({ alias, plan: 'starter', maxActivations: 1, seatType })
-    });
-    const data = await res.json();
-    if (res.ok && data.data?.key) {
-      _safeCloseModal('modal-new-key');
-      _safeShowToast(`✓ Clave ${data.data.key} generada para ${alias}`, 'success');
-      loadLicenses();
-      loadFleetOverview();
-    } else {
-      _safeShowToast(data.error?.message || 'Error al generar clave', 'error');
-    }
-  } catch (err) {
-    _safeShowToast('Error de conexión', 'error');
-  } finally {
-    if (btn) {
-      btn.innerText = 'Generar Clave';
-      btn.disabled = false;
-    }
-  }
-}
-
-async function handleSaveAlias() {
-  const idEl = document.getElementById('edit-alias-id');
-  const inputEl = document.getElementById('edit-alias-input');
-  const id = idEl ? idEl.value : '';
-  const newAlias = inputEl ? inputEl.value.trim() : '';
-  if (!newAlias) return;
-
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-
-  try {
-    const res = await fetch(`/api/v1/licenses/${id}/alias`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ alias: newAlias })
-    });
-    if (res.ok) {
-      _safeCloseModal('modal-edit-alias');
-      _safeShowToast('✓ Alias actualizado con éxito', 'success');
-      loadLicenses();
-    } else {
-      const data = await res.json().catch(() => ({}));
-      _safeShowToast(data.error?.message || 'Error al actualizar alias', 'error');
-    }
-  } catch (err) {
-    _safeShowToast('Error de conexión', 'error');
-  }
-}
-
-async function confirmUnbind() {
-  const idEl = document.getElementById('unbind-license-id');
-  const hwidEl = document.getElementById('unbind-hwid');
-  const id = idEl ? idEl.value : '';
-  const hwid = hwidEl ? hwidEl.value : '';
-  const btn = document.getElementById('btn-confirm-unbind');
-  if (btn) {
-    btn.innerText = 'Liberando licencia...';
-    btn.disabled = true;
-  }
-
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-  const role = window.currentUserRole || localStorage.getItem('bentian_cloud_role') || 'TENANT_CLIENT';
-
-  try {
-    const res = await fetch(`/api/v1/licenses/${id}/unbind`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ hwid })
-    });
-    if (res.ok) {
-      _safeCloseModal('modal-unbind');
-      _safeShowToast('✓ Licencia liberada. Ya puedes activarla en el nuevo PC.', 'success');
-      if (role === 'TENANT_CLIENT') {
-        loadClientPortal();
-      } else {
-        loadLicenses();
-        loadFleetOverview();
-      }
-    } else {
-      const data = await res.json().catch(() => ({}));
-      _safeShowToast(data.error?.message || 'Error al desvincular equipo', 'error');
-    }
-  } catch (err) {
-    _safeShowToast('Error de conexión', 'error');
-  } finally {
-    if (btn) {
-      btn.innerText = 'Confirmar y Liberar Licencia';
-      btn.disabled = false;
-    }
-  }
+  } catch (e) {}
 }
 
 function handleSearch(query) {
@@ -407,14 +235,7 @@ function handleSearch(query) {
   renderLicenses(filtered);
 }
 
-// Exposición global
 window.loadLicenses = loadLicenses;
 window.renderLicenses = renderLicenses;
 window.loadFleetOverview = loadFleetOverview;
-window.openNewKeyModal = openNewKeyModal;
-window.openEditAliasModal = openEditAliasModal;
-window.openUnbindModal = openUnbindModal;
-window.handleCreateLicenseSubmit = handleCreateLicenseSubmit;
-window.handleSaveAlias = handleSaveAlias;
-window.confirmUnbind = confirmUnbind;
 window.handleSearch = handleSearch;
