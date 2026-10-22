@@ -1,6 +1,7 @@
 import { DatabaseService, LicenseService, PostgresLicenseRepository } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { computeOrganizationIdFromEmail } from '../routes/auth.router';
+import { MailerService } from './mailer.service';
 
 const logger = new Logger('LicenseCleanupService');
 
@@ -273,5 +274,182 @@ export class LicenseCleanupService {
       deletedKeys,
       deletedOrgsCount,
     };
+  }
+
+  /**
+   * Resuelve el correo de contacto asociado a una licencia (desde beta_leads, organizations.slug o mapa conocido).
+   */
+  public static async resolveLicenseContactEmail(lic: {
+    id?: string;
+    key?: string;
+    organizationId?: string;
+    organization_id?: string;
+    lead_email?: string | null;
+    org_slug?: string | null;
+  }): Promise<string | null> {
+    if (lic.lead_email && String(lic.lead_email).includes('@')) {
+      return String(lic.lead_email).trim().toLowerCase();
+    }
+    if (lic.org_slug && String(lic.org_slug).includes('@')) {
+      return String(lic.org_slug).trim().toLowerCase();
+    }
+    const keyUpper = String(lic.key || '').trim().toUpperCase();
+    if (keyUpper === 'EB-6RE3E-HXPS4-XYNRV-HVZWT') {
+      return 'info@nicripsia.com';
+    }
+
+    const db = DatabaseService.getInstance();
+    if (db.isAvailable()) {
+      const leadRes = await db
+        .query(
+          `SELECT email FROM beta_leads WHERE (license_id = $1 OR license_key = $2) AND email LIKE '%@%' ORDER BY consented_at DESC LIMIT 1`,
+          [String(lic.id || ''), keyUpper]
+        )
+        .then((r) => r.rows[0]?.email as string | undefined)
+        .catch(() => undefined);
+      if (leadRes) return leadRes.trim().toLowerCase();
+
+      const orgId = lic.organizationId || lic.organization_id;
+      if (orgId) {
+        const orgRes = await db
+          .query(`SELECT slug FROM organizations WHERE id = $1 AND slug LIKE '%@%' LIMIT 1`, [orgId])
+          .then((r) => r.rows[0]?.slug as string | undefined)
+          .catch(() => undefined);
+        if (orgRes) return orgRes.trim().toLowerCase();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Reenvía las instrucciones de instalación y clave de licencia al correo del cliente o agencia.
+   */
+  public static async resendLicenseInstructionsEmail(
+    licenseId: string,
+    overrideEmail?: string
+  ): Promise<{ sent: boolean; email?: string; message?: string }> {
+    const licenseService = new LicenseService();
+    const lic = await licenseService.getLicenseById(licenseId).catch(() => null);
+    if (!lic) {
+      return { sent: false, message: 'Licencia no encontrada' };
+    }
+
+    const targetEmail = (overrideEmail && overrideEmail.includes('@'))
+      ? overrideEmail.trim().toLowerCase()
+      : await LicenseCleanupService.resolveLicenseContactEmail(lic);
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      return { sent: false, message: 'Indica un correo electrónico válido para enviar la clave' };
+    }
+
+    const planLabel =
+      String(lic.plan || '').toLowerCase() === 'trial'
+        ? 'Licencia de Evaluación / Beta 2026'
+        : 'Licencia Oficial Bentian ERP Bridge';
+
+    const ok = await MailerService.sendLicenseWelcomeEmail({
+      customerEmail: targetEmail,
+      licenseKey: lic.key,
+      planName: planLabel,
+      alias: lic.alias || 'Servidor Factusol',
+      companyName: lic.alias || 'Cliente Bentian',
+    });
+
+    if (!ok) {
+      return { sent: false, email: targetEmail, message: 'El proveedor SMTP/Resend no pudo entregar el correo en este momento' };
+    }
+
+    return { sent: true, email: targetEmail };
+  }
+
+  /**
+   * Envía una alerta inmediata al administrador (Cristian Jiménez) cuando un cliente o lead (ej. Soy.es)
+   * instala y activa por primera vez Bentian Agent en un equipo Windows.
+   */
+  public static async notifyFirstMachineActivation(params: {
+    lic: { id: string; key: string; alias?: string | null; plan?: string; organizationId?: string };
+    hwid: string;
+    machineInfo?: Record<string, any>;
+  }): Promise<void> {
+    const { lic, hwid, machineInfo } = params;
+    if (LicenseCleanupService.isTestOrObsoleteLicense(lic)) return;
+
+    const escape = (s: string | undefined | null) =>
+      String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    const contactEmail = await LicenseCleanupService.resolveLicenseContactEmail(lic);
+    const hostname = escape(machineInfo?.hostname || 'Equipo Windows');
+    const osInfo = escape(
+      [machineInfo?.platform, machineInfo?.osRelease || machineInfo?.release, machineInfo?.arch]
+        .filter(Boolean)
+        .join(' · ') || 'Windows'
+    );
+    const aliasSafe = escape(lic.alias || 'Licencia Bentian');
+    const keySafe = escape(lic.key);
+    const hwidSafe = escape(hwid);
+    const emailSafe = escape(contactEmail || 'No registrado');
+    const timestampEsp = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
+
+    const html = MailerService.renderBrandedEmail({
+      title: `Activación en PC: ${aliasSafe} (${hostname})`,
+      badgeText: 'AGENTE ACTIVADO EN VIVO',
+      badgeType: 'success',
+      contentHtml: `
+        <h2 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 700; color: #ffffff; line-height: 1.3;">
+          Un cliente o lead acaba de activar Bentian Agent en su PC
+        </h2>
+        <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #a1a1aa;">
+          El ejecutable <strong>BentianAgent.exe</strong> se ha conectado desde un nuevo ordenador y ha vinculado su huella hardware (HWID) por primera vez:
+        </p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #16161f; border: 1px solid #27272a; border-radius: 12px; margin-bottom: 24px;">
+          <tr>
+            <td style="padding: 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px; line-height: 1.8;">
+                <tr>
+                  <td width="150" style="color: #a1a1aa; padding: 5px 0;">Licencia / Empresa:</td>
+                  <td style="color: #ffffff; font-weight: 700; padding: 5px 0;">${aliasSafe}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a1a1aa; padding: 5px 0;">Clave Activada:</td>
+                  <td style="color: #34d399; font-family: Consolas, monospace; font-weight: 700; padding: 5px 0;">${keySafe}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a1a1aa; padding: 5px 0;">Email Asociado:</td>
+                  <td style="color: #818cf8; font-weight: 600; padding: 5px 0;">${emailSafe}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a1a1aa; padding: 5px 0;">Nombre del PC:</td>
+                  <td style="color: #ffffff; font-family: Consolas, monospace; font-weight: 700; padding: 5px 0;">${hostname}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a1a1aa; padding: 5px 0;">Sistema / HWID:</td>
+                  <td style="color: #e4e4e7; font-family: Consolas, monospace; font-size: 12px; padding: 5px 0;">${osInfo} (${hwidSafe.substring(0, 16)}...)</td>
+                </tr>
+                <tr>
+                  <td style="color: #a1a1aa; padding: 5px 0;">Hora (Madrid):</td>
+                  <td style="color: #fbbf24; font-weight: 600; padding: 5px 0;">${escape(timestampEsp)}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        ${MailerService.renderButton('Abrir Consola Cloud (/dashboard) &rarr;', 'https://bridge.cristianjm.com/dashboard', 'indigo')}
+      `,
+      previewText: `${aliasSafe} acaba de instalar y activar Bentian Agent en el equipo ${hostname}.`,
+      footerNote: 'Notificación automática en tiempo real de primera activación de hardware (HWID).',
+    });
+
+    await MailerService.sendEmail({
+      to: 'cristianjimeneztrabajo@gmail.com',
+      subject: `[AGENTE ACTIVADO] ${lic.alias || lic.key} se ha conectado desde ${machineInfo?.hostname || 'nuevo PC'}`,
+      html,
+      text: `Activación en vivo: ${lic.alias || lic.key} (${lic.key}) activado en PC ${machineInfo?.hostname || 'N/D'} (HWID: ${hwid}) a las ${timestampEsp}. Email: ${contactEmail || 'N/D'}`,
+    }).catch((err: any) => {
+      logger.warn('No se pudo enviar alerta de primera activación:', { err: String(err?.message || err) });
+    });
   }
 }

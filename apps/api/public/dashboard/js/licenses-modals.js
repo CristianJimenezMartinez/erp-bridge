@@ -220,5 +220,28 @@ async function purgeTestLicenses() {
   }
 }
 
+async function resendLicenseEmail(id, key, alias, defaultEmail) {
+  if (!id) return;
+  const email = window.prompt(`Enviar clave ${key} (${alias || 'Licencia Bentian'}) e instrucciones de instalación al correo:`, defaultEmail || '');
+  if (!email || !email.trim()) return;
+  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  try {
+    const res = await fetch(`/api/v1/licenses/${encodeURIComponent(id)}/resend-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ email: email.trim() })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      _licModalToast(`Instrucciones enviadas a ${data.data?.email || email.trim()}`, 'success');
+    } else {
+      _licModalToast(data.error?.message || 'Error al enviar el correo', 'error');
+    }
+  } catch {
+    _licModalToast('Error de conexión al reenviar correo', 'error');
+  }
+}
+
 window.deleteLicenseById = deleteLicenseById;
 window.purgeTestLicenses = purgeTestLicenses;
+window.resendLicenseEmail = resendLicenseEmail;

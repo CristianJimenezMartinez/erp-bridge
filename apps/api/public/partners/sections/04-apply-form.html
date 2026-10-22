@@ -1,12 +1,12 @@
     <!-- SECCIÓN 4.5: FORMULARIO DE ALTA INSTANTÁNEA DE PARTNER + EMISIÓN DE LICENCIA NFR -->
     <section id="alta-partner" class="no-print mt-16 scroll-mt-24">
-      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#15201c] to-[#121622] border-2 border-emerald-500/45 shadow-2xl">
+      <div class="p-8 sm:p-10 rounded-2xl bg-[#12151e] border border-white/[0.14] shadow-xl">
         <div class="max-w-3xl">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-semibold">
-            ⚡ EMISIÓN AUTOMÁTICA EN TIEMPO REAL
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-white/[0.06] border border-white/[0.14] text-zinc-200 text-xs font-mono font-semibold">
+            EMISIÓN AUTOMÁTICA EN TIEMPO REAL
           </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">Solicita tu Código Oficial de Partner (<code class="text-emerald-400 font-mono">PT-XXXX</code>) y tu Licencia NFR Gratis</h2>
-          <p class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mt-3">Solicita tu Código Oficial de Partner (<code class="text-indigo-300 font-mono">PT-XXXX</code>) y tu Licencia NFR Gratis</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
             Completa los datos de tu agencia, consultora o empresa de soporte informático. El sistema generará al instante en pantalla tu <strong class="text-white">Código de Atribución del 25% Recurrente</strong> y una <strong class="text-white">Licencia NFR de Demostración (2 puestos con Modo Evaluación Sandbox)</strong> para que la pruebes hoy mismo.
           </p>
         </div>
@@ -14,23 +14,23 @@
         <form id="partner-apply-form" onsubmit="submitPartnerApplication(event)" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label for="pt-agency-name" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Nombre de la Agencia / Empresa IT *</label>
-            <input id="pt-agency-name" type="text" required minlength="2" placeholder="Ej: Agencia Digital Levante S.L." class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-agency-name" type="text" required minlength="2" placeholder="Ej: Agencia Digital Levante S.L." class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
           <div>
             <label for="pt-contact-name" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Persona de Contacto / Cargo *</label>
-            <input id="pt-contact-name" type="text" required minlength="2" placeholder="Ej: Carlos Martínez (Director Técnico)" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-contact-name" type="text" required minlength="2" placeholder="Ej: Carlos Martínez (Director Técnico)" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
           <div>
             <label for="pt-email" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Correo Electrónico Profesional *</label>
-            <input id="pt-email" type="email" required placeholder="carlos@tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-email" type="email" required placeholder="carlos@tuagencia.es" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
           <div>
             <label for="pt-phone" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Teléfono / WhatsApp Directo *</label>
-            <input id="pt-phone" type="tel" required minlength="6" placeholder="Ej: +34 600 000 000" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-phone" type="tel" required minlength="6" placeholder="Ej: +34 600 000 000" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
           <div>
             <label for="pt-type" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Perfil Principal de Partner</label>
-            <select id="pt-type" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white text-sm focus:outline-none focus:border-emerald-400">
+            <select id="pt-type" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white text-sm focus:outline-none focus:border-indigo-500">
               <option value="agencia_ecommerce">Agente Digitalizador / Agencia WooCommerce, Shopify o PrestaShop</option>
               <option value="implantador_erp">Implantador ERP / Mantenimiento Informático y Redes</option>
               <option value="asesoria_holded">Asesoría Fiscal / Gestoría / Partner Holded</option>
@@ -38,7 +38,7 @@
           </div>
           <div>
             <label for="pt-clients" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Clientes estimados a conectar en 12 meses</label>
-            <select id="pt-clients" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white text-sm focus:outline-none focus:border-emerald-400">
+            <select id="pt-clients" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white text-sm focus:outline-none focus:border-indigo-500">
               <option value="1-5 clientes">1 a 5 clientes (Piloto inicial)</option>
               <option value="6-15 clientes">6 a 15 clientes</option>
               <option value="16-50 clientes">16 a 50 clientes</option>
@@ -47,67 +47,67 @@
           </div>
           <div>
             <label for="pt-erps" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">ERPs más habituales en vuestros clientes</label>
-            <input id="pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" placeholder="Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS..." class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" placeholder="Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS..." class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
           <div>
             <label for="pt-website" class="block text-xs font-mono font-medium text-slate-200 mb-1.5">Web de tu Agencia / Empresa (Opcional)</label>
-            <input id="pt-website" type="text" placeholder="https://www.tuagencia.es" class="w-full px-4 py-3 rounded-xl bg-[#1b2132] border border-white/[0.2] text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400" />
+            <input id="pt-website" type="text" placeholder="https://www.tuagencia.es" class="w-full px-4 py-3 rounded-lg bg-[#0e1118] border border-white/[0.16] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500" />
           </div>
 
           <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-            <p class="text-xs text-slate-300">
-              🔒 Sin permanencia ni compra mínima de licencias. Recibirás tu código <code class="text-emerald-400 font-mono">PT-XXXX</code> y tu clave NFR al instante.
+            <p class="text-xs text-slate-400">
+              Sin permanencia ni compra mínima de licencias. Recibirás tu código <code class="text-white font-mono">PT-XXXX</code> y tu clave NFR al instante.
             </p>
-            <button id="pt-submit-btn" type="submit" class="px-7 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 shrink-0 whitespace-nowrap">
-              ⚡ Generar Código Partner + Licencia NFR Ahora
+            <button id="pt-submit-btn" type="submit" class="px-7 py-3.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shrink-0 whitespace-nowrap">
+              Generar Código Partner + Licencia NFR Ahora &rarr;
             </button>
           </div>
         </form>
 
         <!-- Tarjeta de Resultado Instantáneo -->
-        <div id="pt-result-box" class="hidden mt-8 p-6 sm:p-8 rounded-2xl bg-[#13221c] border-2 border-emerald-400/50">
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.14] pb-4">
+        <div id="pt-result-box" class="hidden mt-8 p-6 sm:p-8 rounded-xl bg-[#171b26] border border-emerald-500/40">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.1] pb-4">
             <div>
-              <span class="text-xs font-mono text-emerald-400 uppercase font-bold">✓ ACREDITACIÓN OFICIAL DE PARTNER B2B ACTIVA</span>
-              <h3 id="pt-res-title" class="text-xl font-extrabold text-white mt-1">¡Bienvenido al Canal de Partners de Bentian!</h3>
+              <span class="text-xs font-mono text-emerald-400 uppercase font-semibold">ACREDITACIÓN OFICIAL DE PARTNER B2B ACTIVA</span>
+              <h3 id="pt-res-title" class="text-xl font-bold text-white mt-1">Bienvenido al Canal de Partners de Bentian</h3>
             </div>
-            <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-mono font-bold">
+            <span class="px-3 py-1 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-semibold">
               Comisión Asignada: 25% Recurrente Vitalicia
             </span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-            <div class="p-4 rounded-xl bg-[#1b2132] border border-white/[0.18]">
-              <div class="text-[11px] font-mono text-slate-300 uppercase">Tu Código Oficial de Atribución Partner (25%)</div>
+            <div class="p-4 rounded-lg bg-[#0e1118] border border-white/[0.14]">
+              <div class="text-[11px] font-mono text-slate-400 uppercase">Tu Código Oficial de Atribución Partner (25%)</div>
               <div class="flex items-center justify-between gap-3 mt-1.5">
-                <code id="pt-res-code" class="text-2xl font-extrabold text-emerald-400 font-mono tracking-wider">PT-XXXX-0000</code>
-                <button type="button" onclick="copyPartnerText('pt-res-code')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition">Copiar</button>
+                <code id="pt-res-code" class="text-2xl font-bold text-white font-mono tracking-wider">PT-XXXX-0000</code>
+                <button type="button" onclick="copyPartnerText('pt-res-code')" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-xs font-medium text-white transition">Copiar</button>
               </div>
-              <p class="text-[11px] text-slate-300 mt-1.5">Indica este código en tus implantaciones para vincular el CIF del cliente a tu cuenta.</p>
+              <p class="text-[11px] text-slate-400 mt-1.5">Indica este código en tus implantaciones para vincular el CIF del cliente a tu cuenta.</p>
             </div>
 
-            <div class="p-4 rounded-xl bg-[#1b2132] border border-white/[0.18]">
-              <div class="text-[11px] font-mono text-slate-300 uppercase">Tu Licencia NFR de Demostración (2 Puestos · Modo Sandbox)</div>
+            <div class="p-4 rounded-lg bg-[#0e1118] border border-white/[0.14]">
+              <div class="text-[11px] font-mono text-slate-400 uppercase">Tu Licencia NFR de Demostración (2 Puestos · Modo Sandbox)</div>
               <div class="flex items-center justify-between gap-3 mt-1.5">
                 <code id="pt-res-key" class="text-base sm:text-lg font-bold text-indigo-300 font-mono break-all">EB-XXXX-XXXX-XXXX-XXXX</code>
-                <button type="button" onclick="copyPartnerText('pt-res-key')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition shrink-0">Copiar</button>
+                <button type="button" onclick="copyPartnerText('pt-res-key')" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-xs font-medium text-white transition shrink-0">Copiar</button>
               </div>
-              <p class="text-[11px] text-slate-300 mt-1.5">Úsala en tu propio PC para probar los 5 ERPs en Modo Evaluación y como tu <strong class="text-white">Clave Secreta de Acceso Partner</strong> en el Dashboard Cloud.</p>
+              <p class="text-[11px] text-slate-400 mt-1.5">Úsala en tu propio PC para probar los 5 ERPs en Modo Evaluación y como tu <strong class="text-white">Clave Secreta de Acceso Partner</strong> en el Dashboard Cloud.</p>
             </div>
           </div>
 
           <div class="mt-6 flex flex-wrap items-center gap-3">
-            <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition whitespace-nowrap">
-              📥 Descargar Instalador Windows (Bentian-Setup.exe)
+            <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition whitespace-nowrap">
+              Descargar Instalador Windows (Bentian-Setup.exe)
             </a>
-            <a href="/dashboard" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition whitespace-nowrap">
-              🚀 Entrar al Portal de Partner (/dashboard)
+            <a href="/dashboard" class="px-5 py-2.5 rounded-lg bg-[#181c26] hover:bg-[#222736] border border-white/[0.16] text-white font-medium text-xs transition whitespace-nowrap">
+              Entrar al Portal de Partner (/dashboard) &rarr;
             </a>
-            <button type="button" onclick="window.print()" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-xs transition whitespace-nowrap">
-              🖨️ Guardar Dossier Ejecutivo PDF
+            <button type="button" onclick="window.print()" class="px-5 py-2.5 rounded-lg bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-slate-200 font-medium text-xs transition whitespace-nowrap">
+              Guardar Dossier Ejecutivo PDF
             </button>
-            <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20acabo%20de%20generar%20mi%20codigo%20de%20Partner%20en%20la%20web%20y%20quiero%20comentar%20un%20caso%20de%20cliente" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-xl bg-emerald-700/60 hover:bg-emerald-700 border border-emerald-500/40 text-emerald-200 font-semibold text-xs transition whitespace-nowrap">
-              💬 Agendar 1º Piloto Asistido por WhatsApp
+            <a href="https://wa.me/34617205053?text=Hola%20Cristian,%20acabo%20de%20generar%20mi%20codigo%20de%20Partner%20en%20la%20web%20y%20quiero%20comentar%20un%20caso%20de%20cliente" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-lg bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-slate-200 font-medium text-xs transition whitespace-nowrap">
+              Agendar 1º Piloto Asistido por WhatsApp
             </a>
           </div>
         </div>

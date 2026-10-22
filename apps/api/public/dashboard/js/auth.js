@@ -29,9 +29,9 @@ function switchLoginMode(mode) {
     }
     if (btn) {
       if (m === mode) {
-        btn.className = 'py-1.5 px-2 rounded-lg bg-[#18181b] border border-white/[0.1] text-indigo-400 font-semibold text-center transition-colors shadow-sm';
+        btn.className = 'py-1.5 px-2 rounded-md bg-[#181c26] border border-white/[0.14] text-white font-semibold text-center transition-colors';
       } else {
-        btn.className = 'py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white text-center transition-colors';
+        btn.className = 'py-1.5 px-2 rounded-md text-zinc-400 hover:text-white text-center transition-colors';
       }
     }
   });

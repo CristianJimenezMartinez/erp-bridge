@@ -606,7 +606,7 @@ licensesRouter.get('/licenses', requireAuth, async (req: AuthenticatedRequest, r
     const db = DatabaseService.getInstance();
     if (db.isAvailable()) {
       let query = `
-        SELECT l.*, o.name as organization_name, o.tax_id as org_tax_id, o.reseller_id
+        SELECT l.*, o.name as organization_name, o.tax_id as org_tax_id, o.reseller_id, o.slug as org_slug
         FROM licenses l
         LEFT JOIN organizations o ON l.organization_id = o.id
       `;
@@ -628,9 +628,13 @@ licensesRouter.get('/licenses', requireAuth, async (req: AuthenticatedRequest, r
 
       const licensesWithActivations = await Promise.all(
         result.rows.map(async (lic: any) => {
-          const activations = await licenseService.listActivations(lic.id).catch(() => []);
+          const [activations, contactEmail] = await Promise.all([
+            licenseService.listActivations(lic.id).catch(() => []),
+            LicenseCleanupService.resolveLicenseContactEmail(lic).catch(() => null),
+          ]);
           return {
             ...lic,
+            contact_email: contactEmail,
             activations,
           };
         })
@@ -848,12 +852,24 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
       return res.status(403).json({ error: { message: 'El periodo de prueba de la Beta ha finalizado. Actualice al Plan Fundador para activar su equipo.' } });
     }
 
+    const priorActivations = lic ? await licenseService.listActivations(lic.id).catch(() => []) : [];
+    const wasAlreadyActivatedOnMachine = priorActivations.some((a) => a.hwid === validated.hwid);
+
     const result = await withKeyedLock(`activate:${normalizedKey}`, () => licenseService.activateLicense({
       ...validated,
       licenseKey: normalizedKey,
     }));
     if (!result.success) {
       return res.status(400).json({ error: { message: result.error } });
+    }
+
+    // Alerta instantánea por correo al administrador en la primera activación de un equipo real
+    if (lic && !wasAlreadyActivatedOnMachine && process.env.NODE_ENV !== 'test') {
+      void LicenseCleanupService.notifyFirstMachineActivation({
+        lic,
+        hwid: validated.hwid,
+        machineInfo: validated.machineInfo as Record<string, any> | undefined,
+      });
     }
 
     // Blindaje criptográfico: El token firmado NUNCA puede sobrepasar la fecha de expiración de la licencia
@@ -1013,6 +1029,21 @@ licensesRouter.delete('/licenses/:id', requireAuth, requireRole(['SUPERADMIN', '
 licensesRouter.post('/admin/licensing/purge-tests', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await LicenseCleanupService.purgeObsoleteAndTestLicenses({ includeHeuristicTests: true });
+    return res.json({ success: true, data: result });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// 10. Resend license key & installation instructions email (admin/reseller)
+licensesRouter.post('/licenses/:id/resend-email', requireAuth, requireRole(['SUPERADMIN', 'ADMIN', 'RESELLER']), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params['id']!;
+    const email = typeof req.body?.email === 'string' ? req.body.email.trim() : undefined;
+    const result = await LicenseCleanupService.resendLicenseInstructionsEmail(id, email);
+    if (!result.sent) {
+      return res.status(400).json({ error: { message: result.message || 'No se pudo enviar el correo' } });
+    }
     return res.json({ success: true, data: result });
   } catch (error) {
     return next(error);

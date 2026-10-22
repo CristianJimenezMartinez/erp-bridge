@@ -34,29 +34,18 @@ function _buildSeatBadge(lic) {
 
 async function loadLicenses() {
   const tbody = document.getElementById('licenses-tbody');
-  if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">Actualizando parque de licencias...</td></tr>`;
-  }
-
+  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">Actualizando parque de licencias...</td></tr>`;
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
   const orgId = window.currentOrgId || localStorage.getItem('bentian_cloud_org') || 'org_default';
-
   try {
-    const res = await fetch('/api/v1/licenses', {
-      headers: { 'Authorization': `Bearer ${token}`, 'x-organization-id': orgId }
-    });
+    const res = await fetch('/api/v1/licenses', { headers: { 'Authorization': `Bearer ${token}`, 'x-organization-id': orgId } });
     const json = res.ok ? await res.json() : {};
     window.allLicenses = json.data || [];
-  } catch {
-    window.allLicenses = [];
-  }
+  } catch { window.allLicenses = []; }
   applyLicensesFilter();
 }
 
-function toggleLicensesHideTests() {
-  window._licensesHideTests = !window._licensesHideTests;
-  applyLicensesFilter();
-}
+function toggleLicensesHideTests() { window._licensesHideTests = !window._licensesHideTests; applyLicensesFilter(); }
 
 function applyLicensesFilter() {
   const all = window.allLicenses || [];
@@ -84,9 +73,10 @@ function applyLicensesFilter() {
     if (q) {
       const alias = (l.alias || '').toLowerCase();
       const key = (l.key || '').toLowerCase();
+      const email = (l.contact_email || '').toLowerCase();
       const hostname = (act?.machineInfo?.hostname || '').toLowerCase();
       const hwid = (act?.hwid || '').toLowerCase();
-      if (!alias.includes(q) && !key.includes(q) && !hostname.includes(q) && !hwid.includes(q)) return false;
+      if (!alias.includes(q) && !key.includes(q) && !email.includes(q) && !hostname.includes(q) && !hwid.includes(q)) return false;
     }
     return true;
   });
@@ -126,6 +116,10 @@ function renderLicenses(list) {
     const shortHwid = act?.hwid ? `${act.hwid.substring(0, 16)}...` : '—';
     const fullHwid = act?.hwid || '';
     const seatBadge = _buildSeatBadge(lic);
+    const contactEmail = lic.contact_email || (String(lic.key || '').toUpperCase() === 'EB-6RE3E-HXPS4-XYNRV-HVZWT' ? 'info@nicripsia.com' : '');
+    const rawExp = lic.expires_at || lic.expiresAt;
+    const expDays = rawExp ? Math.max(0, Math.ceil((new Date(rawExp).getTime() - now) / 86400000)) : null;
+    const expText = rawExp ? `Vence: ${new Date(rawExp).toLocaleDateString('es-ES')} (${expDays}d)` : 'Suscripción activa';
 
     return `
       <tr class="hover:bg-white/[0.03] transition-colors">
@@ -136,7 +130,7 @@ function renderLicenses(list) {
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>
           </div>
-          <span class="text-[10px] text-zinc-400 font-mono">ID: ${_licEsc(String(lic.id || '').substring(0, 8))}</span>
+          <span class="text-[10px] text-zinc-400 font-mono">ID: ${_licEsc(String(lic.id || '').substring(0, 8))}${contactEmail ? ` · <span class="text-indigo-300">${_licEsc(contactEmail)}</span>` : ''}</span>
         </td>
         <td class="p-3.5 font-mono">
           <div class="flex items-center gap-2">
@@ -146,7 +140,7 @@ function renderLicenses(list) {
             </button>
           </div>
         </td>
-        <td class="p-3.5 whitespace-nowrap">${seatBadge}</td>
+        <td class="p-3.5 whitespace-nowrap">${seatBadge}<div class="text-[10px] text-zinc-400 font-mono mt-1">${_licEsc(expText)}</div></td>
         <td class="p-3.5 whitespace-nowrap">
           ${hasMachine ? (
             isOnline ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>En Línea (${lastSeenText})</span>`
@@ -159,8 +153,9 @@ function renderLicenses(list) {
         </td>
         <td class="p-3.5 text-right whitespace-nowrap">
           <button data-action="preview-client-license" data-license-id="${_licEsc(lic.id)}" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] text-[11px] font-medium transition inline-flex items-center gap-1 mr-1 cursor-pointer" title="Inspeccionar portal de cliente de esta licencia">Ver Ficha</button>
+          <button data-action="resend-license-email" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-alias="${_licEsc(lic.alias || '')}" data-email="${_licEsc(contactEmail)}" class="px-2 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] text-indigo-300 border border-white/[0.14] text-[11px] font-medium transition inline-flex items-center mr-1 cursor-pointer" title="Enviar o reenviar clave e instrucciones por email">Reenviar</button>
           ${hasMachine ? `<button data-action="unbind-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-hostname="${_licEsc(hostname)}" data-hwid="${_licEsc(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] text-amber-300 border border-white/[0.14] text-[11px] font-medium transition inline-flex items-center gap-1 mr-1 cursor-pointer"><span>Desvincular PC</span></button>` : ''}
-          ${!_PROTECTED_KEYS.has(String(lic.key || '').toUpperCase()) ? `<button data-action="delete-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-alias="${_licEsc(lic.alias || '')}" class="px-2 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-medium transition inline-flex items-center cursor-pointer" title="Eliminar licencia permanentemente">Eliminar</button>` : `<span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300 font-mono">Activa Prod</span>`}
+          ${!_PROTECTED_KEYS.has(String(lic.key || '').toUpperCase()) ? `<button data-action="delete-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-alias="${_licEsc(lic.alias || '')}" class="px-2 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[11px] font-medium transition inline-flex items-center cursor-pointer" title="Eliminar licencia permanentemente">Eliminar</button>` : `<span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300 font-mono">Protegida</span>`}
         </td>
       </tr>`;
   }).join('');
@@ -200,6 +195,11 @@ function renderLicenses(list) {
       const delBtn = e.target.closest('[data-action="delete-license"]');
       if (delBtn && typeof window.deleteLicenseById === 'function') {
         window.deleteLicenseById(delBtn.getAttribute('data-license-id') || '', delBtn.getAttribute('data-key') || '', delBtn.getAttribute('data-alias') || '');
+        return;
+      }
+      const resendBtn = e.target.closest('[data-action="resend-license-email"]');
+      if (resendBtn && typeof window.resendLicenseEmail === 'function') {
+        window.resendLicenseEmail(resendBtn.getAttribute('data-license-id') || '', resendBtn.getAttribute('data-key') || '', resendBtn.getAttribute('data-alias') || '', resendBtn.getAttribute('data-email') || '');
       }
     });
     tbody._eventsAttached = true;
