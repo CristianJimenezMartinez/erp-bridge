@@ -1,0 +1,18 @@
+# ============================================================================
+# Bentian ERP Bridge — Escudo Apache / Plesk Pre-CGI (.htaccess)
+# ============================================================================
+# 1. Mitigación Pre-CGI contra CVE-2024-4577 (PHP-CGI Argument Injection 0xAD en Windows)
+#    y CVE-2026-105482 (Inyección de bytes nulos %00).
+# 2. Apache evalúa estas reglas ANTES de invocar php-cgi.exe o PHP-FPM.
+# ============================================================================
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Bloquear guion suave (0xAD / %AD) y flags CGI (-d allow_url_include, auto_prepend_file)
+  RewriteCond %{QUERY_STRING} ^.*(%ad|%00|-d|allow_url_include|auto_prepend_file|auto_append_file).*$ [NC]
+  RewriteRule .* - [F,L]
+</IfModule>
+
+# Impedir listado de directorios
+Options -Indexes

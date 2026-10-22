@@ -16,6 +16,7 @@ import { SimplyGestConnector } from '@erp-bridge/connector-simplygest';
 import { WooCommerceConnector } from '@erp-bridge/connector-woocommerce';
 import { errorHandler } from './middleware/error.middleware';
 import { rateLimit } from './middleware/rate-limit';
+import { cveShieldPreBodyMiddleware, cveShieldPostBodyMiddleware } from './middleware/cve-shield.middleware';
 import { healthRouter } from './routes/health.router';
 import { organizationsRouter } from './routes/organizations.router';
 import { connectorsRouter } from './routes/connectors.router';
@@ -122,6 +123,9 @@ export async function bootstrapApp(): Promise<Express> {
     credentials: true,
   }));
 
+  // Escudo Pre-Body contra CVE-2026-111497 (Brotli RCE), CVE-2026-105482 (DNS Null-Byte) y CVE-2024-4577 (%AD)
+  app.use(cveShieldPreBodyMiddleware);
+
   app.use(express.json({
     limit: '100kb',
     verify: (req: any, _res, buf) => {
@@ -129,6 +133,9 @@ export async function bootstrapApp(): Promise<Express> {
     },
   }));
   app.use(express.urlencoded({ extended: true }));
+
+  // Escudo Post-Body contra CVE-2026-105483 / CVE-2026-106069 (TLS Non-Canonical IP Hostname Bypass)
+  app.use(cveShieldPostBodyMiddleware);
 
   // Rate Limiting Global: 300 peticiones / 15 minutos por IP (P3-2 / API-025)
   app.use(rateLimit({

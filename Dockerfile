@@ -3,7 +3,7 @@
 # Multi-stage build for high performance & minimal image size
 # ==========================================================
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -30,7 +30,7 @@ RUN pnpm --filter @erp-bridge/api build
 # ==========================================================
 # PRODUCTION RUNTIME
 # ==========================================================
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 

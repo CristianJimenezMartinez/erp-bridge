@@ -580,11 +580,13 @@ const SECRET_PATTERNS: { name: string; regex: RegExp }[] = [
   { name: 'Secreto de Webhook Stripe (whsec)', regex: /\bwhsec_[0-9a-zA-Z]{24,}\b/ },
   { name: 'GitHub Personal Access Token', regex: /\bghp_[0-9a-zA-Z]{36}\b/ },
   { name: 'Credencial AWS Access Key', regex: /\bAKIA[0-9A-Z]{16}\b/ },
+  { name: 'BatBadBut (CVE-2024-27980): shell: true prohibido en child_process', regex: /\bshell\s*:\s*true\b/ },
 ];
 
 function isIgnoredForSecrets(relPath: string): boolean {
   const norm = relPath.replace(/\\/g, '/').toLowerCase();
   return (
+    norm === 'scripts/quality-gate.ts' ||
     norm.includes('/.git/') ||
     norm.includes('/node_modules/') ||
     norm.includes('/dist/') ||

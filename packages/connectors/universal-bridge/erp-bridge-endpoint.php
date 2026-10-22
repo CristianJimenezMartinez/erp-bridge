@@ -26,6 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Escudo WAF contra CVE-2024-4577 (Inyección CGI 0xAD en Windows) y Bytes Nulos (%00)
+$_ebRawQuery = isset($_SERVER['QUERY_STRING']) ? (string)$_SERVER['QUERY_STRING'] : '';
+$_ebRawUri   = isset($_SERVER['REQUEST_URI'])  ? (string)$_SERVER['REQUEST_URI']  : '';
+if (
+    stripos($_ebRawQuery, '%ad') !== false ||
+    stripos($_ebRawQuery, '%00') !== false ||
+    strpos($_ebRawQuery, "\xAD") !== false ||
+    strpos($_ebRawQuery, "\0") !== false ||
+    stripos($_ebRawQuery, 'allow_url_include') !== false ||
+    stripos($_ebRawQuery, 'auto_prepend_file') !== false ||
+    stripos($_ebRawUri, '%00') !== false
+) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Malformed query string blocked by CVE-2024-4577 security shield']);
+    exit;
+}
+
 // ============================================================================
 // ⚠️ ATENCIÓN: CONFIGURACIÓN PARA EL PROGRAMADOR WEB / ADMINISTRADOR DE HOSTING
 // ============================================================================
