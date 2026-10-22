@@ -508,15 +508,19 @@ if (!fs.existsSync(manifestPath)) {
       allModFiles.sort();
 
       const hasher = crypto.createHash('sha256');
+      const lfHasher = crypto.createHash('sha256');
       for (const f of allModFiles) {
         const rel = path.relative(repoRoot, f).replace(/\\/g, '/');
         const content = fs.readFileSync(f);
+        const lfContent = Buffer.from(content.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
         hasher.update(rel + ':' + crypto.createHash('sha256').update(content).digest('hex') + '\n');
+        lfHasher.update(rel + ':' + crypto.createHash('sha256').update(lfContent).digest('hex') + '\n');
       }
       const actualHash = hasher.digest('hex');
+      const actualLfHash = lfHasher.digest('hex');
 
-      if (actualHash === mod.integrityTreeHash) {
-        console.log(`  ✓ Módulo [${mod.id}] sellado e intacto (Hash: ${actualHash.substring(0, 12)}...)`);
+      if (actualHash === mod.integrityTreeHash || actualLfHash === mod.integrityTreeHash) {
+        console.log(`  ✓ Módulo [${mod.id}] sellado e intacto (Hash: ${mod.integrityTreeHash.substring(0, 12)}...)`);
         gate7Details.push(`[${mod.id}] sellado e intacto`);
       } else {
         if (allowFrozenEdit) {

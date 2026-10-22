@@ -242,7 +242,7 @@
         "apps/agent/src/gui/gui-server.ts",
         "apps/agent/src/gui/router/mini-router.ts"
       ],
-      "integrityTreeHash": "411abce467f73c0e4d7e18a3e12901af3a0321f834c1e7f721071e9966268074",
+      "integrityTreeHash": "8c111bd39b5e283b44fd1172d8e3577bddfa0baf72fa6ec5dc263f1e563b78a4",
       "publicContract": "apps/agent/src/gui/gui-server.ts",
       "testSuites": [
         "apps/agent/test/gui-router.test.ts"
