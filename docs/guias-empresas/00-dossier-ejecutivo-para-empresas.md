@@ -1,127 +1,111 @@
-# DOSSIER EJECUTIVO: BENTIAN ERP BRIDGE
-## La Solución Definitiva de Automatización e Integración entre Factusol y tu Tienda Online
+# DOSSIER EJECUTIVO MULTI-ERP 2026: BENTIAN ERP BRIDGE
+## Infraestructura Local-First para Conectar Factusol, SimplyGest, Sage 50, a3ERP y Ágora POS con WooCommerce, Shopify, PrestaShop y Holded Cloud
 
-> **Resumen Ejecutivo para Dirección General, Gerencia y Dirección de Operaciones**  
-> **Producto:** Bentian ERP Bridge — Conector Empresarial de Datos en Tiempo Real  
+> **Resumen Ejecutivo para Dirección General, Gerencia, Implantadores ERP y Agentes Digitalizadores**  
+> **Producto:** Bentian ERP Bridge (`v0.4.11`) — Puente Polimórfico de Datos en Tiempo Real  
 > **Página Web Oficial:** [https://bridge.cristianjm.com](https://bridge.cristianjm.com)  
-> **Contacto Comercial Directo:** `soporte@cristianjm.com`
+> **Programa de Partners y Distribuidores (25% Recurrente):** [https://bridge.cristianjm.com/partners/](https://bridge.cristianjm.com/partners/)  
+> **Contacto Comercial e Ingeniería:** `soporte@cristianjm.com` · Tel/WhatsApp: **+34 617 205 053**
 
 ---
 
 ## 1. ¿QUÉ ES BENTIAN ERP BRIDGE?
 
-**Bentian ERP Bridge** es la infraestructura de software profesional diseñada específicamente para conectar el sistema de facturación y gestión **Factusol** con cualquier plataforma de comercio electrónico (**WooCommerce, PrestaShop o plataforma web a medida**) de forma bidireccional, automática y en tiempo real.
-
-Tradicionalmente, las empresas que venden tanto en mostrador/almacén físico como en internet se enfrentan a un abismo tecnológico: Factusol opera en local o red corporativa en Windows, mientras que la tienda web reside en un servidor en la nube. 
-
-Bentian actúa como un **puente inteligente y blindado**: se instala en el ordenador o servidor de la empresa en menos de 5 minutos, opera silenciosamente en segundo plano y mantiene sincronizados artículos, precios, stock disponible y pedidos web las 24 horas del día, los 365 días del año.
+**Bentian ERP Bridge** es una infraestructura de software nativa para Windows diseñada para conectar los **5 sistemas ERP y TPV locales más utilizados por las PYMEs españolas** (**Factusol, SimplyGest, Sage 50, Wolters Kluwer a3ERP y Ágora POS**) con canales de comercio electrónico (**WooCommerce, Shopify, PrestaShop**) y facturación contable en la nube (**Holded Cloud ERP**) de forma bidireccional, automática y sin abrir puertos en el router.
 
 ```
-┌─────────────────────────────────┐        Sincronización Bidireccional        ┌─────────────────────────────────┐
-│     FACTUSOL (ERP EMPRESA)      │ ◄────────────────────────────────────────► │     TIENDA WEB / E-COMMERCE     │
-│  Base de datos local / NAS / LAN│   Stock disponible | Pedidos automáticos   │  WooCommerce / PrestaShop / Web │
-└─────────────────────────────────┘                                            └─────────────────────────────────┘
+┌────────────────────────────────────────────────┐      Sincronización Bidireccional       ┌────────────────────────────────────────────────┐
+│          ERP / TPV LOCAL EN WINDOWS            │ ◄─────────────────────────────────────► │        CANALES E-COMMERCE & CLOUD ERP          │
+│ • Factusol (.accdb / .mdb OLEDB)               │   • Stock real disponible (DISSTO)      │ • WooCommerce (REST v3 + HPOS)                 │
+│ • SimplyGest (DBISAM .dat / API :56985 / .mdb) │   • Tarifas 1-10, IVA y Recargo (R.E.)  │ • Shopify (Admin GraphQL API 2024-10+)         │
+│ • Sage 50 (SQL Server Ejercicio 2026XX)        │   • Fotos 100% Automáticas (SHA-256)    │ • PrestaShop (WebServices 1.7 / 8.x)           │
+│ • a3ERP (ActiveX COM + SQL IDPEDV)             │   • Inyección atómica de pedidos web    │ • Holded Cloud ERP (Facturación & Gestoría)    │
+│ • Ágora Retail / POS (SQL + API HTTP :8984)    │   • Cola Offline Store-and-Forward      │ • Endpoint Universal REST / Webhooks           │
+└────────────────────────────────────────────────┘                                         └────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. BENEFICIOS DIRECTOS PARA EL NEGOCIO (IMPACTO EN CUENTA DE RESULTADOS)
+## 2. LOS 5 PROBLEMAS CRÍTICOS QUE RESUELVE EN EL DÍA A DÍA
 
-### 1. Fin Radical del Picado Manual de Pedidos
-- **El problema:** Su equipo administrativo invierte entre 1 y 3 horas diarias transcribiendo manualmente a Factusol cada pedido web: datos del cliente, NIF, direcciones de entrega, referencias, unidades, descuentos y formas de pago.
-- **La solución Bentian:** Cada compra en la web genera automáticamente un pedido o albarán en Factusol en menos de 10 segundos, con desglose exacto de IVA, gastos de envío y vinculación con la ficha del cliente.
-- **Resultado:** Reducción del 95% del tiempo administrativo y eliminación total de erratas en albaranes y facturas.
+### 1. Fin Radical del Picado Manual de Pedidos (Ahorro de ~15h/semana)
+- **El problema:** El equipo administrativo pierde entre 1 y 3 horas diarias copiando a mano cada pedido de WooCommerce o Shopify dentro del ERP local: datos fiscales, NIF, direcciones, referencias, descuentos, portes y régimen de IVA.
+- **La solución Bentian:** Cada pedido pagado en la tienda online se inyecta de forma transaccional en el ERP local en menos de 3 segundos (`F_PCL`/`F_LPC` en Factusol, `PEDIDOSC`/`PEDIDOSL` en SimplyGest, `c_pediven`/`d_pediven` con `guid_id` en Sage 50, `a3ERPActiveX.Pedido`/`CABEPEV` en a3ERP o `CustomerOrder` en Ágora POS).
 
-### 2. Inventario Sincronizado al Segundo (Adiós a Vender Sin Stock)
-- **El problema:** Se vende la última unidad de una herramienta o artículo en el mostrador físico a las 11:30. A las 11:45 un cliente compra ese mismo artículo en la tienda web porque el stock no estaba actualizado. Consecuencia: rotura de stock, llamadas disculpándose, clientes descontentos y ventas perdidas.
-- **La solución Bentian:** El motor de cálculo computa el **Stock Disponible Real** de Factusol (`DISSTO = Stock Actual - Pedidos Pendientes de Servir`). Cada movimiento en tienda física actualiza el catálogo online de forma inmediata.
-- **Resultado:** Cero cancelaciones por falta de existencias y reputación impecable ante sus clientes online.
+### 2. Inventario Disponible Real (Cero Sobreventas entre Mostrador y Web)
+- **El problema:** Se vende la última unidad en el mostrador físico y, minutos después, un cliente online compra ese mismo producto porque la web no estaba enterada.
+- **La solución Bentian:** Calcula el **Stock Disponible Real** descontando reservas y pedidos pendientes de servir (`DISSTO` en Factusol, `FINAL - RESERVADO` en Sage 50, `UNIDADES - RESERVADO` en a3ERP) y actualiza el canal online aplicando *Dirty-Checking* criptográfico (solo transmite los SKUs que han cambiado).
 
-### 3. Pedidos Nocturnos Listos en Factusol a Primera Hora de la Mañana
-- **El problema:** Los pedidos que entran a las 23:00 o durante el fin de semana quedan atascados en el panel web hasta que alguien llega a la oficina el lunes y los introduce uno a uno. Los envíos se retrasan un día completo.
-- **La solución Bentian:** El puente trabaja de noche. A las 08:00 AM, el personal de almacén solo tiene que pulsar "Imprimir albaranes" y comenzar a preparar paquetes.
-- **Resultado:** Expediciones en el mismo día, entregas en 24h reales y ventaja competitiva frente a la competencia.
+### 3. Sincronización 100% Automática de Fotografías (`UniversalErpImageResolver`)
+- **El problema:** Subir y mantener actualizadas miles de fotografías de productos en la tienda online obliga a un trabajo manual inasumible.
+- **La solución Bentian:** El motor universal detecta y extrae automáticamente las imágenes nativas de los 5 ERPs:
+  - **Factusol:** Campo `IMGART` y carpeta local/red `Imagenes\`.
+  - **SimplyGest:** Columnas `IMAGEN` / `FOTO`, carpeta `Imagenes\` y endpoint `/api/articulos/:codigo/imagen`.
+  - **Sage 50, a3ERP y Ágora POS:** Extracción directa de binarios SQL (`VARBINARY(MAX)` / `IMAGE` desde `d_albimg`, `IMAGENES` y `Product.Image`), autodetección de formato por *Magic Bytes* (`JPEG`, `PNG`, `WEBP`, `GIF`) y deduplicación por hash `SHA-256` para no resubir imágenes sin cambios.
 
-### 4. Seguridad Máxima: Sin Abrir Puertos ni Exponer su Servidor
-- **El problema:** La mayoría de conectores baratos exigen abrir puertos en el router hacia el servidor interno o publicar la base de datos de Factusol en internet, creando un riesgo crítico de ciberataques, ransomware y sanciones del RGPD.
-- **La solución Bentian:** Arquitectura *Local-First* con cifrado TLS 1.3 de extremo a extremo. El conector inicia la conexión saliente hacia el servidor seguro sin requerir IP fija, sin abrir un solo puerto y sin tocar el firewall de su empresa.
-- **Resultado:** Tranquilidad absoluta para la dirección de IT y cumplimiento estricto del RGPD europeo.
+### 4. Arquitectura Tripartita: `Shopify / WooCommerce ➔ ERP Almacén ➔ Holded Gestoría`
+- **El problema:** La asesoría fiscal pide trabajar en **Holded Cloud**, pero el almacén no puede abandonar Factusol o SimplyGest porque toda su operativa de pistola de códigos de barras y mostrador depende de su ERP local.
+- **La solución Bentian:** El pedido web entra al ERP local para el *picking* de almacén y, simultáneamente, Bentian emite la factura legal correlativa y el asiento en el Libro Diario de **Holded Cloud ERP**, eliminando por completo la doble contabilidad.
 
----
-
-## 3. COMPATIBILIDAD TÉCNICA GARANTIZADA
-
-| Componente | Versiones y Entornos Homologados |
-| :--- | :--- |
-| **Versiones de Factusol** | **Factusol 2019, 2020, 2021, 2022, 2023, 2024, 2025 y 2026** (Ediciones estándar y nube híbrida). |
-| **Ubicación de la Base de Datos** | Disco local (`C:\FactuSOL\...`), Servidor Windows Server, Unidad de red mapeada (`Z:\...`) o Servidor NAS (`\\NAS_EMPRESA\...`). |
-| **Plataformas de Comercio Online** | **WooCommerce** (WordPress 5.x / 6.x con WooCommerce REST API).<br>**PrestaShop** (1.7.x / 8.x vía Webservice API).<br>**Plataformas Propias / Custom:** Universal Bridge con API REST documentada. |
-| **Sistema Operativo del Puesto** | Windows 10, Windows 11, Windows Server 2016, 2019 y 2022 (64 bits). |
-| **Consumo de Recursos** | Ultraligero: menos de 60 MB de memoria RAM y 0% de uso de CPU en reposo. |
+### 5. Seguridad Local-First (Sin Abrir Puertos en el Router ni Exponer SQL/Access)
+- **El problema:** Otros conectores exigen abrir el puerto `1433` de SQL Server o compartir carpetas SMB en internet, exponiendo la empresa a ataques de ransomware.
+- **La solución Bentian:** El agente se ejecuta como servicio local en Windows y solo realiza conexiones salientes HTTPS (`TLS 1.3`, puerto `443`). Incluye **Modo Evaluación Sandbox** para simular toda la sincronización en seco antes de escribir un solo registro en el ERP.
 
 ---
 
-## 4. CASOS DE USO REALES Y SECTORES DE APLICACIÓN
+## 3. MATRIZ TÉCNICA DE COMPATIBILIDAD MULTI-ERP (2026)
 
-### 🛠️ Suministros Industriales y Ferreterías Profesionales
-- **Reto:** Catálogos extensos con miles de referencias, tarifas mayoristas (PVP con y sin IVA), medidas especiales y mostrador físico de venta rápida continua.
-- **Impacto Bentian:** Los cambios de tarifas o costes realizados en Factusol se reflejan en la tienda online en minutos, manteniendo el margen comercial a salvo de la inflación.
-
-### 📦 Distribuidores Mayoristas y Comercio B2B
-- **Reto:** Clientes especiales con condiciones personalizadas, recargo de equivalencia en factura y pedidos voluminosos con múltiples bultos.
-- **Impacto Bentian:** Los pedidos se graban en Factusol respetando el régimen fiscal del cliente (General, Exento o Recargo de Equivalencia) de forma 100% legal y automática.
-
-### 👟 Retail, Moda, Calzado y Equipamiento
-- **Reto:** Gestión de combinaciones y variantes (tallas, colores, modelos) y alta rotación en temporadas de rebajas o promociones puntuales.
-- **Impacto Bentian:** Descuento instantáneo de unidades evitando que dos personas compren la misma talla en dos canales distintos.
-
-### ⚙️ Recambios, Accesorios y Automoción
-- **Reto:** Búsquedas críticas por código EAN, referencia original o fabricante, con necesidad de verificar disponibilidad antes de confirmar la venta.
-- **Impacto Bentian:** Sincronización continua de referencias y stock garantizado.
+| ERP Local / Cloud | Motor de Conexión Soportado | Lectura de Catálogo, Stock y Fotos | Inyección de Pedidos Web |
+| :--- | :--- | :--- | :--- |
+| **Factusol ERP** *(Software DELSOL)* | Proveedor nativo OLEDB (`Microsoft.ACE.OLEDB.12.0/16.0`) sobre `.accdb` / `.mdb` en local o NAS UNC (`\\SERVIDOR\...`) | `F_ART`, `F_STO` (`DISSTO`), `F_LTA`, variantes tallas/colores y fotos desde `IMGART` + `Imagenes\` | Transaccional en `F_PCL` y `F_LPC` + alta de cliente en `F_CLI` con IVA y Recargo de Equivalencia |
+| **SimplyGest Desktop** *(SimplyGest)* | **Triple Motor:**<br>1. DBISAM (`Datos\Emp1\articulos.dat`)<br>2. Módulo Server API (`:56985`)<br>3. Access OLEDB (`Datos.mdb`) | `ARTICULOS`, `FAMILIAS`, Tarifas 1–10, tallas/colores y fotos desde `IMAGEN`/`FOTO` o API `:56985` | Inyección en `PEDIDOSC`/`PEDIDOSL`, `PEDIDOS_VENTA`/`LINEAS_PEDIDOS`, API REST y CSV `SimplyMove` |
+| **Sage 50** *(Sage España)* | MS SQL Server (`WITH (NOLOCK)`) con **auto-detección de BBDD de ejercicio anual** (`2026XX`) + común (`COMUXX`) | `articulo`, `stocks`, `pvp`, `cajas` y extracción binaria BLOB de fotos en `d_albimg` | Transacción ACID en `c_pediven` y `d_pediven` con generación nativa de `guid_id` y serie documental (`LETRA`) |
+| **a3ERP** *(Wolters Kluwer)* | **Doble Motor:**<br>1. Puente oficial ActiveX COM (`a3ERPActiveX.Pedido`)<br>2. MS SQL Server transaccional | `ARTICULO`, `STOCKALM`, `TARIFASV` y extracción de fotos binarias desde `IMAGENES` | Vía `a3ERPActiveX.Pedido` (32/64 bits) o SQL transaccional con clave correlativa `IDPEDV` en `CABEPEV`/`LINEPEV` |
+| **Ágora Retail / POS** *(Ágora)* | MS SQL Server Express + **API HTTP Oficial de Ágora (`:8984`)** con autenticación `Api-Token` | `SaleItem`, `Stock`, `Price`, códigos EAN y fotos binarias en `Product.Image` | Prioridad vía HTTP API `:8984` (`SaleInitialize` / `CustomerOrder`) para refresco instantáneo en pantallas TPV + respaldo SQL |
+| **Holded Cloud ERP** *(Holded)* | Conector nativo REST API v1 HTTPS con control de idempotencia (`customId`) | Sincronización de contactos fiscales (`CIF/NIF`), catálogo y cuentas contables | Emisión automática de facturas de venta, albaranes y asientos en Libro Diario para la gestoría |
 
 ---
 
-## 5. EL RETORNO DE LA INVERSIÓN (ROI) CALCULADO
+## 4. RETORNO DE LA INVERSIÓN (ROI) PARA LA EMPRESA FINAL
 
 $$\begin{array}{|l|r|}
 \hline
-\textbf{Coste típico de gestión manual sin Bentian} & \\
+\textbf{Coste anual de gestión manual sin Bentian ERP Bridge} & \\
 \hline
-\text{Tiempo medio dedicado a pasar pedidos web a mano} & \text{1 hora / día} \\
+\text{Tiempo medio dedicado a transcribir pedidos web, clientes y fotos a mano} & \text{1,5 horas / día} \\
 \text{Días laborables al año} & \text{220 días} \\
-\text{Coste laboral por hora de administrativo (sueldo + Seguridad Social)} & \text{16,00 € / hora} \\
+\text{Coste empresa por hora administrativa (sueldo + Seguridad Social)} & \text{16,00 € / hora} \\
 \hline
-\mathbf{Coste\ anual\ directo\ en\ picado\ manual} & \mathbf{3.520,00\ \text{€} / \text{año}} \\
-\hline
-\hline
-\textbf{Inversión en Bentian ERP Bridge (Plan Business)} & \mathbf{199,00\ \text{€} / \text{año}} \\
+\mathbf{Coste\ anual\ directo\ en\ picado\ manual\ y\ errores\ de\ stock} & \mathbf{5.280,00\ \text{€} / \text{año}} \\
 \hline
 \hline
-\mathbf{Ahorro\ Neto\ Anual\ Directo\ para\ su\ Empresa} & \mathbf{+3.321,00\ \text{€} / \text{año}} \\
+\textbf{Inversión en Bentian ERP Bridge (Plan Anual Todo Incluido)} & \mathbf{199,00\ \text{€} / \text{año}} \\
+\text{(Tarifa Fundador Fase 1 / Campaña Beta Gratuita hasta 31/12/2026)} & \mathbf{(139,00\ \text{€} / \text{año})} \\
+\hline
+\hline
+\mathbf{Ahorro\ Neto\ Anual\ Directo\ para\ la\ PYME} & \mathbf{+5.081,00\ \text{€} / \text{año}} \\
 \hline
 \end{array}$$
 
-> **El conector se amortiza por completo en las primeras 3 semanas de funcionamiento.** A ello se suma el ahorro intangible en devoluciones por rotura de stock y la fidelización de clientes gracias a la rapidez de entrega.
+---
+
+## 5. PROGRAMA DE PARTNERS, AGENTES DIGITALIZADORES E IMPLANTADORES ERP
+
+¿Eres una **Agencia de Diseño Web / eCommerce**, un **Agente Digitalizador (Kit Digital / Kit Consulting)**, un **Implantador de ERP / Técnico Informático** o una **Asesoría Fiscal conectada con Holded**?
+
+- **25% de Comisión Recurrente y Vitalicia** sobre todas las suscripciones anuales o mensuales de tus clientes.
+- **100% de los Honorarios de Puesta en Marcha (Setup Fee) para ti:** Factura directamente a tu cliente entre **250 € y 600 €** por la implantación y parametrización, resolviéndola en 15 minutos con nuestro asistente guiado y Modo Sandbox.
+- **Panel Multi-Tenant de Distribuidor (`/dashboard`):** Gestiona múltiples organizaciones clientes, emite licencias Trial de 15 días al instante y cuenta con **asistencia directa de nuestra ingeniería** en tu primer cliente piloto.
+
+👉 **Consulta todos los detalles y la calculadora de comisiones en:**  
+**[https://bridge.cristianjm.com/partners/](https://bridge.cristianjm.com/partners/)**
 
 ---
 
-## 6. PUESTA EN MARCHA INMEDIATA Y SIN RIESGOS
+## 6. CONTACTO DIRECTO Y DEMOSTRACIÓN TÉCNICA
 
-La transición no requiere detener la actividad de la empresa ni cambiar la forma en la que sus empleados usan Factusol hoy:
-
-1. **Instalación Asistida en 30 minutos:** Nuestro equipo técnico o su informático de confianza configuran el enlace sin alterar su instalación actual de Factusol.
-2. **Prueba de Funcionamiento Garantizada:** Sincronizamos un artículo de muestra y realizamos un pedido de prueba conjunto para validar tarifas, impuestos y rutas de albarán.
-3. **Demostración y Validación Previa:** Comprobación de compatibilidad con su versión de Factusol y demostración técnica guiada sin compromiso. Sin permanencia: cancele la renovación de su plan en cualquier momento desde su panel en 1 clic.
-
----
-
-## CONTACTO Y CONTRATACIÓN
-
-Conecte su Factusol hoy mismo y comience a operar en tiempo real:
-
-- **Portal Web y Demostración:** [https://bridge.cristianjm.com](https://bridge.cristianjm.com)
-- **Departamento de Ventas y Asesoramiento:** `soporte@cristianjm.com`
-- **Atención al Cliente y Soporte Técnico:** `soporte@cristianjm.com`
-- **Canal de Partners y Distribuidores:** Si trabaja con una empresa de informática o agencia web, consúltele por su código oficial de partner (`PT-XXXX`) para acceder a condiciones preferentes.
-
-**Bentian ERP Bridge — Cristian Jiménez Martínez — Infraestructura de Integración Empresarial Local-First**
+- **Web Oficial y Descarga:** [https://bridge.cristianjm.com](https://bridge.cristianjm.com)
+- **Portal de Partners y Distribuidores:** [https://bridge.cristianjm.com/partners/](https://bridge.cristianjm.com/partners/)
+- **Centro de Documentación (41 Guías Técnicas):** [https://bridge.cristianjm.com/docs/](https://bridge.cristianjm.com/docs/)
+- **Correo de Ingeniería y Canal B2B:** `soporte@cristianjm.com`
+- **Teléfono / WhatsApp Directo:** **+34 617 205 053**

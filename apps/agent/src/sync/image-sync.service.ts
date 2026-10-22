@@ -1,11 +1,13 @@
 import fs from 'fs';
 import { CanonicalProduct, Logger } from '@erp-bridge/shared';
-import { FactusolImageLocator, ResolvedFactusolImage } from '@erp-bridge/connector-factusol';
+import { ResolvedFactusolImage } from '@erp-bridge/connector-factusol';
 import { EventBus } from '../diagnostics/event-bus';
+import { UniversalErpImageResolver } from './universal-erp-image.resolver';
 
 export interface ImageSyncOptions {
   endpointUrl: string;
   secretKey?: string;
+  providerId?: string;
   databasePath?: string;
   customPhotosPath?: string;
   concurrency?: number;
@@ -34,25 +36,39 @@ export class ImageSyncService {
     const concurrency = this.options.concurrency || 3;
     const cleanEndpointUrl = this.options.endpointUrl.trim().replace(/\/+$/, '');
 
-    // 1. Instanciar el localizador de imágenes de Factusol
-    const locator = new FactusolImageLocator(
-      this.options.databasePath,
-      this.options.customPhotosPath
-    );
+    // 1. Instanciar el resolutor universal de imágenes Multi-ERP (Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS)
+    const resolver = new UniversalErpImageResolver({
+      providerId: this.options.providerId,
+      databasePath: this.options.databasePath,
+      customPhotosPath: this.options.customPhotosPath,
+    });
 
-    // 2. Extraer artículos con referencia de imagen
+    // 2. Resolver imágenes para todos los productos (columna BD, BLOB incrustado o auto-descubrimiento por SKU/EAN)
     const candidateArticles: Array<{ sku: string; imgart: string }> = [];
+    const existingImagesMap = new Map<string, ResolvedFactusolImage>(); // clave: relativeWebPath
+
     for (const p of products) {
-      const imgVal =
+      if (!p.sku) continue;
+      const explicitVal =
         p.attributes?.imgart ||
         (p.images && p.images.length > 0 && p.images[0] ? p.images[0].url : '');
-      if (imgVal && p.sku) {
-        candidateArticles.push({ sku: p.sku, imgart: String(imgVal).trim() });
+
+      const resolved = resolver.resolveProductImage(p);
+      if (resolved.exists && resolved.localPath && resolved.relativeWebPath) {
+        // Enriquecer automáticamente el producto para que push_catalog lleve la ruta web de su foto
+        if (!p.attributes) p.attributes = {};
+        p.attributes.imgart = resolved.relativeWebPath;
+        candidateArticles.push({ sku: p.sku, imgart: resolved.relativeWebPath });
+        if (!existingImagesMap.has(resolved.relativeWebPath)) {
+          existingImagesMap.set(resolved.relativeWebPath, resolved);
+        }
+      } else if (explicitVal) {
+        candidateArticles.push({ sku: p.sku, imgart: String(explicitVal).trim() });
       }
     }
 
     if (candidateArticles.length === 0) {
-      this.logger.info('No hay productos con fotos referenciadas en Factusol.');
+      this.logger.info('No hay productos con fotos referenciadas ni autodetectadas en disco.');
       return {
         totalArticlesWithImages: 0,
         totalUniqueImages: 0,
@@ -62,18 +78,6 @@ export class ImageSyncService {
         failedCount: 0,
         durationMs: Date.now() - start,
       };
-    }
-
-    // 3. Resolver imágenes existentes en disco local
-    const resolvedBatch = locator.resolveBatch(candidateArticles);
-    const existingImagesMap = new Map<string, ResolvedFactusolImage>(); // clave: relativeWebPath
-
-    for (const [_, resolved] of resolvedBatch) {
-      if (resolved.exists && resolved.localPath && resolved.relativeWebPath) {
-        if (!existingImagesMap.has(resolved.relativeWebPath)) {
-          existingImagesMap.set(resolved.relativeWebPath, resolved);
-        }
-      }
     }
 
     const uniqueImages = Array.from(existingImagesMap.values());

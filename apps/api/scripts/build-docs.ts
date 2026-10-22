@@ -123,6 +123,12 @@ function renderHeader(): string {
           <span class="hidden sm:inline">Web Principal</span>
         </a>
 
+        <!-- Acceso directo al Programa de Partners -->
+        <a href="/partners/" class="text-xs font-medium text-emerald-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 transition hidden sm:flex items-center gap-1" title="Programa de Partners y Agentes Digitalizadores (25% Recurrente)">
+          <span>Partners</span>
+          <span class="text-[10px] font-mono text-emerald-400">25%</span>
+        </a>
+
         <!-- Acceso directo al Dashboard de Clientes -->
         <a href="/dashboard" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] transition hidden md:flex items-center gap-1.5" title="Acceso a panel de clientes y licencias">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -861,7 +867,24 @@ function updateSitemap(articles: DocArticle[]) {
     return match;
   });
 
-  // 3. Asegurar entrada del Hub central
+  // 3. Asegurar entrada del Hub central y de la página oficial de Partners B2B
+  const partnersUrl = 'https://bridge.cristianjm.com/partners/';
+  if (!sitemap.includes(partnersUrl)) {
+    const partnersEntry = `
+  <!-- Programa Oficial de Partners, Agentes Digitalizadores e Implantadores ERP -->
+  <url>
+    <loc>${partnersUrl}</loc>
+    <lastmod>2026-10-22T18:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="${partnersUrl}" />
+    <xhtml:link rel="alternate" hreflang="es" href="${partnersUrl}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${partnersUrl}" />
+  </url>
+`;
+    sitemap = sitemap.replace('</urlset>', `${partnersEntry}</urlset>`);
+  }
+
   const hubUrl = 'https://bridge.cristianjm.com/docs/';
   if (!sitemap.includes(hubUrl)) {
     const hubEntry = `

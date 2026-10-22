@@ -1,6 +1,7 @@
 import { Logger } from '@erp-bridge/shared';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
+import { isSecretMaskedOrEmpty } from '../../../channels';
 import { renderDashboardHtml } from '../../ui-template';
 import { openDesktopWindow } from '../../window-launcher';
 import {
@@ -27,16 +28,6 @@ export class SystemController {
 
   public static saveFullConfig(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
-      const lic = agent.licenseService?.getLicenseStatus();
-      const incomingLicKey = typeof ctx.body?.licenseKey === 'string' ? ctx.body.licenseKey.trim() : '';
-      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD' && !incomingLicKey) {
-        res.writeHead(403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          success: false,
-          message: 'Operación bloqueada: Necesitas activar una clave de licencia antes de guardar configuraciones del ERP o canales.'
-        }));
-        return;
-      }
       const candidatePaths = [
         ctx.body?.factusol?.databasePath,
         ctx.body?.factusolDbPath,
@@ -54,6 +45,71 @@ export class SystemController {
           }));
           return;
         }
+      }
+
+      let lic = agent.licenseService?.getLicenseStatus();
+      const incomingLicKey = typeof ctx.body?.licenseKey === 'string' ? ctx.body.licenseKey.trim() : '';
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD' && !incomingLicKey) {
+        const storedKey = agent.configManager?.get()?.licenseKey?.trim();
+        if (storedKey && agent.licenseService) {
+          try {
+            await agent.licenseService.validateLicense();
+            lic = agent.licenseService.getLicenseStatus();
+          } catch {}
+        }
+      }
+
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD' && !incomingLicKey) {
+        // Persistir borrador en disco en AppData para que los campos nunca aparezcan vacíos al cerrar y abrir
+        if (agent.configManager && ctx.body && typeof ctx.body === 'object') {
+          try {
+            const current = agent.configManager.get();
+            const draftFactPath = ctx.body.factusol?.databasePath ?? ctx.body.factusolDbPath ?? current.factusolDbPath;
+            const existingUnivSecret = current.universalBridge?.secretKey || '';
+            const existingUnivDbPass = current.universalBridge?.dbPass || '';
+            const nextUniv = ctx.body.universalBridge
+              ? {
+                  ...(current.universalBridge || { storeUrl: '', secretKey: '', enabled: true }),
+                  ...ctx.body.universalBridge,
+                  secretKey: isSecretMaskedOrEmpty(ctx.body.universalBridge.secretKey)
+                    ? existingUnivSecret
+                    : ctx.body.universalBridge.secretKey,
+                  dbPass: isSecretMaskedOrEmpty(ctx.body.universalBridge.dbPass)
+                    ? existingUnivDbPass
+                    : ctx.body.universalBridge.dbPass,
+                }
+              : current.universalBridge;
+            const existingWooSecret = current.woocommerce?.consumerSecret || '';
+            const nextWoo = ctx.body.woocommerce
+              ? {
+                  ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '', enabled: false }),
+                  ...ctx.body.woocommerce,
+                  consumerSecret: isSecretMaskedOrEmpty(ctx.body.woocommerce.consumerSecret)
+                    ? existingWooSecret
+                    : ctx.body.woocommerce.consumerSecret,
+                }
+              : current.woocommerce;
+
+            agent.configManager.update({
+              erpType: ctx.body.erpType || current.erpType,
+              channelType: ctx.body.channelType || current.channelType,
+              factusolDbPath: draftFactPath,
+              factusol: ctx.body.factusol ? { ...(current.factusol || { tariffCode: '1', warehouseCode: 'GEN' }), ...ctx.body.factusol } : current.factusol,
+              simplygest: ctx.body.simplygest ? { ...(current.simplygest || { tariffCode: 1, warehouseCode: '1' }), ...ctx.body.simplygest } : current.simplygest,
+              universalBridge: nextUniv,
+              woocommerce: nextWoo,
+              syncRules: ctx.body.syncRules ? { ...(current.syncRules || {}), ...ctx.body.syncRules } as any : current.syncRules,
+            });
+          } catch (draftErr) {
+            logger.warn(`No se pudo persistir borrador previo a activación: ${String(draftErr)}`);
+          }
+        }
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: 'Operación bloqueada: Necesitas activar una clave de licencia antes de guardar configuraciones del ERP o canales.'
+        }));
+        return;
       }
       const result = await agent.saveFullConfig(ctx.body);
       res.writeHead(200, { 'Content-Type': 'application/json' });

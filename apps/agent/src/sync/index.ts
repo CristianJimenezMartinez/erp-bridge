@@ -8,3 +8,5 @@ export * from './progressive-catalog.helper';
 export * from './tripartite-pipeline.service';
 export * from './shopify-sync.helper';
 export * from './prestashop-sync.helper';
+export * from './image-sync.service';
+export * from './universal-erp-image.resolver';

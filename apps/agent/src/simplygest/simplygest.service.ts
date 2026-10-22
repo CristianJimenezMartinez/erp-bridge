@@ -40,8 +40,9 @@ export class SimplyGestService {
       dbPath = resolved.resolvedPath;
     }
 
-    if (!fs.existsSync(dbPath)) {
-      this.logger.warn(`No existe o no está accesible el archivo Datos.mdb de SimplyGest: ${dbPath}`);
+    const isHttpApi = /^(https?|sgapi):\/\//i.test(dbPath);
+    if (!isHttpApi && !fs.existsSync(dbPath)) {
+      this.logger.warn(`No existe o no está accesible la ruta de SimplyGest: ${dbPath}`);
       this.eventBus?.addEvent('warn', `⚠️ Base de datos SimplyGest no accesible: ${path.basename(dbPath) || dbPath}`);
       return false;
     }
@@ -51,10 +52,15 @@ export class SimplyGestService {
         await this.connector.disconnect();
       }
 
+      const apiKey =
+        (config.simplygest as any)?.apiKey ||
+        (config.softwareErp?.providers?.simplygest as any)?.apiKey ||
+        (config.softwareErp?.providers?.simplygest as any)?.password;
       this.connector = new SimplyGestConnector();
       await this.connector.connect({
         configuration: {
           databasePath: dbPath,
+          apiKey,
         },
       });
 
@@ -109,16 +115,16 @@ export class SimplyGestService {
       dbPath = resolved.resolvedPath;
     }
 
-    if (!fs.existsSync(dbPath)) {
+    const isHttpApi = /^(https?|sgapi):\/\//i.test(dbPath);
+    if (!isHttpApi && !fs.existsSync(dbPath)) {
       return {
         success: false,
-        message: `El archivo Datos.mdb no existe en la ruta indicada: "${dbPath}". Revisa que la unidad o carpeta sea correcta.`,
+        message: `La ruta de SimplyGest no existe: "${dbPath}". Selecciona la carpeta de empresa (Emp1\\articulos.dat), Datos.mdb o la URL del Módulo Servidor (:56985).`,
         resolvedPath: dbPath,
       };
     }
 
-    const stats = fs.statSync(dbPath);
-    const fileSizeBytes = stats.size;
+    const fileSizeBytes = !isHttpApi && fs.existsSync(dbPath) ? fs.statSync(dbPath).size : 0;
 
     const tempConnector = new SimplyGestConnector();
     try {
@@ -172,7 +178,8 @@ export class SimplyGestService {
     if (this.isDemoMode(customDbPath)) return 6;
     const config = this.configManager.get();
     const dbPath = SimplyGestDetector.cleanPath(customDbPath || config.simplygest?.databasePath || config.simplygestDbPath || '');
-    if (!dbPath || !fs.existsSync(dbPath)) return 0;
+    const isHttpApi = /^(https?|sgapi):\/\//i.test(dbPath);
+    if (!dbPath || (!isHttpApi && !fs.existsSync(dbPath))) return 0;
 
     let localConnector = this.connector;
     let shouldDisconnect = false;
@@ -207,7 +214,8 @@ export class SimplyGestService {
     }
     const config = this.configManager.get();
     const dbPath = SimplyGestDetector.cleanPath(customDbPath || config.simplygest?.databasePath || config.simplygestDbPath || '');
-    if (!dbPath || !fs.existsSync(dbPath)) {
+    const isHttpApi = /^(https?|sgapi):\/\//i.test(dbPath);
+    if (!dbPath || (!isHttpApi && !fs.existsSync(dbPath))) {
       return [];
     }
 

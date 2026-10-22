@@ -255,7 +255,7 @@ export class ConfigApplierService {
           const resolved = SimplyGestDetector.resolve(activeSgPath);
           if (resolved.success && resolved.resolvedPath) activeSgPath = resolved.resolvedPath;
         }
-        if (fs.existsSync(activeSgPath)) {
+        if (fs.existsSync(activeSgPath) || /^(https?|sgapi):\/\//i.test(activeSgPath)) {
           await this.simplygestService?.connect(activeSgPath).catch(() => null);
         } else {
           this.logger.warn(`Ruta de SimplyGest guardada pero no accesible inmediatamente (Desconectado/Offline): ${cfg.simplygestDbPath}`);

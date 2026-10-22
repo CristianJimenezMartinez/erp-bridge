@@ -17,13 +17,25 @@ export const licenseScript = `
         const data = await res.json();
         alertBox.style.display = 'block';
         if (data.success) {
+          window.__wizardLicenseJustActivated = true;
           alertBox.style.color = '#34d399';
           alertBox.style.display = 'inline-flex';
           alertBox.style.alignItems = 'center';
           alertBox.style.gap = '6px';
           alertBox.innerHTML = (typeof renderIcon === 'function' ? renderIcon('check', 'color:#34d399;') : '') + '<span>Licencia activada con éxito.</span>';
-          showToast('Licencia vinculada a este equipo con éxito');
-          fetchStatus();
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: 'Licencia Activada',
+              message: 'Licencia vinculada a este equipo con éxito. Ya puedes configurar tu ERP.',
+              type: 'success',
+              actionLabel: 'Ir a Factusol ERP →',
+              targetTab: 'factusol',
+              targetInputId: 'input-factusol-db'
+            });
+          } else {
+            showToast('Licencia vinculada a este equipo con éxito');
+          }
+          fetchStatus(true);
         } else {
           if (typeof renderHumanizedAlert === 'function') {
             renderHumanizedAlert(alertBox, data.error || 'No se pudo activar la clave');

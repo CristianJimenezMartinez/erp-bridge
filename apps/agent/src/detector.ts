@@ -1,27 +1,98 @@
 import fs from 'fs';
 import path from 'path';
+import childProcess from 'child_process';
 import { FactusolDetectedInstance, Logger } from '@erp-bridge/shared';
 
 export class FactusolDetector {
   private static readonly logger = new Logger('FactusolDetector');
 
+  /**
+   * Lee las unidades de red mapeadas de la sesión del usuario en Windows (HKCU\Network).
+   * Permite descubrir letras como W:, X:, Y:, Z: incluso cuando el Agente corre elevado (UAC Admin).
+   */
+  public static getMappedNetworkDrives(): Array<{ letter: string; remotePath: string }> {
+    if (process.platform !== 'win32') return [];
+    const drives: Array<{ letter: string; remotePath: string }> = [];
+    try {
+      const regOut = childProcess.execFileSync('reg.exe', ['query', 'HKCU\\Network', '/s'], {
+        encoding: 'utf8',
+        timeout: 2000,
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
+      const blocks = regOut.split(/\r?\n\r?\n/);
+      for (const block of blocks) {
+        const headerMatch = block.match(/HKEY_CURRENT_USER\\Network\\([A-Za-z])\b/i);
+        const remoteMatch = block.match(/RemotePath\s+REG_SZ\s+([^\r\n]+)/i);
+        if (headerMatch && headerMatch[1] && remoteMatch && remoteMatch[1]) {
+          const letter = headerMatch[1].toUpperCase();
+          const remotePath = remoteMatch[1].trim().replace(/\//g, '\\');
+          if (remotePath) {
+            drives.push({ letter, remotePath });
+          }
+        }
+      }
+    } catch {}
+    return drives;
+  }
+
+  /**
+   * Sincroniza las unidades de red mapeadas del usuario (W:, X:, Y:, Z:) en la sesión actual del proceso
+   * para que aparezcan bajo "Este equipo" dentro del OpenFileDialog nativo aunque haya elevación UAC.
+   */
+  public static syncMappedDrivesInSession(): Array<{ letter: string; remotePath: string }> {
+    const mapped = this.getMappedNetworkDrives();
+    for (const { letter, remotePath } of mapped) {
+      try {
+        if (!fs.existsSync(`${letter}:\\`)) {
+          childProcess.execFileSync('net.exe', ['use', `${letter}:`, remotePath, '/persistent:no'], {
+            timeout: 1500,
+            windowsHide: true,
+            stdio: ['ignore', 'ignore', 'ignore'],
+          });
+        }
+      } catch {}
+    }
+    return mapped;
+  }
+
   private static getStandardDirectories(): string[] {
     const dirs: string[] = [];
-    const driveLetters = ['C', 'D', 'E', 'F', 'G', 'Z', 'Y', 'X'];
+    const mappedDrives = this.syncMappedDrivesInSession();
+    const mappedLetters = mappedDrives.map((d) => d.letter);
+    const driveLetters = [...new Set(['C', 'D', 'E', 'F', 'G', 'W', 'X', 'Y', 'Z', ...mappedLetters])];
+
+    const pushCandidateSubdirs = (rootPath: string) => {
+      const cleanRoot = rootPath.replace(/[\\/]+$/, '');
+      dirs.push(
+        `${cleanRoot}\\FS`,
+        `${cleanRoot}`,
+        `${cleanRoot}\\Datos\\FS`,
+        `${cleanRoot}\\Datos`,
+        `${cleanRoot}\\FACTUSOL\\Datos\\FS`,
+        `${cleanRoot}\\FACTUSOL\\Datos`,
+        `${cleanRoot}\\Factusol\\Datos\\FS`,
+        `${cleanRoot}\\Factusol\\Datos`,
+        `${cleanRoot}\\Software DELSOL\\Factusol\\Datos\\FS`,
+        `${cleanRoot}\\Software DELSOL\\Factusol\\Datos`,
+        `${cleanRoot}\\Software DELSOL\\FACTUSOL\\Datos\\FS`,
+        `${cleanRoot}\\Software DELSOL\\FACTUSOL\\Datos`,
+        `${cleanRoot}\\DELSOL\\Factusol\\Datos\\FS`,
+        `${cleanRoot}\\DELSOL\\Factusol\\Datos`
+      );
+    };
 
     for (const drive of driveLetters) {
+      pushCandidateSubdirs(`${drive}:`);
       dirs.push(
-        `${drive}:\\Software DELSOL\\Factusol\\Datos\\FS`,
-        `${drive}:\\Software DELSOL\\Factusol\\Datos`,
-        `${drive}:\\Software DELSOL\\FACTUSOL\\Datos\\FS`,
-        `${drive}:\\Software DELSOL\\FACTUSOL\\Datos`,
         `${drive}:\\Program Files\\Software DELSOL\\Factusol\\Datos\\FS`,
-        `${drive}:\\Program Files (x86)\\Software DELSOL\\Factusol\\Datos\\FS`,
-        `${drive}:\\Factusol\\Datos\\FS`,
-        `${drive}:\\Factusol\\Datos`,
-        `${drive}:\\DELSOL\\Factusol\\Datos\\FS`,
-        `${drive}:\\DELSOL\\Factusol\\Datos`
+        `${drive}:\\Program Files (x86)\\Software DELSOL\\Factusol\\Datos\\FS`
       );
+    }
+
+    // Añadir también las rutas UNC directas de HKCU\Network (ej: \\Nas-rubio2\datos\factusol\FACTUSOL\Datos)
+    for (const { remotePath } of mappedDrives) {
+      pushCandidateSubdirs(remotePath);
     }
 
     try {
@@ -36,7 +107,7 @@ export class FactusolDetector {
     } catch {}
 
     dirs.push(process.cwd());
-    return dirs;
+    return [...new Set(dirs)];
   }
 
   private static isTemplateOrSystemFile(fileName: string): boolean {

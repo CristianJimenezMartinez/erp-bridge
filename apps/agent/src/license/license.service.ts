@@ -125,11 +125,21 @@ export class LicenseService {
   public async validateLicense(): Promise<LicenseValidationStatus> {
     const hwid = await this.getHWID();
     const config = this.configManager.get();
-    const token = await this.secureStore.loadLicenseToken(hwid);
+    let token = await this.secureStore.loadLicenseToken(hwid);
 
     if (this.lastSeenTimestamp === 0) {
       const persistedTs = await this.secureStore.loadLastSeenTimestamp(hwid);
       this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, persistedTs);
+    }
+
+    if (!token && config.licenseKey && config.licenseKey.trim()) {
+      try {
+        this.logger.info('Token local no encontrado pero existe licenseKey en agent-config.json; recuperando activación...');
+        await this.activateLicense(config.licenseKey.trim());
+        token = await this.secureStore.loadLicenseToken(hwid);
+      } catch (err) {
+        this.logger.warn(`No se pudo auto-recuperar el token con la licenseKey guardada: ${err instanceof Error ? err.message : String(err)}`);
+      }
     }
 
     if (!token) {

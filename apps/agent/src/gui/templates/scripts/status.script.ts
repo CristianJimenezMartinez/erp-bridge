@@ -71,8 +71,8 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         }
         _lastStatusPayload = text;
         currentStatus = JSON.parse(text);
-        handleStatusUpdate(currentStatus);
         updateFormInputs(currentStatus, forceFormSync);
+        handleStatusUpdate(currentStatus);
         if (typeof loadAutoStart === 'function') {
           loadAutoStart(forceFormSync);
         }

@@ -106,7 +106,7 @@ export function renderWizardModal(): string {
                 <span style="font-weight: 700; font-size: 12.5px; color: #34d399;">SimplyGest</span>
                 <span id="wiz-badge-erp-simplygest" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
               </div>
-              <div style="font-size: 10.5px; color: var(--text-muted);">MySQL / SQL Local</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">DBISAM .dat / API :56985</div>
             </div>
 
             <div id="wiz-erp-choice-agora" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('agora')">
@@ -114,7 +114,7 @@ export function renderWizardModal(): string {
                 <span style="font-weight: 700; font-size: 12.5px; color: #f472b6;">Ágora Retail / POS</span>
                 <span id="wiz-badge-erp-agora" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
               </div>
-              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">SQL Server + API :8984</div>
             </div>
 
             <div id="wiz-erp-choice-sage50" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('sage50')">
@@ -122,7 +122,7 @@ export function renderWizardModal(): string {
                 <span style="font-weight: 700; font-size: 12.5px; color: #4ade80;">Sage 50</span>
                 <span id="wiz-badge-erp-sage50" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
               </div>
-              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">SQL Ejercicio 2026XX</div>
             </div>
 
             <div id="wiz-erp-choice-a3erp" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('a3erp')">
@@ -130,7 +130,7 @@ export function renderWizardModal(): string {
                 <span style="font-weight: 700; font-size: 12.5px; color: #fbbf24;">a3ERP</span>
                 <span id="wiz-badge-erp-a3erp" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
               </div>
-              <div style="font-size: 10.5px; color: var(--text-muted);">MS SQL Server Local</div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">SQL Server + ActiveX COM</div>
             </div>
           </div>
 
@@ -316,16 +316,16 @@ export function renderWizardModal(): string {
 
             <div class="form-group">
               <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-                <label class="form-label" style="margin-bottom: 0;">Ruta de la base de datos (Datos.mdb):</label>
+                <label class="form-label" style="margin-bottom: 0;">Ruta de Empresa (Emp1\\articulos.dat, Datos.mdb) o URL API (:56985):</label>
                 <span style="font-size: 11px; color: #34d399; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('wiz-input-simplygest-path').focus()">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   <span>Escribir o pegar directamente</span>
                 </span>
               </div>
               <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
-                Si tu SimplyGest está en un servidor, NAS o unidad de red (ej: <code>Z:\\SimplyGest\\Datos.mdb</code> o <code>\\\\NAS\\...</code>), puedes pegarla directamente aquí.
+                Soporta tablas nativas DBISAM (<code>C:\\SimplyGest\\Datos\\Emp1\\articulos.dat</code>), Módulo Servidor REST API (<code>http://127.0.0.1:56985</code>) y <code>Datos.mdb</code> en disco local o NAS.
               </div>
-              <input type="text" id="wiz-input-simplygest-path" oninput="cleanPathInput(this)" onblur="handleSimplyGestInputBlur('wiz-input-simplygest-path'); wizTestSimplyGestConnection();" class="form-control" placeholder="C:\\\\SimplyGest\\\\Datos.mdb  o  Z:\\\\SimplyGest\\\\Datos.mdb  o  \\\\\\\\NAS\\\\..." style="font-family: monospace; font-size: 13px;">
+              <input type="text" id="wiz-input-simplygest-path" oninput="cleanPathInput(this)" onblur="handleSimplyGestInputBlur('wiz-input-simplygest-path'); wizTestSimplyGestConnection();" class="form-control" placeholder="C:\\\\SimplyGest\\\\Datos\\\\Emp1\\\\articulos.dat  o  http://127.0.0.1:56985  o  C:\\\\SimplyGest\\\\Datos.mdb" style="font-family: monospace; font-size: 13px;">
               <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px; display: inline-flex; align-items: center; gap: 5px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>
                 <span>Las comillas de 'Copiar como ruta de acceso' de Windows se limpian automáticamente.</span>

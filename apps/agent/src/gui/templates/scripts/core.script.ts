@@ -21,10 +21,29 @@ export const coreScript = `
         }
         return origFetch.call(this, input, init).then(function(res) {
           if (res && (res.status === 401 || res.status === 403) && typeof url === 'string' && url.startsWith('/api/local/')) {
-            if (!window.__reloadingForToken) {
-              window.__reloadingForToken = true;
-              setTimeout(function() { window.location.reload(); }, 300);
-            }
+            try {
+              res.clone().json().then(function(body) {
+                const errText = (body && (body.error || body.message)) ? String(body.error || body.message) : '';
+                if (res.status === 401 || errText.indexOf('Token de sesión local') !== -1) {
+                  if (!window.__reloadingForToken) {
+                    window.__reloadingForToken = true;
+                    setTimeout(function() { window.location.reload(); }, 300);
+                  }
+                } else if (errText.toLowerCase().indexOf('licencia requerida') !== -1) {
+                  if (typeof navigateToResolution === 'function') {
+                    navigateToResolution('license', 'input-lic-key');
+                  }
+                  if (typeof showSmartToast === 'function') {
+                    showSmartToast({
+                      title: 'Licencia Requerida',
+                      message: 'Activa primero tu clave de licencia aquí para acceder y configurar Factusol ERP.',
+                      type: 'warn',
+                      duration: 5000
+                    });
+                  }
+                }
+              }).catch(function() {});
+            } catch (e) {}
           }
           return res;
         });
@@ -481,6 +500,29 @@ export const coreScript = `
 
     // Tabs
     function switchTab(tabId) {
+      if (tabId === 'factusol') {
+        const lic = typeof currentStatus !== 'undefined' && currentStatus && currentStatus.license;
+        const isLicActive = Boolean(
+          window.__wizardLicenseJustActivated ||
+          !lic ||
+          lic.valid === true ||
+          lic.status === 'VALID' ||
+          lic.status === 'GRACE_PERIOD'
+        );
+        if (!isLicActive) {
+          navigateToResolution('license', 'input-lic-key');
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: 'Activa tu Licencia Primero',
+              message: 'Para acceder y configurar Factusol ERP, activa primero tu clave de licencia aquí o reclama tu Beta gratuita en 1 clic.',
+              type: 'warn',
+              duration: 5500
+            });
+          }
+          return;
+        }
+      }
+
       document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
       document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
 

@@ -84,6 +84,7 @@
   4. `apps/agent/src/update/update.swapper.ts` (UpdateSwapper atómico en Windows).
   5. `apps/agent/src/config/config.manager.ts` (Persistencia en AppData y Anti-Wiping NAS).
   6. `apps/agent/src/gui/tray/BentianTray.cs` y `apps/agent/src/gui/window-launcher.ts` (Selector nativo OpenFileDialog y Launcher de escritorio).
+  7. `apps/agent/src/erp` (Motor Multi-ERP Polimórfico, `SqlServerBaseAdapter`, perfiles Factusol/SimplyGest/Ágora POS/Sage 50/a3ERP y Modo Evaluación Sandbox).
 * **Mecanismo de Extensión Obligatorio:** Si una nueva característica requiere interactuar con un módulo congelado, se debe extender exclusivamente mediante la capa superior (Decoradores, Adaptadores o Middleware), pero **JAMÁS** editar el código interno del módulo congelado.
 * **Integridad Criptográfica Inquebrantable:** El Quality Gate (`pnpm run quality:check`) incluye el Gate 7 que calcula el hash SHA-256 del árbol de cada módulo congelado. Cualquier alteración de un solo byte fallará inmediatamente la compilación impidiendo el commit o despliegue.
 
@@ -222,5 +223,27 @@
   - Todo registro de prueba o licencia interna de desarrollo debe configurarse con `billing_status: 'TRIAL'`. Queda terminantemente prohibido marcar registros de prueba con `billing_status: 'ACTIVE'`, a fin de prevenir la contaminación de métricas financieras (MRR, ARR, active paid licenses).
 * **Blindaje del Cálculo de MRR/ARR:**
   - El endpoint de analítica financiera y KPIs (`/admin/licensing/overview`) calcula el volumen de licencias de pago activas (`active_paid`) exigiendo rigurosamente `status = 'active'`, `billing_status = 'ACTIVE'` y la presencia verificada de una suscripción o sesión válida de Stripe (`(stripe_subscription_id IS NOT NULL OR stripe_session_id IS NOT NULL)`). Si `active_paid === 0`, las métricas ARR y MRR deben reportar exactamente 0 €.
+
+---
+
+## 21. Arquitectura Polimórfica Multi-ERP y Modelo de Aprovisionamiento Exclusivo (Single Active ERP)
+* **Contrato Canónico `IErpConnector`:** Todo conector o adaptador de software ERP debe desacoplarse del motor de sincronización mediante la interfaz `IErpConnector` y gestionarse a través de `ErpProviderRegistry`. Queda prohibido acoplar `LocalSyncEngine` directamente a motores de bases de datos específicos fuera del patrón Strategy.
+* **Prohibición de Coexistencia Concurrente Destructiva:** En tiempo de ejecución solo puede existir **UN** proveedor de ERP activo a la vez (`softwareErp.activeProvider`). El Agente debe desconectar limpiamente el conector inactivo antes de enlazar el nuevo, garantizando cero colisiones de stock, cero sobreventas y cero duplicidad de pedidos sobre la tienda online.
+* **Persistencia Aislada y Anti-Wiping en AppData:** Los parámetros, rutas NAS/UNC, series y tarifas de cada ERP deben preservarse de forma independiente en `softwareErp.providers.<erpId>` dentro de `%APPDATA%\Bentian Agent\agent-config.json`. Queda terminantemente prohibido sobrescribir o vaciar la configuración de un ERP inactivo al conmutar de software en la GUI o en la API.
+
+---
+
+## 22. Blindaje Inquebrantable de Persistencia Instantánea y Cero Pérdida al Cerrar/Abrir (Zero-Loss Config Persistence)
+* **PROHIBICIÓN ESTRICTA DE DESCARTAR CONFIGURACIONES EN MEMORIA O RECARGAR LA VENTANA:**
+  - Queda terminantemente prohibido que cualquier acción del usuario en el GUI (seleccionar archivo en el diálogo nativo de Windows, resolver ruta `onblur`, probar conexión con Factusol/SimplyGest/Tienda Web, avanzar de paso en el Asistente o pulsar Guardar) deje de escribirse en `%APPDATA%\Bentian Agent\agent-config.json` por no haber activado aún la licencia o por cerrar la ventana antes del último paso.
+  - Queda prohibido que un código HTTP `403` de licencia dispare `window.location.reload()` en el frontend borrando los campos del formulario.
+* **Persistencia de Borrador Garantizada (`Zero-Loss Draft`):**
+  - En `SystemController.saveFullConfig`, incluso si la licencia aún no está activa y el endpoint devuelve `403` para impedir el arranque del bucle de sincronización, todos los campos enviados (`factusol`, `simplygest`, `universalBridge`, `woocommerce`, `channelType`, `erpType`, `syncRules`) deben guardarse atómicamente en `agent-config.json` preservando secretos enmascarados (`isSecretMaskedOrEmpty`).
+  - Asimismo, `FactusolController.openNativeFileDialog`, `FactusolController.testFactusol`, `FactusolController.resolvePath`, `SimplyGestController.openNativeFileDialog` y `ChannelController.testUniversalBridge`/`testWooCommerce` deben persistir inmediatamente en disco la ruta o URL seleccionada/probada.
+* **Orden Inmutable de Inicialización del GUI y Caché reactiva:**
+  - En `status.script.ts`, `updateFormInputs(currentStatus, forceFormSync)` debe ejecutarse **SIEMPRE ANTES** que `handleStatusUpdate(currentStatus)` para que ningún modal o asistente se abra jamás con los campos vacíos.
+  - En `StatusAggregatorService.getStatusDetails`, la caché `cachedLicenseVal` debe invalidarse de inmediato en cuanto `licenseService.getLicenseStatus().status` cambie, y `LicenseService.validateLicense()` debe auto-recuperar el token invocando `activateLicense(config.licenseKey)` si existe `licenseKey` en `agent-config.json` pero falta el token local.
+
+
 
 

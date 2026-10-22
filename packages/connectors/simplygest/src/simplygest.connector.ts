@@ -23,7 +23,6 @@ import {
   CanonicalStock,
   Logger,
 } from '@erp-bridge/shared';
-import { AccessDriver } from '@erp-bridge/connector-factusol';
 import {
   getArticlesQuery,
   updateStockQuery,
@@ -47,16 +46,19 @@ import {
   SimplyGestOrderRaw,
   SimplyGestOrderLineRaw,
 } from './mappers';
+import { SimplyGestMultiDriver } from './simplygest-multi.driver';
 
 export interface SimplyGestConnectionConfig {
   databasePath: string;
+  apiUrl?: string;
+  apiKey?: string;
   provider?: string;
   cscriptPath?: string;
 }
 
 export class SimplyGestConnector implements Connector {
   private readonly logger = new Logger('SimplyGestConnector');
-  private driver: AccessDriver | null = null;
+  private driver: SimplyGestMultiDriver | null = null;
   private config: SimplyGestConnectionConfig | null = null;
 
   public getMetadata(): ConnectorMetadata {
@@ -101,23 +103,29 @@ export class SimplyGestConnector implements Connector {
       );
     }
 
-    const resolvedPath = path.resolve(databasePath);
-    if (!fs.existsSync(resolvedPath)) {
+    const isHttpApi = /^(https?|sgapi):\/\//i.test(databasePath.trim());
+    const resolvedPath = isHttpApi ? databasePath.trim() : path.resolve(databasePath);
+    if (!isHttpApi && !fs.existsSync(resolvedPath)) {
       throw new ConnectionError(
         ErrorCode.CONNECTION_FAILED,
-        `El archivo de base de datos de SimplyGest no existe en la ruta: ${resolvedPath}`,
+        `El archivo o carpeta de SimplyGest no existe en la ruta: ${resolvedPath}`,
         { databasePath: resolvedPath }
       );
     }
 
     this.config = {
       databasePath: resolvedPath,
+      apiUrl: rawConfig.apiUrl,
+      apiKey: rawConfig.apiKey,
       provider: rawConfig.provider || 'Microsoft.ACE.OLEDB.12.0',
       cscriptPath: rawConfig.cscriptPath,
     };
 
-    this.driver = new AccessDriver(this.config);
-    this.logger.info('Conector SimplyGest conectado exitosamente', { databasePath: resolvedPath });
+    this.driver = new SimplyGestMultiDriver(this.config);
+    this.logger.info('Conector SimplyGest conectado exitosamente', {
+      databasePath: resolvedPath,
+      mode: this.driver.mode,
+    });
   }
 
   public async disconnect(): Promise<void> {
@@ -149,15 +157,19 @@ export class SimplyGestConnector implements Connector {
         };
       }
 
-      const fileStats = fs.statSync(this.config.databasePath);
+      const isHttpApi = /^(https?|sgapi):\/\//i.test(this.config.databasePath);
+      const fileStats = !isHttpApi && fs.existsSync(this.config.databasePath)
+        ? fs.statSync(this.config.databasePath)
+        : null;
       return {
         status: 'HEALTHY',
         latencyMs,
-        message: 'Conexión a base de datos de SimplyGest (Datos.mdb) operativa',
+        message: `Conexión a SimplyGest (${this.driver.mode}) operativa`,
         details: {
           databasePath: this.config.databasePath,
-          fileSizeBytes: fileStats.size,
-          lastModified: fileStats.mtime.toISOString(),
+          mode: this.driver.mode,
+          fileSizeBytes: fileStats?.size ?? 0,
+          lastModified: fileStats?.mtime ? fileStats.mtime.toISOString() : new Date().toISOString(),
         },
       };
     } catch (error: unknown) {
@@ -186,8 +198,22 @@ export class SimplyGestConnector implements Connector {
     const limit = options?.limit;
     this.logger.info('Leyendo productos de SimplyGest (ARTICULOS)...', { limit });
 
-    const sql = getArticlesQuery(limit);
-    const rawArticles = await this.driver.query<SimplyGestArticleRaw>(sql);
+    const safeLimit = limit && !isNaN(Number(limit)) ? Math.max(1, Math.min(50000, Math.floor(Number(limit)))) : undefined;
+    const topClause = safeLimit ? `TOP ${safeLimit}` : '';
+    const sqlAllColumns = `
+      SELECT ${topClause} *
+      FROM ARTICULOS
+      WHERE CODIGO IS NOT NULL AND CODIGO <> ''
+      ORDER BY CODIGO ASC
+    `.trim();
+
+    let rawArticles: SimplyGestArticleRaw[];
+    try {
+      rawArticles = await this.driver.query<SimplyGestArticleRaw>(sqlAllColumns);
+    } catch {
+      const sql = getArticlesQuery(limit);
+      rawArticles = await this.driver.query<SimplyGestArticleRaw>(sql);
+    }
 
     const canonicalProducts = rawArticles.map((raw) => mapSimplyGestArticleToCanonical(raw));
     this.logger.info(`Lectura de productos de SimplyGest completada: ${canonicalProducts.length} productos procesados.`);

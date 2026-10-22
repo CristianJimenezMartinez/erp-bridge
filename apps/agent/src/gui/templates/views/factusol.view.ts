@@ -163,8 +163,8 @@ export function renderFactusolTab(): string {
           <div class="form-section">
             <div class="section-header">
               <div>
-                <div class="section-title">Base de Datos SimplyGest (Datos.mdb)</div>
-                <div class="section-desc">Selecciona la base de datos principal de SimplyGest (<code>Datos.mdb</code>). Admite disco local (<code>C:\\SimplyGest\\Datos.mdb</code>), unidades de red (<code>Z:\\...</code>) y rutas de red UNC (<code>\\\\NAS\\Datos\\...</code>).</div>
+                <div class="section-title">SimplyGest Desktop y Módulo Servidor (DBISAM .dat / API :56985 / Datos.mdb)</div>
+                <div class="section-desc">Soporta las 3 arquitecturas reales de SimplyGest: tablas nativas DBISAM (<code>C:\\SimplyGest\\Datos\\Emp1\\articulos.dat</code> + pasarela <code>SimplyMove</code>), Módulo Servidor REST API (<code>http://127.0.0.1:56985</code>) y base de datos vinculada (<code>Datos.mdb</code>), además de subida automática de fotos.</div>
               </div>
               <div style="display: flex; gap: 8px;">
                 <button onclick="detectSimplyGest()" id="btn-detect-simplygest" class="btn btn-secondary btn-sm">
@@ -185,17 +185,17 @@ export function renderFactusolTab(): string {
 
             <div class="form-group">
               <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-                <label class="form-label" style="margin-bottom: 0;">Ruta del archivo Datos.mdb (o carpeta de SimplyGest):</label>
+                <label class="form-label" style="margin-bottom: 0;">Ruta de Empresa (Emp1\\articulos.dat, Datos.mdb) o URL Servidor (:56985):</label>
                 <span style="font-size: 11px; color: #34d399; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="document.getElementById('input-simplygest-db').focus()" title="Puedes escribir o pegar cualquier ruta directamente">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   <span>Escribir o pegar directamente</span>
                 </span>
               </div>
               <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
-                Introduce la ruta del archivo <code>Datos.mdb</code>. Si tu base de datos está en un servidor o NAS (ej: <code>Z:\\SimplyGest\\Datos.mdb</code> o <code>\\\\SERVIDOR\\SimplyGest\\Datos.mdb</code>), escríbela directamente aquí y haz clic en <strong>Guardar Ajustes SimplyGest</strong>.
+                Selecciona <code>C:\\SimplyGest\\Datos\\Emp1\\articulos.dat</code> (o la carpeta raíz <code>C:\\SimplyGest</code>), una ruta de red/NAS (<code>\\\\SERVIDOR\\SimplyGest\\...</code>), el archivo <code>Datos.mdb</code> o la URL del Módulo Servidor (<code>http://127.0.0.1:56985</code>).
               </div>
               <div class="input-with-button">
-                <input type="text" id="input-simplygest-db" oninput="cleanPathInput(this)" onblur="handleSimplyGestInputBlur()" class="form-control" placeholder="C:\\\\SimplyGest\\\\Datos.mdb  o  Z:\\\\SimplyGest\\\\Datos.mdb  o  \\\\\\\\NAS\\\\SimplyGest\\\\Datos.mdb" style="font-family: monospace; font-size: 13px;">
+                <input type="text" id="input-simplygest-db" oninput="cleanPathInput(this)" onblur="handleSimplyGestInputBlur()" class="form-control" placeholder="C:\\\\SimplyGest\\\\Datos\\\\Emp1\\\\articulos.dat  o  http://127.0.0.1:56985  o  C:\\\\SimplyGest\\\\Datos.mdb" style="font-family: monospace; font-size: 13px;">
                 <button onclick="testSimplyGestConnection()" id="btn-test-simplygest" class="btn btn-secondary" style="white-space: nowrap;">
                   <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/></svg>
                   <span>Probar Conexión</span>
@@ -448,8 +448,8 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-simplygest" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #6ee7b7; margin-bottom: 4px; font-weight: 600;">SimplyGest Desktop (MySQL / Datos.mdb)</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Acceso directo a artículos, familias, tarifas, existencias e inyección de pedidos.</div>
+                    <div style="font-size: 11px; color: #6ee7b7; margin-bottom: 4px; font-weight: 600;">SimplyGest (DBISAM .dat / API :56985 / .mdb)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas nativas Emp1\\articulos.dat, Módulo Servidor REST (:56985), SimplyMove CSV y fotos automáticas.</div>
                   </div>
                 </div>
 
@@ -465,8 +465,8 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-agora" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #f9a8d4; margin-bottom: 4px; font-weight: 600;">MS SQL Server Express Local</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Sincronización TPV de mostrador y tienda web (&lt;5s) sobre Product, PriceList, Stock y CustomerOrder.</div>
+                    <div style="font-size: 11px; color: #f9a8d4; margin-bottom: 4px; font-weight: 600;">SQL Server + API Integración TPV (:8984)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Lectura SQL (Product, SaleItemPrice, WarehouseStock) e inyección en tiempo real al TPV táctil (/api/custom-import).</div>
                   </div>
                 </div>
 
@@ -482,8 +482,8 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-sage50" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #86efac; margin-bottom: 4px; font-weight: 600;">MS SQL Server Local (Ejercicio Activo)</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas SQL articulo, stocks, pvp/tarifas y pedidos de venta c_pediven y d_pediven.</div>
+                    <div style="font-size: 11px; color: #86efac; margin-bottom: 4px; font-weight: 600;">MS SQL Server (Autodetección Ejercicio 2026XX)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas articulo, stocks, pvp, ART_FOTO y pedidos c_pediven/d_pediven con guid_id y cuenta contable dinámica.</div>
                   </div>
                 </div>
 
@@ -499,8 +499,8 @@ export function renderFactusolTab(): string {
                       </div>
                       <span id="modal-badge-a3erp" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
                     </div>
-                    <div style="font-size: 11px; color: #fde68a; margin-bottom: 4px; font-weight: 600;">Wolters Kluwer (MS SQL Server Local)</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas maestras SQL ARTICULO, STOCKALM, tarifas y cabeceras/líneas CABEPEV y LINEPEV.</div>
+                    <div style="font-size: 11px; color: #fde68a; margin-bottom: 4px; font-weight: 600;">Wolters Kluwer (ActiveX COM + SQL Server)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Puente oficial a3ERPActiveX.Pedido y SQL directo con clave relacional IDPEDV en CABEPEDV y LINEPEDI.</div>
                   </div>
                 </div>
 

@@ -27,21 +27,43 @@ export const wizardScript = `
       } catch (e) {}
       setWizOrderSeries(existingSeries);
 
-      // Pre-cargar ruta si ya existe en la pantalla de Factusol
+      // Pre-cargar clave de licencia, ruta Factusol, SimplyGest y Canal Web desde currentStatus o DOM
       try {
+        const st = (typeof currentStatus !== 'undefined' && currentStatus) ? currentStatus : null;
+        const wizLicInput = document.getElementById('wiz-input-lic');
+        const mainLicInput = document.getElementById('input-lic-key');
+        if (wizLicInput && !wizLicInput.value) {
+          wizLicInput.value = (st && st.licenseKey) || (mainLicInput && mainLicInput.value) || '';
+        }
+
         const wizFactInput = document.getElementById('wiz-input-fact-path');
         const mainFactInput = document.getElementById('input-factusol-db');
-        if (wizFactInput && !wizFactInput.value && mainFactInput && mainFactInput.value) {
-          wizFactInput.value = mainFactInput.value;
+        if (wizFactInput && !wizFactInput.value) {
+          const stFactPath = (st && st.factusol && st.factusol.databasePath) || (st && st.factusolSettings && st.factusolSettings.databasePath) || '';
+          wizFactInput.value = stFactPath || (mainFactInput && mainFactInput.value) || '';
         }
-      } catch (e) {}
 
-      // Pre-cargar ruta si ya existe en la pantalla de SimplyGest
-      try {
         const wizSgInput = document.getElementById('wiz-input-simplygest-path');
         const mainSgInput = document.getElementById('input-simplygest-db');
-        if (wizSgInput && !wizSgInput.value && mainSgInput && mainSgInput.value) {
-          wizSgInput.value = mainSgInput.value;
+        if (wizSgInput && !wizSgInput.value) {
+          const stSgPath = (st && st.simplygest && st.simplygest.databasePath) || (st && st.simplygestSettings && st.simplygestSettings.databasePath) || '';
+          wizSgInput.value = stSgPath || (mainSgInput && mainSgInput.value) || '';
+        }
+
+        const wizUnivUrl = document.getElementById('wiz-input-univ-url');
+        const mainUnivUrl = document.getElementById('input-universal-url');
+        if (wizUnivUrl && !wizUnivUrl.value) {
+          const stUnivUrl = (st && st.universalBridgeSettings && st.universalBridgeSettings.storeUrl) || '';
+          wizUnivUrl.value = stUnivUrl || (mainUnivUrl && mainUnivUrl.value) || '';
+        }
+
+        if (st && st.channelType && typeof wizSelectChannel === 'function') {
+          wizSelectChannel(st.channelType);
+        }
+
+        // Si la licencia ya está activa, avanzar automáticamente al Paso 2 para no mostrar el Paso 1 vacío
+        if (typeof isWizardLicenseActive === 'function' && isWizardLicenseActive()) {
+          setWizardStep(2);
         }
       } catch (e) {}
     }
@@ -103,7 +125,54 @@ export const wizardScript = `
       updateWizOrderSeriesButtons(cleanVal);
     }
 
+    function wizPersistDraftInputs() {
+      try {
+        const factInput = document.getElementById('wiz-input-fact-path');
+        const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
+        const mainFactInput = document.getElementById('input-factusol-db');
+        if (factPath && mainFactInput) mainFactInput.value = factPath;
+
+        const orderSeriesInput = document.getElementById('wiz-input-fact-order-series');
+        const orderSeriesVal = (orderSeriesInput ? orderSeriesInput.value : '1').trim().toUpperCase().substring(0, 1) || '1';
+
+        const sgInput = document.getElementById('wiz-input-simplygest-path');
+        const sgPath = sgInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(sgInput) : sgInput.value.trim()) : '';
+        const mainSgInput = document.getElementById('input-simplygest-db');
+        if (sgPath && mainSgInput) mainSgInput.value = sgPath;
+
+        const univInput = document.getElementById('wiz-input-univ-url');
+        const univUrl = univInput ? univInput.value.trim() : '';
+        const mainUnivInput = document.getElementById('input-universal-url');
+        if (univUrl && mainUnivInput) mainUnivInput.value = univUrl;
+
+        const wcUrlInput = document.getElementById('wiz-input-wc-url');
+        const wcUrl = wcUrlInput ? wcUrlInput.value.trim() : '';
+
+        if (!factPath && !sgPath && !univUrl && !wcUrl) return;
+
+        const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'factusol';
+        const draftPayload = {
+          erpType: activeErp,
+          channelType: (typeof currentChannelType !== 'undefined' && currentChannelType) ? currentChannelType : undefined,
+          factusol: factPath ? { databasePath: factPath, orderSeries: orderSeriesVal } : undefined,
+          simplygest: sgPath ? { databasePath: sgPath } : undefined,
+          universalBridge: univUrl ? { storeUrl: univUrl, enabled: true } : undefined,
+          woocommerce: wcUrl ? {
+            storeUrl: wcUrl,
+            consumerKey: (document.getElementById('wiz-input-wc-key') ? document.getElementById('wiz-input-wc-key').value.trim() : '') || undefined,
+            consumerSecret: (document.getElementById('wiz-input-wc-secret') ? document.getElementById('wiz-input-wc-secret').value.trim() : '') || undefined
+          } : undefined
+        };
+        fetch('/api/local/save-full-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(draftPayload)
+        }).catch(function() {});
+      } catch (e) {}
+    }
+
     function closeWizardModal() {
+      wizPersistDraftInputs();
       document.getElementById('modal-wizard').classList.remove('open');
     }
 
@@ -163,6 +232,7 @@ export const wizardScript = `
         setWizardStep(2);
         return;
       }
+      wizPersistDraftInputs();
       if (wizardCurrentStep < 4) {
         setWizardStep(wizardCurrentStep + 1);
       }

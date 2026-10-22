@@ -1,6 +1,8 @@
 import { Logger } from '@erp-bridge/shared';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
+import { FactusolDetector } from '../../../detector';
+import { FactusolPathResolver } from '../../../factusol';
 import { openWindowsFileDialog } from '../../window-launcher';
 
 const logger = new Logger('SimplyGestController');
@@ -9,6 +11,8 @@ export class SimplyGestController {
   public static openNativeFileDialog(agent?: LocalAgent): RouteHandler {
     return async (req, res, ctx) => {
       try {
+        FactusolDetector.syncMappedDrivesInSession();
+
         let initialPath =
           (ctx?.body && ctx.body.currentPath) ||
           ctx?.parsedUrl?.searchParams?.get('currentPath') ||
@@ -37,14 +41,30 @@ export class SimplyGestController {
             agent.configManager?.get()?.simplygest?.databasePath;
         }
 
+        const initialDir = FactusolPathResolver.resolveDialogInitialDirectory(initialPath);
+
         const filePath = await openWindowsFileDialog(
-          'Seleccionar Base de Datos SimplyGest (Datos.mdb)',
-          'Base de datos SimplyGest (Datos.mdb;*.mdb)|Datos.mdb;*.mdb;*.accdb',
-          initialPath
+          'Seleccionar Base de Datos SimplyGest (articulos.dat o Datos.mdb)',
+          'Base de datos SimplyGest (articulos.dat;Datos.mdb;*.dat;*.mdb)|articulos.dat;Datos.mdb;*.dat;*.mdb;*.accdb|Todos los archivos (*.*)|*.*',
+          initialDir
         );
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         if (filePath) {
+          if (agent?.configManager) {
+            try {
+              const current = agent.configManager.get();
+              agent.configManager.update({
+                simplygestDbPath: filePath,
+                simplygest: {
+                  ...(current.simplygest || { tariffCode: 1, warehouseCode: '1' }),
+                  databasePath: filePath,
+                },
+              });
+            } catch (err) {
+              logger.warn(`No se pudo auto-persistir ruta SimplyGest seleccionada: ${String(err)}`);
+            }
+          }
           res.end(JSON.stringify({ success: true, filePath }));
         } else {
           res.end(JSON.stringify({ success: false, cancelled: true }));

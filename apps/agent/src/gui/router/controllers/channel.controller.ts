@@ -1,10 +1,26 @@
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
-import { CompanionGenerator } from '../../../channels';
+import { CompanionGenerator, isSecretMaskedOrEmpty } from '../../../channels';
 
 export class ChannelController {
   public static testWooCommerce(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      if (agent?.configManager && ctx.body && typeof ctx.body === 'object' && ctx.body.storeUrl) {
+        try {
+          const current = agent.configManager.get();
+          const existingSecret = current.woocommerce?.consumerSecret || '';
+          agent.configManager.update({
+            channelType: 'woocommerce',
+            woocommerce: {
+              ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '', enabled: true }),
+              storeUrl: String(ctx.body.storeUrl || '').trim(),
+              consumerKey: String(ctx.body.consumerKey || current.woocommerce?.consumerKey || '').trim(),
+              consumerSecret: isSecretMaskedOrEmpty(ctx.body.consumerSecret) ? existingSecret : String(ctx.body.consumerSecret).trim(),
+              enabled: true,
+            },
+          });
+        } catch {}
+      }
       const lic = agent.getLicenseStatus();
       if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -27,6 +43,21 @@ export class ChannelController {
 
   public static testUniversalBridge(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      if (agent?.configManager && ctx.body && typeof ctx.body === 'object' && ctx.body.storeUrl) {
+        try {
+          const current = agent.configManager.get();
+          const existingSecret = current.universalBridge?.secretKey || '';
+          agent.configManager.update({
+            channelType: 'universal_bridge',
+            universalBridge: {
+              ...(current.universalBridge || { storeUrl: '', secretKey: '', enabled: true }),
+              storeUrl: String(ctx.body.storeUrl || '').trim(),
+              secretKey: isSecretMaskedOrEmpty(ctx.body.secretKey) ? existingSecret : String(ctx.body.secretKey).trim(),
+              enabled: true,
+            },
+          });
+        } catch {}
+      }
       const lic = agent.getLicenseStatus();
       if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
         res.writeHead(200, { 'Content-Type': 'application/json' });

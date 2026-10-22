@@ -10,6 +10,7 @@ import { FactusolPathResolver } from '../factusol/factusol.resolver';
 import { IErpConnector } from '../erp';
 import { CatalogUploadResult } from './sync.types';
 import { ImageSyncService } from './image-sync.service';
+import { UniversalErpImageResolver } from './universal-erp-image.resolver';
 
 export interface CatalogUploadContext {
   configManager: ConfigManager;
@@ -70,24 +71,36 @@ export class CatalogUploadHelper {
 
     if (erpConnector && typeof erpConnector.getArticlesForCatalog === 'function') {
       const catalogArticles = await erpConnector.getArticlesForCatalog(options?.limit || 5000);
-      return (catalogArticles || []).map((a: any) => ({
-        sku: a.code,
-        name: a.name || a.description || a.code,
-        description: a.description || a.name || '',
-        shortDescription: a.description || a.name || '',
-        regularPrice: Number(a.price ?? a.salePrice ?? 0),
-        salePrice: a.offerPrice && a.offerPrice > 0 ? Number(a.offerPrice) : undefined,
-        stockQuantity: Number(a.stock || 0),
-        taxRate: Number(a.taxRate ?? a.raw?.taxRate ?? 21),
-        categories: a.family ? [{ id: a.family, name: a.family }] : [],
-        barcode: a.barcode ?? a.ean,
-        weight: a.weight ?? a.raw?.weight,
-        status: 'published',
-        attributes: {
-          imgart: a.imagePath ?? a.raw?.imagePath,
-          unit: 'UNIDADES',
-        },
-      }));
+      const resolver = new UniversalErpImageResolver({
+        providerId: erpConnector.providerId,
+        databasePath: dbPath || erpConnector.getDatabasePath(),
+      });
+      return (catalogArticles || []).map((a: any) => {
+        const product: any = {
+          sku: a.code,
+          name: a.name || a.description || a.code,
+          description: a.description || a.name || '',
+          shortDescription: a.description || a.name || '',
+          regularPrice: Number(a.price ?? a.salePrice ?? 0),
+          salePrice: a.offerPrice && a.offerPrice > 0 ? Number(a.offerPrice) : undefined,
+          stockQuantity: Number(a.stock || 0),
+          taxRate: Number(a.taxRate ?? a.raw?.taxRate ?? 21),
+          categories: a.family ? [{ id: a.family, name: a.family }] : [],
+          barcode: a.barcode ?? a.ean,
+          weight: a.weight ?? a.raw?.weight,
+          status: 'published',
+          attributes: {
+            imgart: a.imagePath ?? a.raw?.imagePath,
+            unit: 'UNIDADES',
+          },
+          rawSourceData: a.raw,
+        };
+        const resolvedImg = resolver.resolveProductImage(product);
+        if (resolvedImg.exists && resolvedImg.relativeWebPath) {
+          product.attributes.imgart = resolvedImg.relativeWebPath;
+        }
+        return product;
+      });
     }
 
     return [];
@@ -401,20 +414,22 @@ export class CatalogUploadHelper {
 
       ctx.eventBus.addEvent('info', `Leídos ${factusolProducts.length} artículos de ${erpDisplayName} en ${readCatalogMs}ms.`);
 
-      // 2. Sincronización Directa y Automática de Fotos por HTTPS
+      // 2. Sincronización Directa y Automática de Fotos por HTTPS (Multi-ERP: Factusol, SimplyGest, Sage 50, a3ERP y Ágora POS)
       let imgSyncMs = 0;
-      if (isRealFactusolFile) {
+      const isEvalDb = Boolean(dbPath && dbPath.trim().toUpperCase().startsWith('DEMO://'));
+      if (!isEvalDb && (isRealFactusolFile || erpConnector)) {
         try {
           const tImgSyncStart = performance.now();
           const imageSync = new ImageSyncService(
             {
               endpointUrl,
               secretKey,
-              databasePath: dbPath,
+              providerId: erpConnector?.providerId || 'factusol',
+              databasePath: dbPath || erpConnector?.getDatabasePath(),
             },
             ctx.eventBus
           );
-          ctx.eventBus.addEvent('info', '📸 Comprobando y subiendo fotos de Factusol por HTTPS...');
+          ctx.eventBus.addEvent('info', `📸 Comprobando y subiendo fotos de ${erpDisplayName} por HTTPS...`);
           await imageSync.syncImages(factusolProducts);
           imgSyncMs = Math.round(performance.now() - tImgSyncStart);
         } catch (imgSyncErr) {

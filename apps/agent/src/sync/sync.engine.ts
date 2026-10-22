@@ -46,6 +46,18 @@ export class LocalSyncEngine {
       const sgService = new SimplyGestService(this.configManager, this.eventBus);
       return new SimplyGestAdapter(this.configManager, sgService, this.eventBus);
     }
+    if (active === 'agora' || active === 'sage50' || active === 'a3erp') {
+      const { AgoraErpAdapter, Sage50ErpAdapter, A3ErpAdapter } = require('../erp');
+      const { enhanceSqlErpAdapter } = require('../services/sql-erp-enhancer.service');
+      const adapter =
+        active === 'agora'
+          ? new AgoraErpAdapter(this.configManager, this.eventBus)
+          : active === 'sage50'
+            ? new Sage50ErpAdapter(this.configManager, this.eventBus)
+            : new A3ErpAdapter(this.configManager, this.eventBus);
+      enhanceSqlErpAdapter(adapter, this.logger);
+      return adapter;
+    }
     const { FactusolAdapter } = require('../erp/adapters/factusol.adapter');
     return new FactusolAdapter(this.configManager, this.factusolService, this.eventBus);
   }

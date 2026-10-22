@@ -3,7 +3,8 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { LocalAgent } from '../src/agent';
+import { LocalAgent, FactusolPathResolver } from '../src/agent';
+import { FactusolDetector } from '../src/detector';
 import { LocalGuiServer } from '../src/gui/gui-server';
 
 console.log('--- Running Local GUI Server & Router Tests ---');
@@ -323,6 +324,44 @@ async function testGuiServer() {
     });
     assert.strictEqual(resSaveCfgNoLic.status, 403, 'POST /api/local/save-full-config sin licencia ni licenseKey debe responder 403');
     console.log('  ✓ Todos los endpoints ERP y de guardado de configuración bloquean con 403 Forbidden si no hay licencia activa.');
+
+    // 24. Normalización de directorio para OpenFileDialog, unidades mapeadas HKCU\Network y redirección a Licencia
+    console.log('24. Probando resolveDialogInitialDirectory (sin bloqueo de archivo .accdb) y unidades mapeadas...');
+    const sampleAccdbPath = path.join(testDir, '2262026.accdb');
+    fs.writeFileSync(sampleAccdbPath, 'dummy');
+    const resolvedDir = FactusolPathResolver.resolveDialogInitialDirectory(sampleAccdbPath);
+    assert.strictEqual(resolvedDir, testDir, 'resolveDialogInitialDirectory debe devolver el directorio padre y nunca el archivo .accdb');
+    const mappedDrives = FactusolDetector.getMappedNetworkDrives();
+    assert(Array.isArray(mappedDrives), 'getMappedNetworkDrives debe retornar un array');
+    assert(html.includes("navigateToResolution('license', 'input-lic-key')"), 'switchTab debe redirigir a la pestaña Licencia si se clica Factusol sin licencia activa');
+    console.log('  ✓ OpenFileDialog recibe directorio limpio, HKCU\\Network se escanea y Factusol sin licencia redirige a Licencia.');
+
+    // 25. Blindaje de persistencia en disco (Zero-Loss Draft & Auto-Save al cerrar y abrir)
+    console.log('25. Probando persistencia garantizada en disco al cerrar y abrir (incluso antes de activar licencia)...');
+    const draftSaveRes = await fetch(`${url}/api/local/save-full-config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        erpType: 'factusol',
+        channelType: 'universal_bridge',
+        factusol: { databasePath: sampleAccdbPath, orderSeries: '1' },
+        universalBridge: { storeUrl: 'https://www.suministrosrubio.com/erp-bridge-endpoint.php', secretKey: 'rubio_secreto_2026', enabled: true },
+      })
+    });
+    assert.strictEqual(draftSaveRes.status, 403, 'Debe devolver 403 si no hay licencia pero persistir el borrador en disco');
+    const rawDiskAfterDraft = JSON.parse(fs.readFileSync(path.join(testDir, 'agent-config.json'), 'utf8'));
+    assert.strictEqual(rawDiskAfterDraft.factusolDbPath, sampleAccdbPath, 'factusolDbPath debe quedar grabado en agent-config.json');
+    assert.strictEqual(rawDiskAfterDraft.factusol.databasePath, sampleAccdbPath, 'factusol.databasePath debe quedar grabado en agent-config.json');
+    assert.strictEqual(rawDiskAfterDraft.universalBridge.storeUrl, 'https://www.suministrosrubio.com/erp-bridge-endpoint.php', 'universalBridge.storeUrl debe quedar grabado en agent-config.json');
+    assert(rawDiskAfterDraft.universalBridge.secretKey.startsWith('enc:v1:'), 'universalBridge.secretKey debe quedar cifrado en reposo en agent-config.json');
+    assert.strictEqual(agent.getConfig().universalBridge?.secretKey, 'rubio_secreto_2026', 'universalBridge.secretKey debe quedar disponible en agent.getConfig()');
+    assert.strictEqual(rawDiskAfterDraft.channelType, 'universal_bridge', 'channelType debe quedar grabado en agent-config.json');
+
+    const statusAfterReopen = await (await fetch(`${url}/api/local/status`)).json() as any;
+    assert.strictEqual(statusAfterReopen.factusol.databasePath, sampleAccdbPath, 'GET /api/local/status debe devolver la ruta de Factusol tras reabrir');
+    assert.strictEqual(statusAfterReopen.universalBridgeSettings.storeUrl, 'https://www.suministrosrubio.com/erp-bridge-endpoint.php', 'GET /api/local/status debe devolver storeUrl tras reabrir');
+    assert.strictEqual(statusAfterReopen.channelType, 'universal_bridge', 'GET /api/local/status debe devolver channelType tras reabrir');
+    console.log('  ✓ Persistencia Zero-Loss verificada en disco y en /api/local/status tras simular cierre y reapertura.');
 
   } finally {
     await server.stop();

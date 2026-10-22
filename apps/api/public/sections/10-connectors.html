@@ -134,10 +134,10 @@
               </div>
               <h3 class="text-lg font-semibold text-white flex items-center gap-2">
                 <span>SimplyGest Desktop</span>
-                <span class="text-[10px] font-mono text-emerald-300 bg-emerald-950/70 border border-emerald-800/60 px-1.5 py-0.5 rounded">Datos.mdb</span>
+                <span class="text-[10px] font-mono text-emerald-300 bg-emerald-950/70 border border-emerald-800/60 px-1.5 py-0.5 rounded">DBISAM / API / MDB</span>
               </h3>
               <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                Conexión nativa OLEDB local con <code class="text-zinc-300 font-mono">Datos.mdb</code> en <code class="text-zinc-300 font-mono">C:\SimplyGest</code> o servidor de red local. Sincronización de catálogo, stock multi-tarifa, variantes de tallas y colores, e inyección atómica de pedidos en <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> sin bloquear terminales TPV.
+                Triple motor nativo: tablas DBISAM (<code class="text-zinc-300 font-mono">Emp1\articulos.dat</code>), Módulo <code class="text-zinc-300 font-mono">SimplyGest Server API :56985</code> y <code class="text-zinc-300 font-mono">Datos.mdb</code>. Sincronización de catálogo, fotos automáticas, tallas/colores e inyección de pedidos en <code class="text-zinc-300 font-mono">PEDIDOSC</code> / <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> sin bloquear el TPV.
               </p>
             </div>
             <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
@@ -187,7 +187,7 @@
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">Factusol ERP</h4>
                   <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">Producción</span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-1">Software DELSOL. Conexión nativa OLEDB (.accdb / .mdb). Stock DISSTO y pedidos F_PCL.</p>
+                <p class="text-[11px] text-zinc-400 mt-1">Software DELSOL. OLEDB (.accdb / .mdb), stock DISSTO, pedidos F_PCL y fotos automáticas IMGART.</p>
               </div>
             </a>
 
@@ -199,9 +199,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">SimplyGest Desktop</h4>
-                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">Producción</span>
+                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">Triple Motor</span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-1">SimplyGest Software. Base Datos.mdb en local o red. Familias, tallas, tarifas e inyección TPV.</p>
+                <p class="text-[11px] text-zinc-400 mt-1">DBISAM (Emp1\articulos.dat), Server API :56985 y Datos.mdb. Pedidos PEDIDOSC y fotos automáticas.</p>
               </div>
             </a>
 
@@ -213,9 +213,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-pink-300 transition">Ágora Retail / POS</h4>
-                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">SQL Local</span>
+                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">SQL + API :8984</span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-1">MS SQL Server Express. Descuento rápido de ventas de mostrador (&lt;5s), Product, PriceList y Stock.</p>
+                <p class="text-[11px] text-zinc-400 mt-1">SQL Server Express + API HTTP :8984 (CustomerOrder / SaleInitialize) y extracción BLOB de imágenes.</p>
               </div>
             </a>
 
@@ -227,9 +227,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-emerald-300 transition">Sage 50</h4>
-                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">SQL Local</span>
+                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">Auto-Ejercicio</span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-1">MS SQL Server Local (ejercicio activo). Tablas articulo, stocks, pvp y pedidos c_pediven / d_pediven.</p>
+                <p class="text-[11px] text-zinc-400 mt-1">Auto-detección BBDD anual (2026XX), inyección c_pediven / d_pediven con guid_id y fotos d_albimg.</p>
               </div>
             </a>
 
@@ -241,9 +241,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm font-semibold text-white group-hover:text-amber-300 transition">a3ERP (Wolters Kluwer)</h4>
-                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">SQL Local</span>
+                  <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/50 px-1.5 py-0.5 rounded">COM + SQL</span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-1">MS SQL Server Local. Tablas maestras ARTICULO, STOCKALM, tarifas y pedidos CABEPEV / LINEPEV.</p>
+                <p class="text-[11px] text-zinc-400 mt-1">Puente ActiveX COM (a3ERPActiveX.Pedido) + SQL transaccional IDPEDV y fotos binarias IMAGENES.</p>
               </div>
             </a>
 
@@ -261,6 +261,15 @@
               </div>
             </a>
 
+          </div>
+
+          <!-- Highlight: Motor Universal de Fotos Automáticas -->
+          <div class="mt-5 pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-400">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-700/50 text-[10px] font-mono text-indigo-300 font-semibold">FOTOS 100% AUTOMÁTICAS</span>
+              <span>Resolución universal de imágenes en los 5 ERPs: carpetas locales/UNC, binarios SQL <code class="text-zinc-300 font-mono">VARBINARY/IMAGE</code> y deduplicación por hash SHA-256.</span>
+            </div>
+            <a href="/partners/" class="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 underline shrink-0">¿Eres Agencia o Implantador ERP? Programa Partners (25%) →</a>
           </div>
 
         </div>

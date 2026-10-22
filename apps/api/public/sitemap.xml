@@ -1328,4 +1328,15 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/sql-erps/conector-a3erp-wolters-kluwer/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/sql-erps/conector-a3erp-wolters-kluwer/" />
   </url>
+
+  <!-- Programa Oficial de Partners, Agentes Digitalizadores e Implantadores ERP -->
+  <url>
+    <loc>https://bridge.cristianjm.com/partners/</loc>
+    <lastmod>2026-10-22T18:30:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/partners/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/partners/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/partners/" />
+  </url>
 </urlset>

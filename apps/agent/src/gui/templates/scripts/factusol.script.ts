@@ -438,46 +438,46 @@ export const factusolScript = `
         defaultInstance: ''
       },
       simplygest: {
-        title: 'SimplyGest Desktop',
-        sidebarTitle: 'SimplyGest Desktop',
+        title: 'SimplyGest Desktop y Servidor',
+        sidebarTitle: 'SimplyGest',
         sidebarBadge: 'SimplyGest',
         tagClass: 'tag-green',
         color: '#34d399',
         bg: 'rgba(16,185,129,0.12)',
-        desc: 'Sincronización directa con base de datos Datos.mdb de SimplyGest.',
-        defaultDb: 'Datos.mdb',
+        desc: 'Sincronización nativa con SimplyGest (DBISAM Emp1\\articulos.dat, Módulo Servidor API :56985 y Datos.mdb) + fotos automáticas.',
+        defaultDb: 'articulos.dat',
         defaultInstance: ''
       },
       agora: {
-        title: 'Ágora Retail / POS (MS SQL Server Local)',
+        title: 'Ágora Retail / POS (SQL Server + API :8984)',
         sidebarTitle: 'Ágora POS',
         sidebarBadge: 'Ágora POS',
         tagClass: 'tag-amber',
         color: '#f472b6',
         bg: 'rgba(244,114,182,0.15)',
-        desc: 'Sincronización rápida (<5s) con Ágora Retail / POS sobre Microsoft SQL Server Express.',
+        desc: 'Sincronización en tiempo real (<5s) con Ágora Retail / POS sobre SQL Server Express e inyección al TPV por API (:8984).',
         defaultDb: 'AgoraDB',
         defaultInstance: '.\\SQLEXPRESS'
       },
       sage50: {
-        title: 'Sage 50 (MS SQL Server Local)',
+        title: 'Sage 50 (SQL Server Ejercicio Activo)',
         sidebarTitle: 'Sage 50 ERP',
         sidebarBadge: 'Sage 50',
         tagClass: 'tag-green',
         color: '#4ade80',
         bg: 'rgba(34,197,94,0.15)',
-        desc: 'Sincronización directa con tablas articulo, stocks, pvp y c_pediven/d_pediven en SQL Server.',
+        desc: 'Sincronización directa con Sage 50 SQL Server (autodetección ejercicio 2026XX, guid_id, ART_FOTO y c_pediven/d_pediven).',
         defaultDb: 'GESTION',
         defaultInstance: '.\\SAGE50'
       },
       a3erp: {
-        title: 'Wolters Kluwer a3ERP (MS SQL Server Local)',
+        title: 'Wolters Kluwer a3ERP (ActiveX COM + SQL Server)',
         sidebarTitle: 'a3ERP',
         sidebarBadge: 'a3ERP',
         tagClass: 'tag-amber',
         color: '#fbbf24',
         bg: 'rgba(245,158,11,0.15)',
-        desc: 'Sincronización directa con tablas maestras ARTICULO, STOCKALM, CABEPEV y LINEPEV en SQL Server.',
+        desc: 'Sincronización nativa con Wolters Kluwer a3ERP (puente COM a3ERPActiveX.Pedido y SQL directo con clave IDPEDV).',
         defaultDb: 'A3ERP',
         defaultInstance: '.\\SQLEXPRESS'
       }
@@ -700,7 +700,7 @@ export const factusolScript = `
         btnWizNative.disabled = true;
         btnWizNative.innerHTML = spinnerHTML;
       }
-      showToast('Abriendo selector de archivos de Windows (Datos.mdb)...', 'info');
+      showToast('Abriendo selector de archivos de Windows (articulos.dat / Datos.mdb)...', 'info');
 
       try {
         const targetInput = targetIsWizard 
@@ -802,11 +802,11 @@ export const factusolScript = `
             '<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #e4e4e7; line-height: 1.5;">' +
               '<div style="display:flex;align-items:center;gap:6px;font-weight:600;color:#fbbf24;margin-bottom:4px;">' +
                 (typeof renderIcon === 'function' ? renderIcon('warn') : '') +
-                '<span>No se detectó Datos.mdb en las carpetas por defecto:</span>' +
+                '<span>No se detectó SimplyGest en las carpetas por defecto:</span>' +
               '</div>' +
               '<div style="color: var(--text-muted); margin-top: 4px;">' +
-                'Se buscaron archivos en las rutas habituales (<code>C:\\\\SimplyGest\\\\Datos.mdb</code>), pero no se detectaron instalaciones automáticas.<br>' +
-                'Si tienes tu base de datos en otra carpeta o servidor, haz clic en <strong>Examinar en Windows</strong> para localizarla.' +
+                'Se buscaron archivos en las rutas habituales (<code>C:\\\\SimplyGest\\\\Datos\\\\Emp1\\\\articulos.dat</code> y <code>Datos.mdb</code>), pero no se detectaron instalaciones automáticas.<br>' +
+                'Si tienes tu empresa en otra carpeta, servidor NAS o Módulo Servidor (<code>http://127.0.0.1:56985</code>), usa <strong>Examinar en Windows</strong> o pega la ruta.' +
               '</div>' +
             '</div>';
           showToast('No se encontró SimplyGest en rutas habituales. Usa "Examinar en Windows".', 'warn');

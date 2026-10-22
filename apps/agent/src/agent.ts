@@ -79,7 +79,7 @@ import {
   IErpConnector,
   SupportedErpProviderId,
 } from './erp';
-import { enhanceSqlErpAdapter } from './services/sql-erp-enhancer.service';
+import { enhanceSqlErpAdapter, enhanceSimplyGestAdapter } from './services/sql-erp-enhancer.service';
 
 // Re-exportar tipos y submódulos para 100% de compatibilidad externa
 export * from './config';
@@ -445,6 +445,9 @@ export class LocalAgent {
       this.addEvent('warn', `⚠️ Licencia no activa (${licenseCheck.status}). Active su clave para sincronizar.`);
     }
 
+    // Sincronizar unidades de red mapeadas (W:, X:, Y:, Z:) de HKCU\Network antes de verificar rutas NAS
+    FactusolDetector.syncMappedDrivesInSession();
+
     if (!cfg.factusolDbPath) {
       const primary = FactusolDetector.getPrimaryInstance();
       if (primary) {
@@ -453,9 +456,17 @@ export class LocalAgent {
       }
     }
 
-    if (cfg.factusolDbPath && fs.existsSync(cfg.factusolDbPath)) {
-      await this.factusolService.connect(cfg.factusolDbPath);
-      this.fileWatcherService.start(cfg.factusolDbPath, cfg.organizationId || 'org_default', async (reason) => {
+    let startupDbPath = cfg.factusolDbPath;
+    if (startupDbPath && !fs.existsSync(startupDbPath)) {
+      const uncPath = FactusolPathResolver.resolveMappedDriveToUnc(startupDbPath);
+      if (uncPath && fs.existsSync(uncPath)) {
+        startupDbPath = uncPath;
+      }
+    }
+
+    if (startupDbPath && fs.existsSync(startupDbPath)) {
+      await this.factusolService.connect(startupDbPath);
+      this.fileWatcherService.start(startupDbPath, cfg.organizationId || 'org_default', async (reason) => {
         await this.fileWatcherCoordinator.handleFileWatcherChange(reason);
       });
       this.addEvent('info', '✓ Vigilante de archivos Factusol activo en tiempo real');
@@ -531,7 +542,10 @@ export class LocalAgent {
       };
     }
 
-    // 2. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP) con transacciones T-SQL atómicas (cabecera + líneas + stock + correlativo MAX+1 + idempotencia) y soporte de DB física local (.mdb)
+    // 2. Extender SimplyGestAdapter para tablas físicas DBISAM (.dat) y SimplyGest Server REST API (:56985)
+    enhanceSimplyGestAdapter(this.simplygestAdapter, this.logger);
+
+    // 3. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP) con transacciones T-SQL atómicas (cabecera + líneas + stock + correlativo MAX+1 + idempotencia) y soporte de DB física local (.mdb)
     for (const sqlAdapter of [this.agoraAdapter, this.sage50Adapter, this.a3erpAdapter]) {
       enhanceSqlErpAdapter(sqlAdapter, this.logger);
     }

@@ -7,13 +7,19 @@ const logger = new Logger('SimplyGestDetector');
 
 export class SimplyGestDetector {
   private static readonly STANDARD_CANDIDATES: string[] = [
+    'C:\\SimplyGest\\Datos\\Emp1\\articulos.dat',
+    'C:\\SimplyGest\\Datos\\articulos.dat',
     'C:\\SimplyGest\\Datos.mdb',
     'C:\\SimplyGest\\Datos\\Datos.mdb',
+    'C:\\Program Files (x86)\\SimplyGest\\Datos\\Emp1\\articulos.dat',
+    'C:\\Program Files (x86)\\SimplyGest\\Datos\\articulos.dat',
     'C:\\Program Files (x86)\\SimplyGest\\Datos.mdb',
     'C:\\Program Files (x86)\\SimplyGest\\Datos\\Datos.mdb',
+    'C:\\Program Files\\SimplyGest\\Datos\\Emp1\\articulos.dat',
     'C:\\Program Files\\SimplyGest\\Datos.mdb',
     'C:\\Archivos de programa\\SimplyGest\\Datos.mdb',
     'C:\\SimplyGest Cloud\\Datos.mdb',
+    'D:\\SimplyGest\\Datos\\Emp1\\articulos.dat',
     'D:\\SimplyGest\\Datos.mdb',
     'D:\\SimplyGest\\Datos\\Datos.mdb',
     'E:\\SimplyGest\\Datos.mdb',
@@ -35,11 +41,58 @@ export class SimplyGestDetector {
       return { success: false, message: 'Ruta no especificada' };
     }
 
+    if (/^(https?|sgapi):\/\//i.test(cleaned)) {
+      return {
+        success: true,
+        resolvedPath: cleaned,
+        isDirectory: false,
+        message: `Conexión API HTTP SimplyGest Server: ${cleaned}`,
+      };
+    }
+
     try {
       if (fs.existsSync(cleaned)) {
         const stat = fs.statSync(cleaned);
         if (stat.isDirectory()) {
-          // Si el usuario indicó la carpeta, buscar Datos.mdb o *.mdb dentro
+          // 1. Buscar tablas nativas DBISAM (articulos.dat) en la carpeta o en Emp1/
+          const datDirect = path.join(cleaned, 'articulos.dat');
+          if (fs.existsSync(datDirect)) {
+            return {
+              success: true,
+              resolvedPath: datDirect,
+              isDirectory: true,
+              message: `Se detectó tabla nativa DBISAM articulos.dat en: ${datDirect}`,
+            };
+          }
+          const datEmp1 = path.join(cleaned, 'Emp1', 'articulos.dat');
+          if (fs.existsSync(datEmp1)) {
+            return {
+              success: true,
+              resolvedPath: datEmp1,
+              isDirectory: true,
+              message: `Se detectó empresa SimplyGest (Emp1\\articulos.dat) en: ${datEmp1}`,
+            };
+          }
+          const datDatosEmp1 = path.join(cleaned, 'Datos', 'Emp1', 'articulos.dat');
+          if (fs.existsSync(datDatosEmp1)) {
+            return {
+              success: true,
+              resolvedPath: datDatosEmp1,
+              isDirectory: true,
+              message: `Se detectó empresa SimplyGest (Datos\\Emp1\\articulos.dat) en: ${datDatosEmp1}`,
+            };
+          }
+          const datDatosDirect = path.join(cleaned, 'Datos', 'articulos.dat');
+          if (fs.existsSync(datDatosDirect)) {
+            return {
+              success: true,
+              resolvedPath: datDatosDirect,
+              isDirectory: true,
+              message: `Se detectó tabla DBISAM (Datos\\articulos.dat) en: ${datDatosDirect}`,
+            };
+          }
+
+          // 2. Si el usuario indicó la carpeta, buscar Datos.mdb o *.mdb dentro
           const directFile = path.join(cleaned, 'Datos.mdb');
           if (fs.existsSync(directFile)) {
             return {
@@ -51,6 +104,17 @@ export class SimplyGestDetector {
           }
 
           const files = fs.readdirSync(cleaned);
+          const datFile = files.find((f) => f.toLowerCase() === 'articulos.dat');
+          if (datFile) {
+            const foundDat = path.join(cleaned, datFile);
+            return {
+              success: true,
+              resolvedPath: foundDat,
+              isDirectory: true,
+              message: `Se detectó tabla DBISAM en la carpeta: ${foundDat}`,
+            };
+          }
+
           const mdbFile = files.find((f) => f.toLowerCase() === 'datos.mdb') || files.find((f) => f.toLowerCase().endsWith('.mdb'));
           if (mdbFile) {
             const foundPath = path.join(cleaned, mdbFile);
@@ -65,7 +129,7 @@ export class SimplyGestDetector {
           return {
             success: false,
             isDirectory: true,
-            message: `La carpeta ${cleaned} no contiene el archivo Datos.mdb de SimplyGest`,
+            message: `La carpeta ${cleaned} no contiene articulos.dat (DBISAM) ni Datos.mdb de SimplyGest`,
           };
         }
 

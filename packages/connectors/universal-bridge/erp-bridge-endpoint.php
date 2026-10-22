@@ -201,7 +201,7 @@ function getPublicImagesBaseDir() {
 // ----------------------------------------------------------------------------
 function verifyAuthentication() {
     $secret = EB_SECRET_KEY;
-    if (empty($secret) || strpos($secret, '%%EB_SECRET_KEY%%') !== false || strlen($secret) < 16) {
+    if (empty($secret) || strpos($secret, '%%' . 'EB_SECRET_KEY' . '%%') !== false || strlen($secret) < 16) {
         http_response_code(503);
         echo json_encode(['error' => 'Endpoint no configurado: Clave secreta no establecida o insegura (EB_SECRET_KEY debe configurarse con al menos 16 caracteres)']);
         exit;
@@ -914,6 +914,7 @@ if ($mainAction === 'upload_image') {
     // Replicación secundaria automática si existe subdirectorio de tienda
     $subdomainCandidates = [
         __DIR__ . '/tienda/assets/img/factusolImg/' . $targetRelPath,
+        dirname(__DIR__) . '/tienda.suministrosrubio.com/assets/img/factusolImg/' . $targetRelPath,
     ];
     foreach ($subdomainCandidates as $subCand) {
         $subDir = dirname($subCand);

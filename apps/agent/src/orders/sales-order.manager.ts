@@ -58,8 +58,10 @@ export class SalesOrderManager {
     }
 
     const config = this.configManager.get();
-    const series = order.factusolSeries || config.factusol?.orderSeries || '1';
-    const warehouse = config.factusol?.warehouseCode || 'GEN';
+    const activeProvider = config.softwareErp?.activeProvider || config.erpType || 'factusol';
+    const providerCfg = (config.softwareErp?.providers as any)?.[activeProvider];
+    const series = order.factusolSeries || providerCfg?.orderSeries || config.factusol?.orderSeries || '1';
+    const warehouse = providerCfg?.warehouseCode || config.factusol?.warehouseCode || 'GEN';
 
     const totalAmount = Number.isFinite(order.totalAmount) ? order.totalAmount : 0;
     const netAmount = Math.round((totalAmount / 1.21) * 100) / 100;

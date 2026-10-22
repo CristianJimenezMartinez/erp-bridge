@@ -10,6 +10,9 @@ export interface SimplyGestArticleRaw {
   IMPUESTO?: number | string;
   FAMILIA?: string;
   CODBARRAS?: string;
+  IMAGEN?: string;
+  FOTO?: string;
+  RUTA_IMAGEN?: string;
 }
 
 export function mapSimplyGestArticleToCanonical(raw: SimplyGestArticleRaw): CanonicalProduct {
@@ -21,6 +24,7 @@ export function mapSimplyGestArticleToCanonical(raw: SimplyGestArticleRaw): Cano
   const barcode = raw.CODBARRAS ? String(raw.CODBARRAS).trim() : undefined;
   const family = raw.FAMILIA ? String(raw.FAMILIA).trim() : undefined;
   const description = raw.DESCR_LARGA ? String(raw.DESCR_LARGA).trim() : name;
+  const rawImg = String(raw.IMAGEN || raw.FOTO || raw.RUTA_IMAGEN || '').trim();
 
   // Tax class mapping: 0 = 21%, 1 = 10%, 2 = 4%, 3 = 0%
   let taxClass = 'standard';
@@ -43,10 +47,11 @@ export function mapSimplyGestArticleToCanonical(raw: SimplyGestArticleRaw): Cano
     status: 'published',
     barcode,
     categories: family ? [{ id: family, name: family, slug: family.toLowerCase().replace(/\s+/g, '-') }] : [],
-    images: [],
+    images: rawImg ? [{ url: rawImg }] : [],
     attributes: {
       taxClass,
       simplygestImpuesto: String(taxCode),
+      ...(rawImg ? { imgart: rawImg } : {}),
     },
     rawSourceData: raw as unknown as Record<string, unknown>,
   };

@@ -137,7 +137,27 @@
               <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
             </summary>
             <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
-              Sí. Bentian incluye soporte nativo certificado para <strong>SimplyGest Desktop</strong>. Se conecta directamente al archivo de base de datos <code class="text-zinc-300 font-mono">Datos.mdb</code> (ubicado habitualmente en <code class="text-zinc-300 font-mono">C:\SimplyGest</code> o en una carpeta de red compartida) mediante el proveedor OLEDB local de Windows. Sincroniza catálogo de productos, familias, stock disponible por almacén, tarifas de venta, tallas/colores e inyecta pedidos web en <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> sin interrumpir el funcionamiento del TPV en mostrador.
+              Sí. Bentian incluye un <strong>triple motor nativo certificado para SimplyGest</strong>: (1) Lectura de tablas DBISAM (<code class="text-zinc-300 font-mono">Datos\Emp1\articulos.dat</code>) mediante ODBC o mirror binario, (2) Conexión directa al <strong>Módulo SimplyGest Server API REST</strong> (puerto <code class="text-zinc-300 font-mono">:56985</code>) y (3) Lectura OLEDB de <code class="text-zinc-300 font-mono">Datos.mdb</code>. Sincroniza catálogo, familias, stock por almacén, tarifas 1–10, tallas/colores, fotografías e inyecta pedidos web en <code class="text-zinc-300 font-mono">PEDIDOSC</code> / <code class="text-zinc-300 font-mono">PEDIDOS_VENTA</code> sin bloquear el TPV.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>¿Las fotografías de mis productos se suben automáticamente desde mi ERP a la tienda online?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí, al 100% y sin intervención manual. El motor <strong>UniversalErpImageResolver</strong> detecta y extrae las fotografías nativas de cada ERP: en <strong>Factusol</strong> lee el campo <code class="text-zinc-300 font-mono">IMGART</code> y la carpeta <code class="text-zinc-300 font-mono">Imagenes\</code>; en <strong>SimplyGest</strong> resuelve <code class="text-zinc-300 font-mono">IMAGEN</code> / <code class="text-zinc-300 font-mono">FOTO</code> y el endpoint <code class="text-zinc-300 font-mono">/api/articulos/:codigo/imagen</code>; y en <strong>Sage 50</strong>, <strong>a3ERP</strong> y <strong>Ágora POS</strong> extrae automáticamente los binarios SQL (<code class="text-zinc-300 font-mono">VARBINARY(MAX)</code> / <code class="text-zinc-300 font-mono">IMAGE</code> de <code class="text-zinc-300 font-mono">d_albimg</code>, <code class="text-zinc-300 font-mono">IMAGENES</code> o <code class="text-zinc-300 font-mono">Product.Image</code>), detecta su formato por Magic Bytes y calcula un hash <code class="text-zinc-300 font-mono">SHA-256</code> para subir solo las fotos nuevas o modificadas.
+            </p>
+          </details>
+
+          <details class="group p-5 rounded-xl bg-[#121215] border border-white/[0.06] [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-semibold text-sm text-white">
+              <span>Soy Agente Digitalizador, Implantador ERP o Agencia Web: ¿tenéis programa de Partners?</span>
+              <span class="text-zinc-500 group-open:rotate-180 transition">↓</span>
+            </summary>
+            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+              Sí. Contamos con un <strong>Panel Multi-Tenant para Distribuidores, Implantadores ERP y Agentes Digitalizadores</strong> con un <strong>25% de comisión recurrente vitalicia</strong> y el 100% de tus honorarios de implantación. Puedes gestionar múltiples organizaciones clientes desde una única cuenta, emitir licencias de evaluación en tiempo real y desplegar integraciones llave en mano de Factusol, SimplyGest, Sage 50, a3ERP o Ágora POS en menos de 15 minutos con asistencia directa en tu primer cliente piloto. Consulta el <a href="/partners/" class="text-emerald-400 hover:text-emerald-300 underline font-semibold">Dossier Oficial de Partners y Calculadora de Comisiones aquí</a>.
             </p>
           </details>
 

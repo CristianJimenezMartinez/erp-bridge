@@ -127,13 +127,27 @@ export class TestOrderSimulatorService {
         status: 'ok',
         details: `${activeConnector.getDatabasePath() || activeConnector.displayName} (${isEval ? 'Modo Evaluación Sandbox' : 'Conectado'})`,
       });
-      const previews = await activeConnector.getPreviewArticles(5).catch(() => []);
-      const firstArt = previews[0] || { code: 'DEMO-001', description: 'Artículo de Prueba Bentian', salePrice: 24.5, costPrice: 14, stock: 25 };
+      const providerCfg = cfg?.softwareErp?.providers?.[activeConnector.providerId] as any;
+      const series = (options.orderSeries || providerCfg?.orderSeries || cfg?.factusol?.orderSeries || '1').trim() || '1';
+      const warehouse = (options.warehouse || providerCfg?.warehouseCode || cfg?.factusol?.warehouseCode || 'GEN').trim() || 'GEN';
+      const previews = await activeConnector.getPreviewArticles(10).catch(() => []);
+      const matchedPreview = options.targetArticleCode
+        ? previews.find((a) => String(a.code).trim() === String(options.targetArticleCode).trim())
+        : undefined;
+      const firstArt = matchedPreview || previews[0] || { code: 'DEMO-001', description: 'Artículo de Prueba Bentian', salePrice: 24.5, costPrice: 14, stock: 25 };
       const simArtCode = options.targetArticleCode || firstArt.code;
       const simArtName = firstArt.description || 'Artículo Simulado';
       const simPrice = Number(firstArt.salePrice || firstArt.costPrice || 19.95);
-      const simStockBefore = Number(firstArt.stock ?? 20);
-      const simStockAfter = dryRun ? simStockBefore : Math.max(0, simStockBefore - 1);
+      let simStockBefore = Number(firstArt.stock ?? 20);
+      if (!isEval) {
+        try {
+          const stockMapBefore = await activeConnector.getStockMap(warehouse);
+          if (stockMapBefore.has(simArtCode)) {
+            simStockBefore = Number(stockMapBefore.get(simArtCode));
+          }
+        } catch {}
+      }
+      let simStockAfter = dryRun ? simStockBefore : Math.max(0, simStockBefore - 1);
       steps.push({
         step: 2,
         name: 'Selección de Artículo y Tarifa',
@@ -150,16 +164,107 @@ export class TestOrderSimulatorService {
         details: `Base: ${netAmount.toFixed(2)} € + IVA 21%: ${taxAmount.toFixed(2)} € = Total: ${totalAmount.toFixed(2)} €`,
       });
       const simRef = `SIM-${Date.now().toString().slice(-6)}`;
-      let assignedNum = Math.floor(90000 + Math.random() * 9000);
+      let assignedNum: string | number = Math.floor(90000 + Math.random() * 9000);
       if (!dryRun) {
         const createRes = await activeConnector.createOrder({
+          id: simRef,
           orderNumber: simRef,
           reference: simRef,
-          customer: { fiscalName: 'Cliente Simulación Bentian', taxId: 'B00000000', email: 'test@bentian.es' },
+          series,
+          warehouse,
+          date: new Date(),
+          status: 'pending',
+          customer: {
+            id: '1',
+            customerNumber: '1',
+            fiscalName: 'Cliente Simulación Bentian',
+            taxId: 'B00000000',
+            email: 'test@bentian.es',
+            phone: '965000000',
+            hasEquivalenceSurcharge: false,
+            address: {
+              street: 'Calle Mayor 1',
+              city: 'Alicante',
+              postalCode: '03001',
+              state: 'Alicante',
+              country: 'ES',
+            },
+          },
+          netAmount,
+          taxAmount,
+          totalAmount,
+          shippingAmount: 0,
+          discountAmount: 0,
           totals: { subtotal: netAmount, tax: taxAmount, total: totalAmount },
-          lines: [{ position: 1, sku: simArtCode, name: simArtName, quantity: 1, unitPrice: netAmount, total: netAmount }],
-        } as any, '1', 'GEN');
-        if (createRes.orderNumber) assignedNum = Number(createRes.orderNumber) || assignedNum;
+          lines: [
+            {
+              id: 'line_1',
+              position: 1,
+              sku: simArtCode,
+              name: simArtName,
+              quantity: 1,
+              unitPrice: netAmount,
+              discountPercent: 0,
+              vatPercent: 21,
+              vatType: 0,
+              subtotal: netAmount,
+              total: netAmount,
+            },
+          ],
+          currency: 'EUR',
+          paymentMethod: 'Simulación / Test',
+        } as any, series, warehouse);
+        if (!createRes.success) {
+          const errMsg = createRes.error || `Error al insertar pedido simulado en ${activeConnector.displayName}`;
+          steps.push({
+            step: 4,
+            name: `Inserción en ${activeConnector.displayName}`,
+            status: 'failed',
+            details: errMsg,
+          });
+          return this.buildFailureResult(steps, errMsg, dryRun, t0);
+        }
+        if (createRes.orderNumber || createRes.externalId) {
+          assignedNum = createRes.orderNumber || createRes.externalId || assignedNum;
+        }
+        if (!isEval) {
+          try {
+            const stockMapAfter = await activeConnector.getStockMap(warehouse);
+            if (stockMapAfter.has(simArtCode)) {
+              simStockAfter = Number(stockMapAfter.get(simArtCode));
+            }
+          } catch {}
+        }
+        if (this.salesLedgerManager) {
+          try {
+            this.salesLedgerManager.recordOrder({
+              channel: 'universal_bridge',
+              webOrderId: `TEST-${assignedNum}`,
+              orderNumber: `TEST-${assignedNum}`,
+              factusolSeries: series,
+              factusolOrderNumber: String(assignedNum),
+              customerName: 'Cliente Simulación Bentian',
+              customerEmail: 'test@bentian.es',
+              customerPhone: '965000000',
+              totalAmount,
+              currency: 'EUR',
+              status: 'synced',
+              lines: [
+                {
+                  sku: simArtCode,
+                  name: simArtName,
+                  quantity: 1,
+                  unitPrice: netAmount,
+                  total: totalAmount,
+                },
+              ],
+              shippingAddress: 'Calle Mayor 1, 03001 Alicante',
+              paymentMethod: 'Simulación / Test',
+            });
+          } catch (ledgerErr) {
+            this.logger.warn(`Aviso al registrar pedido simulado en ledger local: ${String(ledgerErr)}`);
+          }
+        }
       }
       steps.push({
         step: 4,
@@ -179,7 +284,7 @@ export class TestOrderSimulatorService {
       return {
         success: true,
         orderNumber: String(assignedNum),
-        series: '1',
+        series,
         articleCode: simArtCode,
         articleDescription: simArtName,
         totalAmount,
@@ -199,9 +304,10 @@ export class TestOrderSimulatorService {
             stockBefore: simStockBefore,
             stockAfter: simStockAfter,
           },
+          breakdown: { subtotal: netAmount, taxRate: 21, taxAmount, total: totalAmount },
         },
         summary: {
-          orderSeries: '1',
+          orderSeries: series,
           orderCode: assignedNum,
           customerCode: 1,
           customerName: 'Cliente Simulación Bentian (CIF: B00000000)',

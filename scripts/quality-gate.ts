@@ -643,6 +643,75 @@ results.push({
 });
 
 // ============================================================================
+// GATE 9: ZERO-LOSS CONFIG PERSISTENCE GUARD (ANTI-EMPTY-ON-REOPEN)
+// ============================================================================
+console.log('\n▶ [Gate 9/9] Verificando blindaje de persistencia instantánea de configuración (Zero-Loss)...');
+let gate9Passed = true;
+const gate9Violations: string[] = [];
+
+const sysCtrlPath = path.join(repoRoot, 'apps/agent/src/gui/router/controllers/system.controller.ts');
+const factCtrlPath = path.join(repoRoot, 'apps/agent/src/gui/router/controllers/factusol.controller.ts');
+const chanCtrlPath = path.join(repoRoot, 'apps/agent/src/gui/router/controllers/channel.controller.ts');
+const statusScriptPath = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts/status.script.ts');
+const wizardScriptPath = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts/wizard.script.ts');
+const statusAggPath = path.join(repoRoot, 'apps/agent/src/status/status-aggregator.service.ts');
+const licSvcPath = path.join(repoRoot, 'apps/agent/src/license/license.service.ts');
+
+if (!fs.existsSync(sysCtrlPath) || !fs.readFileSync(sysCtrlPath, 'utf-8').includes('agent.configManager.update(')) {
+  gate9Passed = false;
+  gate9Violations.push('SystemController.saveFullConfig no persiste borrador en agent.configManager.update() antes de 403');
+}
+if (!fs.existsSync(factCtrlPath) || (fs.readFileSync(factCtrlPath, 'utf-8').match(/agent\.configManager\.update\(/g) || []).length < 3) {
+  gate9Passed = false;
+  gate9Violations.push('FactusolController debe persistir la ruta en openNativeFileDialog, testFactusol y resolvePath');
+}
+if (!fs.existsSync(chanCtrlPath) || (fs.readFileSync(chanCtrlPath, 'utf-8').match(/agent\.configManager\.update\(/g) || []).length < 2) {
+  gate9Passed = false;
+  gate9Violations.push('ChannelController debe persistir storeUrl/credenciales en testUniversalBridge y testWooCommerce');
+}
+if (fs.existsSync(statusScriptPath)) {
+  const stContent = fs.readFileSync(statusScriptPath, 'utf-8');
+  const idxUpdate = stContent.indexOf('updateFormInputs(currentStatus, forceFormSync);');
+  const idxHandle = stContent.indexOf('handleStatusUpdate(currentStatus);');
+  if (idxUpdate === -1 || idxHandle === -1 || idxUpdate > idxHandle) {
+    gate9Passed = false;
+    gate9Violations.push('status.script.ts debe ejecutar updateFormInputs() ANTES de handleStatusUpdate()');
+  }
+} else {
+  gate9Passed = false;
+  gate9Violations.push('No se encontró status.script.ts');
+}
+if (!fs.existsSync(wizardScriptPath) || !fs.readFileSync(wizardScriptPath, 'utf-8').includes('wizPersistDraftInputs()')) {
+  gate9Passed = false;
+  gate9Violations.push('wizard.script.ts debe incluir wizPersistDraftInputs() al cambiar de paso o cerrar modal');
+}
+if (!fs.existsSync(statusAggPath) || !fs.readFileSync(statusAggPath, 'utf-8').includes('this.cachedLicenseVal.data.status === liveLicState.status')) {
+  gate9Passed = false;
+  gate9Violations.push('StatusAggregatorService debe invalidar cachedLicenseVal cuando cambie el estado de licencia');
+}
+if (!fs.existsSync(licSvcPath) || !fs.readFileSync(licSvcPath, 'utf-8').includes('await this.activateLicense(config.licenseKey.trim())')) {
+  gate9Passed = false;
+  gate9Violations.push('LicenseService.validateLicense debe auto-recuperar el token si existe licenseKey en agent-config.json');
+}
+
+const gate9Score = gate9Passed ? 10.0 : 0.0;
+if (gate9Passed) {
+  console.log('  ✓ Blindaje Zero-Loss Config Persistence verificado en controladores, caché y scripts GUI.');
+} else {
+  console.error('  ❌ VIOLACIÓN DE PERSISTENCIA ZERO-LOSS:');
+  gate9Violations.forEach((v) => console.error(`     - ${v}`));
+}
+
+results.push({
+  gateName: '9. Blindaje de Persistencia Instantánea (Zero-Loss)',
+  passed: gate9Passed,
+  score: gate9Score,
+  weight: 0.15,
+  details: gate9Passed ? ['Persistencia garantizada al seleccionar, probar, avanzar o cerrar ventana'] : gate9Violations,
+  warnings: [],
+});
+
+// ============================================================================
 // COMPUTO DE SCORECARD Y REPORTE FINAL
 // ============================================================================
 console.log('\n====================================================');

@@ -44,6 +44,7 @@ export class StatusAggregatorService {
 
   private cachedLicenseVal: { data: LicenseValidationStatus; timestamp: number } | null = null;
   private cachedFactusolHealth: {
+    path: string;
     connected: boolean;
     statusMessage: string;
     articleCount?: number;
@@ -84,8 +85,13 @@ export class StatusAggregatorService {
     const hwid = await this.licenseService.getHWID();
     const now = Date.now();
 
+    const liveLicState = this.licenseService.getLicenseStatus();
     let license: LicenseValidationStatus;
-    if (this.cachedLicenseVal && now - this.cachedLicenseVal.timestamp < 60_000) {
+    if (
+      this.cachedLicenseVal &&
+      now - this.cachedLicenseVal.timestamp < 60_000 &&
+      this.cachedLicenseVal.data.status === liveLicState.status
+    ) {
       license = this.cachedLicenseVal.data;
     } else {
       license = await this.licenseService.validateLicense();
@@ -121,7 +127,11 @@ export class StatusAggregatorService {
         const stats = fs.statSync(effectivePath);
         fileSizeBytes = stats.size;
 
-        if (this.cachedFactusolHealth && now - this.cachedFactusolHealth.timestamp < 30_000) {
+        if (
+          this.cachedFactusolHealth &&
+          this.cachedFactusolHealth.path === effectivePath &&
+          now - this.cachedFactusolHealth.timestamp < 15_000
+        ) {
           connected = this.cachedFactusolHealth.connected;
           statusMessage = this.cachedFactusolHealth.statusMessage;
           articleCount = this.cachedFactusolHealth.articleCount;
@@ -135,7 +145,7 @@ export class StatusAggregatorService {
               articleCount = await this.factusolService.getArticleCount(effectivePath);
             }
           }
-          this.cachedFactusolHealth = { connected, statusMessage, articleCount, timestamp: now };
+          this.cachedFactusolHealth = { path: effectivePath, connected, statusMessage, articleCount, timestamp: now };
         }
       } catch (err) {
         statusMessage = err instanceof Error ? err.message : String(err);

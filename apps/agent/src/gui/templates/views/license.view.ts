@@ -60,9 +60,14 @@ export function renderLicenseTab(): string {
                   Solicita tu clave oficial de la Beta Pública con acceso ilimitado hasta el <strong>31 de Diciembre de 2026</strong>.
                 </div>
               </div>
-              <a href="https://bridge.cristianjm.com/beta/" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap;">
-                <span>Pedir Clave Beta Gratis ↗</span>
-              </a>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <button type="button" onclick="openWizardModal()" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap;">
+                  <span>⚡ Activar Gratis en 1 Clic</span>
+                </button>
+                <a href="https://bridge.cristianjm.com/beta/" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap;">
+                  <span>Pedir Clave Beta Gratis ↗</span>
+                </a>
+              </div>
             </div>
           </div>
 

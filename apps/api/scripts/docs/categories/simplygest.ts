@@ -19,27 +19,27 @@ export const simplygestArticles: DocArticle[] = [
     ],
     contentHtml: `
       <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        SimplyGest Desktop almacena el catálogo de artículos, clientes, ventas y configuraciones de TPV en un archivo principal de base de datos Microsoft Access denominado <code class="text-emerald-400 font-mono">Datos.mdb</code>. Bentian ERP Bridge se conecta a este archivo de forma local mediante el proveedor oficial OLEDB de Windows, sin necesidad de APIs intermedias ni software de terceros.
+        SimplyGest Desktop puede operar con tres motores de datos según la edición y antigüedad de la instalación: tablas nativas <strong>DBISAM</strong> (<code class="text-emerald-400 font-mono">Datos\Emp1\articulos.dat</code>), el <strong>Módulo SimplyGest Server API REST</strong> (<code class="text-emerald-400 font-mono">http://127.0.0.1:56985</code>) o el archivo de base de datos Microsoft Access <code class="text-emerald-400 font-mono">Datos.mdb</code>. Bentian ERP Bridge incorpora un <strong>triple conector nativo</strong> capaz de autodetectar y operar sobre cualquiera de las tres arquitecturas sin software de terceros.
       </p>
 
-      <h2 id="ruta-estandar" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Ruta Estándar de Instalación</h2>
+      <h2 id="ruta-estandar" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Ruta Estándar de Instalación (DBISAM .dat, API :56985 y Datos.mdb)</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Por defecto, el instalador oficial de SimplyGest sitúa los datos en la raíz del disco <code class="text-emerald-400 font-mono">C:</code> o en subcarpetas de empresa:
+        Por defecto, el instalador oficial de SimplyGest sitúa los datos en la raíz del disco <code class="text-emerald-400 font-mono">C:</code>, en subcarpetas por empresa (<code class="text-emerald-400 font-mono">Emp1</code>, <code class="text-emerald-400 font-mono">Emp2</code>) o expone el servicio local en el puerto <code class="text-emerald-400 font-mono">56985</code>:
       </p>
       <div class="p-4 rounded-xl bg-[#09090c] border border-white/[0.06] text-xs font-mono space-y-1.5 text-zinc-300 mb-6">
-        <div><strong class="text-emerald-400">Instalación estándar monopuesto:</strong></div>
-        <div class="text-emerald-300">C:\\SimplyGest\\Datos.mdb</div>
-        <div class="pt-2"><strong class="text-sky-400">Instalación multiempresa o versiones profesionales:</strong></div>
-        <div class="text-zinc-300">C:\\SimplyGest\\Datos\\Empresa1\\Datos.mdb</div>
-        <div class="text-zinc-400">C:\\Archivos de programa (x86)\\SimplyGest\\Datos.mdb</div>
-        <div class="pt-2"><strong class="text-amber-400">Servidores y unidades de red compartidas:</strong></div>
-        <div class="text-zinc-300">Z:\\SimplyGest\\Datos.mdb</div>
-        <div class="text-zinc-400">\\\\SERVIDOR\\SimplyGest\\Datos.mdb</div>
+        <div><strong class="text-emerald-400">1. Motor Nativo DBISAM (SimplyGest Estándar / Profesional / Talla y Color):</strong></div>
+        <div class="text-emerald-300">C:\\SimplyGest\\Datos\\Emp1\\articulos.dat</div>
+        <div class="text-zinc-300">C:\\SimplyGest\\Datos\\Emp1\\   (Carpeta de empresa con articulos.dat, clientes.dat, pedidosc.dat)</div>
+        <div class="pt-2"><strong class="text-sky-400">2. Módulo Oficial SimplyGest Server / API REST:</strong></div>
+        <div class="text-sky-300">http://127.0.0.1:56985</div>
+        <div class="pt-2"><strong class="text-amber-400">3. Base de Datos Access OLEDB y Unidades de Red:</strong></div>
+        <div class="text-zinc-300">C:\\SimplyGest\\Datos.mdb</div>
+        <div class="text-zinc-300">\\\\SERVIDOR\\SimplyGest\\Datos\\Emp1\\articulos.dat</div>
       </div>
 
-      <h2 id="estructura-tablas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Estructura de Tablas en Datos.mdb</h2>
+      <h2 id="estructura-tablas" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Estructura de Tablas (DBISAM .dat y Datos.mdb) y Fotos Automáticas</h2>
       <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        El conector de Bentian consulta de manera optimizada y segura las siguientes entidades relacionales de SimplyGest:
+        El conector de Bentian consulta de manera optimizada y segura las entidades relacionales tanto en esquema DBISAM (<code class="text-emerald-400 font-mono">PEDIDOSC</code> / <code class="text-emerald-400 font-mono">PEDIDOSL</code>) como en Access (<code class="text-emerald-400 font-mono">PEDIDOS_VENTA</code> / <code class="text-emerald-400 font-mono">LINEAS_PEDIDOS</code>), incluyendo la extracción 100% automática de fotografías desde <code class="text-emerald-400 font-mono">IMAGEN</code> / <code class="text-emerald-400 font-mono">FOTO</code> y la carpeta <code class="text-emerald-400 font-mono">Imagenes\\</code>:
       </p>
       <div class="overflow-x-auto mb-6">
         <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">

@@ -59,6 +59,47 @@ export class FactusolPathResolver {
     return null;
   }
 
+  /**
+   * Normaliza una ruta inicial para OpenFileDialog garantizando que SIEMPRE sea un directorio
+   * existente y NUNCA un archivo (.accdb/.mdb/.dat). Esto evita que Windows pre-rellene la caja
+   * "Nombre:" con "2262026.accdb", lo cual impedía entrar en carpetas al hacer clic.
+   */
+  public static resolveDialogInitialDirectory(initialPath?: string): string | undefined {
+    if (!initialPath) return undefined;
+    let candidate = this.cleanPath(initialPath);
+    if (!candidate) return undefined;
+
+    if (/\.(accdb|mdb|dat|ldb|laccdb)$/i.test(candidate)) {
+      candidate = path.dirname(candidate);
+    } else {
+      try {
+        if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+          candidate = path.dirname(candidate);
+        }
+      } catch {}
+    }
+
+    if (!fs.existsSync(candidate)) {
+      const unc = this.resolveMappedDriveToUnc(candidate);
+      if (unc) {
+        candidate = unc;
+      }
+    }
+
+    for (let i = 0; i < 4; i++) {
+      try {
+        if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+          return candidate;
+        }
+      } catch {}
+      const parent = path.dirname(candidate);
+      if (!parent || parent === candidate) break;
+      candidate = parent;
+    }
+
+    return undefined;
+  }
+
   public static resolve(inputPath: string): PathResolutionResult {
     try {
       const cleanPath = this.cleanPath(inputPath);
