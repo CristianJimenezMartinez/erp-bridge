@@ -77,14 +77,20 @@
 
 ## 9. Blindaje y Congelación de Módulos ("Code Freeze & Sealed Modules")
 * **PROHIBICIÓN ESTRICTA:** Queda terminantemente prohibido modificar, refactorizar, renombrar o eliminar cualquier archivo listado como `status: "FROZEN"` en `ARCHITECTURE_MANIFEST.json` o documentado como sellado en `MODULES.md`.
-* **Módulos Sellados Oficiales:**
-  1. `packages/connectors/factusol/src` (Conector Factusol OLEDB, transacciones y motor relacional).
-  2. `packages/core/src/license` (Licencias, tokens HMAC y HWID).
-  3. `packages/core/src/update/update-signer.ts` (Firmas asimétricas Ed25519).
-  4. `apps/agent/src/update/update.swapper.ts` (UpdateSwapper atómico en Windows).
-  5. `apps/agent/src/config/config.manager.ts` (Persistencia en AppData y Anti-Wiping NAS).
-  6. `apps/agent/src/gui/tray/BentianTray.cs` y `apps/agent/src/gui/window-launcher.ts` (Selector nativo OpenFileDialog y Launcher de escritorio).
-  7. `apps/agent/src/erp` (Motor Multi-ERP Polimórfico, `SqlServerBaseAdapter`, perfiles Factusol/SimplyGest/Ágora POS/Sage 50/a3ERP y Modo Evaluación Sandbox).
+* **Módulos Sellados Oficiales (13 Módulos `FROZEN` con Hash SHA-256 en Gate 7):**
+  1. `packages/connectors/factusol/src` (`connectors.factusol`: Conector Factusol OLEDB, transacciones y motor relacional).
+  2. `packages/core/src/license` (`core.licensing`: Licencias, tokens HMAC y HWID).
+  3. `packages/core/src/update/update-signer.ts` (`core.update.signer`: Firmas asimétricas Ed25519).
+  4. `apps/agent/src/update/update.swapper.ts` y `update-script.builder.ts` (`agent.update.swapper`: UpdateSwapper atómico en Windows).
+  5. `apps/agent/src/config/config.manager.ts` y `config-storage.helper.ts` (`agent.config.persistence`: Persistencia en AppData y Anti-Wiping NAS).
+  6. `apps/agent/src/gui/tray/BentianTray.cs` y `apps/agent/src/gui/window-launcher.ts` (`agent.gui.native_dialog`: Selector nativo OpenFileDialog y Launcher de escritorio).
+  7. `apps/agent/src/erp` (`agent.erp`: Motor Multi-ERP Polimórfico, `SqlServerBaseAdapter`, perfiles Factusol/SimplyGest/Ágora POS/Sage 50/a3ERP y Modo Evaluación Sandbox).
+  8. `packages/connectors/woocommerce/src` (`connectors.woocommerce`: Conector WooCommerce REST API v3, variantes y stock disponible `DISSTO`).
+  9. `packages/connectors/simplygest/src` y `apps/agent/src/services/sql-erp-enhancer.service.ts` (`connectors.simplygest`: Conector SimplyGest Triple-Modo `.dat`/`.mdb`/REST y transacciones T-SQL atómicas).
+  10. `apps/agent/src/detector.ts` y `apps/agent/src/factusol/factusol.resolver.ts` (`agent.factusol.resolver_detector`: Escaneo de unidades mapeadas `HKCU\Network` UAC, resolución UNC y directorio padre limpio para `OpenFileDialog`).
+  11. `apps/agent/src/lifecycle/config-applier.service.ts`, `apps/agent/src/status/status-aggregator.service.ts` y `apps/agent/src/license/license.service.ts` (`agent.lifecycle.zero_loss`: Guardado completo Zero-Loss, caché reactiva de licencia y auto-recuperación de token).
+  12. `apps/agent/src/gui/gui-server.ts` y `apps/agent/src/gui/router/mini-router.ts` (`agent.gui.server_security`: Servidor local en puerto fijo inmutable `39281`, tolerancia `TIME_WAIT` y blindaje Anti-CSRF).
+  13. `apps/agent/src/sync/image-sync.service.ts` y `apps/agent/src/sync/universal-erp-image.resolver.ts` (`agent.sync.images`: Sincronización incremental de imágenes con caché MD5 y resolutor Multi-ERP).
 * **Mecanismo de Extensión Obligatorio:** Si una nueva característica requiere interactuar con un módulo congelado, se debe extender exclusivamente mediante la capa superior (Decoradores, Adaptadores o Middleware), pero **JAMÁS** editar el código interno del módulo congelado.
 * **Integridad Criptográfica Inquebrantable:** El Quality Gate (`pnpm run quality:check`) incluye el Gate 7 que calcula el hash SHA-256 del árbol de cada módulo congelado. Cualquier alteración de un solo byte fallará inmediatamente la compilación impidiendo el commit o despliegue.
 

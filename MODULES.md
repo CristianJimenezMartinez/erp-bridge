@@ -53,6 +53,41 @@ Consultar el archivo canónico [`ARCHITECTURE_MANIFEST.json`](./ARCHITECTURE_MAN
 * **Pruebas de Certificación:** `gui-router.test.ts`, verificación nativa Win32 STA.
 * **Contrato Público:** `apps/agent/src/gui/window-launcher.ts`
 
+#### 7. `agent.erp` (`apps/agent/src/erp`)
+* **Propósito:** Registro y adaptadores polimórficos de proveedores ERP mediante el patrón Strategy (`IErpConnector`, `ErpProviderRegistry`, `SqlServerBaseAdapter`) para los 5 ERPs oficiales en España (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) con Modo Evaluación Sandbox.
+* **Pruebas de Certificación:** `erp-provider-strategy.test.ts`, `multi-erp-milestones.test.ts`.
+* **Contrato Público:** `apps/agent/src/erp/index.ts`
+
+#### 8. `connectors.woocommerce` (`packages/connectors/woocommerce/src`)
+* **Propósito:** Conector oficial WooCommerce REST API v3 con mapeo canónico bidireccional de productos, stock disponible (`DISSTO` anti-sobreventas), tarifas, variantes padre-hijo (tallas/colores) y descarga de pedidos.
+* **Pruebas de Certificación:** `woocommerce-mapper.test.ts`, `woocommerce-order-mapper.test.ts`, `woocommerce-stock.test.ts`, `woocommerce-variations.test.ts`.
+* **Contrato Público:** `packages/connectors/woocommerce/src/index.ts`
+
+#### 9. `connectors.simplygest` (`packages/connectors/simplygest/src` y `apps/agent/src/services/sql-erp-enhancer.service.ts`)
+* **Propósito:** Conector triple para SimplyGest (tablas físicas DBISAM `articulos.dat`, `Datos.mdb` OLEDB y SimplyGest Server REST `:56985`) y motor de transacciones T-SQL atómicas (`BEGIN TRAN / COMMIT` con `UPDLOCK, HOLDLOCK`) para Ágora POS, Sage 50 y a3ERP.
+* **Pruebas de Certificación:** `read-products.spec.ts`, `multi-erp-milestones.test.ts`.
+* **Contrato Público:** `packages/connectors/simplygest/src/index.ts`
+
+#### 10. `agent.factusol.resolver_detector` (`apps/agent/src/detector.ts` y `apps/agent/src/factusol/factusol.resolver.ts`)
+* **Propósito:** Escaneo de unidades locales y unidades de red mapeadas del usuario en `HKCU\Network` (`W:`, `X:`, `Y:`, `Z:`), montaje automático en sesión elevada UAC, resolución UNC y normalización del directorio padre limpio para `OpenFileDialog`.
+* **Pruebas de Certificación:** `gui-router.test.ts`, `nas-dialog-e2e.test.ts`.
+* **Contrato Público:** `apps/agent/src/factusol/factusol.resolver.ts`
+
+#### 11. `agent.lifecycle.zero_loss` (`apps/agent/src/lifecycle/config-applier.service.ts`, `apps/agent/src/status/status-aggregator.service.ts`, `apps/agent/src/license/license.service.ts`)
+* **Propósito:** Guardado garantizado Zero-Loss de configuración en AppData preservando secretos enmascarados (`••••••••••••`), invalidación instantánea de caché al activar licencia y auto-recuperación del token desde `agent-config.json` en el arranque.
+* **Pruebas de Certificación:** `gui-router.test.ts`, `config-persistence.test.ts`.
+* **Contrato Público:** `apps/agent/src/lifecycle/config-applier.service.ts`
+
+#### 12. `agent.gui.server_security` (`apps/agent/src/gui/gui-server.ts` y `apps/agent/src/gui/router/mini-router.ts`)
+* **Propósito:** Servidor HTTP local en el puerto fijo inmutable `39281` con tolerancia a `TIME_WAIT` (8 reintentos sin port-hopping), validación de token de sesión `X-Bentian-Token` y blindaje Anti-CSRF (`Origin`, `Referer`, `Host`, `Sec-Fetch-Site`).
+* **Pruebas de Certificación:** `gui-router.test.ts`.
+* **Contrato Público:** `apps/agent/src/gui/gui-server.ts`
+
+#### 13. `agent.sync.images` (`apps/agent/src/sync/image-sync.service.ts` y `apps/agent/src/sync/universal-erp-image.resolver.ts`)
+* **Propósito:** Resolución automática de fotografías de productos en los 5 ERPs (Factusol, SimplyGest, Ágora POS, Sage 50 y a3ERP) y sincronización incremental por lotes con caché MD5 para evitar re-subidas innecesarias.
+* **Pruebas de Certificación:** `multi-erp-milestones.test.ts`.
+* **Contrato Público:** `apps/agent/src/sync/image-sync.service.ts`
+
 ---
 
 ## 3. Módulos Estables de Producción y Dashboard Canónico

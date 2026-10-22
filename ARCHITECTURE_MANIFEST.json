@@ -129,17 +129,20 @@
     {
       "id": "connectors.woocommerce",
       "name": "Conector WooCommerce REST API (v3)",
-      "status": "STABLE",
-      "certifiedAt": "2026-09-21",
-      "certifiedCommit": "d82c20a",
-      "description": "Mapeo canónico bidireccional de productos, stock, precios, pedidos y variaciones padre-hijo (tallas/colores) contra WooCommerce REST API.",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Mapeo canónico bidireccional de productos, stock disponible (DISSTO anti-sobreventas), precios, pedidos y variaciones padre-hijo (tallas/colores) contra WooCommerce REST API.",
       "paths": [
         "packages/connectors/woocommerce/src"
       ],
+      "integrityTreeHash": "6598d4becf3c838d59c22daa117b605e5d106ddc951c90a307971cebd031ec26",
       "publicContract": "packages/connectors/woocommerce/src/index.ts",
       "testSuites": [
-        "packages/connectors/woocommerce/test/woocommerce-connector.test.ts",
-        "packages/connectors/woocommerce/test/variation-handler.test.ts"
+        "packages/connectors/woocommerce/test/woocommerce-mapper.test.ts",
+        "packages/connectors/woocommerce/test/woocommerce-order-mapper.test.ts",
+        "packages/connectors/woocommerce/test/woocommerce-stock.test.ts",
+        "packages/connectors/woocommerce/test/woocommerce-variations.test.ts"
       ]
     },
     {
@@ -159,17 +162,20 @@
     },
     {
       "id": "connectors.simplygest",
-      "name": "Conector SimplyGest Desktop (Datos.mdb OLEDB Nativo)",
-      "status": "STABLE",
-      "certifiedAt": "2026-10-11",
-      "certifiedCommit": "d82c20a",
-      "description": "Conector local OLEDB nativo para SimplyGest Desktop. Mapeo de ARTICULOS, CLIENTES, tarifas 1 a 5, familias y variantes, e inyección atómica de pedidos en PEDIDOS_VENTA sin bloquear TPV.",
+      "name": "Conector SimplyGest Triple-Modo (DBISAM .dat, Access .mdb & Server REST) y Motor Transaccional SQL Server",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Conector triple para SimplyGest (tablas físicas DBISAM articulos.dat, Datos.mdb OLEDB y SimplyGest Server REST :56985) y transacciones T-SQL atómicas (BEGIN TRAN/COMMIT con UPDLOCK, HOLDLOCK) para Ágora POS, Sage 50 y a3ERP.",
       "paths": [
-        "packages/connectors/simplygest/src"
+        "packages/connectors/simplygest/src",
+        "apps/agent/src/services/sql-erp-enhancer.service.ts"
       ],
+      "integrityTreeHash": "1a1bb5222a5213b00b20e40f90273bb09465752f020abe8b3033f1496c6e4594",
       "publicContract": "packages/connectors/simplygest/src/index.ts",
       "testSuites": [
-        "packages/connectors/simplygest/test/read-products.spec.ts"
+        "packages/connectors/simplygest/test/read-products.spec.ts",
+        "apps/agent/test/multi-erp-milestones.test.ts"
       ]
     },
     {
@@ -186,6 +192,77 @@
       "publicContract": "apps/agent/src/erp/index.ts",
       "testSuites": [
         "apps/agent/test/erp-provider-strategy.test.ts"
+      ]
+    },
+    {
+      "id": "agent.factusol.resolver_detector",
+      "name": "Detector Factusol Multi-Unidad (HKCU\\Network UAC) y Resolutor de Rutas NAS/UNC",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Escaneo de unidades locales y unidades de red mapeadas del usuario en HKCU\\Network (W:, X:, Y:, Z:), montaje automático en sesión elevada UAC, resolución UNC y normalización de directorio padre para OpenFileDialog.",
+      "paths": [
+        "apps/agent/src/detector.ts",
+        "apps/agent/src/factusol/factusol.resolver.ts"
+      ],
+      "integrityTreeHash": "e16d2a66b4c866a54034d7adab966cf20bd4303fddab8a82ebed1f63c6fab1e4",
+      "publicContract": "apps/agent/src/factusol/factusol.resolver.ts",
+      "testSuites": [
+        "apps/agent/test/gui-router.test.ts",
+        "apps/agent/test/nas-dialog-e2e.test.ts"
+      ]
+    },
+    {
+      "id": "agent.lifecycle.zero_loss",
+      "name": "Motor de Aplicación de Configuración Zero-Loss, Agregador de Estado y Auto-Recuperación de Licencia",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Guardado garantizado de configuración en AppData preservando secretos enmascarados, invalidación instantánea de caché de estado al activar licencia y auto-recuperación de token desde agent-config.json en el arranque.",
+      "paths": [
+        "apps/agent/src/lifecycle/config-applier.service.ts",
+        "apps/agent/src/status/status-aggregator.service.ts",
+        "apps/agent/src/license/license.service.ts"
+      ],
+      "integrityTreeHash": "37dc6d0580241c1f8c1132d6ceae6407ba85c0c9274df0a26237104235a27b96",
+      "publicContract": "apps/agent/src/lifecycle/config-applier.service.ts",
+      "testSuites": [
+        "apps/agent/test/gui-router.test.ts",
+        "apps/agent/test/config-persistence.test.ts"
+      ]
+    },
+    {
+      "id": "agent.gui.server_security",
+      "name": "Servidor HTTP Local en Puerto Fijo Inmutable 39281 y MiniRouter Anti-CSRF",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Servidor loopback 127.0.0.1 con puerto fijo inmutable 39281, reintentos ante TIME_WAIT sin port-hopping, validación de token X-Bentian-Token y blindaje Anti-CSRF por Origin, Referer, Host y Sec-Fetch-Site.",
+      "paths": [
+        "apps/agent/src/gui/gui-server.ts",
+        "apps/agent/src/gui/router/mini-router.ts"
+      ],
+      "integrityTreeHash": "411abce467f73c0e4d7e18a3e12901af3a0321f834c1e7f721071e9966268074",
+      "publicContract": "apps/agent/src/gui/gui-server.ts",
+      "testSuites": [
+        "apps/agent/test/gui-router.test.ts"
+      ]
+    },
+    {
+      "id": "agent.sync.images",
+      "name": "Motor de Sincronización Incremental de Imágenes (MD5 Hash Cache) y Resolutor Multi-ERP",
+      "status": "FROZEN",
+      "certifiedAt": "2026-10-22",
+      "certifiedCommit": "0fc7842",
+      "description": "Resolución automática de fotografías de productos en los 5 ERPs (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) y sincronización incremental por lotes con caché MD5 para evitar re-subidas innecesarias.",
+      "paths": [
+        "apps/agent/src/sync/image-sync.service.ts",
+        "apps/agent/src/sync/universal-erp-image.resolver.ts"
+      ],
+      "integrityTreeHash": "35c24394cf4296c9badba800d26daf33fd427be39845c90feb45358892c5bcd8",
+      "publicContract": "apps/agent/src/sync/image-sync.service.ts",
+      "testSuites": [
+        "apps/agent/test/multi-erp-milestones.test.ts"
       ]
     },
     {
