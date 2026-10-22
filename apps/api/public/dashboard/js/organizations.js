@@ -80,16 +80,42 @@ async function loadOrganizations() {
   }
 }
 
-async function loadPartnerClients() {
+async function loadPartnerClients(selectedPartnerCode) {
   const tbody = document.getElementById('partner-clients-tbody');
   if (tbody) {
     tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">Cargando cartera de clientes...</td></tr>`;
   }
 
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  const isSuper = window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN';
+
+  // Si es Superadmin, poblar selector de partners para simular cada portal individual
+  const selectEl = document.getElementById('superadmin-partner-preview-select');
+  if (isSuper && selectEl) {
+    try {
+      const ptRes = await fetch('/api/v1/admin/partners', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (ptRes.ok) {
+        const ptJson = await ptRes.json();
+        const ptList = ptJson.data || [];
+        const currentSelected = selectedPartnerCode || selectEl.value || 'ALL';
+        selectEl.innerHTML = `<option value="ALL" ${currentSelected === 'ALL' ? 'selected' : ''}>Todos los Clientes / Partners (${ptList.length})</option>` +
+          ptList.map(p => {
+            const pCode = p.partner_code || '';
+            const pName = p.agency_name || pCode;
+            const sel = currentSelected === pCode ? 'selected' : '';
+            return `<option value="${_safeEscapeHtml(pCode)}" ${sel}>${_safeEscapeHtml(pCode)} — ${_safeEscapeHtml(pName)}</option>`;
+          }).join('');
+      }
+    } catch {}
+  }
+
+  const effectiveCode = selectedPartnerCode || (isSuper && selectEl ? selectEl.value : '') || '';
+  const querySuffix = (isSuper && effectiveCode) ? `?partnerCode=${encodeURIComponent(effectiveCode)}` : '';
 
   try {
-    const res = await fetch('/api/v1/partner/clients', {
+    const res = await fetch(`/api/v1/partner/clients${querySuffix}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) {
@@ -98,11 +124,18 @@ async function loadPartnerClients() {
       const countEl = document.getElementById('partner-clients-count');
       if (countEl) countEl.innerText = `${clients.length} Empresas Registradas`;
 
-      // Actualizar enlace de afiliado con el código real del partner
-      const partnerCode = localStorage.getItem('bentian_cloud_partner_code') || localStorage.getItem('bentian_cloud_org') || 'PT-PARTNER';
+      // Actualizar enlace de afiliado con el código real del partner o el seleccionado en previsualización
+      const partnerCode = (effectiveCode && effectiveCode !== 'ALL')
+        ? effectiveCode
+        : (localStorage.getItem('bentian_cloud_partner_code') || localStorage.getItem('bentian_cloud_org') || 'PT-PARTNER');
       const affInput = document.getElementById('partner-affiliate-link');
       if (affInput) {
         affInput.value = `https://bridge.cristianjm.com/?ref=${encodeURIComponent(partnerCode)}`;
+      }
+      const commEl = document.getElementById('partner-commission-available');
+      if (commEl) {
+        const estComm = (clients.length * 49.75).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        commEl.innerText = `${estComm} €`;
       }
 
       if (!tbody) return;
@@ -310,6 +343,14 @@ async function loadAdminPartners() {
         return;
       }
 
+      if (action === 'preview-partner-portal') {
+        if (typeof window.switchDashboardTab === 'function') {
+          window.switchDashboardTab('partner-clients');
+        }
+        await loadPartnerClients(val);
+        return;
+      }
+
       if (action === 'toggle-partner-status') {
         const nextStatus = val === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
         await updateAdminPartner(partnerId, { status: nextStatus });
@@ -411,9 +452,14 @@ async function loadAdminPartners() {
             <div class="text-[10px] text-emerald-400 font-mono mt-0.5">${annualComm} € / año (${commRate}%)</div>
           </td>
           <td class="py-3.5 px-4 text-right">
-            <button type="button" data-action="toggle-partner-status" data-id="${_safeEscapeHtml(idOrCode)}" data-val="${_safeEscapeHtml(status)}" class="px-2 py-0.5 rounded text-[10px] font-mono cursor-pointer ${isAct ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}" title="Pulsa para activar/suspender">
-              ${isAct ? 'ACTIVO' : 'SUSPENDIDO'}
-            </button>
+            <div class="flex items-center justify-end gap-1.5">
+              <button type="button" data-action="preview-partner-portal" data-val="${_safeEscapeHtml(code)}" class="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 cursor-pointer" title="Ver cómo ve su portal este Partner">
+                👁️ Portal
+              </button>
+              <button type="button" data-action="toggle-partner-status" data-id="${_safeEscapeHtml(idOrCode)}" data-val="${_safeEscapeHtml(status)}" class="px-2 py-0.5 rounded text-[10px] font-mono cursor-pointer ${isAct ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}" title="Pulsa para activar/suspender">
+                ${isAct ? 'ACTIVO' : 'SUSPENDIDO'}
+              </button>
+            </div>
           </td>
         </tr>
       `;

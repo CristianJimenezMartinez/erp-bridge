@@ -144,7 +144,7 @@ function renderLicenses(list) {
           <div class="text-zinc-200 text-xs font-medium">${_safeEscapeHtml(hostname)}</div>
           <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${_safeEscapeHtml(fullHwid)}">HWID: ${_safeEscapeHtml(shortHwid)}</div>
         </td>
-        <td class="p-3 text-right whitespace-nowrap">
+        <td class="p-3 text-right whitespace-nowrap"><button data-action="preview-client-license" data-license-id="${_safeEscapeHtml(lic.id)}" class="px-2 py-1 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] font-medium transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Ver cómo ve su portal este cliente">👁️ Portal</button>
           ${hasMachine ? `
             <button 
               data-action="unbind-license"
@@ -167,6 +167,13 @@ function renderLicenses(list) {
 
   if (!tbody._eventsAttached) {
     tbody.addEventListener('click', (e) => {
+      const previewBtn = e.target.closest('[data-action="preview-client-license"]');
+      if (previewBtn) {
+        const id = previewBtn.getAttribute('data-license-id') || '';
+        if (typeof window.switchDashboardTab === 'function') window.switchDashboardTab('client-portal');
+        if (typeof window.loadClientPortal === 'function') window.loadClientPortal(id);
+        return;
+      }
       const editBtn = e.target.closest('[data-action="edit-alias"]');
       if (editBtn) {
         const id = editBtn.getAttribute('data-license-id') || '';

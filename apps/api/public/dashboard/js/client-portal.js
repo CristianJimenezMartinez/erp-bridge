@@ -47,7 +47,7 @@ async function loadClientPortal(selectedKeyOrId) {
     const multiSelect = document.getElementById('client-license-select');
     const multiCount = document.getElementById('client-multi-count-badge');
 
-    if (licenses.length > 1) {
+    if (licenses.length > 1 || window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN') {
       if (multiBanner) multiBanner.classList.remove('hidden');
       if (multiCount) multiCount.innerText = `${licenses.length} Licencias`;
       if (multiSelect) {

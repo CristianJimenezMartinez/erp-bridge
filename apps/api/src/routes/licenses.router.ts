@@ -142,8 +142,12 @@ licensesRouter.get('/admin/licensing/overview', requireAuth, requireRole(['SUPER
 // 0.1 Partner/Reseller: Cartera de clientes asignados a la empresa instaladora
 licensesRouter.get('/partner/clients', requireAuth, requireRole(['RESELLER', 'SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const resellerCode = req.user?.resellerId || req.user?.sub;
+    const requestedPartnerCode = typeof req.query['partnerCode'] === 'string' ? req.query['partnerCode'].trim() : '';
     const isSuper = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
+    const resellerCode = (isSuper && requestedPartnerCode && requestedPartnerCode !== 'ALL')
+      ? requestedPartnerCode
+      : (req.user?.resellerId || req.user?.sub);
+    const showAll = isSuper && (!requestedPartnerCode || requestedPartnerCode === 'ALL');
     const db = DatabaseService.getInstance();
     if (db.isAvailable()) {
       const clients = await db.query(`
@@ -155,7 +159,7 @@ licensesRouter.get('/partner/clients', requireAuth, requireRole(['RESELLER', 'SU
         WHERE ($1 = true) OR (o.reseller_id = $2)
         GROUP BY o.id, o.name, o.tax_id, o.legal_name, o.reseller_id, o.created_at
         ORDER BY o.created_at DESC
-      `, [isSuper, resellerCode]).then(r => r.rows).catch(() => []);
+      `, [showAll, resellerCode]).then(r => r.rows).catch(() => []);
 
       return res.json({ data: clients });
     }

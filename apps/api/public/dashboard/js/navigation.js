@@ -25,12 +25,15 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('admin-overview')" id="nav-tab-admin-overview" class="px-3 py-1 rounded-md transition text-white bg-[#18181b] border border-white/[0.1] shadow-sm font-medium">Finanzas & KPIs</button>
         <button onclick="switchDashboardTab('licenses')" id="nav-tab-licenses" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Parque de Licencias</button>
         <button onclick="switchDashboardTab('organizations')" id="nav-tab-organizations" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span>🤝 Partners B2B (25%)</span></button>
-        <button onclick="switchDashboardTab('fleet-errors')" id="nav-tab-fleet-errors" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span>Diagnóstico & Incidencias</span><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span></button>
-        <button onclick="switchDashboardTab('multichannel')" id="nav-tab-multichannel" class="px-3 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Canales & Webhooks</span></button>
+        <button onclick="switchDashboardTab('fleet')" id="nav-tab-fleet" class="px-2.5 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium">Flota ERP</button>
+        <button onclick="switchDashboardTab('fleet-errors')" id="nav-tab-fleet-errors" class="px-2.5 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span>Incidencias</span><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span></button>
+        <button onclick="switchDashboardTab('multichannel')" id="nav-tab-multichannel" class="px-2.5 py-1 rounded-md transition text-zinc-400 hover:text-white font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>Webhooks</span></button>
         <div class="h-4 w-[1px] bg-white/[0.08] mx-0.5"></div>
-        <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-2.5 py-1 rounded-md transition text-zinc-400 hover:text-white text-[11px] font-medium flex items-center gap-1 border border-dashed border-white/[0.1] hover:border-white/[0.25]" title="Previsualizar portal como cliente final">
-          <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-          <span>Vista Cliente</span>
+        <button onclick="switchDashboardTab('partner-clients')" id="nav-tab-partner-clients" class="px-2.5 py-1 rounded-md transition text-emerald-300 hover:text-white text-[11px] font-medium flex items-center gap-1 border border-dashed border-emerald-500/30 hover:border-emerald-400/50" title="Previsualizar portal como Partner Instalador">
+          <span>👁️ Vista Partner</span>
+        </button>
+        <button onclick="switchDashboardTab('client-portal')" id="nav-tab-client-portal" class="px-2.5 py-1 rounded-md transition text-indigo-300 hover:text-white text-[11px] font-medium flex items-center gap-1 border border-dashed border-indigo-500/30 hover:border-indigo-400/50" title="Previsualizar portal como cliente final">
+          <span>👁️ Vista Cliente</span>
         </button>
         <button onclick="switchDashboardTab('audit')" id="nav-tab-audit" class="px-2 py-1 rounded-md transition text-zinc-400 hover:text-white text-[11px] font-medium" title="Logs de Auditoría">Auditoría</button>
       `;
@@ -42,9 +45,11 @@ function setupRoleNavigation(role) {
         <button onclick="switchDashboardTab('admin-overview')" id="mob-nav-tab-admin-overview" class="px-3 py-1.5 rounded-md transition text-white bg-[#18181b] font-medium whitespace-nowrap">Finanzas & KPIs</button>
         <button onclick="switchDashboardTab('licenses')" id="mob-nav-tab-licenses" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Parque de Licencias</button>
         <button onclick="switchDashboardTab('organizations')" id="mob-nav-tab-organizations" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">🤝 Partners B2B (25%)</button>
+        <button onclick="switchDashboardTab('fleet')" id="mob-nav-tab-fleet" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Flota ERP</button>
         <button onclick="switchDashboardTab('fleet-errors')" id="mob-nav-tab-fleet-errors" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Diagnóstico & Incidencias</button>
         <button onclick="switchDashboardTab('multichannel')" id="mob-nav-tab-multichannel" class="px-3 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap">Canales & Webhooks</button>
-        <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-2.5 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap text-[11px] border border-dashed border-white/[0.1]">Vista Cliente</button>
+        <button onclick="switchDashboardTab('partner-clients')" id="mob-nav-tab-partner-clients" class="px-2.5 py-1.5 rounded-md transition text-emerald-300 hover:text-white font-medium whitespace-nowrap text-[11px] border border-dashed border-emerald-500/30">👁️ Vista Partner</button>
+        <button onclick="switchDashboardTab('client-portal')" id="mob-nav-tab-client-portal" class="px-2.5 py-1.5 rounded-md transition text-indigo-300 hover:text-white font-medium whitespace-nowrap text-[11px] border border-dashed border-indigo-500/30">👁️ Vista Cliente</button>
         <button onclick="switchDashboardTab('audit')" id="mob-nav-tab-audit" class="px-2.5 py-1.5 rounded-md transition text-zinc-400 hover:text-white font-medium whitespace-nowrap text-[11px]">Auditoría</button>
       `;
     }
@@ -168,6 +173,16 @@ function switchDashboardTab(tabName) {
     if (typeof window.loadOrganizations === 'function') window.loadOrganizations();
   } else if (tabName === 'multichannel') {
     if (typeof window.loadMultichannelData === 'function') window.loadMultichannelData();
+  } else if (tabName === 'partner-clients') {
+    if (typeof window.loadPartnerClients === 'function') window.loadPartnerClients();
+    const ptBanner = document.getElementById('partner-preview-superadmin-banner');
+    if (ptBanner) {
+      if (window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN') {
+        ptBanner.classList.remove('hidden');
+      } else {
+        ptBanner.classList.add('hidden');
+      }
+    }
   } else if (tabName === 'client-portal') {
     if (typeof window.loadClientPortal === 'function') window.loadClientPortal();
     const banner = document.getElementById('client-preview-superadmin-banner');

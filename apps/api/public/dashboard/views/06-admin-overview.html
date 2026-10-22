@@ -4,16 +4,24 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-white">Panel de Control de Dirección & Facturación</h2>
+              <h2 class="text-sm font-semibold text-white">Panel de Control de Dirección &amp; Facturación</h2>
             </div>
             <p class="text-[11px] text-zinc-400 mt-1">
-              Visión global de ingresos recurrentes, desglose de puestos base vs adicionales y telemetría de fallos del parque ERP.
+              Visión global de ingresos recurrentes, desglose de puestos base vs adicionales y acceso directo a todas las vistas de Roles (Partner, Cliente y Flota).
             </p>
           </div>
-          <button onclick="loadAdminOverview()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5 self-start sm:self-auto">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Actualizar Métricas</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+            <button onclick="switchDashboardTab('partner-clients')" class="px-3 py-1.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <span>👁️ Ver Portal Partner</span>
+            </button>
+            <button onclick="switchDashboardTab('client-portal')" class="px-3 py-1.5 rounded-md bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <span>👁️ Ver Portal Cliente</span>
+            </button>
+            <button onclick="loadAdminOverview()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Actualizar Métricas</span>
+            </button>
+          </div>
         </div>
 
         <!-- 4 KPIS FINANCIEROS Y DE LICENCIAS -->
@@ -74,6 +82,156 @@
             </div>
             <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-red-400/80">
               Reintento de cobro Stripe activo
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTRO DE INSPECCIÓN DE PORTALES Y VISTAS (ACCESO RÁPIDO SUPERADMIN) -->
+        <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-5 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3.5">
+            <div>
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+                <span>🔭 Centro de Inspección de Portales y Vistas del Ecosistema</span>
+                <span class="px-2 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30">ACCESO SUPERADMIN</span>
+              </h3>
+              <p class="text-[11px] text-zinc-400 mt-0.5">
+                Entra en 1 clic a lo que ve cada rol dentro del Dashboard (Partner Instalador, Cliente Final, Flota, Licencias) o abre cualquiera de los portales públicos para revisarlos.
+              </p>
+            </div>
+          </div>
+
+          <!-- SUBSECCIÓN 1: VISTAS INTERNAS DEL DASHBOARD POR ROL -->
+          <div>
+            <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-2.5">1. Portales del Dashboard por Rol &amp; Módulos Internos</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <!-- Card Vista Partner -->
+              <div onclick="switchDashboardTab('partner-clients')" class="p-3.5 rounded-xl bg-emerald-950/20 hover:bg-emerald-950/35 border border-emerald-500/30 transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-emerald-300">👁️ Portal Partner (Reseller)</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">ROL PARTNER</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Lo que ve una agencia/implantador al entrar con su código <code class="text-emerald-300 font-mono">PT-XXXX</code>: enlace afiliado, compra al -25% (149,25 €) y emisión de trials 15d.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-emerald-400">Abrir Vista Partner &rarr;</div>
+              </div>
+
+              <!-- Card Vista Cliente -->
+              <div onclick="switchDashboardTab('client-portal')" class="p-3.5 rounded-xl bg-indigo-950/20 hover:bg-indigo-950/35 border border-indigo-500/30 transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-indigo-300">👁️ Portal Cliente Final</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">ROL CLIENTE</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Lo que ve un comercio al entrar con su clave <code class="text-indigo-300 font-mono">EB-XXXX</code> o email: su licencia, servidor HWID vinculado, mudar PC y descargas.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-indigo-400">Abrir Vista Cliente &rarr;</div>
+              </div>
+
+              <!-- Card CRM Partners 25% -->
+              <div onclick="switchDashboardTab('organizations')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">🤝 CRM Partners B2B (25%)</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">ADMIN</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Directorio de agencias acreditadas, alta rápida con licencia NFR de 2 puestos, contador de referidos y organizaciones.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Gestionar Partners &rarr;</div>
+              </div>
+
+              <!-- Card Parque de Licencias -->
+              <div onclick="switchDashboardTab('licenses')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">🔑 Parque de Licencias</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">ADMIN</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Todas las licencias emitidas, equipos HWID activos, edición de alias, emisión manual y desvinculación de máquinas.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Abrir Licencias &rarr;</div>
+              </div>
+
+              <!-- Card Salud de Flota -->
+              <div onclick="switchDashboardTab('fleet')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">🖥️ Salud de Servidores (Flota)</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">TELEMETRÍA</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Estado en tiempo real de las máquinas Windows conectadas, latidos de versión y salud OLEDB de Factusol.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Ver Flota ERP &rarr;</div>
+              </div>
+
+              <!-- Card Diagnóstico & Incidencias -->
+              <div onclick="switchDashboardTab('fleet-errors')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">🚨 Diagnóstico &amp; Incidencias</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/15 text-red-300">LOGS</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Monitor de errores reportados por los agentes en clientes (caídas de red NAS, bloqueos de Access o API web).
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Ver Incidencias &rarr;</div>
+              </div>
+
+              <!-- Card Canales & Webhooks -->
+              <div onclick="switchDashboardTab('multichannel')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">⚡ Canales &amp; Webhooks</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">SHOPIFY/HOLDED</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Configuración de endpoints HMAC-SHA256 y stream en vivo de eventos de Shopify y Holded.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Abrir Webhooks &rarr;</div>
+              </div>
+
+              <!-- Card Auditoría -->
+              <div onclick="switchDashboardTab('audit')" class="p-3.5 rounded-xl bg-[#18181b] hover:bg-[#222228] border border-white/[0.08] transition cursor-pointer flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white">🛡️ Auditoría de Seguridad</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">TRAZABILIDAD</span>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 mt-1.5">
+                    Registro inmutable de inicios de sesión, activaciones de licencias y operaciones administrativas.
+                  </p>
+                </div>
+                <div class="mt-3 text-[11px] font-semibold text-zinc-200">Ver Auditoría &rarr;</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBSECCIÓN 2: PORTALES Y EMBUDOS WEB PÚBLICOS -->
+          <div class="pt-3 border-t border-white/[0.06]">
+            <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-2.5">2. Portales Web Públicos y Embudos Comerciales (Abrir en nueva pestaña)</div>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-200 transition">🏠 Landing Principal (/)</a>
+              <a href="/partners/" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-medium transition">🤝 Portal Partners B2B (/partners/)</a>
+              <a href="/partners/?print=1" target="_blank" class="px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-medium transition">🖨️ Dossier PDF Partners</a>
+              <a href="/beta/" target="_blank" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-medium transition">🎁 Embudo Beta Gratuita (/beta/)</a>
+              <a href="/docs/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-200 transition">📚 Centro Documentación (/docs/)</a>
+              <a href="/conector-factusol/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-200 transition">🗺️ Hub 52 Ciudades (/conector-factusol/)</a>
+              <a href="/simplygest-woocommerce/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-300 transition">SimplyGest ⇄ Woo</a>
+              <a href="/sage50-woocommerce/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-300 transition">Sage 50 ⇄ Woo</a>
+              <a href="/a3erp-woocommerce/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-300 transition">a3ERP ⇄ Woo</a>
+              <a href="/agora-pos-woocommerce/" target="_blank" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.08] text-zinc-300 transition">Ágora POS ⇄ Woo</a>
             </div>
           </div>
         </div>
