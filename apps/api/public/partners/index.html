@@ -12,12 +12,21 @@
   <link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/partners/" />
   <link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/partners/" />
 
-  <meta name="theme-color" content="#09090b" />
+  <meta name="theme-color" content="#0b0d13" />
   <meta name="application-name" content="Bentian ERP Bridge" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="stylesheet" href="/css/tailwind.min.css" />
+
+  <!-- Tipografía: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN & Configuración Oficial -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -82,6 +91,15 @@
   </script>
 
   <style>
+    body { background-color: #0b0d13; color: #f8fafc; }
+    .bg-\[\#09090b\] { background-color: #0b0d13 !important; }
+    .bg-\[\#121215\] { background-color: #151822 !important; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07); }
+    .bg-\[\#18181b\] { background-color: #1e2230 !important; }
+    .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
+    .border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
+    .text-zinc-500 { color: #a1a8b8 !important; }
+    .text-zinc-400 { color: #cbd5e1 !important; }
+    .text-zinc-300 { color: #e2e8f0 !important; }
     @media print {
       body { background: #ffffff !important; color: #111827 !important; }
       header, .no-print, footer { display: none !important; }

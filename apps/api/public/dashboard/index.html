@@ -839,45 +839,45 @@
       <div id="view-tab-partner-clients" class="hidden space-y-6">
 
         <!-- BANNER DE PREVISUALIZACIÓN SUPERADMIN (Solo visible si es SUPERADMIN o ADMIN) -->
-        <div id="partner-preview-superadmin-banner" class="hidden bg-purple-950/40 border border-purple-500/30 rounded-xl p-3.5 text-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-purple-200 shadow-sm">
-          <div class="flex flex-wrap items-center gap-2.5">
-            <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse shrink-0"></span>
-            <span><strong>Modo Previsualización Partner:</strong> Estás viendo el portal exacto que ve una Agencia / Implantador (Rol <code class="text-purple-300 font-mono">RESELLER</code>).</span>
-            <select id="superadmin-partner-preview-select" onchange="loadPartnerClients(this.value)" class="bg-[#18181b] border border-purple-500/40 rounded-lg px-2.5 py-1 text-xs text-white font-mono focus:outline-none">
+        <div id="partner-preview-superadmin-banner" class="hidden bg-gradient-to-r from-purple-950/80 via-indigo-950/70 to-[#151822] border border-purple-400/40 rounded-xl p-4 text-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-purple-100 shadow-lg">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse shrink-0"></span>
+            <span class="text-white font-medium"><strong class="text-purple-200">Modo Previsualización Partner:</strong> Estás viendo el portal exacto que ve una Agencia / Implantador (<code class="text-purple-200 font-mono font-bold">RESELLER</code>).</span>
+            <select id="superadmin-partner-preview-select" onchange="loadPartnerClients(this.value)" class="bg-[#1e2230] border border-purple-400/50 rounded-lg px-3 py-1.5 text-xs text-white font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
               <option value="ALL">Ver Todos los Partners</option>
             </select>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <button onclick="switchDashboardTab('organizations')" class="px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.12] text-emerald-300 font-medium transition text-xs cursor-pointer">
+            <button onclick="switchDashboardTab('organizations')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-semibold transition text-xs cursor-pointer">
               🤝 Ir a CRM Partners (25%)
             </button>
-            <button onclick="switchDashboardTab('client-portal')" class="px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-white/[0.12] text-indigo-300 font-medium transition text-xs cursor-pointer">
+            <button onclick="switchDashboardTab('client-portal')" class="px-3 py-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 font-semibold transition text-xs cursor-pointer">
               👁️ Ver Vista Cliente
             </button>
-            <button onclick="switchDashboardTab('admin-overview')" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium transition text-xs flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <button onclick="switchDashboardTab('admin-overview')" class="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold transition text-xs flex items-center gap-1.5 shadow-md cursor-pointer">
               <span>Volver a Consola Global</span>
             </button>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/40 via-[#121215] to-[#121215] border border-emerald-500/20 rounded-xl p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/60 via-[#151822] to-[#151822] border border-emerald-400/35 rounded-xl p-5 shadow-lg">
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <h2 class="text-sm font-semibold text-white">Cartera de Clientes & Empresas Instaladas</h2>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PARTNER OFICIAL</span>
+              <h2 class="text-base font-bold text-white">Cartera de Clientes & Empresas Instaladas</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">PARTNER OFICIAL</span>
             </div>
-            <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
+            <p class="text-xs sm:text-sm text-zinc-200 mt-1 leading-relaxed">
               Gestión de clientes, compras de licencias con tarifa mayorista (-25%) y seguimiento de servidores Factusol.
             </p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="openPartnerBuyModal()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 shrink-0">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button onclick="openPartnerBuyModal()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md border border-emerald-400/40 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
               <span>Comprar Licencia (-25%: 149,25 €)</span>
             </button>
-            <button onclick="openPartnerIssueModal()" class="px-3 py-2 rounded-md bg-[#18181b] hover:bg-[#222228] text-zinc-300 hover:text-white border border-white/[0.1] text-xs font-medium transition flex items-center gap-1.5 shrink-0">
-              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <button onclick="openPartnerIssueModal()" class="px-3.5 py-2 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.18] text-xs font-semibold transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               <span>+ Clave Evaluación (15d)</span>
             </button>
           </div>
@@ -885,73 +885,58 @@
 
         <!-- TARJETAS DE AFILIADO & COMISIONES -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Card 1: Enlace de Afiliado -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
             <div>
-              <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Tu Enlace de Distribuidor</span>
-              <div class="mt-2 flex items-center gap-2">
-                <input 
-                  type="text" 
-                  id="partner-affiliate-link" 
-                  readonly 
-                  value="https://bridge.cristianjm.com/?ref=PT-TEST" 
-                  class="w-full bg-[#18181b] border border-white/[0.06] rounded px-2.5 py-1 text-[11px] font-mono text-zinc-300 select-all"
-                />
-                <button onclick="copyPartnerAffiliateLink()" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] font-medium shrink-0 transition">
+              <span class="text-xs font-mono font-bold text-emerald-300 uppercase tracking-wider block">🔗 Tu Enlace de Distribuidor</span>
+              <div class="mt-2.5 flex items-center gap-2">
+                <input type="text" id="partner-affiliate-link" readonly value="https://bridge.cristianjm.com/?ref=PT-TEST" class="w-full bg-[#1e2230] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs font-mono font-semibold text-white select-all" />
+                <button onclick="copyPartnerAffiliateLink()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shrink-0 transition cursor-pointer">
                   Copiar
                 </button>
               </div>
             </div>
-            <p class="text-[10px] text-zinc-500 mt-2">
-              Tus clientes compran en la web y se vinculan automáticamente a tu código.
-            </p>
+            <p class="text-xs text-zinc-300 mt-2.5">Tus clientes compran en la web y se vinculan automáticamente a tu código.</p>
           </div>
 
-          <!-- Card 2: Margen Mayorista en Origen -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Margen Mayorista Directo</span>
-            <div class="mt-1">
-              <span class="text-xl font-bold font-mono text-emerald-400">25% Retenido</span>
-              <span class="text-[11px] text-zinc-400 block mt-0.5">Pagas 149,25 € / Facturas 199,00 € al cliente</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-xs font-mono font-bold text-indigo-200 uppercase tracking-wider">💰 Margen Mayorista Directo</span>
+            <div class="mt-1.5">
+              <span class="text-2xl font-bold font-mono text-emerald-300">25% Retenido</span>
+              <span class="text-xs text-zinc-200 block mt-0.5">Pagas 149,25 € / Facturas 199,00 € al cliente</span>
             </div>
-            <span class="text-[10px] text-emerald-400/80 mt-2 block">✓ Cero esperas ni papeleo de comisiones</span>
+            <span class="text-xs text-emerald-300 font-medium mt-2 block">✓ Cero esperas ni papeleo de comisiones</span>
           </div>
 
-          <!-- Card 3: Comisiones Afiliado (Garantía 30d & Anual) -->
-          <div class="bg-[#121215] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Comisiones Venta Web</span>
-            <div class="mt-1 flex items-baseline gap-2">
-              <span class="text-xl font-bold font-mono text-zinc-100" id="partner-commission-available">0,00 €</span>
-              <span class="text-[11px] text-zinc-500">(Acumulado liquidable)</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-xs font-mono font-bold text-indigo-200 uppercase tracking-wider">📈 Comisiones Venta Web</span>
+            <div class="mt-1.5 flex items-baseline gap-2">
+              <span class="text-2xl font-bold font-mono text-white" id="partner-commission-available">0,00 €</span>
+              <span class="text-xs text-zinc-300">(Acumulado liquidable)</span>
             </div>
-            <p class="text-[10px] text-zinc-500 mt-2">
-              Garantía: 30d maduración. Mensuales: Liquidación a cierre anual o &gt;100 €.
-            </p>
+            <p class="text-xs text-zinc-300 mt-2">Garantía: 30d maduración · Liquidación anual o &gt;100 €.</p>
           </div>
         </div>
 
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
-            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Empresas en tu Cartera</h3>
-            <span id="partner-clients-count" class="text-[11px] text-zinc-400 font-mono">Cargando...</span>
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
+          <div class="p-4 border-b border-white/[0.12] flex items-center justify-between bg-[#1a1e2b]">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Empresas en tu Cartera</h3>
+            <span id="partner-clients-count" class="text-xs text-emerald-300 font-mono font-semibold">Cargando...</span>
           </div>
 
           <div class="overflow-x-auto custom-scroll">
             <table class="w-full text-left text-xs">
-              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+              <thead class="bg-[#1e2230] text-[11px] uppercase font-bold text-zinc-200 border-b border-white/[0.12]">
                 <tr>
-                  <th class="p-3">Empresa / Razón Social</th>
-                  <th class="p-3">CIF / NIF</th>
-                  <th class="p-3">Licencias Asignadas</th>
-                  <th class="p-3">Fecha de Alta</th>
-                  <th class="p-3 text-right">Estado</th>
+                  <th class="p-3.5">Empresa / Razón Social</th>
+                  <th class="p-3.5">CIF / NIF</th>
+                  <th class="p-3.5">Licencias Asignadas</th>
+                  <th class="p-3.5">Fecha de Alta</th>
+                  <th class="p-3.5 text-right">Estado</th>
                 </tr>
               </thead>
-              <tbody id="partner-clients-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="partner-clients-tbody" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
-                    Cargando cartera de clientes...
-                  </td>
+                  <td colspan="5" class="p-8 text-center text-zinc-300 font-mono text-xs">Cargando cartera de clientes...</td>
                 </tr>
               </tbody>
             </table>
