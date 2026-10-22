@@ -9,8 +9,8 @@ const _licToast = (msg, type) => { if (typeof window.showToast === 'function') w
 window.allLicenses = [];
 window._licensesHideTests = false;
 
-const _PROTECTED_KEYS = new Set(['EB-8WEN2-W08N2-8KJAW-0AHCH', 'EB-S6AB3-2MHWP-50DTT-72242']);
-const _OBSOLETE_KEYS = new Set(['EB-6RE3E-HXPS4-XYNRV-HVZWT', 'EB-KHT50-6XPQH-DZSE6-BRWRY', 'EB-1E4XK-C7HVV-A4X5Y-YKHNP', 'EB-XDGG0-NQZJA-DP70P-06E3E', 'EB-JTMBG-GT8HJ-MMET1-HE7E2', 'EB-WT35M-64BZH-Y0VE2-Y0314', 'EB-KC3ZV-DEK37-XSS01-58C9D', 'EB-MFFF9-VV92C-M9JNV-0H1P0', 'EB-TZJZ2-Z2ZTN-ZR5J1-XPXPV', 'EB-6WCKT-6S1ST-H816X-D0477', 'EB-QGCES-7ENH2-RR6QC-84675', 'EB-SJR5V-VSJEF-3K56F-11F2F']);
+const _PROTECTED_KEYS = new Set(['EB-8WEN2-W08N2-8KJAW-0AHCH', 'EB-S6AB3-2MHWP-50DTT-72242', 'EB-6RE3E-HXPS4-XYNRV-HVZWT']);
+const _OBSOLETE_KEYS = new Set(['EB-KHT50-6XPQH-DZSE6-BRWRY', 'EB-1E4XK-C7HVV-A4X5Y-YKHNP', 'EB-XDGG0-NQZJA-DP70P-06E3E', 'EB-JTMBG-GT8HJ-MMET1-HE7E2', 'EB-WT35M-64BZH-Y0VE2-Y0314', 'EB-KC3ZV-DEK37-XSS01-58C9D', 'EB-MFFF9-VV92C-M9JNV-0H1P0', 'EB-TZJZ2-Z2ZTN-ZR5J1-XPXPV', 'EB-6WCKT-6S1ST-H816X-D0477', 'EB-QGCES-7ENH2-RR6QC-84675', 'EB-SJR5V-VSJEF-3K56F-11F2F']);
 
 function _isTestLicense(lic) {
   const key = String(lic.key || '').toUpperCase();
@@ -18,7 +18,7 @@ function _isTestLicense(lic) {
   if (_OBSOLETE_KEYS.has(key)) return true;
   const alias = String(lic.alias || '').toUpperCase();
   const org = String(lic.organization_id || lic.organizationId || '').toUpperCase();
-  return alias.includes('[TEST]') || alias.includes('TEST E2E') || alias.includes('SOFTPEDIA') || alias.includes('SOY.ES') || alias.includes('DEMO CORPORACION') || org.includes('TEST');
+  return alias.includes('[TEST]') || alias.includes('TEST E2E') || alias.includes('SOFTPEDIA') || alias.includes('DEMO CORPORACION') || org.includes('TEST');
 }
 
 function _buildSeatBadge(lic) {

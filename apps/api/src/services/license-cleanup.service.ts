@@ -1,23 +1,25 @@
 import { DatabaseService, LicenseService, PostgresLicenseRepository } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
+import { computeOrganizationIdFromEmail } from '../routes/auth.router';
 
 const logger = new Logger('LicenseCleanupService');
 
 /**
- * Las 2 licencias reales en producción activa (blindadas contra borrado accidental en purgas masivas):
+ * Licencias reales en producción y leads comerciales reales protegidos contra borrado en purgas:
  * 1. Servidor Factusol Principal (Telkkalas) -> EB-8WEN2-W08N2-8KJAW-0AHCH
  * 2. Suministros Rubio - Tienda y Factusol (De por vida) (DESKTOP-2730DUT) -> EB-S6AB3-2MHWP-50DTT-72242
+ * 3. Beta 2026 - Soy.es (Lead comercial real: info@nicripsia.com / Raúl y equipo) -> EB-6RE3E-HXPS4-XYNRV-HVZWT
  */
 export const PROTECTED_PRODUCTION_KEYS = new Set<string>([
   'EB-8WEN2-W08N2-8KJAW-0AHCH',
   'EB-S6AB3-2MHWP-50DTT-72242',
+  'EB-6RE3E-HXPS4-XYNRV-HVZWT',
 ]);
 
 /**
- *Las 12 claves obsoletas / de test / duplicadas antiguas identificadas para purga definitiva:
+ * Las 11 claves obsoletas / de test / duplicadas antiguas identificadas para purga definitiva:
  */
 export const KNOWN_OBSOLETE_KEYS: string[] = [
-  'EB-6RE3E-HXPS4-XYNRV-HVZWT', // Beta 2026 - Soy.es (Sin asignar)
   'EB-KHT50-6XPQH-DZSE6-BRWRY', // [TEST] Auditoría Funnel 2026 (FUNNEL-AUDIT-HOST)
   'EB-1E4XK-C7HVV-A4X5Y-YKHNP', // Beta 2026 - Softpedia QA (Sin asignar)
   'EB-XDGG0-NQZJA-DP70P-06E3E', // [TEST] Empresa Verificación 2 (Sin asignar)
@@ -54,7 +56,6 @@ export class LicenseCleanupService {
       alias.includes('[TEST]') ||
       alias.includes('TEST E2E') ||
       alias.includes('SOFTPEDIA') ||
-      alias.includes('SOY.ES') ||
       alias.includes('DEMO CORPORACION') ||
       alias.includes('AUDITOR HETZNER') ||
       alias.includes('AUDITOR ENTERPRISE') ||
@@ -161,6 +162,32 @@ export class LicenseCleanupService {
     }
 
     try {
+      // Garantizar en producción que la clave real enviada a Soy.es (EB-6RE3E-HXPS4-XYNRV-HVZWT) esté presente y activa
+      if (process.env.NODE_ENV === 'production') {
+        const soyOrgId = computeOrganizationIdFromEmail('info@nicripsia.com');
+        const soyLicId = '355494ee-b202-4026-8000-000000002026';
+        const soyKey = 'EB-6RE3E-HXPS4-XYNRV-HVZWT';
+        const betaExpires = new Date('2026-12-31T23:59:59.999Z');
+
+        await db
+          .query(
+            `INSERT INTO organizations (id, name, slug, status, plan, legal_name, created_at, updated_at)
+             VALUES ($1, 'Soy.es', 'info@nicripsia.com', 'ACTIVE', 'trial', 'Soy.es', NOW(), NOW())
+             ON CONFLICT (id) DO NOTHING`,
+            [soyOrgId]
+          )
+          .catch(() => {});
+
+        await db
+          .query(
+            `INSERT INTO licenses (id, key, organization_id, alias, plan, status, max_activations, current_activations, seat_type, billing_status, created_at, expires_at, trial_ends_at)
+             VALUES ($1, $2, $3, 'Beta 2026 - Soy.es', 'trial', 'active', 1, 0, 'BASE', 'TRIAL', NOW(), $4, $4)
+             ON CONFLICT (key) DO NOTHING`,
+            [soyLicId, soyKey, soyOrgId, betaExpires]
+          )
+          .catch(() => {});
+      }
+
       const allRows = await db
         .query(`SELECT id::text as id, key, alias, organization_id FROM licenses`)
         .then((r) => r.rows as Array<{ id: string; key: string; alias: string | null; organization_id: string }>)
@@ -219,7 +246,6 @@ export class LicenseCleanupService {
         const isTestOrg =
           affectedOrgIds.has(org.id) ||
           upperName.includes('[TEST]') ||
-          upperName.includes('SOY.ES') ||
           upperName.includes('SOFTPEDIA') ||
           upperName.includes('DEMO CORPORACION') ||
           upperName.includes('AUDITOR') ||
