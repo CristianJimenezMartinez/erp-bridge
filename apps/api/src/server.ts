@@ -36,6 +36,7 @@ import { partnersRouter } from './routes/partners.router';
 import { meRouter } from './routes/me.router';
 import { webhooksRouter } from './routes/webhooks';
 import { getLatestReleasedVersion } from './utils/version.util';
+import { LicenseCleanupService } from './services/license-cleanup.service';
 
 dotenv.config();
 
@@ -172,6 +173,9 @@ export async function bootstrapApp(): Promise<Express> {
       await db.runMigrations();
       const orgService = new OrganizationService();
       await orgService.ensureDefaultOrganization();
+      await LicenseCleanupService.purgeObsoleteAndTestLicenses({
+        includeHeuristicTests: process.env.NODE_ENV === 'production',
+      });
       logger.info('Base de datos inicializada y migrada.');
     } else {
       logger.warn(`PostgreSQL no disponible (${health.message}). Continuando en modo memoria/local.`);

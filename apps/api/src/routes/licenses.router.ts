@@ -15,6 +15,7 @@ import { getLatestInstallerUrl } from '../utils/version.util';
 import { MailerService } from '../services/mailer.service';
 import { rateLimit, consumeRateLimit } from '../middleware/rate-limit';
 import { LicenseProofService } from '../services/license-proof.service';
+import { LicenseCleanupService } from '../services/license-cleanup.service';
 
 const PartnerIssueLicenseSchema = z.object({
   clientName: z.string().trim().min(1, 'El nombre de la empresa es obligatorio').max(100),
@@ -989,5 +990,31 @@ licensesRouter.post('/licenses/:id/revoke', requireAuth, requireRole(['SUPERADMI
     res.json({ data: revoked });
   } catch (error) {
     next(error);
+  }
+});
+
+// 8. Delete license permanently (admin)
+licensesRouter.delete('/licenses/:id', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params['id']!;
+    const forceProtected = req.query['force'] === 'true';
+    const result = await LicenseCleanupService.deleteLicenseById(id, { forceProtected });
+    if (!result.deleted) {
+      const status = result.message?.includes('protegida') ? 409 : 404;
+      return res.status(status).json({ error: { message: result.message || 'No se pudo eliminar la licencia' } });
+    }
+    return res.json({ success: true, data: result });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// 9. Purge all obsolete / test licenses (admin)
+licensesRouter.post('/admin/licensing/purge-tests', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await LicenseCleanupService.purgeObsoleteAndTestLicenses({ includeHeuristicTests: true });
+    return res.json({ success: true, data: result });
+  } catch (error) {
+    return next(error);
   }
 });

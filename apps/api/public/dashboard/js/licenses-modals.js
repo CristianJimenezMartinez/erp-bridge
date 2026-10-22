@@ -174,3 +174,51 @@ window.openUnbindModal = openUnbindModal;
 window.handleCreateLicenseSubmit = handleCreateLicenseSubmit;
 window.handleSaveAlias = handleSaveAlias;
 window.confirmUnbind = confirmUnbind;
+
+async function deleteLicenseById(id, key, alias) {
+  if (!id) return;
+  if (!window.confirm(`¿Eliminar permanentemente la licencia "${alias || key}" (${key})? Esta acción borrará la clave de la base de datos.`)) return;
+  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  try {
+    const res = await fetch(`/api/v1/licenses/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      _licModalToast(`Clave ${key} eliminada permanentemente`, 'success');
+      if (typeof window.loadLicenses === 'function') window.loadLicenses();
+      if (typeof window.loadFleetOverview === 'function') window.loadFleetOverview();
+    } else {
+      _licModalToast(data.error?.message || 'No se pudo eliminar la licencia', 'error');
+    }
+  } catch {
+    _licModalToast('Error de conexión al eliminar licencia', 'error');
+  }
+}
+
+async function purgeTestLicenses() {
+  if (!window.confirm('¿Purgar permanentemente todas las licencias de prueba, QA y duplicadas obsoletas? Las 2 licencias activas en producción (Telkkalas y Suministros Rubio) están protegidas y NO se tocarán.')) return;
+  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  try {
+    const res = await fetch('/api/v1/admin/licensing/purge-tests', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      const cnt = data.data?.deletedCount ?? 0;
+      _licModalToast(`Purga completada: ${cnt} licencias obsoletas eliminadas`, 'success');
+      if (typeof window.loadLicenses === 'function') window.loadLicenses();
+      if (typeof window.loadFleetOverview === 'function') window.loadFleetOverview();
+      if (typeof window.loadOrganizationsAdmin === 'function') window.loadOrganizationsAdmin();
+    } else {
+      _licModalToast(data.error?.message || 'Error al purgar licencias', 'error');
+    }
+  } catch {
+    _licModalToast('Error de conexión al purgar licencias', 'error');
+  }
+}
+
+window.deleteLicenseById = deleteLicenseById;
+window.purgeTestLicenses = purgeTestLicenses;
