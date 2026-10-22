@@ -60,7 +60,7 @@ export class DatabaseService {
           port: config.port || Number(process.env['DB_PORT']) || 5432,
           database: config.database || process.env['DB_DATABASE'] || 'Factusol',
           user: config.user || process.env['DB_USER'] || 'postgres',
-          password: config.password || process.env['DB_PASSWORD'] || (process.env.NODE_ENV === 'production' ? '' : '123456789'),
+          password: config.password || process.env['DB_PASSWORD'] || '',
           ssl: sslConfig,
           max: config.maxPoolSize || 10,
         };

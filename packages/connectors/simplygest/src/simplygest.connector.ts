@@ -27,6 +27,7 @@ import { AccessDriver } from '@erp-bridge/connector-factusol';
 import {
   getArticlesQuery,
   updateStockQuery,
+  decrementStockQuery,
   findCustomerByCifQuery,
   findCustomerByEmailQuery,
   insertCustomerQuery,
@@ -381,13 +382,16 @@ export class SimplyGestConnector implements Connector {
       const maxRows = await this.driver.query<{ maxid: string }>(getNextOrderIdQuery());
       const nextOrderNumber = String((Number(maxRows[0]?.maxid) || 100) + 1);
 
-      // Multi-statement atomic transaction: header + all lines
+      // Multi-statement atomic transaction: header + all lines + stock deduction
       const headerSql = insertOrderHeaderQuery(order, nextOrderNumber, customerCode);
       const lineSqls = order.lines.map((line: any, idx: number) =>
         insertOrderLineQuery(line, nextOrderNumber, idx + 1)
       );
+      const stockSqls = order.lines
+        .filter((line: any) => line && line.sku && Number(line.quantity) > 0)
+        .map((line: any) => decrementStockQuery(String(line.sku), Number(line.quantity)));
 
-      await this.driver.executeTransaction([headerSql, ...lineSqls]);
+      await this.driver.executeTransaction([headerSql, ...lineSqls, ...stockSqls]);
       this.logger.info(`Pedido creado exitosamente en SimplyGest (NUMERO=${nextOrderNumber}) para ref ${reference}`);
 
       return {

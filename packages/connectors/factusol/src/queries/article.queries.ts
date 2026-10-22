@@ -1,4 +1,4 @@
-import { sanitizeAndTruncate } from './order.queries';
+import { sanitizeAndTruncate, sanitizeInt } from './order.queries';
 
 export interface FactusolRawArticle {
   CODART: string;
@@ -49,7 +49,8 @@ export interface FactusolRawBarcode {
 }
 
 export function getArticlesQuery(activeOnly = true, limit?: number): string {
-  const topClause = limit ? `TOP ${limit}` : '';
+  const safeLimit = limit !== undefined && limit !== null ? sanitizeInt(limit, 0, 1, 100000) : 0;
+  const topClause = safeLimit > 0 ? `TOP ${safeLimit}` : '';
   const whereClause = activeOnly ? "WHERE (F_ART.SUWART = 1 OR F_ART.SUWART = -1 OR F_ART.SUWART <> 0)" : '';
   return `
     SELECT ${topClause} 
@@ -65,7 +66,8 @@ export function getArticlesQuery(activeOnly = true, limit?: number): string {
 }
 
 export function getAllArticlesQuery(limit?: number): string {
-  const topClause = limit ? `TOP ${limit}` : '';
+  const safeLimit = limit !== undefined && limit !== null ? sanitizeInt(limit, 0, 1, 100000) : 0;
+  const topClause = safeLimit > 0 ? `TOP ${safeLimit}` : '';
   return `
     SELECT ${topClause} 
       F_ART.CODART, F_ART.DESART, F_ART.DEWART, F_ART.EANART, F_ART.FAMART, F_ART.PCOART, F_ART.SUWART,

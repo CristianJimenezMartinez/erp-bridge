@@ -1,9 +1,10 @@
-import { sanitizeSql } from './order.queries';
+import { sanitizeInt, sanitizeSql } from './order.queries';
 import { ReadStockOptions } from '@erp-bridge/sdk';
 
 export function readStockQuery(options?: ReadStockOptions): string {
   const warehouse = options?.warehouse ? sanitizeSql(options.warehouse) : undefined;
-  const limitClause = options?.limit && options.limit > 0 ? `TOP ${options.limit} ` : '';
+  const safeLimit = options?.limit && Number(options.limit) > 0 ? sanitizeInt(options.limit, 0, 1, 100000) : 0;
+  const limitClause = safeLimit > 0 ? `TOP ${safeLimit} ` : '';
 
   let whereClause = '';
   if (warehouse) {

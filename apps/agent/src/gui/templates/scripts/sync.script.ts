@@ -1,5 +1,24 @@
 export const syncScript = `
     async function triggerManualSync() {
+      if (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.license) {
+        const licStatus = currentStatus.license.status;
+        if (licStatus !== 'VALID' && licStatus !== 'GRACE_PERIOD') {
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: 'Licencia Requerida',
+              message: 'Activa tu clave de licencia antes de iniciar una sincronización.',
+              actionLabel: 'Activar Licencia →',
+              targetTab: 'license',
+              targetInputId: 'input-lic-key',
+              type: 'warn'
+            });
+          }
+          if (typeof navigateToResolution === 'function') {
+            navigateToResolution('license', 'input-lic-key');
+          }
+          return;
+        }
+      }
       // Directiva de usuario: si la url del sitio web no está puesta, llevar hasta el canal web
       if (typeof isStoreUrlConfigured === 'function' && !isStoreUrlConfigured()) {
         if (typeof navigateToChannelUrlInput === 'function') {
@@ -124,6 +143,25 @@ export const syncScript = `
 
     async function runSimulationOrder(dryRun) {
       if (dryRun === undefined) dryRun = true;
+      if (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.license) {
+        const licStatus = currentStatus.license.status;
+        if (licStatus !== 'VALID' && licStatus !== 'GRACE_PERIOD') {
+          if (typeof showSmartToast === 'function') {
+            showSmartToast({
+              title: 'Licencia Requerida',
+              message: 'Debes activar una licencia válida antes de simular o insertar pedidos en el ERP.',
+              actionLabel: 'Activar Licencia →',
+              targetTab: 'license',
+              targetInputId: 'input-lic-key',
+              type: 'warn'
+            });
+          }
+          if (typeof navigateToResolution === 'function') {
+            navigateToResolution('license', 'input-lic-key');
+          }
+          return;
+        }
+      }
       const btn = document.getElementById('btn-simulate-order');
       const spinner = document.getElementById('btn-sim-spinner');
       const modal = document.getElementById('modal-test-order-simulation');

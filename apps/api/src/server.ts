@@ -47,6 +47,9 @@ export function assertProductionSecrets(): void {
     { name: 'LICENSE_JWT_SECRET', minLength: 32, disallowed: ['default', 'secret', 'changeme', 'test', 'license_secret'] },
     { name: 'LICENSE_SIGNING_PRIVATE_KEY', minLength: 32, disallowed: ['default', 'placeholder', 'changeme'] },
     { name: 'PARTNER_SECRET', minLength: 16, disallowed: ['default', 'secret', 'changeme', 'partnersecret2026!'] },
+    ...(process.env['STRIPE_SECRET_KEY'] || process.env['STRIPE_WEBHOOK_SECRET']
+      ? [{ name: 'STRIPE_WEBHOOK_SECRET', minLength: 16, disallowed: ['default', 'secret', 'changeme', 'placeholder'] }]
+      : []),
   ];
 
   const missingOrInvalid: string[] = [];
@@ -153,7 +156,7 @@ export async function bootstrapApp(): Promise<Express> {
       port: Number(process.env['DB_PORT']) || 5432,
       database: process.env['DB_DATABASE'] || 'Factusol',
       user: process.env['DB_USER'] || 'postgres',
-      password: process.env['DB_PASSWORD'] || (process.env.NODE_ENV === 'production' ? '' : '123456789'),
+      password: process.env['DB_PASSWORD'] || '',
     });
 
     const health = await db.checkHealth();

@@ -84,6 +84,11 @@ export interface UpdateSwapOptions {
    * archivo justo antes de lanzar el proceso (el llamador ya lo ha verificado).
    */
   expectedSha256?: string;
+  /**
+   * SHA-256 (hex) esperado para adodb.js opcional. Si no se proporciona un hash válido,
+   * adodb.js nunca se copia desde el directorio temporal a la carpeta de instalación.
+   */
+  expectedAdodbSha256?: string;
 }
 
 /**

@@ -22,7 +22,8 @@ export class SalesOrderManager {
     private readonly configManager: ConfigManager,
     private readonly factusolService: FactusolService,
     private readonly eventBus: EventBus,
-    private readonly erpRegistry?: ErpProviderRegistry
+    private readonly erpRegistry?: ErpProviderRegistry,
+    private readonly licenseCheckFn?: () => { status: string; plan?: string }
   ) {}
 
   public getSalesOrders(options?: GetSalesOrdersOptions): PaginatedSalesOrdersResult {
@@ -44,6 +45,16 @@ export class SalesOrderManager {
         success: false,
         message: `El pedido #${order.orderNumber} ya se encuentra sincronizado en Factusol (Nº ${order.factusolOrderNumber || '-'}).`,
       };
+    }
+
+    if (this.licenseCheckFn) {
+      const lic = this.licenseCheckFn();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        const err = `Reintento de pedido bloqueado: Requiere una licencia activa (${lic.status}). Active su clave en el Centro de Control.`;
+        this.logger.warn(err);
+        this.eventBus.addEvent('warn', err);
+        return { success: false, message: err };
+      }
     }
 
     const config = this.configManager.get();
@@ -132,7 +143,7 @@ export class SalesOrderManager {
       try {
         const res = await activeConnector.createOrder(safeOrder as any, series, warehouse);
         if (res.success) {
-          const assignedNum = String(res.orderNumber || res.orderId || order.webOrderId);
+          const assignedNum = String(res.orderNumber || res.externalId || (res as any).orderId || order.webOrderId);
           const updated = this.salesLedgerManager.markOrderRetried(id, 'synced', undefined, assignedNum);
           this.eventBus.addEvent('success', `✓ Pedido #${order.orderNumber} reintentado y registrado en ${activeConnector.displayName} (Nº ${assignedNum})`);
           return {
@@ -141,7 +152,7 @@ export class SalesOrderManager {
             order: updated || undefined,
           };
         }
-        const err = res.errorMessage || `Fallo al insertar pedido en ${activeConnector.displayName}.`;
+        const err = res.error || (res as any).errorMessage || `Fallo al insertar pedido en ${activeConnector.displayName}.`;
         this.salesLedgerManager.markOrderRetried(id, 'failed', err);
         return { success: false, message: err };
       } catch (err: unknown) {

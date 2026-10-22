@@ -85,7 +85,6 @@ export class SimplyGestAdapter implements IErpConnector {
 
     this.configManager.saveConfigToDisk();
     await this.connect(finalDbPath);
-
     this.eventBus?.addEvent('success', `✓ Base de datos SimplyGest reconectada: ${finalDbPath}`);
     return testResult;
   }
@@ -100,9 +99,7 @@ export class SimplyGestAdapter implements IErpConnector {
     );
     if (dbPath && !fs.existsSync(dbPath)) {
       const resolved = SimplyGestDetector.resolve(dbPath);
-      if (resolved.success && resolved.resolvedPath) {
-        dbPath = resolved.resolvedPath;
-      }
+      if (resolved.success && resolved.resolvedPath) dbPath = resolved.resolvedPath;
     }
     return dbPath;
   }
@@ -125,24 +122,14 @@ export class SimplyGestAdapter implements IErpConnector {
   public async getPreviewArticles(limit = 25): Promise<ErpArticlePreviewItem[]> {
     if (this.isEvaluationMode()) {
       return DEMO_ARTICLES_BY_ERP.simplygest.slice(0, limit).map((a) => ({
-        code: a.code,
-        description: a.name,
-        family: a.family,
-        stock: a.stock,
-        salePrice: a.price,
-        costPrice: a.costPrice,
-        ean: a.barcode,
+        code: a.code, description: a.name, family: a.family, stock: a.stock,
+        salePrice: a.price, costPrice: a.costPrice, ean: a.barcode,
       }));
     }
     const articles = await this.simplygestService.getPreviewArticles(undefined, limit);
     return articles.map((a) => ({
-      code: a.code,
-      description: a.description,
-      family: a.family,
-      stock: a.stock,
-      salePrice: a.salePrice,
-      costPrice: a.costPrice,
-      ean: a.ean,
+      code: a.code, description: a.description, family: a.family, stock: a.stock,
+      salePrice: a.salePrice, costPrice: a.costPrice, ean: a.ean,
     }));
   }
 
@@ -171,9 +158,7 @@ export class SimplyGestAdapter implements IErpConnector {
       return demoMap;
     }
     const dbPath = this.getDatabasePath();
-    if (!dbPath || !fs.existsSync(dbPath)) {
-      return new Map();
-    }
+    if (!dbPath || !fs.existsSync(dbPath)) return new Map();
 
     let localConnector = this.simplygestService.getConnector();
     let shouldDisconnect = false;
@@ -188,18 +173,14 @@ export class SimplyGestAdapter implements IErpConnector {
       const map = new Map<string, number>();
       for (const item of stockList) {
         const sku = (item.sku || '').trim().toUpperCase();
-        if (sku) {
-          map.set(sku, Math.max(0, Math.round(Number(item.quantity) || 0)));
-        }
+        if (sku) map.set(sku, Math.max(0, Math.round(Number(item.quantity) || 0)));
       }
       return map;
     } catch (err) {
       this.logger.warn(`Fallo al obtener mapa de existencias de SimplyGest: ${String(err)}`);
       return new Map();
     } finally {
-      if (shouldDisconnect && localConnector) {
-        await localConnector.disconnect().catch(() => {});
-      }
+      if (shouldDisconnect && localConnector) await localConnector.disconnect().catch(() => {});
     }
   }
 
@@ -222,14 +203,8 @@ export class SimplyGestAdapter implements IErpConnector {
     }
 
     try {
-      // Inyectar serie o almacén si procede
-      if (series && order) {
-        order.series = series;
-      }
-      if (warehouse && order) {
-        order.warehouse = warehouse;
-      }
-
+      if (series && order) order.series = series;
+      if (warehouse && order) order.warehouse = warehouse;
       const res = await localConnector.createOrder(order);
       return {
         success: res.success,
@@ -242,9 +217,7 @@ export class SimplyGestAdapter implements IErpConnector {
       this.logger.error('Error al insertar pedido en SimplyGest:', err);
       return { success: false, error: msg };
     } finally {
-      if (shouldDisconnect && localConnector) {
-        await localConnector.disconnect().catch(() => {});
-      }
+      if (shouldDisconnect && localConnector) await localConnector.disconnect().catch(() => {});
     }
   }
 
@@ -264,20 +237,11 @@ export class SimplyGestAdapter implements IErpConnector {
     try {
       const products = await localConnector.readProducts({ limit });
       return products.map((p) => ({
-        code: p.sku,
-        name: p.name,
-        family: p.categories?.[0]?.name,
-        stock: p.stockQuantity ?? 0,
-        price: p.regularPrice ?? 0,
-        costPrice: p.costPrice,
-        barcode: p.barcode,
-        description: p.description,
-        raw: p,
+        code: p.sku, name: p.name, family: p.categories?.[0]?.name, stock: p.stockQuantity ?? 0,
+        price: p.regularPrice ?? 0, costPrice: p.costPrice, barcode: p.barcode, description: p.description, raw: p,
       }));
     } finally {
-      if (shouldDisconnect && localConnector) {
-        await localConnector.disconnect().catch(() => {});
-      }
+      if (shouldDisconnect && localConnector) await localConnector.disconnect().catch(() => {});
     }
   }
 }

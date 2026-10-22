@@ -99,12 +99,12 @@ export function renderOverviewTab(): string {
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/></svg>
                 Licencia Local
               </span>
-              <span id="card-lic-badge" class="tag tag-green">Activa</span>
+              <span id="card-lic-badge" class="tag tag-amber">Comprobando...</span>
             </div>
-            <div id="card-lic-plan" class="card-metric">Professional</div>
-            <div id="card-lic-key" class="card-desc" style="font-family: monospace;">EB-PRO-XXXXX</div>
+            <div id="card-lic-plan" class="card-metric">Sin Licencia</div>
+            <div id="card-lic-key" class="card-desc" style="font-family: monospace;">Sin clave activa</div>
             <div class="card-footer">
-              <span id="card-lic-grace">Puesto vinculado</span>
+              <span id="card-lic-grace">Pendiente de activación</span>
               <button onclick="switchTab('license')" class="btn btn-secondary btn-sm">Ver</button>
             </div>
           </div>

@@ -65,6 +65,16 @@ namespace Bentian.Tray
             catch { }
         }
 
+        private static bool IsSafePortalUrl(string candidateUrl)
+        {
+            if (string.IsNullOrWhiteSpace(candidateUrl)) return false;
+            Uri parsed;
+            if (!Uri.TryCreate(candidateUrl.Trim(), UriKind.Absolute, out parsed)) return false;
+            if (parsed.Scheme == Uri.UriSchemeHttps) return true;
+            if (parsed.Scheme == Uri.UriSchemeHttp && (parsed.Host == "127.0.0.1" || parsed.Host == "localhost")) return true;
+            return false;
+        }
+
         private static NotifyIcon trayIcon;
         private static ContextMenuStrip contextMenu;
         private static int port = 39281;
@@ -174,12 +184,17 @@ namespace Bentian.Tray
                 SetCurrentProcessExplicitAppUserModelID("Bentian.ERPBridge.Agent");
             }
             catch { }
-            // Parse arguments
+
+            // Parse arguments with strict validation
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--port" && i + 1 < args.Length)
                 {
-                    int.TryParse(args[i + 1], out port);
+                    int parsedPort;
+                    if (int.TryParse(args[i + 1], out parsedPort) && parsedPort >= 1024 && parsedPort <= 65535)
+                    {
+                        port = parsedPort;
+                    }
                 }
                 else if (args[i] == "--parent-pid" && i + 1 < args.Length)
                 {
@@ -187,7 +202,10 @@ namespace Bentian.Tray
                 }
                 else if (args[i] == "--cloud-url" && i + 1 < args.Length)
                 {
-                    cloudUrl = args[i + 1];
+                    if (IsSafePortalUrl(args[i + 1]))
+                    {
+                        cloudUrl = args[i + 1].Trim();
+                    }
                 }
             }
 
@@ -311,7 +329,6 @@ namespace Bentian.Tray
             }
             catch
             {
-                // Fallback: direct browser launch
                 try
                 {
                     Process.Start(new ProcessStartInfo("http://127.0.0.1:" + port) { UseShellExecute = true });
@@ -333,7 +350,10 @@ namespace Bentian.Tray
         {
             try
             {
-                Process.Start(new ProcessStartInfo(cloudUrl) { UseShellExecute = true });
+                if (IsSafePortalUrl(cloudUrl))
+                {
+                    Process.Start(new ProcessStartInfo(cloudUrl) { UseShellExecute = true });
+                }
             }
             catch { }
         }
@@ -375,7 +395,6 @@ namespace Bentian.Tray
                     using (var reader = new StreamReader(resp.GetResponseStream()))
                     {
                         string json = reader.ReadToEnd();
-                        // Truncate tooltip safely (Windows limit: 63 characters)
                         string tip = "Bentian ERP Bridge — Conectado";
                         if (json.Contains("\"licenseStatus\":\"ACTIVE\"") || json.Contains("\"licenseStatus\":\"GRACE_PERIOD\""))
                         {
@@ -404,7 +423,6 @@ namespace Bentian.Tray
             }
             catch { }
 
-            // If parent process is still alive after 1 second, terminate it
             if (parentPid > 0)
             {
                 ThreadPool.QueueUserWorkItem(_ =>

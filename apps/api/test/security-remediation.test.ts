@@ -1,8 +1,12 @@
 import assert from 'assert';
 import http from 'http';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { bootstrapApp, assertProductionSecrets } from '../src/server';
 import { AuthService } from '../src/routes/auth.router';
+import { assertSafeCloudConnectionConfig } from '../src/routes/connections.router';
+import { validateSessionRedemptionWindow, clearRedeemedSessions } from '../src/routes/billing.helpers';
 import { AgentService, SyncScheduler } from '@erp-bridge/core';
 import { resetRateLimiters } from '../src/middleware/rate-limit';
 
@@ -390,6 +394,146 @@ async function runTests() {
     assert.strictEqual(healthJson.memory, undefined, 'No debe filtrar memoria interna');
     assert.strictEqual(healthJson.database?.message, undefined, 'No debe filtrar mensaje de error interno de BD');
     console.log('  ✓ /health limpio sin filtración de memoria ni detalles de base de datos.');
+
+    // -------------------------------------------------------------
+    // Test 10: Auditoría Adicional API & Web (SSRF, Session Replay, Telemetry Auth, Web Logout)
+    // -------------------------------------------------------------
+    console.log('10. Probando blindajes adicionales de API & Web (SSRF, Session Replay, Telemetría y Frontend)...');
+
+    // 10.1 SSRF en /connections/test bloqueado para TENANT_CLIENT y para IPs internas / rutas locales
+    const resConnTestTenant = await fetch(`${baseUrl}/api/v1/connections/test`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        connectorId: 'woocommerce',
+        configuration: { storeUrl: 'http://169.254.169.254/latest/meta-data/' },
+      }),
+    });
+    assert.strictEqual(resConnTestTenant.status, 403, 'TENANT_CLIENT no debe poder ejecutar /connections/test en Cloud');
+
+    assert.throws(
+      () => assertSafeCloudConnectionConfig({ storeUrl: 'https://169.254.169.254/latest/meta-data/' }),
+      /anti-SSRF/,
+      'Debe bloquear metadata cloud IP 169.254.169.254'
+    );
+    assert.throws(
+      () => assertSafeCloudConnectionConfig({ storeUrl: 'https://127.0.0.1:8080' }),
+      /anti-SSRF/,
+      'Debe bloquear loopback 127.0.0.1'
+    );
+    assert.throws(
+      () => assertSafeCloudConnectionConfig({ databasePath: '/etc/passwd' }),
+      /sistema de archivos local/,
+      'Debe bloquear rutas locales en Cloud API'
+    );
+    console.log('  ✓ Mitigación anti-SSRF y restricción RBAC en /connections/test verificadas.');
+
+    // 10.2 Protección anti-replay en /billing/session-license
+    clearRedeemedSessions();
+    const expiredCheck = validateSessionRedemptionWindow(
+      'cs_live_expired_123',
+      Math.floor((Date.now() - 2 * 60 * 60 * 1000) / 1000) // hace 2 horas
+    );
+    assert.strictEqual(expiredCheck.allowed, false, 'Sesión Stripe de hace > 60 min debe ser rechazada');
+
+    const firstRedeem = validateSessionRedemptionWindow('cs_live_fresh_456', Math.floor(Date.now() / 1000));
+    assert.strictEqual(firstRedeem.allowed, true, 'Primer canje reciente debe permitirse');
+
+    const lateReplay = validateSessionRedemptionWindow(
+      'cs_live_fresh_456',
+      Math.floor(Date.now() / 1000),
+      null,
+      Date.now() + 20 * 60 * 1000 // 20 min después del primer canje
+    );
+    assert.strictEqual(lateReplay.allowed, false, 'Replay pasados > 15 min del primer canje debe rechazarse');
+    clearRedeemedSessions();
+    console.log('  ✓ Ventana temporal y anti-replay de session_id en /billing/session-license verificados.');
+
+    // 10.3 Heartbeat y report-error sin autenticación ni agente registrado deben devolver 401
+    resetRateLimiters();
+    const resUnauthHeartbeat = await fetch(`${baseUrl}/api/v1/agents/ag_spoofed_999999/heartbeat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'ag_spoofed_999999',
+        hwid: 'spoofed_unknown_hwid_999999999999',
+        status: 'ONLINE',
+        version: '0.4.10',
+      }),
+    });
+    assert.strictEqual(resUnauthHeartbeat.status, 401, 'Heartbeat de agente desconocido sin token/licencia debe dar 401');
+
+    const resUnauthErrorReport = await fetch(`${baseUrl}/api/v1/fleet/report-error`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'ag_spoofed_999999',
+        errorCode: 'FAKE_ERR',
+        message: 'Flood attempt',
+      }),
+    });
+    assert.strictEqual(resUnauthErrorReport.status, 401, 'POST /fleet/report-error sin autenticación debe dar 401');
+    console.log('  ✓ Endpoints /agents/:id/heartbeat y /fleet/report-error protegidos contra spoofing anónimo.');
+
+    // 10.4 Frontend Dashboard: revocación en logout y eliminación de secreto estático en multichannel
+    const authJsContent = fs.readFileSync(path.resolve(__dirname, '../public/dashboard/js/auth.js'), 'utf8');
+    assert.ok(authJsContent.includes("fetch('/api/v1/auth/logout'"), 'auth.js debe invocar /api/v1/auth/logout al cerrar sesión');
+
+    const multiJsContent = fs.readFileSync(path.resolve(__dirname, '../public/dashboard/js/multichannel.js'), 'utf8');
+    assert.ok(!multiJsContent.includes('shpss_sec_99887766554433221100aabbccddeeff'), 'multichannel.js no debe tener secreto estático hardcodeado');
+    console.log('  ✓ Dashboard Web: logout con revocación en servidor y eliminación de secreto estático verificados.');
+
+    // -----------------------------------------------------------------------
+    // 11. Conectores secundarios (SimplyGest SQL, WooCommerce SSRF) y MappingEngine
+    // -----------------------------------------------------------------------
+    console.log('\n[Test 11] Blindaje en SimplyGest, WooCommerce y MappingEngine (Prototype Pollution)...');
+    const { sanitizeSql: sanitizeSimplyGest } = await import('../../../packages/connectors/simplygest/src/queries/article.queries');
+    const boundaryVal = 'A'.repeat(19) + "' OR 1=1--";
+    const escapedBoundary = sanitizeSimplyGest(boundaryVal, 20);
+    const singleQuotesCount = (escapedBoundary.match(/'/g) || []).length;
+    assert.strictEqual(singleQuotesCount % 2, 0, 'sanitizeSql de SimplyGest nunca debe dejar una comilla impar al truncar');
+
+    const { MappingEngine } = await import('@erp-bridge/core');
+    const engine = new MappingEngine();
+    const dummyProduct: any = {
+      id: 'p1',
+      sku: 'SKU1',
+      name: 'Test',
+      price: 10,
+      currency: 'EUR',
+      taxRate: 21,
+      active: true,
+      categories: [],
+      attributes: {},
+    };
+    engine.applyMappingToProduct(dummyProduct, [
+      { sourceField: 'name', destinationField: '__proto__.pollutedFlag', defaultValue: 'yes' },
+      { sourceField: 'name', destinationField: 'constructor.prototype.pollutedFlag2', defaultValue: 'yes' },
+    ]);
+    assert.strictEqual(({} as any).pollutedFlag, undefined, 'Object.prototype no debe contaminarse vía __proto__');
+    assert.strictEqual(({} as any).pollutedFlag2, undefined, 'Object.prototype no debe contaminarse vía constructor.prototype');
+
+    const { WooCommerceClient } = await import('@erp-bridge/connector-woocommerce');
+    const prevEnv = process.env['NODE_ENV'];
+    process.env['NODE_ENV'] = 'production';
+    try {
+      assert.throws(
+        () => new WooCommerceClient({ url: 'http://169.254.169.254', consumerKey: 'ck_1', consumerSecret: 'cs_1' }),
+        /Host no permitido/,
+        'WooCommerceClient debe rechazar 169.254.169.254 en producción'
+      );
+      assert.throws(
+        () => new WooCommerceClient({ url: 'http://127.0.0.1:8080', consumerKey: 'ck_1', consumerSecret: 'cs_1' }),
+        /Host no permitido/,
+        'WooCommerceClient debe rechazar 127.0.0.1 en producción'
+      );
+    } finally {
+      process.env['NODE_ENV'] = prevEnv;
+    }
+    console.log('  ✓ SimplyGest SQL, MappingEngine anti-Prototype-Pollution y WooCommerce anti-SSRF verificados.');
 
     console.log('\n============================================================');
     console.log('✅ TODAS LAS PRUEBAS DE SEGURIDAD (P0, P1 y P3) PASARON CON ÉXITO');

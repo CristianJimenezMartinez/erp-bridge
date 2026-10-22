@@ -65,8 +65,8 @@ export function renderWizardModal(): string {
             <div id="wiz-lic-alert" style="margin-top: 10px; font-size: 12px; display: none;"></div>
           </div>
 
-          <div style="text-align: center; margin-top: 14px;">
-            <button type="button" onclick="wizSkipToExplore()" style="background:none;border:none;color:#94a3b8;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:12px;">Saltar por ahora y explorar el programa sin clave →</button>
+          <div style="text-align: center; margin-top: 14px; font-size: 11.5px; color: var(--text-subtle);">
+            🔒 Se requiere una clave activa o Licencia Beta Gratuita para desbloquear los conectores ERP y la sincronización.
           </div>
         </div>
 
@@ -358,6 +358,22 @@ export function renderWizardModal(): string {
               <div style="font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 2px;">WooCommerce</div>
               <div style="font-size: 11px; color: var(--text-muted);">Conexión con claves API oficial.</div>
             </div>
+
+            <div id="wiz-choice-prestashop" class="channel-card" onclick="wizSelectChannel('prestashop')">
+              <div class="channel-icon" style="color: #f43f5e;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+              <div style="font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 2px;">PrestaShop 1.7 / 8.x</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Webservices API nativo sin módulos.</div>
+            </div>
+
+            <div id="wiz-choice-shopify" class="channel-card" onclick="wizSelectChannel('shopify')">
+              <div class="channel-icon" style="color: #34d399;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              </div>
+              <div style="font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 2px;">Shopify</div>
+              <div style="font-size: 11px; color: var(--text-muted);">GraphQL Admin API y multiubicación.</div>
+            </div>
           </div>
 
           <div id="wiz-panel-univ">
@@ -401,6 +417,42 @@ export function renderWizardModal(): string {
               </button>
             </div>
             <div id="wiz-wc-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <div id="wiz-panel-prestashop" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">URL de tu Tienda PrestaShop:</label>
+              <input type="text" id="wiz-input-ps-url" onblur="sanitizeUrlInput('wiz-input-ps-url')" class="form-control" placeholder="https://mitienda.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clave de Servicio Web (Webservice API Key):</label>
+              <input type="password" id="wiz-input-ps-key" class="form-control" placeholder="32 caracteres alfanuméricos">
+            </div>
+            <div style="margin-top: 8px;">
+              <button onclick="wizTestPrestashop()" id="wiz-btn-test-ps" class="btn btn-secondary btn-sm">
+                <span>Comprobar Conexión PrestaShop</span>
+              </button>
+            </div>
+            <div id="wiz-ps-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
+          </div>
+
+          <div id="wiz-panel-shopify" style="display: none;">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Subdominio Shopify:</label>
+                <input type="text" id="wiz-input-shopify-subdomain" class="form-control" placeholder="mi-tienda.myshopify.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Admin API Access Token:</label>
+                <input type="password" id="wiz-input-shopify-token" class="form-control" placeholder="shpat_...">
+              </div>
+            </div>
+            <div style="margin-top: 8px;">
+              <button onclick="wizTestShopify()" id="wiz-btn-test-shopify" class="btn btn-secondary btn-sm">
+                <span>Comprobar Conexión Shopify</span>
+              </button>
+            </div>
+            <div id="wiz-shopify-alert" style="margin-top: 8px; font-size: 12px; display: none;"></div>
           </div>
         </div>
 

@@ -7,7 +7,6 @@ import {
   LicenseActivationRequest,
   LicenseActivationRequestSchema,
   LicenseActivationResponse,
-  LicenseTokenPayload,
   LicenseValidationRequest,
   LicenseValidationRequestSchema,
   LicenseValidationResponse,
@@ -17,10 +16,16 @@ import {
 import { ILicenseRepository, PostgresLicenseRepository } from '../database/repositories/license.repository';
 import { LicenseKeyGenerator } from './license-key.generator';
 import { LicenseTokenManager } from './license-token';
+import {
+  buildFleetOverview,
+  FleetOverviewSummary,
+  GRACE_PERIOD_DAYS,
+  GRACE_PERIOD_MS,
+  issueSignedMachineToken,
+  verifyLicenseActiveState,
+  withLicenseKeyLock,
+} from './license-fleet.helper';
 import { EventBus } from '../events/event-bus';
-
-const GRACE_PERIOD_DAYS = 7;
-const GRACE_PERIOD_MS = GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000;
 
 export class LicenseService {
   private readonly logger = new Logger('LicenseService');
@@ -85,10 +90,7 @@ export class LicenseService {
     const result: LicenseWithActivations[] = [];
     for (const lic of licenses) {
       const activations = await this.repository.listActivationsByLicense(lic.id);
-      result.push({
-        ...lic,
-        activations,
-      });
+      result.push({ ...lic, activations });
     }
     return result;
   }
@@ -99,57 +101,24 @@ export class LicenseService {
   }
 
   public async unbindMachine(licenseId: string, hwid: string): Promise<{ success: boolean; message?: string }> {
-    const license = await this.repository.findLicenseById(licenseId);
-    if (!license) {
-      return { success: false, message: 'Licencia no encontrada' };
-    }
-    const activation = await this.repository.findActivation(license.id, hwid);
-    if (!activation) {
-      return { success: false, message: 'No se encontró activación para este equipo' };
-    }
-    await this.repository.deactivateActivation(activation.id);
-    license.currentActivations = Math.max(0, license.currentActivations - 1);
-    await this.repository.updateLicense(license);
-    this.logger.info(`✓ Equipo HWID ${hwid.substring(0, 16)}... desvinculado con éxito de la licencia ${license.key}`);
-    return { success: true };
+    return withLicenseKeyLock(licenseId, async () => {
+      const license = await this.repository.findLicenseById(licenseId);
+      if (!license) return { success: false, message: 'Licencia no encontrada' };
+
+      const activation = await this.repository.findActivation(license.id, hwid);
+      if (!activation) return { success: false, message: 'No se encontró activación para este equipo' };
+
+      await this.repository.deactivateActivation(activation.id);
+      license.currentActivations = Math.max(0, license.currentActivations - 1);
+      await this.repository.updateLicense(license);
+      this.logger.info(`✓ Equipo HWID ${hwid.substring(0, 16)}... desvinculado con éxito de la licencia ${license.key}`);
+      return { success: true };
+    });
   }
 
-  public async getFleetOverview(organizationId: string): Promise<{
-    totalLicenses: number;
-    totalAllowedSeats: number;
-    activeSeats: number;
-    onlineSeats: number;
-    plan: string;
-    licenses: LicenseWithActivations[];
-  }> {
+  public async getFleetOverview(organizationId: string): Promise<FleetOverviewSummary> {
     const licenses = await this.listLicensesWithActivations(organizationId);
-    let totalAllowedSeats = 0;
-    let activeSeats = 0;
-    let onlineSeats = 0;
-    const now = Date.now();
-    const twentyFourHours = 24 * 60 * 60 * 1000;
-
-    for (const lic of licenses) {
-      totalAllowedSeats += lic.maxActivations;
-      activeSeats += lic.activations.length;
-      for (const act of lic.activations) {
-        const lastVal = new Date(act.lastValidatedAt).getTime();
-        if (now - lastVal < twentyFourHours) {
-          onlineSeats++;
-        }
-      }
-    }
-
-    const primaryPlan = licenses[0]?.plan || 'starter';
-
-    return {
-      totalLicenses: licenses.length,
-      totalAllowedSeats: Math.max(totalAllowedSeats, 1),
-      activeSeats,
-      onlineSeats,
-      plan: primaryPlan,
-      licenses,
-    };
+    return buildFleetOverview(licenses);
   }
 
   public async activateLicense(request: LicenseActivationRequest): Promise<LicenseActivationResponse> {
@@ -161,179 +130,128 @@ export class LicenseService {
     }
 
     const normalizedKey = LicenseKeyGenerator.normalize(validated.licenseKey);
-    const license = await this.repository.findLicenseByKey(normalizedKey);
 
-    if (!license) {
-      return { success: false, error: 'La clave de licencia especificada no existe en el sistema' };
-    }
+    return withLicenseKeyLock(normalizedKey, async () => {
+      const rawLicense = await this.repository.findLicenseByKey(normalizedKey);
+      const stateCheck = await verifyLicenseActiveState(
+        rawLicense,
+        this.repository,
+        'La clave de licencia especificada no existe en el sistema'
+      );
+      if (!stateCheck.ok) {
+        return { success: false, error: stateCheck.error };
+      }
+      const license = stateCheck.license;
 
-    if (license.status === 'revoked') {
-      return { success: false, error: `Licencia revocada: ${license.revokedReason || 'Contacte con soporte'}` };
-    }
+      const existingActivation = await this.repository.findActivation(license.id, validated.hwid);
 
-    if (license.status === 'suspended') {
-      return { success: false, error: 'Licencia temporalmente suspendida' };
-    }
+      if (!existingActivation) {
+        if (license.currentActivations >= license.maxActivations) {
+          return {
+            success: false,
+            error: `Límite de activaciones alcanzado (${license.currentActivations}/${license.maxActivations}). Desactive un equipo previo para continuar.`,
+          };
+        }
 
-    // Check expiration
-    if (license.expiresAt && new Date() > license.expiresAt) {
-      license.status = 'expired';
-      await this.repository.updateLicense(license);
-      return { success: false, error: 'La licencia ha expirado' };
-    }
-
-    // Check if this HWID is already activated for this license
-    const existingActivation = await this.repository.findActivation(license.id, validated.hwid);
-
-    if (!existingActivation) {
-      // Check activation capacity limit
-      if (license.currentActivations >= license.maxActivations) {
-        return {
-          success: false,
-          error: `Límite de activaciones alcanzado (${license.currentActivations}/${license.maxActivations}). Desactive un equipo previo para continuar.`,
+        const newActivation: LicenseActivation = {
+          id: uuidv4(),
+          licenseId: license.id,
+          hwid: validated.hwid,
+          agentId: validated.agentId,
+          machineInfo: validated.machineInfo,
+          activatedAt: new Date(),
+          lastValidatedAt: new Date(),
         };
+
+        await this.repository.createActivation(newActivation);
+        license.currentActivations += 1;
+        await this.repository.updateLicense(license);
+
+        this.eventBus.publish({
+          type: 'LICENSE_ACTIVATED',
+          organizationId: license.organizationId,
+          source: 'LicenseService',
+          data: { licenseId: license.id, hwid: validated.hwid, plan: license.plan },
+        });
+      } else {
+        await this.repository.updateActivationValidation(existingActivation.id);
       }
 
-      // Create new activation
-      const newActivation: LicenseActivation = {
-        id: uuidv4(),
-        licenseId: license.id,
-        hwid: validated.hwid,
-        agentId: validated.agentId,
-        machineInfo: validated.machineInfo,
-        activatedAt: new Date(),
-        lastValidatedAt: new Date(),
+      const { token, expiresAtIso } = issueSignedMachineToken(license, validated.hwid, validated.agentId);
+
+      return {
+        success: true,
+        licenseToken: token,
+        plan: license.plan,
+        expiresAt: expiresAtIso,
+        gracePeriodDays: GRACE_PERIOD_DAYS,
       };
-
-      await this.repository.createActivation(newActivation);
-      license.currentActivations += 1;
-      await this.repository.updateLicense(license);
-
-      this.eventBus.publish({
-        type: 'LICENSE_ACTIVATED',
-        organizationId: license.organizationId,
-        source: 'LicenseService',
-        data: { licenseId: license.id, hwid: validated.hwid, plan: license.plan },
-      });
-    } else {
-      // Refresh existing activation
-      await this.repository.updateActivationValidation(existingActivation.id);
-    }
-
-    // Generate signed JWT token
-    const tokenPayload: LicenseTokenPayload = {
-      licenseId: license.id,
-      organizationId: license.organizationId,
-      plan: license.plan,
-      hwid: validated.hwid,
-      agentId: validated.agentId,
-      issuedAt: Date.now(),
-      expiresAt: Date.now() + GRACE_PERIOD_MS,
-    };
-
-    const licenseToken = LicenseTokenManager.createToken(tokenPayload);
-
-    return {
-      success: true,
-      licenseToken,
-      plan: license.plan,
-      expiresAt: new Date(tokenPayload.expiresAt).toISOString(),
-      gracePeriodDays: GRACE_PERIOD_DAYS,
-    };
+    });
   }
 
   public async validateLicense(request: LicenseValidationRequest): Promise<LicenseValidationResponse> {
     const validated = LicenseValidationRequestSchema.parse(request);
 
-    // 1. Verify cryptographic token
     const verification = LicenseTokenManager.verifyToken(validated.licenseToken);
     if (!verification.valid || !verification.payload) {
       return { valid: false, message: verification.reason || 'Token de licencia inválido' };
     }
 
     const payload = verification.payload;
-
-    // 2. Hardware binding check
     if (payload.hwid !== validated.hwid) {
       return { valid: false, message: 'Hardware fingerprint mismatch (el token no corresponde a esta máquina)' };
     }
 
-    // 3. Database check
-    const license = await this.repository.findLicenseById(payload.licenseId);
-    if (!license) {
-      return { valid: false, message: 'La licencia asociada al token ya no existe' };
+    const rawLicense = await this.repository.findLicenseById(payload.licenseId);
+    const stateCheck = await verifyLicenseActiveState(
+      rawLicense,
+      this.repository,
+      'La licencia asociada al token ya no existe'
+    );
+    if (!stateCheck.ok) {
+      return { valid: false, message: stateCheck.error };
     }
-
-    if (license.status === 'revoked') {
-      return { valid: false, message: `Licencia revocada: ${license.revokedReason || 'Contacte con soporte'}` };
-    }
-
-    if (license.status === 'suspended') {
-      return { valid: false, message: 'Licencia suspendida' };
-    }
-
-    if (license.expiresAt && new Date() > license.expiresAt) {
-      license.status = 'expired';
-      await this.repository.updateLicense(license);
-      return { valid: false, message: 'La licencia ha expirado' };
-    }
+    const license = stateCheck.license;
 
     const activation = await this.repository.findActivation(license.id, validated.hwid);
     if (!activation) {
       return { valid: false, message: 'Esta máquina no está activada en la licencia' };
     }
 
-    // Update validation timestamp
     await this.repository.updateActivationValidation(activation.id);
 
-    // Renew token with new 7-day validity
-    const renewedPayload: LicenseTokenPayload = {
-      licenseId: license.id,
-      organizationId: license.organizationId,
-      plan: license.plan,
-      hwid: validated.hwid,
-      agentId: payload.agentId,
-      issuedAt: Date.now(),
-      expiresAt: Date.now() + GRACE_PERIOD_MS,
-    };
-
-    const renewedToken = LicenseTokenManager.createToken(renewedPayload);
+    const { token: renewedToken, expiresAtIso } = issueSignedMachineToken(license, validated.hwid, payload.agentId);
 
     return {
       valid: true,
       plan: license.plan,
       renewedToken,
-      expiresAt: new Date(renewedPayload.expiresAt).toISOString(),
+      expiresAt: expiresAtIso,
       gracePeriodRemainingSeconds: Math.floor(GRACE_PERIOD_MS / 1000),
     };
   }
 
   public async deactivateLicense(licenseKey: string, hwid: string): Promise<{ success: boolean; message?: string }> {
     const normalizedKey = LicenseKeyGenerator.normalize(licenseKey);
-    const license = await this.repository.findLicenseByKey(normalizedKey);
+    return withLicenseKeyLock(normalizedKey, async () => {
+      const license = await this.repository.findLicenseByKey(normalizedKey);
+      if (!license) return { success: false, message: 'Licencia no encontrada' };
 
-    if (!license) {
-      return { success: false, message: 'Licencia no encontrada' };
-    }
+      const activation = await this.repository.findActivation(license.id, hwid);
+      if (!activation) return { success: false, message: 'No hay activación registrada para este equipo en la licencia' };
 
-    const activation = await this.repository.findActivation(license.id, hwid);
-    if (!activation) {
-      return { success: false, message: 'No hay activación registrada para este equipo en la licencia' };
-    }
+      await this.repository.deactivateActivation(activation.id);
+      license.currentActivations = Math.max(0, license.currentActivations - 1);
+      await this.repository.updateLicense(license);
 
-    await this.repository.deactivateActivation(activation.id);
-    license.currentActivations = Math.max(0, license.currentActivations - 1);
-    await this.repository.updateLicense(license);
-
-    this.logger.info(`Activación liberada para HWID ${hwid.substring(0, 16)}... en licencia ${license.key}`);
-    return { success: true };
+      this.logger.info(`Activación liberada para HWID ${hwid.substring(0, 16)}... en licencia ${license.key}`);
+      return { success: true };
+    });
   }
 
   public async revokeLicense(licenseId: string, reason: string): Promise<License> {
     const license = await this.repository.findLicenseById(licenseId);
-    if (!license) {
-      throw new Error(`Licencia no encontrada con ID: ${licenseId}`);
-    }
+    if (!license) throw new Error(`Licencia no encontrada con ID: ${licenseId}`);
 
     license.status = 'revoked';
     license.revokedAt = new Date();

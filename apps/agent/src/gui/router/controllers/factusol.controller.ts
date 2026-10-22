@@ -73,6 +73,15 @@ export class FactusolController {
 
   public static testFactusol(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const lic = agent.licenseService?.getLicenseStatus();
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: 'Licencia requerida: Activa tu clave de licencia en el Paso 1 o en la pestaña Licencia antes de conectar con Factusol.'
+        }));
+        return;
+      }
       const dbPath = ctx.body?.databasePath || '';
       if (/[\x00-\x1f;'"\x60]/.test(dbPath)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -97,6 +106,16 @@ export class FactusolController {
 
   public static getPreview(agent: LocalAgent): RouteHandler {
     return async (_req, res) => {
+      const lic = agent.licenseService?.getLicenseStatus();
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          articles: [],
+          message: 'Licencia requerida para consultar el catálogo de Factusol.'
+        }));
+        return;
+      }
       const preview = await agent.getFactusolPreviewArticles(25);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(preview));

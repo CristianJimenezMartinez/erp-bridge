@@ -14,7 +14,10 @@ export const updatesRouter = Router();
 const updateService = new UpdateService();
 
 // 1. Agent checks for updates
-updatesRouter.post('/updates/check', async (req: Request, res: Response, next: NextFunction) => {
+updatesRouter.post(
+  '/updates/check',
+  rateLimit({ name: 'updates-check', windowMs: 15 * 60 * 1000, max: 60 }),
+  async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = UpdateCheckRequestSchema.parse(req.body);
     let result = await updateService.checkForUpdates(validated);

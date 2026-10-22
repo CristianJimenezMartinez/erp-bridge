@@ -1,16 +1,5 @@
-import {
-  OrderMutationResult,
-  ReadOrdersOptions,
-  ConnectionError,
-  ErrorCode,
-} from '@erp-bridge/sdk';
-import {
-  CanonicalOrder,
-  CanonicalOrderLine,
-  CanonicalCustomer,
-  Logger,
-  OrderStatus,
-} from '@erp-bridge/shared';
+import { OrderMutationResult, ReadOrdersOptions, ConnectionError, ErrorCode } from '@erp-bridge/sdk';
+import { CanonicalOrder, CanonicalOrderLine, CanonicalCustomer, Logger, OrderStatus } from '@erp-bridge/shared';
 import { AccessDriver } from '../access-driver';
 import {
   findOrderByReferenceQuery,
@@ -24,12 +13,9 @@ import {
   updateOrderStatusQuery,
   normalizeTaxId,
   sanitizeAndTruncate,
+  sanitizeFloat,
 } from '../queries';
-import {
-  FactusolOrderRaw,
-  FactusolOrderLineRaw,
-  FactusolOrderMapper,
-} from '../mappers';
+import { FactusolOrderRaw, FactusolOrderLineRaw, FactusolOrderMapper } from '../mappers';
 import { FactusolConnectionConfig } from '../factusol.types';
 import { FactusolCustomerHandler } from './customer.handler';
 
@@ -223,7 +209,7 @@ export class FactusolOrderHandler {
       // 3. Sentencias atómicas de reposición de stock
       const stockRestoreSqls: string[] = [];
       for (const line of lines) {
-        const qty = Number(line.CANLPC || 0);
+        const qty = sanitizeFloat(line.CANLPC || 0);
         const sku = sanitizeAndTruncate(line.ARTLPC, 13);
         if (qty > 0 && sku) {
           stockRestoreSqls.push(

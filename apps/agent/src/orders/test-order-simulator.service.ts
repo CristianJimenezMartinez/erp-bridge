@@ -71,6 +71,9 @@ export interface TestOrderSimulationResult {
     [key: string]: any;
   };
   error?: string;
+  message?: string;
+  steps?: TestOrderSimulationStep[];
+  summary?: Record<string, any>;
 }
 
 export class TestOrderSimulatorService {
@@ -82,7 +85,8 @@ export class TestOrderSimulatorService {
     private readonly salesLedgerManager?: SalesLedgerManager,
     private readonly factusolService?: FactusolService,
     public defaultDriver?: AccessDriver,
-    private readonly erpRegistry?: ErpProviderRegistry
+    private readonly erpRegistry?: ErpProviderRegistry,
+    private readonly licenseCheckFn?: () => { status: string; plan?: string }
   ) {
     if (this.factusolService) {
       this.logger.debug('TestOrderSimulatorService inicializado con FactusolService.');
@@ -94,6 +98,15 @@ export class TestOrderSimulatorService {
     const t0 = performance.now();
     const steps: TestOrderSimulationStep[] = [];
     const dryRun = options.dryRun !== undefined ? options.dryRun : true;
+
+    if (this.licenseCheckFn && (!dryRun || (!options.customDriver && !this.defaultDriver))) {
+      const lic = this.licenseCheckFn();
+      if (lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        const errMsg = `Operación bloqueada: Requiere una licencia activa (${lic.status}). Active su clave en la pestaña Licencia.`;
+        steps.push({ step: 1, name: 'Verificación de Licencia Activa', status: 'failed', details: errMsg });
+        return this.buildFailureResult(steps, errMsg, dryRun, t0);
+      }
+    }
 
     // 0. Si el ERP activo no es Factusol en disco (ej: SimplyGest, Ágora POS, Sage 50, a3ERP o Modo Evaluación), usar erpRegistry polimórfico
     const activeConnector = this.erpRegistry?.getActiveConnector();
@@ -130,6 +143,12 @@ export class TestOrderSimulatorService {
       const netAmount = Number(simPrice.toFixed(2));
       const taxAmount = Number((netAmount * 0.21).toFixed(2));
       const totalAmount = Number((netAmount + taxAmount).toFixed(2));
+      steps.push({
+        step: 3,
+        name: 'Cuadre de IVA y céntimos (21%)',
+        status: 'ok',
+        details: `Base: ${netAmount.toFixed(2)} € + IVA 21%: ${taxAmount.toFixed(2)} € = Total: ${totalAmount.toFixed(2)} €`,
+      });
       const simRef = `SIM-${Date.now().toString().slice(-6)}`;
       let assignedNum = Math.floor(90000 + Math.random() * 9000);
       if (!dryRun) {
@@ -139,26 +158,48 @@ export class TestOrderSimulatorService {
           customer: { fiscalName: 'Cliente Simulación Bentian', taxId: 'B00000000', email: 'test@bentian.es' },
           totals: { subtotal: netAmount, tax: taxAmount, total: totalAmount },
           lines: [{ position: 1, sku: simArtCode, name: simArtName, quantity: 1, unitPrice: netAmount, total: netAmount }],
-        } as any, 1, 'GEN');
+        } as any, '1', 'GEN');
         if (createRes.orderNumber) assignedNum = Number(createRes.orderNumber) || assignedNum;
       }
       steps.push({
-        step: 3,
+        step: 4,
         name: dryRun ? 'Validación de Inserción (Dry-Run)' : `Inserción en ${activeConnector.displayName}`,
         status: 'ok',
         details: dryRun
           ? `Simulación en seco verificada sobre ${activeConnector.displayName} (Pedido #${assignedNum})`
           : `Pedido #${assignedNum} registrado en ${activeConnector.displayName}`,
       });
+      steps.push({
+        step: 5,
+        name: 'Actualización de stock disponible',
+        status: 'ok',
+        details: `Stock disponible: ${simStockBefore} → ${simStockAfter} uds`,
+      });
       const durationMs = Math.round(performance.now() - t0);
       return {
         success: true,
+        orderNumber: String(assignedNum),
+        series: '1',
+        articleCode: simArtCode,
+        articleDescription: simArtName,
+        totalAmount,
+        taxAmount,
         dryRun,
         message: dryRun
           ? `✓ Simulación en seco (Dry-Run) completada con éxito en ${activeConnector.displayName} (${durationMs}ms)`
           : `✓ Pedido de prueba #${assignedNum} creado con éxito en ${activeConnector.displayName} (${durationMs}ms)`,
         durationMs,
         steps,
+        details: {
+          steps,
+          article: {
+            code: simArtCode,
+            description: simArtName,
+            price: netAmount,
+            stockBefore: simStockBefore,
+            stockAfter: simStockAfter,
+          },
+        },
         summary: {
           orderSeries: '1',
           orderCode: assignedNum,

@@ -234,11 +234,11 @@ export class StatusAggregatorService {
         sage50: { inst: '.\\SAGE50', db: 'GESTION' },
         a3erp: { inst: '.\\SQLEXPRESS', db: 'A3ERP' },
       };
-      const srv = activeProviderCfg.serverInstance || activeProviderCfg.sqlInstance || sqlDefaults[activeErp].inst;
+      const srv = activeProviderCfg.serverInstance || activeProviderCfg.sqlInstance || sqlDefaults[activeErp]?.inst || '.\\SQLEXPRESS';
       const rawDb = String(activeProviderCfg.databaseName || activeProviderCfg.databasePath || '').trim();
       const dbName = (!isEvalActive && rawDb && !rawDb.startsWith('mssql://') && !rawDb.toUpperCase().startsWith('DEMO'))
         ? rawDb
-        : (activeProviderCfg.databaseName || sqlDefaults[activeErp].db);
+        : (activeProviderCfg.databaseName || sqlDefaults[activeErp]?.db || 'ERP');
       sqlConnection = {
         connected: Boolean(isEvalActive || activeProviderCfg.serverInstance || activeProviderCfg.sqlInstance || cfg.softwareErp?.provisioned),
         serverInstance: srv,

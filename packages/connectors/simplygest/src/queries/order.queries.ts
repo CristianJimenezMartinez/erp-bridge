@@ -20,24 +20,29 @@ export function getNextOrderIdQuery(): string {
   return `SELECT MAX(NUMERO) AS maxid FROM PEDIDOS_VENTA`;
 }
 
+function safeFixed(val: unknown, decimals: number, fallback = 0): string {
+  const num = Number(val);
+  return (Number.isFinite(num) ? num : fallback).toFixed(decimals);
+}
+
 export function insertOrderHeaderQuery(
   order: CanonicalOrder,
   orderNumber: string,
   customerCode: string
 ): string {
-  const ref = sanitizeSql(order.reference || `WC-${order.orderNumber || order.id}`).substring(0, 50);
+  const ref = sanitizeSql(order.reference || `WC-${order.orderNumber || order.id}`, 50);
   const dateFormatted = formatAccessDate(order.date || new Date());
-  const netAmount = Number(order.netAmount || 0).toFixed(2);
-  const taxAmount = Number(order.taxAmount || 0).toFixed(2);
-  const totalAmount = Number(order.totalAmount || 0).toFixed(2);
+  const netAmount = safeFixed(order.netAmount, 2, 0);
+  const taxAmount = safeFixed(order.taxAmount, 2, 0);
+  const totalAmount = safeFixed(order.totalAmount, 2, 0);
 
   return `
     INSERT INTO PEDIDOS_VENTA (
       NUMERO, FECHA, CLIENTE, REFPEDIDO, BASE_IMP, IVA, TOTAL, ESTADO
     ) VALUES (
-      '${sanitizeSql(orderNumber)}',
+      '${sanitizeSql(orderNumber, 20)}',
       ${dateFormatted},
-      '${sanitizeSql(customerCode)}',
+      '${sanitizeSql(customerCode, 20)}',
       '${ref}',
       ${netAmount},
       ${taxAmount},
@@ -52,18 +57,19 @@ export function insertOrderLineQuery(
   orderNumber: string,
   position: number
 ): string {
-  const sku = sanitizeSql(line.sku).substring(0, 30);
-  const name = sanitizeSql(line.name).substring(0, 100);
-  const qty = Number(line.quantity || 1).toFixed(4);
-  const price = Number(line.unitPrice || 0).toFixed(4);
-  const total = Number(line.total || (Number(qty) * Number(price))).toFixed(2);
+  const sku = sanitizeSql(line.sku, 30);
+  const name = sanitizeSql(line.name, 100);
+  const safePosition = Math.max(1, Math.floor(Number(position) || 1));
+  const qty = safeFixed(line.quantity, 4, 1);
+  const price = safeFixed(line.unitPrice, 4, 0);
+  const total = safeFixed(line.total ?? (Number(qty) * Number(price)), 2, 0);
 
   return `
     INSERT INTO LINEAS_PEDIDOS (
       NUMERO_PEDIDO, LINEA, CODIGO_ART, DESCR, CANTIDAD, PRECIO, TOTAL
     ) VALUES (
-      '${sanitizeSql(orderNumber)}',
-      ${position},
+      '${sanitizeSql(orderNumber, 20)}',
+      ${safePosition},
       '${sku}',
       '${name}',
       ${qty},

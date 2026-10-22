@@ -68,23 +68,23 @@ export class CatalogUploadHelper {
       return factusolProducts || [];
     }
 
-    if (erpConnector) {
+    if (erpConnector && typeof erpConnector.getArticlesForCatalog === 'function') {
       const catalogArticles = await erpConnector.getArticlesForCatalog(options?.limit || 5000);
-      return (catalogArticles || []).map((a) => ({
+      return (catalogArticles || []).map((a: any) => ({
         sku: a.code,
-        name: a.description,
-        description: a.description || '',
-        shortDescription: a.description || '',
-        regularPrice: Number(a.salePrice || 0),
+        name: a.name || a.description || a.code,
+        description: a.description || a.name || '',
+        shortDescription: a.description || a.name || '',
+        regularPrice: Number(a.price ?? a.salePrice ?? 0),
         salePrice: a.offerPrice && a.offerPrice > 0 ? Number(a.offerPrice) : undefined,
         stockQuantity: Number(a.stock || 0),
-        taxRate: Number(a.taxRate ?? 21),
+        taxRate: Number(a.taxRate ?? a.raw?.taxRate ?? 21),
         categories: a.family ? [{ id: a.family, name: a.family }] : [],
-        barcode: a.ean,
-        weight: a.weight,
+        barcode: a.barcode ?? a.ean,
+        weight: a.weight ?? a.raw?.weight,
         status: 'published',
         attributes: {
-          imgart: a.imagePath,
+          imgart: a.imagePath ?? a.raw?.imagePath,
           unit: 'UNIDADES',
         },
       }));
@@ -271,7 +271,7 @@ export class CatalogUploadHelper {
           manage_stock: true,
           stock_quantity: Math.max(0, p.stockQuantity || 0),
           description: p.description || '',
-          categories: p.categories && p.categories.length > 0 ? p.categories.map((c) => ({ name: c.name })) : undefined,
+          categories: p.categories && p.categories.length > 0 ? p.categories.map((c: any) => ({ name: c.name })) : undefined,
           status: 'publish',
         }));
 

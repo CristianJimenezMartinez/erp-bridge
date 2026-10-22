@@ -1,4 +1,5 @@
 import { DocArticle } from '../types';
+import { prestashopArticle } from './canales-prestashop';
 import { shopifyArticle } from './canales-shopify';
 import { holdedArticle } from './canales-holded';
 
@@ -96,100 +97,7 @@ export const canalesArticles: DocArticle[] = [
       </figure>
     `,
   },
-  {
-    slug: 'canales/prestashop',
-    categorySlug: 'canales',
-    title: 'Conexión con PrestaShop 1.7 y 8.x mediante Webservices',
-    subtitle: 'Cómo activar los servicios web oficiales de PrestaShop, conceder permisos en recursos de pedidos/stock y mapear combinaciones.',
-    badge: 'Conector PrestaShop',
-    readingTime: '5 min de lectura',
-    metaTitle: 'Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP',
-    metaDescription: 'Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.',
-    keywords: 'conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop',
-    toc: [
-      { id: 'activar-webservices', label: '1. Activación del Servicio Web en PrestaShop', level: 2 },
-      { id: 'generar-clave-api', label: '2. Creación de la Clave de Servicio Web', level: 2 },
-      { id: 'recursos-necesarios', label: '3. Permisos en Recursos (GET / POST / PUT)', level: 2 },
-      { id: 'prestashop-8', label: '4. Compatibilidad con PrestaShop 8 y PHP 8.x', level: 2 },
-      { id: 'configuracion-bentian', label: '5. Configuración en Bentian ERP Bridge', level: 2 },
-    ],
-    contentHtml: `
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        PrestaShop dispone de una arquitectura nativa de servicios web (Webservices RESTful) que permite interactuar con su base de datos sin necesidad de instalar módulos no verificados. Bentian aprovecha este motor estándar para sincronizar pedidos, productos y stock disponible.
-      </p>
-
-      <h2 id="activar-webservices" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Activación del Servicio Web en PrestaShop</h2>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Accede al Backoffice de PrestaShop.</li>
-        <li>En el menú lateral, dirígete a <strong class="text-white">Parámetros avanzados → Webservice (Servicio web)</strong>.</li>
-        <li>Activa la casilla <strong class="text-emerald-400">Activar el servicio web de PrestaShop: SÍ</strong>.</li>
-        <li>Guarda los cambios.</li>
-      </ol>
-
-      <h2 id="generar-clave-api" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Creación de la Clave de Servicio Web</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Haz clic en <strong class="text-indigo-400">Añadir una nueva clave de servicio web</strong>. Puedes generar una clave aleatoria de 32 caracteres pulsando el botón <em>Generar</em>.
-      </p>
-
-      <h2 id="recursos-necesarios" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Permisos en Recursos (GET / POST / PUT)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Marca los siguientes permisos para la clave generada:
-      </p>
-      <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
-          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
-            <tr>
-              <th class="px-4 py-2.5">Recurso</th>
-              <th class="px-4 py-2.5">GET (Ver)</th>
-              <th class="px-4 py-2.5">POST (Crear)</th>
-              <th class="px-4 py-2.5">PUT (Modificar)</th>
-              <th class="px-4 py-2.5 font-sans">Propósito</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">orders</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Descargar pedidos y marcar estado sincronizado.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">order_details</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Lectura de líneas de pedido y referencias.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">stock_availables</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Actualizar el stock disponible en tiempo real.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">products</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Consultar y sincronizar tarifas y referencias.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 id="prestashop-8" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Compatibilidad con PrestaShop 8 y PHP 8.x</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge es compatible tanto con PrestaShop 1.7 como con las ediciones modernas de PrestaShop 8.x ejecutadas en servidores con PHP 8.1 o PHP 8.2.
-      </p>
-
-      <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Configuración en Bentian ERP Bridge</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En el panel de control de Bentian, selecciona la plataforma <strong>PrestaShop</strong>, introduce la URL base de tu tienda y la clave de Webservice generada. Haz clic en <strong>Probar Conexión</strong> para confirmar la sincronización.
-      </p>
-    `,
-  },
+  prestashopArticle,
   shopifyArticle,
   holdedArticle,
   {

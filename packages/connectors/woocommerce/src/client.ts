@@ -23,6 +23,35 @@ export class WooCommerceClient {
     }
     // Remove trailing slash
     cleanUrl = cleanUrl.replace(/\/+$/, '');
+
+    try {
+      const parsed = new URL(cleanUrl);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        throw new ConnectionError(ErrorCode.CONNECTION_FAILED, `Protocolo no válido para WooCommerce: ${parsed.protocol}`);
+      }
+      if (process.env['NODE_ENV'] === 'production') {
+        const host = parsed.hostname.toLowerCase();
+        const isPrivateOrLocal =
+          host === 'localhost' ||
+          host === '127.0.0.1' ||
+          host === '::1' ||
+          host === '0.0.0.0' ||
+          host.startsWith('127.') ||
+          host.startsWith('10.') ||
+          host.startsWith('192.168.') ||
+          host.startsWith('169.254.') ||
+          /^172\.(1[6-9]|2\d|3[0-1])\./.test(host) ||
+          host.endsWith('.internal') ||
+          host.endsWith('.local');
+        if (isPrivateOrLocal) {
+          throw new ConnectionError(ErrorCode.CONNECTION_FAILED, `Host no permitido para WooCommerce en producción: ${host}`);
+        }
+      }
+    } catch (uErr: unknown) {
+      if (uErr instanceof ConnectionError) throw uErr;
+      throw new ConnectionError(ErrorCode.CONNECTION_FAILED, `URL no válida para WooCommerce: ${cleanUrl}`);
+    }
+
     this.baseUrl = cleanUrl;
 
     this.api = new WooCommerceRestApi({

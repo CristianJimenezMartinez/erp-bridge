@@ -79,6 +79,7 @@ import {
   IErpConnector,
   SupportedErpProviderId,
 } from './erp';
+import { enhanceSqlErpAdapter } from './services/sql-erp-enhancer.service';
 
 // Re-exportar tipos y submódulos para 100% de compatibilidad externa
 export * from './config';
@@ -150,7 +151,7 @@ export class LocalAgent {
     this.historyManager = new HistoryManager(storeDir);
     this.salesLedgerManager = new SalesLedgerManager(storeDir);
     this.eventBus = new EventBus(80);
-    this.licenseService = new LicenseService(this.configManager, this.eventBus, customStoreDir);
+    this.licenseService = new LicenseService(this.configManager, this.eventBus, customStoreDir || process.env.BENTIAN_DATA_DIR);
     this.factusolService = new FactusolService(this.configManager, this.eventBus);
     this.simplygestService = new SimplyGestService(this.configManager, this.eventBus);
     this.factusolAdapter = new FactusolAdapter(this.configManager, this.factusolService, this.eventBus);
@@ -204,6 +205,10 @@ export class LocalAgent {
     if (customConfig?.simplygest) {
       cfg.simplygest = { ...(cfg.simplygest || {}), ...customConfig.simplygest };
     }
+    if (customConfig?.simplygestDbPath) {
+      cfg.simplygestDbPath = customConfig.simplygestDbPath;
+      if (!cfg.simplygest) cfg.simplygest = { databasePath: customConfig.simplygestDbPath };
+    }
     if (customConfig?.erpType) {
       cfg.erpType = customConfig.erpType;
     }
@@ -228,8 +233,23 @@ export class LocalAgent {
     this.updateClient = new UpdateClient(updateOptions, this.eventBus);
 
     // Inicialización de delegados especializados
-    this.salesOrderManager = new SalesOrderManager(this.salesLedgerManager, this.configManager, this.factusolService, this.eventBus, this.erpRegistry);
-    this.testOrderSimulator = new TestOrderSimulatorService(this.configManager, this.eventBus, this.salesLedgerManager, this.factusolService, undefined, this.erpRegistry);
+    this.salesOrderManager = new SalesOrderManager(
+      this.salesLedgerManager,
+      this.configManager,
+      this.factusolService,
+      this.eventBus,
+      this.erpRegistry,
+      () => this.licenseService.getLicenseStatus()
+    );
+    this.testOrderSimulator = new TestOrderSimulatorService(
+      this.configManager,
+      this.eventBus,
+      this.salesLedgerManager,
+      this.factusolService,
+      undefined,
+      this.erpRegistry,
+      () => this.licenseService.getLicenseStatus()
+    );
     this.channelTester = new ChannelTesterService(this.configManager);
     this.statusAggregator = new StatusAggregatorService({
       configManager: this.configManager,
@@ -511,48 +531,9 @@ export class LocalAgent {
       };
     }
 
-    // 2. Extender createOrder en los adaptadores SQL Server (Ágora, Sage 50, a3ERP) para insertar también las líneas de pedido (insertOrderLine)
+    // 2. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP) con transacciones T-SQL atómicas (cabecera + líneas + stock + correlativo MAX+1 + idempotencia) y soporte de DB física local (.mdb)
     for (const sqlAdapter of [this.agoraAdapter, this.sage50Adapter, this.a3erpAdapter]) {
-      const origCreateOrder = sqlAdapter.createOrder.bind(sqlAdapter);
-      sqlAdapter.createOrder = async (order: any, series: string | number = 1, warehouse = '1') => {
-        const res = await origCreateOrder(order, series, warehouse);
-        if (
-          res.success &&
-          res.orderNumber &&
-          !(sqlAdapter as any).isEvaluationMode?.() &&
-          Array.isArray(order?.lines) &&
-          order.lines.length > 0
-        ) {
-          const lineTemplate: string | undefined = (sqlAdapter as any).profile?.queries?.insertOrderLine;
-          const execNonQuery = (sqlAdapter as any).executeNonQuery?.bind(sqlAdapter);
-          if (lineTemplate && typeof execNonQuery === 'function') {
-            const safeSeries = String(series ?? 1).replace(/'/g, "''");
-            const safeWh = String(warehouse || '1').replace(/'/g, "''");
-            for (let idx = 0; idx < order.lines.length; idx++) {
-              const l = order.lines[idx] || {};
-              const sku = String(l.sku || '').replace(/'/g, "''").substring(0, 50);
-              const desc = String(l.name || l.description || sku).replace(/'/g, "''").substring(0, 120);
-              const qty = Number(l.quantity) || 1;
-              const unitPrice = Number(l.unitPrice) || 0;
-              const totalLine = Number(l.total) || Number((qty * unitPrice).toFixed(2));
-              const lineSql = lineTemplate
-                .replace(/@series/g, safeSeries)
-                .replace(/@orderNumber/g, String(res.orderNumber))
-                .replace(/@lineIndex/g, String(l.position || idx + 1))
-                .replace(/@sku/g, sku)
-                .replace(/@description/g, desc)
-                .replace(/@quantity/g, String(qty))
-                .replace(/@unitPrice/g, String(unitPrice))
-                .replace(/@totalLine/g, String(totalLine))
-                .replace(/@warehouse/g, safeWh);
-              await execNonQuery(lineSql).catch((err: unknown) => {
-                this.logger.warn(`Aviso al insertar línea ${idx + 1} en ${sqlAdapter.displayName}: ${String(err)}`);
-              });
-            }
-          }
-        }
-        return res;
-      };
+      enhanceSqlErpAdapter(sqlAdapter, this.logger);
     }
   }
 

@@ -222,29 +222,35 @@ async function runTests() {
       assert.ok(preview.length >= 3, `${providerId} debe devolver artículos demo en getPreviewArticles`);
 
       const stockMap = await activeConn.getStockMap();
-      assert.ok(Object.keys(stockMap).length >= 3, `${providerId} debe devolver stockMap en modo evaluación`);
+      assert.ok(stockMap.size >= 3, `${providerId} debe devolver stockMap en modo evaluación`);
 
       const orderRes = await activeConn.createOrder({
+        id: `WEB-${providerId.toUpperCase()}-001`,
         orderNumber: `WEB-${providerId.toUpperCase()}-001`,
-        customerName: 'Agencia Test Beta',
-        customerTaxId: 'B12345678',
-        customerAddress: 'Calle Mayor 1',
-        customerCity: 'Elche',
-        customerPostalCode: '03201',
-        customerProvince: 'Alicante',
-        customerEmail: 'test@agencia.es',
+        date: new Date(),
+        status: 'pending',
+        currency: 'EUR',
+        netAmount: 100,
         totalAmount: 121,
         taxAmount: 21,
-        items: [
+        customer: {
+          id: 'cust-1',
+          fiscalName: 'Agencia Test Beta',
+          taxId: 'B12345678',
+          email: 'test@agencia.es',
+        },
+        lines: [
           {
-            sku: preview[0].code,
-            name: preview[0].description,
+            position: 1,
+            sku: preview[0]!.code,
+            name: preview[0]!.description,
             quantity: 2,
             unitPrice: 50,
-            taxRate: 21,
+            subtotal: 100,
+            total: 121,
           },
         ],
-      });
+      } as any);
       assert.strictEqual(orderRes.success, true, `createOrder debe funcionar en modo evaluación para ${providerId}`);
       assert.ok((orderRes.orderNumber || orderRes.externalId));
       console.log(`   ✓ [${providerId}] Evaluación verificada (${preview.length} arts., pedido #${orderRes.orderNumber || orderRes.externalId})`);
@@ -254,13 +260,12 @@ async function runTests() {
     console.log('10. Verificando TestOrderSimulatorService y SalesOrderManager polimórficos...');
     const { TestOrderSimulatorService } = await import('../src/orders/test-order-simulator.service');
     const { SalesOrderManager } = await import('../src/orders/sales-order.manager');
-    const simulator = new TestOrderSimulatorService(configManager, factusolService, eventBus, salesLedgerManager, registry);
-    const salesOrderMgr = new SalesOrderManager(configManager, salesLedgerManager, eventBus, registry);
+    const simulator = new TestOrderSimulatorService(configManager, eventBus, salesLedgerManager, factusolService, undefined, registry);
+    const salesOrderMgr = new SalesOrderManager(salesLedgerManager, configManager, factusolService, eventBus, registry);
 
     for (const providerId of ['agora', 'sage50', 'a3erp', 'simplygest'] as const) {
       configManager.update({
         erpType: providerId,
-        evaluationMode: { enabled: true, simulatedErp: providerId },
         softwareErp: {
           activeProvider: providerId,
           provisioned: true,
@@ -269,7 +274,6 @@ async function runTests() {
               databasePath: 'DEMO',
               databaseName: 'DEMO',
               serverInstance: '.\\SQLEXPRESS',
-              sqlInstance: '.\\SQLEXPRESS',
               evaluationMode: true,
               orderSeries: '1',
             },
@@ -278,7 +282,7 @@ async function runTests() {
       });
       const simRes = await simulator.simulateOrder({ dryRun: false });
       assert.strictEqual(simRes.success, true, `Simulador de pedidos debe tener éxito en ${providerId}`);
-      assert.ok(simRes.steps.length >= 4);
+      assert.ok(simRes.details.steps.length >= 4);
 
       // Registrar un pedido fallido y reintentarlo vía SalesOrderManager
       const failedRecord = salesLedgerManager.recordOrder({

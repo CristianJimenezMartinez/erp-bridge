@@ -1,14 +1,15 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { AgentService, UpdateService, DatabaseService } from '@erp-bridge/core';
+import { AgentService, UpdateService, DatabaseService, LicenseTokenManager, LicenseService } from '@erp-bridge/core';
 import { AgentHeartbeatPayloadSchema, AgentPairingRequestSchema } from '@erp-bridge/shared';
-import { requireAuth, requireRole, AuthenticatedRequest } from './auth.router';
+import { requireAuth, requireRole, AuthenticatedRequest, AuthService } from './auth.router';
 import { resolveOrgId } from './org-scope';
 import { rateLimit } from '../middleware/rate-limit';
 
 export const agentsRouter = Router();
 const agentService = new AgentService();
 const updateService = new UpdateService();
+const licenseService = new LicenseService();
 
 const pairRateLimiter = rateLimit({
   name: 'agent-pair',
@@ -30,6 +31,76 @@ const reportIncidentRateLimiter = rateLimit({
   max: 5,
   message: 'Demasiadas solicitudes de soporte técnico desde esta IP. Por favor, espere unos minutos.',
 });
+
+const reportErrorRateLimiter = rateLimit({
+  name: 'agent-report-error',
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: 'Demasiados reportes de error desde esta IP. Por favor, espere unos minutos.',
+});
+
+const heartbeatRateLimiter = rateLimit({
+  name: 'agent-heartbeat',
+  windowMs: 60 * 1000,
+  max: 60,
+  message: 'Frecuencia de heartbeat excedida.',
+});
+
+/**
+ * Verifica que el emisor de telemetría (heartbeat / report-error) sea un Agente legítimo:
+ * acepta JWT de sesión, licenseToken firmado, x-license-key activa o un agente/HWID ya registrado.
+ */
+async function verifyAgentTelemetryAuth(req: Request): Promise<boolean> {
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7).trim();
+    if (token) {
+      if (AuthService.verifyToken(token).valid) return true;
+      if (LicenseTokenManager.verifyToken(token).valid) return true;
+    }
+  }
+
+  const licToken = (req.headers['x-license-token'] as string | undefined)?.trim() || (req.body?.licenseToken as string | undefined)?.trim();
+  if (licToken && LicenseTokenManager.verifyToken(licToken).valid) {
+    return true;
+  }
+
+  const licKey = (req.headers['x-license-key'] as string | undefined)?.trim() || (req.body?.licenseKey as string | undefined)?.trim();
+  if (licKey) {
+    const lic = await licenseService.getLicenseByKey(licKey).catch(() => null);
+    if (lic && String(lic.status).toUpperCase() === 'ACTIVE') {
+      return true;
+    }
+  }
+
+  const agentId = (req.params['id'] || req.body?.agentId || '').trim();
+  const hwid = (req.body?.hwid || '').trim();
+
+  if (agentId) {
+    const knownInMem = await agentService.getAgentById('org_default', agentId).catch(() => null);
+    if (knownInMem) return true;
+  }
+
+  const db = DatabaseService.getInstance();
+  if (db.isAvailable()) {
+    if (hwid) {
+      const actRow = await db.query(
+        `SELECT 1 FROM license_activations WHERE hwid = $1 LIMIT 1`,
+        [hwid]
+      ).catch(() => ({ rows: [] }));
+      if (actRow.rows.length > 0) return true;
+    }
+    if (agentId) {
+      const agRow = await db.query(
+        `SELECT 1 FROM agents WHERE id = $1 LIMIT 1`,
+        [agentId]
+      ).catch(() => ({ rows: [] }));
+      if (agRow.rows.length > 0) return true;
+    }
+  }
+
+  return false;
+}
 
 function escapeHtml(str: string): string {
   return str
@@ -223,8 +294,14 @@ agentsRouter.get('/admin/fleet/errors', requireAuth, requireRole(['SUPERADMIN', 
 });
 
 // 2.2 Report agent error event (from Agent or local monitor)
-agentsRouter.post('/fleet/report-error', async (req: Request, res: Response, next: NextFunction) => {
+agentsRouter.post('/fleet/report-error', reportErrorRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const isAuthorized = await verifyAgentTelemetryAuth(req);
+    if (!isAuthorized) {
+      return res.status(401).json({
+        error: { code: 'UNAUTHORIZED_AGENT', message: 'Se requiere autenticación de agente o licencia activa para reportar eventos de flota.' }
+      });
+    }
     const validated = FleetReportErrorSchema.parse(req.body);
     const { agentId, organizationId, errorCode, message, details } = validated;
     const db = DatabaseService.getInstance();
@@ -332,8 +409,15 @@ agentsRouter.post('/agents/pair', pairRateLimiter, async (req: Request, res: Res
   }
 });
 
-agentsRouter.post('/agents/:id/heartbeat', async (req: Request, res: Response, next: NextFunction) => {
+agentsRouter.post('/agents/:id/heartbeat', heartbeatRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const isAuthorized = await verifyAgentTelemetryAuth(req);
+    if (!isAuthorized) {
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED_AGENT', message: 'Heartbeat rechazado: se requiere agente emparejado, licencia activa o token válido.' }
+      });
+      return;
+    }
     const validated = AgentHeartbeatPayloadSchema.parse({
       ...req.body,
       agentId: req.params['id'] || req.body.agentId,

@@ -1,4 +1,4 @@
-import { sanitizeAndTruncate } from './order.queries';
+import { sanitizeAndTruncate, sanitizeInt, sanitizeFloat } from './order.queries';
 
 export { sanitizeAndTruncate };
 
@@ -100,17 +100,19 @@ export function insertInvoiceHeaderQuery(header: {
   const cemfacVal = header.cemfac ? `'${sanitizeAndTruncate(header.cemfac, 255)}'` : "''";
   const cpafacVal = header.cpafac ? `'${sanitizeAndTruncate(header.cpafac, 50)}'` : "'ESPAÑA'";
   const fopfacVal = header.fopfac ? `'${sanitizeAndTruncate(header.fopfac, 3).toUpperCase()}'` : "'TAR'";
-  const bas1 = typeof header.bas1fac === 'number' ? header.bas1fac : Number((header.net1fac + header.ipor1fac).toFixed(2));
-  const bas2 = header.bas2fac ?? 0;
-  const bas3 = header.bas3fac ?? 0;
-  const bas4 = header.bas4fac ?? 0;
-  const net2 = header.net2fac ?? 0;
-  const net3 = header.net3fac ?? 0;
-  const net4 = header.net4fac ?? 0;
-  const iiva2 = header.iiva2fac ?? 0;
-  const iiva3 = header.iiva3fac ?? 0;
-  const tivfac = header.tivfac ?? 0;
-  const reqfac = header.reqfac ?? 0;
+  const bas1 = typeof header.bas1fac === 'number'
+    ? sanitizeFloat(header.bas1fac)
+    : sanitizeFloat(Number((sanitizeFloat(header.net1fac) + sanitizeFloat(header.ipor1fac)).toFixed(2)));
+  const bas2 = sanitizeFloat(header.bas2fac ?? 0);
+  const bas3 = sanitizeFloat(header.bas3fac ?? 0);
+  const bas4 = sanitizeFloat(header.bas4fac ?? 0);
+  const net2 = sanitizeFloat(header.net2fac ?? 0);
+  const net3 = sanitizeFloat(header.net3fac ?? 0);
+  const net4 = sanitizeFloat(header.net4fac ?? 0);
+  const iiva2 = sanitizeFloat(header.iiva2fac ?? 0);
+  const iiva3 = sanitizeFloat(header.iiva3fac ?? 0);
+  const tivfac = sanitizeInt(header.tivfac ?? 0);
+  const reqfac = sanitizeInt(header.reqfac ?? 0);
 
   return `
     INSERT INTO F_FAC (
@@ -125,15 +127,15 @@ export function insertInvoiceHeaderQuery(header: {
       TOTFAC
     ) VALUES (
       '${tipfacVal}',
-      ${header.codfac},
+      ${sanitizeInt(header.codfac)},
       '${reffacVal}',
       ${header.fecfac},
       ${header.horfac},
-      ${header.usufac ?? 0},
-      ${header.estfac},
+      ${sanitizeInt(header.usufac ?? 0)},
+      ${sanitizeInt(header.estfac)},
       '${almfacVal}',
-      ${header.agefac ? header.agefac : 0},
-      ${header.clifac},
+      ${header.agefac ? sanitizeInt(header.agefac) : 0},
+      ${sanitizeInt(header.clifac)},
       '${cnofacVal}',
       ${cdofacVal},
       ${cpofacVal},
@@ -146,13 +148,13 @@ export function insertInvoiceHeaderQuery(header: {
       ${fopfacVal},
       ${tivfac},
       ${reqfac},
-      ${header.piva1fac},
-      ${header.piva2fac},
-      ${header.piva3fac},
-      ${header.ipor1fac},
-      ${header.net1fac},
+      ${sanitizeFloat(header.piva1fac)},
+      ${sanitizeFloat(header.piva2fac)},
+      ${sanitizeFloat(header.piva3fac)},
+      ${sanitizeFloat(header.ipor1fac)},
+      ${sanitizeFloat(header.net1fac)},
       ${bas1},
-      ${header.iiva1fac},
+      ${sanitizeFloat(header.iiva1fac)},
       ${net2},
       ${bas2},
       ${iiva2},
@@ -161,7 +163,7 @@ export function insertInvoiceHeaderQuery(header: {
       ${iiva3},
       ${net4},
       ${bas4},
-      ${header.totfac}
+      ${sanitizeFloat(header.totfac)}
     )
   `.trim();
 }

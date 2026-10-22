@@ -107,7 +107,37 @@ export const wizardScript = `
       document.getElementById('modal-wizard').classList.remove('open');
     }
 
+    function isWizardLicenseActive() {
+      if (window.__wizardLicenseJustActivated) return true;
+      if (typeof currentStatus !== 'undefined' && currentStatus && currentStatus.license) {
+        const st = currentStatus.license.status;
+        if (st === 'VALID' || st === 'GRACE_PERIOD' || currentStatus.license.valid === true) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     function setWizardStep(step) {
+      if (step > 1 && !isWizardLicenseActive()) {
+        step = 1;
+        const alertBox = document.getElementById('wiz-lic-alert');
+        if (alertBox) {
+          renderWizardErrorCard(alertBox, {
+            title: 'Activación de licencia obligatoria',
+            cause: 'Para configurar un ERP o sincronizar tu tienda es necesario activar primero una clave de licencia en el Paso 1.',
+            suggestion: 'Introduce tu correo arriba para activar tu Licencia Beta Gratuita en 1 Clic o pega tu clave EB-...'
+          }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-claim-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary">⚡ Activar Beta Gratuita en 1 Clic</button>');
+        }
+        if (typeof showSmartToast === 'function') {
+          showSmartToast({
+            title: 'Licencia Requerida',
+            message: 'Activa tu clave gratuita en 1 clic o introduce tu código EB-... antes de pasar al Paso 2.',
+            type: 'warn'
+          });
+        }
+        return;
+      }
       wizardCurrentStep = step;
       [1, 2, 3, 4].forEach(function(i) {
         const pane = document.getElementById('wizard-pane-' + i);
@@ -129,6 +159,10 @@ export const wizardScript = `
     }
 
     function wizNextStep() {
+      if (wizardCurrentStep === 1 && !isWizardLicenseActive()) {
+        setWizardStep(2);
+        return;
+      }
       if (wizardCurrentStep < 4) {
         setWizardStep(wizardCurrentStep + 1);
       }
@@ -206,6 +240,7 @@ export const wizardScript = `
         });
         const data = await res.json();
         if (data.success) {
+          window.__wizardLicenseJustActivated = true;
           renderWizardSuccessCard(alertBox, 'Licencia vinculada a este equipo con éxito. Pulsa en Siguiente Paso para continuar.');
           showSmartToast({
             title: 'Licencia Activada',
@@ -268,6 +303,7 @@ export const wizardScript = `
         });
         const data = await res.json();
         if (data.success && data.licenseKey) {
+          window.__wizardLicenseJustActivated = true;
           const licInput = document.getElementById('wiz-input-lic');
           if (licInput) {
             licInput.value = data.licenseKey;
@@ -334,33 +370,46 @@ export const wizardScript = `
     }
 
     function wizSkipToExplore() {
+      if (!isWizardLicenseActive()) {
+        const alertBox = document.getElementById('wiz-lic-alert');
+        if (alertBox) {
+          renderWizardErrorCard(alertBox, {
+            title: 'Licencia requerida para utilizar el programa',
+            cause: 'El uso sin clave de licencia está deshabilitado por seguridad.',
+            suggestion: 'Solicita tu clave Beta Gratuita en 1 Clic introduciendo tu email arriba o pega tu código EB-...'
+          }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-claim-email&quot;).focus()" class="smart-error-btn smart-error-btn-primary">⚡ Activar Clave Gratuita en 1 Clic</button>');
+        }
+        return;
+      }
       localStorage.setItem('bentian_onboarding_completed', 'true');
       closeWizardModal();
-      if (typeof showSmartToast === 'function') {
-        showSmartToast({
-          title: 'Modo Exploración',
-          message: 'Asistente cerrado. Puedes explorar el programa libremente o configurarlo desde Ajustes.',
-          type: 'info'
-        });
-      }
     }
 
     function wizSelectChannel(type) {
       const cardUniv = document.getElementById('wiz-choice-univ');
       const cardWoo = document.getElementById('wiz-choice-woo');
+      const cardPs = document.getElementById('wiz-choice-prestashop');
+      const cardShop = document.getElementById('wiz-choice-shopify');
       const panelUniv = document.getElementById('wiz-panel-univ');
       const panelWoo = document.getElementById('wiz-panel-woo');
+      const panelPs = document.getElementById('wiz-panel-prestashop');
+      const panelShop = document.getElementById('wiz-panel-shopify');
+
+      [cardUniv, cardWoo, cardPs, cardShop].forEach(function(c) { if (c) c.classList.remove('selected'); });
+      [panelUniv, panelWoo, panelPs, panelShop].forEach(function(p) { if (p) p.style.display = 'none'; });
 
       if (type === 'universal_bridge') {
-        cardUniv.classList.add('selected');
-        cardWoo.classList.remove('selected');
-        panelUniv.style.display = 'block';
-        panelWoo.style.display = 'none';
+        if (cardUniv) cardUniv.classList.add('selected');
+        if (panelUniv) panelUniv.style.display = 'block';
+      } else if (type === 'prestashop') {
+        if (cardPs) cardPs.classList.add('selected');
+        if (panelPs) panelPs.style.display = 'block';
+      } else if (type === 'shopify') {
+        if (cardShop) cardShop.classList.add('selected');
+        if (panelShop) panelShop.style.display = 'block';
       } else {
-        cardWoo.classList.add('selected');
-        cardUniv.classList.remove('selected');
-        panelWoo.style.display = 'block';
-        panelUniv.style.display = 'none';
+        if (cardWoo) cardWoo.classList.add('selected');
+        if (panelWoo) panelWoo.style.display = 'block';
       }
       selectChannelType(type);
     }
@@ -472,6 +521,89 @@ export const wizardScript = `
         renderWizardErrorCard(alertBox, errInfo, 
           '<button type="button" onclick="wizTestWooCommerce()" class="smart-error-btn smart-error-btn-primary">' + (typeof renderIcon === 'function' ? renderIcon('refresh') : '') + '<span>Reintentar</span></button>'
         );
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function wizTestPrestashop() {
+      sanitizeUrlInput('wiz-input-ps-url');
+      const storeUrl = (document.getElementById('wiz-input-ps-url') ? document.getElementById('wiz-input-ps-url').value : '').trim();
+      const apiKey = (document.getElementById('wiz-input-ps-key') ? document.getElementById('wiz-input-ps-key').value : '').trim();
+      const alertBox = document.getElementById('wiz-ps-alert');
+      const btn = document.getElementById('wiz-btn-test-ps');
+
+      if (!storeUrl || !apiKey) {
+        renderWizardErrorCard(alertBox, {
+          title: 'Credenciales de PrestaShop incompletas',
+          cause: 'Se requiere la URL de la tienda y la clave de Webservice (32 caracteres).',
+          suggestion: 'Copia la clave desde Parámetros Avanzados > Webservice en tu Backoffice de PrestaShop.'
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-ps-url&quot;).focus()" class="smart-error-btn smart-error-btn-primary">Completar credenciales</button>');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;">Comprobando conexión con PrestaShop Webservice API...</div>';
+
+      try {
+        const res = await fetch('/api/local/test-prestashop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storeUrl: storeUrl, apiKey: apiKey })
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderWizardSuccessCard(alertBox, 'Conexión con PrestaShop Webservices validada con éxito.');
+          showSmartToast({ title: 'PrestaShop Conectado', message: 'Servicio Web verificado.', type: 'success' });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message || 'Error en PrestaShop', 'channel');
+          renderWizardErrorCard(alertBox, errInfo, '<button type="button" onclick="wizTestPrestashop()" class="smart-error-btn smart-error-btn-primary">Reintentar</button>');
+        }
+      } catch (err) {
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        renderWizardErrorCard(alertBox, errInfo, '<button type="button" onclick="wizTestPrestashop()" class="smart-error-btn smart-error-btn-primary">Reintentar</button>');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function wizTestShopify() {
+      const shopSubdomain = (document.getElementById('wiz-input-shopify-subdomain') ? document.getElementById('wiz-input-shopify-subdomain').value : '').trim();
+      const accessToken = (document.getElementById('wiz-input-shopify-token') ? document.getElementById('wiz-input-shopify-token').value : '').trim();
+      const alertBox = document.getElementById('wiz-shopify-alert');
+      const btn = document.getElementById('wiz-btn-test-shopify');
+
+      if (!shopSubdomain || !accessToken) {
+        renderWizardErrorCard(alertBox, {
+          title: 'Credenciales de Shopify incompletas',
+          cause: 'Se requiere el subdominio (.myshopify.com) y el Admin API Access Token (shpat_...).',
+          suggestion: 'Copia las credenciales desde Configuración > Aplicaciones en tu Shopify Admin.'
+        }, '<button type="button" onclick="document.getElementById(&quot;wiz-input-shopify-subdomain&quot;).focus()" class="smart-error-btn smart-error-btn-primary">Completar credenciales</button>');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:12px;">Comprobando conexión con Shopify GraphQL Admin API...</div>';
+
+      try {
+        const res = await fetch('/api/local/test-shopify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shopSubdomain: shopSubdomain, accessToken: accessToken })
+        });
+        const data = await res.json();
+        if (data.success) {
+          renderWizardSuccessCard(alertBox, 'Conexión con Shopify GraphQL Admin API validada con éxito.');
+          showSmartToast({ title: 'Shopify Conectado', message: 'GraphQL Admin API verificada.', type: 'success' });
+        } else {
+          const errInfo = humanizeErrorMessage(data.message || 'Error en Shopify', 'channel');
+          renderWizardErrorCard(alertBox, errInfo, '<button type="button" onclick="wizTestShopify()" class="smart-error-btn smart-error-btn-primary">Reintentar</button>');
+        }
+      } catch (err) {
+        const errInfo = humanizeErrorMessage(err, 'channel');
+        renderWizardErrorCard(alertBox, errInfo, '<button type="button" onclick="wizTestShopify()" class="smart-error-btn smart-error-btn-primary">Reintentar</button>');
       } finally {
         if (btn) btn.disabled = false;
       }
@@ -775,6 +907,10 @@ export const wizardScript = `
     }
 
     async function finishWizardAndStart() {
+      if (!isWizardLicenseActive()) {
+        setWizardStep(1);
+        return;
+      }
       const factInput = document.getElementById('wiz-input-fact-path');
       const factPath = factInput ? ((typeof cleanPathInput === 'function') ? cleanPathInput(factInput) : factInput.value.trim()) : '';
       const orderSeriesInput = document.getElementById('wiz-input-fact-order-series');
@@ -844,6 +980,14 @@ export const wizardScript = `
           storeUrl: document.getElementById('wiz-input-wc-url').value.trim() || undefined,
           consumerKey: document.getElementById('wiz-input-wc-key').value.trim() || undefined,
           consumerSecret: document.getElementById('wiz-input-wc-secret').value.trim() || undefined,
+        },
+        prestashop: {
+          storeUrl: (document.getElementById('wiz-input-ps-url') ? document.getElementById('wiz-input-ps-url').value.trim() : '') || undefined,
+          apiKey: (document.getElementById('wiz-input-ps-key') ? document.getElementById('wiz-input-ps-key').value.trim() : '') || undefined,
+        },
+        shopify: {
+          shopSubdomain: (document.getElementById('wiz-input-shopify-subdomain') ? document.getElementById('wiz-input-shopify-subdomain').value.trim() : '') || undefined,
+          accessToken: (document.getElementById('wiz-input-shopify-token') ? document.getElementById('wiz-input-shopify-token').value.trim() : '') || undefined,
         }
       };
       if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
@@ -889,6 +1033,8 @@ export const wizardScript = `
     window.wizSkipToExplore = wizSkipToExplore;
     window.wizTestUniversal = wizTestUniversal;
     window.wizTestWooCommerce = wizTestWooCommerce;
+    window.wizTestPrestashop = wizTestPrestashop;
+    window.wizTestShopify = wizTestShopify;
     window.wizTestFactusolConnection = wizTestFactusolConnection;
     window.wizToggleSqlAuthFields = wizToggleSqlAuthFields;
     window.toggleMainSqlAuthFields = toggleMainSqlAuthFields;

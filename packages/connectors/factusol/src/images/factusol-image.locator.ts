@@ -91,6 +91,19 @@ export class FactusolImageLocator {
     // Normalizar separadores y eliminar slashes iniciales
     const cleanSlashes = raw.replace(/\\/g, '/').replace(/^\/+/, '');
     const filename = path.basename(cleanSlashes);
+    const ext = path.extname(filename).toLowerCase();
+    const allowedExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp']);
+
+    if (!allowedExtensions.has(ext) || cleanSlashes.includes('..')) {
+      return {
+        sku,
+        originalPath: raw,
+        localPath: null,
+        relativeWebPath: '',
+        exists: false,
+        filename: '',
+      };
+    }
 
     // Determinar la ruta relativa web canónica (ej: FOTOS/BOMBAS/bomba.jpg)
     let relativeWebPath = cleanSlashes;
@@ -106,8 +119,14 @@ export class FactusolImageLocator {
       relativeWebPath = 'FOTOS/' + relativeWebPath.substring(6);
     }
 
-    // 1. Si es ruta absoluta directa en Windows (ej: C:\...)
-    if (/^[a-zA-Z]:[\\/]/.test(raw) && fs.existsSync(raw)) {
+    // 1. Si es ruta absoluta directa en Windows (ej: C:\...), rechazar directorios sensibles del sistema
+    const lowerRaw = raw.toLowerCase();
+    const isSystemPath =
+      lowerRaw.includes('\\windows\\') ||
+      lowerRaw.includes('\\system32\\') ||
+      lowerRaw.includes('\\program files');
+
+    if (!isSystemPath && /^[a-zA-Z]:[\\/]/.test(raw) && fs.existsSync(raw)) {
       try {
         const stat = fs.statSync(raw);
         if (stat.isFile()) {

@@ -290,6 +290,40 @@ async function testGuiServer() {
     assert(claimInvalidJson.error.includes('no válida'));
     console.log('  ✓ Email inválido rechazado correctamente con 400 Bad Request.');
 
+    // 23. Bloqueo de uso sin licencia activa en endpoints ERP y configuración
+    console.log('23. Probando bloqueo estricto de operaciones ERP sin licencia activa (403 Forbidden)...');
+    const resTestFactNoLic = await fetch(`${url}/api/local/test-factusol`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ databasePath: 'C:\\Test\\0012026.accdb' })
+    });
+    assert.strictEqual(resTestFactNoLic.status, 403, 'POST /api/local/test-factusol sin licencia debe responder 403');
+
+    const resTestSgNoLic = await fetch(`${url}/api/local/test-simplygest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ databasePath: 'C:\\Test\\Datos.mdb' })
+    });
+    assert.strictEqual(resTestSgNoLic.status, 403, 'POST /api/local/test-simplygest sin licencia debe responder 403');
+
+    const resTestSqlNoLic = await fetch(`${url}/api/local/test-sql-erp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ erpType: 'agora', evaluationMode: true })
+    });
+    assert.strictEqual(resTestSqlNoLic.status, 403, 'POST /api/local/test-sql-erp sin licencia debe responder 403');
+
+    const resPreviewNoLic = await fetch(`${url}/api/local/erp/preview`);
+    assert.strictEqual(resPreviewNoLic.status, 403, 'GET /api/local/erp/preview sin licencia debe responder 403');
+
+    const resSaveCfgNoLic = await fetch(`${url}/api/local/save-full-config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ erpType: 'factusol' })
+    });
+    assert.strictEqual(resSaveCfgNoLic.status, 403, 'POST /api/local/save-full-config sin licencia ni licenseKey debe responder 403');
+    console.log('  ✓ Todos los endpoints ERP y de guardado de configuración bloquean con 403 Forbidden si no hay licencia activa.');
+
   } finally {
     await server.stop();
     delete process.env.BENTIAN_DATA_DIR;

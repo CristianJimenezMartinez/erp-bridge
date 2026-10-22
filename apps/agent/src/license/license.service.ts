@@ -1,10 +1,6 @@
-import os from 'os';
 import {
-  LicenseActivationRequest,
   LicenseActivationResponse,
   LicenseTokenPayload,
-  LicenseValidationRequest,
-  LicenseValidationResponse,
   Logger,
 } from '@erp-bridge/shared';
 import { LicenseTokenManager } from '@erp-bridge/core';
@@ -12,9 +8,18 @@ import { HWIDManager } from '../security/hwid';
 import { SecureStore } from '../security/secure-store';
 import { ConfigManager } from '../config/config.manager';
 import { EventBus } from '../diagnostics/event-bus';
-import { AgentDiskLogger } from '../diagnostics/disk-logger';
 import { AgentLicenseStatus, LicenseValidationStatus } from './license.types';
-import { verifyLicenseProof, isSignedLicenseProof, DEFAULT_LICENSE_PROOF_PUBLIC_KEY, VerifiedLicenseProof } from './license-proof';
+import {
+  verifyLicenseProof,
+  isSignedLicenseProof,
+  DEFAULT_LICENSE_PROOF_PUBLIC_KEY,
+  VerifiedLicenseProof,
+} from './license-proof';
+import {
+  requestRemoteLicenseActivation,
+  requestRemoteLicenseValidation,
+  resolveSafeLicenseApiBaseUrl,
+} from './license-remote.helper';
 
 /**
  * Si es true, el periodo de gracia OFFLINE solo se concede con una prueba Ed25519 válida emitida
@@ -86,48 +91,14 @@ export class LicenseService {
     const config = this.configManager.get();
     this.logger.info(`Iniciando activación de licencia: ${licenseKey.substring(0, 8)}... (HWID: ${hwid.substring(0, 16)}...)`);
 
-    const requestPayload: LicenseActivationRequest = {
-      licenseKey,
-      hwid,
-      agentId: config.agentId,
-      machineInfo: {
-        hostname: os.hostname(),
-        platform: os.platform(),
-        arch: os.arch(),
-      },
-    };
-
-    const tActivateStart = performance.now();
-    const response = await fetch(`${config.apiBaseUrl}/api/v1/licenses/activate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestPayload),
-    });
-    const activateDurationMs = Math.round(performance.now() - tActivateStart);
-
-    const resJson = (await response.json()) as { data?: LicenseActivationResponse; error?: { message?: string } };
-
-    AgentDiskLogger.getInstance().log({
-      level: response.ok && resJson.data?.success ? 'SUCCESS' : 'ERROR',
-      component: 'LicenseService',
-      action: 'activate_license',
-      duration_ms: activateDurationMs,
-      status: response.ok && resJson.data?.success ? 'SUCCESS' : 'FAILURE',
-      message: response.ok && resJson.data?.success
-        ? `Licencia activada con éxito en ${activateDurationMs}ms (Plan: ${resJson.data.plan})`
-        : `Fallo al activar licencia tras ${activateDurationMs}ms: ${resJson.error?.message || resJson.data?.error || `HTTP ${response.status}`}`,
-      metadata: {
-        plan: resJson.data?.plan,
-      },
-    });
-
-    if (!response.ok || !resJson.data?.success) {
-      const msg = resJson.error?.message || resJson.data?.error || `Error HTTP ${response.status}`;
+    const remoteRes = await requestRemoteLicenseActivation(config.apiBaseUrl || '', licenseKey, hwid, config.agentId);
+    if (!remoteRes.ok || !remoteRes.data) {
+      const msg = remoteRes.errorMsg || 'Fallo al activar licencia';
       this.logger.warn(`Fallo al activar licencia: ${msg}`);
       return { success: false, error: msg };
     }
 
-    const activation = resJson.data;
+    const activation = remoteRes.data;
     if (activation.licenseToken) {
       await this.secureStore.saveLicenseToken(activation.licenseToken, hwid);
       const activationProofOk = await this.persistProofIfValid((activation as unknown as { licenseProof?: unknown }).licenseProof, hwid);
@@ -156,7 +127,6 @@ export class LicenseService {
     const config = this.configManager.get();
     const token = await this.secureStore.loadLicenseToken(hwid);
 
-    // Cargar timestamp monotónico persistido en disco si aún no está inicializado
     if (this.lastSeenTimestamp === 0) {
       const persistedTs = await this.secureStore.loadLastSeenTimestamp(hwid);
       this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, persistedTs);
@@ -168,15 +138,15 @@ export class LicenseService {
       return { status: 'UNLICENSED', message: 'No hay token de licencia guardado en este equipo' };
     }
 
-    // 1. Check local token payload with cryptographic verification and HWID binding
     const verification = LicenseTokenManager.verifyToken(token);
-    const localPayload: LicenseTokenPayload | null = verification.valid && verification.payload ? verification.payload : null;
+    const localPayload: LicenseTokenPayload | null = verification.valid && verification.payload
+      ? verification.payload
+      : LicenseTokenManager.decodeUnverified(token);
     if (localPayload?.expiresAt) {
       this.tokenExpiresAt = localPayload.expiresAt;
     }
     const now = Date.now();
 
-    // Detección de manipulación de reloj (Clock Rollback)
     if (this.lastSeenTimestamp > 0 && now < this.lastSeenTimestamp) {
       this.logger.error(`Manipulación de reloj detectada: La hora actual del sistema (${now}) es anterior al último timestamp registrado (${this.lastSeenTimestamp}). Bloqueando período de gracia.`);
       this.licenseStatus = 'EXPIRED';
@@ -195,65 +165,39 @@ export class LicenseService {
 
     this.lastSeenTimestamp = Math.max(this.lastSeenTimestamp, now);
     await this.secureStore.saveLastSeenTimestamp(this.lastSeenTimestamp, hwid);
-    const isLocalTokenValid = localPayload ? (now <= localPayload.expiresAt && (!localPayload.hwid || localPayload.hwid === hwid)) : false;
+    const isLocalTokenValid = verification.valid && localPayload
+      ? (now <= localPayload.expiresAt && (!localPayload.hwid || localPayload.hwid === hwid))
+      : false;
 
-    // 2. Attempt online validation and token renewal
     try {
-      const requestPayload: LicenseValidationRequest = {
-        licenseToken: token,
+      const onlineRes = await requestRemoteLicenseValidation(
+        config.apiBaseUrl || '',
+        token,
         hwid,
-        agentVersion: this.configManager.getVersion(),
-      };
+        this.configManager.getVersion()
+      );
 
-      const tValidateStart = performance.now();
-      const response = await fetch(`${config.apiBaseUrl}/api/v1/licenses/validate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestPayload),
-        signal: AbortSignal.timeout(2000),
-      });
-      const validateDurationMs = Math.round(performance.now() - tValidateStart);
-
-      const resJson = (await response.json()) as { data?: LicenseValidationResponse; error?: { message?: string } };
-
-      AgentDiskLogger.getInstance().log({
-        level: response.ok && resJson.data?.valid ? 'SUCCESS' : 'INFO',
-        component: 'LicenseService',
-        action: 'validate_license_online',
-        duration_ms: validateDurationMs,
-        status: response.ok && resJson.data?.valid ? 'SUCCESS' : 'FAILURE',
-        message: response.ok && resJson.data?.valid
-          ? `Validación online de licencia completada en ${validateDurationMs}ms (Plan: ${resJson.data.plan || 'Activo'})`
-          : `Validación online tras ${validateDurationMs}ms (HTTP ${response.status})`,
-        metadata: {
-          valid: resJson.data?.valid,
-          plan: resJson.data?.plan,
-        },
-      });
-
-      if (response.ok && resJson.data?.valid) {
-        if (resJson.data.renewedToken) {
-          await this.secureStore.saveLicenseToken(resJson.data.renewedToken, hwid);
+      if (onlineRes.ok && onlineRes.data?.valid) {
+        if (onlineRes.data.renewedToken) {
+          await this.secureStore.saveLicenseToken(onlineRes.data.renewedToken, hwid);
         }
-        await this.persistProofIfValid((resJson.data as unknown as { licenseProof?: unknown }).licenseProof, hwid);
+        await this.persistProofIfValid((onlineRes.data as unknown as { licenseProof?: unknown }).licenseProof, hwid);
         this.licenseStatus = 'VALID';
-        this.activePlan = resJson.data.plan;
-        this.activeFeatures = resJson.data.features || localPayload?.features || [];
+        this.activePlan = onlineRes.data.plan;
+        this.activeFeatures = onlineRes.data.features || localPayload?.features || [];
         this.lastOnlineTimestamp = Date.now();
         await this.secureStore.saveLastOnlineTimestamp(this.lastOnlineTimestamp, hwid);
-        return { status: 'VALID', plan: resJson.data.plan, features: this.activeFeatures };
-      } else if (response.status === 403 || response.status === 400) {
+        return { status: 'VALID', plan: onlineRes.data.plan, features: this.activeFeatures };
+      } else if (onlineRes.status === 403 || onlineRes.status === 400) {
         this.licenseStatus = 'EXPIRED';
         this.activePlan = undefined;
         this.activeFeatures = [];
-        return { status: 'EXPIRED', message: resJson.error?.message || 'Licencia revocada o expirada' };
+        return { status: 'EXPIRED', message: onlineRes.errorMsg || 'Licencia revocada o expirada' };
       }
     } catch {
-      // Offline / Network failure -> fallback to local token verification
+      // Offline / Network failure -> fallback to local Ed25519 proof verification
     }
 
-    // Fuente de confianza para el modo offline: prueba Ed25519 verificada con la clave pública embebida.
-    // El payload HS256 solo se admite si REQUIRE_SIGNED_LICENSE_PROOF está desactivado (compatibilidad).
     const proof = await this.loadVerifiedProof(hwid);
     const gracePayload: { plan: string; issuedAt: number; expiresAt: number } | null =
       proof ?? (REQUIRE_SIGNED_LICENSE_PROOF ? null : localPayload && isLocalTokenValid ? localPayload : null);
@@ -262,7 +206,6 @@ export class LicenseService {
     }
 
     if (gracePayload) {
-      // 2.1 Verificación dura de expiración: Si la fecha del token o licencia ya expiró, EXPIRED sin excepciones
       if (now >= gracePayload.expiresAt) {
         this.licenseStatus = 'EXPIRED';
         this.activePlan = undefined;
@@ -272,7 +215,6 @@ export class LicenseService {
         return { status: 'EXPIRED', message: msg };
       }
 
-      // 2.2 Límite estricto de desconexión para Beta/Trial (máx 48h offline sin contacto con el servidor)
       const planStr = String(gracePayload.plan || '').toLowerCase();
       const isBetaOrTrial = planStr.includes('trial') || planStr.includes('beta');
       if (isBetaOrTrial) {
@@ -287,7 +229,7 @@ export class LicenseService {
           this.licenseStatus = 'EXPIRED';
           this.activePlan = undefined;
           const msg = 'La licencia Beta requiere validación online cada 48 horas. Conecte el equipo a internet para reanudar la sincronización.';
-          this.logger.warn(`Límite offline superado en Beta (>48h sin contacto con el servidor). Bloqueando sincronización.`);
+          this.logger.warn('Límite offline superado en Beta (>48h sin contacto con el servidor). Bloqueando sincronización.');
           this.eventBus?.addEvent('error', msg);
           return { status: 'EXPIRED', message: msg };
         }
@@ -315,7 +257,8 @@ export class LicenseService {
 
     if (key && config.apiBaseUrl) {
       try {
-        await fetch(`${config.apiBaseUrl}/api/v1/licenses/deactivate`, {
+        const safeBaseUrl = resolveSafeLicenseApiBaseUrl(config.apiBaseUrl);
+        await fetch(`${safeBaseUrl}/api/v1/licenses/deactivate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ licenseKey: key, hwid }),
@@ -336,9 +279,7 @@ export class LicenseService {
   }
 
   public startValidationLoop(onRevalidated?: () => void): void {
-    if (this.licenseCheckTimer) {
-      clearInterval(this.licenseCheckTimer);
-    }
+    if (this.licenseCheckTimer) clearInterval(this.licenseCheckTimer);
     const intervalMs = 24 * 60 * 60 * 1000;
     this.licenseCheckTimer = setInterval(async () => {
       await this.validateLicense();
@@ -371,19 +312,8 @@ export class LicenseService {
     };
   }
 
-  public getLastSeenTimestamp(): number {
-    return this.lastSeenTimestamp;
-  }
-
-  public setLastSeenTimestamp(ts: number): void {
-    this.lastSeenTimestamp = ts;
-  }
-
-  public getActiveFeatures(): string[] {
-    return [...this.activeFeatures];
-  }
-
-  public hasFeature(feature: string): boolean {
-    return this.activeFeatures.includes(feature);
-  }
+  public getLastSeenTimestamp(): number { return this.lastSeenTimestamp; }
+  public setLastSeenTimestamp(ts: number): void { this.lastSeenTimestamp = ts; }
+  public getActiveFeatures(): string[] { return [...this.activeFeatures]; }
+  public hasFeature(feature: string): boolean { return this.activeFeatures.includes(feature); }
 }

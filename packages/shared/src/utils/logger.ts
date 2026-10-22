@@ -12,8 +12,25 @@ export interface LogContext {
 
 const SENSITIVE_KEYS = new Set([
   'password',
+  'dbpassword',
+  'db_password',
+  'dbpass',
   'secret',
+  'webhooksecret',
+  'webhook_secret',
+  'bridgesecret',
+  'bridge_secret',
+  'bridgekey',
+  'bridge_key',
   'token',
+  'accesstoken',
+  'access_token',
+  'localtoken',
+  'local_token',
+  'licensekey',
+  'license_key',
+  'privatekey',
+  'private_key',
   'consumersecret',
   'consumer_secret',
   'consumerkey',
@@ -63,7 +80,7 @@ export function sanitizeMessage(message: string): string {
   return sanitized;
 }
 
-export function sanitizeObject(obj: unknown): unknown {
+export function sanitizeObject(obj: unknown, seen: WeakSet<object> = new WeakSet()): unknown {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj !== 'object') {
     if (typeof obj === 'string') {
@@ -72,8 +89,13 @@ export function sanitizeObject(obj: unknown): unknown {
     return obj;
   }
 
+  if (seen.has(obj as object)) {
+    return '[Circular]';
+  }
+  seen.add(obj as object);
+
   if (Array.isArray(obj)) {
-    return obj.map((item) => sanitizeObject(item));
+    return obj.map((item) => sanitizeObject(item, seen));
   }
 
   const result: Record<string, unknown> = {};
@@ -83,7 +105,7 @@ export function sanitizeObject(obj: unknown): unknown {
     } else if (typeof value === 'string') {
       result[key] = sanitizeMessage(value);
     } else if (typeof value === 'object' && value !== null) {
-      result[key] = sanitizeObject(value);
+      result[key] = sanitizeObject(value, seen);
     } else {
       result[key] = value;
     }

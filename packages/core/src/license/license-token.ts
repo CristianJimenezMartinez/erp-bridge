@@ -18,10 +18,35 @@ export class LicenseTokenManager {
   private static readonly DEFAULT_SECRET = 'erp-bridge-default-jwt-secret-replace-in-prod-v1';
 
   /**
+   * Resolves the HMAC secret key. In server production environments (NODE_ENV=production, non-pkg),
+   * refuses to fall back to the default public secret if LICENSE_JWT_SECRET is missing or weak.
+   */
+  private static resolveSecret(secret?: string): string {
+    if (secret && secret.trim().length > 0) {
+      return secret;
+    }
+
+    const envSecret = process.env.LICENSE_JWT_SECRET?.trim();
+    const isPackagedClient = Boolean((process as unknown as { pkg?: unknown }).pkg);
+    const isServerProd = process.env.NODE_ENV === 'production' && !isPackagedClient;
+
+    if (isServerProd) {
+      if (!envSecret || envSecret === this.DEFAULT_SECRET || envSecret.length < 24) {
+        throw new Error(
+          'CRITICAL SECURITY: LICENSE_JWT_SECRET must be explicitly configured (>=24 chars) in production.'
+        );
+      }
+      return envSecret;
+    }
+
+    return envSecret || this.DEFAULT_SECRET;
+  }
+
+  /**
    * Signs a LicenseTokenPayload into a standard HMAC-SHA256 JWT token.
    */
   public static createToken(payload: LicenseTokenPayload, secret?: string): string {
-    const key = secret || process.env.LICENSE_JWT_SECRET || this.DEFAULT_SECRET;
+    const key = this.resolveSecret(secret);
     const header = { alg: 'HS256', typ: 'JWT' };
 
     const encodedHeader = base64UrlEncode(JSON.stringify(header));
@@ -35,14 +60,14 @@ export class LicenseTokenManager {
   }
 
   /**
-   * Verifies the cryptographic signature and expiration of a license token.
+   * Verifies the cryptographic signature, algorithm header, and expiration of a license token.
    */
   public static verifyToken(
     token: string,
     secret?: string
   ): { valid: boolean; payload?: LicenseTokenPayload; reason?: string } {
-    if (!token || typeof token !== 'string') {
-      return { valid: false, reason: 'Token is empty or not a string' };
+    if (!token || typeof token !== 'string' || token.length > 4096) {
+      return { valid: false, reason: 'Token is empty, invalid, or exceeds maximum size' };
     }
 
     const parts = token.split('.');
@@ -58,9 +83,23 @@ export class LicenseTokenManager {
       return { valid: false, reason: 'Invalid token structure' };
     }
 
-    const key = secret || process.env.LICENSE_JWT_SECRET || this.DEFAULT_SECRET;
-    const dataToSign = `${encodedHeader}.${encodedPayload}`;
+    try {
+      const parsedHeader = JSON.parse(base64UrlDecode(encodedHeader)) as { alg?: string; typ?: string };
+      if (parsedHeader.alg !== 'HS256') {
+        return { valid: false, reason: 'Unsupported or insecure JWT algorithm' };
+      }
+    } catch {
+      return { valid: false, reason: 'Invalid token header' };
+    }
 
+    let key: string;
+    try {
+      key = this.resolveSecret(secret);
+    } catch (err) {
+      return { valid: false, reason: err instanceof Error ? err.message : 'Missing JWT secret' };
+    }
+
+    const dataToSign = `${encodedHeader}.${encodedPayload}`;
     const expectedSignature = crypto.createHmac('sha256', key).update(dataToSign).digest();
     const expectedEncodedSignature = base64UrlEncode(expectedSignature);
 
@@ -93,6 +132,7 @@ export class LicenseTokenManager {
    */
   public static decodeUnverified(token: string): LicenseTokenPayload | null {
     try {
+      if (!token || typeof token !== 'string' || token.length > 4096) return null;
       const parts = token.split('.');
       if (parts.length !== 3 || !parts[1]) return null;
       const decoded = base64UrlDecode(parts[1]);

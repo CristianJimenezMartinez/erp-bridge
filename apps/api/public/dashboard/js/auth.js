@@ -78,6 +78,13 @@ function showLoginError(msg) {
 function handleLogout() {
   const menu = document.getElementById('user-dropdown-menu');
   if (menu) menu.classList.add('hidden');
+  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
+  if (token) {
+    fetch('/api/v1/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).catch(() => {});
+  }
   localStorage.removeItem('bentian_cloud_token');
   localStorage.removeItem('bentian_cloud_role');
   localStorage.removeItem('bentian_cloud_email');

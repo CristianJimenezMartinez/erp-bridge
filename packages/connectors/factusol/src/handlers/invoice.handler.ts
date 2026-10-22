@@ -1,9 +1,4 @@
-import {
-  InvoiceMutationResult,
-  ReadInvoicesOptions,
-  ConnectionError,
-  ErrorCode,
-} from '@erp-bridge/sdk';
+import { InvoiceMutationResult, ReadInvoicesOptions, ConnectionError, ErrorCode } from '@erp-bridge/sdk';
 import { CanonicalInvoice, Logger } from '@erp-bridge/shared';
 import { AccessDriver } from '../access-driver';
 import {
@@ -17,6 +12,9 @@ import {
   deletePaymentByIdQuery,
   deleteInvoicePaymentLinesQuery,
   PaymentRecordParams,
+  sanitizeAndTruncate,
+  sanitizeInt,
+  sanitizeFloat,
 } from '../queries';
 import { FactusolInvoiceMapper } from '../mappers';
 import { FactusolConnectionConfig } from '../factusol.types';
@@ -29,15 +27,14 @@ export class FactusolInvoiceHandler {
   ) {}
 
   public async readInvoices(options?: ReadInvoicesOptions): Promise<CanonicalInvoice[]> {
-    const query = SELECT_INVOICES_HEADER_QUERY;
-    const headers = await this.driver.query<Record<string, unknown>>(query);
+    const headers = await this.driver.query<Record<string, unknown>>(SELECT_INVOICES_HEADER_QUERY);
     const limit = options?.limit || 50;
     const slice = headers.slice(0, limit);
 
     const invoices: CanonicalInvoice[] = [];
     for (const h of slice) {
-      const tipfac = String(h['TIPFAC'] || h['tipfac'] || '1').trim();
-      const codfac = Number(h['CODFAC'] || h['codfac'] || 0);
+      const tipfac = sanitizeAndTruncate(String(h['TIPFAC'] || h['tipfac'] || '1').trim(), 1);
+      const codfac = sanitizeInt(h['CODFAC'] || h['codfac'] || 0);
 
       const linesQuery = SELECT_INVOICE_LINES_QUERY
         .replace('?', `'${tipfac}'`)
@@ -51,13 +48,13 @@ export class FactusolInvoiceHandler {
   }
 
   public async createInvoice(invoice: CanonicalInvoice): Promise<InvoiceMutationResult> {
-    const series = (invoice.series || this.config.invoiceSeries || '1').substring(0, 1);
+    const series = sanitizeAndTruncate(invoice.series || this.config.invoiceSeries || '1', 1);
     const ref = invoice.orderReference || invoice.invoiceNumber;
 
     try {
       // 1. Idempotency check: does this invoice ref already exist in F_FAC?
       if (ref) {
-        const lookupRef = ref.substring(0, 20).replace(/'/g, "''");
+        const lookupRef = sanitizeAndTruncate(ref, 20);
         const checkSql = `SELECT CODFAC, TIPFAC, REFFAC, TOTFAC FROM F_FAC WHERE REFFAC = '${lookupRef}' AND TIPFAC = '${series}'`;
         const existing = await this.driver.query<{ CODFAC: number; TIPFAC: string }>(checkSql);
         if (existing && existing.length > 0) {
@@ -92,20 +89,19 @@ export class FactusolInvoiceHandler {
           const lines = FactusolInvoiceMapper.toFactusolLines(invoice, nextInvoiceId);
 
           const headerSql = insertInvoiceHeaderQuery(header);
-
           const lineSqls = lines.map((line) => `
             INSERT INTO F_LFA (
               TIPLFA, CODLFA, POSLFA, ARTLFA, DESLFA, CANLFA, PRELFA, TOTLFA, IVALFA
             ) VALUES (
-              '${line.tiplfa}',
-              ${line.codlfa},
-              ${line.poslfa},
-              '${line.artlfa.replace(/'/g, "''")}',
-              '${line.deslfa.replace(/'/g, "''")}',
-              ${line.canlfa},
-              ${line.prelfa},
-              ${line.totlfa},
-              ${line.ivalfa ?? 0}
+              '${sanitizeAndTruncate(line.tiplfa, 1)}',
+              ${sanitizeInt(line.codlfa)},
+              ${sanitizeInt(line.poslfa)},
+              '${sanitizeAndTruncate(line.artlfa, 13)}',
+              '${sanitizeAndTruncate(line.deslfa, 100)}',
+              ${sanitizeFloat(line.canlfa)},
+              ${sanitizeFloat(line.prelfa)},
+              ${sanitizeFloat(line.totlfa)},
+              ${sanitizeFloat(line.ivalfa ?? 0)}
             )
           `.trim());
 
@@ -183,12 +179,11 @@ export class FactusolInvoiceHandler {
       throw new ConnectionError(ErrorCode.VALIDATION_ERROR, `ID de factura Factusol inválido: ${invoiceId}`);
     }
 
-    const series = this.config.invoiceSeries || '1';
-    const statusCode = FactusolInvoiceMapper.mapCanonicalStatusToFactusol(status as any);
+    const series = sanitizeAndTruncate(this.config.invoiceSeries || '1', 1);
+    const statusCode = sanitizeInt(FactusolInvoiceMapper.mapCanonicalStatusToFactusol(status as any));
 
     const updateSql = `UPDATE F_FAC SET ESTFAC = ${statusCode} WHERE TIPFAC = '${series}' AND CODFAC = ${invoiceNum}`;
     const txStatements: string[] = [updateSql];
-
     const shouldRecordPayment = status === 'paid' && this.config.recordPayments !== false;
 
     if (shouldRecordPayment) {
@@ -198,18 +193,14 @@ export class FactusolInvoiceHandler {
       ).catch(() => []);
 
       if (existingCob.length === 0) {
-        const facRows = await this.driver.query<{
-          TOTFAC: number;
-          CLIFAC: number;
-          FOPFAC: string;
-          FECFAC: string;
-        }>(`SELECT TOTFAC, CLIFAC, FOPFAC, FECFAC FROM F_FAC WHERE TIPFAC = '${series}' AND CODFAC = ${invoiceNum}`).catch(() => []);
+        const facRows = await this.driver.query<{ TOTFAC: number; CLIFAC: number; FOPFAC: string; FECFAC: string }>(
+          `SELECT TOTFAC, CLIFAC, FOPFAC, FECFAC FROM F_FAC WHERE TIPFAC = '${series}' AND CODFAC = ${invoiceNum}`
+        ).catch(() => []);
 
         if (facRows.length > 0) {
           const fac = facRows[0]!;
           const maxPaymentRows = await this.driver.query<{ maxid: number }>(getNextPaymentIdQuery(series));
-          const maxPayment = Number(maxPaymentRows[0]?.maxid) || 0;
-          const nextPaymentId = maxPayment + 1;
+          const nextPaymentId = (Number(maxPaymentRows[0]?.maxid) || 0) + 1;
 
           const paymentParams: PaymentRecordParams = {
             id: nextPaymentId,
@@ -222,13 +213,10 @@ export class FactusolInvoiceHandler {
             status: 2,
           };
 
-          const paymentSql = insertPaymentRecordQuery(paymentParams);
-          const paymentLineSql = insertInvoicePaymentLineQuery(paymentParams);
-          txStatements.push(paymentSql, paymentLineSql);
+          txStatements.push(insertPaymentRecordQuery(paymentParams), insertInvoicePaymentLineQuery(paymentParams));
         }
       }
     } else if (status !== 'paid') {
-      // Mantener integridad: si la factura deja de estar pagada, revertir apuntes de cobro asociados
       const existingCob = await this.driver.query<{ MULLCO: number }>(
         selectPaymentsByInvoiceQuery(series, invoiceNum)
       ).catch(() => []);
@@ -245,13 +233,6 @@ export class FactusolInvoiceHandler {
 
     await this.driver.executeTransaction(txStatements);
     this.logger.info(`Estado de factura actualizado en Factusol: CODFAC=${invoiceNum}, ESTFAC=${statusCode} (${status})`);
-
-    return {
-      success: true,
-      invoiceId,
-      externalId: String(invoiceNum),
-      series,
-      status,
-    };
+    return { success: true, invoiceId, externalId: String(invoiceNum), series, status };
   }
 }

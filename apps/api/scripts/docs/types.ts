@@ -18,6 +18,7 @@ export interface DocArticle {
   contentHtml: string;
   relatedSlugs?: string[];
   image?: string;
+  faqs?: Array<{ question: string; answer: string }>;
 }
 
 export interface DocCategory {

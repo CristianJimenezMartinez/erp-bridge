@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
 import { SqlServerBaseAdapter, SupportedErpProviderId } from '../../../erp';
@@ -11,6 +12,13 @@ export class SqlErpController {
           ? { serverInstance: inst, label: inst, databases: [] }
           : inst
       );
+      if (fs.existsSync('C:\\BentianLab\\AgoraDB.mdb') || fs.existsSync('C:\\BentianLab\\GESTION.mdb') || fs.existsSync('C:\\BentianLab\\A3ERP.mdb')) {
+        instances.unshift({
+          serverInstance: 'LOCAL_MDB',
+          label: 'LOCAL_MDB (Base de Datos Física Real en C:\\BentianLab)',
+          databases: ['AgoraDB', 'GESTION', 'A3ERP'],
+        });
+      }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, instances }));
     };
@@ -18,6 +26,15 @@ export class SqlErpController {
 
   public static testSqlErp(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const lic = agent.licenseService?.getLicenseStatus();
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: 'Licencia requerida: Activa tu clave de licencia en el Paso 1 o en la pestaña Licencia antes de conectar un ERP o el Modo Evaluación.'
+        }));
+        return;
+      }
       const body = ctx.body || {};
       const providerId = (body.providerId || body.erpType || 'agora') as SupportedErpProviderId;
       const rawDbInput = String(body.databaseName || body.databasePath || '').trim();
@@ -92,6 +109,16 @@ export class SqlErpController {
 
   public static getPreview(agent: LocalAgent): RouteHandler {
     return async (req, res) => {
+      const lic = agent.licenseService?.getLicenseStatus();
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD') {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          articles: [],
+          message: 'Licencia requerida para consultar el catálogo del ERP.'
+        }));
+        return;
+      }
       const url = new URL(req.url || '/', 'http://127.0.0.1');
       const providerId = (url.searchParams.get('provider') || url.searchParams.get('erpType') || agent.erpRegistry.getActiveProviderId()) as SupportedErpProviderId;
       const connector = agent.erpRegistry.getConnector(providerId);

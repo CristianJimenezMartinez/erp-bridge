@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { LicenseService, DatabaseService, PostgresLicenseRepository } from '@erp-bridge/core';
 import { Logger } from '@erp-bridge/shared';
 import { requireAuth, AuthService, requireRole, AuthenticatedRequest } from './auth.router';
+import { rateLimit } from '../middleware/rate-limit';
 import { MailerService } from '../services/mailer.service';
 import { EmailProtectionService } from '../services/email-protection.service';
 
@@ -43,6 +44,8 @@ export {
   acquireSessionLock,
   computeOrganizationIdFromEmail,
   ensureOrganizationExists,
+  validateSessionRedemptionWindow,
+  clearRedeemedSessions,
   PlanDefinition,
   CATALOG_PLANS,
 } from './billing.helpers';
@@ -54,6 +57,7 @@ import {
   acquireSessionLock,
   computeOrganizationIdFromEmail,
   ensureOrganizationExists,
+  validateSessionRedemptionWindow,
   CATALOG_PLANS,
 } from './billing.helpers';
 
@@ -349,6 +353,7 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
       return res.status(400).json({ error: { message: 'Razón Social y CIF/NIF del cliente son obligatorios' } });
     }
     const { clientName, clientTaxId, clientEmail, alias, returnUrl = DEFAULT_DASHBOARD_URL } = parsed.data;
+    const safeReturnUrl = sanitizeReturnUrl(returnUrl, DEFAULT_DASHBOARD_URL);
 
     const resellerCode = req.user?.resellerId || req.user?.sub || 'PT-PARTNER';
     const cleanTaxId = clientTaxId.trim().toUpperCase();
@@ -360,8 +365,8 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
       const params = new URLSearchParams();
       params.append('mode', 'subscription');
       params.append('customer_email', targetEmail);
-      params.append('success_url', returnUrl.includes('{CHECKOUT_SESSION_ID}') ? returnUrl : `${returnUrl}?session_id={CHECKOUT_SESSION_ID}&checkout=partner_success`);
-      params.append('cancel_url', `${returnUrl}?checkout=cancel`);
+      params.append('success_url', safeReturnUrl.includes('{CHECKOUT_SESSION_ID}') ? safeReturnUrl : `${safeReturnUrl}?session_id={CHECKOUT_SESSION_ID}&checkout=partner_success`);
+      params.append('cancel_url', `${safeReturnUrl}?checkout=cancel`);
       params.append('metadata[organizationId]', orgId);
       params.append('metadata[resellerId]', resellerCode);
       params.append('metadata[clientTaxId]', cleanTaxId);
@@ -416,21 +421,8 @@ billingRouter.post('/billing/create-portal-session', requireAuth, async (req: Au
   try {
     const parsed = CreatePortalSessionSchema.safeParse(req.body || {});
     let { returnUrl = DEFAULT_DASHBOARD_URL } = parsed.success ? parsed.data : {};
-    returnUrl = returnUrl || DEFAULT_DASHBOARD_URL;
+    returnUrl = sanitizeReturnUrl(returnUrl || DEFAULT_DASHBOARD_URL, DEFAULT_DASHBOARD_URL);
     const isSuperadmin = req.user?.role === 'SUPERADMIN' || req.user?.role === 'ADMIN';
-
-    // Validar returnUrl para que pertenezca al dominio configurado (o localhost en no-prod)
-    try {
-      const parsedUrl = new URL(returnUrl);
-      const defaultHost = new URL(DEFAULT_DASHBOARD_URL).host;
-      const isDevLocal = process.env.NODE_ENV !== 'production' && (parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1');
-      if (parsedUrl.host !== defaultHost && !isDevLocal) {
-        logger.warn(`returnUrl rechazado por no pertenecer al dominio configurado: ${returnUrl}`);
-        returnUrl = DEFAULT_DASHBOARD_URL;
-      }
-    } catch {
-      returnUrl = DEFAULT_DASHBOARD_URL;
-    }
 
     // Resolver Stripe Customer ID desde la base de datos para la organización del usuario
     const db = DatabaseService.getInstance();
@@ -941,7 +933,10 @@ billingRouter.get('/billing/licenses-by-email', requireAuth, async (req: Authent
  * Permite al frontend del Dashboard recibir la sesión completada de Stripe,
  * auto-iniciar sesión y entregar en pantalla de inmediato la clave de licencia y el instalador.
  */
-billingRouter.get('/billing/session-license', async (req: Request, res: Response, next: NextFunction) => {
+billingRouter.get(
+  '/billing/session-license',
+  rateLimit({ name: 'session-license', windowMs: 15 * 60 * 1000, max: 15 }),
+  async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sessionId = (req.query['session_id'] as string || '').trim();
     if (!sessionId) {
@@ -952,6 +947,12 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
 
     // Modo Mock / Testing Local (ej: cs_test_mock_...) — Desactivado en Producción
     if (process.env.NODE_ENV !== 'production' && (sessionId.startsWith('cs_test_mock_') || (!STRIPE_SECRET_KEY && sessionId.startsWith('cs_')))) {
+      const mockWindowCheck = validateSessionRedemptionWindow(sessionId);
+      if (!mockWindowCheck.allowed) {
+        return res.status(403).json({
+          error: { code: 'SESSION_EXPIRED_USE_OTP', message: mockWindowCheck.reason }
+        });
+      }
       const demoEmail = 'cliente-demo@cristianjm.com';
       const orgId = computeOrganizationIdFromEmail(demoEmail);
       let licenses = await licenseService.listLicenses(orgId);
@@ -1020,6 +1021,13 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
       });
     }
 
+    const windowCheck = validateSessionRedemptionWindow(sessionId, sessionData.created);
+    if (!windowCheck.allowed) {
+      return res.status(403).json({
+        error: { code: 'SESSION_EXPIRED_USE_OTP', message: windowCheck.reason }
+      });
+    }
+
     const customerEmail = (
       sessionData.customer_details?.email ||
       sessionData.customer_email ||
@@ -1047,6 +1055,15 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
         ).then(r => r.rows[0] as Record<string, any> | undefined).catch(() => undefined);
 
         if (sessionRow) {
+          const existingCheck = validateSessionRedemptionWindow(
+            sessionId,
+            sessionData.created,
+            sessionRow.created_at || sessionRow.createdAt
+          );
+          if (!existingCheck.allowed) {
+            license = { __expiredReplay: true, reason: existingCheck.reason };
+            return;
+          }
           license = sessionRow;
           logger.info(`✓ [Session-License] Licencia ${license.key} ya existente para sesión ${sessionId}. Reutilizando.`);
         }
@@ -1119,6 +1136,12 @@ billingRouter.get('/billing/session-license', async (req: Request, res: Response
         }
       }
     });
+
+    if (license?.__expiredReplay) {
+      return res.status(403).json({
+        error: { code: 'SESSION_EXPIRED_USE_OTP', message: license.reason }
+      });
+    }
 
     if (!license) {
       return res.status(400).json({

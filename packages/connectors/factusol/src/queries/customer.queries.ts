@@ -1,5 +1,5 @@
 import { CanonicalAddress, CanonicalCustomer } from '@erp-bridge/shared';
-import { formatAccessDate, normalizeTaxId, sanitizeAndTruncate } from './order.queries';
+import { formatAccessDate, normalizeTaxId, sanitizeAndTruncate, sanitizeInt, sanitizeLikePattern } from './order.queries';
 
 export { sanitizeAndTruncate };
 
@@ -14,7 +14,9 @@ export function findCustomerByNifQuery(nif: string): string {
 }
 
 export function findCustomerByEmailQuery(email: string): string {
-  return `SELECT * FROM F_CLI WHERE EMACLI = '${sanitizeAndTruncate(email, 100)}' OR OBSCLI LIKE '%${sanitizeAndTruncate(email, 100)}%'`;
+  const safeEmail = sanitizeAndTruncate(email, 100);
+  const safeLikeEmail = sanitizeLikePattern(email, 100);
+  return `SELECT * FROM F_CLI WHERE EMACLI = '${safeEmail}' OR OBSCLI LIKE '%${safeLikeEmail}%'`;
 }
 
 export function insertCustomerQuery(
@@ -22,6 +24,7 @@ export function insertCustomerQuery(
   customerCode: number,
   configuredPaymentMethod = 'TRF'
 ): string {
+  const safeCustCode = sanitizeInt(customerCode, 1, 1);
   const addr: CanonicalAddress = customer.address || { country: 'ES' };
   const nofcli = sanitizeAndTruncate(customer.fiscalName, 100);
   const noccli = sanitizeAndTruncate(customer.commercialName || customer.fiscalName, 100);
@@ -32,7 +35,7 @@ export function insertCustomerQuery(
   const procli = sanitizeAndTruncate(addr.state || '', 40);
   const telcli = sanitizeAndTruncate(customer.phone || addr.phone || '', 50);
   const email = sanitizeAndTruncate(customer.email || '', 100);
-  const tarcli = customer.priceList ?? 1;
+  const tarcli = sanitizeInt(customer.priceList ?? 1, 1, 1, 99);
   const falcli = formatAccessDate(new Date());
   const paicli = '724';
   const reqcli = customer.hasEquivalenceSurcharge ? 1 : 0;
@@ -44,7 +47,7 @@ export function insertCustomerQuery(
     INSERT INTO F_CLI (
       CODCLI, NOFCLI, NOCCLI, NIFCLI, DOMCLI, POBCLI, CPOCLI, PROCLI, PAICLI, TELCLI, TARCLI, EMACLI, OBSCLI, REQCLI, IVACLI, FPACLI, ESTCLI, FALCLI
     ) VALUES (
-      ${customerCode},
+      ${safeCustCode},
       '${nofcli}',
       '${noccli}',
       '${nifcli}',

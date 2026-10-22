@@ -242,7 +242,21 @@ function renderDocArticlePage(article: DocArticle): string {
             "item": "${pageUrl}"
           }
         ]
-      }
+      }${article.faqs && article.faqs.length > 0 ? `,
+      {
+        "@type": "FAQPage",
+        "@id": "${pageUrl}#faq",
+        "mainEntity": ${JSON.stringify(
+          article.faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: f.answer,
+            },
+          }))
+        )}
+      }` : ''}
     ]
   }
   </script>

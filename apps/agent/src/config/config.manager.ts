@@ -3,6 +3,11 @@ import path from 'path';
 import os from 'os';
 import { Logger } from '@erp-bridge/shared';
 import { AgentConfigFile } from './config.types';
+import {
+  readConfigFromDiskWithMigration,
+  resolveAgentConfigPaths,
+  writeConfigAtomicallyToDisk,
+} from './config-storage.helper';
 
 export class ConfigManager {
   private readonly logger = new Logger('ConfigManager');
@@ -12,12 +17,12 @@ export class ConfigManager {
   private config: AgentConfigFile;
 
   constructor(customConfig?: Partial<AgentConfigFile>) {
-    // 1. Determinar ubicaciones de configuración (primaria siempre escribible, secundaria para migración)
+    // 1. Determinar ubicaciones de configuración (primaria siempre escribible en AppData, secundaria para migración)
     const { primaryPath, secondaryPath } = ConfigManager.resolveConfigFilePaths();
     this.configFilePath = primaryPath;
     this.secondaryConfigFilePath = secondaryPath;
 
-    // 2. Cargar configuración existente en disco (con migración si procede)
+    // 2. Cargar configuración existente en disco (con desencriptado transparente y migración si procede)
     const diskConfig = this.loadConfigFromDisk();
 
     // 3. Determinar versión del agente
@@ -44,9 +49,16 @@ export class ConfigManager {
 
     // NUNCA descartar una ruta configurada por el usuario (en NAS, red local \\NAS\... o unidades mapeadas Z:\)
     // aunque fs.existsSync falle transitoriamente en el arranque mientras la red conecta.
-    const rawDbPath = (customConfig?.factusolDbPath || customConfig?.factusol?.databasePath || diskConfig.factusolDbPath || diskFactusol.databasePath || '').trim();
+    const rawDbPath = (
+      customConfig?.factusolDbPath ||
+      customConfig?.factusol?.databasePath ||
+      diskConfig.factusolDbPath ||
+      diskFactusol.databasePath ||
+      ''
+    ).trim();
 
     this.config = {
+      ...diskConfig,
       agentName: resolvedAgentName,
       agentVersion: this.currentVersion,
       apiBaseUrl: customConfig?.apiBaseUrl || diskConfig.apiBaseUrl || 'https://bridge.cristianjm.com',
@@ -58,6 +70,7 @@ export class ConfigManager {
       licenseKey: customConfig?.licenseKey || diskConfig.licenseKey,
       channelType: customConfig?.channelType || diskConfig.channelType || 'universal_bridge',
       universalBridge: {
+        ...diskUniv,
         storeUrl: customConfig?.universalBridge?.storeUrl || diskUniv.storeUrl || '',
         secretKey: customConfig?.universalBridge?.secretKey || diskUniv.secretKey || '',
         enabled: customConfig?.universalBridge?.enabled ?? (diskUniv.enabled !== false),
@@ -100,47 +113,7 @@ export class ConfigManager {
   }
 
   public static resolveConfigFilePaths(): { primaryPath: string; secondaryPath?: string } {
-    if (process.env.BENTIAN_DATA_DIR) {
-      return { 
-        primaryPath: path.join(process.env.BENTIAN_DATA_DIR, 'agent-config.json'),
-        secondaryPath: process.env.BENTIAN_LEGACY_CONFIG_PATH
-      };
-    }
-    if (process.env.BENTIAN_CONFIG_PATH) {
-      return { 
-        primaryPath: process.env.BENTIAN_CONFIG_PATH,
-        secondaryPath: process.env.BENTIAN_LEGACY_CONFIG_PATH
-      };
-    }
-
-    const appData = process.env.APPDATA || (process.platform === 'darwin'
-      ? path.join(os.homedir(), 'Library', 'Application Support')
-      : path.join(os.homedir(), '.config'));
-
-    const userBentianDir = path.join(appData, 'Bentian Agent');
-    const userConfigPath = path.join(userBentianDir, 'agent-config.json');
-
-    const exeDir = path.dirname(process.execPath);
-    const exeConfigPath = path.join(exeDir, 'agent-config.json');
-    const cwdConfigPath = path.join(process.cwd(), 'agent-config.json');
-
-    const isPortable = fs.existsSync(path.join(exeDir, '.portable'));
-
-    if (isPortable) {
-      return { primaryPath: exeConfigPath, secondaryPath: userConfigPath };
-    }
-
-    // Instalación estándar en Windows / Producción:
-    // La ubicación primaria SIEMPRE debe ser AppData (100% escribible sin permisos de administrador).
-    // Las rutas de exe o cwd solo se utilizan como secundaria para migración inicial si existían previamente.
-    const secondaryCandidate = fs.existsSync(exeConfigPath) && exeConfigPath !== userConfigPath
-      ? exeConfigPath
-      : (fs.existsSync(cwdConfigPath) && cwdConfigPath !== userConfigPath ? cwdConfigPath : undefined);
-
-    return {
-      primaryPath: userConfigPath,
-      secondaryPath: secondaryCandidate
-    };
+    return resolveAgentConfigPaths();
   }
 
   public get(): AgentConfigFile {
@@ -194,100 +167,10 @@ export class ConfigManager {
   }
 
   public loadConfigFromDisk(): AgentConfigFile {
-    // 1. Intentar cargar desde ubicación primaria
-    try {
-      if (fs.existsSync(this.configFilePath)) {
-        const raw = fs.readFileSync(this.configFilePath, 'utf8').replace(/^\uFEFF/, '');
-        const parsed = JSON.parse(raw) as AgentConfigFile;
-        if (parsed && typeof parsed === 'object') {
-          return parsed;
-        }
-      }
-    } catch (err) {
-      this.logger.warn(`Aviso al leer configuración de ${this.configFilePath}: ${String(err)}`);
-    }
-
-    // 2. Fallback a ubicación secundaria (ej: Program Files de versiones previas)
-    if (this.secondaryConfigFilePath && this.secondaryConfigFilePath !== this.configFilePath) {
-      try {
-        if (fs.existsSync(this.secondaryConfigFilePath)) {
-          const raw = fs.readFileSync(this.secondaryConfigFilePath, 'utf8').replace(/^\uFEFF/, '');
-          const parsed = JSON.parse(raw) as AgentConfigFile;
-          if (parsed && typeof parsed === 'object') {
-            this.logger.info(`✓ Configuración migrada desde ubicación previa: ${this.secondaryConfigFilePath} -> ${this.configFilePath}`);
-            return parsed;
-          }
-        }
-      } catch (err) {
-        this.logger.warn(`Aviso al leer configuración secundaria: ${String(err)}`);
-      }
-    }
-
-    // 3. Fallback a CWD (solo si no se especificó una ruta explícita por variable de entorno)
-    if (!process.env.BENTIAN_CONFIG_PATH) {
-      const cwdConfig = path.join(process.cwd(), 'agent-config.json');
-      if (cwdConfig !== this.configFilePath && cwdConfig !== this.secondaryConfigFilePath) {
-        try {
-          if (fs.existsSync(cwdConfig)) {
-            const raw = fs.readFileSync(cwdConfig, 'utf8').replace(/^\uFEFF/, '');
-            const parsed = JSON.parse(raw) as AgentConfigFile;
-            if (parsed && typeof parsed === 'object') {
-              return parsed;
-            }
-          }
-        } catch {}
-      }
-    }
-
-    return {};
+    return readConfigFromDiskWithMigration(this.configFilePath, this.secondaryConfigFilePath, this.logger);
   }
 
   public saveConfigToDisk(): { success: boolean; filePath: string; error?: string } {
-    let tempFile: string | null = null;
-    try {
-      const dir = path.dirname(this.configFilePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      tempFile = `${this.configFilePath}.tmp.${Date.now()}`;
-      const content = JSON.stringify(this.config, null, 2);
-      fs.writeFileSync(tempFile, content, 'utf8');
-
-      // Reemplazo atómico seguro en Windows con reintentos para bloqueos transitorios
-      let replaced = false;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          if (fs.existsSync(this.configFilePath)) {
-            try {
-              fs.unlinkSync(this.configFilePath);
-            } catch {}
-          }
-          fs.renameSync(tempFile, this.configFilePath);
-          replaced = true;
-          break;
-        } catch {
-          const delay = (attempt + 1) * 30;
-          const end = Date.now() + delay;
-          while (Date.now() < end) {}
-        }
-      }
-
-      // Si renameSync falló tras reintentos por bloqueo persistente de Windows, copiar contenido
-      if (!replaced) {
-        fs.copyFileSync(tempFile, this.configFilePath);
-        try { fs.unlinkSync(tempFile); } catch {}
-      }
-
-      this.logger.info(`✓ Configuración guardada en disco: ${this.configFilePath}`);
-      return { success: true, filePath: this.configFilePath };
-    } catch (err) {
-      if (tempFile && fs.existsSync(tempFile)) {
-        try { fs.unlinkSync(tempFile); } catch {}
-      }
-      const msg = `Error al persistir configuración en ${this.configFilePath}: ${String(err)}`;
-      this.logger.error(msg);
-      return { success: false, filePath: this.configFilePath, error: String(err) };
-    }
+    return writeConfigAtomicallyToDisk(this.configFilePath, this.config, this.logger);
   }
 }

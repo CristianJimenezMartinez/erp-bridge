@@ -18,6 +18,8 @@ export class SecureStore {
   constructor(customDir?: string) {
     if (customDir) {
       this.storageDir = customDir;
+    } else if (process.env.BENTIAN_DATA_DIR) {
+      this.storageDir = process.env.BENTIAN_DATA_DIR;
     } else {
       const appData = process.env.APPDATA || (os.platform() === 'darwin' ? path.join(os.homedir(), 'Library', 'Preferences') : path.join(os.homedir(), '.config'));
       this.storageDir = path.join(appData, 'erp-bridge');

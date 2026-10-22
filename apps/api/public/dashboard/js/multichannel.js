@@ -18,13 +18,23 @@
       .replace(/'/g, '&#039;');
   }
 
+  function _generateEphemeralSecret() {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint8Array(24);
+      window.crypto.getRandomValues(array);
+      const hex = Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+      return `shpss_sec_${hex}`;
+    }
+    return '';
+  }
+
   // Estado interno del módulo
   const state = {
     activeChannel: 'shopify',
     activeTopic: 'shopify-orders',
     isSecretVisible: false,
-    realSecret: 'shpss_sec_99887766554433221100aabbccddeeff',
-    maskedSecret: 'shpss_••••••••••••••••3a9f',
+    realSecret: _generateEphemeralSecret(),
+    maskedSecret: 'shpss_••••••••••••••••••••••••',
     isStreamPaused: false,
     filter: 'all',
     events: [],

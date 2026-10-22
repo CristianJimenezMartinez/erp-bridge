@@ -165,6 +165,7 @@ Formato de estado: `ABIERTO` · `EN CURSO` · `HECHO (commit abc1234)` · `BLOQU
 | P3-7 | Quality Gate Secret Audit | HECHO | 64218be | Gate 8 (Secret Scanning Guard) implementado en scripts/quality-gate.ts escaneando ficheros git rastreados en busca de claves privadas y tokens vivos (sk_live, whsec, ghp_, AKIA) |
 | P3-8 | AGT-021, 022 | HECHO | 64218be | Honestidad documental certificada en AGENTS.md, GEMINI.md, MODULES.md y docs/CAPABILITIES_MANIFEST.md: persistencia local JSON atómico en AppData (sin SQLite) e instancia única por sondeo de puerto 39281 /health (sin named pipe) |
 | P3-9 | API-022, 028, 029 | HECHO | 09e0467 | Endpoint /health mínimo (status, version, timestamp) sin fuga de memoria ni detalles internos de BD; respuestas de error 500 genéricas en producción |
+| P3-10 | Auditoría API & Web 2026-10-22 | HECHO | — | Blindaje anti-SSRF y RBAC en /connections/test (`assertSafeCloudConnectionConfig`), ventana temporal anti-replay en `/billing/session-license` (`validateSessionRedemptionWindow`), autenticación y rate-limit en `/agents/:id/heartbeat` y `/fleet/report-error`, `escapeHtml` en alerta admin de `/licenses/beta/claim`, `sanitizeReturnUrl` en `/billing/partner-checkout`, revocación `/auth/logout` en `auth.js` y eliminación de secreto estático en `multichannel.js` |
 
 ## 7. Checklist por tarea (haz esto siempre)
 

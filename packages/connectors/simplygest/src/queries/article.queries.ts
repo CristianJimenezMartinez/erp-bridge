@@ -1,6 +1,10 @@
-export function sanitizeSql(val: unknown): string {
+export function sanitizeSql(val: unknown, maxLen?: number): string {
   if (val === null || val === undefined) return '';
-  return String(val).replace(/'/g, "''").trim();
+  let clean = String(val).replace(/[\x00-\x1f\x7f]/g, '').trim();
+  if (typeof maxLen === 'number' && maxLen > 0 && clean.length > maxLen) {
+    clean = clean.substring(0, maxLen);
+  }
+  return clean.replace(/'/g, "''");
 }
 
 export function getArticlesQuery(limit?: number): string {
@@ -29,6 +33,15 @@ export function updateStockQuery(sku: string, newStock: number): string {
   return `
     UPDATE ARTICULOS
     SET STOCK = ${safeQty}
+    WHERE CODIGO = '${sanitizeSql(sku)}'
+  `.trim();
+}
+
+export function decrementStockQuery(sku: string, quantity: number): string {
+  const safeDelta = !isNaN(Number(quantity)) && Number(quantity) > 0 ? Number(quantity).toFixed(4) : '0.0000';
+  return `
+    UPDATE ARTICULOS
+    SET STOCK = IIF(STOCK - ${safeDelta} >= 0, STOCK - ${safeDelta}, 0)
     WHERE CODIGO = '${sanitizeSql(sku)}'
   `.trim();
 }

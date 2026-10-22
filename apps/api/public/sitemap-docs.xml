@@ -200,7 +200,7 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/canales/woocommerce/" />
   </url>
 
-  <!-- Doc: Conexión con PrestaShop 1.7 y 8.x mediante Webservices -->
+  <!-- Doc: Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice -->
   <url>
     <loc>https://bridge.cristianjm.com/docs/canales/prestashop/</loc>
     <lastmod>2026-10-21T14:00:00+02:00</lastmod>

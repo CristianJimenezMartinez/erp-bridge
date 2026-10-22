@@ -1,5 +1,7 @@
 import { CanonicalProduct, FieldMapping } from '@erp-bridge/shared';
 
+const FORBIDDEN_PATH_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 export class MappingEngine {
   public applyMappings(
     products: CanonicalProduct[],
@@ -35,7 +37,13 @@ export class MappingEngine {
     const parts = fieldPath.split('.');
     let current: unknown = product;
     for (const part of parts) {
+      if (!part || FORBIDDEN_PATH_KEYS.has(part)) {
+        return undefined;
+      }
       if (current === null || current === undefined || typeof current !== 'object') {
+        return undefined;
+      }
+      if (!Object.prototype.hasOwnProperty.call(current, part)) {
         return undefined;
       }
       current = (current as Record<string, unknown>)[part];
@@ -45,11 +53,18 @@ export class MappingEngine {
 
   private setFieldValue(product: CanonicalProduct, fieldPath: string, value: unknown): void {
     const parts = fieldPath.split('.');
+    for (const part of parts) {
+      if (!part || FORBIDDEN_PATH_KEYS.has(part)) {
+        return;
+      }
+    }
+
     let current: Record<string, unknown> = product as unknown as Record<string, unknown>;
 
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i]!;
-      if (!current[part] || typeof current[part] !== 'object') {
+      const existing = Object.prototype.hasOwnProperty.call(current, part) ? current[part] : undefined;
+      if (!existing || typeof existing !== 'object') {
         current[part] = {};
       }
       current = current[part] as Record<string, unknown>;

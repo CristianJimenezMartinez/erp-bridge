@@ -95,11 +95,12 @@ class Bentian_Bridge_Admin {
             wp_send_json_error( array( 'message' => __( 'Error al escribir las credenciales en la base de datos de WooCommerce.', 'bentian-erp-bridge-for-factusol' ) ) );
         }
 
-        update_option( 'bentian_last_credentials', array(
+        set_transient( 'bentian_last_credentials', array(
             'consumer_key'    => $consumer_key,
             'consumer_secret' => $consumer_secret,
             'created_at'      => current_time( 'mysql' ),
-        ) );
+        ), 300 );
+        delete_option( 'bentian_last_credentials' );
 
         wp_send_json_success( array(
             'consumer_key'    => $consumer_key,
@@ -136,7 +137,10 @@ class Bentian_Bridge_Admin {
      */
     public function render_admin_page() {
         $settings         = get_option( 'bentian_bridge_settings', array() );
-        $last_credentials = get_option( 'bentian_last_credentials', array() );
+        $last_credentials = get_transient( 'bentian_last_credentials' );
+        if ( ! is_array( $last_credentials ) ) {
+            $last_credentials = array();
+        }
 
         // Diagnósticos del sistema
         $ssl_ok        = is_ssl();

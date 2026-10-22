@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP</title>
-  <meta name="description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
-  <meta name="keywords" content="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+  <title>Conector Factusol PrestaShop (1.7 y 8.x) — Stock y Pedidos en Tiempo Real | Bentian ERP</title>
+  <meta name="description" content="Conector Factusol PrestaShop oficial para PrestaShop 1.7 y 8.x. Sincroniza stock disponible (F_STO DISSTO), combinaciones, tarifas y pedidos (F_PCL/F_LPC) por Webservice API sin módulos pesados. Descarga gratis.">
+  <meta name="keywords" content="prestashop factusol, conector factusol prestashop, conector prestashop, factusol prestashop, sincronizar factusol prestashop, modulo factusol prestashop 8, webservice prestashop factusol, sincronizar stock prestashop factusol">
   <meta name="author" content="Cristian Jiménez Martínez">
   <link rel="canonical" href="https://bridge.cristianjm.com/docs/canales/prestashop/">
 
@@ -17,17 +17,17 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://bridge.cristianjm.com/docs/canales/prestashop/">
   <meta property="og:site_name" content="Bentian ERP Bridge">
-  <meta property="og:title" content="Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP">
-  <meta property="og:description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
-  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
-  <meta property="og:image:secure_url" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta property="og:title" content="Conector Factusol PrestaShop (1.7 y 8.x) — Stock y Pedidos en Tiempo Real | Bentian ERP">
+  <meta property="og:description" content="Conector Factusol PrestaShop oficial para PrestaShop 1.7 y 8.x. Sincroniza stock disponible (F_STO DISSTO), combinaciones, tarifas y pedidos (F_PCL/F_LPC) por Webservice API sin módulos pesados. Descarga gratis.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/screenshots/03-ecommerce-channels.png">
+  <meta property="og:image:secure_url" content="https://bridge.cristianjm.com/assets/screenshots/03-ecommerce-channels.png">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="820">
   <meta property="og:locale" content="es_ES">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Conectar Factusol con PrestaShop (1.7 y 8.x) | Bentian ERP">
-  <meta name="twitter:description" content="Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.">
-  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:title" content="Conector Factusol PrestaShop (1.7 y 8.x) — Stock y Pedidos en Tiempo Real | Bentian ERP">
+  <meta name="twitter:description" content="Conector Factusol PrestaShop oficial para PrestaShop 1.7 y 8.x. Sincroniza stock disponible (F_STO DISSTO), combinaciones, tarifas y pedidos (F_PCL/F_LPC) por Webservice API sin módulos pesados. Descarga gratis.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/screenshots/03-ecommerce-channels.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -38,9 +38,9 @@
       {
         "@type": "TechArticle",
         "@id": "https://bridge.cristianjm.com/docs/canales/prestashop/#article",
-        "headline": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
-        "description": "Cómo conectar Factusol con PrestaShop mediante la API de Webservices oficial. Configuración de claves, permisos y combinaciones de atributos.",
-        "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+        "headline": "Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice",
+        "description": "Conector Factusol PrestaShop oficial para PrestaShop 1.7 y 8.x. Sincroniza stock disponible (F_STO DISSTO), combinaciones, tarifas y pedidos (F_PCL/F_LPC) por Webservice API sin módulos pesados. Descarga gratis.",
+        "image": "https://bridge.cristianjm.com/assets/screenshots/03-ecommerce-channels.png",
         "inLanguage": "es-ES",
         "author": {
           "@type": "Person",
@@ -83,10 +83,15 @@
           {
             "@type": "ListItem",
             "position": 4,
-            "name": "Conexión con PrestaShop 1.7 y 8.x mediante Webservices",
+            "name": "Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice",
             "item": "https://bridge.cristianjm.com/docs/canales/prestashop/"
           }
         ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://bridge.cristianjm.com/docs/canales/prestashop/#faq",
+        "mainEntity": [{"@type":"Question","name":"¿Necesito comprar o instalar algún módulo en PrestaShop para conectarlo con Factusol?","acceptedAnswer":{"@type":"Answer","text":"No. Bentian ERP Bridge se conecta directamente a la API RESTful nativa de PrestaShop (Parámetros Avanzados > Webservice) incluida de serie en PrestaShop 1.7 y PrestaShop 8.x. Evitas instalar módulos de terceros que ralentizan el servidor PHP o rompen actualizaciones."}},{"@type":"Question","name":"¿Cómo sincroniza el conector Factusol PrestaShop el stock para evitar sobreventas?","acceptedAnswer":{"@type":"Answer","text":"El agente calcula el stock disponible real en Factusol (DISSTO = ACTSTO - PENPCL en la tabla F_STO) y actualiza únicamente los recursos stock_availables cuyo stock ha variado (dirty-checking) mediante peticiones PUT autenticadas."}},{"@type":"Question","name":"¿Es compatible con combinaciones de productos (tallas, colores, formatos) en PrestaShop?","acceptedAnswer":{"@type":"Answer","text":"Sí. Bentian cruza tanto las referencias de productos simples (/api/products) como las referencias específicas de cada combinación (/api/combinations) con el código de artículo (CODART / CODSTO) de tu ERP."}},{"@type":"Question","name":"¿Qué ocurre cuando entra un pedido nuevo en PrestaShop?","acceptedAnswer":{"@type":"Answer","text":"Bentian descarga automáticamente los pedidos pagados (/api/orders), valida la integridad fiscal (IVA 21%, 10%, 4% y Recargo de Equivalencia), crea o vincula la ficha del cliente por NIF/DNI en F_CLI e inyecta el pedido de forma atómica en F_PCL (cabecera) y F_LPC (líneas) sin bloquear Factusol."}}]
       }
     ]
   }
@@ -162,7 +167,7 @@
         <!-- Botón canónico de descarga oficial -->
         <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
           <span>Descargar</span>
-          <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.4.10</span>
+          <span class="text-[10px] bg-indigo-700/60 px-1 py-0.2 rounded text-indigo-200" data-app-version>v0.4.11</span>
         </a>
       </div>
     </header>
@@ -349,9 +354,9 @@
                       </a>
                     </li>
                   
-                    <li data-title="conexión con prestashop 1.7 y 8.x mediante webservices" data-keywords="conectar factusol prestashop, webservices prestashop factusol, prestashop 8 factusol, api prestashop conector factusol, sincronizar pedidos prestashop">
+                    <li data-title="conector factusol prestashop (1.7 y 8.x): sincronización de stock y pedidos por webservice" data-keywords="prestashop factusol, conector factusol prestashop, conector prestashop, factusol prestashop, sincronizar factusol prestashop, modulo factusol prestashop 8, webservice prestashop factusol, sincronizar stock prestashop factusol">
                       <a href="/docs/canales/prestashop/" class="block px-2.5 py-1.5 text-xs transition leading-snug bg-indigo-500/10 text-indigo-300 font-semibold border-l-2 border-indigo-500 -ml-[9px] pl-2 rounded-r-md">
-                        Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+                        Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice
                       </a>
                     </li>
                   
@@ -555,7 +560,7 @@
 
       <!-- Sidebar Footer Badge -->
       <div class="mt-8 pt-4 border-t border-white/[0.08] px-2 text-[11px] text-zinc-500 flex items-center justify-between">
-        <span>Agente <span data-app-version>v0.4.10</span></span>
+        <span>Agente <span data-app-version>v0.4.11</span></span>
         <span class="inline-flex items-center gap-1 text-emerald-400">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>100% Local-First</span>
@@ -581,107 +586,215 @@
           <span>/</span>
           <a href="/docs/#cat-canales" class="text-zinc-400 hover:text-zinc-200 transition">Canales eCommerce</a>
           <span>/</span>
-          <span class="text-indigo-400 font-medium truncate max-w-xs">Conexión con PrestaShop 1.7 y 8.x mediante Webservices</span>
+          <span class="text-indigo-400 font-medium truncate max-w-xs">Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice</span>
         </nav>
 
         <!-- Article Header -->
         <div class="mb-8 pb-6 border-b border-white/[0.08]">
           <div class="flex items-center gap-2 mb-3">
             <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              Conector PrestaShop
+              Conector PrestaShop Oficial
             </span>
             <span class="text-xs text-zinc-500">·</span>
-            <span class="text-xs text-zinc-500 font-mono">5 min de lectura</span>
+            <span class="text-xs text-zinc-500 font-mono">7 min de lectura</span>
             <span class="text-xs text-zinc-500">·</span>
-            <span class="text-xs text-zinc-500 font-mono">Actualizado v0.4.10</span>
+            <span class="text-xs text-zinc-500 font-mono">Actualizado v0.4.11</span>
           </div>
 
           <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-3">
-            Conexión con PrestaShop 1.7 y 8.x mediante Webservices
+            Conector Factusol PrestaShop (1.7 y 8.x): Sincronización de Stock y Pedidos por Webservice
           </h1>
           <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
-            Cómo activar los servicios web oficiales de PrestaShop, conceder permisos en recursos de pedidos/stock y mapear combinaciones.
+            Guía técnica paso a paso para conectar Factusol (y SimplyGest, Sage 50, Ágora o a3ERP) con PrestaShop 1.7 y 8.x mediante su API Webservice nativa sin instalar módulos pesados.
           </p>
         </div>
 
         <!-- Article Rich Content Body -->
         <article class="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed space-y-6">
           
-      <p class="text-base text-zinc-300 leading-relaxed mb-6">
-        PrestaShop dispone de una arquitectura nativa de servicios web (Webservices RESTful) que permite interactuar con su base de datos sin necesidad de instalar módulos no verificados. Bentian aprovecha este motor estándar para sincronizar pedidos, productos y stock disponible.
-      </p>
+    <p class="text-base text-zinc-300 leading-relaxed mb-6">
+      Si buscas un <strong>conector Factusol PrestaShop</strong> fiable, rápido y sin cuotas ocultas por pedido, <strong>Bentian ERP Bridge</strong> conecta tu base de datos local de <strong>Factusol</strong> (así como <em>SimplyGest, Sage 50, Ágora POS y a3ERP</em>) directamente con <strong>PrestaShop 1.7 y PrestaShop 8.x</strong> utilizando el motor nativo de <strong>Webservices RESTful</strong> de PrestaShop. Sin instalar módulos pesados en tu hosting y sin abrir puertos en el router de tu empresa.
+    </p>
 
-      <h2 id="activar-webservices" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Activación del Servicio Web en PrestaShop</h2>
-      <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
-        <li>Accede al Backoffice de PrestaShop.</li>
-        <li>En el menú lateral, dirígete a <strong class="text-white">Parámetros avanzados → Webservice (Servicio web)</strong>.</li>
-        <li>Activa la casilla <strong class="text-emerald-400">Activar el servicio web de PrestaShop: SÍ</strong>.</li>
-        <li>Guarda los cambios.</li>
-      </ol>
-
-      <h2 id="generar-clave-api" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Creación de la Clave de Servicio Web</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Haz clic en <strong class="text-indigo-400">Añadir una nueva clave de servicio web</strong>. Puedes generar una clave aleatoria de 32 caracteres pulsando el botón <em>Generar</em>.
-      </p>
-
-      <h2 id="recursos-necesarios" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Permisos en Recursos (GET / POST / PUT)</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Marca los siguientes permisos para la clave generada:
-      </p>
-      <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
-          <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
-            <tr>
-              <th class="px-4 py-2.5">Recurso</th>
-              <th class="px-4 py-2.5">GET (Ver)</th>
-              <th class="px-4 py-2.5">POST (Crear)</th>
-              <th class="px-4 py-2.5">PUT (Modificar)</th>
-              <th class="px-4 py-2.5 font-sans">Propósito</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">orders</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Descargar pedidos y marcar estado sincronizado.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">order_details</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Lectura de líneas de pedido y referencias.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">stock_availables</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-zinc-600">-</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Actualizar el stock disponible en tiempo real.</td>
-            </tr>
-            <tr>
-              <td class="px-4 py-2 text-white font-bold">products</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 text-emerald-400">✓</td>
-              <td class="px-4 py-2 font-sans text-zinc-300">Consultar y sincronizar tarifas y referencias.</td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <strong class="text-white text-sm block mb-1">⚡ Prueba el Conector Factusol ↔ PrestaShop hoy mismo</strong>
+        <span>Incluye Modo Evaluación con datos de prueba e integración nativa en el Paso 3 del Asistente de Configuración.</span>
       </div>
+      <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold whitespace-nowrap transition shadow-lg shadow-indigo-600/20">
+        Descargar Agente Oficial (<span data-app-version>Última Versión</span>)
+      </a>
+    </div>
 
-      <h2 id="prestashop-8" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Compatibilidad con PrestaShop 8 y PHP 8.x</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        Bentian ERP Bridge es compatible tanto con PrestaShop 1.7 como con las ediciones modernas de PrestaShop 8.x ejecutadas en servidores con PHP 8.1 o PHP 8.2.
-      </p>
+    <h2 id="comparativa-modulos-addons" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">1. Conector Nativo Webservice vs Módulos de PrestaShop Addons</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Los módulos tradicionales para conectar PrestaShop con Factusol suelen costar entre 250 € y 450 € de alta más renovaciones de soporte, se instalan dentro de la carpeta <code class="text-zinc-200">/modules/</code> de tu tienda y ejecutan pesadas tareas cron en PHP que agotan la memoria del servidor (errores 500 / 504 Gateway Timeout). Bentian resuelve este problema de raíz:
+    </p>
+    <div class="overflow-x-auto mb-8">
+      <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+        <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
+          <tr>
+            <th class="px-4 py-2.5">Característica Técnica</th>
+            <th class="px-4 py-2.5 text-emerald-400">Bentian ERP Bridge (Webservice Nativo)</th>
+            <th class="px-4 py-2.5 text-zinc-400">Módulos PHP Tradicionales (Addons)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/[0.06] text-zinc-300">
+          <tr>
+            <td class="px-4 py-2.5 font-semibold text-white">Instalación en PrestaShop</td>
+            <td class="px-4 py-2.5 text-emerald-300">0 módulos (usa la API oficial integrada en PrestaShop)</td>
+            <td class="px-4 py-2.5 text-zinc-400">Requiere instalar plugin PHP y overrides en el servidor</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-semibold text-white">Impacto en PHP / Hosting</td>
+            <td class="px-4 py-2.5 text-emerald-300">Mínimo (solo actualiza SKUs cuyo stock ha cambiado)</td>
+            <td class="px-4 py-2.5 text-zinc-400">Alto (volcados masivos CSV/XML que bloquean MySQL)</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-semibold text-white">Seguridad de Red</td>
+            <td class="px-4 py-2.5 text-emerald-300">100% Tráfico HTTPS saliente (0 puertos abiertos en el router)</td>
+            <td class="px-4 py-2.5 text-zinc-400">Suele requerir abrir puertos o subir el archivo .accdb por FTP</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-semibold text-white">Compatibilidad PHP 8.1 / 8.2</td>
+            <td class="px-4 py-2.5 text-emerald-300">Total en PrestaShop 1.7.x y PrestaShop 8.x</td>
+            <td class="px-4 py-2.5 text-zinc-400">Frecuentes roturas al actualizar versión de PrestaShop</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Configuración en Bentian ERP Bridge</h2>
-      <p class="text-sm text-zinc-300 leading-relaxed mb-4">
-        En el panel de control de Bentian, selecciona la plataforma <strong>PrestaShop</strong>, introduce la URL base de tu tienda y la clave de Webservice generada. Haz clic en <strong>Probar Conexión</strong> para confirmar la sincronización.
-      </p>
-    
+    <h2 id="mapeo-tablas-factusol-prestashop" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">2. Mapeo Técnico de Tablas: Factusol (.accdb) ↔ PrestaShop API</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      El motor de sincronización (<code class="text-indigo-300 font-mono">PrestashopSyncHelper</code>) enlaza de forma bidireccional las tablas relacionales de Factusol con las entidades del Webservice de PrestaShop:
+    </p>
+    <div class="overflow-x-auto mb-8">
+      <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
+        <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08] font-sans">
+          <tr>
+            <th class="px-4 py-2.5">Entidad</th>
+            <th class="px-4 py-2.5">Tabla / Campo en Factusol</th>
+            <th class="px-4 py-2.5">Recurso en PrestaShop API</th>
+            <th class="px-4 py-2.5">Dirección y Comportamiento</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+          <tr>
+            <td class="px-4 py-2 text-white font-sans font-semibold">Referencia / SKU</td>
+            <td class="px-4 py-2 text-indigo-300">F_ART.CODART / F_STO.CODSTO</td>
+            <td class="px-4 py-2 text-emerald-300">products.reference / combinations.reference</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Clave unívoca de cruce (normalizada en mayúsculas).</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-sans font-semibold">Stock Disponible</td>
+            <td class="px-4 py-2 text-indigo-300">F_STO.DISSTO (ACTSTO - PENPCL)</td>
+            <td class="px-4 py-2 text-emerald-300">PUT /api/stock_availables/{id}</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">ERP → PrestaShop con dirty-checking en tiempo real.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-sans font-semibold">Cabecera Pedido</td>
+            <td class="px-4 py-2 text-indigo-300">F_PCL (TIPPCL, CODPCL, TOTPCL)</td>
+            <td class="px-4 py-2 text-emerald-300">GET /api/orders?display=full</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">PrestaShop → ERP con idempotencia anti-duplicados.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-sans font-semibold">Líneas Pedido</td>
+            <td class="px-4 py-2 text-indigo-300">F_LPC (ARTLPC, CANLPC, PRELPC)</td>
+            <td class="px-4 py-2 text-emerald-300">orders.associations.order_rows</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">PrestaShop → ERP con desglose de base imponible e IVA.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="activar-webservices" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">3. Paso 1: Activar el Servicio Web en el Backoffice de PrestaShop</h2>
+    <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-6">
+      <li>Accede al panel de administración (Backoffice) de tu tienda PrestaShop 1.7 u 8.x.</li>
+      <li>En el menú lateral izquierdo, dirígete a <strong class="text-white">Parámetros avanzados → Webservice (Servicio web)</strong>.</li>
+      <li>En el bloque <em>Configuración</em>, activa la opción <strong class="text-emerald-400">Activar el servicio web de PrestaShop: SÍ</strong> y pulsa <strong>Guardar</strong>.</li>
+    </ol>
+
+    <h2 id="recursos-necesarios" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">4. Paso 2: Clave de 32 Caracteres y Permisos (GET / POST / PUT)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-4">
+      Haz clic en el botón superior <strong class="text-indigo-400">Añadir una nueva clave de servicio web</strong>, pulsa en <em>Generar</em> para crear tu clave de 32 caracteres alfanuméricos y marca los siguientes permisos en la matriz de recursos:
+    </p>
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden font-mono">
+        <thead class="bg-zinc-900/80 text-zinc-300 border-b border-white/[0.08]">
+          <tr>
+            <th class="px-4 py-2.5">Recurso</th>
+            <th class="px-4 py-2.5">GET (Ver)</th>
+            <th class="px-4 py-2.5">POST (Crear)</th>
+            <th class="px-4 py-2.5">PUT (Modificar)</th>
+            <th class="px-4 py-2.5 font-sans">Propósito en el Conector</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+          <tr>
+            <td class="px-4 py-2 text-white font-bold">products</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Mapear referencias (<code class="text-zinc-200">reference</code>) con códigos de Factusol.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-bold">combinations</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 text-zinc-600">-</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Sincronizar stock de variantes (tallas, colores, medidas).</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-bold">stock_availables</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 text-zinc-600">-</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Actualizar cantidades disponibles en tiempo real mediante XML PUT.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 text-white font-bold">orders / order_details</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 text-zinc-600">-</td>
+            <td class="px-4 py-2 text-emerald-400">✓</td>
+            <td class="px-4 py-2 font-sans text-zinc-300">Descargar pedidos validados e inyectarlos en <code class="text-zinc-200">F_PCL</code> y <code class="text-zinc-200">F_LPC</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="combinaciones-y-dissto" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">5. Combinaciones (Tallas/Colores) y Stock Real Disponible (DISSTO)</h2>
+    <p class="text-sm text-zinc-300 leading-relaxed mb-6">
+      En PrestaShop, las existencias tanto de un producto simple (<code class="text-zinc-200 font-mono">id_product_attribute = 0</code>) como de sus combinaciones (<code class="text-zinc-200 font-mono">id_product_attribute &gt; 0</code>) se almacenan en el recurso <code class="text-indigo-300 font-mono">stock_availables</code>. Bentian resuelve automáticamente el SKU de cada combinación y actualiza su cantidad exacta tomando el campo <code class="text-emerald-400 font-mono">DISSTO</code> de tu almacén configurado (por defecto <code class="text-zinc-200 font-mono">GEN</code>).
+    </p>
+
+    <h2 id="configuracion-bentian" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">6. Paso 3: Vincular PrestaShop en el Asistente de Bentian ERP Bridge</h2>
+    <ol class="text-sm text-zinc-300 space-y-2 list-decimal list-inside mb-8">
+      <li>Abre el panel local de Bentian (<code class="text-zinc-200 font-mono">http://127.0.0.1:39281</code>) y dirígete al <strong>Paso 3 del Asistente</strong> o a la pestaña <strong>Canal Web</strong>.</li>
+      <li>Selecciona la tarjeta <strong class="text-white">PrestaShop 1.7 / 8.x</strong>.</li>
+      <li>Introduce la URL de tu tienda (ej: <code class="text-zinc-200">https://www.mitienda.es</code>) y pega tu clave Webservice de 32 caracteres.</li>
+      <li>Pulsa en <strong class="text-indigo-400">Comprobar Conexión PrestaShop</strong>: el agente verificará en tiempo real el servidor, el certificado SSL, la respuesta JSON del Webservice y los permisos sobre <code class="text-zinc-200">products</code>, <code class="text-zinc-200">stock_availables</code> y <code class="text-zinc-200">orders</code>.</li>
+    </ol>
+
+    <h2 id="preguntas-frecuentes-prestashop" class="text-xl font-bold text-white mb-4 pb-2 border-b border-white/[0.08]">7. Preguntas Frecuentes (FAQ): Factusol y PrestaShop</h2>
+    <div class="space-y-4 mb-6">
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-1">¿Necesito comprar o instalar algún módulo en PrestaShop para conectarlo con Factusol?</h3>
+        <p class="text-xs text-zinc-300 leading-relaxed">No. Bentian ERP Bridge se conecta directamente a la API RESTful nativa de PrestaShop (Parámetros Avanzados → Webservice) incluida de serie en PrestaShop 1.7 y PrestaShop 8.x. Evitas instalar módulos de terceros que ralentizan el servidor PHP o rompen actualizaciones.</p>
+      </div>
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-1">¿Cómo sincroniza el conector Factusol PrestaShop el stock para evitar sobreventas?</h3>
+        <p class="text-xs text-zinc-300 leading-relaxed">El agente calcula el stock disponible real en Factusol (<code class="text-indigo-300">DISSTO = ACTSTO - PENPCL</code> en la tabla <code class="text-indigo-300">F_STO</code>) y actualiza únicamente los recursos <code class="text-emerald-300">stock_availables</code> cuyo stock ha variado (dirty-checking) mediante peticiones PUT autenticadas.</p>
+      </div>
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-1">¿Es compatible con combinaciones de productos (tallas, colores, formatos) en PrestaShop?</h3>
+        <p class="text-xs text-zinc-300 leading-relaxed">Sí. Bentian cruza tanto las referencias de productos simples (<code class="text-zinc-200">/api/products</code>) como las referencias específicas de cada combinación (<code class="text-zinc-200">/api/combinations</code>) con el código de artículo (<code class="text-zinc-200">CODART / CODSTO</code>) de tu ERP.</p>
+      </div>
+      <div class="p-4 rounded-xl bg-[#121215] border border-white/[0.08]">
+        <h3 class="text-sm font-bold text-white mb-1">¿Funciona también con SimplyGest, Sage 50, Ágora POS o a3ERP además de Factusol?</h3>
+        <p class="text-xs text-zinc-300 leading-relaxed">Sí. Gracias a la arquitectura polimórfica Multi-ERP de Bentian, el mismo canal de PrestaShop sincroniza stock y pedidos contra Factusol (<code class="text-zinc-200">.accdb</code>), SimplyGest (<code class="text-zinc-200">Datos.mdb</code>), Sage 50, Ágora POS y Wolters Kluwer a3ERP.</p>
+      </div>
+    </div>
+  
         </article>
 
         <!-- Pagination: Prev / Next Buttons -->
@@ -719,32 +832,44 @@
         <ul class="space-y-2 text-xs border-l border-white/[0.06] pl-3" id="toc-list">
           
             <li>
-              <a href="#activar-webservices" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="activar-webservices">
-                1. Activación del Servicio Web en PrestaShop
+              <a href="#comparativa-modulos-addons" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="comparativa-modulos-addons">
+                1. Conector Nativo Webservice vs Módulos de PrestaShop Addons
               </a>
             </li>
           
             <li>
-              <a href="#generar-clave-api" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="generar-clave-api">
-                2. Creación de la Clave de Servicio Web
+              <a href="#mapeo-tablas-factusol-prestashop" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="mapeo-tablas-factusol-prestashop">
+                2. Mapeo Técnico de Tablas: Factusol (.accdb) ↔ PrestaShop API
+              </a>
+            </li>
+          
+            <li>
+              <a href="#activar-webservices" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="activar-webservices">
+                3. Paso 1: Activar el Servicio Web en el Backoffice de PrestaShop
               </a>
             </li>
           
             <li>
               <a href="#recursos-necesarios" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="recursos-necesarios">
-                3. Permisos en Recursos (GET / POST / PUT)
+                4. Paso 2: Clave de 32 Caracteres y Permisos (GET / POST / PUT)
               </a>
             </li>
           
             <li>
-              <a href="#prestashop-8" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="prestashop-8">
-                4. Compatibilidad con PrestaShop 8 y PHP 8.x
+              <a href="#combinaciones-y-dissto" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="combinaciones-y-dissto">
+                5. Combinaciones (Tallas/Colores) y Stock Real Disponible (DISSTO)
               </a>
             </li>
           
             <li>
               <a href="#configuracion-bentian" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="configuracion-bentian">
-                5. Configuración en Bentian ERP Bridge
+                6. Paso 3: Vincular PrestaShop en el Asistente de Bentian ERP Bridge
+              </a>
+            </li>
+          
+            <li>
+              <a href="#preguntas-frecuentes-prestashop" class="block text-zinc-400 hover:text-white transition leading-snug toc-link" data-id="preguntas-frecuentes-prestashop">
+                7. Preguntas Frecuentes (FAQ): Factusol y PrestaShop
               </a>
             </li>
           
@@ -755,7 +880,7 @@
           <div class="text-[11px] font-bold text-white mb-1">Bentian ERP Bridge</div>
           <p class="text-[10px] text-zinc-400 mb-3 leading-relaxed">Conector nativo Windows local-first para Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP y tiendas web.</p>
           <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="block text-center py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition">
-            Descargar v0.4.10
+            Descargar v0.4.11
           </a>
         </div>
       </aside>

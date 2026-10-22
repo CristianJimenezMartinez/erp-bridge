@@ -27,6 +27,16 @@ export class SystemController {
 
   public static saveFullConfig(agent: LocalAgent): RouteHandler {
     return async (_req, res, ctx) => {
+      const lic = agent.licenseService?.getLicenseStatus();
+      const incomingLicKey = typeof ctx.body?.licenseKey === 'string' ? ctx.body.licenseKey.trim() : '';
+      if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD' && !incomingLicKey) {
+        res.writeHead(403, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          success: false,
+          message: 'Operación bloqueada: Necesitas activar una clave de licencia antes de guardar configuraciones del ERP o canales.'
+        }));
+        return;
+      }
       const candidatePaths = [
         ctx.body?.factusol?.databasePath,
         ctx.body?.factusolDbPath,

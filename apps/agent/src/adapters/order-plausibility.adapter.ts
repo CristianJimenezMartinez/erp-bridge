@@ -157,6 +157,9 @@ export class OrderPlausibilityAdapter {
       taxId: taxId || undefined,
       email: email || undefined,
       phone: phone || undefined,
+      priceList: rawCust.priceList !== undefined
+        ? Math.max(1, Math.min(10, Math.floor(Number(rawCust.priceList) || 1)))
+        : undefined,
       hasEquivalenceSurcharge: Boolean(rawCust.hasEquivalenceSurcharge),
       commercialName: rawCust.commercialName ? truncateString(cleanControlChars(rawCust.commercialName), 100) : undefined,
     };

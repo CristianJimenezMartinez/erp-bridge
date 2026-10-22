@@ -36,15 +36,8 @@ import {
   FactusolInvoiceHandler,
 } from './handlers';
 
-import {
-  FactusolConnectionConfig,
-  FactusolConnectorOptions,
-} from './factusol.types';
-
-export {
-  FactusolConnectionConfig,
-  FactusolConnectorOptions,
-};
+import { FactusolConnectionConfig, FactusolConnectorOptions } from './factusol.types';
+export { FactusolConnectionConfig, FactusolConnectorOptions };
 
 export class FactusolConnector implements Connector {
   private readonly logger = new Logger('FactusolConnector');
@@ -103,12 +96,7 @@ export class FactusolConnector implements Connector {
       if (resolution.switched) {
         this.logger.info(
           `Cambio automático de ejercicio fiscal detectado en Factusol: ejercicio ${resolution.previousYear} -> ${resolution.currentYear}`,
-          {
-            previousYear: resolution.previousYear,
-            currentYear: resolution.currentYear,
-            configuredPath: dbPath,
-            activePath: resolution.activePath,
-          }
+          { previousYear: resolution.previousYear, currentYear: resolution.currentYear, configuredPath: dbPath, activePath: resolution.activePath }
         );
         activeDbPath = resolution.activePath;
       }
@@ -134,10 +122,7 @@ export class FactusolConnector implements Connector {
       autoRollover,
     };
 
-    this.driver = new AccessDriver({
-      databasePath: activeDbPath,
-      provider: rawConfig.provider,
-    });
+    this.driver = new AccessDriver({ databasePath: activeDbPath, provider: rawConfig.provider });
 
     // Initialize domain handlers
     this.customerHandler = new FactusolCustomerHandler(this.driver, this.logger);
@@ -145,7 +130,6 @@ export class FactusolConnector implements Connector {
     this.orderHandler = new FactusolOrderHandler(this.driver, this.config, this.customerHandler, this.logger);
     this.stockHandler = new FactusolStockHandler(this.driver, this.config, this.logger);
     this.invoiceHandler = new FactusolInvoiceHandler(this.driver, this.config, this.logger);
-
     this.logger.info('Factusol connector configured successfully', { databasePath: dbPath });
   }
 
@@ -162,10 +146,7 @@ export class FactusolConnector implements Connector {
 
   public async healthCheck(): Promise<HealthCheckResult> {
     if (!this.driver || !this.config) {
-      return {
-        status: 'DOWN',
-        message: 'El conector de Factusol no está inicializado ni conectado',
-      };
+      return { status: 'DOWN', message: 'El conector de Factusol no está inicializado ni conectado' };
     }
 
     const start = Date.now();
@@ -173,18 +154,13 @@ export class FactusolConnector implements Connector {
       this.driver.verifyFileExists();
       const rows = await this.driver.query<{ CODART: string }>(FACTUSOL_QUERIES.healthCheck());
       const latencyMs = Date.now() - start;
-
       const fileStats = fs.statSync(this.config.databasePath);
 
       return {
         status: 'HEALTHY',
         latencyMs,
         message: `Conexión OLEDB establecida con Factusol. Acceso correcto a ${rows.length > 0 ? 'F_ART' : 'tablas'}.`,
-        details: {
-          databasePath: this.config.databasePath,
-          fileSizeBytes: fileStats.size,
-          lastModified: fileStats.mtime,
-        },
+        details: { databasePath: this.config.databasePath, fileSizeBytes: fileStats.size, lastModified: fileStats.mtime },
       };
     } catch (error: unknown) {
       const latencyMs = Date.now() - start;
@@ -193,20 +169,16 @@ export class FactusolConnector implements Connector {
         status: 'DOWN',
         latencyMs,
         message: `Error al comprobar la salud de Factusol: ${message}`,
-        details: {
-          databasePath: this.config?.databasePath,
-        },
+        details: { databasePath: this.config?.databasePath },
       };
     }
   }
 
-  // --- Product Operations ---
   public async readProducts(options?: ReadProductsOptions): Promise<CanonicalProduct[]> {
     this.ensureConnected();
     return this.productHandler!.readProducts(options);
   }
 
-  // --- Customer Operations ---
   public async findCustomer(criteria: { taxId?: string; email?: string }): Promise<CanonicalCustomer | null> {
     this.ensureConnected();
     return this.customerHandler!.findCustomer(criteria);
@@ -217,7 +189,6 @@ export class FactusolConnector implements Connector {
     return this.customerHandler!.createCustomer(customer);
   }
 
-  // --- Order Operations ---
   public async createOrder(order: CanonicalOrder): Promise<OrderMutationResult> {
     this.ensureConnected();
     return this.orderHandler!.createOrder(order);
@@ -228,21 +199,16 @@ export class FactusolConnector implements Connector {
     return this.orderHandler!.readOrders(options);
   }
 
-  public async updateOrderStatus(
-    orderId: string,
-    status: OrderStatus | string
-  ): Promise<OrderMutationResult> {
+  public async updateOrderStatus(orderId: string, status: OrderStatus | string): Promise<OrderMutationResult> {
     this.ensureConnected();
     return this.orderHandler!.updateOrderStatus(orderId, status);
   }
 
-  // --- Stock Operations ---
   public async readStock(options?: ReadStockOptions): Promise<CanonicalStock[]> {
     this.ensureConnected();
     return this.stockHandler!.readStock(options);
   }
 
-  // --- Invoice Operations ---
   public async readInvoices(options?: ReadInvoicesOptions): Promise<CanonicalInvoice[]> {
     this.ensureConnected();
     return this.invoiceHandler!.readInvoices(options);
@@ -253,10 +219,7 @@ export class FactusolConnector implements Connector {
     return this.invoiceHandler!.createInvoice(invoice);
   }
 
-  public async updateInvoiceStatus(
-    invoiceId: string,
-    status: string
-  ): Promise<InvoiceMutationResult> {
+  public async updateInvoiceStatus(invoiceId: string, status: string): Promise<InvoiceMutationResult> {
     this.ensureConnected();
     return this.invoiceHandler!.updateInvoiceStatus(invoiceId, status);
   }

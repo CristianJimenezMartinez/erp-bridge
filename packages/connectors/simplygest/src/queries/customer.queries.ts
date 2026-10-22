@@ -32,20 +32,20 @@ export function findCustomerByEmailQuery(email: string): string {
 
 export function insertCustomerQuery(customer: CanonicalCustomer, nextCode: string): string {
   const addr: CanonicalAddress = customer.address || { country: 'ES' };
-  const name = sanitizeSql(customer.fiscalName).substring(0, 100);
-  const cif = sanitizeSql(customer.taxId || '').substring(0, 20);
-  const dir = sanitizeSql(addr.street || '').substring(0, 100);
-  const cp = sanitizeSql(addr.postalCode || '').substring(0, 10);
-  const pob = sanitizeSql(addr.city || '').substring(0, 50);
-  const prov = sanitizeSql(addr.state || '').substring(0, 50);
-  const email = sanitizeSql(customer.email || '').substring(0, 100);
-  const tel = sanitizeSql(customer.phone || addr.phone || '').substring(0, 30);
+  const name = sanitizeSql(customer.fiscalName, 100);
+  const cif = sanitizeSql(customer.taxId || '', 20);
+  const dir = sanitizeSql(addr.street || '', 100);
+  const cp = sanitizeSql(addr.postalCode || '', 10);
+  const pob = sanitizeSql(addr.city || '', 50);
+  const prov = sanitizeSql(addr.state || '', 50);
+  const email = sanitizeSql(customer.email || '', 100);
+  const tel = sanitizeSql(customer.phone || addr.phone || '', 30);
 
   return `
     INSERT INTO CLIENTES (
       CODIGO, NOMBRE, CIF, DIRECCION, CP, POBLACION, PROVINCIA, EMAIL, TELEFONO
     ) VALUES (
-      '${sanitizeSql(nextCode)}',
+      '${sanitizeSql(nextCode, 20)}',
       '${name}',
       '${cif}',
       '${dir}',

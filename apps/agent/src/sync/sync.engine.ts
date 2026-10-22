@@ -16,6 +16,7 @@ import { OrderNotifierService } from '../notifications/order-notifier.service';
 import { SalesLedgerManager } from '../orders/sales-ledger.manager';
 import { OrderPlausibilityAdapter } from '../adapters/order-plausibility.adapter';
 import { ShopifySyncHelper } from './shopify-sync.helper';
+import { PrestashopSyncHelper } from './prestashop-sync.helper';
 
 export class LocalSyncEngine {
   private readonly logger = new Logger('LocalSyncEngine');
@@ -177,6 +178,19 @@ export class LocalSyncEngine {
         return { success: false, message: msg };
       }
       return this.syncShopify(dbPath, config, start, isManual, erpConnector);
+    }
+
+    const isPrestashop =
+      config.channelType === 'prestashop' ||
+      (Boolean(config.prestashop?.storeUrl) && !woo.storeUrl);
+
+    if (isPrestashop) {
+      if (!isErpAccessible) {
+        const msg = `Base de datos de ${erpDisplayName} no configurada o inaccesible (${dbPath || 'Sin ruta'}).`;
+        this.eventBus.addEvent('error', `❌ ${msg}`);
+        return { success: false, message: msg };
+      }
+      return this.syncPrestashop(dbPath, config, start, isManual, erpConnector);
     }
 
     try {
@@ -585,9 +599,12 @@ export class LocalSyncEngine {
       const isShopify =
         config.channelType === 'shopify' ||
         (Boolean(config.shopify?.shopSubdomain) && !woo?.storeUrl);
+      const isPrestashop =
+        config.channelType === 'prestashop' ||
+        (Boolean(config.prestashop?.storeUrl) && !woo?.storeUrl);
 
       const isErpAccessible = Boolean(dbPath && (erpConnector.isDatabaseAccessible() || fs.existsSync(dbPath)));
-      if (!isErpAccessible || (!isBridge && !isWoo && !isShopify)) {
+      if (!isErpAccessible || (!isBridge && !isWoo && !isShopify && !isPrestashop)) {
         return;
       }
 
@@ -1055,69 +1072,57 @@ export class LocalSyncEngine {
     }
   }
 
-  private async syncShopify(
+  private async syncShopify(dbPath: string, config: any, start: number, isManual = true, erpConnector?: IErpConnector): Promise<SyncManualResult> {
+    return this.runHelperChannelSync('shopify', 'Shopify', dbPath, config, start, isManual, erpConnector);
+  }
+
+  private async syncPrestashop(dbPath: string, config: any, start: number, isManual = true, erpConnector?: IErpConnector): Promise<SyncManualResult> {
+    return this.runHelperChannelSync('prestashop', 'PrestaShop', dbPath, config, start, isManual, erpConnector);
+  }
+
+  private async runHelperChannelSync(
+    channelKey: 'shopify' | 'prestashop',
+    channelLabel: string,
     dbPath: string,
     config: any,
     start: number,
-    isManual: boolean = true,
+    isManual: boolean,
     erpConnector?: IErpConnector
   ): Promise<SyncManualResult> {
     try {
       const connector = erpConnector || this.getActiveErpConnector();
       const isRealFactusolFile = connector.providerId === 'factusol' && Boolean(dbPath && fs.existsSync(dbPath));
       const driver = isRealFactusolFile ? new AccessDriver({ databasePath: dbPath }) : (null as any);
-      const warehouse = (
-        config.softwareErp?.providers?.[connector.providerId]?.warehouseCode ||
-        (connector.providerId === 'simplygest' ? config.simplygest?.warehouseCode : config.factusol?.warehouseCode) ||
-        'GEN'
-      );
-      const series = (
-        config.softwareErp?.providers?.[connector.providerId]?.orderSeries ||
-        (connector.providerId === 'simplygest' ? config.simplygest?.orderSeries : config.factusol?.orderSeries) ||
-        '1'
-      );
+      const warehouse = config.softwareErp?.providers?.[connector.providerId]?.warehouseCode ||
+        (connector.providerId === 'simplygest' ? config.simplygest?.warehouseCode : config.factusol?.warehouseCode) || 'GEN';
+      const series = config.softwareErp?.providers?.[connector.providerId]?.orderSeries ||
+        (connector.providerId === 'simplygest' ? config.simplygest?.orderSeries : config.factusol?.orderSeries) || '1';
+      const opts = { plausibilityAdapter: OrderPlausibilityAdapter, orderNotifier: OrderNotifierService, salesLedgerManager: this.salesLedgerManager, eventBus: this.eventBus, series, warehouse, erpConnector: connector };
 
-      const stockRes = await ShopifySyncHelper.syncStockToShopify(driver, config, warehouse, { erpConnector: connector });
-      const orderRes = await ShopifySyncHelper.importShopifyOrders(driver, config, {
-        plausibilityAdapter: OrderPlausibilityAdapter,
-        orderNotifier: OrderNotifierService,
-        salesLedgerManager: this.salesLedgerManager,
-        eventBus: this.eventBus,
-        series,
-        warehouse,
-        erpConnector: connector,
-      });
+      const stockRes = channelKey === 'shopify'
+        ? await ShopifySyncHelper.syncStockToShopify(driver, config, warehouse, { erpConnector: connector })
+        : await PrestashopSyncHelper.syncStockToPrestashop(driver, config, warehouse, { erpConnector: connector });
+      const orderRes = channelKey === 'shopify'
+        ? await ShopifySyncHelper.importShopifyOrders(driver, config, opts)
+        : await PrestashopSyncHelper.importPrestashopOrders(driver, config, opts);
 
-      const itemsUpdated = stockRes.itemsUpdated;
-      const ordersImported = orderRes.ordersImported;
+      const { itemsUpdated } = stockRes;
+      const { ordersImported } = orderRes;
       const cycleDurationMs = Date.now() - start;
       const duration = (cycleDurationMs / 1000).toFixed(1);
-      const summary = `✓ Sincronización completada con Shopify (${itemsUpdated} productos, ${ordersImported} pedidos)`;
+      const summary = `✓ Sincronización completada con ${channelLabel} (${itemsUpdated} productos, ${ordersImported} pedidos)`;
 
       if (isManual || itemsUpdated > 0 || ordersImported > 0) {
-        this.historyManager.addSyncHistoryRecord({
-          type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'success',
-          durationSeconds: parseFloat(duration), itemsUpdated, ordersImported, message: summary,
-        });
+        this.historyManager.addSyncHistoryRecord({ type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'success', durationSeconds: parseFloat(duration), itemsUpdated, ordersImported, message: summary });
         this.eventBus.addEvent('success', summary);
-      } else {
-        this.logger.debug(`Sondeo Shopify completado sin novedades: ${summary}`);
       }
-
-      AgentDiskLogger.getInstance().log({
-        level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cycle_complete', duration_ms: cycleDurationMs, status: 'SUCCESS',
-        message: `Ciclo completo de sincronización Shopify finalizado en ${cycleDurationMs}ms`,
-        metadata: { channel: 'shopify', itemsUpdated, ordersImported },
-      });
+      AgentDiskLogger.getInstance().log({ level: 'SUCCESS', component: 'SyncEngine', action: 'sync_cycle_complete', duration_ms: cycleDurationMs, status: 'SUCCESS', message: `Ciclo completo de sincronización ${channelLabel} finalizado en ${cycleDurationMs}ms`, metadata: { channel: channelKey, itemsUpdated, ordersImported } });
       return { success: true, message: summary };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       const duration = parseFloat(((Date.now() - start) / 1000).toFixed(1));
-      this.historyManager.addSyncHistoryRecord({
-        type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'error',
-        durationSeconds: duration, itemsUpdated: 0, ordersImported: 0, message: `Fallo en sincronización Shopify: ${msg}`,
-      });
-      this.eventBus.addEvent('warn', `Aviso en sincronización Shopify: ${msg}`);
+      this.historyManager.addSyncHistoryRecord({ type: isManual ? 'manual' : 'periodic', mode: 'full', status: 'error', durationSeconds: duration, itemsUpdated: 0, ordersImported: 0, message: `Fallo en sincronización ${channelLabel}: ${msg}` });
+      this.eventBus.addEvent('warn', `Aviso en sincronización ${channelLabel}: ${msg}`);
       return { success: false, message: `Sincronización finalizada con incidencias: ${msg}` };
     }
   }

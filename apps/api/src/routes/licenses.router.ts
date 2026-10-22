@@ -43,9 +43,20 @@ const UnbindMachineSchema = z.object({
 });
 
 const DeactivateLicenseSchema = z.object({
-  licenseKey: z.string().trim().min(1, 'Se requiere licenseKey'),
-  hwid: z.string().trim().min(1, 'Se requiere hwid'),
+  licenseKey: z.string().trim().min(1, 'Se requiere licenseKey').max(80),
+  hwid: z.string().trim().min(1, 'Se requiere hwid').max(128),
+  licenseToken: z.string().trim().optional(),
 });
+
+function escapeHtml(str: string | undefined | null): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 export const licensesRouter = Router();
 const logger = new Logger('LicensesRouter');
@@ -431,11 +442,15 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
         });
       }
 
-      // 6.1 Notificación urgente al administrador (Cristian Jiménez)
-      const mailtoUrl = `mailto:${normalizedEmail}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%2C%20PrestaShop%20o%20Shopify)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez`;
+      // 6.1 Notificación urgente al administrador (Cristian Jiménez) — Con sanitización anti-XSS/HTML Injection
+      const safeCompanyHtml = escapeHtml(cleanCompanyName || 'No especificada');
+      const safeEmailHtml = escapeHtml(normalizedEmail);
+      const safeTaxIdHtml = escapeHtml(cleanTaxId);
+      const safeKeyHtml = escapeHtml(license.key);
+      const mailtoUrl = `mailto:${encodeURIComponent(normalizedEmail)}?subject=Soporte%20y%20puesta%20en%20marcha%20Bentian%20ERP%20Bridge&body=Hola%20${encodeURIComponent(cleanCompanyName || '')}%2C%0A%0AHe%20visto%20tu%20solicitud%20de%20acceso%20a%20la%20beta%20de%20Bentian%20ERP%20Bridge.%20%C2%BFEn%20qu%C3%A9%20versi%C3%B3n%20de%20Factusol%20y%20qu%C3%A9%20tienda%20(WooCommerce%2C%20PrestaShop%20o%20Shopify)%20tienes%20pensado%20instalarlo%3F%0A%0AUn%20saludo%2C%0ACristian%20Jim%C3%A9nez`;
 
       const adminBetaAlertHtml = MailerService.renderBrandedEmail({
-        title: `Nueva Solicitud de Beta Gratuita: ${cleanCompanyName || normalizedEmail}`,
+        title: `Nueva Solicitud de Beta Gratuita: ${safeCompanyHtml}`,
         badgeText: 'LEAD BETA 2026',
         badgeType: 'success',
         contentHtml: `
@@ -452,23 +467,23 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px; line-height: 1.8;">
                   <tr>
                     <td width="140" style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Empresa / Comercio:</td>
-                    <td style="color: #ffffff; font-weight: 700; padding: 6px 0;">${cleanCompanyName || 'No especificada'}</td>
+                    <td style="color: #ffffff; font-weight: 700; padding: 6px 0;">${safeCompanyHtml}</td>
                   </tr>
                   <tr>
                     <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Email de Contacto:</td>
                     <td style="padding: 6px 0;">
-                      <a href="mailto:${normalizedEmail}" style="color: #818cf8; text-decoration: underline; font-weight: 600;">${normalizedEmail}</a>
+                      <a href="mailto:${safeEmailHtml}" style="color: #818cf8; text-decoration: underline; font-weight: 600;">${safeEmailHtml}</a>
                     </td>
                   </tr>
-                  ${cleanTaxId ? `
+                  ${safeTaxIdHtml ? `
                   <tr>
                     <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">CIF / NIF:</td>
-                    <td style="color: #e4e4e7; font-family: 'SFMono-Regular', Consolas, monospace; padding: 6px 0;">${cleanTaxId}</td>
+                    <td style="color: #e4e4e7; font-family: 'SFMono-Regular', Consolas, monospace; padding: 6px 0;">${safeTaxIdHtml}</td>
                   </tr>
                   ` : ''}
                   <tr>
                     <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Clave Generada:</td>
-                    <td style="color: #34d399; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; padding: 6px 0;">${license.key}</td>
+                    <td style="color: #34d399; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 700; padding: 6px 0;">${safeKeyHtml}</td>
                   </tr>
                   <tr>
                     <td style="color: #a1a1aa; padding: 6px 0; vertical-align: top;">Validez:</td>
@@ -481,7 +496,7 @@ licensesRouter.post('/licenses/beta/claim', rateLimit({ name: 'beta-claim', wind
 
           ${MailerService.renderButton('Contactar con el Cliente Potencial &rarr;', mailtoUrl, 'indigo')}
         `,
-        previewText: `Nuevo lead: ${cleanCompanyName || normalizedEmail} ha reclamado acceso a la Beta de Bentian ERP Bridge.`,
+        previewText: `Nuevo lead: ${safeCompanyHtml} ha reclamado acceso a la Beta de Bentian ERP Bridge.`,
         footerNote: 'Alerta interna confidencial generada automáticamente por el sistema de licencias de Bentian ERP Bridge.',
       });
 
@@ -872,7 +887,10 @@ licensesRouter.post('/licenses/activate', rateLimit({ name: 'license-activate', 
 });
 
 // 5. Periodic token validation and renewal from an Agent
-licensesRouter.post('/licenses/validate', async (req: Request, res: Response, next: NextFunction) => {
+licensesRouter.post(
+  '/licenses/validate',
+  rateLimit({ name: 'license-validate', windowMs: 15 * 60 * 1000, max: 120 }),
+  async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = LicenseValidationRequestSchema.parse(req.body);
 
@@ -931,22 +949,33 @@ licensesRouter.post('/licenses/validate', async (req: Request, res: Response, ne
 });
 
 // 6. Deactivate a machine activation
-licensesRouter.post('/licenses/deactivate', rateLimit({ name: 'license-deactivate', windowMs: 15*60*1000, max: 30 }), async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const parsed = DeactivateLicenseSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: { message: 'Se requiere licenseKey y hwid' } });
+licensesRouter.post(
+  '/licenses/deactivate',
+  rateLimit({ name: 'license-deactivate', windowMs: 15 * 60 * 1000, max: 15 }),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const parsed = DeactivateLicenseSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: { message: 'Se requiere licenseKey y hwid válidos' } });
+      }
+      const { licenseKey, hwid, licenseToken } = parsed.data;
+      const headerToken = (req.headers['x-license-token'] as string | undefined)?.trim() || licenseToken;
+      if (headerToken) {
+        const verified = LicenseTokenManager.verifyToken(headerToken);
+        if (!verified.valid || (verified.payload && verified.payload.hwid !== hwid)) {
+          return res.status(401).json({ error: { message: 'Token de licencia inválido para esta máquina' } });
+        }
+      }
+      const result = await licenseService.deactivateLicense(licenseKey, hwid);
+      if (!result.success) {
+        return res.status(400).json({ error: { message: result.message } });
+      }
+      return res.json({ data: result });
+    } catch (error) {
+      return next(error);
     }
-    const { licenseKey, hwid } = parsed.data;
-    const result = await licenseService.deactivateLicense(licenseKey, hwid);
-    if (!result.success) {
-      return res.status(400).json({ error: { message: result.message } });
-    }
-    return res.json({ data: result });
-  } catch (error) {
-    return next(error);
   }
-});
+);
 
 // 7. Revoke license (admin)
 licensesRouter.post('/licenses/:id/revoke', requireAuth, requireRole(['SUPERADMIN', 'ADMIN']), async (req: Request, res: Response, next: NextFunction) => {

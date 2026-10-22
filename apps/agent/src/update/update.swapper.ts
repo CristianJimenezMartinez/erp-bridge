@@ -1,10 +1,14 @@
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import * as path from 'path';
-import * as os from 'os';
 import * as childProcess from 'child_process';
 import { Logger } from '@erp-bridge/shared';
 import { UpdateSwapOptions } from './update.types';
+import {
+  buildBatchSwapScript,
+  buildPowerShellSwapScript,
+  resolveDefaultUpdateScriptDir,
+} from './update-script.builder';
 
 export class UpdateSwapper {
   private static readonly logger = new Logger('UpdateSwapper');
@@ -13,218 +17,14 @@ export class UpdateSwapper {
    * Genera el script de PowerShell nativo para el swap atómico y monitorización de 10 segundos.
    */
   public static generatePowerShellScript(options: UpdateSwapOptions): string {
-    const rawTarget = path.resolve(options.targetExePath);
-    const rawNew = path.resolve(options.newExePath);
-    const rawBackup = options.backupExePath ? path.resolve(options.backupExePath) : `${rawTarget}.bak`;
-
-    const targetExe = rawTarget.replace(/'/g, "''");
-    const newExe = rawNew.replace(/'/g, "''");
-    const backupExe = rawBackup.replace(/'/g, "''");
-
-    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
-    const rawScriptDir = scriptDir.replace(/'/g, "''");
-
-    const timeoutSecs = options.timeoutSeconds ?? 10;
-    const procNames = options.processNamesToKill ?? ['BentianAgent', 'BentianTray'];
-    const procListStr = procNames.map((p) => `'${p}'`).join(', ');
-    const postArgs = options.postUpdateArgs && options.postUpdateArgs.length > 0
-      ? options.postUpdateArgs.map((a) => `'${a}'`).join(', ')
-      : `'start', '--post-update'`;
-    const expectedSha256 = /^[0-9a-fA-F]{64}$/.test(options.expectedSha256 || '')
-      ? String(options.expectedSha256).toLowerCase()
-      : '';
-
-    return `# ==============================================================================
-# BENTIAN ERP BRIDGE - SCRIPT NATIVO DE ACTUALIZACIÓN ATÓMICA Y ROLLBACK DE SEGURIDAD
-# Generado automáticamente por Bentian UpdateSwapper
-# ==============================================================================
-$ErrorActionPreference = 'Continue'
-$targetExe = '${targetExe}'
-$newExe = '${newExe}'
-$backupExe = '${backupExe}'
-$timeoutSecs = ${timeoutSecs}
-$targetDir = Split-Path -Parent $targetExe
-$logDir = '${rawScriptDir}'
-if (-not (Test-Path "$logDir")) { New-Item -ItemType Directory -Path "$logDir" -Force -ErrorAction SilentlyContinue | Out-Null }
-$logFile = Join-Path $logDir 'bentian-update.log'
-
-function Log-Msg($msg) {
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $line = "[$timestamp] $msg"
-    Write-Output $line
-    Add-Content -Path $logFile -Value $line -ErrorAction SilentlyContinue
-}
-
-Log-Msg "Iniciando proceso de sustitución binaria silenciosa..."
-
-# 0. Staging protegido y reverificación SHA-256 (cierra la ventana TOCTOU en %TEMP%).
-#    El binario se copia a la carpeta destino (solo escribible por administradores en Program Files)
-#    y se comprueba su hash ANTES de detener nada. Si no coincide, se aborta sin tocar la instalación.
-$expectedSha256 = '${expectedSha256}'
-$installSource = $newExe
-if ($expectedSha256) {
-    $stagedExe = "$targetExe.new"
-    $actualSha256 = ''
-    try {
-        if (Test-Path "$stagedExe") { Remove-Item -Path "$stagedExe" -Force -ErrorAction Stop }
-        Copy-Item -Path "$newExe" -Destination "$stagedExe" -Force -ErrorAction Stop
-        $actualSha256 = (Get-FileHash -Path "$stagedExe" -Algorithm SHA256 -ErrorAction Stop).Hash.ToLower()
-    } catch {
-        Log-Msg "SEGURIDAD: no se pudo preparar el binario nuevo para verificarlo: $($_.Exception.Message)"
-    }
-    if ($actualSha256 -ne $expectedSha256.ToLower()) {
-        Log-Msg "SEGURIDAD: el SHA-256 del binario nuevo NO coincide con el esperado. Actualización abortada sin modificar la instalación."
-        Remove-Item -Path "$stagedExe" -Force -ErrorAction SilentlyContinue
-        exit 3
-    }
-    Log-Msg "Binario nuevo verificado (SHA-256 correcto) en ubicación protegida."
-    $installSource = $stagedExe
-}
-
-# 1. Detener procesos activos de Bentian para liberar bloqueos de archivo
-$procsToKill = @(${procListStr})
-foreach ($pName in $procsToKill) {
-    Log-Msg "Deteniendo proceso: $pName..."
-    Stop-Process -Name $pName -Force -ErrorAction SilentlyContinue
-    taskkill /F /IM "$pName.exe" 2>&1 | Out-Null
-}
-Start-Sleep -Seconds 2
-
-# 2. Backup del binario actual (.bak para rollback)
-if (Test-Path "$targetExe") {
-    if (Test-Path "$backupExe") {
-        Remove-Item -Path "$backupExe" -Force -ErrorAction SilentlyContinue
-    }
-    Log-Msg "Renombrando binario actual a .bak: $backupExe"
-    Move-Item -Path "$targetExe" -Destination "$backupExe" -Force
-}
-
-# 3. Mover el nuevo binario a la ruta objetivo oficial
-Log-Msg "Instalando nuevo binario desde $installSource..."
-Move-Item -Path "$installSource" -Destination "$targetExe" -Force
-if ($installSource -ne $newExe) { Remove-Item -Path "$newExe" -Force -ErrorAction SilentlyContinue }
-
-# 4. Copiar dependencias accesorias (adodb.js) si existen
-$newDir = Split-Path -Parent $newExe
-$adodbSource = Join-Path $newDir "adodb.js"
-$adodbTarget = Join-Path $targetDir "adodb.js"
-if (Test-Path "$adodbSource") {
-    Copy-Item -Path "$adodbSource" -Destination "$adodbTarget" -Force -ErrorAction SilentlyContinue
-}
-
-# 5. Relanzar BentianAgent.exe con WorkingDirectory explícito
-Log-Msg "Relanzando $targetExe con argumentos: ${postArgs}..."
-$launchArgs = @(${postArgs})
-$proc = Start-Process -FilePath "$targetExe" -ArgumentList $launchArgs -WorkingDirectory "$targetDir" -PassThru -WindowStyle Hidden
-
-if (-not $proc) {
-    Log-Msg "CRITICO: No se pudo lanzar el nuevo binario. Ejecutando rollback de emergencia..."
-    Remove-Item -Path "$targetExe" -Force -ErrorAction SilentlyContinue
-    if (Test-Path "$backupExe") {
-        Move-Item -Path "$backupExe" -Destination "$targetExe" -Force
-        Start-Process -FilePath "$targetExe" -ArgumentList "start" -WorkingDirectory "$targetDir" -WindowStyle Hidden
-    }
-    exit 1
-}
-
-$procId = $proc.Id
-Log-Msg "Proceso lanzado (PID: $procId). Monitorizando estabilidad durante $timeoutSecs segundos..."
-
-# 6. Monitorización de arranque durante 10 segundos (Rollback de Seguridad)
-$crashed = $false
-for ($i = 1; $i -le $timeoutSecs; $i++) {
-    Start-Sleep -Seconds 1
-    if ($proc.HasExited) {
-        $crashed = $true
-        Log-Msg "CRASH DETECTADO: El proceso finalizo inesperadamente en el segundo $i con codigo $($proc.ExitCode)!"
-        break
-    }
-}
-
-if ($crashed) {
-    Log-Msg "[WARN] ACTIVANDO ROLLBACK DE SEGURIDAD AUTOMATICO..."
-    Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "$targetExe" -Force -ErrorAction SilentlyContinue
-    if (Test-Path "$backupExe") {
-        Log-Msg "Restaurando version previa desde $backupExe..."
-        Move-Item -Path "$backupExe" -Destination "$targetExe" -Force
-        Start-Process -FilePath "$targetExe" -ArgumentList "start" -WindowStyle Hidden
-        Log-Msg "Rollback completado. Version anterior restaurada y operativa."
-    }
-    exit 1
-}
-
-Log-Msg "[OK] Arranque verificado exitosamente tras $timeoutSecs segundos de supervision continua. Actualizacion completada."
-exit 0
-`;
+    return buildPowerShellSwapScript(options);
   }
 
   /**
    * Genera el script .bat ejecutable directamente por Windows CMD sin restricciones de política.
    */
   public static generateBatchScript(options: UpdateSwapOptions, ps1Path?: string): string {
-    const targetExe = path.resolve(options.targetExePath);
-    const newExe = path.resolve(options.newExePath);
-    const backupExe = options.backupExePath ? path.resolve(options.backupExePath) : `${targetExe}.bak`;
-    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
-    const logFile = path.join(scriptDir, 'bentian-update.log');
-    const resolvedPs1 = ps1Path || path.join(scriptDir, 'bentian-apply-update.ps1');
-
-    return `@echo off
-rem ==============================================================================
-rem BENTIAN ERP BRIDGE - WRAPPER NATIVO DE ACTUALIZACIÓN ATÓMICA (.BAT)
-rem ==============================================================================
-setlocal enabledelayedexpansion
-
-set "TARGET_EXE=${targetExe}"
-set "NEW_EXE=${newExe}"
-set "BACKUP_EXE=${backupExe}"
-set "LOG_FILE=${logFile}"
-set "PS1_SCRIPT=${resolvedPs1}"
-
-echo [%DATE% %TIME%] Iniciando bentian-apply-update.bat >> "%LOG_FILE%"
-
-rem Intentar delegar la supervisión de 10s y rollback al script PowerShell silencioso
-if exist "%PS1_SCRIPT%" (
-    echo [%DATE% %TIME%] Ejecutando PowerShell con supervisión activa de 10s >> "%LOG_FILE%"
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%PS1_SCRIPT%"
-    exit /b %ERRORLEVEL%
-)
-
-rem Fallback nativo CMD si PowerShell no estuviera disponible:
-rem 1. Matar procesos
-taskkill /F /IM BentianAgent.exe >nul 2>&1
-taskkill /F /IM BentianTray.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
-
-rem 2. Renombrar actual a .bak
-if exist "%TARGET_EXE%" (
-    if exist "%BACKUP_EXE%" del /f /q "%BACKUP_EXE%"
-    move /y "%TARGET_EXE%" "%BACKUP_EXE%" >> "%LOG_FILE%" 2>&1
-)
-
-rem 3. Mover nuevo binario
-move /y "%NEW_EXE%" "%TARGET_EXE%" >> "%LOG_FILE%" 2>&1
-
-rem 4. Lanzar nuevo binario desacoplado
-start "" "%TARGET_EXE%" start --post-update
-
-rem 5. Monitorizar 10 segundos
-timeout /t 10 /nobreak >nul
-tasklist /fi "imagename eq BentianAgent.exe" | find /i "BentianAgent.exe" >nul
-if errorlevel 1 (
-    echo [%DATE% %TIME%] Fallo en arranque detectado en CMD. Revertiendo a .bak... >> "%LOG_FILE%"
-    if exist "%BACKUP_EXE%" (
-        del /f /q "%TARGET_EXE%" >nul 2>&1
-        move /y "%BACKUP_EXE%" "%TARGET_EXE%" >nul 2>&1
-        start "" "%TARGET_EXE%" start
-    )
-    exit /b 1
-)
-
-echo [%DATE% %TIME%] Actualizacion CMD completada exitosamente. >> "%LOG_FILE%"
-exit /b 0
-`;
+    return buildBatchSwapScript(options, ps1Path);
   }
 
   /**
@@ -234,7 +34,7 @@ exit /b 0
     batPath: string;
     ps1Path: string;
   } {
-    const scriptDir = options.scriptDir || path.join(os.tmpdir(), 'bentian-updates');
+    const scriptDir = resolveDefaultUpdateScriptDir(options.scriptDir);
     if (!fs.existsSync(scriptDir)) {
       fs.mkdirSync(scriptDir, { recursive: true });
     }

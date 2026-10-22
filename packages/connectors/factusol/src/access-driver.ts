@@ -3,6 +3,14 @@ import path from 'path';
 import childProcess from 'child_process';
 import { ConnectionError, ErrorCode } from '@erp-bridge/sdk';
 import { Logger } from '@erp-bridge/shared';
+import {
+  OLEDB_CANDIDATES,
+  buildSafeOledbConnectionString,
+  decodeCscriptStreamBuffer,
+  resolveTrustedAdodbJsPath,
+  sanitizeDatabasePath,
+  sanitizeOledbProvider,
+} from './access-connection.helper';
 
 export class AccessDatabaseTimeoutError extends Error {
   constructor(
@@ -28,8 +36,8 @@ export class AccessDriver {
   private readonly adodbJsPath: string;
 
   constructor(config: AccessDriverConfig) {
-    this.databasePath = path.resolve(config.databasePath);
-    this.provider = config.provider || 'Microsoft.ACE.OLEDB.12.0';
+    this.databasePath = sanitizeDatabasePath(config.databasePath);
+    this.provider = sanitizeOledbProvider(config.provider);
 
     const winDir = process.env['WINDIR'] || process.env['SystemRoot'] || 'C:\\Windows';
     const sysWow64 = path.join(winDir, 'SysWOW64', 'cscript.exe');
@@ -43,26 +51,12 @@ export class AccessDriver {
       this.cscriptPath = system32;
     }
 
-    const possibleAdodbPaths = [
-      path.resolve(path.dirname(process.execPath), 'adodb.js'),
-      path.resolve(__dirname, 'adodb.js'),
-      path.resolve(__dirname, '../src/adodb.js'),
-      path.resolve(process.cwd(), 'builder/dist/adodb.js'),
-      path.resolve(process.cwd(), 'packages/connectors/factusol/src/adodb.js'),
-    ];
-    let resolvedAdodb = possibleAdodbPaths.find((p) => fs.existsSync(p));
-    if (!resolvedAdodb) {
-      try {
-        resolvedAdodb = require.resolve('node-adodb/lib/adodb.js');
-      } catch {
-        resolvedAdodb = path.resolve(__dirname, '../../../node_modules/node-adodb/lib/adodb.js');
-      }
-    }
-    this.adodbJsPath = resolvedAdodb;
+    this.adodbJsPath = resolveTrustedAdodbJsPath(__dirname);
   }
 
   public getConnectionString(): string {
-    return `Provider=${this.provider};Data Source=${this.databasePath};Mode=Share Deny None;Persist Security Info=False;`;
+    // Mantiene Mode=Share Deny None; requerido para concurrencia con Factusol en caliente
+    return buildSafeOledbConnectionString(this.provider, this.databasePath, true);
   }
 
   public getDatabasePath(): string {
@@ -101,25 +95,17 @@ export class AccessDriver {
     action: 'query' | 'execute' | 'transaction',
     sqlOrSqls: string | string[]
   ): Promise<string> {
-    const candidates: Array<{ cscript: string; provider: string }> = [
-      { cscript: 'C:\\Windows\\SysWOW64\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.12.0' },
-      { cscript: 'C:\\Windows\\SysWOW64\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.16.0' },
-      { cscript: 'C:\\Windows\\System32\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.16.0' },
-      { cscript: 'C:\\Windows\\System32\\cscript.exe', provider: 'Microsoft.ACE.OLEDB.12.0' },
-      { cscript: 'C:\\Windows\\SysWOW64\\cscript.exe', provider: 'Microsoft.Jet.OLEDB.4.0' },
-    ];
-
-    for (const cand of candidates) {
+    for (const cand of OLEDB_CANDIDATES) {
       if (!fs.existsSync(cand.cscript)) continue;
       if (cand.cscript === this.cscriptPath && cand.provider === this.provider) continue;
 
       try {
-        const testConn = `Provider=${cand.provider};Data Source=${this.databasePath};Persist Security Info=False;`;
-        const payload = action === 'transaction'
-          ? { connection: testConn, sqls: sqlOrSqls }
-          : { connection: testConn, sql: sqlOrSqls };
-        const testInput = JSON.stringify(payload);
-        const res = await this.runAdodbWith(cand.cscript, action, testInput);
+        const testConn = buildSafeOledbConnectionString(cand.provider, this.databasePath, false);
+        const payload =
+          action === 'transaction'
+            ? { connection: testConn, sqls: sqlOrSqls }
+            : { connection: testConn, sql: sqlOrSqls };
+        const res = await this.runAdodbWith(cand.cscript, action, JSON.stringify(payload));
         this.logger.info(
           `✓ Conexión OLEDB auto-reparada y adaptada: cscript=${cand.cscript}, provider=${cand.provider}`
         );
@@ -127,29 +113,10 @@ export class AccessDriver {
         this.provider = cand.provider;
         return res;
       } catch {
-        // Continuar con el siguiente candidato
+        // Probar siguiente candidato
       }
     }
     throw new Error('Ninguna combinación de proveedor OLEDB / arquitectura de Windows fue capaz de abrir la base de datos.');
-  }
-
-  private decodeStreamBuffer(buf: Buffer): string {
-    if (!buf || buf.length === 0) return '';
-    // Detect UTF-16LE: check for UTF-16LE BOM (0xFF, 0xFE) or null high-byte in first ASCII character
-    if (buf.length >= 2 && ((buf[0] === 0xff && buf[1] === 0xfe) || buf[1] === 0x00)) {
-      const text = buf.toString('utf16le');
-      return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
-    }
-    // Fallback: UTF-8 without replacement char, else Latin1
-    try {
-      const text = buf.toString('utf8');
-      if (!text.includes('\ufffd')) {
-        return text;
-      }
-    } catch {
-      // Fallback to latin1 below
-    }
-    return buf.toString('latin1');
   }
 
   private runAdodbWith(
@@ -168,9 +135,7 @@ export class AccessDriver {
         killed = true;
         try {
           child.kill('SIGKILL');
-        } catch {
-          // Ignorar si el proceso ya finalizó
-        }
+        } catch {}
         reject(
           new AccessDatabaseTimeoutError(
             'Tiempo de espera agotado al consultar la base de datos Access (posible bloqueo exclusivo o compactación en curso)'
@@ -194,25 +159,21 @@ export class AccessDriver {
         if (killed) return;
 
         if (stderrChunks.length > 0) {
-          const stderrText = this.decodeStreamBuffer(Buffer.concat(stderrChunks)).trim();
+          const stderrText = decodeCscriptStreamBuffer(Buffer.concat(stderrChunks)).trim();
           let errMsg = stderrText;
           try {
             const parsedErr = JSON.parse(stderrText);
             errMsg = parsedErr.message || stderrText;
-          } catch {
-            // Mantener texto en bruto
-          }
+          } catch {}
           return reject(new Error(errMsg));
         }
 
         if (code !== 0) {
-          const stdoutText = this.decodeStreamBuffer(Buffer.concat(stdoutChunks)).trim();
+          const stdoutText = decodeCscriptStreamBuffer(Buffer.concat(stdoutChunks)).trim();
           return reject(new Error(stdoutText || `cscript process exited with code ${code}`));
         }
 
-        const outBuf = Buffer.concat(stdoutChunks);
-        const text = this.decodeStreamBuffer(outBuf);
-        return resolve(text);
+        return resolve(decodeCscriptStreamBuffer(Buffer.concat(stdoutChunks)));
       });
 
       child.stdin.end(Buffer.from(input, 'utf16le'));
@@ -223,149 +184,54 @@ export class AccessDriver {
     return this.runAdodbWith(this.cscriptPath, action, input);
   }
 
-  public async query<T = Record<string, unknown>>(sql: string): Promise<T[]> {
+  private async executeWithArchFallback(
+    action: 'query' | 'execute' | 'transaction',
+    sqlOrSqls: string | string[],
+    errorPrefix: string
+  ): Promise<string> {
     this.verifyFileExists();
-
     const connectionString = this.getConnectionString();
-    const input = JSON.stringify({
-      connection: connectionString,
-      sql,
-    });
+    const input = JSON.stringify(
+      action === 'transaction'
+        ? { connection: connectionString, sqls: sqlOrSqls }
+        : { connection: connectionString, sql: sqlOrSqls }
+    );
 
-    const startTime = Date.now();
     try {
-      const resultJson = await this.runAdodb('query', input);
-      const parsed = JSON.parse(resultJson) as T[];
-      this.logger.debug(`Query executed in ${Date.now() - startTime}ms: ${sql.substring(0, 80)}...`);
-      return parsed;
+      return await this.runAdodb(action, input);
     } catch (error: unknown) {
       if (error instanceof AccessDatabaseTimeoutError) {
-        this.logger.error(`Timeout agotado en consulta Access (30s): ${sql}`, error);
+        this.logger.error(`Timeout agotado en operación Access (${action}, 30s)`, error);
         throw error;
       }
-
-      const err = error as { message?: string };
-      const errorMessage = err?.message || 'Error desconocido al ejecutar consulta en Access';
-
+      const errorMessage = (error as { message?: string })?.message || 'Error desconocido en operación Access';
       if (this.isProviderOrArchError(errorMessage)) {
         try {
-          this.logger.warn(`Detectado posible conflicto de arquitectura OLEDB (${errorMessage}). Probando arquitecturas alternativas...`);
-          const fallbackJson = await this.tryCandidates('query', sql);
-          const parsed = JSON.parse(fallbackJson) as T[];
-          return parsed;
-        } catch {
-          // Si fallan los candidatos, continúa hacia el throw de ConnectionError
-        }
+          this.logger.warn(`Conflicto de arquitectura OLEDB (${errorMessage}). Probando candidatos alternativos...`);
+          return await this.tryCandidates(action, sqlOrSqls);
+        } catch {}
       }
-
-      this.logger.error(`Error ejecutando consulta Access: ${sql}`, error);
-      throw new ConnectionError(
-        ErrorCode.CONNECTION_FAILED,
-        `Error en consulta Access: ${errorMessage}`,
-        {
-          sql,
-          databasePath: this.databasePath,
-          cscriptPath: this.cscriptPath,
-          rawError: errorMessage,
-        }
-      );
+      this.logger.error(`${errorPrefix}: ${errorMessage}`, error);
+      throw new ConnectionError(ErrorCode.CONNECTION_FAILED, `${errorPrefix}: ${errorMessage}`, {
+        databasePath: this.databasePath,
+        cscriptPath: this.cscriptPath,
+        rawError: errorMessage,
+      });
     }
   }
 
+  public async query<T = Record<string, unknown>>(sql: string): Promise<T[]> {
+    const resultJson = await this.executeWithArchFallback('query', sql, 'Error en consulta Access');
+    return JSON.parse(resultJson) as T[];
+  }
+
   public async execute(sql: string): Promise<void> {
-    this.verifyFileExists();
-
-    const connectionString = this.getConnectionString();
-    const input = JSON.stringify({
-      connection: connectionString,
-      sql,
-    });
-
-    const startTime = Date.now();
-    try {
-      await this.runAdodb('execute', input);
-      this.logger.debug(`Execute completed in ${Date.now() - startTime}ms: ${sql.substring(0, 80)}...`);
-    } catch (error: unknown) {
-      if (error instanceof AccessDatabaseTimeoutError) {
-        this.logger.error(`Timeout agotado en comando Access (30s): ${sql}`, error);
-        throw error;
-      }
-
-      const err = error as { message?: string };
-      const errorMessage = err?.message || 'Error desconocido al ejecutar comando en Access';
-
-      if (this.isProviderOrArchError(errorMessage)) {
-        try {
-          this.logger.warn(`Detectado posible conflicto de arquitectura OLEDB (${errorMessage}). Probando arquitecturas alternativas...`);
-          await this.tryCandidates('execute', sql);
-          return;
-        } catch {
-          // Continúa hacia el throw si fallan los candidatos
-        }
-      }
-
-      this.logger.error(`Error ejecutando comando Access: ${sql}`, error);
-      throw new ConnectionError(
-        ErrorCode.CONNECTION_FAILED,
-        `Error ejecutando comando Access: ${errorMessage}`,
-        {
-          sql,
-          databasePath: this.databasePath,
-          cscriptPath: this.cscriptPath,
-          rawError: errorMessage,
-        }
-      );
-    }
+    await this.executeWithArchFallback('execute', sql, 'Error ejecutando comando Access');
   }
 
   public async executeTransaction(sqlStatements: string[]): Promise<void> {
     const validStatements = (sqlStatements || []).filter((s) => s && s.trim().length > 0);
     if (validStatements.length === 0) return;
-
-    this.verifyFileExists();
-
-    const connectionString = this.getConnectionString();
-    const input = JSON.stringify({
-      connection: connectionString,
-      sqls: validStatements,
-    });
-
-    const startTime = Date.now();
-    try {
-      await this.runAdodb('transaction', input);
-      this.logger.debug(
-        `Transacción atómica ejecutada (${validStatements.length} sentencias) en ${Date.now() - startTime}ms`
-      );
-    } catch (error: unknown) {
-      if (error instanceof AccessDatabaseTimeoutError) {
-        this.logger.error(`Timeout agotado en transacción Access (30s, ${validStatements.length} sentencias)`, error);
-        throw error;
-      }
-
-      const err = error as { message?: string };
-      const errorMessage = err?.message || 'Error desconocido al ejecutar transacción en Access';
-
-      if (this.isProviderOrArchError(errorMessage)) {
-        try {
-          this.logger.warn(`Detectado posible conflicto de arquitectura OLEDB (${errorMessage}). Probando arquitecturas alternativas...`);
-          await this.tryCandidates('transaction', validStatements);
-          return;
-        } catch {
-          // Continúa hacia el throw si fallan los candidatos
-        }
-      }
-
-      this.logger.error(`Error ejecutando transacción Access (${validStatements.length} sentencias)`, error);
-      throw new ConnectionError(
-        ErrorCode.CONNECTION_FAILED,
-        `Error ejecutando transacción Access: ${errorMessage}`,
-        {
-          statementCount: validStatements.length,
-          databasePath: this.databasePath,
-          cscriptPath: this.cscriptPath,
-          rawError: errorMessage,
-        }
-      );
-    }
+    await this.executeWithArchFallback('transaction', validStatements, 'Error ejecutando transacción Access');
   }
 }

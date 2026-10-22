@@ -121,7 +121,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
                 : !!(data.factusol && data.factusol.configured))
           );
 
-          if (!completed && (!isLicValid || !isErpConfigured)) {
+          if (!isLicValid || (!completed && !isErpConfigured)) {
             setTimeout(function() {
               if (typeof openWizardModal === 'function') {
                 openWizardModal();
@@ -463,140 +463,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
 
       const isLicenseActive = lic.status === 'VALID' || lic.status === 'GRACE_PERIOD';
 
-      // 1. Caso ERP Desconectado
-      if (isErpOffline) {
-        if (banner) {
-          banner.style.display = 'flex';
-          banner.style.background = 'rgba(255, 255, 255, 0.03)';
-          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con ' + erpName + ' ERP';
-          if (bannerDesc) bannerDesc.textContent = 'La ruta está registrada pero la base de datos no responde. Comprueba si la unidad de red o NAS está encendida y accesible.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
-          if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
-            bannerIconBox.style.color = '#f87171';
-          }
-          _currentZenAlertAction = function() {
-            navigateToResolution('factusol', targetErpInput);
-          };
-        }
-
-        if (heroCard) {
-          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
-          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-        }
-        if (badge) {
-          badge.style.background = 'rgba(255, 255, 255, 0.06)';
-          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-          badge.style.color = '#f87171';
-        }
-        if (badgeDot) badgeDot.style.background = '#f87171';
-        if (badgeText) badgeText.textContent = erpName + ' Desconectado';
-        if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de ' + erpName;
-        if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo ' + erpFileExt + '. Revisa la ruta o reconecta tu unidad de red para continuar.';
-        if (primaryBtn) {
-          primaryBtn.className = 'btn btn-primary btn-lg';
-          primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-          primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
-        }
-        if (primaryBtnText) primaryBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
-        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
-        _currentZenPrimaryAction = function() {
-          navigateToResolution('factusol', targetErpInput);
-        };
-        return;
-      }
-
-      // 2. Caso ERP Sin Configurar
-      if (isErpMissing) {
-        if (banner) {
-          banner.style.display = 'flex';
-          banner.style.background = 'rgba(255, 255, 255, 0.03)';
-          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = erpName + ' ERP pendiente de configurar';
-          if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (' + erpFileExt + ') para que el agente empiece a trabajar.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
-          if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
-            bannerIconBox.style.color = '#fbbf24';
-          }
-          _currentZenAlertAction = function() {
-            navigateToResolution('factusol', targetErpInput);
-          };
-        }
-
-        if (heroCard) {
-          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
-          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-        }
-        if (badge) {
-          badge.style.background = 'rgba(255, 255, 255, 0.06)';
-          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-          badge.style.color = '#fbbf24';
-        }
-        if (badgeDot) badgeDot.style.background = '#fbbf24';
-        if (badgeText) badgeText.textContent = 'Configuración Inicial';
-        if (zenTitle) zenTitle.textContent = 'Conecta tu ' + erpName + ' para comenzar a sincronizar';
-        if (zenSub) zenSub.textContent = 'Selecciona tu archivo de ' + erpName + ' con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
-        if (primaryBtn) {
-          primaryBtn.className = 'btn btn-primary btn-lg';
-          primaryBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-          primaryBtn.style.boxShadow = '0 4px 20px rgba(245,158,11,0.35)';
-        }
-        if (primaryBtnText) primaryBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
-        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
-        _currentZenPrimaryAction = function() {
-          navigateToResolution('factusol', targetErpInput);
-        };
-        return;
-      }
-
-      // 3. Caso Canal Web No Configurado
-      if (!isChannelConfigured) {
-        const targetInput = chType === 'woocommerce' ? 'input-wc-url' : (chType === 'shopify' ? 'input-shopify-subdomain' : (chType === 'holded' ? 'input-holded-apikey' : 'input-universal-url'));
-        if (banner) {
-          banner.style.display = 'flex';
-          banner.style.background = 'rgba(255, 255, 255, 0.03)';
-          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-          if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
-          if (bannerDesc) bannerDesc.textContent = erpName + ' está preparado con ' + (erpInfo.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
-          if (bannerBtnText) bannerBtnText.textContent = 'Vincular Tienda Web →';
-          if (bannerIconBox) {
-            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
-            bannerIconBox.style.color = '#60a5fa';
-          }
-          _currentZenAlertAction = function() {
-            navigateToResolution('channel', targetInput);
-          };
-        }
-
-        if (heroCard) {
-          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
-          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-        }
-        if (badge) {
-          badge.style.background = 'rgba(255, 255, 255, 0.06)';
-          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-          badge.style.color = '#60a5fa';
-        }
-        if (badgeDot) badgeDot.style.background = '#60a5fa';
-        if (badgeText) badgeText.textContent = 'Tienda Online sin vincular';
-        if (zenTitle) zenTitle.textContent = 'Enlaza tu tienda web para publicar tu catálogo';
-        if (zenSub) zenSub.textContent = 'Tu ' + erpName + ' está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
-        if (primaryBtn) {
-          primaryBtn.className = 'btn btn-primary btn-lg';
-          primaryBtn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
-          primaryBtn.style.boxShadow = '0 4px 20px rgba(59,130,246,0.35)';
-        }
-        if (primaryBtnText) primaryBtnText.textContent = 'Vincular Tienda Web →';
-        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>';
-        _currentZenPrimaryAction = function() {
-          navigateToResolution('channel', targetInput);
-        };
-        return;
-      }
-
-      // 4. Caso Licencia Pendiente
+      // 1. Caso Licencia Pendiente (Prioridad #1 de Seguridad y Activación)
       if (!isLicenseActive) {
         const isBetaOpen = Date.now() <= new Date('2026-12-31T23:59:59Z').getTime();
         if (banner) {
@@ -641,6 +508,139 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/></svg>';
         _currentZenPrimaryAction = function() {
           navigateToResolution('license', 'input-lic-key');
+        };
+        return;
+      }
+
+      // 2. Caso ERP Desconectado
+      if (isErpOffline) {
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+          if (bannerTitle) bannerTitle.textContent = 'Desconexión detectada con ' + erpName + ' ERP';
+          if (bannerDesc) bannerDesc.textContent = 'La ruta está registrada pero la base de datos no responde. Comprueba si la unidad de red o NAS está encendida y accesible.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
+            bannerIconBox.style.color = '#f87171';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('factusol', targetErpInput);
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          badge.style.color = '#f87171';
+        }
+        if (badgeDot) badgeDot.style.background = '#f87171';
+        if (badgeText) badgeText.textContent = erpName + ' Desconectado';
+        if (zenTitle) zenTitle.textContent = 'No se puede acceder a la base de datos de ' + erpName;
+        if (zenSub) zenSub.textContent = 'La sincronización automática está pausada porque no se encuentra el archivo ' + erpFileExt + '. Revisa la ruta o reconecta tu unidad de red para continuar.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Solucionar en ' + erpName + ' ERP →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('factusol', targetErpInput);
+        };
+        return;
+      }
+
+      // 3. Caso ERP Sin Configurar
+      if (isErpMissing) {
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+          if (bannerTitle) bannerTitle.textContent = erpName + ' ERP pendiente de configurar';
+          if (bannerDesc) bannerDesc.textContent = 'Indica dónde se encuentra el archivo de datos de tu empresa (' + erpFileExt + ') para que el agente empiece a trabajar.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
+            bannerIconBox.style.color = '#fbbf24';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('factusol', targetErpInput);
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          badge.style.color = '#fbbf24';
+        }
+        if (badgeDot) badgeDot.style.background = '#fbbf24';
+        if (badgeText) badgeText.textContent = 'Configuración Inicial';
+        if (zenTitle) zenTitle.textContent = 'Conecta tu ' + erpName + ' para comenzar a sincronizar';
+        if (zenSub) zenSub.textContent = 'Selecciona tu archivo de ' + erpName + ' con un clic o deja que el agente lo auto-detecte en tus carpetas habituales.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(245,158,11,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Configurar ' + erpName + ' ERP →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('factusol', targetErpInput);
+        };
+        return;
+      }
+
+      // 4. Caso Canal Web No Configurado
+      if (!isChannelConfigured) {
+        const targetInput = chType === 'woocommerce' ? 'input-wc-url' : (chType === 'shopify' ? 'input-shopify-subdomain' : (chType === 'holded' ? 'input-holded-apikey' : 'input-universal-url'));
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'rgba(255, 255, 255, 0.03)';
+          banner.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+          if (bannerTitle) bannerTitle.textContent = 'Falta vincular tu Tienda Online';
+          if (bannerDesc) bannerDesc.textContent = erpName + ' está preparado con ' + (erpInfo.articleCount || 0).toLocaleString('es-ES') + ' artículos listos. Añade la dirección de tu web para publicar precios y recibir pedidos.';
+          if (bannerBtnText) bannerBtnText.textContent = 'Vincular Tienda Web →';
+          if (bannerIconBox) {
+            bannerIconBox.style.background = 'rgba(255, 255, 255, 0.06)';
+            bannerIconBox.style.color = '#60a5fa';
+          }
+          _currentZenAlertAction = function() {
+            navigateToResolution('channel', targetInput);
+          };
+        }
+
+        if (heroCard) {
+          heroCard.style.background = 'rgba(255, 255, 255, 0.03)';
+          heroCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          badge.style.color = '#60a5fa';
+        }
+        if (badgeDot) badgeDot.style.background = '#60a5fa';
+        if (badgeText) badgeText.textContent = 'Tienda Online sin vincular';
+        if (zenTitle) zenTitle.textContent = 'Enlaza tu tienda web para publicar tu catálogo';
+        if (zenSub) zenSub.textContent = 'Tu ' + erpName + ' está conectado. Solo falta indicar la web de tu comercio para que la sincronización bidireccional comience a operar.';
+        if (primaryBtn) {
+          primaryBtn.className = 'btn btn-primary btn-lg';
+          primaryBtn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+          primaryBtn.style.boxShadow = '0 4px 20px rgba(59,130,246,0.35)';
+        }
+        if (primaryBtnText) primaryBtnText.textContent = 'Vincular Tienda Web →';
+        if (primaryBtnIcon) primaryBtnIcon.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>';
+        _currentZenPrimaryAction = function() {
+          navigateToResolution('channel', targetInput);
         };
         return;
       }

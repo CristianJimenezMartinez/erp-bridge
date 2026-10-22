@@ -77,6 +77,7 @@ export class HeartbeatService {
             headers: {
               'Content-Type': 'application/json',
               ...(cfg.authToken ? { Authorization: `Bearer ${cfg.authToken}` } : {}),
+              ...(cfg.licenseKey ? { 'x-license-key': cfg.licenseKey } : {}),
             },
             body: JSON.stringify(heartbeat),
           }).catch(() => null);

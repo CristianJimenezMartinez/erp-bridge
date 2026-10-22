@@ -8,13 +8,13 @@
       "id": "connectors.factusol",
       "name": "Conector Factusol ERP (OLEDB Driver, SQL Queries & Relational Engine)",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "d82c20a",
       "description": "Driver OLEDB cscript.exe (32/64 bits, ACE/Jet), transacciones atómicas F_PCL/F_LPC/F_STO, consultas SQL saneadas, rollover de año fiscal y cuadre aritmético al céntimo.",
       "paths": [
         "packages/connectors/factusol/src"
       ],
-      "integrityTreeHash": "4468021a030e60cd7aa826eb40132656ecf8e6ee133056a7692f8f0863f680a6",
+      "integrityTreeHash": "54d91c07a361d04b82304c95e6a5df7b7df48343939270d5a2b4327c258652b0",
       "publicContract": "packages/connectors/factusol/src/index.ts",
       "testSuites": [
         "packages/connectors/factusol/test/connector.test.ts",
@@ -27,13 +27,13 @@
       "id": "core.licensing",
       "name": "Motor de Licencias y HWID Criptográfico",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "d82c20a",
       "description": "Generación de claves EB-XXXXX, tokens criptográficos HMAC-SHA256, período de gracia offline de 7 días y vinculación de hardware por HWID.",
       "paths": [
         "packages/core/src/license"
       ],
-      "integrityTreeHash": "43075e95e158fbf73715b8827a179bbdd0ffb250459ba83bc773bd0f57776ba9",
+      "integrityTreeHash": "439450fec54ec4962109c75d6042e5f0b315f88de1fa7ede842356fe2c3ce2e0",
       "publicContract": "packages/core/src/license/index.ts",
       "testSuites": [
         "packages/core/test/license-key.test.ts",
@@ -45,13 +45,13 @@
       "id": "core.update.signer",
       "name": "Firmas Asimétricas Ed25519 para Actualizaciones",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "d82c20a",
       "description": "Firma asimétrica y verificación criptográfica de binarios ejecutables con curvas elípticas Ed25519 y SHA-256.",
       "paths": [
         "packages/core/src/update/update-signer.ts"
       ],
-      "integrityTreeHash": "570926baf054c943d42b96a7b0821c996e08cd2104cd743ca301f0cee1a8745a",
+      "integrityTreeHash": "e66837eef3bec065e8cc1a3ef65a7f3d7339aa2d974b112d5b8b18662c1368f8",
       "publicContract": "packages/core/src/update/update-signer.ts",
       "testSuites": [
         "packages/core/test/update-service.test.ts"
@@ -61,13 +61,14 @@
       "id": "agent.update.swapper",
       "name": "Intercambiador Atómico de Actualizaciones en Windows (UpdateSwapper)",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "d82c20a",
       "description": "Reemplazo atómico desacoplado en %TEMP%, elevación UAC para Program Files, terminación limpia de procesos bloqueantes y rollback en 10s ante crash.",
       "paths": [
-        "apps/agent/src/update/update.swapper.ts"
+        "apps/agent/src/update/update.swapper.ts",
+        "apps/agent/src/update/update-script.builder.ts"
       ],
-      "integrityTreeHash": "5d05ef8008b314f975fb1834b4174418d083342c3ce296953dc11e4f5a497d8b",
+      "integrityTreeHash": "2606897a86775a77bec5bad91ae8f908d5062d48c4078ff812cadc6df1496554",
       "publicContract": "apps/agent/src/update/update.swapper.ts",
       "testSuites": [
         "apps/agent/test/update-system.test.ts"
@@ -77,13 +78,14 @@
       "id": "agent.config.persistence",
       "name": "Persistencia de Configuración en AppData & Anti-Wiping NAS",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "d82c20a",
       "description": "Persistencia canónica inmutable en %APPDATA%, escritura atómica mediante ficheros temporales y preservación blindada de rutas UNC y unidades de red.",
       "paths": [
-        "apps/agent/src/config/config.manager.ts"
+        "apps/agent/src/config/config.manager.ts",
+        "apps/agent/src/config/config-storage.helper.ts"
       ],
-      "integrityTreeHash": "d66055603d8bd05760f7b2e26ba5ebb82f1fe75d92ba09645347552539766bfb",
+      "integrityTreeHash": "58bb08bc15dfbbe360a7880f29c682bb99f35efeac315e108edec5c103a8f98c",
       "publicContract": "apps/agent/src/config/config.manager.ts",
       "testSuites": [
         "apps/agent/test/config-persistence.test.ts",
@@ -94,14 +96,14 @@
       "id": "agent.gui.native_dialog",
       "name": "Selector Nativo de Archivos Windows (OpenFileDialog) & Launcher Aislado Edge",
       "status": "FROZEN",
-      "certifiedAt": "2026-09-29",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "260af56",
       "description": "Invocación oficial STA mediante BentianTray.exe y fallback PowerShell puro con TopMost y owner invisible sin .Show(), modo app exclusivo Edge y puerto fijo 39281.",
       "paths": [
         "apps/agent/src/gui/tray/BentianTray.cs",
         "apps/agent/src/gui/window-launcher.ts"
       ],
-      "integrityTreeHash": "d01fdb8144fa219001daeb8f5f3d4f8a775b17ce88ebf6c070dce25e56a20861",
+      "integrityTreeHash": "0db7c88e01fca82c01e63309ba4f3c35f8ebab8441b3cdb6edeb8db4d38059a5",
       "publicContract": "apps/agent/src/gui/window-launcher.ts",
       "testSuites": [
         "apps/agent/test/gui-router.test.ts"
@@ -174,13 +176,13 @@
       "id": "agent.erp",
       "name": "Registro, Motor SQL Server Local y Adaptadores Polimórficos Multi-ERP (Strategy Pattern)",
       "status": "FROZEN",
-      "certifiedAt": "2026-10-21",
+      "certifiedAt": "2026-10-22",
       "certifiedCommit": "633f724",
       "description": "Patrón Strategy desacoplado (IErpConnector, ErpProviderRegistry y SqlServerBaseAdapter) para los 5 ERPs oficiales en España (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) con Modo Evaluación Sandbox.",
       "paths": [
         "apps/agent/src/erp"
       ],
-      "integrityTreeHash": "677f991869840a6421b21654e64f001fcadb96eb695b43036df0d13d0a47d22b",
+      "integrityTreeHash": "0f889ab28dfab17feb44d695260c95f9d100adc7dc8bfb1768a9ab634cd757e5",
       "publicContract": "apps/agent/src/erp/index.ts",
       "testSuites": [
         "apps/agent/test/erp-provider-strategy.test.ts"

@@ -5,13 +5,34 @@ import { Logger } from '@erp-bridge/shared';
 
 const logger = new Logger('WindowLauncher');
 
+/**
+ * Validates that a target URL is strictly HTTP/HTTPS and free of shell metacharacters
+ * before passing it to browser launchers or OS URL handlers.
+ */
+export function sanitizeDesktopWindowUrl(rawUrl: string): string | null {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  const trimmed = rawUrl.trim();
+  if (/["'`$&|;<>\\\r\n\x00-\x1f\x7f]/.test(trimmed)) {
+    return null;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return null;
+    }
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function findBrowserAppExecutable(): string | null {
   const localAppData = process.env['LOCALAPPDATA'] || '';
   const programFiles = process.env['ProgramFiles'] || 'C:\\Program Files';
   const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
 
   const candidatePaths = [
-    // 1. Microsoft Edge (prioridad #1 en Windows 10/11: ventana aislada nativa de escritorio independiente, sin interferir con pestañas de Chrome)
+    // 1. Microsoft Edge (prioridad #1 en Windows 10/11: ventana aislada nativa de escritorio independiente)
     path.join(programFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
     path.join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
     path.join(localAppData, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
@@ -42,8 +63,14 @@ let lastOpenedAt = 0;
  * sin barra de direcciones, sin pestañas y con marco de aplicación independiente.
  */
 export function openDesktopWindow(url: string): boolean {
+  const safeUrl = sanitizeDesktopWindowUrl(url);
+  if (!safeUrl) {
+    logger.warn('URL rechazada por seguridad en openDesktopWindow:', { url });
+    return false;
+  }
+
   if (process.env['HEADLESS'] === 'true') {
-    logger.info(`Modo headless/test activo: apertura de ventana simulada para ${url}`);
+    logger.info(`Modo headless/test activo: apertura de ventana simulada para ${safeUrl}`);
     return true;
   }
 
@@ -62,7 +89,7 @@ export function openDesktopWindow(url: string): boolean {
           logger.info(`Lanzando ventana de escritorio nativa independiente con: ${browserExe}`);
           const child = childProcess.spawn(
             browserExe,
-            [`--app=${url}`, '--new-window', '--window-size=1180,820'],
+            [`--app=${safeUrl}`, '--new-window', '--window-size=1180,820'],
             {
               detached: true,
               stdio: 'ignore',
@@ -76,13 +103,13 @@ export function openDesktopWindow(url: string): boolean {
       }
 
       logger.info('Abriendo interfaz de Bentian en el navegador del usuario...');
-      childProcess.exec(`start "" "${url}"`);
+      childProcess.execFile('cmd.exe', ['/c', 'start', '', safeUrl], { windowsHide: true });
       return true;
     } else if (process.platform === 'darwin') {
-      childProcess.exec(`open "${url}"`);
+      childProcess.execFile('open', [safeUrl]);
       return true;
     } else {
-      childProcess.exec(`xdg-open "${url}"`);
+      childProcess.execFile('xdg-open', [safeUrl]);
       return true;
     }
   } catch (err) {
@@ -100,58 +127,43 @@ export async function openWindowsFileDialog(
   filter = 'Bases de datos Factusol (*.accdb;*.mdb)|*.accdb;*.mdb',
   initialPath?: string
 ): Promise<string> {
-  // Soporte de mock para pruebas automatizadas y CI/CD
   if (process.env['BENTIAN_MOCK_FILE_DIALOG'] !== undefined) {
     const mockVal = process.env['BENTIAN_MOCK_FILE_DIALOG'];
     logger.info(`[MOCK/TEST] openWindowsFileDialog simulado: ${mockVal || '(CANCEL)'}`);
     return mockVal === 'CANCEL' ? '' : mockVal;
   }
 
-  if (process.env['HEADLESS'] === 'true') {
-    logger.info('[HEADLESS] openWindowsFileDialog ignorado en entorno sin cabeza.');
+  if (process.env['HEADLESS'] === 'true' || process.platform !== 'win32') {
     return '';
   }
 
-  if (process.platform !== 'win32') {
-    return '';
-  }
+  const cleanInitialPath = initialPath ? String(initialPath).replace(/[\x00-\x1f\x7f]/g, '').trim() : undefined;
 
-  // 1. Intentar mediante BentianTray.exe --open-file-dialog [initialPath]
+  // 1. Intentar mediante BentianTray.exe --open-file-dialog [initialPath] (solo rutas de confianza)
   try {
     const execDir = path.dirname(process.execPath);
+    const repoRootFromModule = path.resolve(__dirname, '../../../..');
     const trayCandidates = [
       path.join(execDir, 'BentianTray.exe'),
       path.join(__dirname, 'tray', 'BentianTray.exe'),
       path.join(__dirname, 'BentianTray.exe'),
-      path.resolve(process.cwd(), 'builder', 'dist', 'BentianTray.exe'),
-      path.resolve(process.cwd(), 'apps', 'agent', 'src', 'gui', 'tray', 'BentianTray.exe'),
-      path.resolve(process.cwd(), 'apps', 'agent', 'dist', 'gui', 'tray', 'BentianTray.exe'),
+      path.join(repoRootFromModule, 'builder', 'dist', 'BentianTray.exe'),
     ];
 
-    let foundTrayExe: string | null = null;
-    for (const trayExe of trayCandidates) {
-      if (fs.existsSync(trayExe)) {
-        foundTrayExe = trayExe;
-        break;
-      }
-    }
+    const foundTrayExe = trayCandidates.find((candidate) => fs.existsSync(candidate)) || null;
 
     if (foundTrayExe) {
       logger.info(`Abriendo selector nativo de Windows mediante: ${foundTrayExe}`);
       const args = ['--open-file-dialog'];
-      if (initialPath) {
-        args.push(initialPath);
+      if (cleanInitialPath) {
+        args.push(cleanInitialPath);
       }
 
       const output = await new Promise<string | null>((resolve) => {
         childProcess.execFile(
-          foundTrayExe!,
+          foundTrayExe,
           args,
-          {
-            encoding: 'utf8',
-            timeout: 120000,
-            windowsHide: false,
-          },
+          { encoding: 'utf8', timeout: 120000, windowsHide: false },
           (err, stdout) => {
             if (err) {
               logger.warn('Aviso al invocar BentianTray dialog, usando fallback de PowerShell:', { err: String(err) });
@@ -171,13 +183,16 @@ export async function openWindowsFileDialog(
     logger.warn('Aviso al invocar BentianTray dialog, usando fallback de PowerShell:', { err: String(trayErr) });
   }
 
-  // 2. Fallback mediante PowerShell nativo en modo STA con ventana TopMost y UTF-8
+  // 2. Fallback mediante PowerShell nativo en modo STA con ventana TopMost y UTF-8 (-EncodedCommand)
   try {
     logger.info('Invocando selector nativo mediante fallback PowerShell (TopMost = true, UTF-8)...');
 
+    const safeTitle = String(title || '').replace(/[\x00-\x1f\x7f]/g, '').replace(/'/g, "''");
+    const safeFilter = String(filter || '').replace(/[\x00-\x1f\x7f]/g, '').replace(/'/g, "''");
+
     let initialDirPs = '';
-    if (initialPath) {
-      const sanitizedInitial = initialPath.replace(/'/g, "''");
+    if (cleanInitialPath) {
+      const sanitizedInitial = cleanInitialPath.replace(/'/g, "''");
       initialDirPs = `$initPath = '${sanitizedInitial}'; if (Test-Path $initPath -PathType Leaf) { $d.InitialDirectory = [System.IO.Path]::GetDirectoryName($initPath); $d.FileName = [System.IO.Path]::GetFileName($initPath); } elseif (Test-Path $initPath -PathType Container) { $d.InitialDirectory = $initPath; };`;
     } else {
       initialDirPs = `foreach ($p in @('C:\\Software DELSOL\\Factusol\\Datos\\FS', 'C:\\Factusol\\Datos\\FS')) { if (Test-Path $p) { $d.InitialDirectory = $p; break; } };`;
@@ -192,8 +207,8 @@ export async function openWindowsFileDialog(
       '$f.TopMost = $true;',
       '$null = $f.Handle;',
       '$d = New-Object System.Windows.Forms.OpenFileDialog;',
-      `$d.Title = '${title.replace(/'/g, "''")}';`,
-      `$d.Filter = '${filter.replace(/'/g, "''")}|Todos los archivos (*.*)|*.*';`,
+      `$d.Title = '${safeTitle}';`,
+      `$d.Filter = '${safeFilter}|Todos los archivos (*.*)|*.*';`,
       '$d.CheckFileExists = $true;',
       '$d.RestoreDirectory = $true;',
       '$d.AutoUpgradeEnabled = $true;',
@@ -204,15 +219,13 @@ export async function openWindowsFileDialog(
       '$f.Dispose();',
     ].join(' ');
 
+    const encodedCommand = Buffer.from(psScript, 'utf16le').toString('base64');
+
     const output = await new Promise<string>((resolve) => {
       childProcess.execFile(
         'powershell.exe',
-        ['-NoProfile', '-STA', '-Command', psScript],
-        {
-          encoding: 'utf8',
-          timeout: 120000,
-          windowsHide: true,
-        },
+        ['-NoProfile', '-NonInteractive', '-STA', '-EncodedCommand', encodedCommand],
+        { encoding: 'utf8', timeout: 120000, windowsHide: true },
         (err, stdout) => {
           if (err) {
             logger.warn('Fallo o timeout al invocar OpenFileDialog de PowerShell:', { err: String(err) });

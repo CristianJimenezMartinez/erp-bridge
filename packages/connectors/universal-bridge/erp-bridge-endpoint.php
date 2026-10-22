@@ -813,9 +813,15 @@ if ($mainAction === 'upload_image') {
         $targetRelPath = trim($_SERVER['HTTP_X_FILE_PATH']);
     }
 
-    // Saneamiento de seguridad contra Directory Traversal
+    // Saneamiento de seguridad contra Directory Traversal y doble extensión ejecutable
     $targetRelPath = ltrim(str_replace('\\', '/', $targetRelPath), '/');
-    if (empty($targetRelPath) || strpos($targetRelPath, '..') !== false) {
+    if (
+        empty($targetRelPath) ||
+        strpos($targetRelPath, '..') !== false ||
+        strpos($targetRelPath, "\0") !== false ||
+        !preg_match('/^[a-zA-Z0-9_\-\/]+\.(jpg|jpeg|png|webp)$/i', $targetRelPath) ||
+        preg_match('/\.(php\d*|phtml|phar|htaccess|cgi|pl|py|sh|exe|bat|cmd)(\.|$)/i', $targetRelPath)
+    ) {
         http_response_code(400);
         echo json_encode(['error' => 'Ruta de archivo no especificada o inválida']);
         exit;
@@ -931,7 +937,8 @@ if ($mainAction === 'upload_image') {
     }
 
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $rawHost = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = preg_replace('/[^a-zA-Z0-9.\-:]/', '', $rawHost) ?: 'localhost';
     $publicUrl = "{$scheme}://{$host}/assets/img/factusolImg/{$targetRelPath}";
 
     echo json_encode([

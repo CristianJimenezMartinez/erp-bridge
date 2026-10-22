@@ -152,12 +152,12 @@ export class ConfigApplierService {
     for (const sqlId of ['agora', 'sage50', 'a3erp'] as const) {
       const pObj = cfg.softwareErp.providers?.[sqlId] as any;
       if (pObj) {
-        const srv = pObj.serverInstance || pObj.sqlInstance || sqlDefaults[sqlId].inst;
+        const srv = pObj.serverInstance || pObj.sqlInstance || sqlDefaults[sqlId]?.inst || '.\\SQLEXPRESS';
         const rawDb = String(pObj.databaseName || pObj.databasePath || '').trim();
         const isEval = Boolean(pObj.evaluationMode) || rawDb.toUpperCase().startsWith('DEMO');
         const dbName = (!isEval && rawDb && !rawDb.startsWith('mssql://') && !rawDb.toUpperCase().startsWith('DEMO'))
           ? rawDb
-          : (pObj.databaseName || sqlDefaults[sqlId].db);
+          : (pObj.databaseName || sqlDefaults[sqlId]?.db || 'ERP');
         pObj.serverInstance = srv;
         pObj.sqlInstance = srv;
         pObj.databaseName = dbName;

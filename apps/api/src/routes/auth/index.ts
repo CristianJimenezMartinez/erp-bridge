@@ -27,7 +27,11 @@ authRouter.post(
 );
 
 // POST /api/v1/auth/email-session (Acceso por correo de facturación Stripe con verificación OTP o Clave)
-authRouter.post('/auth/email-session', handleEmailSession);
+authRouter.post(
+  '/auth/email-session',
+  rateLimit({ name: 'email-session', windowMs: 15 * 60 * 1000, max: 20 }),
+  handleEmailSession
+);
 
 export * from './auth.types';
 export * from './auth.service';

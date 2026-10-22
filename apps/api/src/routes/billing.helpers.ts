@@ -15,6 +15,63 @@ export const ANONYMOUS_BUYABLE_PLANS = [
   'setup_vip',
 ];
 
+const SESSION_CHECKOUT_MAX_AGE_MS = 60 * 60 * 1000; // 1 hora desde creación en Stripe
+const SESSION_REPLAY_GRACE_MS = 15 * 60 * 1000; // 15 min de gracia para recarga de pestaña tras primer canje
+const redeemedSessionTimestamps = new Map<string, number>();
+
+export function clearRedeemedSessions(): void {
+  redeemedSessionTimestamps.clear();
+}
+
+/**
+ * Impide que un `session_id` antiguo (filtrado en historial, logs o cabeceras)
+ * permita emitir nuevos JWT de 48h o leer `licenseKey` en texto plano sin autenticación.
+ */
+export function validateSessionRedemptionWindow(
+  sessionId: string,
+  stripeCreatedUnixSec?: number,
+  licenseCreatedAt?: string | Date | null,
+  nowMs: number = Date.now()
+): { allowed: boolean; reason?: string } {
+  if (typeof stripeCreatedUnixSec === 'number' && stripeCreatedUnixSec > 0) {
+    const createdMs = stripeCreatedUnixSec > 1e11 ? stripeCreatedUnixSec : stripeCreatedUnixSec * 1000;
+    if (nowMs - createdMs > SESSION_CHECKOUT_MAX_AGE_MS) {
+      return {
+        allowed: false,
+        reason: 'El enlace temporal post-pago ha expirado por seguridad (máx. 60 min). Accede con tu correo y código OTP en el Panel de Control.',
+      };
+    }
+  }
+
+  if (licenseCreatedAt) {
+    const licMs = new Date(licenseCreatedAt).getTime();
+    if (!Number.isNaN(licMs) && nowMs - licMs > SESSION_REPLAY_GRACE_MS) {
+      return {
+        allowed: false,
+        reason: 'Esta sesión de pago ya fue canjeada anteriormente. Por seguridad, inicia sesión con tu correo electrónico o clave en el Panel de Control.',
+      };
+    }
+  }
+
+  const firstRedeemedAt = redeemedSessionTimestamps.get(sessionId);
+  if (firstRedeemedAt !== undefined) {
+    if (nowMs - firstRedeemedAt > SESSION_REPLAY_GRACE_MS) {
+      return {
+        allowed: false,
+        reason: 'Esta sesión de pago ya fue canjeada anteriormente. Por seguridad, inicia sesión con tu correo electrónico o clave en el Panel de Control.',
+      };
+    }
+  } else if (sessionId) {
+    if (redeemedSessionTimestamps.size > 2000) {
+      const oldestKey = redeemedSessionTimestamps.keys().next().value;
+      if (oldestKey) redeemedSessionTimestamps.delete(oldestKey);
+    }
+    redeemedSessionTimestamps.set(sessionId, nowMs);
+  }
+
+  return { allowed: true };
+}
+
 export function sanitizeReturnUrl(urlStr: string | undefined, fallback: string): string {
   if (!urlStr || typeof urlStr !== 'string') return fallback;
   try {
