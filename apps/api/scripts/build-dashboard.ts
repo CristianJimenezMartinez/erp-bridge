@@ -363,6 +363,7 @@ export function buildDashboard(): void {
     'src="/dashboard/js/licenses-modals.js',
     'src="/dashboard/js/fleet.js',
     'src="/dashboard/js/organizations.js',
+    'src="/dashboard/js/partner-actions.js',
     'src="/dashboard/js/partners-admin.js',
     'src="/dashboard/js/audit-errors.js',
     'src="/dashboard/js/multichannel.js',

@@ -52,9 +52,11 @@
     .bg-\[\#18181b\] { background-color: #1e2230 !important; }
     .border-white\/\[0\.04\], .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
     .border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
+    .text-zinc-600 { color: #94a3b8 !important; }
     .text-zinc-500 { color: #a1a8b8 !important; }
     .text-zinc-400 { color: #cbd5e1 !important; }
     .text-zinc-300 { color: #e2e8f0 !important; }
+    input::placeholder { color: #94a3b8 !important; opacity: 1; }
   </style>
   <script>
     // Fail-safe modal & interactive controller (Immediate availability guarantee)
@@ -62,25 +64,25 @@
       var el = document.getElementById(id);
       if (el) el.classList.add('hidden');
     }
-    function openPartnerBuyModal() {
+    function openPartnerBuyModal(prefillName, prefillTaxId) {
       var nameEl = document.getElementById('partner-buy-client-name');
       var taxEl = document.getElementById('partner-buy-tax-id');
       var emailEl = document.getElementById('partner-buy-email');
       var aliasEl = document.getElementById('partner-buy-alias');
-      if (nameEl) nameEl.value = '';
-      if (taxEl) taxEl.value = '';
+      if (nameEl) nameEl.value = prefillName || '';
+      if (taxEl) taxEl.value = prefillTaxId || '';
       if (emailEl) emailEl.value = '';
-      if (aliasEl) aliasEl.value = '';
+      if (aliasEl) aliasEl.value = prefillName ? ('Servidor ' + prefillName) : '';
       var modal = document.getElementById('modal-partner-buy');
       if (modal) modal.classList.remove('hidden');
     }
-    function openPartnerIssueModal() {
+    function openPartnerIssueModal(prefillName, prefillTaxId) {
       var nameEl = document.getElementById('partner-issue-client-name');
       var taxEl = document.getElementById('partner-issue-tax-id');
       var aliasEl = document.getElementById('partner-issue-alias');
-      if (nameEl) nameEl.value = '';
-      if (taxEl) taxEl.value = '';
-      if (aliasEl) aliasEl.value = '';
+      if (nameEl) nameEl.value = prefillName || '';
+      if (taxEl) taxEl.value = prefillTaxId || '';
+      if (aliasEl) aliasEl.value = prefillName ? ('Evaluación ' + prefillName) : '';
       var modal = document.getElementById('modal-partner-issue');
       if (modal) modal.classList.remove('hidden');
     }
@@ -628,69 +630,69 @@
         <!-- BANNER DE KPIS DE CONEXIÓN -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Card 1: Plan & Facturación -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Plan Contratado</span>
-              <span id="kpi-plan-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span class="text-[11px] font-mono font-bold text-indigo-200 uppercase tracking-wider">Plan Contratado</span>
+              <span id="kpi-plan-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-400/40">
                 PROFESSIONAL
               </span>
             </div>
             <div class="mt-2">
-              <div class="text-lg font-bold text-zinc-100 flex items-center gap-2">
+              <div class="text-lg font-bold text-white flex items-center gap-2">
                 <span id="kpi-plan-name">Plan Base (1 ERP ⇄ 1 Tienda Web)</span>
               </div>
-              <p class="text-xs text-zinc-400 mt-0.5">Suscripción recurrente con soporte prioritario Factusol.</p>
+              <p class="text-xs text-zinc-200 mt-0.5">Suscripción recurrente con soporte prioritario Factusol.</p>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
-              <span class="text-emerald-400 text-[11px] flex items-center gap-1">
+            <div class="mt-4 pt-3 border-t border-white/[0.12] flex items-center justify-between text-xs">
+              <span class="text-emerald-300 text-[11px] font-semibold flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Pagos al día en Stripe
               </span>
-              <button onclick="openStripePortal()" class="text-indigo-400 hover:text-indigo-300 font-medium text-[11px] transition">
+              <button onclick="openStripePortal()" class="text-indigo-300 hover:text-white font-semibold text-[11px] transition cursor-pointer">
                 Gestionar Plan →
               </button>
             </div>
           </div>
 
           <!-- Card 2: Conector ERP / Servidor Vinculado -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Conector ERP</span>
-              <span class="text-zinc-400 font-mono text-[10px]">Factusol ⇄ Web</span>
+              <span class="text-[11px] font-mono font-bold text-indigo-200 uppercase tracking-wider">Conector ERP</span>
+              <span class="text-zinc-200 font-mono text-[10px] font-semibold">Factusol ⇄ Web</span>
             </div>
             <div class="mt-2">
-              <div class="text-2xl font-extrabold text-zinc-100 font-mono">
-                <span id="kpi-active-seats">0</span> <span class="text-sm font-normal text-zinc-500">/ <span id="kpi-total-seats">1</span> Servidor</span>
+              <div class="text-2xl font-extrabold text-white font-mono">
+                <span id="kpi-active-seats">0</span> <span class="text-sm font-normal text-zinc-300">/ <span id="kpi-total-seats">1</span> Servidor</span>
               </div>
-              <div class="w-full bg-[#1c1c20] rounded-full h-1.5 mt-2 overflow-hidden">
+              <div class="w-full bg-[#1e2230] rounded-full h-1.5 mt-2 overflow-hidden">
                 <div id="kpi-progress-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+            <div class="mt-4 pt-3 border-t border-white/[0.12] text-[11px] text-zinc-200 flex items-center justify-between">
               <span id="kpi-seats-available-text">Conexión Factusol</span>
-              <button onclick="openNewKeyModal()" class="text-indigo-400 hover:text-indigo-300 font-medium transition">
+              <button onclick="openNewKeyModal()" class="text-indigo-300 hover:text-white font-semibold transition cursor-pointer">
                 + Nueva Licencia
               </button>
             </div>
           </div>
 
           <!-- Card 3: Estado de Conexión del Servidor -->
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Telemetría del Conector</span>
-              <span class="text-emerald-400 font-mono text-[10px]">Latidos &lt; 24h</span>
+              <span class="text-[11px] font-mono font-bold text-indigo-200 uppercase tracking-wider">Telemetría del Conector</span>
+              <span class="text-emerald-300 font-mono text-[10px] font-semibold">Latidos &lt; 24h</span>
             </div>
             <div class="mt-2">
-              <div class="text-2xl font-extrabold text-zinc-100 font-mono flex items-center gap-2">
+              <div class="text-2xl font-extrabold text-white font-mono flex items-center gap-2">
                 <span id="kpi-online-seats">0</span>
-                <span class="text-xs font-normal text-emerald-400 flex items-center gap-1 font-sans">
+                <span class="text-xs font-semibold text-emerald-300 flex items-center gap-1 font-sans">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> En línea
                 </span>
               </div>
-              <p class="text-xs text-zinc-400 mt-1">Equipos sincronizando stock y pedidos con Factusol.</p>
+              <p class="text-xs text-zinc-200 mt-1">Equipos sincronizando stock y pedidos con Factusol.</p>
             </div>
-            <div class="mt-4 pt-3 border-t border-white/[0.06] text-[11px] text-zinc-400 flex items-center justify-between">
+            <div class="mt-4 pt-3 border-t border-white/[0.12] text-[11px] text-zinc-200 flex items-center justify-between">
               <span>Tolerancia offline: 7 días</span>
-              <button onclick="loadLicenses()" class="text-zinc-400 hover:text-white transition" title="Refrescar lista">
+              <button onclick="loadLicenses()" class="text-zinc-300 hover:text-white transition cursor-pointer" title="Refrescar lista">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               </button>
             </div>
@@ -698,28 +700,39 @@
         </div>
 
         <!-- LISTADO DE CLAVES Y CONEXIONES -->
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#151518]">
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
+          <div class="p-4 border-b border-white/[0.12] flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#1a1e2b]">
             <div>
-              <h2 class="text-sm font-semibold text-zinc-100">Conexiones ERP & Servidores Vinculados</h2>
-              <p class="text-[11px] text-zinc-400 mt-0.5">
+              <div class="flex items-center gap-2.5">
+                <h2 class="text-sm font-bold text-white">Conexiones ERP & Servidores Vinculados</h2>
+                <span id="licenses-count-badge" class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-[11px] font-mono font-bold text-indigo-200">0 licencias</span>
+              </div>
+              <p class="text-xs text-zinc-200 mt-0.5">
                 El conector se ejecuta en el PC/servidor donde reside Factusol. Si cambias de máquina, puedes desvincular el HWID con 1 clic.
               </p>
             </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <div class="relative flex-1 sm:flex-initial w-full sm:w-64">
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="relative">
                 <input 
                   type="text" 
                   id="search-input" 
                   oninput="handleSearch(this.value)" 
-                  placeholder="Buscar por alias, clave, hostname..." 
-                  class="bg-[#18181b] border border-white/[0.08] rounded-md pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 w-full sm:w-64 transition"
+                  placeholder="🔍 Buscar alias, clave, PC..." 
+                  class="bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-indigo-400 w-48 sm:w-56 transition"
                 />
-                <svg class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
               </div>
+              <select id="licenses-status-filter" onchange="applyLicensesFilter()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-400 cursor-pointer">
+                <option value="ALL">Estado: Todas</option>
+                <option value="ONLINE">🟢 En Línea</option>
+                <option value="PENDING">🟡 Esperando Activación</option>
+                <option value="OFFLINE">⚪ Desconectadas</option>
+              </select>
+              <button id="btn-licenses-hide-tests" type="button" onclick="toggleLicensesHideTests()" class="px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap" title="Ocultar licencias de prueba [TEST]">
+                🧹 Ocultar [TEST]
+              </button>
               <button 
                 onclick="openNewKeyModal()" 
-                class="px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow-sm transition flex items-center gap-1.5 shrink-0"
+                class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer whitespace-nowrap"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 <span>Generar Clave</span>
@@ -730,19 +743,19 @@
           <!-- TABLA DE CLAVES -->
           <div class="overflow-x-auto custom-scroll">
             <table class="w-full text-left text-xs min-w-[780px]">
-              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+              <thead class="bg-[#1e2230] text-[11px] uppercase font-bold text-zinc-200 border-b border-white/[0.12]">
                 <tr>
-                  <th class="p-3">Servidor / Alias</th>
-                  <th class="p-3">Clave de Activación</th>
-                  <th class="p-3 whitespace-nowrap">Tipo & Puesto</th>
-                  <th class="p-3 whitespace-nowrap">Estado Conexión</th>
-                  <th class="p-3">Equipo Vinculado (HWID)</th>
-                  <th class="p-3 text-right whitespace-nowrap">Acciones</th>
+                  <th class="p-3.5">Servidor / Alias</th>
+                  <th class="p-3.5">Clave de Activación</th>
+                  <th class="p-3.5 whitespace-nowrap">Tipo & Puesto</th>
+                  <th class="p-3.5 whitespace-nowrap">Estado Conexión</th>
+                  <th class="p-3.5">Equipo Vinculado (HWID)</th>
+                  <th class="p-3.5 text-right whitespace-nowrap">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="licenses-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="licenses-tbody" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  <td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">
                     Cargando parque de licencias...
                   </td>
                 </tr>
@@ -751,11 +764,11 @@
           </div>
 
           <!-- FOOTER INFORMATIVO -->
-          <div class="p-3.5 bg-[#121215] border-t border-white/[0.06] text-[11px] text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div class="p-3.5 bg-[#181c29] border-t border-white/[0.12] text-xs text-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-2">
             <span>
               💡 <strong>Aviso First-Local:</strong> Toda la configuración de Factusol y credenciales se realiza de forma privada y local en el propio servidor del cliente.
             </span>
-            <a href="#modal-instructions" onclick="openInstructionsModal()" class="text-indigo-400 hover:underline shrink-0">
+            <a href="#modal-instructions" onclick="openInstructionsModal()" class="text-indigo-300 hover:text-white font-semibold hover:underline shrink-0">
               ¿Cómo instalar en mi servidor Factusol?
             </a>
           </div>
@@ -766,53 +779,64 @@
       <!-- PESTAÑA: SALUD DE SERVIDORES (SUPERADMIN & RESELLER)               -->
       <!-- ================================================================= -->
       <div id="view-tab-fleet" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#151822] border border-white/[0.15] rounded-xl p-5 shadow-lg">
           <div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-zinc-100">Telemetría y Salud de Servidores ERP</h2>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <h2 class="text-sm sm:text-base font-bold text-white">Telemetría y Salud de Servidores ERP</h2>
             </div>
-            <p class="text-[11px] text-zinc-400 mt-1">
+            <p class="text-xs text-zinc-200 mt-1">
               Supervisión de cada equipo Windows: latidos de conexión, estado OLEDB con Factusol y versiones activas.
             </p>
           </div>
-          <button onclick="loadFleetHealthData()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <button onclick="loadFleetHealthData()" class="px-3.5 py-2 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.18] text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto">
+            <svg class="w-3.5 h-3.5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             <span>Refrescar Salud</span>
           </button>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
-            <div class="text-[11px] font-mono text-zinc-500 uppercase">Servidores ERP Vinculados</div>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4">
+            <div class="text-[11px] font-mono font-bold text-indigo-200 uppercase">Servidores ERP Vinculados</div>
             <div class="text-2xl font-bold text-white font-mono mt-1" id="health-kpi-total-seats">0</div>
-            <div class="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
+            <div class="text-xs text-emerald-300 font-semibold mt-1 flex items-center gap-1.5" id="fleet-summary-badge">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Monitorizados en tiempo real
             </div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
-            <div class="text-[11px] font-mono text-zinc-500 uppercase">Salud Conexión Factusol</div>
-            <div class="text-2xl font-bold text-emerald-400 font-mono mt-1" id="health-kpi-db-status">ÓPTIMA</div>
-            <div class="text-[11px] text-zinc-400 mt-1">Lectura OLEDB local sin bloqueos</div>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4">
+            <div class="text-[11px] font-mono font-bold text-emerald-300 uppercase">Salud Conexión Factusol</div>
+            <div class="text-2xl font-bold text-emerald-300 font-mono mt-1" id="health-kpi-db-status">ÓPTIMA</div>
+            <div class="text-xs text-zinc-200 mt-1">Lectura OLEDB local sin bloqueos</div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4">
-            <div class="text-[11px] font-mono text-zinc-500 uppercase">Versión del Agente</div>
-            <div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="health-kpi-version" data-app-version>v0.4.12</div>
-            <div class="text-[11px] text-zinc-400 mt-1">Firma Ed25519 verificada</div>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4">
+            <div class="text-[11px] font-mono font-bold text-indigo-200 uppercase">Versión Oficial del Agente</div>
+            <div class="text-2xl font-bold text-indigo-300 font-mono mt-1" id="health-kpi-version" data-app-version>v0.4.12</div>
+            <div class="text-xs text-zinc-200 mt-1">Firma Ed25519 verificada</div>
           </div>
         </div>
 
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
-            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Detalle de Máquinas & Agentes</h3>
-            <span class="text-[11px] text-zinc-500 font-mono" id="table-last-heartbeat">Actualizado continuamente</span>
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
+          <div class="p-4 border-b border-white/[0.12] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1a1e2b]">
+            <div>
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Detalle de Máquinas &amp; Agentes Windows</h3>
+              <span class="text-[11px] text-zinc-300 font-mono" id="table-last-heartbeat">Actualizado continuamente</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="fleet-search-input" type="text" oninput="filterAndRenderFleet()" placeholder="🔍 Buscar hostname, empresa o HWID..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-indigo-400" />
+              <select id="fleet-status-filter" onchange="filterAndRenderFleet()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-400 cursor-pointer">
+                <option value="ALL">Estado: Todos</option>
+                <option value="ONLINE">🟢 Online</option>
+                <option value="OFFLINE">⚪ Offline</option>
+                <option value="OUTDATED">🟡 Actualización disp.</option>
+              </select>
+            </div>
           </div>
 
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs text-zinc-300 min-w-[720px]">
-              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            <table class="w-full text-left text-xs text-zinc-200 min-w-[720px]">
+              <thead class="bg-[#1e2230] border-b border-white/[0.12] text-[11px] font-mono uppercase tracking-wider font-bold text-zinc-200">
                 <tr>
                   <th class="py-3 px-4">Servidor / Hostname</th>
                   <th class="py-3 px-4">Organización</th>
@@ -821,9 +845,9 @@
                   <th class="py-3 px-4 text-right whitespace-nowrap">Estado</th>
                 </tr>
               </thead>
-              <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.04]">
+              <tbody id="fleet-health-table-body" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  <td colspan="5" class="p-8 text-center text-zinc-300 font-mono text-xs">
                     Cargando estado de máquinas...
                   </td>
                 </tr>
@@ -1015,40 +1039,40 @@
 
         <!-- 4 KPIS FINANCIEROS Y DE LICENCIAS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Ingresos Estimados</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-purple-300 uppercase">Ingresos Estimados</span>
             <div class="mt-2">
-              <div class="text-2xl font-bold text-white font-mono flex items-baseline gap-1"><span id="kpi-arr">0 €</span><span class="text-xs font-normal text-zinc-500">/ año</span></div>
-              <div class="text-[11px] text-purple-400 font-mono mt-1">MRR: <span id="kpi-mrr">0 €</span> / mes</div>
+              <div class="text-2xl font-bold text-white font-mono flex items-baseline gap-1"><span id="kpi-arr">0 €</span><span class="text-xs font-normal text-zinc-300">/ año</span></div>
+              <div class="text-[11px] text-purple-300 font-mono font-semibold mt-1">MRR: <span id="kpi-mrr">0 €</span> / mes</div>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400"><span id="kpi-seats-breakdown">0 Licencias Base Activas</span></div>
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200"><span id="kpi-seats-breakdown">0 Licencias Base Activas</span></div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Licencias Pagadas Activas</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-emerald-300 uppercase">Licencias Pagadas Activas</span>
             <div class="mt-2">
-              <div class="text-2xl font-bold text-emerald-400 font-mono" id="kpi-active-paid">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">Cobro recurrente al día en Stripe</div>
+              <div class="text-2xl font-bold text-emerald-300 font-mono" id="kpi-active-paid">0</div>
+              <div class="text-xs text-zinc-200 mt-1">Cobro recurrente al día en Stripe</div>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Servicio operativo 100%</div>
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-emerald-300 font-semibold flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Servicio operativo 100%</div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Período de Prueba (Trial)</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-amber-300 uppercase">Período de Prueba (Trial)</span>
             <div class="mt-2">
-              <div class="text-2xl font-bold text-amber-400 font-mono" id="kpi-trials">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">En evaluación de integración ERP</div>
+              <div class="text-2xl font-bold text-amber-300 font-mono" id="kpi-trials">0</div>
+              <div class="text-xs text-zinc-200 mt-1">En evaluación de integración ERP</div>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">Conversión guiada activa</div>
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200">Conversión guiada activa</div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Impagadas / Canceladas</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-red-300 uppercase">Impagadas / Canceladas</span>
             <div class="mt-2">
-              <div class="text-2xl font-bold text-red-400 font-mono" id="kpi-unpaid">0</div>
-              <div class="text-[11px] text-zinc-400 mt-1">Acceso a sincronización bloqueado</div>
+              <div class="text-2xl font-bold text-red-300 font-mono" id="kpi-unpaid">0</div>
+              <div class="text-xs text-zinc-200 mt-1">Acceso a sincronización bloqueado</div>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-red-400/80">Reintento de cobro Stripe activo</div>
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-red-300">Reintento de cobro Stripe activo</div>
           </div>
         </div>
 
@@ -1167,28 +1191,28 @@
       <!-- ================================================================= -->
       <div id="view-tab-organizations" class="hidden space-y-6">
         <!-- CABECERA DEL CANAL DE PARTNERS B2B -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/40 via-[#121215] to-[#121215] border border-emerald-500/20 rounded-xl p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-gradient-to-r from-emerald-950/60 via-[#151822] to-[#151822] border border-emerald-400/35 rounded-xl p-5 shadow-lg">
           <div>
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-white">Red de Partners Oficiales, Agentes Digitalizadores &amp; Implantadores ERP</h2>
-              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">COMISIÓN 25% RECURRENTE</span>
+              <h2 class="text-sm sm:text-base font-bold text-white">Red de Partners Oficiales, Agentes Digitalizadores &amp; Implantadores ERP</h2>
+              <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">COMISIÓN 25% RECURRENTE</span>
             </div>
-            <p class="text-[11px] text-zinc-400 mt-1 leading-relaxed">
-              Gestión integral del canal B2B: acreditación instantánea con código <code class="text-emerald-300 font-mono">PT-XXXX</code>, licencias NFR de demostración (2 puestos) y control de clientes referidos.
+            <p class="text-xs text-zinc-200 mt-1 leading-relaxed">
+              Gestión integral del canal B2B: acreditación instantánea con código <code class="text-emerald-300 font-mono font-bold">PT-XXXX</code>, licencias NFR de demostración (2 puestos) y control de clientes referidos.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <button onclick="toggleNewPartnerPanel()" class="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <button onclick="toggleNewPartnerPanel()" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
               <span>+ Alta Rápida Partner (NFR 2 Puestos)</span>
             </button>
-            <a href="/partners/" target="_blank" class="px-3 py-2 rounded-md bg-[#18181b] hover:bg-[#222228] text-zinc-200 border border-white/[0.1] text-xs font-medium transition flex items-center gap-1.5">
+            <a href="/partners/" target="_blank" class="px-3 py-2 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.16] text-xs font-medium transition flex items-center gap-1.5 whitespace-nowrap">
               <span>Portal Público (/partners)</span>
             </a>
-            <a href="/partners/?print=1" target="_blank" class="px-3 py-2 rounded-md bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-xs font-medium transition flex items-center gap-1.5">
+            <a href="/partners/?print=1" target="_blank" class="px-3 py-2 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 text-xs font-semibold transition flex items-center gap-1.5 whitespace-nowrap">
               <span>🖨️ Dossier PDF</span>
             </a>
-            <button onclick="loadAdminPartners(); loadOrganizations();" class="px-3 py-2 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-300 border border-white/[0.08] text-xs font-medium transition cursor-pointer">
+            <button onclick="loadAdminPartners(); loadOrganizations();" class="px-3 py-2 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-zinc-200 border border-white/[0.16] text-xs font-medium transition cursor-pointer">
               <span>Actualizar</span>
             </button>
           </div>
@@ -1196,87 +1220,87 @@
 
         <!-- 4 KPIS DEL CANAL DE PARTNERS B2B -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Partners Acreditados</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-emerald-300 uppercase">Partners Acreditados</span>
             <div class="mt-2 flex items-baseline gap-2">
               <span id="kpi-partners-total" class="text-2xl font-bold text-white font-mono">0</span>
-              <span class="text-xs text-emerald-400 font-mono">(<span id="kpi-partners-active">0</span> activos)</span>
+              <span class="text-xs text-emerald-300 font-mono font-semibold">(<span id="kpi-partners-active">0</span> activos)</span>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200">
               Agencias eCommerce, Implantadores y Asesorías
             </div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Clientes Referidos por Canal</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-indigo-200 uppercase">Clientes Referidos por Canal</span>
             <div class="mt-2">
-              <span id="kpi-partners-clients" class="text-2xl font-bold text-indigo-400 font-mono">0</span>
+              <span id="kpi-partners-clients" class="text-2xl font-bold text-indigo-300 font-mono">0</span>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200">
               Empresas vinculadas a códigos PT-XXXX
             </div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">ARR Generado por Canal</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-emerald-300 uppercase">ARR Generado por Canal</span>
             <div class="mt-2 flex items-baseline gap-1">
-              <span id="kpi-partners-arr" class="text-2xl font-bold text-emerald-400 font-mono">0 €</span>
-              <span class="text-xs text-zinc-500">/ año</span>
+              <span id="kpi-partners-arr" class="text-2xl font-bold text-emerald-300 font-mono">0 €</span>
+              <span class="text-xs text-zinc-300">/ año</span>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200">
               Base: 199 € / año por cliente activo
             </div>
           </div>
 
-          <div class="bg-[#121215] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between">
-            <span class="text-[11px] font-mono text-zinc-500 uppercase">Comisiones Canal (25%)</span>
+          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-4 flex flex-col justify-between">
+            <span class="text-[11px] font-mono font-bold text-amber-300 uppercase">Comisiones Canal (25%)</span>
             <div class="mt-2 flex items-baseline gap-1">
-              <span id="kpi-partners-commissions" class="text-2xl font-bold text-amber-400 font-mono">0 €</span>
-              <span class="text-xs text-zinc-500">/ año</span>
+              <span id="kpi-partners-commissions" class="text-2xl font-bold text-amber-300 font-mono">0 €</span>
+              <span class="text-xs text-zinc-300">/ año</span>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/[0.06] text-[10px] text-zinc-400">
+            <div class="mt-3 pt-2 border-t border-white/[0.12] text-xs text-zinc-200">
               49,75 € / año por licencia (Neto Bentian: 149,25 €)
             </div>
           </div>
         </div>
 
         <!-- PANEL DESPLEGABLE: ALTA RÁPIDA DE PARTNER EN 1 CLIC -->
-        <div id="admin-new-partner-panel" class="hidden bg-[#121215] border border-emerald-500/30 rounded-xl p-5 shadow-xl">
-          <div class="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-4">
+        <div id="admin-new-partner-panel" class="hidden bg-[#151822] border border-emerald-400/40 rounded-xl p-5 shadow-xl">
+          <div class="flex items-center justify-between border-b border-white/[0.12] pb-3 mb-4">
             <div>
-              <h3 class="text-xs font-bold text-emerald-400 uppercase font-mono">⚡ Alta Directa de Partner B2B + Emisión Automática NFR (2 Puestos)</h3>
-              <p class="text-[11px] text-zinc-400 mt-0.5">Genera el código PT-XXXX, crea la licencia NFR para pruebas en Modo Evaluación y envía las credenciales por correo a la agencia.</p>
+              <h3 class="text-xs font-bold text-emerald-300 uppercase font-mono">⚡ Alta Directa de Partner B2B + Emisión Automática NFR (2 Puestos)</h3>
+              <p class="text-xs text-zinc-200 mt-0.5">Genera el código PT-XXXX, crea la licencia NFR para pruebas en Modo Evaluación y envía las credenciales por correo a la agencia.</p>
             </div>
-            <button type="button" onclick="toggleNewPartnerPanel()" class="text-xs text-zinc-400 hover:text-white px-2 py-1 rounded bg-white/[0.05] cursor-pointer">Cerrar ✕</button>
+            <button type="button" onclick="toggleNewPartnerPanel()" class="text-xs text-zinc-200 hover:text-white px-2.5 py-1 rounded bg-white/[0.08] cursor-pointer">Cerrar ✕</button>
           </div>
           <form onsubmit="handleAdminCreatePartner(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">Agencia / Implantador *</label>
-              <input id="adm-pt-agency" type="text" required placeholder="Ej: Agencia Digital Levante" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">Agencia / Implantador *</label>
+              <input id="adm-pt-agency" type="text" required placeholder="Ej: Agencia Digital Levante" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white placeholder-zinc-400 focus:border-emerald-400 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">Persona de Contacto *</label>
-              <input id="adm-pt-contact" type="text" required placeholder="Ej: Carlos Gómez" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">Persona de Contacto *</label>
+              <input id="adm-pt-contact" type="text" required placeholder="Ej: Carlos Gómez" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white placeholder-zinc-400 focus:border-emerald-400 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">Email Profesional *</label>
-              <input id="adm-pt-email" type="email" required placeholder="hola@agencia.es" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">Email Profesional *</label>
+              <input id="adm-pt-email" type="email" required placeholder="hola@agencia.es" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white placeholder-zinc-400 focus:border-emerald-400 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">Teléfono / WhatsApp *</label>
-              <input id="adm-pt-phone" type="tel" required placeholder="+34 600 000 000" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">Teléfono / WhatsApp *</label>
+              <input id="adm-pt-phone" type="tel" required placeholder="+34 600 000 000" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white placeholder-zinc-400 focus:border-emerald-400 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">Perfil de Partner</label>
-              <select id="adm-pt-type" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none">
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">Perfil de Partner</label>
+              <select id="adm-pt-type" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white focus:border-emerald-400 focus:outline-none">
                 <option value="agencia_ecommerce">Agencia WooCommerce / Shopify / PrestaShop</option>
                 <option value="implantador_erp">Implantador / Distribuidor ERP Local</option>
                 <option value="asesoria_holded">Asesoría Fiscal / Consultor Holded</option>
               </select>
             </div>
             <div>
-              <label class="block text-[11px] text-zinc-400 mb-1">ERPs que trabaja</label>
-              <input id="adm-pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" class="w-full px-3 py-2 rounded-lg bg-[#09090b] border border-white/[0.1] text-white focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-[11px] font-semibold text-zinc-200 mb-1">ERPs que trabaja</label>
+              <input id="adm-pt-erps" type="text" value="Factusol, SimplyGest, Sage 50" class="w-full px-3 py-2 rounded-lg bg-[#12151f] border border-white/[0.18] text-white focus:border-emerald-400 focus:outline-none" />
             </div>
             <div class="sm:col-span-2 lg:col-span-3 flex items-center justify-end gap-2 pt-2">
               <button type="submit" id="btn-adm-create-partner" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition cursor-pointer">
@@ -1287,14 +1311,22 @@
         </div>
 
         <!-- TABLA DE PARTNERS B2B ACREDITADOS -->
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
-            <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Directorio de Partners &amp; Agentes Digitalizadores</h3>
-            <span class="text-[11px] text-zinc-400 font-mono">Clave Portal Partner = Licencia NFR</span>
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
+          <div class="p-4 border-b border-white/[0.12] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1a1e2b]">
+            <div class="flex items-center gap-2.5">
+              <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Directorio de Partners &amp; Agentes Digitalizadores</h3>
+              <span class="text-[11px] text-emerald-300 font-mono">Clave Portal = Licencia NFR</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="admin-partners-search" type="text" oninput="filterAndRenderAdminPartners()" placeholder="🔍 Buscar código, agencia o email..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-emerald-400" />
+              <button id="btn-admin-partners-hide-tests" type="button" onclick="toggleAdminPartnersHideTests()" class="px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap">
+                🧹 Ocultar [TEST]
+              </button>
+            </div>
           </div>
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs text-zinc-300">
-              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            <table class="w-full text-left text-xs text-zinc-200">
+              <thead class="bg-[#1e2230] border-b border-white/[0.12] text-[11px] font-mono uppercase tracking-wider font-bold text-zinc-200">
                 <tr>
                   <th class="py-3 px-4">Código &amp; Link</th>
                   <th class="py-3 px-4">Agencia / Implantador</th>
@@ -1305,9 +1337,9 @@
                   <th class="py-3 px-4 text-right">Estado</th>
                 </tr>
               </thead>
-              <tbody id="admin-partners-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="admin-partners-tbody" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="7" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  <td colspan="7" class="p-8 text-center text-zinc-300 font-mono text-xs">
                     Cargando red de partners B2B...
                   </td>
                 </tr>
@@ -1317,28 +1349,45 @@
         </div>
 
         <!-- TABLA DE ORGANIZACIONES Y EMPRESAS FINALES -->
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
-          <div class="p-4 border-b border-white/[0.06] flex items-center justify-between bg-[#151518]">
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
+          <div class="p-4 border-b border-white/[0.12] flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#1a1e2b]">
             <div>
-              <h3 class="text-xs font-semibold text-zinc-100 uppercase tracking-wider font-mono">Clientes &amp; Cuentas Empresariales Registradas</h3>
-              <p class="text-[11px] text-zinc-400 mt-0.5">Organizaciones dadas de alta en Bentian Cloud y su atribución a Partner o venta directa.</p>
+              <div class="flex items-center gap-2.5">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Clientes &amp; Cuentas Empresariales Registradas</h3>
+                <span id="orgs-count-badge" class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-[11px] font-mono font-bold text-indigo-200">0 empresas</span>
+              </div>
+              <p class="text-xs text-zinc-200 mt-0.5">Organizaciones dadas de alta en Bentian Cloud y su atribución a Partner o venta directa.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <input id="orgs-search" type="text" oninput="filterAndRenderOrgs()" placeholder="🔍 Buscar empresa, CIF o Partner..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-indigo-400" />
+              <select id="orgs-status-filter" onchange="filterAndRenderOrgs()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-400 cursor-pointer">
+                <option value="ALL">Filtro: Todas</option>
+                <option value="ACTIVE">🟢 Con Licencia Activa</option>
+                <option value="NO_LICENSE">🟡 Sin Licencia</option>
+                <option value="PARTNER">🤝 Canal Partner</option>
+                <option value="DIRECT">🏢 Venta Directa</option>
+              </select>
+              <button id="btn-orgs-hide-tests" type="button" onclick="toggleOrgsHideTests()" class="px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap">
+                🧹 Ocultar [TEST]
+              </button>
             </div>
           </div>
           <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs text-zinc-300">
-              <thead class="bg-[#18181b] border-b border-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            <table class="w-full text-left text-xs text-zinc-200">
+              <thead class="bg-[#1e2230] border-b border-white/[0.12] text-[11px] font-mono uppercase tracking-wider font-bold text-zinc-200">
                 <tr>
                   <th class="py-3 px-4">Organización / Empresa</th>
                   <th class="py-3 px-4">CIF / NIF</th>
                   <th class="py-3 px-4">Licencias (Activas / Tot.)</th>
                   <th class="py-3 px-4">Partner Asociado</th>
                   <th class="py-3 px-4">Plan Stripe</th>
-                  <th class="py-3 px-4 text-right">Estado</th>
+                  <th class="py-3 px-4">Estado</th>
+                  <th class="py-3 px-4 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody id="orgs-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="orgs-tbody" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  <td colspan="7" class="p-8 text-center text-zinc-300 font-mono text-xs">
                     Cargando organizaciones...
                   </td>
                 </tr>
@@ -1352,36 +1401,43 @@
       <!-- PESTAÑA SUPERADMIN: AUDITORÍA EN VIVO                              -->
       <!-- ================================================================= -->
       <div id="view-tab-audit" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#151822] border border-white/[0.15] rounded-xl p-5 shadow-lg">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-zinc-100">Stream de Auditoría Global de Seguridad</h2>
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              <h2 class="text-sm sm:text-base font-bold text-white">Stream de Auditoría Global de Seguridad</h2>
+              <span id="audit-count-badge" class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-[11px] font-mono font-bold text-indigo-200">0 eventos</span>
             </div>
-            <p class="text-[11px] text-zinc-400 mt-1">
+            <p class="text-xs text-zinc-200 mt-1">
               Trazabilidad en tiempo real de accesos, comprobaciones de licencia, activaciones y llamadas de agentes.
             </p>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="loadAuditLogs()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition">
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="audit-search-input" type="text" oninput="filterAndRenderAuditLogs()" placeholder="🔍 Filtrar acción o entidad..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-indigo-400" />
+            <select id="audit-filter-select" onchange="filterAndRenderAuditLogs()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-400 cursor-pointer">
+              <option value="ALL">Resultado: Todos</option>
+              <option value="SUCCESS">🟢 Éxito (SUCCESS)</option>
+              <option value="ERROR">🔴 Rechazados / Fallos</option>
+            </select>
+            <button onclick="loadAuditLogs()" class="px-3.5 py-1.5 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.18] text-xs font-semibold transition cursor-pointer">
               Actualizar
             </button>
-            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-400 hover:text-white border border-white/[0.08] text-xs font-medium transition">
+            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-zinc-200 hover:text-white border border-white/[0.18] text-xs font-medium transition cursor-pointer">
               Limpiar
             </button>
           </div>
         </div>
 
-        <div class="bg-[#09090b] border border-white/[0.08] rounded-xl p-5 font-mono text-xs overflow-hidden shadow-2xl">
-          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] text-zinc-500 mb-3">
-            <span>Terminal de Eventos y Trazas de Seguridad</span>
-            <span class="text-emerald-400 text-[11px] flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
+        <div class="bg-[#0d1018] border border-white/[0.16] rounded-xl p-5 font-mono text-xs overflow-hidden shadow-2xl">
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.12] text-zinc-200 mb-3">
+            <span class="font-semibold">Terminal de Eventos y Trazas de Seguridad</span>
+            <span class="text-emerald-300 text-[11px] font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
             </span>
           </div>
 
-          <div class="space-y-2 text-zinc-300 max-h-[420px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
-            <div class="flex gap-3 text-zinc-400"><span class="text-zinc-600">--:--:--</span> <span class="text-indigo-400 font-semibold">[SYSTEM]</span> Monitor de auditoría cloud inicializado</div>
+          <div class="space-y-2 text-zinc-100 max-h-[460px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
+            <div class="flex gap-3 text-zinc-200"><span class="text-zinc-400">--:--:--</span> <span class="text-indigo-300 font-bold">[SYSTEM]</span> Monitor de auditoría cloud inicializado</div>
           </div>
         </div>
       </div>
@@ -1390,38 +1446,47 @@
       <!-- PESTAÑA SUPERADMIN: TELEMETRÍA DE ERRORES DE FLOTA                 -->
       <!-- ================================================================= -->
       <div id="view-tab-fleet-errors" class="hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-white/[0.06] rounded-xl p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#151822] border border-white/[0.15] rounded-xl p-5 shadow-lg">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
-              <h2 class="text-sm font-semibold text-zinc-100">Telemetría de Errores y Diagnóstico de Agentes</h2>
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse"></span>
+              <h2 class="text-sm sm:text-base font-bold text-white">Telemetría de Errores y Diagnóstico de Agentes</h2>
+              <span id="fleet-errors-count" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-[11px] font-mono font-bold text-emerald-300">0 incidencias</span>
             </div>
-            <p class="text-[11px] text-zinc-400 mt-1">
+            <p class="text-xs text-zinc-200 mt-1">
               Registro centralizado de fallos en equipos clientes: caídas de OLEDB Factusol, desconexiones, bloqueos (.ldb) y anomalías.
             </p>
           </div>
-          <button onclick="loadFleetErrors()" class="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-[#27272a] text-zinc-200 border border-white/[0.08] text-xs font-medium transition flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Actualizar Fallos</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="fleet-errors-search" type="text" oninput="filterAndRenderFleetErrors()" placeholder="🔍 Buscar equipo, código o error..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-red-400" />
+            <select id="fleet-errors-filter" onchange="filterAndRenderFleetErrors()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-red-400 cursor-pointer">
+              <option value="ALL">Severidad: Todas</option>
+              <option value="FATAL">🔴 Solo FATAL</option>
+              <option value="WARNING">🟡 Solo WARNING</option>
+            </select>
+            <button onclick="loadFleetErrors()" class="px-3.5 py-1.5 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.18] text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Actualizar Fallos</span>
+            </button>
+          </div>
         </div>
 
-        <div class="bg-[#121215] border border-white/[0.06] rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-[#151822] border border-white/[0.15] rounded-xl overflow-hidden shadow-lg">
           <div class="overflow-x-auto custom-scroll">
             <table class="w-full text-left text-xs min-w-[760px]">
-              <thead class="bg-[#18181b] text-[10px] uppercase font-semibold text-zinc-400 border-b border-white/[0.06]">
+              <thead class="bg-[#1e2230] text-[11px] uppercase font-bold text-zinc-200 border-b border-white/[0.12]">
                 <tr>
-                  <th class="p-3">Equipo / Hostname</th>
-                  <th class="p-3">Organización / Cliente</th>
-                  <th class="p-3 whitespace-nowrap">Componente</th>
-                  <th class="p-3">Mensaje & Código de Error</th>
-                  <th class="p-3 whitespace-nowrap">Fecha / Ocurrencia</th>
-                  <th class="p-3 text-right whitespace-nowrap">Severidad</th>
+                  <th class="p-3.5">Equipo / Hostname</th>
+                  <th class="p-3.5">Organización / Cliente</th>
+                  <th class="p-3.5 whitespace-nowrap">Componente</th>
+                  <th class="p-3.5">Mensaje &amp; Código de Error</th>
+                  <th class="p-3.5 whitespace-nowrap">Fecha / Ocurrencia</th>
+                  <th class="p-3.5 text-right whitespace-nowrap">Severidad</th>
                 </tr>
               </thead>
-              <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.04]">
+              <tbody id="fleet-errors-tbody" class="divide-y divide-white/[0.08]">
                 <tr>
-                  <td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">
+                  <td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">
                     Cargando telemetría de errores...
                   </td>
                 </tr>
@@ -1668,8 +1733,8 @@
 
           <div>
             <label class="block text-[11px] font-medium text-zinc-400 mb-1">Tipo de Puesto</label>
-            <select id="new-key-seat-type" class="w-full bg-[#18181b] border border-white/[0.08] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500">
-              <option value="BASE" selected>Licencia Base Principal (199 €/año)</option>
+            <select id="new-key-seat-type" class="w-full bg-[#18181b] border border-white/[0.15] rounded-md px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-indigo-500">
+              <option value="BASE_LICENSE" selected>Licencia Base Principal (199 €/año)</option>
               <option value="ADDITIONAL_SEAT">Puesto Adicional Mismo CIF (99 €/año)</option>
             </select>
           </div>
@@ -1833,7 +1898,7 @@
             Cancelar
           </button>
           <button type="submit" id="btn-submit-partner-issue" class="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition cursor-pointer">
-            Emitir Licencia Base
+            Emitir Clave de Evaluación (15d)
           </button>
         </div>
       </form>
@@ -2092,6 +2157,7 @@
   <script src="/dashboard/js/licenses-modals.js?v=0.4.12"></script>
   <script src="/dashboard/js/fleet.js?v=0.4.12"></script>
   <script src="/dashboard/js/organizations.js?v=0.4.12"></script>
+  <script src="/dashboard/js/partner-actions.js?v=0.4.12"></script>
   <script src="/dashboard/js/partners-admin.js?v=0.4.12"></script>
   <script src="/dashboard/js/audit-errors.js?v=0.4.12"></script>
   <script src="/dashboard/js/multichannel.js?v=0.4.12"></script>

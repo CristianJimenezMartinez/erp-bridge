@@ -22,6 +22,13 @@ function togglePartnerHideTests() {
   }
 }
 
+function toggleOrgsHideTests() {
+  window._orgsHideTests = !window._orgsHideTests;
+  if (typeof window.filterAndRenderOrgs === 'function') {
+    window.filterAndRenderOrgs();
+  }
+}
+
 function changePartnerClientsPage(delta) {
   const next = (window._partnerClientsPage || 1) + delta;
   if (typeof window.filterAndRenderPartnerClients === 'function') {
@@ -31,13 +38,9 @@ function changePartnerClientsPage(delta) {
 
 function inspectPartnerClientOrg(orgId) {
   if (typeof window.switchDashboardTab === 'function') {
-    window.switchDashboardTab('client-portal');
-    const sel = document.getElementById('superadmin-client-preview-select');
-    if (sel && orgId) {
-      sel.value = orgId;
-      if (typeof window.loadClientPortalData === 'function') {
-        window.loadClientPortalData(orgId);
-      }
+    window.switchDashboardTab('client-portal', true);
+    if (typeof window.loadClientPortal === 'function') {
+      window.loadClientPortal(orgId);
     }
   }
 }
@@ -163,6 +166,7 @@ async function handlePartnerIssueSubmit(e) {
 }
 
 window.togglePartnerHideTests = togglePartnerHideTests;
+window.toggleOrgsHideTests = toggleOrgsHideTests;
 window.changePartnerClientsPage = changePartnerClientsPage;
 window.inspectPartnerClientOrg = inspectPartnerClientOrg;
 window.exportPartnerClientsCsv = exportPartnerClientsCsv;

@@ -52,9 +52,11 @@
     .bg-\[\#18181b\] { background-color: #1e2230 !important; }
     .border-white\/\[0\.04\], .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
     .border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
+    .text-zinc-600 { color: #94a3b8 !important; }
     .text-zinc-500 { color: #a1a8b8 !important; }
     .text-zinc-400 { color: #cbd5e1 !important; }
     .text-zinc-300 { color: #e2e8f0 !important; }
+    input::placeholder { color: #94a3b8 !important; opacity: 1; }
   </style>
   <script>
     // Fail-safe modal & interactive controller (Immediate availability guarantee)
@@ -62,25 +64,25 @@
       var el = document.getElementById(id);
       if (el) el.classList.add('hidden');
     }
-    function openPartnerBuyModal() {
+    function openPartnerBuyModal(prefillName, prefillTaxId) {
       var nameEl = document.getElementById('partner-buy-client-name');
       var taxEl = document.getElementById('partner-buy-tax-id');
       var emailEl = document.getElementById('partner-buy-email');
       var aliasEl = document.getElementById('partner-buy-alias');
-      if (nameEl) nameEl.value = '';
-      if (taxEl) taxEl.value = '';
+      if (nameEl) nameEl.value = prefillName || '';
+      if (taxEl) taxEl.value = prefillTaxId || '';
       if (emailEl) emailEl.value = '';
-      if (aliasEl) aliasEl.value = '';
+      if (aliasEl) aliasEl.value = prefillName ? ('Servidor ' + prefillName) : '';
       var modal = document.getElementById('modal-partner-buy');
       if (modal) modal.classList.remove('hidden');
     }
-    function openPartnerIssueModal() {
+    function openPartnerIssueModal(prefillName, prefillTaxId) {
       var nameEl = document.getElementById('partner-issue-client-name');
       var taxEl = document.getElementById('partner-issue-tax-id');
       var aliasEl = document.getElementById('partner-issue-alias');
-      if (nameEl) nameEl.value = '';
-      if (taxEl) taxEl.value = '';
-      if (aliasEl) aliasEl.value = '';
+      if (nameEl) nameEl.value = prefillName || '';
+      if (taxEl) taxEl.value = prefillTaxId || '';
+      if (aliasEl) aliasEl.value = prefillName ? ('Evaluación ' + prefillName) : '';
       var modal = document.getElementById('modal-partner-issue');
       if (modal) modal.classList.remove('hidden');
     }

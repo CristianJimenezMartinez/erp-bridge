@@ -99,7 +99,7 @@ function setupRoleNavigation(role) {
   }
 }
 
-function switchDashboardTab(tabName) {
+function switchDashboardTab(tabName, skipAutoLoad) {
   const allViews = [
     'admin-overview', 'fleet-errors', 'partner-clients', 'client-portal',
     'licenses', 'fleet', 'audit', 'organizations', 'multichannel'
@@ -119,6 +119,16 @@ function switchDashboardTab(tabName) {
   if (mobBtn) mobBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
   const isSuper = window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN';
+  if (tabName === 'partner-clients') {
+    const ptBanner = document.getElementById('partner-preview-superadmin-banner');
+    if (ptBanner) ptBanner.classList.toggle('hidden', !isSuper);
+  } else if (tabName === 'client-portal') {
+    const banner = document.getElementById('client-preview-superadmin-banner');
+    if (banner) banner.classList.toggle('hidden', !isSuper);
+  }
+
+  if (skipAutoLoad) return;
+
   if (tabName === 'licenses') {
     if (typeof window.loadLicenses === 'function') window.loadLicenses();
     if (typeof window.loadFleetOverview === 'function') window.loadFleetOverview();
@@ -135,12 +145,8 @@ function switchDashboardTab(tabName) {
     if (typeof window.loadMultichannelData === 'function') window.loadMultichannelData();
   } else if (tabName === 'partner-clients') {
     if (typeof window.loadPartnerClients === 'function') window.loadPartnerClients();
-    const ptBanner = document.getElementById('partner-preview-superadmin-banner');
-    if (ptBanner) ptBanner.classList.toggle('hidden', !isSuper);
   } else if (tabName === 'client-portal') {
     if (typeof window.loadClientPortal === 'function') window.loadClientPortal();
-    const banner = document.getElementById('client-preview-superadmin-banner');
-    if (banner) banner.classList.toggle('hidden', !isSuper);
   }
 }
 

@@ -60,16 +60,39 @@ async function loadClientPortal(selectedKeyOrId) {
 
     let target = licenses[0];
     if (selectedKeyOrId) {
-      const found = licenses.find(l => l.id === selectedKeyOrId || l.key === selectedKeyOrId);
+      const found = licenses.find(l =>
+        l.id === selectedKeyOrId ||
+        l.key === selectedKeyOrId ||
+        l.organization_id === selectedKeyOrId ||
+        l.organizationId === selectedKeyOrId
+      );
       if (found) target = found;
     }
     _currentClientPortalLicense = target;
+
+    if (multiSelect && target) {
+      multiSelect.value = target.id;
+    }
 
     const keyEl = document.getElementById('client-license-key');
     if (keyEl) keyEl.innerText = target.key;
 
     const seatTypeEl = document.getElementById('client-seat-type');
-    if (seatTypeEl) seatTypeEl.innerText = 'Licencia Base (1 ERP ⇄ 1 Tienda)';
+    if (seatTypeEl) {
+      const planStr = String(target.plan || '').toLowerCase();
+      const sType = String(target.seat_type || target.seatType || '').toUpperCase();
+      if (planStr === 'nfr' || String(target.key || '').includes('NFR')) {
+        seatTypeEl.innerText = 'Licencia NFR Partner (Sandbox 2 Puestos)';
+      } else if (planStr === 'trial') {
+        seatTypeEl.innerText = 'Evaluación Temporal (15 Días)';
+      } else if (sType === 'ADDITIONAL_SEAT') {
+        seatTypeEl.innerText = 'Puesto Adicional (2ª Tienda -20%)';
+      } else if (planStr.includes('founder') || planStr === 'beta') {
+        seatTypeEl.innerText = 'Plan Fundador Vitalicio (1 ERP ⇄ 1 Tienda)';
+      } else {
+        seatTypeEl.innerText = 'Licencia Base (1 ERP ⇄ 1 Tienda)';
+      }
+    }
 
     const statusBadge = document.getElementById('client-status-badge');
     const subStatus = document.getElementById('client-subscription-status');

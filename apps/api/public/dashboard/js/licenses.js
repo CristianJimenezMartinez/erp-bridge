@@ -1,31 +1,43 @@
 /**
  * Bentian ERP Bridge — Dashboard Licenses Module
- * Gestión del listado de licencias, telemetría de parque activo y búsqueda filtrada.
+ * Gestión del listado de licencias, telemetría de parque activo y búsqueda/filtrado avanzado.
  */
 
-function _safeEscapeHtml(str) {
-  if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function _safeShowToast(msg, type) {
-  if (typeof window.showToast === 'function') {
-    window.showToast(msg, type);
-  }
-}
+const _licEsc = window.escapeHtml || (s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
+const _licToast = (msg, type) => { if (typeof window.showToast === 'function') window.showToast(msg, type); };
 
 window.allLicenses = [];
+window._licensesHideTests = false;
+
+function _isTestLicense(lic) {
+  const alias = String(lic.alias || '').toUpperCase();
+  const org = String(lic.organization_id || lic.organizationId || '').toUpperCase();
+  return alias.includes('[TEST]') || alias.includes('TEST E2E') || alias.includes('SOFTPEDIA') || org.includes('TEST');
+}
+
+function _buildSeatBadge(lic) {
+  const plan = String(lic.plan || '').toLowerCase();
+  const sType = String(lic.seat_type || lic.seatType || '').toUpperCase();
+  const key = String(lic.key || '').toUpperCase();
+  if (plan === 'nfr' || key.includes('NFR')) {
+    return '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-200 border border-purple-400/40">NFR Partner (2P)</span>';
+  }
+  if (plan === 'trial') {
+    return '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-200 border border-amber-400/40">Evaluación 15d</span>';
+  }
+  if (sType === 'ADDITIONAL_SEAT') {
+    return '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">2ª Tienda (-20%)</span>';
+  }
+  if (plan.includes('founder') || plan === 'beta') {
+    return '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">Plan Fundador</span>';
+  }
+  return '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-400/40">Licencia Base</span>';
+}
 
 async function loadLicenses() {
   const tbody = document.getElementById('licenses-tbody');
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">Actualizando parque de licencias...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">Actualizando parque de licencias...</td></tr>`;
   }
 
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
@@ -33,37 +45,66 @@ async function loadLicenses() {
 
   try {
     const res = await fetch('/api/v1/licenses', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'x-organization-id': orgId
-      }
+      headers: { 'Authorization': `Bearer ${token}`, 'x-organization-id': orgId }
     });
-
-    if (res.ok) {
-      const json = await res.json();
-      window.allLicenses = json.data || [];
-      renderLicenses(window.allLicenses);
-    } else {
-      window.allLicenses = [];
-      renderLicenses(window.allLicenses);
-    }
-  } catch (e) {
+    const json = res.ok ? await res.json() : {};
+    window.allLicenses = json.data || [];
+  } catch {
     window.allLicenses = [];
-    renderLicenses(window.allLicenses);
   }
+  applyLicensesFilter();
+}
+
+function toggleLicensesHideTests() {
+  window._licensesHideTests = !window._licensesHideTests;
+  applyLicensesFilter();
+}
+
+function applyLicensesFilter() {
+  const all = window.allLicenses || [];
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+  const statusFilter = document.getElementById('licenses-status-filter')?.value || 'ALL';
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  const testCount = all.filter(_isTestLicense).length;
+  const hideBtn = document.getElementById('btn-licenses-hide-tests');
+  if (hideBtn) {
+    hideBtn.textContent = window._licensesHideTests ? `👁️ Mostrar [TEST] (${testCount})` : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.className = window._licensesHideTests
+      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+  }
+
+  const filtered = all.filter(l => {
+    if (window._licensesHideTests && _isTestLicense(l)) return false;
+    const act = l.activations && l.activations.length > 0 ? l.activations[0] : null;
+    const isOnline = act && act.lastValidatedAt && (now - new Date(act.lastValidatedAt).getTime() < dayMs);
+    if (statusFilter === 'ONLINE' && !isOnline) return false;
+    if (statusFilter === 'PENDING' && act) return false;
+    if (statusFilter === 'OFFLINE' && (!act || isOnline)) return false;
+    if (q) {
+      const alias = (l.alias || '').toLowerCase();
+      const key = (l.key || '').toLowerCase();
+      const hostname = (act?.machineInfo?.hostname || '').toLowerCase();
+      const hwid = (act?.hwid || '').toLowerCase();
+      if (!alias.includes(q) && !key.includes(q) && !hostname.includes(q) && !hwid.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const badge = document.getElementById('licenses-count-badge');
+  if (badge) {
+    badge.innerText = filtered.length === all.length ? `${all.length} licencias` : `${filtered.length} de ${all.length} licencias`;
+  }
+  renderLicenses(filtered);
 }
 
 function renderLicenses(list) {
   const tbody = document.getElementById('licenses-tbody');
   if (!tbody) return;
   if (!list || list.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="p-10 text-center text-zinc-500 text-xs">
-          No hay licencias registradas en esta vista. Pulsa <strong>"+ Generar Clave"</strong> para dar de alta una nueva conexión.
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-zinc-300 text-xs">No hay licencias que coincidan con el filtro actual. Pulsa <strong>"+ Generar Clave"</strong> para dar de alta una conexión.</td></tr>`;
     return;
   }
 
@@ -86,63 +127,43 @@ function renderLicenses(list) {
     const hostname = act?.machineInfo?.hostname || 'Sin asignar';
     const shortHwid = act?.hwid ? `${act.hwid.substring(0, 16)}...` : '—';
     const fullHwid = act?.hwid || '';
-    const seatBadge = '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Licencia Base</span>';
+    const seatBadge = _buildSeatBadge(lic);
 
     return `
-      <tr class="hover:bg-white/[0.02] transition-colors">
-        <td class="p-3">
+      <tr class="hover:bg-white/[0.03] transition-colors">
+        <td class="p-3.5">
           <div class="flex items-center gap-2">
-            <span class="font-semibold text-zinc-100 text-xs">${_safeEscapeHtml(lic.alias || 'Servidor Factusol')}</span>
-            <button data-action="edit-alias" data-license-id="${_safeEscapeHtml(lic.id)}" data-alias="${_safeEscapeHtml(lic.alias || '')}" title="Editar Alias" class="text-zinc-500 hover:text-zinc-300 p-0.5">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            <span class="font-semibold text-white text-xs">${_licEsc(lic.alias || 'Servidor Factusol')}</span>
+            <button data-action="edit-alias" data-license-id="${_licEsc(lic.id)}" data-alias="${_licEsc(lic.alias || '')}" title="Editar Alias" class="text-zinc-300 hover:text-white p-0.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>
           </div>
-          <span class="text-[10px] text-zinc-500 font-mono">ID: ${_safeEscapeHtml(lic.id.substring(0, 8))}</span>
+          <span class="text-[10px] text-zinc-400 font-mono">ID: ${_licEsc(String(lic.id || '').substring(0, 8))}</span>
         </td>
-        <td class="p-3 font-mono">
+        <td class="p-3.5 font-mono">
           <div class="flex items-center gap-2">
-            <span class="text-indigo-400 font-semibold text-xs tracking-wider">${_safeEscapeHtml(lic.key)}</span>
-            <button data-action="copy-key" data-key="${_safeEscapeHtml(lic.key)}" title="Copiar Clave" class="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] flex items-center gap-1 transition">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            <span class="text-indigo-300 font-bold text-xs tracking-wider">${_licEsc(lic.key)}</span>
+            <button data-action="copy-key" data-key="${_licEsc(lic.key)}" title="Copiar Clave" class="px-2 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 text-[10px] font-semibold flex items-center gap-1 transition cursor-pointer">
               <span>Copiar</span>
             </button>
           </div>
         </td>
-        <td class="p-3 whitespace-nowrap">${seatBadge}</td>
-        <td class="p-3 whitespace-nowrap">
+        <td class="p-3.5 whitespace-nowrap">${seatBadge}</td>
+        <td class="p-3.5 whitespace-nowrap">
           ${hasMachine ? (
-            isOnline ? `
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>
-                En Línea (${lastSeenText})
-              </span>
-            ` : `
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span>
-                Desconectado (${lastSeenText})
-              </span>
-            `
-          ) : `
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-              Esperando Activación
-            </span>
-          `}
+            isOnline ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse"></span>En Línea (${lastSeenText})</span>`
+                     : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-semibold bg-zinc-500/20 text-zinc-200 border border-zinc-400/40"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Desconectado (${lastSeenText})</span>`
+          ) : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Esperando Activación</span>`}
         </td>
-        <td class="p-3">
-          <div class="text-zinc-200 text-xs font-medium">${_safeEscapeHtml(hostname)}</div>
-          <div class="text-[10px] text-zinc-500 font-mono mt-0.5" title="${_safeEscapeHtml(fullHwid)}">HWID: ${_safeEscapeHtml(shortHwid)}</div>
+        <td class="p-3.5">
+          <div class="text-white text-xs font-semibold">${_licEsc(hostname)}</div>
+          <div class="text-[10px] text-zinc-300 font-mono mt-0.5" title="${_licEsc(fullHwid)}">HWID: ${_licEsc(shortHwid)}</div>
         </td>
-        <td class="p-3 text-right whitespace-nowrap"><button data-action="preview-client-license" data-license-id="${_safeEscapeHtml(lic.id)}" class="px-2 py-1 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 text-[10px] font-medium transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Ver cómo ve su portal este cliente">👁️ Portal</button>
-          ${hasMachine ? `
-            <button data-action="unbind-license" data-license-id="${_safeEscapeHtml(lic.id)}" data-key="${_safeEscapeHtml(lic.key)}" data-hostname="${_safeEscapeHtml(hostname)}" data-hwid="${_safeEscapeHtml(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[11px] font-medium transition inline-flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-              <span>Mudar PC</span>
-            </button>
-          ` : `<span class="text-[10px] text-zinc-500">Lista para usar</span>`}
+        <td class="p-3.5 text-right whitespace-nowrap">
+          <button data-action="preview-client-license" data-license-id="${_licEsc(lic.id)}" class="px-2.5 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-200 border border-indigo-400/40 text-[11px] font-semibold transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Ver cómo ve su portal este cliente">👁️ Portal</button>
+          ${hasMachine ? `<button data-action="unbind-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-hostname="${_licEsc(hostname)}" data-hwid="${_licEsc(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/35 text-amber-200 border border-amber-400/40 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer"><span>Mudar PC</span></button>` : `<span class="text-[10px] text-zinc-300 font-mono">Lista para usar</span>`}
         </td>
-      </tr>
-    `;
+      </tr>`;
   }).join('');
 
   if (!tbody._eventsAttached) {
@@ -150,7 +171,7 @@ function renderLicenses(list) {
       const previewBtn = e.target.closest('[data-action="preview-client-license"]');
       if (previewBtn) {
         const id = previewBtn.getAttribute('data-license-id') || '';
-        if (typeof window.switchDashboardTab === 'function') window.switchDashboardTab('client-portal');
+        if (typeof window.switchDashboardTab === 'function') window.switchDashboardTab('client-portal', true);
         if (typeof window.loadClientPortal === 'function') window.loadClientPortal(id);
         return;
       }
@@ -173,14 +194,8 @@ function renderLicenses(list) {
       const copyBtn = e.target.closest('[data-action="copy-key"]');
       if (copyBtn) {
         const key = copyBtn.getAttribute('data-key') || '';
-        if (typeof window.copyKey === 'function') {
-          window.copyKey(key);
-        } else if (navigator.clipboard) {
-          navigator.clipboard.writeText(key).then(() => {
-            _safeShowToast('✓ Clave copiada al portapapeles', 'success');
-          });
-        }
-        return;
+        if (typeof window.copyKey === 'function') window.copyKey(key);
+        else if (navigator.clipboard) navigator.clipboard.writeText(key).then(() => _licToast('✓ Clave copiada al portapapeles', 'success'));
       }
     });
     tbody._eventsAttached = true;
@@ -193,49 +208,30 @@ async function loadFleetOverview() {
 
   try {
     const res = await fetch('/api/v1/licenses/fleet-overview', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'x-organization-id': orgId
-      }
+      headers: { 'Authorization': `Bearer ${token}`, 'x-organization-id': orgId }
     });
     if (res.ok) {
       const json = await res.json();
       const d = json.data || {};
-      const planBadge = document.getElementById('kpi-plan-badge');
-      if (planBadge) planBadge.innerText = (d.plan || 'BASE').toUpperCase();
-      const actSeats = document.getElementById('kpi-active-seats');
-      if (actSeats) actSeats.innerText = d.activeSeats || 0;
-      const totSeats = document.getElementById('kpi-total-seats');
-      if (totSeats) totSeats.innerText = d.totalAllowedSeats || 1;
-      const onSeats = document.getElementById('kpi-online-seats');
-      if (onSeats) onSeats.innerText = d.onlineSeats || 0;
-
-      const total = d.totalAllowedSeats || 1;
-      const active = d.activeSeats || 0;
-      const pct = Math.min(100, Math.round((active / total) * 100));
+      const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+      setEl('kpi-plan-badge', (d.plan || 'BASE').toUpperCase());
+      setEl('kpi-active-seats', d.activeSeats || 0);
+      setEl('kpi-total-seats', d.totalAllowedSeats || 1);
+      setEl('kpi-online-seats', d.onlineSeats || 0);
+      const pct = Math.min(100, Math.round(((d.activeSeats || 0) / (d.totalAllowedSeats || 1)) * 100));
       const progBar = document.getElementById('kpi-progress-bar');
       if (progBar) progBar.style.width = pct + '%';
     }
-  } catch (e) {}
+  } catch {}
 }
 
-function handleSearch(query) {
-  const q = (query || '').toLowerCase().trim();
-  if (!q) {
-    renderLicenses(window.allLicenses);
-    return;
-  }
-  const filtered = window.allLicenses.filter(l => {
-    const alias = (l.alias || '').toLowerCase();
-    const key = (l.key || '').toLowerCase();
-    const hostname = (l.activations?.[0]?.machineInfo?.hostname || '').toLowerCase();
-    const hwid = (l.activations?.[0]?.hwid || '').toLowerCase();
-    return alias.includes(q) || key.includes(q) || hostname.includes(q) || hwid.includes(q);
-  });
-  renderLicenses(filtered);
+function handleSearch() {
+  applyLicensesFilter();
 }
 
 window.loadLicenses = loadLicenses;
 window.renderLicenses = renderLicenses;
 window.loadFleetOverview = loadFleetOverview;
 window.handleSearch = handleSearch;
+window.applyLicensesFilter = applyLicensesFilter;
+window.toggleLicensesHideTests = toggleLicensesHideTests;
