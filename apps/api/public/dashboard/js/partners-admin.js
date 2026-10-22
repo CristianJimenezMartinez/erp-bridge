@@ -95,10 +95,10 @@ function filterAndRenderAdminPartners() {
   const testCount = all.filter(_isTestPartnerRecord).length;
   const hideBtn = document.getElementById('btn-admin-partners-hide-tests');
   if (hideBtn) {
-    hideBtn.textContent = window._adminPartnersHideTests ? `👁️ Mostrar [TEST] (${testCount})` : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.textContent = window._adminPartnersHideTests ? `Mostrar test (${testCount})` : `Ocultar test (${testCount})`;
     hideBtn.className = window._adminPartnersHideTests
-      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
-      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+      ? 'px-2.5 py-1.5 rounded-md bg-indigo-500/20 border border-indigo-400/40 text-xs font-mono text-indigo-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-md bg-[#0e1118] hover:bg-[#1a1f2e] border border-white/[0.14] text-xs font-mono text-zinc-300 transition cursor-pointer whitespace-nowrap';
   }
 
   const list = all.filter(p => {
@@ -177,8 +177,8 @@ function filterAndRenderAdminPartners() {
       </td>
       <td class="py-3.5 px-4 text-right whitespace-nowrap">
         <div class="flex items-center justify-end gap-1.5">
-          <button type="button" data-action="preview-partner-portal" data-val="${_ptEscapeHtml(code)}" class="px-2.5 py-1 rounded text-[10px] font-mono font-semibold bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-200 border border-indigo-400/40 cursor-pointer" title="Ver cómo ve su portal este Partner">👁️ Portal</button>
-          <button type="button" data-action="toggle-partner-status" data-id="${_ptEscapeHtml(idOrCode)}" data-val="${_ptEscapeHtml(status)}" class="px-2.5 py-1 rounded text-[10px] font-mono font-bold cursor-pointer ${isAct ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40' : 'bg-red-500/20 text-red-300 border border-red-400/40'}">${isAct ? 'ACTIVO' : 'SUSPENDIDO'}</button>
+          <button type="button" data-action="preview-partner-portal" data-val="${_ptEscapeHtml(code)}" class="px-2.5 py-1 rounded text-[10px] font-mono font-medium bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] cursor-pointer" title="Inspeccionar portal de este Partner">Ver Portal</button>
+          <button type="button" data-action="toggle-partner-status" data-id="${_ptEscapeHtml(idOrCode)}" data-val="${_ptEscapeHtml(status)}" class="px-2.5 py-1 rounded text-[10px] font-mono font-semibold cursor-pointer ${isAct ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/15 text-red-300 border border-red-500/30'}">${isAct ? 'ACTIVO' : 'SUSPENDIDO'}</button>
         </div>
       </td>
     </tr>`;

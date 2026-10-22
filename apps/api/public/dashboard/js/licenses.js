@@ -70,10 +70,10 @@ function applyLicensesFilter() {
   const testCount = all.filter(_isTestLicense).length;
   const hideBtn = document.getElementById('btn-licenses-hide-tests');
   if (hideBtn) {
-    hideBtn.textContent = window._licensesHideTests ? `👁️ Mostrar [TEST] (${testCount})` : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.textContent = window._licensesHideTests ? `Mostrar test (${testCount})` : `Ocultar test (${testCount})`;
     hideBtn.className = window._licensesHideTests
-      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
-      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+      ? 'px-2.5 py-1.5 rounded-md bg-indigo-500/20 border border-indigo-400/40 text-xs font-mono text-indigo-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-md bg-[#0e1118] hover:bg-[#1a1f2e] border border-white/[0.14] text-xs font-mono text-zinc-300 transition cursor-pointer whitespace-nowrap';
   }
 
   const filtered = all.filter(l => {
@@ -160,8 +160,8 @@ function renderLicenses(list) {
           <div class="text-[10px] text-zinc-300 font-mono mt-0.5" title="${_licEsc(fullHwid)}">HWID: ${_licEsc(shortHwid)}</div>
         </td>
         <td class="p-3.5 text-right whitespace-nowrap">
-          <button data-action="preview-client-license" data-license-id="${_licEsc(lic.id)}" class="px-2.5 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-200 border border-indigo-400/40 text-[11px] font-semibold transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Ver cómo ve su portal este cliente">👁️ Portal</button>
-          ${hasMachine ? `<button data-action="unbind-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-hostname="${_licEsc(hostname)}" data-hwid="${_licEsc(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/35 text-amber-200 border border-amber-400/40 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer"><span>Mudar PC</span></button>` : `<span class="text-[10px] text-zinc-300 font-mono">Lista para usar</span>`}
+          <button data-action="preview-client-license" data-license-id="${_licEsc(lic.id)}" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] text-[11px] font-medium transition inline-flex items-center gap-1 mr-1.5 cursor-pointer" title="Inspeccionar portal de cliente de esta licencia">Ver Ficha</button>
+          ${hasMachine ? `<button data-action="unbind-license" data-license-id="${_licEsc(lic.id)}" data-key="${_licEsc(lic.key)}" data-hostname="${_licEsc(hostname)}" data-hwid="${_licEsc(act.hwid || '')}" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] text-amber-300 border border-white/[0.14] text-[11px] font-medium transition inline-flex items-center gap-1 cursor-pointer"><span>Desvincular PC</span></button>` : `<span class="text-[10px] text-zinc-400 font-mono">Disponible</span>`}
         </td>
       </tr>`;
   }).join('');

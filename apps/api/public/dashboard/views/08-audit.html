@@ -2,43 +2,43 @@
       <!-- PESTAÑA SUPERADMIN: AUDITORÍA EN VIVO                              -->
       <!-- ================================================================= -->
       <div id="view-tab-audit" class="hidden space-y-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#151822] border border-white/[0.15] rounded-xl p-5 shadow-lg">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#12151e] border border-white/[0.12] rounded-xl p-5">
           <div>
             <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
-              <h2 class="text-sm sm:text-base font-bold text-white">Stream de Auditoría Global de Seguridad</h2>
-              <span id="audit-count-badge" class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/40 text-[11px] font-mono font-bold text-indigo-200">0 eventos</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+              <h2 class="text-sm sm:text-base font-semibold text-white tracking-tight">Registro de Auditoría de Seguridad</h2>
+              <span id="audit-count-badge" class="px-2 py-0.5 rounded bg-white/[0.06] border border-white/[0.12] text-[11px] font-mono text-zinc-300">0 eventos</span>
             </div>
-            <p class="text-xs text-zinc-200 mt-1">
-              Trazabilidad en tiempo real de accesos, comprobaciones de licencia, activaciones y llamadas de agentes.
+            <p class="text-xs text-zinc-400 mt-1">
+              Trazabilidad inmutable de autenticaciones, validaciones de licencia y operaciones administrativas.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <input id="audit-search-input" type="text" oninput="filterAndRenderAuditLogs()" placeholder="🔍 Filtrar acción o entidad..." class="w-48 sm:w-56 bg-[#12151f] border border-white/[0.18] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-indigo-400" />
-            <select id="audit-filter-select" onchange="filterAndRenderAuditLogs()" class="bg-[#12151f] border border-white/[0.18] rounded-lg px-2.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-indigo-400 cursor-pointer">
+            <input id="audit-search-input" type="text" oninput="filterAndRenderAuditLogs()" placeholder="Filtrar acción o entidad..." class="w-48 sm:w-56 bg-[#0e1118] border border-white/[0.14] rounded-md px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            <select id="audit-filter-select" onchange="filterAndRenderAuditLogs()" class="bg-[#0e1118] border border-white/[0.14] rounded-md px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
               <option value="ALL">Resultado: Todos</option>
-              <option value="SUCCESS">🟢 Éxito (SUCCESS)</option>
-              <option value="ERROR">🔴 Rechazados / Fallos</option>
+              <option value="SUCCESS">Éxito (SUCCESS)</option>
+              <option value="ERROR">Rechazados / Fallos</option>
             </select>
-            <button onclick="loadAuditLogs()" class="px-3.5 py-1.5 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-white border border-white/[0.18] text-xs font-semibold transition cursor-pointer">
+            <button onclick="loadAuditLogs()" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] text-xs font-medium transition cursor-pointer">
               Actualizar
             </button>
-            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-lg bg-[#1e2230] hover:bg-[#282d40] text-zinc-200 hover:text-white border border-white/[0.18] text-xs font-medium transition cursor-pointer">
+            <button onclick="clearAuditStream()" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-400 hover:text-white border border-white/[0.14] text-xs font-medium transition cursor-pointer">
               Limpiar
             </button>
           </div>
         </div>
 
-        <div class="bg-[#0d1018] border border-white/[0.16] rounded-xl p-5 font-mono text-xs overflow-hidden shadow-2xl">
-          <div class="flex items-center justify-between pb-3 border-b border-white/[0.12] text-zinc-200 mb-3">
-            <span class="font-semibold">Terminal de Eventos y Trazas de Seguridad</span>
-            <span class="text-emerald-300 text-[11px] font-bold flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONECTADO
+        <div class="bg-[#0d1017] border border-white/[0.12] rounded-xl p-5 font-mono text-xs overflow-hidden">
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.08] text-zinc-400 mb-3">
+            <span class="font-medium">Secuencia de Eventos del Sistema</span>
+            <span class="text-emerald-400 text-[11px] font-medium flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ACTIVO
             </span>
           </div>
 
-          <div class="space-y-2 text-zinc-100 max-h-[460px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
-            <div class="flex gap-3 text-zinc-200"><span class="text-zinc-400">--:--:--</span> <span class="text-indigo-300 font-bold">[SYSTEM]</span> Monitor de auditoría cloud inicializado</div>
+          <div class="space-y-1.5 text-zinc-200 max-h-[460px] overflow-y-auto custom-scroll pr-2" id="audit-logs-container">
+            <div class="flex gap-3 text-zinc-300"><span class="text-zinc-500">--:--:--</span> <span class="text-indigo-300 font-semibold">[SYSTEM]</span> Registro de auditoría inicializado</div>
           </div>
         </div>
       </div>

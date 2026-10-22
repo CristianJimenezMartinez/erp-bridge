@@ -36,27 +36,28 @@
     }
   </script>
   <style>
-    body { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; background-color: #0b0d13; color: #f8fafc; }
+    body { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; background-color: #0b0d12; color: #f8fafc; }
+    .font-mono { font-variant-numeric: tabular-nums; }
     .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.28); }
     @keyframes pulse-subtle {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.55; transform: scale(0.96); }
     }
     .status-pulse { animation: pulse-subtle 2s infinite ease-in-out; }
-    /* Elevación global de contraste WCAG AA/AAA en superficies, bordes y textos secundarios */
-    .bg-\[\#09090b\] { background-color: #0b0d13 !important; }
-    .bg-\[\#121215\] { background-color: #151822 !important; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.07); }
-    .bg-\[\#18181b\] { background-color: #1e2230 !important; }
-    .border-white\/\[0\.04\], .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.15) !important; }
-    .border-white\/\[0\.1\], .border-white\/\[0\.12\] { border-color: rgba(255, 255, 255, 0.22) !important; }
-    .text-zinc-600 { color: #94a3b8 !important; }
-    .text-zinc-500 { color: #a1a8b8 !important; }
+    /* Sistema de diseño Enterprise B2B Sobrio (Grafito neutro + Contraste WCAG AA/AAA) */
+    .bg-\[\#09090b\] { background-color: #0b0d12 !important; }
+    .bg-\[\#121215\], .bg-\[\#151822\] { background-color: #12151e !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.04); }
+    .bg-\[\#18181b\], .bg-\[\#1e2230\], .bg-\[\#1a1e2b\] { background-color: #171b26 !important; }
+    .border-white\/\[0\.04\], .border-white\/\[0\.06\], .border-white\/\[0\.08\] { border-color: rgba(255, 255, 255, 0.11) !important; }
+    .border-white\/\[0\.1\], .border-white\/\[0\.12\], .border-white\/\[0\.15\] { border-color: rgba(255, 255, 255, 0.14) !important; }
+    .text-zinc-600 { color: #8b95a5 !important; }
+    .text-zinc-500 { color: #94a3b8 !important; }
     .text-zinc-400 { color: #cbd5e1 !important; }
     .text-zinc-300 { color: #e2e8f0 !important; }
-    input::placeholder { color: #94a3b8 !important; opacity: 1; }
+    input::placeholder { color: #64748b !important; opacity: 1; }
   </style>
   <script>
     // Fail-safe modal & interactive controller (Immediate availability guarantee)

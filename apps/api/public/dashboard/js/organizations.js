@@ -44,10 +44,10 @@ function filterAndRenderOrgs() {
   const testCount = all.filter(_isTestPartnerClient).length;
   const hideBtn = document.getElementById('btn-orgs-hide-tests');
   if (hideBtn) {
-    hideBtn.textContent = window._orgsHideTests ? `👁️ Mostrar [TEST] (${testCount})` : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.textContent = window._orgsHideTests ? `Mostrar test (${testCount})` : `Ocultar test (${testCount})`;
     hideBtn.className = window._orgsHideTests
-      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
-      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+      ? 'px-2.5 py-1.5 rounded-md bg-indigo-500/20 border border-indigo-400/40 text-xs font-mono text-indigo-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-md bg-[#0e1118] hover:bg-[#1a1f2e] border border-white/[0.14] text-xs font-mono text-zinc-300 transition cursor-pointer whitespace-nowrap';
   }
 
   const list = all.filter(o => {
@@ -93,7 +93,7 @@ function filterAndRenderOrgs() {
       <td class="py-3.5 px-4 text-zinc-200 font-medium">${_safeEscapeHtml(o.plan || 'Standard')}</td>
       <td class="py-3.5 px-4">${statusBadge}</td>
       <td class="py-3.5 px-4 text-right whitespace-nowrap">
-        <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(o.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/40 text-[11px] font-semibold text-indigo-200 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta organización">👁️ Ver</button>
+        <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(o.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-zinc-200 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta organización">Inspeccionar</button>
       </td>
     </tr>`;
   }).join('');
@@ -153,10 +153,10 @@ function filterAndRenderPartnerClients(targetPage) {
   const testCount = all.filter(_isTestPartnerClient).length;
   const hideBtn = document.getElementById('btn-partner-hide-tests');
   if (hideBtn) {
-    hideBtn.textContent = window._partnerHideTests ? `👁️ Mostrar [TEST] (${testCount})` : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.textContent = window._partnerHideTests ? `Mostrar test (${testCount})` : `Ocultar test (${testCount})`;
     hideBtn.className = window._partnerHideTests
-      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
-      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+      ? 'px-2.5 py-1.5 rounded-md bg-indigo-500/20 border border-indigo-400/40 text-xs font-mono text-indigo-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-md bg-[#0e1118] hover:bg-[#1a1f2e] border border-white/[0.14] text-xs font-mono text-zinc-300 transition cursor-pointer whitespace-nowrap';
   }
 
   let filtered = all.filter(c => {
@@ -234,9 +234,9 @@ function filterAndRenderPartnerClients(targetPage) {
       <td class="p-3.5 text-zinc-200 font-mono">${dateStr}</td>
       <td class="p-3.5">${statusBadge}</td>
       <td class="p-3.5 text-right whitespace-nowrap space-x-1.5">
-        <button type="button" onclick="openPartnerIssueModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#1e2230] hover:bg-[#282d40] border border-white/[0.16] text-[11px] font-semibold text-emerald-300 transition cursor-pointer" title="Emitir clave Trial 15 días para esta empresa">+ Trial 15d</button>
-        <button type="button" onclick="openPartnerBuyModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-emerald-600/20 hover:bg-emerald-600/35 border border-emerald-400/40 text-[11px] font-semibold text-emerald-200 transition cursor-pointer" title="Comprar licencia anual con -25% para esta empresa">💳 -25%</button>
-        <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(c.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/40 text-[11px] font-semibold text-indigo-200 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta empresa">👁️ Ver</button>
+        <button type="button" onclick="openPartnerIssueModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-zinc-200 transition cursor-pointer" title="Emitir clave de evaluación de 15 días">Emitir 15d</button>
+        <button type="button" onclick="openPartnerBuyModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-emerald-300 transition cursor-pointer" title="Contratar licencia anual con descuento Partner (-25%)">Contratar (-25%)</button>
+        <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(c.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-indigo-300 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta empresa">Inspeccionar</button>
       </td>
     </tr>`;
   }).join('');

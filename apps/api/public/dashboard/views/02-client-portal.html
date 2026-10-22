@@ -4,196 +4,172 @@
       <div id="view-tab-client-portal" class="hidden space-y-6">
 
         <!-- BANNER DE PREVISUALIZACIÓN SUPERADMIN (Solo visible si es SUPERADMIN o ADMIN) -->
-        <div id="client-preview-superadmin-banner" class="hidden bg-gradient-to-r from-purple-950/80 via-indigo-950/70 to-[#151822] border border-purple-400/40 rounded-xl p-4 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-purple-100 shadow-lg">
+        <div id="client-preview-superadmin-banner" class="hidden bg-[#171b26] border border-white/[0.16] rounded-xl p-3.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-zinc-200">
           <div class="flex flex-wrap items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse shrink-0"></span>
-            <span class="text-white font-medium"><strong class="text-purple-200">Modo Previsualización Cliente:</strong> Estás inspeccionando la vista exacta de un cliente final.</span>
-            <button onclick="switchDashboardTab('partner-clients')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-semibold transition text-xs cursor-pointer">👁️ Ir a Vista Partner</button>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-white/[0.08] text-white border border-white/[0.14]">VISTA SUPERVISIÓN</span>
+            <span class="text-zinc-300">Inspeccionando la vista de Cliente Final (<code class="text-white font-mono">TENANT_CLIENT</code>).</span>
+            <button onclick="switchDashboardTab('partner-clients')" class="px-3 py-1 rounded-md bg-[#12151e] hover:bg-[#222736] border border-white/[0.14] text-zinc-200 font-medium transition text-xs cursor-pointer">Ir a Vista Partner</button>
           </div>
-          <button onclick="switchDashboardTab('admin-overview')" class="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold transition text-xs shrink-0 flex items-center gap-1.5 shadow-md cursor-pointer">
-            <span>Volver a Consola Global</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+          <button onclick="switchDashboardTab('admin-overview')" class="px-3 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition text-xs shrink-0 cursor-pointer">
+            Volver a Resumen
           </button>
         </div>
 
         <!-- BIENVENIDA CLIENTE -->
-        <div class="bg-gradient-to-r from-indigo-950/70 via-[#151822] to-[#151822] border border-indigo-400/35 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+        <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2.5">
-              <span>Tu Conexión Bentian Factusol ⇄ Tienda Web</span>
-              <span id="client-status-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">ACTIVA</span>
+            <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2.5">
+              <span>Conexión Bentian Factusol ⇄ Tienda Online</span>
+              <span id="client-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">ACTIVA</span>
             </h2>
-            <p class="text-xs sm:text-sm text-zinc-200 mt-1">
-              Copia tu clave de licencia, consulta el estado del servidor vinculado y descarga el instalador oficial de Windows.
+            <p class="text-xs text-zinc-400 mt-1">
+              Gestión de clave de activación, estado del equipo Windows vinculado y descarga del agente oficial.
             </p>
           </div>
-          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg shadow-indigo-600/30 border border-indigo-400/40 self-start sm:self-auto shrink-0">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
+          <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition self-start sm:self-auto shrink-0">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.951-1.801"/></svg>
             <span>Descargar Instalador (.exe)</span>
           </a>
         </div>
 
         <!-- BANNER DE UPGRADE / EXPIRACIÓN BETA -->
-        <div id="client-upgrade-banner" class="hidden bg-gradient-to-r from-amber-500/15 via-amber-900/15 to-[#151822] border border-amber-400/40 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div id="client-upgrade-banner" class="hidden bg-[#171b26] border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/25 text-amber-200 border border-amber-400/40">CUPO LIMITADO: 25 CLAVES</span>
-              <span class="text-xs sm:text-sm font-bold text-white">Conserva tu conector con el Plan Fundador (-30% vitalicio)</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">TARIFA FUNDADOR</span>
+              <span class="text-xs sm:text-sm font-semibold text-white">Suscripción Anual con Reducción Vitalicia (-30%)</span>
             </div>
-            <p class="text-xs text-zinc-200 mt-1">Descuento vitalicio garantizado a 139 €/año (vs 199 €/año oficial). Cupo estricto reservado a las primeras 25 plazas.</p>
+            <p class="text-xs text-zinc-300 mt-1">Tarifa garantizada a 139,00 €/año (frente a 199,00 €/año estándar).</p>
           </div>
-          <button onclick="handleClientUpgradeFounder()" id="btn-client-upgrade-founder" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition shrink-0 shadow-lg shadow-amber-500/20 flex items-center gap-1.5 cursor-pointer">
-            <span>Activar Plan Fundador (139 €/año) ↗</span>
+          <button onclick="handleClientUpgradeFounder()" id="btn-client-upgrade-founder" class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shrink-0 cursor-pointer">
+            Activar Plan Fundador (139 €/año) &rarr;
           </button>
         </div>
 
         <!-- MULTI-LICENCIA SELECTOR -->
-        <div id="client-multi-license-banner" class="hidden bg-[#151822] border border-indigo-400/35 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <div id="client-multi-license-banner" class="hidden bg-[#12151e] border border-white/[0.12] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-semibold text-white flex items-center gap-2">
+              <span>Selector de Licencia Activa</span>
+              <span id="client-multi-count-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-white/[0.06] text-zinc-300 border border-white/[0.12]">2 Licencias</span>
             </div>
-            <div>
-              <div class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                <span>Cartera Multi-Licencia</span>
-                <span id="client-multi-count-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-indigo-500/25 text-indigo-200 border border-indigo-400/30">2 Licencias</span>
-              </div>
-              <p class="text-xs text-zinc-300 mt-0.5">Selecciona la clave o servidor que deseas inspeccionar o gestionar:</p>
-            </div>
+            <p class="text-xs text-zinc-400 mt-0.5">Selecciona la clave o servidor que deseas inspeccionar:</p>
           </div>
           <div class="flex items-center gap-2">
-            <select id="client-license-select" onchange="loadClientPortal(this.value)" class="bg-[#1e2230] border border-indigo-400/40 rounded-lg px-3.5 py-2 text-xs text-white font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors cursor-pointer">
+            <select id="client-license-select" onchange="loadClientPortal(this.value)" class="bg-[#0e1118] border border-white/[0.16] rounded-md px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-indigo-500 cursor-pointer">
             </select>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <!-- CARD 1: TU CLAVE DE ACTIVACIÓN -->
-          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-5 flex flex-col justify-between">
+          <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-5 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-mono font-bold text-indigo-200 uppercase tracking-wider">🔑 Tu Clave de Licencia</span>
-              <div class="mt-3 p-3.5 rounded-xl bg-[#1e2230] border border-indigo-400/35 flex items-center justify-between gap-2 shadow-inner">
+              <span class="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider">Clave de Licencia</span>
+              <div class="mt-3 p-3 rounded-lg bg-[#0e1118] border border-white/[0.14] flex items-center justify-between gap-2">
                 <span id="client-license-key" class="font-mono text-sm sm:text-base font-bold text-white tracking-wider break-all">Cargando...</span>
-                <button onclick="copyClientKey()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                  <span>Copiar</span>
+                <button onclick="copyClientKey()" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-white text-xs font-medium transition shrink-0 cursor-pointer">
+                  Copiar
                 </button>
               </div>
-              <div class="mt-3.5 flex items-center justify-between text-xs text-zinc-200">
-                <span>Tipo: <strong id="client-seat-type" class="text-white">Licencia Base (1 ERP ⇄ 1 Tienda)</strong></span>
-                <span id="client-subscription-status" class="text-emerald-300 font-semibold flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Suscripción Activa y al día
+              <div class="mt-3.5 flex items-center justify-between text-xs text-zinc-300">
+                <span>Modalidad: <strong id="client-seat-type" class="text-white font-medium">Licencia Base (1 ERP ⇄ 1 Tienda)</strong></span>
+                <span id="client-subscription-status" class="text-emerald-400 font-medium flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activa
                 </span>
               </div>
             </div>
 
-            <div class="mt-5 pt-3.5 border-t border-white/[0.12] flex items-center justify-between text-xs">
-              <span class="text-zinc-300">Pagos y facturas gestionados con Stripe</span>
-              <button onclick="openStripePortal()" id="client-stripe-portal-btn" class="px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-400/30 text-indigo-200 hover:text-white font-semibold text-xs transition cursor-pointer">
-                Portal de Facturación →
+            <div class="mt-5 pt-3.5 border-t border-white/[0.08] flex items-center justify-between text-xs">
+              <span class="text-zinc-400">Facturación y recibos en Stripe</span>
+              <button onclick="openStripePortal()" id="client-stripe-portal-btn" class="text-indigo-400 hover:text-indigo-300 font-medium text-xs transition cursor-pointer">
+                Portal de Facturación &rarr;
               </button>
             </div>
           </div>
 
           <!-- CARD 2: SERVIDOR ERP VINCULADO -->
-          <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-5 flex flex-col justify-between">
+          <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-5 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-mono font-bold text-indigo-200 uppercase tracking-wider">🖥️ Servidor Factusol Vinculado</span>
-              <div class="mt-3 p-3.5 rounded-xl bg-[#1e2230] border border-white/[0.16]">
+              <span class="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider">Servidor Factusol Vinculado</span>
+              <div class="mt-3 p-3 rounded-lg bg-[#0e1118] border border-white/[0.14]">
                 <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <svg class="w-4 h-4 text-indigo-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                    <span id="client-device-hostname" class="font-bold text-white text-xs sm:text-sm font-mono truncate">Sin asignar</span>
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span id="client-device-hostname" class="font-semibold text-white text-xs sm:text-sm font-mono truncate">Sin asignar</span>
                   </div>
-                  <span id="client-device-status-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/40 shrink-0">
-                    Esperando Activación
+                  <span id="client-device-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">
+                    Pendiente
                   </span>
                 </div>
-                <div class="text-xs text-zinc-300 font-mono mt-1.5 truncate" id="client-device-hwid">HWID: —</div>
+                <div class="text-[11px] text-zinc-400 font-mono mt-1 truncate" id="client-device-hwid">HWID: —</div>
               </div>
-              <p class="text-xs text-zinc-200 mt-3 leading-relaxed">
-                ¿Vas a cambiar de ordenador o servidor? Puedes desvincular el equipo actual en 1 clic para activar tu clave en la nueva máquina.
+              <p class="text-xs text-zinc-400 mt-3 leading-relaxed">
+                En caso de sustitución o formateo del equipo servidor, desvincula el HWID actual para activar la licencia en la nueva máquina.
               </p>
             </div>
 
-            <div class="mt-5 pt-3.5 border-t border-white/[0.12] flex items-center justify-end">
-              <button id="btn-client-unbind" onclick="handleClientUnbindClick()" class="hidden px-3.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                <span>Mudar Licencia a Nuevo PC</span>
+            <div class="mt-5 pt-3.5 border-t border-white/[0.08] flex items-center justify-end">
+              <button id="btn-client-unbind" onclick="handleClientUnbindClick()" class="hidden px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] text-xs font-medium transition cursor-pointer">
+                Desvincular Equipo (Cambiar PC)
               </button>
             </div>
           </div>
         </div>
 
         <!-- SECCIÓN: CANALES Y WEBHOOKS EN TIEMPO REAL -->
-        <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="flex items-start sm:items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-semibold text-white uppercase font-mono tracking-wider">Canales y Webhooks en Tiempo Real</h3>
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">ACTIVO</span>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-white">Canales y Webhooks en Tiempo Real</h3>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">EN VIVO</span>
-              </div>
-              <p class="text-xs text-zinc-200 mt-0.5">
-                Integraciones activas de <strong class="text-white">Shopify</strong> (pedidos y stock) y <strong class="text-white">Holded</strong> (facturación y clientes) con verificación HMAC-SHA256.
-              </p>
-            </div>
+            <p class="text-xs text-zinc-400 mt-1">
+              Recepción de eventos de <strong class="text-zinc-200">Shopify</strong> y <strong class="text-zinc-200">Holded</strong> autenticados mediante firma HMAC-SHA256.
+            </p>
           </div>
-          <button data-action="switch-tab" data-tab="multichannel" id="btn-portal-open-multichannel" class="px-4 py-2 rounded-lg bg-indigo-600/25 hover:bg-indigo-600/40 text-indigo-100 hover:text-white border border-indigo-400/40 text-xs font-semibold transition flex items-center gap-2 shrink-0 self-start md:self-auto cursor-pointer">
-            <span>Abrir Monitor de Webhooks y Canales</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <button data-action="switch-tab" data-tab="multichannel" id="btn-portal-open-multichannel" class="px-3.5 py-2 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 border border-white/[0.14] text-xs font-medium transition shrink-0 self-start md:self-auto cursor-pointer">
+            Configurar Webhooks &rarr;
           </button>
         </div>
 
         <!-- GUÍA RÁPIDA EN 3 PASOS -->
-        <div class="bg-[#151822] border border-white/[0.15] rounded-xl p-5">
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono mb-4">Guía Rápida de Instalación en tu Servidor Factusol</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-zinc-200">
-            <div class="p-4 rounded-xl bg-[#1e2230] border border-white/[0.14]">
-              <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs mb-2.5 shadow-sm">1</div>
-              <strong class="text-white text-sm block">Descarga el Instalador</strong>
-              <p class="text-zinc-200 text-xs mt-1 leading-relaxed">
-                Descarga <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-indigo-300 hover:text-white underline font-mono font-semibold">Bentian-Setup.exe</a> directamente en el ordenador donde reside Factusol.
+        <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-5">
+          <h3 class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider font-mono mb-3.5">Procedimiento de Puesta en Marcha</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-3.5 rounded-lg bg-[#171b26] border border-white/[0.1]">
+              <div class="text-[10px] font-mono text-zinc-400 uppercase">Paso 01</div>
+              <strong class="text-white text-xs block mt-1">Descargar Agente</strong>
+              <p class="text-zinc-400 text-[11px] mt-1 leading-relaxed">
+                Descarga <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-indigo-400 hover:underline font-mono">Bentian-Setup.exe</a> en el equipo Windows donde se aloja Factusol.
               </p>
             </div>
-            <div class="p-4 rounded-xl bg-[#1e2230] border border-white/[0.14]">
-              <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs mb-2.5 shadow-sm">2</div>
-              <strong class="text-white text-sm block">Ejecuta el Asistente</strong>
-              <p class="text-zinc-200 text-xs mt-1 leading-relaxed">
-                Instala el software con dos clics. Se ejecutará silenciosamente en segundo plano junto al reloj de Windows.
+            <div class="p-3.5 rounded-lg bg-[#171b26] border border-white/[0.1]">
+              <div class="text-[10px] font-mono text-zinc-400 uppercase">Paso 02</div>
+              <strong class="text-white text-xs block mt-1">Ejecutar Instalador</strong>
+              <p class="text-zinc-400 text-[11px] mt-1 leading-relaxed">
+                Completa el asistente. El servicio quedará residente en la bandeja del sistema de Windows.
               </p>
             </div>
-            <div class="p-4 rounded-xl bg-[#1e2230] border border-white/[0.14]">
-              <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs mb-2.5 shadow-sm">3</div>
-              <strong class="text-white text-sm block">Activa tu Clave</strong>
-              <p class="text-zinc-200 text-xs mt-1 leading-relaxed">
-                Pega tu clave de activación y selecciona tu archivo Factusol (.accdb). ¡La sincronización comenzará al instante!
+            <div class="p-3.5 rounded-lg bg-[#171b26] border border-white/[0.1]">
+              <div class="text-[10px] font-mono text-zinc-400 uppercase">Paso 03</div>
+              <strong class="text-white text-xs block mt-1">Vincular Licencia y Base de Datos</strong>
+              <p class="text-zinc-400 text-[11px] mt-1 leading-relaxed">
+                Introduce la clave de activación y selecciona el fichero <code class="text-zinc-200 font-mono">.accdb</code> de Factusol.
               </p>
             </div>
           </div>
         </div>
 
         <!-- AVISO DE SOPORTE SMARTSCREEN Y EXCLUSIONES ANTIVIRUS -->
-        <div class="bg-[#151822] border border-amber-400/35 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div class="flex items-start gap-3">
-            <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0 mt-0.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            </div>
-            <div>
-              <h4 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                <span>¿Windows SmartScreen o tu antivirus bloquea el instalador?</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-200 border border-amber-400/40">Soporte Windows</span>
-              </h4>
-              <p class="text-xs text-zinc-200 mt-1 leading-relaxed">
-                Pulsa <strong class="text-white">"Más información"</strong> y luego <strong class="text-white">"Ejecutar de todas formas"</strong>. Recuerda excluir <code class="text-amber-200 bg-white/[0.08] px-1.5 py-0.5 rounded font-mono">%APPDATA%\Bentian Agent\</code> y el archivo <code class="text-amber-200 bg-white/[0.08] px-1.5 py-0.5 rounded font-mono">.accdb</code> de Factusol en tu antivirus.
-              </p>
-            </div>
+        <div class="bg-[#12151e] border border-white/[0.12] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h4 class="text-xs font-semibold text-white">Exclusiones Recomendadas en Antivirus y Windows SmartScreen</h4>
+            <p class="text-xs text-zinc-400 mt-1">
+              En caso de aviso de SmartScreen, selecciona <strong class="text-zinc-200">"Más información"</strong> &rarr; <strong class="text-zinc-200">"Ejecutar de todas formas"</strong>. Añade <code class="text-zinc-200 font-mono">%APPDATA%\Bentian Agent\</code> a las exclusiones del antivirus.
+            </p>
           </div>
-          <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="px-3.5 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-xs font-semibold border border-amber-400/40 transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
-            <span>Ver Guía Técnica & Exclusiones</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <a href="/docs/seguridad/antivirus-edr-smartscreen/" target="_blank" class="px-3 py-1.5 rounded-md bg-[#181c26] hover:bg-[#222736] text-zinc-200 text-xs font-medium border border-white/[0.14] transition shrink-0">
+            Documentación Técnica &rarr;
           </a>
         </div>
 
