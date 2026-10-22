@@ -297,6 +297,8 @@ export function buildDashboard(): void {
     'id="kpi-arr"',
     'id="kpi-mrr"',
     'id="kpi-active-paid"',
+    'id="kpi-partners-total"',
+    'id="admin-partners-tbody"',
     'id="orgs-tbody"',
     'id="audit-logs-container"',
     'id="fleet-errors-tbody"',

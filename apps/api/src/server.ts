@@ -31,6 +31,7 @@ import { authRouter } from './routes/auth.router';
 import { monitoringRouter } from './routes/monitoring.router';
 import { notificationsRouter } from './routes/notifications.router';
 import { contactRouter } from './routes/contact.router';
+import { partnersRouter } from './routes/partners.router';
 import { meRouter } from './routes/me.router';
 import { webhooksRouter } from './routes/webhooks';
 import { getLatestReleasedVersion } from './utils/version.util';
@@ -191,6 +192,8 @@ export async function bootstrapApp(): Promise<Express> {
   app.use('/api/v1', notificationsRouter);
   app.use('/api/v1', contactRouter);
   app.use(contactRouter);
+  app.use('/api/v1', partnersRouter);
+  app.use(partnersRouter);
   app.use('/api/v1', meRouter);
   app.use(meRouter);
   app.use('/api/webhooks', webhooksRouter);
