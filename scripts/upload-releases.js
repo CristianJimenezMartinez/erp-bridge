@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const https = require('https');
+const childProcess = require('child_process');
 
 const host = process.env.HETZNER_HOST || '178.105.87.40';
 const user = process.env.HETZNER_USER || 'root';
@@ -126,19 +127,34 @@ async function uploadReleases(options = {}) {
   console.log(`   SUBIENDO RELEASE v${version} A HETZNER CX23 (bridge.cristianjm.com) `);
   console.log('================================================================\n');
 
+  // Compilar siempre TypeScript de apps/api antes de empaquetar dist/
+  try {
+    const apiDir = path.resolve(__dirname, '../apps/api');
+    childProcess.execFileSync(
+      process.execPath,
+      [path.resolve(__dirname, '../node_modules/typescript/bin/tsc'), '-p', path.join(apiDir, 'tsconfig.json')],
+      { stdio: 'inherit' }
+    );
+    console.log('    ✓ Backend TypeScript (apps/api/dist) compilado y actualizado.');
+  } catch (tscErr) {
+    console.warn('    ⚠️ Aviso al compilar apps/api:', tscErr.message);
+  }
+
   // Construir cola de subida
   const filesInVersionDir = fs.readdirSync(versionReleaseDir);
   const uploadQueue = [];
 
-  // 1. Archivos de la carpeta versionada
-  for (const file of filesInVersionDir) {
-    const localFile = path.join(versionReleaseDir, file);
-    if (fs.statSync(localFile).isFile()) {
-      uploadQueue.push({
-        local: localFile,
-        remote: `${remoteVersionDir}/${file}`,
-        name: `v${version}/${file}`
-      });
+  // 1. Archivos de la carpeta versionada (omitir si se pasa --code-only y ya están subidos)
+  if (!options.codeOnly) {
+    for (const file of filesInVersionDir) {
+      const localFile = path.join(versionReleaseDir, file);
+      if (fs.statSync(localFile).isFile()) {
+        uploadQueue.push({
+          local: localFile,
+          remote: `${remoteVersionDir}/${file}`,
+          name: `v${version}/${file}`
+        });
+      }
     }
   }
 
@@ -209,44 +225,48 @@ async function uploadReleases(options = {}) {
 
             for (const item of uploadQueue) {
               const sizeBytes = fs.statSync(item.local).size;
-              const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(2);
+              const sizeMB = (sizeBytes / (1024 * 1024)).toFixed(2);
               const isLarge = sizeBytes > 1024 * 1024;
-              
               if (isLarge) {
-                console.log(`  ↑ Subiendo ${item.name} (${sizeMb} MB)...`);
+                console.log(`  ↑ Subiendo ${item.name} (${sizeMB} MB)...`);
               }
 
-              let putSuccess = false;
+              const maxAttempts = 3;
+              let uploaded = false;
               let lastPutErr = null;
-              for (let attempt = 1; attempt <= 5; attempt++) {
+
+              for (let attempt = 1; attempt <= maxAttempts && !uploaded; attempt++) {
                 try {
                   await new Promise((resPut, rejPut) => {
-                    sftp.fastPut(item.local, item.remote, {
-                      step: (total, nb, totalSize) => {
-                        if (isLarge) {
-                          const pct = Math.round((total / totalSize) * 100);
-                          process.stdout.write(`\r     Progreso: ${pct}% (${(total / 1024 / 1024).toFixed(1)} / ${(totalSize / 1024 / 1024).toFixed(1)} MB)`);
-                        }
-                      }
-                    }, (putErr) => {
-                      if (putErr) rejPut(putErr);
-                      else {
+                    sftp.fastPut(
+                      item.local,
+                      item.remote,
+                      {
+                        concurrency: 4,
+                        chunkSize: 32768,
+                        step: isLarge ? (totalTransferred, _chunk, total) => {
+                          const pct = Math.round((totalTransferred / total) * 100);
+                          const mbDone = (totalTransferred / (1024 * 1024)).toFixed(1);
+                          const mbTotal = (total / (1024 * 1024)).toFixed(1);
+                          process.stdout.write(`\r     Progreso: ${pct}% (${mbDone} / ${mbTotal} MB)`);
+                        } : undefined
+                      },
+                      (putErr) => {
+                        if (putErr) return rejPut(putErr);
                         if (isLarge) process.stdout.write('\n');
                         resPut();
                       }
-                    });
+                    );
                   });
-                  putSuccess = true;
-                  break;
-                } catch (err) {
-                  lastPutErr = err;
-                  if (attempt < 5) {
-                    console.log(`\n     ⚠️ Reintento ${attempt}/5 para ${item.name} (${err.code || err.message})...`);
-                    await new Promise(r => setTimeout(r, 2000));
-                  }
+                  uploaded = true;
+                } catch (e) {
+                  lastPutErr = e;
+                  console.warn(`\n    ⚠️ Reintentando subida de ${item.name} (intento ${attempt}/${maxAttempts}): ${e.message}`);
+                  await new Promise(r => setTimeout(r, 1500));
                 }
               }
-              if (!putSuccess) {
+
+              if (!uploaded) {
                 throw lastPutErr;
               }
             }
@@ -320,6 +340,7 @@ async function uploadReleases(options = {}) {
             console.log('>>> [6/6] Sincronizando backend compilado y reiniciando contenedor Docker...');
             const updateContainerCmd = `
               docker cp "${remoteDistDir}/." bentian-api-prod:/app/apps/api/dist/ &&
+              docker cp "${remotePublicDir}/." bentian-api-prod:/app/apps/api/public/ 2>/dev/null || true &&
               docker restart bentian-api-prod
             `;
             await runSshCommand(conn, updateContainerCmd);
@@ -383,9 +404,10 @@ async function uploadReleases(options = {}) {
 
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const requestedVersion = args[0] && !args[0].startsWith('-') ? args[0] : undefined;
+  const requestedVersion = args.find(a => !a.startsWith('-'));
+  const codeOnly = args.includes('--code-only');
 
-  uploadReleases({ version: requestedVersion })
+  uploadReleases({ version: requestedVersion, codeOnly })
     .then(() => {
       process.exit(0);
     })
