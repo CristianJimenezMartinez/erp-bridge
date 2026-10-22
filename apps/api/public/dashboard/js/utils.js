@@ -136,14 +136,14 @@ function recordLatency(durationMs) {
 
   if (dot && badge) {
     if (rounded < 200) {
-      dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
-      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-emerald-400 border border-emerald-500/30 transition cursor-pointer';
+      dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shrink-0';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-mono font-semibold bg-[#1e2230] hover:bg-[#282d40] text-emerald-300 border border-emerald-400/40 transition cursor-pointer whitespace-nowrap shrink-0';
     } else if (rounded < 600) {
-      dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
-      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-amber-400 border border-amber-500/30 transition cursor-pointer';
+      dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-mono font-semibold bg-[#1e2230] hover:bg-[#282d40] text-amber-300 border border-amber-400/40 transition cursor-pointer whitespace-nowrap shrink-0';
     } else {
-      dot.className = 'w-1.5 h-1.5 rounded-full bg-red-400';
-      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-[#18181b] hover:bg-[#222228] text-red-400 border border-red-500/30 transition cursor-pointer';
+      dot.className = 'w-2 h-2 rounded-full bg-red-400 shrink-0';
+      badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-mono font-semibold bg-[#1e2230] hover:bg-[#282d40] text-red-300 border border-red-400/40 transition cursor-pointer whitespace-nowrap shrink-0';
     }
   }
 }

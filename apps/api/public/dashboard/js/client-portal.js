@@ -73,19 +73,21 @@ async function loadClientPortal(selectedKeyOrId) {
 
     const statusBadge = document.getElementById('client-status-badge');
     const subStatus = document.getElementById('client-subscription-status');
-    const isActive = target.status === 'ACTIVE';
+    const normStatus = String(target.status || 'ACTIVE').toUpperCase();
+    const isActive = normStatus === 'ACTIVE' || normStatus === 'ACTIVA';
 
     if (statusBadge) {
-      statusBadge.innerText = isActive ? 'ACTIVA' : target.status;
+      statusBadge.innerText = isActive ? 'ACTIVA' : normStatus;
       statusBadge.className = isActive
-        ? 'px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-        : 'px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+        : 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40';
     }
 
     if (subStatus) {
+      subStatus.className = isActive ? 'text-emerald-300 font-semibold flex items-center gap-1.5' : 'text-amber-300 font-semibold flex items-center gap-1.5';
       subStatus.innerHTML = isActive
-        ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Suscripción al día'
-        : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Estado: ' + _safeEscapeHtml(target.status);
+        ? '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Suscripción Activa y al día'
+        : '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Estado: ' + _safeEscapeHtml(target.status);
     }
 
     const upgradeBanner = document.getElementById('client-upgrade-banner');
@@ -105,7 +107,7 @@ async function loadClientPortal(selectedKeyOrId) {
       if (hostEl) hostEl.innerText = hostname;
       if (badgeEl) {
         badgeEl.innerText = 'Conectado';
-        badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shrink-0';
       }
       if (hwidEl) {
         hwidEl.innerText = `HWID: ${act.hwid || '—'}`;
@@ -113,10 +115,10 @@ async function loadClientPortal(selectedKeyOrId) {
       }
       if (unbindBtn) unbindBtn.classList.remove('hidden');
     } else {
-      if (hostEl) hostEl.innerText = 'Sin asignar';
+      if (hostEl) hostEl.innerText = 'Pendiente de vincular en PC Factusol';
       if (badgeEl) {
-        badgeEl.innerText = 'Pendiente';
-        badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-500/10 text-zinc-400 border border-zinc-500/20';
+        badgeEl.innerText = 'Esperando Activación';
+        badgeEl.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/40 shrink-0';
       }
       if (hwidEl) hwidEl.innerText = 'HWID: —';
       if (unbindBtn) unbindBtn.classList.add('hidden');
