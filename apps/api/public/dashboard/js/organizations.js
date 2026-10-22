@@ -1,7 +1,12 @@
 /**
  * Bentian ERP Bridge — Dashboard Organizations & Partner Portfolio Module
- * Gestión de organizaciones multi-tenant y cartera de clientes del portal de Partner.
+ * Gestión de organizaciones multi-tenant, filtrado, paginación y cartera de Partner.
  */
+
+window._partnerClientsCache = [];
+window._partnerClientsFiltered = [];
+window._partnerClientsPage = 1;
+window._partnerHideTests = false;
 
 function _safeEscapeHtml(str) {
   if (typeof window.escapeHtml === 'function') return window.escapeHtml(str);
@@ -14,21 +19,14 @@ function _safeEscapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-function _safeShowToast(msg, type) {
-  if (typeof window.showToast === 'function') window.showToast(msg, type);
-}
-
-function _safeCloseModal(id) {
-  if (typeof window.closeModal === 'function') window.closeModal(id);
-  else {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('hidden');
-  }
+function _isTestPartnerClient(c) {
+  const name = String(c.legal_name || c.name || '').toUpperCase();
+  return name.includes('[TEST]') || name.includes('EMPRESA TEST') || name.includes('SOFTPEDIA QA') || name.includes('DEMO CORPORACION');
 }
 
 async function loadOrganizations() {
   const tbody = document.getElementById('orgs-tbody');
-  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-500 font-mono text-xs">Cargando organizaciones...</td></tr>`;
+  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-400 font-mono text-xs">Cargando organizaciones...</td></tr>`;
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
 
   try {
@@ -38,23 +36,26 @@ async function loadOrganizations() {
       const orgs = json.data || [];
       if (!tbody) return;
       if (orgs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-500 text-xs">No hay organizaciones registradas.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-400 text-xs">No hay organizaciones registradas.</td></tr>`;
         return;
       }
       tbody.innerHTML = orgs.map(o => {
-        const activeLic = o.active_licenses !== undefined ? o.active_licenses : '—';
+        const activeLic = Number(o.active_licenses || 0);
         const totalLic = o.total_licenses !== undefined ? o.total_licenses : '—';
         const licDisplay = o.active_licenses !== undefined
-          ? `<span class="text-emerald-400 font-semibold">${activeLic}</span> <span class="text-zinc-500 font-mono text-[11px]">/ ${totalLic} tot.</span>`
-          : '<span class="text-zinc-500 font-mono text-xs">—</span>';
+          ? `<span class="${activeLic > 0 ? 'text-emerald-300' : 'text-amber-300'} font-semibold">${activeLic}</span> <span class="text-zinc-400 font-mono text-[11px]">/ ${totalLic} tot.</span>`
+          : '<span class="text-zinc-400 font-mono text-xs">—</span>';
+        const statusBadge = activeLic > 0
+          ? `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">● ACTIVA</span>`
+          : `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">○ SIN LICENCIA</span>`;
 
-        return `<tr class="hover:bg-white/[0.02] transition">
+        return `<tr class="hover:bg-white/[0.03] transition">
           <td class="py-3.5 px-4 font-semibold text-white">${_safeEscapeHtml(o.legal_name || o.name || 'Organización')}</td>
           <td class="py-3.5 px-4 font-mono text-indigo-300">${_safeEscapeHtml(o.tax_id || '—')}</td>
           <td class="py-3.5 px-4 font-mono">${licDisplay}</td>
-          <td class="py-3.5 px-4 font-mono text-zinc-400">${_safeEscapeHtml(o.reseller_id || 'Directo')}</td>
-          <td class="py-3.5 px-4 text-zinc-300">${_safeEscapeHtml(o.plan || 'Standard')}</td>
-          <td class="py-3.5 px-4 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVA</span></td>
+          <td class="py-3.5 px-4 font-mono text-zinc-300">${_safeEscapeHtml(o.reseller_id || 'Directo')}</td>
+          <td class="py-3.5 px-4 text-zinc-200">${_safeEscapeHtml(o.plan || 'Standard')}</td>
+          <td class="py-3.5 px-4 text-right">${statusBadge}</td>
         </tr>`;
       }).join('');
     }
@@ -65,25 +66,19 @@ async function loadOrganizations() {
 
 async function loadPartnerClients(selectedPartnerCode) {
   const tbody = document.getElementById('partner-clients-tbody');
-  if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-zinc-500 font-mono text-xs">Cargando cartera de clientes...</td></tr>`;
+  if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-zinc-300 font-mono text-xs">Cargando cartera de clientes...</td></tr>`;
 
   const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
   const isSuper = window.currentUserRole === 'SUPERADMIN' || window.currentUserRole === 'ADMIN';
   const selectEl = document.getElementById('superadmin-partner-preview-select');
+  let ptList = [];
 
   if (isSuper && selectEl) {
     try {
       const ptRes = await fetch('/api/v1/admin/partners', { headers: { 'Authorization': `Bearer ${token}` } });
       if (ptRes.ok) {
         const ptJson = await ptRes.json();
-        const ptList = ptJson.data || [];
-        const currentSelected = selectedPartnerCode || selectEl.value || 'ALL';
-        selectEl.innerHTML = `<option value="ALL" ${currentSelected === 'ALL' ? 'selected' : ''}>Todos los Clientes / Partners (${ptList.length})</option>` +
-          ptList.map(p => {
-            const pCode = p.partner_code || '';
-            const pName = p.agency_name || pCode;
-            return `<option value="${_safeEscapeHtml(pCode)}" ${currentSelected === pCode ? 'selected' : ''}>${_safeEscapeHtml(pCode)} — ${_safeEscapeHtml(pName)}</option>`;
-          }).join('');
+        ptList = ptJson.data || [];
       }
     } catch {}
   }
@@ -96,129 +91,150 @@ async function loadPartnerClients(selectedPartnerCode) {
     if (res.ok) {
       const json = await res.json();
       const clients = json.data || [];
-      const countEl = document.getElementById('partner-clients-count');
-      if (countEl) countEl.innerText = `${clients.length} Empresas Registradas`;
+      window._partnerClientsCache = clients;
 
-      const partnerCode = (effectiveCode && effectiveCode !== 'ALL')
+      if (isSuper && selectEl) {
+        const currentSelected = effectiveCode || 'ALL';
+        selectEl.innerHTML =
+          `<option value="ALL" ${currentSelected === 'ALL' ? 'selected' : ''}>Vista Global — ${clients.length} Empresas (${ptList.length} Partners)</option>` +
+          ptList.map(p => {
+            const pCode = p.partner_code || '';
+            const pName = p.agency_name || pCode;
+            return `<option value="${_safeEscapeHtml(pCode)}" ${currentSelected === pCode ? 'selected' : ''}>${_safeEscapeHtml(pCode)} — ${_safeEscapeHtml(pName)}</option>`;
+          }).join('');
+      }
+
+      const rawCode = (effectiveCode && effectiveCode !== 'ALL')
         ? effectiveCode
-        : (localStorage.getItem('bentian_cloud_partner_code') || localStorage.getItem('bentian_cloud_org') || 'PT-PARTNER');
+        : (localStorage.getItem('bentian_cloud_partner_code') || 'PT-CENTRAL');
+      const cleanPartnerCode = (rawCode === 'org_default' || !rawCode) ? 'PT-CENTRAL' : rawCode;
       const affInput = document.getElementById('partner-affiliate-link');
-      if (affInput) affInput.value = `https://bridge.cristianjm.com/?ref=${encodeURIComponent(partnerCode)}`;
+      if (affInput) affInput.value = `https://bridge.cristianjm.com/?ref=${encodeURIComponent(cleanPartnerCode)}`;
 
-      const commEl = document.getElementById('partner-commission-available');
-      if (commEl) {
-        commEl.innerText = `${(clients.length * 49.75).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-      }
-
-      if (!tbody) return;
-      if (clients.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-zinc-500 text-xs">Aún no tienes clientes dados de alta. Pulsa <strong>"Comprar Licencia (-25%)"</strong> o <strong>"+ Clave Evaluación"</strong> para comenzar.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = clients.map(c => {
-        const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('es-ES') : '—';
-        return `<tr class="hover:bg-white/[0.02] transition">
-          <td class="p-3 font-semibold text-white">${_safeEscapeHtml(c.legal_name || c.name || 'Cliente')}</td>
-          <td class="p-3 font-mono text-indigo-300">${_safeEscapeHtml(c.tax_id || '—')}</td>
-          <td class="p-3 font-mono">${c.active_licenses || 0} activas / ${c.total_licenses || 0} tot.</td>
-          <td class="p-3 text-zinc-400">${dateStr}</td>
-          <td class="p-3 text-right"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVO</span></td>
-        </tr>`;
-      }).join('');
+      filterAndRenderPartnerClients(1);
     }
   } catch (e) {
-    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-400 font-mono text-xs">Error al cargar clientes.</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-400 font-mono text-xs">Error al cargar clientes.</td></tr>`;
   }
 }
 
-function copyPartnerAffiliateLink() {
-  const affInput = document.getElementById('partner-affiliate-link');
-  if (affInput && affInput.value) {
-    navigator.clipboard.writeText(affInput.value).then(() => {
-      _safeShowToast('✓ Enlace de distribuidor copiado al portapapeles', 'success');
-    }).catch(() => {});
-  }
-}
+function filterAndRenderPartnerClients(targetPage) {
+  const all = window._partnerClientsCache || [];
+  const search = (document.getElementById('partner-clients-search')?.value || '').trim().toLowerCase();
+  const statusFilter = document.getElementById('partner-clients-status-filter')?.value || 'ALL';
+  const sortMode = document.getElementById('partner-clients-sort')?.value || 'RECENT';
+  const pageSize = parseInt(document.getElementById('partner-clients-page-size')?.value || '10', 10) || 10;
 
-function openPartnerBuyModal() {
-  ['partner-buy-client-name', 'partner-buy-tax-id', 'partner-buy-email', 'partner-buy-alias'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+  const testCount = all.filter(_isTestPartnerClient).length;
+  const hideBtn = document.getElementById('btn-partner-hide-tests');
+  if (hideBtn) {
+    hideBtn.textContent = window._partnerHideTests
+      ? `👁️ Mostrar [TEST] (${testCount})`
+      : `🧹 Ocultar [TEST] (${testCount})`;
+    hideBtn.className = window._partnerHideTests
+      ? 'px-2.5 py-1.5 rounded-lg bg-emerald-600/25 border border-emerald-400/50 text-xs font-mono text-emerald-200 transition cursor-pointer whitespace-nowrap'
+      : 'px-2.5 py-1.5 rounded-lg bg-[#12151f] hover:bg-[#23283b] border border-white/[0.18] text-xs font-mono text-zinc-200 transition cursor-pointer whitespace-nowrap';
+  }
+
+  let filtered = all.filter(c => {
+    if (window._partnerHideTests && _isTestPartnerClient(c)) return false;
+    const active = Number(c.active_licenses || 0);
+    if (statusFilter === 'ACTIVE' && active <= 0) return false;
+    if (statusFilter === 'NO_LICENSE' && active > 0) return false;
+    if (search) {
+      const name = String(c.legal_name || c.name || '').toLowerCase();
+      const tax = String(c.tax_id || '').toLowerCase();
+      const id = String(c.id || '').toLowerCase();
+      if (!name.includes(search) && !tax.includes(search) && !id.includes(search)) return false;
+    }
+    return true;
   });
-  const modal = document.getElementById('modal-partner-buy');
-  if (modal) modal.classList.remove('hidden');
-}
 
-async function handlePartnerBuySubmit(e) {
-  e.preventDefault();
-  const clientName = (document.getElementById('partner-buy-client-name')?.value || '').trim();
-  const clientTaxId = (document.getElementById('partner-buy-tax-id')?.value || '').trim();
-  const clientEmail = (document.getElementById('partner-buy-email')?.value || '').trim();
-  const alias = (document.getElementById('partner-buy-alias')?.value || '').trim();
-  const btn = document.getElementById('btn-submit-partner-buy');
-
-  if (!clientName || !clientTaxId) return _safeShowToast('La Razón Social y el CIF son obligatorios', 'warning');
-  if (btn) { btn.innerText = 'Conectando con Stripe...'; btn.disabled = true; }
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-
-  try {
-    const res = await fetch('/api/v1/billing/partner-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ clientName, clientTaxId, clientEmail, alias })
-    });
-    const data = await res.json();
-    if (res.ok && data.url) window.location.href = data.url;
-    else _safeShowToast(data.error?.message || 'Error al generar la pasarela de pago mayorista', 'error');
-  } catch (err) {
-    _safeShowToast('Error de conexión con la pasarela de pago', 'error');
-  } finally {
-    if (btn) { btn.innerText = 'Pagar en Stripe (149,25 €) →'; btn.disabled = false; }
-  }
-}
-
-function openPartnerIssueModal() {
-  ['partner-issue-client-name', 'partner-issue-tax-id', 'partner-issue-alias'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+  filtered.sort((a, b) => {
+    if (sortMode === 'NAME_ASC') {
+      return String(a.legal_name || a.name || '').localeCompare(String(b.legal_name || b.name || ''), 'es');
+    }
+    if (sortMode === 'LIC_DESC') {
+      return Number(b.active_licenses || 0) - Number(a.active_licenses || 0);
+    }
+    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
   });
-  const modal = document.getElementById('modal-partner-issue');
-  if (modal) modal.classList.remove('hidden');
-}
 
-async function handlePartnerIssueSubmit(e) {
-  e.preventDefault();
-  const clientName = (document.getElementById('partner-issue-client-name')?.value || '').trim();
-  const clientTaxId = (document.getElementById('partner-issue-tax-id')?.value || '').trim();
-  const alias = (document.getElementById('partner-issue-alias')?.value || '').trim();
-  const btn = document.getElementById('btn-submit-partner-issue');
-  if (btn) { btn.innerText = 'Emitiendo...'; btn.disabled = true; }
+  window._partnerClientsFiltered = filtered;
 
-  const token = window.currentAuthToken || localStorage.getItem('bentian_cloud_token') || '';
-  try {
-    const res = await fetch('/api/v1/partner/licenses/issue', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ clientName, clientTaxId, alias })
-    });
-    const data = await res.json();
-    if (res.ok && data.data?.key) {
-      _safeCloseModal('modal-partner-issue');
-      _safeShowToast(`✓ Clave de Evaluación (15d) emitida: ${data.data.key}`, 'success');
-      loadPartnerClients();
-    } else _safeShowToast(data.error?.message || 'Error al emitir licencia', 'error');
-  } catch (err) {
-    _safeShowToast('Error de conexión con el servidor central', 'error');
-  } finally {
-    if (btn) { btn.innerText = 'Emitir Clave de Evaluación (15d)'; btn.disabled = false; }
+  const countEl = document.getElementById('partner-clients-count');
+  if (countEl) {
+    countEl.innerText = filtered.length === all.length
+      ? `${all.length} Empresas Registradas`
+      : `${filtered.length} de ${all.length} Empresas`;
   }
+
+  const totalActiveLic = filtered.reduce((acc, c) => acc + Number(c.active_licenses || 0), 0);
+  const commEl = document.getElementById('partner-commission-available');
+  const commSubEl = document.getElementById('partner-commission-subtitle');
+  if (commEl) {
+    commEl.innerText = `${(totalActiveLic * 49.75).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  }
+  if (commSubEl) {
+    commSubEl.innerText = `(${totalActiveLic} lic. activas × 49,75 €)`;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const page = Math.min(Math.max(1, targetPage || window._partnerClientsPage || 1), totalPages);
+  window._partnerClientsPage = page;
+
+  const startIdx = (page - 1) * pageSize;
+  const pageItems = filtered.slice(startIdx, startIdx + pageSize);
+
+  const pageInfo = document.getElementById('partner-clients-page-info');
+  if (pageInfo) {
+    pageInfo.innerText = filtered.length === 0
+      ? 'Mostrando 0 de 0 empresas'
+      : `Mostrando ${startIdx + 1}–${Math.min(startIdx + pageSize, filtered.length)} de ${filtered.length} empresas`;
+  }
+  const pageInd = document.getElementById('partner-clients-page-indicator');
+  if (pageInd) pageInd.innerText = `Página ${page} / ${totalPages}`;
+
+  const prevBtn = document.getElementById('btn-partner-page-prev');
+  const nextBtn = document.getElementById('btn-partner-page-next');
+  if (prevBtn) prevBtn.disabled = page <= 1;
+  if (nextBtn) nextBtn.disabled = page >= totalPages;
+
+  const tbody = document.getElementById('partner-clients-tbody');
+  if (!tbody) return;
+  if (pageItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-zinc-300 text-xs">No hay empresas que coincidan con el filtro actual.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = pageItems.map(c => {
+    const name = c.legal_name || c.name || 'Cliente';
+    const tax = c.tax_id || '';
+    const active = Number(c.active_licenses || 0);
+    const total = Number(c.total_licenses || 0);
+    const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('es-ES') : '—';
+    const statusBadge = active > 0
+      ? `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 whitespace-nowrap">● ACTIVA</span>`
+      : `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 whitespace-nowrap">○ SIN LICENCIA</span>`;
+    const licHtml = active > 0
+      ? `<span class="text-emerald-300 font-bold">${active} activas</span> <span class="text-zinc-400">/ ${total} tot.</span>`
+      : `<span class="text-amber-300 font-bold">0 activas</span> <span class="text-zinc-400">/ ${total} tot.</span>`;
+
+    return `<tr class="hover:bg-white/[0.03] transition">
+      <td class="p-3.5 font-semibold text-white">${_safeEscapeHtml(name)}</td>
+      <td class="p-3.5 font-mono text-indigo-300">${_safeEscapeHtml(tax || '—')}</td>
+      <td class="p-3.5 font-mono">${licHtml}</td>
+      <td class="p-3.5 text-zinc-300 font-mono">${dateStr}</td>
+      <td class="p-3.5">${statusBadge}</td>
+      <td class="p-3.5 text-right whitespace-nowrap space-x-1.5">
+        <button type="button" onclick="openPartnerIssueModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#1e2230] hover:bg-[#282d40] border border-white/[0.16] text-[11px] font-semibold text-emerald-300 transition cursor-pointer" title="Emitir clave Trial 15 días para esta empresa">+ Trial 15d</button>
+        <button type="button" onclick="openPartnerBuyModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-emerald-600/20 hover:bg-emerald-600/35 border border-emerald-400/40 text-[11px] font-semibold text-emerald-200 transition cursor-pointer" title="Comprar licencia anual con -25% para esta empresa">💳 -25%</button>
+        <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(c.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-indigo-500/20 hover:bg-indigo-500/35 border border-indigo-400/40 text-[11px] font-semibold text-indigo-200 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta empresa">👁️ Ver</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 window.loadOrganizations = loadOrganizations;
 window.loadPartnerClients = loadPartnerClients;
-window.openPartnerBuyModal = openPartnerBuyModal;
-window.handlePartnerBuySubmit = handlePartnerBuySubmit;
-window.copyPartnerAffiliateLink = copyPartnerAffiliateLink;
-window.openPartnerIssueModal = openPartnerIssueModal;
-window.handlePartnerIssueSubmit = handlePartnerIssueSubmit;
+window.filterAndRenderPartnerClients = filterAndRenderPartnerClients;

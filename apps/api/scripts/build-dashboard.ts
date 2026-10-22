@@ -48,6 +48,7 @@ export const DASHBOARD_SCRIPTS = [
   'licenses-modals.js',
   'fleet.js',
   'organizations.js',
+  'partner-actions.js',
   'partners-admin.js',
   'audit-errors.js',
   'multichannel.js',
