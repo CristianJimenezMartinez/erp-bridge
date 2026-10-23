@@ -732,6 +732,63 @@ results.push({
 });
 
 // ============================================================================
+// GATE 10: FUNCTIONAL CONTRACTS GUARD (ANTI-415 POST & PROTECTED LICENSES)
+// ============================================================================
+console.log('\n▶ [Gate 10/10] Verificando contratos funcionales GUI (Anti-415 POST) y licencias protegidas...');
+let gate10Passed = true;
+const gate10Violations: string[] = [];
+
+const coreScriptPath = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts/core.script.ts');
+const cleanupSvcPath = path.join(repoRoot, 'apps/api/src/services/license-cleanup.service.ts');
+const guiScriptsDir = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts');
+
+if (!fs.existsSync(coreScriptPath) || !fs.readFileSync(coreScriptPath, 'utf-8').includes("init.headers['Content-Type'] = 'application/json'")) {
+  gate10Passed = false;
+  gate10Violations.push('core.script.ts debe inyectar Content-Type: application/json en POST/PUT para cumplir el filtro Anti-CSRF de MiniRouter');
+}
+
+if (fs.existsSync(guiScriptsDir)) {
+  const guiScriptFiles = fs.readdirSync(guiScriptsDir).filter((f) => f.endsWith('.ts'));
+  for (const sf of guiScriptFiles) {
+    const sfContent = fs.readFileSync(path.join(guiScriptsDir, sf), 'utf-8');
+    if (/fetch\([^)]+,\s*\{\s*method:\s*'POST'\s*\}\s*\)/.test(sfContent)) {
+      gate10Passed = false;
+      gate10Violations.push(`Llamada fetch POST sin cabecera Content-Type explícita en ${sf} (provoca HTTP 415 en MiniRouter)`);
+    }
+  }
+}
+
+if (fs.existsSync(cleanupSvcPath)) {
+  const clContent = fs.readFileSync(cleanupSvcPath, 'utf-8');
+  for (const reqKey of ['EB-8WEN2-W08N2-8KJAW-0AHCH', 'EB-S6AB3-2MHWP-50DTT-72242', 'EB-6RE3E-HXPS4-XYNRV-HVZWT']) {
+    if (!clContent.includes(reqKey)) {
+      gate10Passed = false;
+      gate10Violations.push(`Clave protegida ausente en license-cleanup.service.ts: ${reqKey}`);
+    }
+  }
+} else {
+  gate10Passed = false;
+  gate10Violations.push('No se encontró license-cleanup.service.ts');
+}
+
+const gate10Score = gate10Passed ? 10.0 : 0.0;
+if (gate10Passed) {
+  console.log('  ✓ Contratos funcionales GUI (Anti-415 POST) y las 3 licencias protegidas verificados.');
+} else {
+  console.error('  ❌ VIOLACIÓN DE CONTRATO FUNCIONAL:');
+  gate10Violations.forEach((v) => console.error(`     - ${v}`));
+}
+
+results.push({
+  gateName: '10. Contratos Funcionales GUI & Licencias Protegidas',
+  passed: gate10Passed,
+  score: gate10Score,
+  weight: 0.15,
+  details: gate10Passed ? ['0 llamadas POST sin Content-Type y 3 licencias reales blindadas'] : gate10Violations,
+  warnings: [],
+});
+
+// ============================================================================
 // COMPUTO DE SCORECARD Y REPORTE FINAL
 // ============================================================================
 console.log('\n====================================================');

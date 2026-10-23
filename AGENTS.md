@@ -259,6 +259,17 @@
   - El compilador del Dashboard (`apps/api/scripts/build-dashboard.ts` con `MAX_DASHBOARD_MODULE_LOC = 250`) y el Gate 1 del Quality Gate (`scripts/quality-gate.ts`) verifican automáticamente el número de líneas de cada componente modular y abortan la compilación si cualquier archivo de `apps/api/public/dashboard/{js,views,modals,layout}` supera las 250 líneas.
   - Cuando una funcionalidad o vista crezca, debe dividirse obligatoriamente en submódulos cohesivos de responsabilidad única (ej: `auth.js` + `auth-otp.js`, `licenses.js` + `licenses-modals.js`, `organizations.js` + `partners-admin.js`, `multichannel.js` + `multichannel-actions.js`, `navigation.js` + `session-bootstrap.js`).
 
+---
+
+## 24. Registro Maestro de Funcionalidades y Verificación Automática E2E (`verify:features`)
+* **Documento Oficial de Especificación Funcional:**
+  - El inventario completo de endpoints, botones, motores en segundo plano, licencias protegidas (`Telkkalas`, `Suministros Rubio`, `Beta 2026 - Soy.es`) y contratos de seguridad reside en `erp-bridge/docs/FUNCTIONAL_SPECIFICATION_AND_CONTRACTS.md`.
+* **Regla Anti-415 en Peticiones `POST` / `PUT` del Agente GUI:**
+  - Como `MiniRouter` exige `Content-Type: application/json` en toda petición `POST`/`PUT` con cabecera `Origin`, queda terminantemente prohibido escribir llamadas `fetch(..., { method: 'POST' })` sin `Content-Type: application/json` en los scripts del GUI (`apps/agent/src/gui/templates/scripts/*.ts`).
+* **Verificación Obligatoria Antes de Cerrar Cualquier Tarea:**
+  - Además del Quality Gate (`pnpm run quality:check`, que incluye el **Gate 10** de contratos funcionales), se debe ejecutar `pnpm run verify:features` (`scripts/verify-functional-contracts.ts`) para comprobar estáticamente todos los contratos y verificar en vivo la salud de `https://bridge.cristianjm.com` y `https://www.suministrosrubio.com/erp-bridge-endpoint.php?action=ping`.
+
+
 
 
 
