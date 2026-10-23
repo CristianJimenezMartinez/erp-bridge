@@ -88,7 +88,8 @@ async function probeTarget(urlStr: string, redirectsLeft = 2): Promise<{
     const req = client.request({
       protocol: parsed.protocol, hostname: domain, port: isHttps ? 443 : 80, path: parsed.pathname + parsed.search, method: 'GET', timeout: 5500,
       headers: { 'User-Agent': 'CristianJM-B2B-SecurityAudit/1.0 (+https://cristianjm.com)', 'Accept': 'text/html,*/*;q=0.8' },
-      lookup: (_h, _o, cb) => cb(null, safeIp.address, safeIp.family),
+      lookup: (_h, opts: any, cb: any) =>
+        opts?.all ? cb(null, [{ address: safeIp.address, family: safeIp.family }]) : cb(null, safeIp.address, safeIp.family),
     }, (res) => {
       const ttfbMs = Math.max(1, Date.now() - start);
       let tlsProtocol: string | null = null;
