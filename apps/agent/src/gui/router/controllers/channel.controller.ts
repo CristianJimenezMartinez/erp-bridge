@@ -12,11 +12,10 @@ export class ChannelController {
           agent.configManager.update({
             channelType: 'woocommerce',
             woocommerce: {
-              ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '', enabled: true }),
+              ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '' }),
               storeUrl: String(ctx.body.storeUrl || '').trim(),
               consumerKey: String(ctx.body.consumerKey || current.woocommerce?.consumerKey || '').trim(),
               consumerSecret: isSecretMaskedOrEmpty(ctx.body.consumerSecret) ? existingSecret : String(ctx.body.consumerSecret).trim(),
-              enabled: true,
             },
           });
         } catch {}

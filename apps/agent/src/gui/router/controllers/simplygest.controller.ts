@@ -57,7 +57,7 @@ export class SimplyGestController {
               agent.configManager.update({
                 simplygestDbPath: filePath,
                 simplygest: {
-                  ...(current.simplygest || { tariffCode: 1, warehouseCode: '1' }),
+                  ...(current.simplygest || { tariffCode: '1', warehouseCode: '1' }),
                   databasePath: filePath,
                 },
               });

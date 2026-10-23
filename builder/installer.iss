@@ -37,7 +37,6 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
-Name: "autostart"; Description: "Iniciar Bentian Agent automáticamente al encender el equipo"; GroupDescription: "Opciones de Inicio:"; Flags: checkedonce
 
 [Files]
 Source: "{#SourceDir}\BentianAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -57,7 +56,8 @@ Name: "{group}\Desinstalar {#MyAppName}"; Filename: "{uninstallexe}"; IconFilena
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
 
 [Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BentianAgent"; ValueData: """{app}\{#MyAppExeName}"" start --minimized"; Flags: uninsdeletevalue; Tasks: autostart
+; Auto-arranque obligatorio e inmutable con Windows para evitar olvidos de ejecución
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "BentianAgent"; ValueData: """{app}\{#MyAppExeName}"" start --minimized"; Flags: uninsdeletevalue
 ; Registrar AppUserModelId oficial para que Windows 10/11 permita notificaciones Toast
 Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; ValueType: string; ValueName: "DisplayName"; ValueData: "Bentian ERP Bridge"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\AppUserModelId\Bentian.ERPBridge.Agent"; ValueType: string; ValueName: "IconUri"; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey

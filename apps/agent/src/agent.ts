@@ -428,6 +428,16 @@ export class LocalAgent {
     const hwid = await this.licenseService.getHWID();
 
     await this.autoUpdater.handlePostUpdate();
+    // Garantizar que el arranque automático con Windows esté siempre habilitado
+    void this.autoStartService.enable().catch((err) => {
+      this.logger.warn(`Aviso al garantizar auto-arranque con Windows: ${String(err)}`);
+    });
+    // Garantizar tiempos de estabilidad fijos e inmutables
+    if (cfg.syncRules) {
+      cfg.syncRules.enableFileWatcher = true;
+      cfg.syncRules.debounceSeconds = 5;
+      cfg.syncRules.periodicIntervalMinutes = 15;
+    }
     const licenseCheck = await this.licenseService.validateLicense();
 
     this.logger.info(`🚀 Arrancando ERP Bridge Local Agent: ${cfg.agentName || 'Agent'} (v${this.configManager.getVersion()})`, {

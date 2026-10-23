@@ -53,15 +53,22 @@
 | `GET/POST` | `/api/local/check-update` | `SystemController.checkUpdate` | Consulta `/releases/latest.json` en `bridge.cristianjm.com`. |
 | `POST` | `/api/local/apply-update` | `SystemController.applyUpdate` | Descarga instalador, verifica SHA-256 + firma Ed25519 y lanza `UpdateSwapper`. |
 
-### 1.3. Motores Autónomos en Segundo Plano del Agente
-1. **Vigilante en Tiempo Real (`FileWatcherCoordinatorService`):**
-   - Vigila cambios sobre el archivo `.accdb` y `.laccdb` de Factusol con debounce configurable.
+### 1.3. Motores Autónomos y Tiempos de Estabilidad Fijos e Inmutables
+Los siguientes tiempos y reglas de ejecución están **fijados por arquitectura y bloqueados en la interfaz** para evitar desconfiguraciones u olvidos del cliente:
+1. **Inicio Automático con Windows (`AutoStartService`):**
+   - **Siempre Activo e Incondicional:** Se registra automáticamente en `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\BentianAgent` tanto durante la instalación (`builder/installer.iss`) como en cada arranque del agente (`LocalAgent.start()`), ejecutándose minimizado en la bandeja del sistema (`--minimized`).
+2. **Vigilante en Tiempo Real (`FileWatcherCoordinatorService`):**
+   - **Siempre Activo (`enableFileWatcher: true`).**
+   - **Tiempo de Estabilización (Debounce OLEDB):** **`5 segundos` fijos (`5000 ms`)** tras cada guardado en Factusol (con ventana mínima de `30 segundos` entre ráfagas) para permitir que Microsoft Access libere los bloqueos antes de consultar.
    - Al detectar un cambio, registra `Cambio detectado en Factusol (...). Sincronizando stock...`, ejecuta `triggerManualSync(false)` y registra en la consola `✓ Sincronización completada...` al concluir.
-2. **Sondeo Bidireccional Periódico (`LocalSyncEngine.startAutoSyncLoop`):**
-   - Comprueba cada 30 segundos pedidos nuevos en la tienda web, cancelaciones de pedidos para reponer stock en Factusol y cambios de stock con *dirty-checking* (`lastUniversalBridgeStock`) para no saturar la red si no hay cambios.
-3. **Rollover Fiscal Anual Automático (`FactusolYearResolver`):**
+3. **Sondeo Bidireccional Periódico (`LocalSyncEngine.startAutoSyncLoop`):**
+   - **Ciclo de Pedidos y Stock:** **`Cada 30 segundos` fijos (`30000 ms`)** comprobando pedidos nuevos en la tienda web, cancelaciones de pedidos para reponer stock en Factusol y cambios de stock con *dirty-checking* (`lastUniversalBridgeStock`).
+   - **Barrido Periódico de Seguridad:** **`Cada 15 minutos` fijos (`periodicIntervalMinutes: 15`)**.
+4. **Disparo Inicial Tras Arranque (*Install & Plug*):**
+   - **`3 segundos` fijos (`3000 ms`)** después de iniciar el agente.
+5. **Rollover Fiscal Anual Automático (`FactusolYearResolver`):**
    - Si Factusol crea un nuevo archivo al cambiar de año (ej. `2262025.accdb` ➔ `2262026.accdb`), el agente conmuta automáticamente la ruta activa y la persiste en `agent-config.json`.
-4. **Persistencia Atómica Zero-Loss (`ConfigManager`):**
+6. **Persistencia Atómica Zero-Loss (`ConfigManager`):**
    - Guarda siempre en `%APPDATA%\Bentian Agent\agent-config.json` mediante escritura atómica (`.tmp` + `renameSync`) y copia `.bak`. Nunca borra rutas NAS/UNC aunque estén desconectadas al arrancar.
 
 ---

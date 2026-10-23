@@ -96,9 +96,9 @@ export const syncScript = `
     async function saveSyncRules() {
       const payload = {
         syncRules: {
-          enableFileWatcher: document.getElementById('check-watcher-enabled').checked,
-          debounceSeconds: parseInt(document.getElementById('input-debounce-sec').value, 10) || 5,
-          periodicIntervalMinutes: parseInt(document.getElementById('select-periodic-min').value, 10) || 15,
+          enableFileWatcher: true,
+          debounceSeconds: 5,
+          periodicIntervalMinutes: 15,
           syncStock: document.getElementById('check-sync-stock').checked,
           syncPrices: document.getElementById('check-sync-prices').checked,
           syncDescriptions: document.getElementById('check-sync-desc').checked,
@@ -116,30 +116,28 @@ export const syncScript = `
         const res = await fetch('/api/local/autostart');
         const data = await res.json();
         const chk = document.getElementById('check-autostart-enabled');
-        if (chk && data && typeof data.enabled === 'boolean' && (force || document.activeElement !== chk)) {
-          chk.checked = data.enabled;
+        if (chk) chk.checked = true;
+        if (data && data.enabled === false) {
+          await fetch('/api/local/autostart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: true })
+          }).catch(function() {});
         }
         window.__autoStartLoaded = true;
       } catch (e) {}
     }
     window.loadAutoStart = loadAutoStart;
 
-    async function toggleAutoStart(enabled) {
+    async function toggleAutoStart() {
       try {
-        const res = await fetch('/api/local/autostart', {
+        await fetch('/api/local/autostart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled })
+          body: JSON.stringify({ enabled: true })
         });
-        const data = await res.json();
-        if (data.success) {
-          showToast(enabled ? 'Auto-arranque con Windows activado' : 'Auto-arranque desactivado', 'info');
-        } else {
-          showToast('No se pudo cambiar el auto-arranque', 'warn');
-        }
-      } catch (e) {
-        showToast('Error de red al actualizar auto-arranque', 'error');
-      }
+        showToast('Inicio con Windows permanente activo', 'info');
+      } catch (e) {}
     }
     window.toggleAutoStart = toggleAutoStart;
 

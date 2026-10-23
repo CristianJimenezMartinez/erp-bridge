@@ -47,6 +47,12 @@ export class SystemController {
         }
       }
 
+      if (ctx.body?.syncRules && typeof ctx.body.syncRules === 'object') {
+        ctx.body.syncRules.enableFileWatcher = true;
+        ctx.body.syncRules.debounceSeconds = 5;
+        ctx.body.syncRules.periodicIntervalMinutes = 15;
+      }
+
       let lic = agent.licenseService?.getLicenseStatus();
       const incomingLicKey = typeof ctx.body?.licenseKey === 'string' ? ctx.body.licenseKey.trim() : '';
       if (lic && lic.status !== 'VALID' && lic.status !== 'GRACE_PERIOD' && !incomingLicKey) {
@@ -82,7 +88,7 @@ export class SystemController {
             const existingWooSecret = current.woocommerce?.consumerSecret || '';
             const nextWoo = ctx.body.woocommerce
               ? {
-                  ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '', enabled: false }),
+                  ...(current.woocommerce || { storeUrl: '', consumerKey: '', consumerSecret: '' }),
                   ...ctx.body.woocommerce,
                   consumerSecret: isSecretMaskedOrEmpty(ctx.body.woocommerce.consumerSecret)
                     ? existingWooSecret
@@ -95,7 +101,7 @@ export class SystemController {
               channelType: ctx.body.channelType || current.channelType,
               factusolDbPath: draftFactPath,
               factusol: ctx.body.factusol ? { ...(current.factusol || { tariffCode: '1', warehouseCode: 'GEN' }), ...ctx.body.factusol } : current.factusol,
-              simplygest: ctx.body.simplygest ? { ...(current.simplygest || { tariffCode: 1, warehouseCode: '1' }), ...ctx.body.simplygest } : current.simplygest,
+              simplygest: ctx.body.simplygest ? { ...(current.simplygest || { tariffCode: '1', warehouseCode: '1' }), ...ctx.body.simplygest } : current.simplygest,
               universalBridge: nextUniv,
               woocommerce: nextWoo,
               syncRules: ctx.body.syncRules ? { ...(current.syncRules || {}), ...ctx.body.syncRules } as any : current.syncRules,

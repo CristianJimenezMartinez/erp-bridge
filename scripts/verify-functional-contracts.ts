@@ -82,6 +82,19 @@ function verifyAgentGuiContracts(): CheckGroupResult {
     errors.push('Falta confirmación de sincronización en sync.script.ts o file-watcher-coordinator.service.ts');
   }
 
+  const agentTs = readText('apps/agent/src/agent.ts');
+  const syncView = readText('apps/agent/src/gui/templates/views/sync.view.ts');
+  if (
+    agentTs.includes('this.autoStartService.enable()') &&
+    syncScript.includes('debounceSeconds: 5') &&
+    syncScript.includes('periodicIntervalMinutes: 15') &&
+    syncView.includes('Siempre Activo')
+  ) {
+    checks.push('Inicio con Windows permanente y tiempos de estabilidad fijos (5s debounce / 30s-15m ciclo) blindados');
+  } else {
+    errors.push('El auto-arranque con Windows o los tiempos de estabilidad fijos no están blindados en agent.ts / sync.view.ts');
+  }
+
   return { name: '1. Contratos Agente Windows & GUI (:39281)', passed: errors.length === 0, checks, errors };
 }
 

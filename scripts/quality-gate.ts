@@ -739,12 +739,24 @@ let gate10Passed = true;
 const gate10Violations: string[] = [];
 
 const coreScriptPath = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts/core.script.ts');
+const agentTsPath = path.join(repoRoot, 'apps/agent/src/agent.ts');
+const syncScriptPath = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts/sync.script.ts');
 const cleanupSvcPath = path.join(repoRoot, 'apps/api/src/services/license-cleanup.service.ts');
 const guiScriptsDir = path.join(repoRoot, 'apps/agent/src/gui/templates/scripts');
 
 if (!fs.existsSync(coreScriptPath) || !fs.readFileSync(coreScriptPath, 'utf-8').includes("init.headers['Content-Type'] = 'application/json'")) {
   gate10Passed = false;
   gate10Violations.push('core.script.ts debe inyectar Content-Type: application/json en POST/PUT para cumplir el filtro Anti-CSRF de MiniRouter');
+}
+
+if (!fs.existsSync(agentTsPath) || !fs.readFileSync(agentTsPath, 'utf-8').includes('this.autoStartService.enable()')) {
+  gate10Passed = false;
+  gate10Violations.push('agent.ts debe garantizar this.autoStartService.enable() al arrancar para inicio permanente con Windows');
+}
+
+if (!fs.existsSync(syncScriptPath) || !fs.readFileSync(syncScriptPath, 'utf-8').includes('debounceSeconds: 5')) {
+  gate10Passed = false;
+  gate10Violations.push('sync.script.ts debe mantener los tiempos de estabilidad fijos (debounceSeconds: 5, periodicIntervalMinutes: 15)');
 }
 
 if (fs.existsSync(guiScriptsDir)) {

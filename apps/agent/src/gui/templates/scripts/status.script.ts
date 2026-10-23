@@ -854,22 +854,16 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           if (holded.defaultWarehouseId || force) inHoldedWh.value = holded.defaultWarehouseId || '';
         }
 
-        // Reglas de Sync
+        // Reglas de Sync (Tiempos de estabilidad e inicio fijos e inmutables)
         const rules = data.syncRules || {};
         const chkWatcher = document.getElementById('check-watcher-enabled');
-        if (chkWatcher && rules.enableFileWatcher !== undefined && (force || document.activeElement !== chkWatcher)) {
-          chkWatcher.checked = rules.enableFileWatcher;
-        }
+        if (chkWatcher) chkWatcher.checked = true;
 
         const inDebounce = document.getElementById('input-debounce-sec');
-        if (inDebounce && rules.debounceSeconds && (force || document.activeElement !== inDebounce)) {
-          inDebounce.value = rules.debounceSeconds;
-        }
+        if (inDebounce) inDebounce.value = '5';
 
         const selInterval = document.getElementById('select-periodic-min');
-        if (selInterval && rules.periodicIntervalMinutes && (force || document.activeElement !== selInterval)) {
-          selInterval.value = rules.periodicIntervalMinutes;
-        }
+        if (selInterval) selInterval.value = '15';
 
         const chkStock = document.getElementById('check-sync-stock');
         if (chkStock && rules.syncStock !== undefined && (force || document.activeElement !== chkStock)) {

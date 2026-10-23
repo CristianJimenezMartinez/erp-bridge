@@ -4,41 +4,47 @@ export function renderSyncTab(): string {
         <div class="form-section">
           <div class="section-header">
             <div>
-              <div class="section-title">Vigilante en Tiempo Real y Reglas</div>
-              <div class="section-desc">Controla la periodicidad y qué datos tienen permiso para actualizar tu tienda.</div>
+              <div class="section-title">Parámetros de Estabilidad y Arranque (Fijos)</div>
+              <div class="section-desc">Valores certificados y bloqueados automáticamente por el sistema para garantizar máxima estabilidad y cero olvidos.</div>
             </div>
           </div>
 
-          <label class="checkbox-row">
-            <input type="checkbox" id="check-watcher-enabled" checked>
-            <div>
-              <div class="checkbox-label">Activar Vigilante en Tiempo Real del Software ERP</div>
-              <div class="checkbox-desc">Sincroniza al instante cada vez que tu ERP guarda un albarán, factura o modifica existencias.</div>
-            </div>
-          </label>
+          <input type="checkbox" id="check-watcher-enabled" checked disabled style="display:none;">
+          <input type="checkbox" id="check-autostart-enabled" checked disabled style="display:none;">
+          <input type="hidden" id="input-debounce-sec" value="5">
+          <select id="select-periodic-min" style="display:none;"><option value="15" selected>15</option></select>
 
-          <label class="checkbox-row" style="margin-top: 10px;">
-            <input type="checkbox" id="check-autostart-enabled" onchange="toggleAutoStart(this.checked)">
-            <div>
-              <div class="checkbox-label">Iniciar con Windows (Auto-arranque del Agente)</div>
-              <div class="checkbox-desc">Arranca el agente automáticamente en segundo plano en la bandeja del sistema al encender el ordenador.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 10px;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 600; color: #f8fafc;">Inicio con Windows</span>
+                <span class="tag tag-green" style="font-size: 10px;">Siempre Activo</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Arranca automáticamente en segundo plano al encender el ordenador para evitar olvidos.</div>
             </div>
-          </label>
 
-          <div class="form-grid" style="margin-top: 14px;">
-            <div class="form-group">
-              <label class="form-label">Tiempo de estabilización (segundos):</label>
-              <input type="number" id="input-debounce-sec" class="form-control" value="5" min="1" max="60">
-              <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">Espera a que el software ERP libere el archivo antes de leer datos.</div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 600; color: #f8fafc;">Vigilante en Tiempo Real</span>
+                <span class="tag tag-green" style="font-size: 10px;">Siempre Activo</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Detecta al instante cada albarán, factura o cambio de stock guardado en Factusol.</div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Sincronización Periódica de Seguridad:</label>
-              <select id="select-periodic-min" class="form-control form-select">
-                <option value="5">Cada 5 minutos</option>
-                <option value="15" selected>Cada 15 minutos (Recomendado)</option>
-                <option value="30">Cada 30 minutos</option>
-                <option value="60">Cada 1 hora</option>
-              </select>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 600; color: #f8fafc;">Tiempo de Estabilización</span>
+                <span class="tag tag-blue" style="font-size: 10px; font-variant-numeric: tabular-nums;">5 segundos (Fijo)</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Margen tras cada guardado para que Microsoft Access libere bloqueos OLEDB antes de leer.</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 600; color: #f8fafc;">Ciclo Autónomo Web</span>
+                <span class="tag tag-blue" style="font-size: 10px; font-variant-numeric: tabular-nums;">30 s / 15 min (Fijo)</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Revisa pedidos web y cambios de stock cada 30 segundos (Dirty-Check) y barrido cada 15 min.</div>
             </div>
           </div>
 
