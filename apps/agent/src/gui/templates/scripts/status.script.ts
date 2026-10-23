@@ -1006,7 +1006,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       showToast('Iniciando proceso de actualización y reinicio...', 'info');
 
       try {
-        const res = await fetch('/api/local/apply-update', { method: 'POST' });
+        const res = await fetch('/api/local/apply-update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const result = await res.json();
         if (!res.ok || (result && result.success === false)) {
           showToast((result && result.message) || 'No se pudo iniciar la actualización', 'error');
@@ -1127,7 +1127,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       if (btn) btn.disabled = true;
       showToast('Comprobando actualizaciones en el servidor central...', 'info');
       try {
-        const res = await fetch('/api/local/check-update', { method: 'POST' });
+        const res = await fetch('/api/local/check-update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const data = await res.json();
         if (data && (data.available || (data.checkResult && data.checkResult.available))) {
           const ver = data.version || (data.checkResult && data.checkResult.version) || '';

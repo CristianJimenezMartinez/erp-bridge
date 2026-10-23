@@ -711,7 +711,7 @@ export const wizardScript = `
       }
 
       try {
-        const res = await fetch('/api/local/detect-sql-instances', { method: 'POST' });
+        const res = await fetch('/api/local/detect-sql-instances', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const data = await res.json();
         if (box) box.style.display = 'block';
         const esc = window.escapeHtml || function(s) { return String(s || ''); };

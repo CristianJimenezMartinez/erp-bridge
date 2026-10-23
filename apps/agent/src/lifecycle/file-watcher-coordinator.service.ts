@@ -35,7 +35,11 @@ export class FileWatcherCoordinatorService {
     }
 
     if (!this.syncEngine.isBusy()) {
-      void this.syncEngine.triggerManualSync(false);
+      void this.syncEngine.triggerManualSync(false).then((res) => {
+        if (res.success && res.message && res.message.includes('0 stock actualizado, 0 pedidos importados')) {
+          this.eventBus.addEvent('success', `✓ ${res.message}`);
+        }
+      });
     }
     if (cfg.agentId && cfg.apiBaseUrl) {
       const tNotify = performance.now();

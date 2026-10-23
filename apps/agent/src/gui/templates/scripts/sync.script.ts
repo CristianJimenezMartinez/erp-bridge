@@ -35,7 +35,11 @@ export const syncScript = `
       if (iconH) iconH.classList.add('spin');
       showSmartToast({ message: 'Iniciando sincronización autónoma...', type: 'info' });
       try {
-        const res = await fetch('/api/local/sync-now', { method: 'POST' });
+        const res = await fetch('/api/local/sync-now', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}'
+        });
         const data = await res.json();
         const timeSuffix = (typeof data.durationMs === 'number') ? ' (' + data.durationMs + ' ms)' : '';
         if (data.success) {
@@ -47,16 +51,26 @@ export const syncScript = `
           fetchStatus();
           if (typeof loadSalesOrders === 'function') loadSalesOrders();
         } else {
-          // Si el mensaje del backend indica ausencia de URL, redirigir al canal web
-          const isMissingUrlError = /url.*no configurada|url.*requerida|falta.*url|dirección.*requerida|tienda.*no configurada/i.test(data.message || '');
-          if (isMissingUrlError && typeof navigateToChannelUrlInput === 'function') {
-            navigateToChannelUrlInput(data.message);
+          const rawMsg = data.message || data.error || '';
+          if (/ya hay un proceso de sincronización en ejecución|ya está ejecutando/i.test(rawMsg)) {
+            showSmartToast({
+              title: 'Sincronización en curso',
+              message: 'Ya se está ejecutando una sincronización automática con Factusol en este momento.',
+              type: 'info'
+            });
+            fetchStatus();
             return;
           }
-          const errInfo = humanizeErrorMessage(data.message, 'sync');
+          // Si el mensaje del backend indica ausencia de URL, redirigir al canal web
+          const isMissingUrlError = /url.*no configurada|url.*requerida|falta.*url|dirección.*requerida|tienda.*no configurada/i.test(rawMsg);
+          if (isMissingUrlError && typeof navigateToChannelUrlInput === 'function') {
+            navigateToChannelUrlInput(rawMsg);
+            return;
+          }
+          const errInfo = humanizeErrorMessage(rawMsg, 'sync');
           showSmartToast({
             title: errInfo.title || 'Aviso en sincronización',
-            message: (errInfo.message || data.message) + timeSuffix,
+            message: (errInfo.message || rawMsg) + timeSuffix,
             actionLabel: errInfo.actionLabel || 'Ver Registro →',
             targetTab: errInfo.targetTab || 'logs',
             targetInputId: errInfo.targetInputId,

@@ -120,7 +120,7 @@ export const factusolScript = `
       const label = isWizard ? null : document.getElementById('factusol-detected-label');
 
       try {
-        const res = await fetch('/api/local/detect-factusol', { method: 'POST' });
+        const res = await fetch('/api/local/detect-factusol', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const data = await res.json();
 
         box.style.display = 'block';
@@ -766,7 +766,7 @@ export const factusolScript = `
       const label = isWizard ? null : document.getElementById('simplygest-detected-label');
 
       try {
-        const res = await fetch('/api/local/detect-simplygest', { method: 'POST' });
+        const res = await fetch('/api/local/detect-simplygest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
         const data = await res.json();
 
         box.style.display = 'block';

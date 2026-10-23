@@ -6,17 +6,25 @@ export const coreScript = `
         init = init || {};
         const url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
         if (typeof url === 'string' && (url.startsWith('/api/local/') || url.startsWith('/v1/'))) {
+          const method = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          const isWriteMethod = method === 'POST' || method === 'PUT';
           const metaEl = document.querySelector('meta[name="bentian-token"]');
           const token = window.__BENTIAN_TOKEN__ || (metaEl ? metaEl.getAttribute('content') : '');
-          if (token) {
-            init.headers = init.headers || {};
-            if (typeof Headers !== 'undefined' && init.headers instanceof Headers) {
-              if (!init.headers.has('X-Bentian-Token')) init.headers.set('X-Bentian-Token', token);
-            } else if (Array.isArray(init.headers)) {
-              init.headers.push(['X-Bentian-Token', token]);
-            } else {
-              init.headers['X-Bentian-Token'] = token;
+          init.headers = init.headers || {};
+          if (typeof Headers !== 'undefined' && init.headers instanceof Headers) {
+            if (token && !init.headers.has('X-Bentian-Token')) init.headers.set('X-Bentian-Token', token);
+            if (isWriteMethod && !init.headers.has('Content-Type')) init.headers.set('Content-Type', 'application/json');
+          } else if (Array.isArray(init.headers)) {
+            if (token) init.headers.push(['X-Bentian-Token', token]);
+            if (isWriteMethod) init.headers.push(['Content-Type', 'application/json']);
+          } else {
+            if (token) init.headers['X-Bentian-Token'] = token;
+            if (isWriteMethod && !init.headers['Content-Type'] && !init.headers['content-type']) {
+              init.headers['Content-Type'] = 'application/json';
             }
+          }
+          if (isWriteMethod && init.body === undefined) {
+            init.body = '{}';
           }
         }
         return origFetch.call(this, input, init).then(function(res) {
