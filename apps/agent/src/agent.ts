@@ -587,16 +587,12 @@ export class LocalAgent {
     // 2. Extender SimplyGestAdapter para tablas físicas DBISAM (.dat) y SimplyGest Server REST API (:56985)
     enhanceSimplyGestAdapter(this.simplygestAdapter, this.logger);
 
-    // 3. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP y nuevos ERPs españoles) con transacciones T-SQL atómicas y resolución extendida en ErpProviderRegistry
+    // 3. Extender adaptadores SQL Server base (Ágora, Sage 50, a3ERP) con transacciones T-SQL atómicas
+    // (Los 7 nuevos conectores españoles ya incorporan enhanceExtendedSpanishSqlAdapter y clientes REST/RPC propios)
     for (const sqlAdapter of [
       this.agoraAdapter,
       this.sage50Adapter,
       this.a3erpAdapter,
-      this.sage200Adapter,
-      this.icgAdapter,
-      this.visionwinAdapter,
-      this.aplifisaAdapter,
-      this.businesscentralAdapter,
     ]) {
       enhanceSqlErpAdapter(sqlAdapter, this.logger);
     }

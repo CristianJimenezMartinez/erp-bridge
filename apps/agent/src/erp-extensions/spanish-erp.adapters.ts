@@ -10,35 +10,42 @@ import {
   SqlServerConnectionOptions,
 } from '../erp';
 import { EXTENDED_SQL_PROFILES } from './spanish-erp-profiles';
+import { enhanceExtendedSpanishSqlAdapter } from './spanish-local-mdb.helper';
+export { BusinessCentralErpAdapter } from './business-central.adapter';
 
 export class Sage200ErpAdapter extends SqlServerBaseAdapter {
   constructor(configManager: ConfigManager, eventBus?: EventBus) {
     super(EXTENDED_SQL_PROFILES.sage200, configManager, eventBus);
+    enhanceExtendedSpanishSqlAdapter(this);
   }
 }
 
 export class IcgManagerErpAdapter extends SqlServerBaseAdapter {
   constructor(configManager: ConfigManager, eventBus?: EventBus) {
     super(EXTENDED_SQL_PROFILES.icg, configManager, eventBus);
+    enhanceExtendedSpanishSqlAdapter(this);
   }
 }
 
 export class VisionwinErpAdapter extends SqlServerBaseAdapter {
   constructor(configManager: ConfigManager, eventBus?: EventBus) {
     super(EXTENDED_SQL_PROFILES.visionwin, configManager, eventBus);
+    enhanceExtendedSpanishSqlAdapter(this);
   }
 }
 
 export class AplifisaErpAdapter extends SqlServerBaseAdapter {
   constructor(configManager: ConfigManager, eventBus?: EventBus) {
     super(EXTENDED_SQL_PROFILES.aplifisa, configManager, eventBus);
+    enhanceExtendedSpanishSqlAdapter(this);
   }
 }
 
 /**
  * Conector Híbrido Odoo ERP (v14–v18):
  * - Si serverInstance es una URL HTTP/HTTPS (ej: http://127.0.0.1:8069 o https://mi-odoo.es),
- *   opera mediante el protocolo oficial JSON-RPC (/jsonrpc -> common.authenticate y object.execute_kw).
+ *   opera mediante el protocolo oficial JSON-RPC (/jsonrpc -> common.authenticate y object.execute_kw)
+ *   para catálogo, stock libre (free_qty) e inyección de pedidos completos (sale.order + sale.order.line).
  * - Si es una instancia SQL o Modo Evaluación Sandbox, delega en SqlServerBaseAdapter.
  */
 export class OdooErpAdapter extends SqlServerBaseAdapter {
@@ -151,6 +158,93 @@ export class OdooErpAdapter extends SqlServerBaseAdapter {
       return await this.fetchOdooCatalogViaRpc(limit);
     } catch {
       return [];
+    }
+  }
+
+  public override async getStockMap(warehouseCode?: string): Promise<Map<string, number>> {
+    if (this.isEvaluationMode() || !this.isHttpRpcUrl()) {
+      return super.getStockMap(warehouseCode);
+    }
+    const map = new Map<string, number>();
+    try {
+      const items = await this.fetchOdooCatalogViaRpc(5000);
+      for (const item of items) {
+        map.set(item.code.toUpperCase(), Math.max(0, item.stock));
+      }
+    } catch {}
+    return map;
+  }
+
+  public override async createOrder(order: CanonicalOrder, series?: string, warehouse?: string): Promise<ErpOrderResult> {
+    if (this.isEvaluationMode() || !this.isHttpRpcUrl()) {
+      return super.createOrder(order, series, warehouse);
+    }
+    try {
+      const s = this.getProviderSettings();
+      const baseUrl = this.getCleanBaseUrl(s.serverInstance);
+      const dbName = s.databaseName || 'odoo';
+      const user = s.username || 'admin';
+      const pass = s.password || '';
+      const uid = await this.callOdooJsonRpc(baseUrl, 'common', 'authenticate', [dbName, user, pass, {}]);
+      if (!uid) {
+        return { success: false, error: 'Autenticación fallida en Odoo JSON-RPC al crear pedido.' };
+      }
+
+      // 1. Resolver o crear cliente (res.partner)
+      const custName = order.customer?.fiscalName || 'Cliente Web';
+      const custEmail = order.customer?.email || '';
+      let partnerIds: number[] = [];
+      if (custEmail) {
+        partnerIds = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+          dbName, uid, pass, 'res.partner', 'search', [[['email', '=', custEmail]]], { limit: 1 },
+        ]);
+      }
+      let partnerId = Array.isArray(partnerIds) && partnerIds[0] ? Number(partnerIds[0]) : 0;
+      if (!partnerId) {
+        partnerId = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+          dbName, uid, pass, 'res.partner', 'create', [{ name: custName, email: custEmail || false }],
+        ]);
+      }
+
+      // 2. Construir comandos (0, 0, {...}) de líneas de pedido (sale.order.line)
+      const orderLineCommands: any[] = [];
+      for (const line of order.lines || []) {
+        const prodIds: number[] = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+          dbName, uid, pass, 'product.product', 'search', [[['default_code', '=', line.sku]]], { limit: 1 },
+        ]);
+        const prodId = Array.isArray(prodIds) && prodIds[0] ? Number(prodIds[0]) : false;
+        orderLineCommands.push([
+          0,
+          0,
+          {
+            ...(prodId ? { product_id: prodId } : {}),
+            name: line.name || line.sku,
+            product_uom_qty: Number(line.quantity) || 1,
+            price_unit: Number(line.unitPrice) || 0,
+          },
+        ]);
+      }
+
+      // 3. Crear sale.order con todas sus líneas en una sola transacción RPC
+      const orderId = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+        dbName,
+        uid,
+        pass,
+        'sale.order',
+        'create',
+        [
+          {
+            partner_id: partnerId,
+            client_order_ref: String(order.orderNumber || order.id || ''),
+            note: order.notes || '',
+            order_line: orderLineCommands,
+          },
+        ],
+      ]);
+
+      return { success: true, orderNumber: orderId, externalId: `SO-${orderId}` };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : String(err) };
     }
   }
 
@@ -294,6 +388,34 @@ export class FacturaScriptsErpAdapter extends SqlServerBaseAdapter {
     }
   }
 
+  public override async getStockMap(warehouseCode?: string): Promise<Map<string, number>> {
+    if (this.isEvaluationMode() || !this.isHttpApiUrl()) {
+      return super.getStockMap(warehouseCode);
+    }
+    const map = new Map<string, number>();
+    try {
+      const s = this.getProviderSettings();
+      const baseUrl = this.getCleanBaseUrl(s.serverInstance);
+      const apiKey = s.password || '';
+      const res = await fetch(`${baseUrl}/api/3/stocks?limit=2000`, {
+        headers: { Token: apiKey, Accept: 'application/json' },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) {
+        const rows: any[] = (await res.json()) as any[];
+        for (const r of rows || []) {
+          const sku = String(r.referencia || '').trim().toUpperCase();
+          const disp = Number(r.disponible ?? Number(r.cantidad || 0) - Number(r.reservada || 0));
+          if (sku) {
+            map.set(sku, Math.max(0, Math.round((map.get(sku) || 0) + disp)));
+          }
+        }
+        return map;
+      }
+    } catch {}
+    return map;
+  }
+
   public override async getPreviewArticles(limit = 25): Promise<ErpArticlePreviewItem[]> {
     if (this.isEvaluationMode() || !this.isHttpApiUrl()) {
       return super.getPreviewArticles(limit);
@@ -354,16 +476,5 @@ export class FacturaScriptsErpAdapter extends SqlServerBaseAdapter {
     } catch (err) {
       return { success: false, error: err instanceof Error ? err.message : String(err) };
     }
-  }
-}
-
-/**
- * Conector Híbrido Microsoft Dynamics 365 Business Central / Dynamics NAV:
- * - Soporta SQL Server On-Premises (tablas [CRONUS$Item], [CRONUS$Item Ledger Entry], [CRONUS$Sales Header])
- * - Soporta REST API v2.0 OData v4 (/api/v2.0/companies({id})/items y /salesOrders) cuando se indica URL HTTPS.
- */
-export class BusinessCentralErpAdapter extends SqlServerBaseAdapter {
-  constructor(configManager: ConfigManager, eventBus?: EventBus) {
-    super(EXTENDED_SQL_PROFILES.businesscentral, configManager, eventBus);
   }
 }
