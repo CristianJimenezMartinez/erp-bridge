@@ -79,6 +79,16 @@ import {
   IErpConnector,
   SupportedErpProviderId,
 } from './erp';
+import {
+  Sage200ErpAdapter,
+  IcgManagerErpAdapter,
+  VisionwinErpAdapter,
+  AplifisaErpAdapter,
+  OdooErpAdapter,
+  FacturaScriptsErpAdapter,
+  BusinessCentralErpAdapter,
+  ExtendedErpProviderId,
+} from './erp-extensions';
 import { enhanceSqlErpAdapter, enhanceSimplyGestAdapter } from './services/sql-erp-enhancer.service';
 
 // Re-exportar tipos y submódulos para 100% de compatibilidad externa
@@ -90,6 +100,7 @@ export * from './license';
 export * from './factusol';
 export * from './simplygest';
 export * from './erp';
+export * from './erp-extensions';
 export * from './channels';
 export * from './sync';
 export * from './update';
@@ -121,6 +132,13 @@ export class LocalAgent {
   public readonly agoraAdapter: AgoraErpAdapter;
   public readonly sage50Adapter: Sage50ErpAdapter;
   public readonly a3erpAdapter: A3ErpAdapter;
+  public readonly sage200Adapter: Sage200ErpAdapter;
+  public readonly icgAdapter: IcgManagerErpAdapter;
+  public readonly visionwinAdapter: VisionwinErpAdapter;
+  public readonly aplifisaAdapter: AplifisaErpAdapter;
+  public readonly odooAdapter: OdooErpAdapter;
+  public readonly facturascriptsAdapter: FacturaScriptsErpAdapter;
+  public readonly businesscentralAdapter: BusinessCentralErpAdapter;
   public readonly erpRegistry: ErpProviderRegistry;
   public readonly fileWatcherService: FileWatcherService;
   public readonly syncEngine: LocalSyncEngine;
@@ -159,12 +177,26 @@ export class LocalAgent {
     this.agoraAdapter = new AgoraErpAdapter(this.configManager, this.eventBus);
     this.sage50Adapter = new Sage50ErpAdapter(this.configManager, this.eventBus);
     this.a3erpAdapter = new A3ErpAdapter(this.configManager, this.eventBus);
+    this.sage200Adapter = new Sage200ErpAdapter(this.configManager, this.eventBus);
+    this.icgAdapter = new IcgManagerErpAdapter(this.configManager, this.eventBus);
+    this.visionwinAdapter = new VisionwinErpAdapter(this.configManager, this.eventBus);
+    this.aplifisaAdapter = new AplifisaErpAdapter(this.configManager, this.eventBus);
+    this.odooAdapter = new OdooErpAdapter(this.configManager, this.eventBus);
+    this.facturascriptsAdapter = new FacturaScriptsErpAdapter(this.configManager, this.eventBus);
+    this.businesscentralAdapter = new BusinessCentralErpAdapter(this.configManager, this.eventBus);
     this.erpRegistry = new ErpProviderRegistry(this.configManager, [
       this.factusolAdapter,
       this.simplygestAdapter,
       this.agoraAdapter,
       this.sage50Adapter,
       this.a3erpAdapter,
+      this.sage200Adapter,
+      this.icgAdapter,
+      this.visionwinAdapter,
+      this.aplifisaAdapter,
+      this.odooAdapter,
+      this.facturascriptsAdapter,
+      this.businesscentralAdapter,
     ]);
     this.enhanceErpAdapters();
     this.fileWatcherService = new FileWatcherService();
@@ -555,10 +587,30 @@ export class LocalAgent {
     // 2. Extender SimplyGestAdapter para tablas físicas DBISAM (.dat) y SimplyGest Server REST API (:56985)
     enhanceSimplyGestAdapter(this.simplygestAdapter, this.logger);
 
-    // 3. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP) con transacciones T-SQL atómicas (cabecera + líneas + stock + correlativo MAX+1 + idempotencia) y soporte de DB física local (.mdb)
-    for (const sqlAdapter of [this.agoraAdapter, this.sage50Adapter, this.a3erpAdapter]) {
+    // 3. Extender adaptadores SQL Server (Ágora, Sage 50, a3ERP y nuevos ERPs españoles) con transacciones T-SQL atómicas y resolución extendida en ErpProviderRegistry
+    for (const sqlAdapter of [
+      this.agoraAdapter,
+      this.sage50Adapter,
+      this.a3erpAdapter,
+      this.sage200Adapter,
+      this.icgAdapter,
+      this.visionwinAdapter,
+      this.aplifisaAdapter,
+      this.businesscentralAdapter,
+    ]) {
       enhanceSqlErpAdapter(sqlAdapter, this.logger);
     }
+
+    const origGetActiveId = this.erpRegistry.getActiveProviderId.bind(this.erpRegistry);
+    this.erpRegistry.getActiveProviderId = () => {
+      const c = this.configManager.get();
+      if (c.softwareErp?.activeProvider) return c.softwareErp.activeProvider;
+      const candidate = String(c.erpType || '').trim() as ExtendedErpProviderId;
+      if (candidate && this.erpRegistry.getAllConnectors().some((conn) => conn.providerId === (candidate as SupportedErpProviderId))) {
+        return candidate as SupportedErpProviderId;
+      }
+      return origGetActiveId();
+    };
   }
 
   public setGuiServer(server: AgentGuiServer | null): void {

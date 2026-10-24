@@ -2,6 +2,7 @@ import fs from 'fs';
 import { RouteHandler } from '../mini-router';
 import { LocalAgent } from '../../../agent';
 import { SqlServerBaseAdapter, SupportedErpProviderId } from '../../../erp';
+import { CatalogAuditController } from './catalog-audit.controller';
 
 export class SqlErpController {
   public static detectSqlInstances(): RouteHandler {
@@ -61,18 +62,36 @@ export class SqlErpController {
         return;
       }
 
-      const defaultDbs: Record<string, string> = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
-      const defaultInsts: Record<string, string> = { agora: '.\\SQLEXPRESS', sage50: '.\\SAGE50', a3erp: '.\\SQLEXPRESS' };
+      const defaultDbs: Record<string, string> = {
+        agora: 'AgoraDB',
+        sage50: 'GESTION',
+        a3erp: 'A3ERP',
+        sage200: 'SAGE200',
+        icg: 'ICGManager',
+        visionwin: 'VISIONWIN',
+        aplifisa: 'GESTFUTURO',
+        odoo: 'odoo_prod',
+        facturascripts: 'facturascripts',
+        businesscentral: 'BC_CRONUS_ES',
+      };
+      const defaultInsts: Record<string, string> = {
+        agora: '.\\SQLEXPRESS',
+        sage50: '.\\SAGE50',
+        a3erp: '.\\SQLEXPRESS',
+        sage200: '.\\SAGE200',
+        icg: '.\\ICG',
+        visionwin: '.\\SQLEXPRESS',
+        aplifisa: '.\\APLIFISA',
+        odoo: 'http://127.0.0.1:8069',
+        facturascripts: 'http://127.0.0.1:8000',
+        businesscentral: '.\\BCDEMO',
+      };
       const serverInstance = String(body.serverInstance || body.sqlInstance || defaultInsts[providerId] || '.\\SQLEXPRESS').trim();
       const databaseName = (!evaluationMode && rawDbInput && !rawDbInput.startsWith('mssql://'))
         ? rawDbInput
         : (defaultDbs[providerId] || 'AgoraDB');
 
-      const adapter = providerId === 'sage50'
-        ? agent.sage50Adapter
-        : providerId === 'a3erp'
-          ? agent.a3erpAdapter
-          : agent.agoraAdapter;
+      const adapter = agent.erpRegistry.getConnector(providerId) as SqlServerBaseAdapter;
 
       const testRes = await adapter.reconnect(
         evaluationMode ? 'DEMO' : `mssql://${serverInstance}/${databaseName}`,
@@ -120,6 +139,15 @@ export class SqlErpController {
         return;
       }
       const url = new URL(req.url || '/', 'http://127.0.0.1');
+      const mode = (url.searchParams.get('mode') || '').trim().toLowerCase();
+      if (mode === 'audit') {
+        await CatalogAuditController.handleAuditJson(agent, req, res);
+        return;
+      }
+      if (mode === 'audit-csv') {
+        await CatalogAuditController.handleAuditCsv(agent, req, res);
+        return;
+      }
       const providerId = (url.searchParams.get('provider') || url.searchParams.get('erpType') || agent.erpRegistry.getActiveProviderId()) as SupportedErpProviderId;
       const connector = agent.erpRegistry.getConnector(providerId);
       const articles = await connector.getPreviewArticles(25);

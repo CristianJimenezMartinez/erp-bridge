@@ -24,6 +24,13 @@ export function renderSidebar(agentVersion: string = '0.2.0'): string {
         </div>
         <span id="sidebar-erp-badge" class="tag tag-blue" style="font-size: 9px; padding: 1px 5px; font-weight: 700; margin-left: auto;">Factusol</span>
       </li>
+      <li class="nav-item" data-tab="catalog-audit" onclick="switchTab('catalog-audit')" style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: inline-flex; align-items: center; gap: 8px;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg>
+          <span>Auditoría de Catálogo</span>
+        </div>
+        <span id="sidebar-audit-badge" class="tag" style="font-size: 9px; padding: 1px 5px; font-weight: 700; margin-left: auto; background: rgba(255,255,255,0.06); color: var(--text-muted);">Auditor</span>
+      </li>
       <li class="nav-item" data-tab="channel" onclick="switchTab('channel')">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
         <span>Canal Web / Tienda</span>

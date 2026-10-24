@@ -753,11 +753,36 @@ export const wizardScript = `
       }
     }
 
+    const SQL_DEFAULT_DB_MAP = {
+      agora: 'AgoraDB',
+      sage50: 'GESTION',
+      a3erp: 'A3ERP',
+      sage200: 'SAGE200',
+      icg: 'ICGDB',
+      visionwin: 'VISIONWIN',
+      aplifisa: 'GESTFUTURO',
+      odoo: 'odoo_prod',
+      facturascripts: 'facturascripts',
+      businesscentral: 'BC240'
+    };
+
+    const SQL_DEFAULT_INSTANCE_MAP = {
+      agora: '.\\SQLEXPRESS',
+      sage50: '.\\SAGE50',
+      a3erp: '.\\SQLEXPRESS',
+      sage200: '.\\SAGE200',
+      icg: '.\\SQLEXPRESS',
+      visionwin: '.\\SQLEXPRESS',
+      aplifisa: '.\\SQLEXPRESS',
+      odoo: 'http://localhost:8069',
+      facturascripts: 'http://localhost:8000',
+      businesscentral: '.\\BCDEMO'
+    };
+
     async function wizTestSqlErpConnection() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
-      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
-      const databasePath = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
+      const sqlInstance = (document.getElementById('wiz-input-sql-instance') ? document.getElementById('wiz-input-sql-instance').value.trim() : '') || (SQL_DEFAULT_INSTANCE_MAP[activeErp] || '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('wiz-input-sql-dbname') ? document.getElementById('wiz-input-sql-dbname').value.trim() : '') || (SQL_DEFAULT_DB_MAP[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('wiz-select-sql-auth') ? document.getElementById('wiz-select-sql-auth').value : 'windows';
       const username = document.getElementById('wiz-input-sql-user') ? document.getElementById('wiz-input-sql-user').value.trim() : 'sa';
       const password = document.getElementById('wiz-input-sql-pass') ? document.getElementById('wiz-input-sql-pass').value : '';
@@ -810,9 +835,8 @@ export const wizardScript = `
 
     async function testMainSqlErpConnection() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
-      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
-      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (SQL_DEFAULT_INSTANCE_MAP[activeErp] || '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (SQL_DEFAULT_DB_MAP[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
       const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
       const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
@@ -859,13 +883,14 @@ export const wizardScript = `
 
     async function wizEnableEvaluationMode() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'factusol';
+      const isSql = activeErp !== 'factusol' && activeErp !== 'simplygest';
       try {
         const factInput = document.getElementById('wiz-input-fact-path');
         const sgInput = document.getElementById('wiz-input-simplygest-path');
         const sqlDbInput = document.getElementById('wiz-input-sql-dbname');
         if (activeErp === 'factusol' && factInput) factInput.value = 'DEMO';
         if (activeErp === 'simplygest' && sgInput) sgInput.value = 'DEMO';
-        if (sqlDbInput && (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp')) sqlDbInput.value = 'DEMO';
+        if (sqlDbInput && isSql) sqlDbInput.value = 'DEMO';
 
         const res = await fetch('/api/local/test-sql-erp', {
           method: 'POST',
@@ -877,7 +902,7 @@ export const wizardScript = `
           })
         });
         const data = await res.json();
-        const alertId = activeErp === 'simplygest' ? 'wiz-simplygest-alert' : ((activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') ? 'wiz-sql-alert' : 'wiz-fact-alert');
+        const alertId = activeErp === 'simplygest' ? 'wiz-simplygest-alert' : (isSql ? 'wiz-sql-alert' : 'wiz-fact-alert');
         const alertBox = document.getElementById(alertId);
         if (alertBox) {
           renderWizardSuccessCard(alertBox, data.message || 'Modo Evaluación (Datos Demo) activado con éxito.');
@@ -903,9 +928,8 @@ export const wizardScript = `
 
     async function saveSqlErpSettings() {
       const activeErp = (typeof currentErpType !== 'undefined' && currentErpType) ? currentErpType : 'agora';
-      const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
-      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (activeErp === 'sage50' ? '.\\SAGE50' : '.\\SQLEXPRESS');
-      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (defaultDbMap[activeErp] || 'AgoraDB');
+      const sqlInstance = (document.getElementById('input-sql-erp-instance') ? document.getElementById('input-sql-erp-instance').value.trim() : '') || (SQL_DEFAULT_INSTANCE_MAP[activeErp] || '.\\SQLEXPRESS');
+      const databasePath = (document.getElementById('input-sql-erp-db') ? document.getElementById('input-sql-erp-db').value.trim() : '') || (SQL_DEFAULT_DB_MAP[activeErp] || 'AgoraDB');
       const authMode = document.getElementById('select-sql-erp-auth') ? document.getElementById('select-sql-erp-auth').value : 'windows';
       const username = document.getElementById('input-sql-erp-user') ? document.getElementById('input-sql-erp-user').value.trim() : 'sa';
       const password = document.getElementById('input-sql-erp-pass') ? document.getElementById('input-sql-erp-pass').value : '';
@@ -1009,9 +1033,9 @@ export const wizardScript = `
         }
       };
 
-      if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
-        const defaultDbMap = { agora: 'AgoraDB', sage50: 'GESTION', a3erp: 'A3ERP' };
-        const effectiveDbName = sqlDbName || defaultDbMap[activeErp] || 'AgoraDB';
+      const isSqlErpTarget = activeErp !== 'factusol' && activeErp !== 'simplygest';
+      if (isSqlErpTarget) {
+        const effectiveDbName = sqlDbName || SQL_DEFAULT_DB_MAP[activeErp] || 'AgoraDB';
         providers[activeErp] = {
           serverInstance: sqlInstance,
           sqlInstance: sqlInstance,
@@ -1060,7 +1084,7 @@ export const wizardScript = `
           accessToken: (document.getElementById('wiz-input-shopify-token') ? document.getElementById('wiz-input-shopify-token').value.trim() : '') || undefined,
         }
       };
-      if (activeErp === 'agora' || activeErp === 'sage50' || activeErp === 'a3erp') {
+      if (isSqlErpTarget) {
         payload[activeErp] = providers[activeErp];
       }
       await submitConfigUpdates(payload, '¡Configuración completada con éxito!');

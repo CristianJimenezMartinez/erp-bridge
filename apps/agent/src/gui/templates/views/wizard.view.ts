@@ -132,6 +132,62 @@ export function renderWizardModal(): string {
               </div>
               <div style="font-size: 10.5px; color: var(--text-muted);">SQL Server + ActiveX COM</div>
             </div>
+
+            <div id="wiz-erp-choice-sage200" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('sage200')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #34d399;">Sage 200</span>
+                <span id="wiz-badge-erp-sage200" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">SQL Server (Murano)</div>
+            </div>
+
+            <div id="wiz-erp-choice-icg" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('icg')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #fb7185;">ICG / FrontRetail</span>
+                <span id="wiz-badge-erp-icg" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">SQL Server (ICGManager)</div>
+            </div>
+
+            <div id="wiz-erp-choice-visionwin" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('visionwin')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #38bdf8;">Visionwin</span>
+                <span id="wiz-badge-erp-visionwin" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">Firebird / SQL Local</div>
+            </div>
+
+            <div id="wiz-erp-choice-aplifisa" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('aplifisa')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #c084fc;">Aplifisa</span>
+                <span id="wiz-badge-erp-aplifisa" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">GestFuturo / Factus</div>
+            </div>
+
+            <div id="wiz-erp-choice-odoo" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('odoo')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #a78bfa;">Odoo ERP</span>
+                <span id="wiz-badge-erp-odoo" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">JSON-RPC / PostgreSQL</div>
+            </div>
+
+            <div id="wiz-erp-choice-facturascripts" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('facturascripts')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #60a5fa;">FacturaScripts</span>
+                <span id="wiz-badge-erp-facturascripts" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">API REST v3 / SQL</div>
+            </div>
+
+            <div id="wiz-erp-choice-businesscentral" class="channel-card" style="padding: 11px 12px;" onclick="wizSelectErp('businesscentral')">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 12.5px; color: #38bdf8;">Business Central</span>
+                <span id="wiz-badge-erp-businesscentral" class="tag" style="font-size: 9px; background: rgba(255,255,255,0.06); color: var(--text-muted);">○ Disponible</span>
+              </div>
+              <div style="font-size: 10.5px; color: var(--text-muted);">Dynamics NAV / OData</div>
+            </div>
           </div>
 
           <!-- PANEL SQL SERVER LOCAL EN WIZARD (ÁGORA POS, SAGE 50, A3ERP) -->

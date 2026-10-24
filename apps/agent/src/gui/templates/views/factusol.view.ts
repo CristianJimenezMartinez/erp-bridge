@@ -504,6 +504,125 @@ export function renderFactusolTab(): string {
                   </div>
                 </div>
 
+                <!-- 6. SAGE 200 (SAGE MURANO) -->
+                <div id="modal-choice-sage200" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('sage200')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #34d399;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Sage 200 (Murano)</span>
+                      </div>
+                      <span id="modal-badge-sage200" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #6ee7b7; margin-bottom: 4px; font-weight: 600;">MS SQL Server (SAGE200 / LogicClass)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas Articulos, AcumuladosStock (Periodo 99) y pedidos CabeceraPedidoCliente / LineasPedidoCliente.</div>
+                  </div>
+                </div>
+
+                <!-- 7. ICG MANAGER / FRONTRETAIL (HIOPOS) -->
+                <div id="modal-choice-icg" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('icg')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(244,63,94,0.15); display: flex; align-items: center; justify-content: center; color: #fb7185;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">ICG Manager / FrontRetail</span>
+                      </div>
+                      <span id="modal-badge-icg" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #fda4af; margin-bottom: 4px; font-weight: 600;">SQL Server Local (ICGManager / HIOPOS)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas ARTICULOS, ARTICULOSLIN (tallas/colores/EAN), PRECIOSVENTA, STOCKS y PEDVENTACAB.</div>
+                  </div>
+                </div>
+
+                <!-- 8. VISIONWIN GESTIÓN -->
+                <div id="modal-choice-visionwin" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('visionwin')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(56,189,248,0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Visionwin Gestión</span>
+                      </div>
+                      <span id="modal-badge-visionwin" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #7dd3fc; margin-bottom: 4px; font-weight: 600;">Firebird / SQL Local (VISIONWIN)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas ARTICULOS (PVP1..PVP5, STOCK, CODBARRAS) y pedidos PEDIDOS_CLI / LINEAS_PEDIDOS_CLI.</div>
+                  </div>
+                </div>
+
+                <!-- 9. APLIFISA (GESTFUTURO / FACTUS) -->
+                <div id="modal-choice-aplifisa" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('aplifisa')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(168,85,247,0.15); display: flex; align-items: center; justify-content: center; color: #c084fc;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Aplifisa (GestFuturo)</span>
+                      </div>
+                      <span id="modal-badge-aplifisa" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #d8b4fe; margin-bottom: 4px; font-weight: 600;">SQL Server / Firebird (GESTFUTURO / Factus)</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas ARTICULOS, EXISTENCIAS (STOCKACTUAL - RESERVADO) y PEDIDOSCLI_CAB / PEDIDOSCLI_LIN.</div>
+                  </div>
+                </div>
+
+                <!-- 10. ODOO ERP (ON-PREMISE & CLOUD) -->
+                <div id="modal-choice-odoo" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('odoo')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(139,92,246,0.15); display: flex; align-items: center; justify-content: center; color: #a78bfa;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Odoo ERP (v14–v18)</span>
+                      </div>
+                      <span id="modal-badge-odoo" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #c4b5fd; margin-bottom: 4px; font-weight: 600;">JSON-RPC (/jsonrpc) & PostgreSQL Local</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Modelos product.product, stock.quant (free_qty) y sale.order / sale.order.line.</div>
+                  </div>
+                </div>
+
+                <!-- 11. FACTURASCRIPTS -->
+                <div id="modal-choice-facturascripts" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('facturascripts')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; color: #60a5fa;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 16 18"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">FacturaScripts</span>
+                      </div>
+                      <span id="modal-badge-facturascripts" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #93c5fd; margin-bottom: 4px; font-weight: 600;">API REST v3 (/api/3) & MySQL / PostgreSQL</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Endpoints /api/3/productos, /api/3/variantes, /api/3/stocks y /api/3/crearPedidoCliente.</div>
+                  </div>
+                </div>
+
+                <!-- 12. MICROSOFT DYNAMICS 365 BUSINESS CENTRAL / NAV -->
+                <div id="modal-choice-businesscentral" class="channel-card" style="cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; transition: all 0.2s;" onclick="selectModalErp('businesscentral')">
+                  <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(14,165,233,0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #fff; font-size: 13.5px;">Business Central / NAV</span>
+                      </div>
+                      <span id="modal-badge-businesscentral" class="tag" style="font-size: 9.5px; background: rgba(255,255,255,0.06); color: var(--text-muted);">Disponible</span>
+                    </div>
+                    <div style="font-size: 11px; color: #7dd3fc; margin-bottom: 4px; font-weight: 600;">Dynamics NAV SQL Server & OData API v2.0</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">Tablas [CRONUS$Item], [CRONUS$Item Ledger Entry] y [CRONUS$Sales Header] / [Sales Line].</div>
+                  </div>
+                </div>
+
               </div>
 
               <!-- AVISO PEDAGÓGICO DE CAMBIO -->

@@ -2,6 +2,7 @@ export { renderSidebar } from './sidebar.view';
 export { renderHeader } from './header.view';
 export { renderOverviewTab } from './overview.view';
 export { renderFactusolTab } from './factusol.view';
+export { renderCatalogAuditTab } from './catalog-audit.view';
 export { renderChannelTab } from './channel.view';
 export { renderSyncTab } from './sync.view';
 export { renderNotificationsTab } from './notifications.view';

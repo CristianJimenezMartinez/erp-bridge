@@ -548,18 +548,26 @@ export const coreScript = `
                                currentStatus.erpType
                              )) || 'factusol';
       const isSimplyGest = activeProvider === 'simplygest';
-      const isSqlErp = activeProvider === 'agora' || activeProvider === 'sage50' || activeProvider === 'a3erp';
+      const isSqlErp = Boolean(activeProvider && activeProvider !== 'factusol' && activeProvider !== 'simplygest');
       const erpTabTitles = {
         factusol: 'Factusol ERP',
         simplygest: 'SimplyGest Desktop',
         agora: 'Ágora Retail / POS',
         sage50: 'Sage 50 ERP',
-        a3erp: 'Wolters Kluwer a3ERP'
+        a3erp: 'Wolters Kluwer a3ERP',
+        sage200: 'Sage 200 (Sage Murano)',
+        icg: 'ICG Manager / FrontRetail',
+        visionwin: 'Visionwin Gestión',
+        aplifisa: 'Aplifisa (GestFuturo)',
+        odoo: 'Odoo ERP (v14–v18)',
+        facturascripts: 'FacturaScripts ERP',
+        businesscentral: 'Dynamics 365 Business Central'
       };
 
       const titles = {
         overview: 'Estado General',
         factusol: erpTabTitles[activeProvider] || 'Factusol ERP',
+        'catalog-audit': 'Auditoría de Catálogo — ' + (erpTabTitles[activeProvider] || 'Factusol ERP'),
         channel: 'Canal Web / Tienda Online',
         sync: 'Automatización y Reglas',
         notifications: 'Centro de Notificaciones & Alertas',
@@ -583,6 +591,9 @@ export const coreScript = `
             loadFactusolMetadata();
           }
         }
+      } else if (tabId === 'catalog-audit') {
+        if (typeof syncCatalogAuditErpBanner === 'function') syncCatalogAuditErpBanner(activeProvider);
+        if (typeof loadCatalogAudit === 'function') loadCatalogAudit(false);
       } else if (tabId === 'history') {
         if (typeof loadSalesOrders === 'function') loadSalesOrders();
       }

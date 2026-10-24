@@ -116,7 +116,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
           const isErpConfigured = evalEnabled ? true : (
             activeErpType === 'simplygest'
               ? !!(data.simplygest && data.simplygest.configured)
-              : ((activeErpType === 'agora' || activeErpType === 'sage50' || activeErpType === 'a3erp')
+              : ((activeErpType !== 'factusol' && activeErpType !== 'simplygest')
                 ? Boolean((data.softwareErp && data.softwareErp.sqlConnection && data.softwareErp.sqlConnection.serverInstance) || (data.softwareErp && data.softwareErp.provisioned))
                 : !!(data.factusol && data.factusol.configured))
           );
@@ -149,18 +149,25 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       document.getElementById('sidebar-hostname').textContent = (data.system && data.system.hostname) ? data.system.hostname : 'Local';
       document.getElementById('sidebar-hwid').textContent = data.hwid ? (data.hwid.substring(0, 12) + '...') : '---';
 
-      // ERP Type & Labels (5 Motores ERP + Modo Evaluación Sandbox)
+      // ERP Type & Labels (12 Motores ERP España + Modo Evaluación Sandbox)
       const erpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
       const evalMode = data.evaluationMode && data.evaluationMode.enabled;
       const isSimplyGest = erpType === 'simplygest';
-      const isSqlErp = erpType === 'agora' || erpType === 'sage50' || erpType === 'a3erp';
+      const isSqlErp = Boolean(erpType && erpType !== 'factusol' && erpType !== 'simplygest');
 
       const erpMetaMap = {
         factusol: { sidebarTitle: 'Factusol ERP', badge: 'Factusol', tagClass: 'tag tag-blue', cardName: 'Factusol Desktop', shortName: 'Factusol', ext: '.accdb', inputId: 'input-factusol-db' },
         simplygest: { sidebarTitle: 'SimplyGest Desktop', badge: 'SimplyGest', tagClass: 'tag tag-green', cardName: 'SimplyGest Desktop', shortName: 'SimplyGest', ext: 'Datos.mdb', inputId: 'input-simplygest-db' },
         agora: { sidebarTitle: 'Ágora POS', badge: 'Ágora POS', tagClass: 'tag tag-amber', cardName: 'Ágora Retail / POS', shortName: 'Ágora POS', ext: 'SQL Server (AgoraDB)', inputId: 'input-sql-erp-instance' },
         sage50: { sidebarTitle: 'Sage 50 ERP', badge: 'Sage 50', tagClass: 'tag tag-green', cardName: 'Sage 50 Local', shortName: 'Sage 50', ext: 'SQL Server (GESTION)', inputId: 'input-sql-erp-instance' },
-        a3erp: { sidebarTitle: 'a3ERP', badge: 'a3ERP', tagClass: 'tag tag-amber', cardName: 'Wolters Kluwer a3ERP', shortName: 'a3ERP', ext: 'SQL Server (A3ERP)', inputId: 'input-sql-erp-instance' }
+        a3erp: { sidebarTitle: 'a3ERP', badge: 'a3ERP', tagClass: 'tag tag-amber', cardName: 'Wolters Kluwer a3ERP', shortName: 'a3ERP', ext: 'SQL Server (A3ERP)', inputId: 'input-sql-erp-instance' },
+        sage200: { sidebarTitle: 'Sage 200', badge: 'Sage 200', tagClass: 'tag tag-green', cardName: 'Sage 200 (Murano)', shortName: 'Sage 200', ext: 'SQL Server (SAGE200)', inputId: 'input-sql-erp-instance' },
+        icg: { sidebarTitle: 'ICG Manager', badge: 'ICG', tagClass: 'tag tag-blue', cardName: 'ICG Manager / FrontRetail', shortName: 'ICG Manager', ext: 'SQL Server (ICGDB)', inputId: 'input-sql-erp-instance' },
+        visionwin: { sidebarTitle: 'Visionwin', badge: 'Visionwin', tagClass: 'tag tag-blue', cardName: 'Visionwin Gestión', shortName: 'Visionwin', ext: 'SQL / Local (VISIONWIN)', inputId: 'input-sql-erp-instance' },
+        aplifisa: { sidebarTitle: 'Aplifisa', badge: 'Aplifisa', tagClass: 'tag tag-amber', cardName: 'Aplifisa (GestFuturo)', shortName: 'Aplifisa', ext: 'SQL Server (GESTFUTURO)', inputId: 'input-sql-erp-instance' },
+        odoo: { sidebarTitle: 'Odoo ERP', badge: 'Odoo', tagClass: 'tag tag-blue', cardName: 'Odoo ERP (v14–v18)', shortName: 'Odoo ERP', ext: 'JSON-RPC / PostgreSQL', inputId: 'input-sql-erp-instance' },
+        facturascripts: { sidebarTitle: 'FacturaScripts', badge: 'FacturaScripts', tagClass: 'tag tag-blue', cardName: 'FacturaScripts ERP', shortName: 'FacturaScripts', ext: 'API REST v3 / SQL', inputId: 'input-sql-erp-instance' },
+        businesscentral: { sidebarTitle: 'Business Central', badge: 'Dynamics BC', tagClass: 'tag tag-blue', cardName: 'Dynamics 365 Business Central', shortName: 'Business Central', ext: 'SQL Server / OData (BC240)', inputId: 'input-sql-erp-instance' }
       };
       const activeMeta = erpMetaMap[erpType] || erpMetaMap.factusol;
 
@@ -177,6 +184,9 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const cardErpName = document.getElementById('card-erp-name');
       if (cardErpName) {
         cardErpName.textContent = evalMode ? 'Sandbox Demo Activo' : activeMeta.cardName;
+      }
+      if (typeof syncCatalogAuditErpBanner === 'function') {
+        syncCatalogAuditErpBanner(erpType);
       }
 
       // ERP Card Status
@@ -401,7 +411,7 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
       const erpType = (data.softwareErp && data.softwareErp.activeProvider) || data.erpType || 'factusol';
       const evalMode = Boolean(data.evaluationMode && data.evaluationMode.enabled);
       const isSimplyGest = (erpType === 'simplygest');
-      const isSqlErp = (erpType === 'agora' || erpType === 'sage50' || erpType === 'a3erp');
+      const isSqlErp = Boolean(erpType && erpType !== 'factusol' && erpType !== 'simplygest');
       const erpInfo = isSimplyGest ? (data.simplygest || {}) : (data.factusol || {});
       const sqlConn = (data.softwareErp && data.softwareErp.sqlConnection) || {};
       const sqlConfigured = Boolean(sqlConn.serverInstance || (data.softwareErp && data.softwareErp.provisioned));
@@ -411,14 +421,28 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         simplygest: 'SimplyGest',
         agora: 'Ágora POS',
         sage50: 'Sage 50',
-        a3erp: 'a3ERP'
+        a3erp: 'a3ERP',
+        sage200: 'Sage 200',
+        icg: 'ICG Manager',
+        visionwin: 'Visionwin',
+        aplifisa: 'Aplifisa',
+        odoo: 'Odoo ERP',
+        facturascripts: 'FacturaScripts',
+        businesscentral: 'Business Central'
       };
       const erpExtMap = {
         factusol: '.accdb',
         simplygest: 'Datos.mdb',
         agora: 'SQL Server (AgoraDB)',
         sage50: 'SQL Server (GESTION)',
-        a3erp: 'SQL Server (A3ERP)'
+        a3erp: 'SQL Server (A3ERP)',
+        sage200: 'SQL Server (SAGE200)',
+        icg: 'SQL Server (ICGDB)',
+        visionwin: 'SQL / Local (VISIONWIN)',
+        aplifisa: 'SQL Server (GESTFUTURO)',
+        odoo: 'JSON-RPC / PostgreSQL (odoo_prod)',
+        facturascripts: 'API REST v3 / SQL (facturascripts)',
+        businesscentral: 'SQL Server / OData (BC240)'
       };
       const erpName = evalMode ? 'Modo Evaluación Demo' : (erpNameMap[erpType] || 'Factusol');
       const erpFileExt = erpExtMap[erpType] || '.accdb';

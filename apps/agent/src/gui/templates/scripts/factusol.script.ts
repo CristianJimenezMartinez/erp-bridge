@@ -480,11 +480,99 @@ export const factusolScript = `
         desc: 'Sincronización nativa con Wolters Kluwer a3ERP (puente COM a3ERPActiveX.Pedido y SQL directo con clave IDPEDV).',
         defaultDb: 'A3ERP',
         defaultInstance: '.\\SQLEXPRESS'
+      },
+      sage200: {
+        title: 'Sage 200 / Murano (SQL Server)',
+        sidebarTitle: 'Sage 200',
+        sidebarBadge: 'Sage 200',
+        tagClass: 'tag-green',
+        color: '#34d399',
+        bg: 'rgba(52,211,153,0.15)',
+        desc: 'Sincronización empresarial con Sage 200 / Sage Murano (Articulos, AcumuladosStock Periodo 99 y CabeceraPedidoCliente).',
+        defaultDb: 'SAGE200',
+        defaultInstance: '.\\SAGE200'
+      },
+      icg: {
+        title: 'ICG Manager / FrontRetail (HIOPOS SQL)',
+        sidebarTitle: 'ICG Manager',
+        sidebarBadge: 'ICG',
+        tagClass: 'tag-blue',
+        color: '#38bdf8',
+        bg: 'rgba(56,189,248,0.15)',
+        desc: 'Sincronización retail y hostelería con ICG Manager / FrontRetail (ARTICULOS, ARTICULOSLIN Talla/Color, STOCKS y PEDVENTACAB).',
+        defaultDb: 'ICGDB',
+        defaultInstance: '.\\SQLEXPRESS'
+      },
+      visionwin: {
+        title: 'Visionwin Gestión (Local / SQL)',
+        sidebarTitle: 'Visionwin',
+        sidebarBadge: 'Visionwin',
+        tagClass: 'tag-blue',
+        color: '#a78bfa',
+        bg: 'rgba(167,139,250,0.15)',
+        desc: 'Sincronización con Visionwin Gestión (ARTICULOS PVP1..5, STOCK_ALMACEN y PEDIDOS_CLI).',
+        defaultDb: 'VISIONWIN',
+        defaultInstance: '.\\SQLEXPRESS'
+      },
+      aplifisa: {
+        title: 'Aplifisa (GestFuturo / Factus SQL)',
+        sidebarTitle: 'Aplifisa',
+        sidebarBadge: 'Aplifisa',
+        tagClass: 'tag-amber',
+        color: '#fb923c',
+        bg: 'rgba(251,146,60,0.15)',
+        desc: 'Sincronización con Aplifisa GestFuturo / Factus (ARTICULOS, EXISTENCIAS y PEDIDOSCLI_CAB).',
+        defaultDb: 'GESTFUTURO',
+        defaultInstance: '.\\SQLEXPRESS'
+      },
+      odoo: {
+        title: 'Odoo ERP (v14–v18 JSON-RPC + PostgreSQL)',
+        sidebarTitle: 'Odoo ERP',
+        sidebarBadge: 'Odoo',
+        tagClass: 'tag-blue',
+        color: '#c084fc',
+        bg: 'rgba(192,132,252,0.15)',
+        desc: 'Sincronización híbrida con Odoo ERP v14–v18 (JSON-RPC /jsonrpc y tablas product_product, stock_quant y sale_order).',
+        defaultDb: 'odoo_prod',
+        defaultInstance: 'http://localhost:8069'
+      },
+      facturascripts: {
+        title: 'FacturaScripts (API REST v3 + SQL)',
+        sidebarTitle: 'FacturaScripts',
+        sidebarBadge: 'FacturaScripts',
+        tagClass: 'tag-blue',
+        color: '#60a5fa',
+        bg: 'rgba(96,165,250,0.15)',
+        desc: 'Sincronización con FacturaScripts Open Source (API REST v3 /api/3/productos y tablas variantes, stocks y pedidoscli).',
+        defaultDb: 'facturascripts',
+        defaultInstance: 'http://localhost:8000'
+      },
+      businesscentral: {
+        title: 'Dynamics 365 Business Central / NAV',
+        sidebarTitle: 'Business Central',
+        sidebarBadge: 'Dynamics BC',
+        tagClass: 'tag-blue',
+        color: '#2dd4bf',
+        bg: 'rgba(45,212,191,0.15)',
+        desc: 'Sincronización corporativa con Microsoft Dynamics 365 Business Central / Navision (SQL Server [CRONUS$Item] y OData v2.0).',
+        defaultDb: 'BC240',
+        defaultInstance: '.\\BCDEMO'
       }
     };
 
+    const ALL_SPANISH_ERPS = [
+      'factusol', 'simplygest', 'agora', 'sage50', 'a3erp',
+      'sage200', 'icg', 'visionwin', 'aplifisa', 'odoo', 'facturascripts', 'businesscentral'
+    ];
+    window.ALL_SPANISH_ERPS = ALL_SPANISH_ERPS;
+
+    function isExtendedSqlOrHybridErp(erpId) {
+      return Boolean(erpId && erpId !== 'factusol' && erpId !== 'simplygest');
+    }
+    window.isExtendedSqlOrHybridErp = isExtendedSqlOrHybridErp;
+
     function updateModalErpUI(type) {
-      const allErps = ['factusol', 'simplygest', 'agora', 'sage50', 'a3erp'];
+      const allErps = ALL_SPANISH_ERPS;
       allErps.forEach(function(id) {
         const card = document.getElementById('modal-choice-' + id);
         const badge = document.getElementById('modal-badge-' + id);
@@ -530,7 +618,7 @@ export const factusolScript = `
     function selectErpType(type) {
       currentErpType = type || 'factusol';
       const meta = ERP_UI_META[currentErpType] || ERP_UI_META.factusol;
-      const isSqlErp = (currentErpType === 'agora' || currentErpType === 'sage50' || currentErpType === 'a3erp');
+      const isSqlErp = isExtendedSqlOrHybridErp(currentErpType);
 
       const iconFact = document.getElementById('erp-active-icon-factusol');
       const iconSg = document.getElementById('erp-active-icon-simplygest');
@@ -564,6 +652,9 @@ export const factusolScript = `
         sidebarBadge.textContent = meta.sidebarBadge;
         sidebarBadge.className = 'tag ' + meta.tagClass;
       }
+      if (typeof syncCatalogAuditErpBanner === 'function') {
+        syncCatalogAuditErpBanner(currentErpType);
+      }
 
       if (currentErpType === 'simplygest') {
         if (iconFact) iconFact.style.display = 'none';
@@ -584,10 +675,12 @@ export const factusolScript = `
         if (sqlPreviewTitle) sqlPreviewTitle.textContent = 'Vista Previa de Artículos — ' + meta.sidebarTitle;
         const dbInput = document.getElementById('input-sql-erp-db');
         const instInput = document.getElementById('input-sql-erp-instance');
-        if (dbInput && (!dbInput.value || dbInput.value === 'AgoraPOS' || dbInput.value === 'SAGE50' || dbInput.value === 'A3ERP')) {
+        const defaultDbs = ['AgoraPOS', 'AgoraDB', 'SAGE50', 'GESTION', 'A3ERP', 'SAGE200', 'ICGDB', 'VISIONWIN', 'GESTFUTURO', 'odoo_prod', 'facturascripts', 'BC240'];
+        const defaultInsts = ['.\\SQLEXPRESS', '.\\SAGE50', '.\\SAGE200', '.\\BCDEMO', 'http://localhost:8069', 'http://localhost:8000'];
+        if (dbInput && (!dbInput.value || defaultDbs.indexOf(dbInput.value) !== -1)) {
           dbInput.value = meta.defaultDb;
         }
-        if (instInput && (!instInput.value || instInput.value === '.\\SQLEXPRESS' || instInput.value === '.\\SAGE50')) {
+        if (instInput && (!instInput.value || defaultInsts.indexOf(instInput.value) !== -1)) {
           instInput.value = meta.defaultInstance;
         }
         if (typeof loadSqlErpPreview === 'function') loadSqlErpPreview();
@@ -604,7 +697,7 @@ export const factusolScript = `
 
     function wizSelectErp(type) {
       const target = type || 'factusol';
-      const allErps = ['factusol', 'simplygest', 'agora', 'sage50', 'a3erp'];
+      const allErps = ALL_SPANISH_ERPS;
       allErps.forEach(function(id) {
         const card = document.getElementById('wiz-erp-choice-' + id);
         const badge = document.getElementById('wiz-badge-erp-' + id);
@@ -631,7 +724,7 @@ export const factusolScript = `
       const panelFact = document.getElementById('wiz-panel-factusol');
       const panelSg = document.getElementById('wiz-panel-simplygest');
       const panelSql = document.getElementById('wiz-panel-sql-erp');
-      const isSqlErp = (target === 'agora' || target === 'sage50' || target === 'a3erp');
+      const isSqlErp = isExtendedSqlOrHybridErp(target);
 
       if (target === 'simplygest') {
         if (panelFact) panelFact.style.display = 'none';

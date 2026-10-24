@@ -7,3 +7,4 @@ export * from './system.controller';
 export * from './sales-orders.controller';
 export * from './simplygest.controller';
 export * from './sql-erp.controller';
+export * from './catalog-audit.controller';
