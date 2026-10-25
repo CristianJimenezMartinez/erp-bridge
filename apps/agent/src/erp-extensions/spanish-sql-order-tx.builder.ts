@@ -32,6 +32,10 @@ export function buildExtendedSpanishSqlOrderBatch(
   const lines = Array.isArray(order.lines) ? order.lines : [];
   const fallbackOrderNum = Math.floor(Date.now() / 1000) % 1000000;
 
+  // NO VERIFICADO (sin documentación pública oficial): tablas/columnas de Sage 200 (CabeceraPedidoCliente/LineasPedidoCliente,
+  // AcumuladosStock/UnidadesReservadas; posible nombre real AcumuladoStock), ICG (PEDVENTACAB/PEDVENTALIN y stock),
+  // Visionwin (PEDIDOS_CLI/LINEAS_PEDIDOS_CLI/STOCK_ALMACEN) y Aplifisa (PEDIDOSCLI_CAB/_LIN/EXISTENCIAS).
+  // BC: el prefijo [CRONUS$] es el de la empresa demo; en producción es el nombre de la empresa.
   if (providerId === 'sage200') {
     const lineSql = lines
       .map((l, idx) => {
@@ -42,7 +46,7 @@ export function buildExtendedSpanishSqlOrderBatch(
         const price = Number(l.unitPrice || 0).toFixed(4);
         const imp = Number(l.total ?? qty * Number(l.unitPrice || 0)).toFixed(2);
         return `
-      INSERT INTO LineasPedidoCliente (CodigoEmpresa, Ejercicio, SeriePedido, NumeroPedido, Orden, CodigoArticulo, DescripcionArticulo, CodigoAlmacen, UnidadesPedidas, Precio, ImporteLiquido)
+      INSERT INTO LineasPedidoCliente (CodigoEmpresa, EjercicioPedido, SeriePedido, NumeroPedido, Orden, CodigoArticulo, DescripcionArticulo, CodigoAlmacen, UnidadesPedidas, Precio, ImporteLiquido)
       VALUES (@CodEmp, YEAR(GETDATE()), '${safeSerie}', @AssignedNum, ${orden}, '${sku}', '${desc}', '${safeWh}', ${qty}, ${price}, ${imp});
       IF OBJECT_ID('AcumuladosStock', 'U') IS NOT NULL
         UPDATE AcumuladosStock SET UnidadesReservadas = ISNULL(UnidadesReservadas, 0) + ${qty}
@@ -59,12 +63,12 @@ BEGIN TRY
   IF OBJECT_ID('Articulos', 'U') IS NOT NULL
     SELECT TOP 1 @CodEmp = ISNULL(CodigoEmpresa, 1) FROM Articulos GROUP BY CodigoEmpresa ORDER BY COUNT(*) DESC;
   SELECT TOP 1 @AssignedNum = NumeroPedido FROM CabeceraPedidoCliente WITH (UPDLOCK, HOLDLOCK)
-    WHERE CodigoEmpresa = @CodEmp AND Observaciones = '${safeRef}' AND '${safeRef}' <> '';
+    WHERE CodigoEmpresa = @CodEmp AND ObservacionesPedido = '${safeRef}' AND '${safeRef}' <> '';
   IF @AssignedNum IS NULL
   BEGIN
     SELECT @AssignedNum = ISNULL(MAX(NumeroPedido), 1000) + 1 FROM CabeceraPedidoCliente WITH (UPDLOCK, HOLDLOCK)
       WHERE CodigoEmpresa = @CodEmp AND SeriePedido = '${safeSerie}';
-    INSERT INTO CabeceraPedidoCliente (CodigoEmpresa, Ejercicio, SeriePedido, NumeroPedido, FechaPedido, RazonSocial, ImporteLiquido, Observaciones)
+    INSERT INTO CabeceraPedidoCliente (CodigoEmpresa, EjercicioPedido, SeriePedido, NumeroPedido, FechaPedido, RazonSocial, ImporteLiquido, ObservacionesPedido)
     VALUES (@CodEmp, YEAR(GETDATE()), '${safeSerie}', @AssignedNum, GETDATE(), '${safeName}', ${total}, '${safeRef}');
     ${lineSql}
   END
@@ -227,8 +231,8 @@ BEGIN TRY
   BEGIN TRAN;
   IF NOT EXISTS (SELECT 1 FROM [CRONUS$Sales Header] WITH (UPDLOCK, HOLDLOCK) WHERE [External Document No_] = '${safeRef}' AND '${safeRef}' <> '')
   BEGIN
-    INSERT INTO [CRONUS$Sales Header] ([Document Type], [No_], [Sell-to Customer Name], [Order Date], [Posting Date], [External Document No_])
-    VALUES (1, @DocNo, '${safeName}', GETDATE(), GETDATE(), '${safeRef}');
+    INSERT INTO [CRONUS$Sales Header] ([Document Type], [No_], [Sell-to Customer No_], [Sell-to Customer Name], [Order Date], [Posting Date], [External Document No_])
+    VALUES (1, @DocNo, '10000', '${safeName}', GETDATE(), GETDATE(), '${safeRef}');
     ${bcLines}
   END
   COMMIT TRAN;
@@ -241,3 +245,4 @@ END CATCH`.trim();
 
   return { tsql, fallbackOrderNum };
 }
+

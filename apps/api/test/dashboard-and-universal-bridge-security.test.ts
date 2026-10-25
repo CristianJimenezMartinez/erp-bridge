@@ -152,11 +152,11 @@ assert.ok(
   'Debe registrar delegación de eventos en el tbody'
 );
 assert.ok(
-  licensesJs.includes('title="${_safeEscapeHtml(fullHwid)}"'),
+  licensesJs.includes('title="${_licEsc(fullHwid)}"'),
   'El title del HWID debe estar escapado con _safeEscapeHtml'
 );
 assert.ok(
-  licensesJs.includes('HWID: ${_safeEscapeHtml(shortHwid)}'),
+  licensesJs.includes('HWID: ${_licEsc(shortHwid)}'),
   'El texto del HWID debe estar escapado con _safeEscapeHtml'
 );
 console.log('    ✓ licenses.js: Handlers inline onclick eliminados y sustituidos por data-* y delegación segura');
@@ -165,7 +165,7 @@ console.log('    ✓ licenses.js: HWID y hostname escapados en el DOM');
 // 2.2 fleet.js
 const fleetJs = fs.readFileSync(fleetJsPath, 'utf8');
 assert.ok(
-  fleetJs.includes('_safeEscapeHtml(shortHwid)'),
+  fleetJs.includes('_fleetEsc(shortHwid)'),
   'fleet.js debe escapar shortHwid con _safeEscapeHtml'
 );
 console.log('    ✓ fleet.js: shortHwid escapado con _safeEscapeHtml');

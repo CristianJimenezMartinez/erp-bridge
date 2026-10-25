@@ -512,7 +512,7 @@ async function runTests() {
     engine.applyMappingToProduct(dummyProduct, [
       { sourceField: 'name', destinationField: '__proto__.pollutedFlag', defaultValue: 'yes' },
       { sourceField: 'name', destinationField: 'constructor.prototype.pollutedFlag2', defaultValue: 'yes' },
-    ]);
+    ] as any);
     assert.strictEqual(({} as any).pollutedFlag, undefined, 'Object.prototype no debe contaminarse vía __proto__');
     assert.strictEqual(({} as any).pollutedFlag2, undefined, 'Object.prototype no debe contaminarse vía constructor.prototype');
 
