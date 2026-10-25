@@ -16,7 +16,12 @@ export const OLEDB_CANDIDATES: OledbCandidate[] = [
 
 /**
  * Valida que la ruta de base de datos Access (.accdb / .mdb) no contenga
- * caracteres de inyección de cadena de conexión OLEDB (; o comillas o caracteres de control).
+ * comillas dobles ni caracteres de control (inyección de cadena de conexión OLEDB).
+ *
+ * F10: `;` y `=` SON válidos en nombres de carpeta de Windows, así que ya no se rechazan:
+ * `buildSafeOledbConnectionString` entrecomilla el valor de `Data Source` cuando los contiene
+ * (las comillas dobles están prohibidas en nombres de fichero de Windows y aquí se rechazan, por lo que
+ * el valor entrecomillado no puede escaparse de la cadena).
  */
 export function sanitizeDatabasePath(rawPath: string): string {
   const cleaned = String(rawPath || '')
@@ -24,7 +29,7 @@ export function sanitizeDatabasePath(rawPath: string): string {
     .replace(/^["']+|["']+$/g, '')
     .replace(/[\x00-\x1f\x7f]/g, '');
 
-  if (cleaned.includes(';') || cleaned.includes('"') || cleaned.includes('=')) {
+  if (cleaned.includes('"')) {
     throw new Error('Ruta de base de datos inválida: contiene caracteres no permitidos en cadena OLEDB.');
   }
 
@@ -50,7 +55,8 @@ export function buildSafeOledbConnectionString(provider: string, databasePath: s
   const safeProvider = sanitizeOledbProvider(provider);
   const safePath = sanitizeDatabasePath(databasePath);
   const modeSegment = includeShareMode ? 'Mode=Share Deny None;' : '';
-  return `Provider=${safeProvider};Data Source=${safePath};${modeSegment}Persist Security Info=False;`;
+  const dataSource = /[;=]/.test(safePath) ? `"${safePath}"` : safePath;
+  return `Provider=${safeProvider};Data Source=${dataSource};${modeSegment}Persist Security Info=False;`;
 }
 
 /**

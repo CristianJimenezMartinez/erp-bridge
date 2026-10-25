@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import childProcess from 'child_process';
+import { FactusolYearResolver } from '@erp-bridge/connector-factusol';
 import { PathResolutionResult } from './factusol.types';
 
 export class FactusolPathResolver {
@@ -136,7 +137,18 @@ export class FactusolPathResolver {
             .filter(f => !f.name.startsWith('.~') && !f.name.toLowerCase().endsWith('.ldb') && !f.name.toLowerCase().endsWith('.laccdb'))
             .sort((a, b) => b.mtime - a.mtime);
 
-          const best = files[0];
+          // F17: el archivo más reciente por mtime puede ser un ejercicio antiguo abierto/copiado después. Dentro de la misma
+          // empresa (prefijo [CODEMPRESA][AÑO]) se prefiere el ejercicio fiscal más alto; sin patrón Factusol, se mantiene mtime.
+          let best = files[0];
+          const bestParsed = best ? FactusolYearResolver.parseDatabaseName(best.name) : null;
+          if (best && bestParsed) {
+            for (const f of files) {
+              const p = FactusolYearResolver.parseDatabaseName(f.name);
+              if (p && p.companyCode.toUpperCase() === bestParsed.companyCode.toUpperCase() && p.year > (FactusolYearResolver.parseDatabaseName(best.name)?.year ?? 0)) {
+                best = f;
+              }
+            }
+          }
           if (best) {
             const prefixMsg = usedUncFallback ? ' (mediante ruta UNC de red)' : '';
             return {

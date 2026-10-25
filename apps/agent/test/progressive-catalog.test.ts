@@ -71,10 +71,13 @@ async function run() {
       }),
     } as any;
 
+    const mockConnector = {
+      readProducts: async () => mockFactusolProducts,
+    };
     const mockFactusolService = {
-      getConnector: () => ({
-        readProducts: async () => mockFactusolProducts,
-      }),
+      getConnector: () => mockConnector,
+      ensureConnector: async () => mockConnector,
+      getSettings: () => ({ activeOnly: false, orderSeries: '1', warehouseCode: 'GEN', tariffCode: '1' }),
     } as any;
 
     const ctx = {

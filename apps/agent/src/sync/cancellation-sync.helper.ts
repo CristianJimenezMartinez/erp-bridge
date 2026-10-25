@@ -72,25 +72,20 @@ export class CancellationSyncHelper {
     const safeDefaultWarehouse = CancellationSyncHelper.sanitizeSql(defaultWarehouse || 'GEN').substring(0, 3) || 'GEN';
 
     // 1. Consultar cabecera del pedido (F_PCL) para verificar estado actual y almacén asignado
-    const headerRows = await driver
-      .query<{ ALMPCL: string; ESTPCL: number; TIPPCL?: string }>(
-        `SELECT ALMPCL, ESTPCL FROM F_PCL WHERE CODPCL = ${code} AND TIPPCL = '${safeSeries}'`
-      )
-      .catch((err) => {
-        CancellationSyncHelper.logger.warn(`Error al consultar F_PCL para pedido #${code}: ${String(err)}`);
-        return [];
-      });
+    // F17: un fallo de lectura (bloqueo, timeout) se PROPAGA: antes se tragaba y se interpretaba como "pedido
+    // inexistente / ya anulado", con lo que el ack a la web se enviaba sin haber repuesto el stock.
+    const headerRows = await driver.query<{ ALMPCL: string; ESTPCL: number; TIPPCL?: string }>(
+      `SELECT ALMPCL, ESTPCL FROM F_PCL WHERE CODPCL = ${code} AND TIPPCL = '${safeSeries}'`
+    );
 
     let matchedSeries = safeSeries;
     let header = headerRows[0];
 
     if (!header) {
       // Intentar buscar el pedido en cualquier serie si difiere de la serie por defecto
-      const anySeriesRows = await driver
-        .query<{ ALMPCL: string; ESTPCL: number; TIPPCL: string }>(
-          `SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = ${code}`
-        )
-        .catch(() => []);
+      const anySeriesRows = await driver.query<{ ALMPCL: string; ESTPCL: number; TIPPCL: string }>(
+        `SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = ${code}`
+      );
       if (anySeriesRows && anySeriesRows.length > 0) {
         header = anySeriesRows[0];
         matchedSeries = String(anySeriesRows[0]?.TIPPCL || safeSeries).trim().substring(0, 1) || safeSeries;
@@ -110,7 +105,8 @@ export class CancellationSyncHelper {
     const safeWarehouse = CancellationSyncHelper.sanitizeSql(warehouse).substring(0, 3) || 'GEN';
 
     // Guardarraíl anti-doble reposición: si el pedido ya está en estado anulado (ESTPCL = 3), no reponer dos veces
-    if (currentEst === 3) {
+    // (el conector marca anulado con ESTPCL=4 y este helper con 3: ambos valores se consideran "anulado" - ❓ por verificar con Factusol real)
+    if (currentEst === 3 || currentEst === 4) {
       CancellationSyncHelper.logger.info(
         `Pedido Factusol #${code} (Serie ${matchedSeries}) ya se encontraba en estado anulado (ESTPCL = 3). Se omite reposición redundante de stock.`
       );
@@ -118,11 +114,10 @@ export class CancellationSyncHelper {
     }
 
     // 2. Consultar líneas del pedido en Factusol (F_LPC)
-    const dbLines = await driver
-      .query<{ ARTLPC: string; CANLPC: number }>(
-        `SELECT ARTLPC, CANLPC FROM F_LPC WHERE CODLPC = ${code} AND TIPLPC = '${matchedSeries}'`
-      )
-      .catch(() => []);
+    // F17: sin .catch: si no se pueden leer las líneas no se anula el pedido sin reponer su stock.
+    const dbLines = await driver.query<{ ARTLPC: string; CANLPC: number }>(
+      `SELECT ARTLPC, CANLPC FROM F_LPC WHERE CODLPC = ${code} AND TIPLPC = '${matchedSeries}'`
+    );
 
     const linesToRestore: Array<{ sku: string; quantity: number }> = [];
 

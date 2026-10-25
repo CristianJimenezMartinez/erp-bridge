@@ -1,9 +1,8 @@
 import fs from 'fs';
 import { Logger, CanonicalOrder } from '@erp-bridge/shared';
-import { AccessDriver, FactusolConnector } from '@erp-bridge/connector-factusol';
 import { ConfigManager } from '../../config/config.manager';
 import { EventBus } from '../../diagnostics/event-bus';
-import { FactusolService } from '../../factusol/factusol.service';
+import { FactusolService, FactusolOfflineError } from '../../factusol/factusol.service';
 import { FactusolPathResolver } from '../../factusol/factusol.resolver';
 import { IErpConnector } from '../erp-connector.interface';
 import { DEMO_ARTICLES_BY_ERP } from '../sql-server-profiles';
@@ -98,8 +97,9 @@ export class FactusolAdapter implements IErpConnector {
 
   public isDatabaseAccessible(): boolean {
     if (this.isEvaluationMode()) return true;
+    // F1: accesible = el ejercicio activo resuelto existe (la ruta configurada nunca se modifica: anti-wiping)
     const p = this.getDatabasePath();
-    return Boolean(p && fs.existsSync(p));
+    return Boolean(p && this.factusolService.resolveActiveDbPath().exists);
   }
 
   public async getArticleCount(customDbPath?: string): Promise<number | undefined> {
@@ -115,6 +115,9 @@ export class FactusolAdapter implements IErpConnector {
       }));
     }
     const res = await this.factusolService.getPreviewArticles(undefined, limit);
+    if (res.offline || res.error) {
+      this.logger.warn(`Vista previa de Factusol sin datos (${res.offline ? 'offline' : 'error'}): ${res.error || ''}`);
+    }
     return res.articles.map((a) => ({
       code: a.code, description: a.description, family: a.family, stock: a.stock,
       salePrice: a.salePrice, costPrice: a.costPrice, ean: a.ean,
@@ -131,45 +134,9 @@ export class FactusolAdapter implements IErpConnector {
       for (const a of DEMO_ARTICLES_BY_ERP.factusol) demoMap.set(a.code.toUpperCase(), a.stock);
       return demoMap;
     }
-    const dbPath = this.getDatabasePath();
-    if (!dbPath || !fs.existsSync(dbPath)) return new Map();
-
-    const cfg = this.configManager.get();
-    const warehouse = String(
-      warehouseCode ||
-      cfg.softwareErp?.providers?.factusol?.warehouseCode ||
-      cfg.factusol?.warehouseCode ||
-      'GEN'
-    ).replace(/[\x00-\x1f\x7f]/g, '').replace(/'/g, "''").trim().substring(0, 10);
-
-    try {
-      const driver = new AccessDriver({ databasePath: dbPath });
-      let stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
-        `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-      ).catch((err) => {
-        this.logger.warn(`Error al consultar stock en Factusol: ${String(err)}`);
-        return null;
-      });
-
-      if ((!stockRows || stockRows.length === 0) && warehouse) {
-        const fallbackRows = await driver.query<{ ARTSTO: any; totalStock: any }>(
-          `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO GROUP BY ARTSTO`
-        ).catch(() => null);
-        if (fallbackRows && fallbackRows.length > 0) stockRows = fallbackRows;
-      }
-
-      const map = new Map<string, number>();
-      if (stockRows) {
-        for (const row of stockRows) {
-          const sku = String(row.ARTSTO || '').trim().toUpperCase();
-          if (sku) map.set(sku, Math.max(0, Math.round(Number(row.totalStock) || 0)));
-        }
-      }
-      return map;
-    } catch (err) {
-      this.logger.warn(`Fallo al obtener mapa de stock de Factusol: ${String(err)}`);
-      return new Map();
-    }
+    // F1/F2/F3/F9: ejercicio activo + política única de stock (suma DISSTO de todos los almacenes salvo almacén
+    // configurado distinto de GEN). Offline o error de lectura => lanza error (nunca un mapa vacío = "stock 0").
+    return this.factusolService.getStockMap(warehouseCode);
   }
 
   public async createOrder(order: CanonicalOrder, series?: string, warehouse?: string): Promise<ErpOrderResult> {
@@ -177,28 +144,20 @@ export class FactusolAdapter implements IErpConnector {
       const demoNum = Math.floor(Date.now() / 1000) % 100000;
       return { success: true, orderNumber: demoNum, externalId: `${series || '1'}-${demoNum}` };
     }
-    const cfg = this.configManager.get();
-    const dbPath = this.getDatabasePath();
-    const orderSeries = series || cfg.softwareErp?.providers?.factusol?.orderSeries || cfg.factusol?.orderSeries || '1';
-    const orderWarehouse = warehouse || cfg.softwareErp?.providers?.factusol?.warehouseCode || cfg.factusol?.warehouseCode || 'GEN';
+    // F5: configuración unificada (softwareErp.providers.factusol.* tiene prioridad) y serie por defecto única.
+    const settings = this.factusolService.getSettings();
+    const orderSeries = series || order.series || settings.orderSeries;
+    const orderWarehouse = warehouse || order.warehouse || settings.warehouseCode;
 
-    let connector = this.factusolService.getConnector();
+    // F1: conector siempre sobre el ejercicio activo; si no hay base de datos accesible, error explícito (offline).
+    const connector = await this.factusolService.ensureConnector();
     if (!connector) {
-      connector = new FactusolConnector();
-      await connector.connect({
-        configuration: {
-          databasePath: dbPath,
-          orderSeries,
-          invoiceSeries: cfg.factusol?.invoiceSeries || '1',
-          defaultWarehouse: orderWarehouse,
-          tariffCode: cfg.factusol?.tariffCode || '1',
-          saleTariffCode: cfg.factusol?.saleTariffCode,
-        },
-      });
+      return { success: false, error: 'Base de datos Factusol no accesible (Desconectado/Offline): el pedido no se ha insertado.' };
     }
 
     try {
-      const res = await connector.createOrder(order);
+      // F5: serie y almacén efectivos viajan en el pedido (el conector los respeta aunque ya exista conexión).
+      const res = await connector.createOrder({ ...order, series: orderSeries, warehouse: orderWarehouse });
       return {
         success: res.success,
         orderNumber: res.externalId || res.orderNumber,
@@ -210,16 +169,12 @@ export class FactusolAdapter implements IErpConnector {
       return { success: false, error: `Excepción OLEDB Factusol: ${err instanceof Error ? err.message : String(err)}` };
     }
   }
-
   public async getArticlesForCatalog(limit?: number, onlyActive?: boolean): Promise<ErpCatalogArticle[]> {
     if (this.isEvaluationMode()) return [...DEMO_ARTICLES_BY_ERP.factusol];
-    const dbPath = this.getDatabasePath();
-    if (!dbPath || !fs.existsSync(dbPath)) return [];
-
-    let connector = this.factusolService.getConnector();
+    // F1/F9: ejercicio activo; offline => error explícito (no un catálogo vacío que despublique la tienda).
+    const connector = await this.factusolService.ensureConnector();
     if (!connector) {
-      connector = new FactusolConnector();
-      await connector.connect({ configuration: { databasePath: dbPath } });
+      throw new FactusolOfflineError('Base de datos Factusol no accesible (Desconectado/Offline): catálogo no leído.');
     }
 
     const products = await connector.readProducts({ limit, activeOnly: onlyActive ?? true });

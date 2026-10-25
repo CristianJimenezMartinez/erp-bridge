@@ -6,6 +6,7 @@ import {
   FactusolRawStock,
   FactusolRawBarcode,
 } from '../queries';
+import { normalizeStockQuantity } from '../queries/stock-policy';
 export {
   FactusolStockRaw,
   FactusolStockMapper,
@@ -80,7 +81,7 @@ export function mapFactusolArticleToCanonical(
   let stockQuantity = 0;
   if (regularPrice > 0) {
     if (enrichment?.stockMap && enrichment.stockMap.has(code)) {
-      stockQuantity = enrichment.stockMap.get(code) || 0;
+      stockQuantity = normalizeStockQuantity(enrichment.stockMap.get(code));
     }
   }
 

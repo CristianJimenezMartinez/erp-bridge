@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Logger } from '@erp-bridge/shared';
-import { AccessDriver, FactusolConnector, FactusolYearResolver } from '@erp-bridge/connector-factusol';
+import { AccessDriver, FactusolConnector, FactusolYearResolver, buildStockSumQuery, normalizeStockQuantity } from '@erp-bridge/connector-factusol';
 import { ConfigManager } from '../config/config.manager';
 import { HistoryManager } from '../history/history.manager';
 import { EventBus } from '../diagnostics/event-bus';
@@ -27,7 +27,7 @@ export class CatalogUploadHelper {
   private static async readProductsPolymorphic(
     ctx: CatalogUploadContext,
     dbPath: string,
-    config: any,
+    _config: any,
     options?: { limit?: number; onlyMissing?: boolean }
   ): Promise<any[]> {
     const erpConnector = ctx.erpConnector;
@@ -35,21 +35,23 @@ export class CatalogUploadHelper {
     const isRealFactusolFile = isFactusol && Boolean(dbPath && fs.existsSync(dbPath));
 
     if (isRealFactusolFile) {
-      let factusolConnector = ctx.factusolService.getConnector();
+      // F1: conector siempre apuntando al ejercicio activo (reconecta si cambió el año con el agente en marcha)
+      let factusolConnector = await ctx.factusolService.ensureConnector();
       if (!factusolConnector) {
         factusolConnector = new FactusolConnector();
+        const fs0 = ctx.factusolService.getSettings();
         await factusolConnector.connect({
           configuration: {
             databasePath: dbPath,
-            orderSeries: config.factusol?.orderSeries || '1',
-            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-            tariffCode: config.factusol?.tariffCode || '1',
-            saleTariffCode: config.factusol?.saleTariffCode,
+            orderSeries: fs0.orderSeries,
+            defaultWarehouse: fs0.warehouseCode,
+            tariffCode: fs0.tariffCode,
+            saleTariffCode: fs0.saleTariffCode,
           },
         });
       }
 
-      const activeOnlyConfig = config.factusol?.activeOnly;
+      const activeOnlyConfig = ctx.factusolService.getSettings().activeOnly;
       let factusolProducts = await factusolConnector.readProducts({
         limit: options?.limit,
         activeOnly: activeOnlyConfig !== false,
@@ -118,7 +120,7 @@ export class CatalogUploadHelper {
 
     const config = ctx.configManager.get();
     let dbPath = isFactusol
-      ? FactusolPathResolver.cleanPath(config.factusol?.databasePath || config.factusolDbPath || erpConnector?.getDatabasePath() || '')
+      ? FactusolPathResolver.cleanPath(ctx.factusolService.getSettings().databasePath || erpConnector?.getDatabasePath() || '')
       : (erpConnector?.getDatabasePath() || '');
     const woo = config.woocommerce || {};
 
@@ -518,22 +520,21 @@ export class CatalogUploadHelper {
 
         let stockUpdates: Array<{ code: string; stock: number }> = [];
         if (isRealFactusolFile) {
-          const driver = new AccessDriver({ databasePath: dbPath });
-          const stockRows = await driver
-            .query<{ ARTSTO: any; totalStock: any }>(
-              `SELECT ARTSTO, SUM(DISSTO) AS totalStock FROM F_STO WHERE ALMSTO = '${warehouse}' OR ALMSTO = 'GEN' GROUP BY ARTSTO`
-            )
-            .catch(() => null);
+          // F1/F2: política única de stock sobre el ejercicio activo (suma DISSTO de todos los almacenes salvo almacén
+          // configurado distinto de GEN; sin 'OR GEN'). F3: un fallo de lectura NO se convierte en "stock 0".
+          const activeDb = ctx.factusolService.resolveActiveDbPath(dbPath);
+          const driver = new AccessDriver({ databasePath: activeDb.exists ? activeDb.activePath : dbPath });
+          const stockRows = await driver.query<{ ARTSTO: any; totalStock: any }>(buildStockSumQuery(warehouse.replace(/''/g, "'")));
           if (stockRows && stockRows.length > 0) {
             stockUpdates = stockRows
               .map((r) => ({
                 code: String(r.ARTSTO || '').trim(),
-                stock: Math.max(0, Math.round(Number(r.totalStock) || 0)),
+                stock: normalizeStockQuantity(r.totalStock),
               }))
               .filter((u) => u.code);
           }
         } else if (erpConnector) {
-          const stockMap = await erpConnector.getStockMap(warehouse).catch(() => new Map<string, number>());
+          const stockMap = await erpConnector.getStockMap(warehouse);
           stockUpdates = Array.from(stockMap.entries())
             .map(([code, stock]) => ({
               code: String(code || '').trim(),
@@ -555,7 +556,11 @@ export class CatalogUploadHelper {
           }
         }
         pushStockMs = Math.round(performance.now() - tPushStockStart);
-      } catch {}
+      } catch (stockErr) {
+        // F3: el fallo se informa (no se interpreta como stock 0 ni se oculta); la web conserva su último stock válido.
+        ctx.logger.warn(`No se pudo leer/enviar el stock del ERP; se conserva el último stock de la web: ${String(stockErr)}`);
+        ctx.eventBus.addEvent('warn', `⚠️ Stock no sincronizado (fallo de lectura del ERP): ${String(stockErr)}`);
+      }
 
       const cycleDurationMs = Date.now() - start;
       const duration = (cycleDurationMs / 1000).toFixed(1);

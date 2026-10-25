@@ -36,7 +36,7 @@ import {
   FactusolInvoiceHandler,
 } from './handlers';
 
-import { FactusolConnectionConfig, FactusolConnectorOptions } from './factusol.types';
+import { FactusolConnectionConfig, FactusolConnectorOptions, DEFAULT_FACTUSOL_ORDER_SERIES } from './factusol.types';
 export { FactusolConnectionConfig, FactusolConnectorOptions };
 
 export class FactusolConnector implements Connector {
@@ -116,13 +116,20 @@ export class FactusolConnector implements Connector {
       saleTariffCode: rawConfig.saleTariffCode,
       activeOnly: rawConfig.activeOnly !== false,
       provider: rawConfig.provider,
-      orderSeries: rawConfig.orderSeries || ' ',
+      orderSeries: rawConfig.orderSeries || DEFAULT_FACTUSOL_ORDER_SERIES,
       invoiceSeries: rawConfig.invoiceSeries || '1',
       defaultWarehouse: rawConfig.defaultWarehouse || 'GEN',
       autoRollover,
+      guestCustomerCode: rawConfig.guestCustomerCode,
+      operationTimeoutMs: rawConfig.operationTimeoutMs,
+      allowEmptyPrices: rawConfig.allowEmptyPrices,
     };
 
-    this.driver = new AccessDriver({ databasePath: activeDbPath, provider: rawConfig.provider });
+    this.driver = new AccessDriver({
+      databasePath: activeDbPath,
+      provider: rawConfig.provider,
+      timeoutMs: rawConfig.operationTimeoutMs,
+    });
 
     // Initialize domain handlers
     this.customerHandler = new FactusolCustomerHandler(this.driver, this.logger);
@@ -130,7 +137,12 @@ export class FactusolConnector implements Connector {
     this.orderHandler = new FactusolOrderHandler(this.driver, this.config, this.customerHandler, this.logger);
     this.stockHandler = new FactusolStockHandler(this.driver, this.config, this.logger);
     this.invoiceHandler = new FactusolInvoiceHandler(this.driver, this.config, this.logger);
-    this.logger.info('Factusol connector configured successfully', { databasePath: dbPath });
+    this.logger.info('Factusol connector configured successfully', { databasePath: activeDbPath, configuredPath: dbPath });
+  }
+
+  /** Ruta de la base de datos realmente abierta (ejercicio activo resuelto), o null si no está conectado. */
+  public getActiveDatabasePath(): string | null {
+    return this.config?.databasePath ?? null;
   }
 
   public async disconnect(): Promise<void> {

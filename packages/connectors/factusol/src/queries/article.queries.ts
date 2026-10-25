@@ -1,4 +1,5 @@
 import { sanitizeAndTruncate, sanitizeInt } from './order.queries';
+import { resolveStockWarehouse } from './stock-policy';
 
 export interface FactusolRawArticle {
   CODART: string;
@@ -115,11 +116,18 @@ export const FACTUSOL_QUERIES = {
   getAuxiliaryBarcodes: (skus: string[]): string => getAuxiliaryBarcodesQuery(skus),
   getAuxiliaryBarcodesQuery: (skus: string[]): string => getAuxiliaryBarcodesQuery(skus),
 
-  getStock: (skus?: string[]): string => {
-    const whereClause =
-      skus && skus.length > 0
-        ? `WHERE ARTSTO IN (${skus.map((s) => `'${sanitizeAndTruncate(s, 13)}'`).join(', ')})`
-        : '';
+  /**
+   * Filas de stock por almacén. `warehouseCode` sigue la política única de stock (F2):
+   * vacío/'GEN' => todos los almacenes; otro código => solo ese almacén.
+   */
+  getStock: (skus?: string[], warehouseCode?: string | null): string => {
+    const conditions: string[] = [];
+    const warehouse = resolveStockWarehouse(warehouseCode);
+    if (warehouse) conditions.push(`ALMSTO = '${sanitizeAndTruncate(warehouse, 10)}'`);
+    if (skus && skus.length > 0) {
+      conditions.push(`ARTSTO IN (${skus.map((s) => `'${sanitizeAndTruncate(s, 13)}'`).join(', ')})`);
+    }
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     return `
       SELECT ARTSTO, ALMSTO, ACTSTO, DISSTO
       FROM F_STO

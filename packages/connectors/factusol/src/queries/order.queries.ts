@@ -31,6 +31,26 @@ export {
   sanitizeSql,
 };
 
+/** Longitud máxima de un literal de cadena en SQL Jet/ACE (F15). */
+export const MAX_ACCESS_SQL_LITERAL = 255;
+
+/**
+ * Sanea un literal para Jet/ACE garantizando que la longitud FINAL ya escapada (comillas duplicadas)
+ * no supere `maxEscapedLen`. Se trunca ANTES de escapar carácter a carácter, de modo que nunca puede
+ * quedar una comilla simple suelta ni excederse el límite de 255 caracteres de un literal Access.
+ */
+export function sanitizeSqlLiteral(val: unknown, maxEscapedLen = MAX_ACCESS_SQL_LITERAL): string {
+  if (val === null || val === undefined) return '';
+  const cleaned = String(val).replace(/[\x00-\x1f\x7f]/g, '').trim();
+  let out = '';
+  for (const ch of cleaned) {
+    const piece = ch === "'" ? "''" : ch;
+    if (out.length + piece.length > maxEscapedLen) break;
+    out += piece;
+  }
+  return out;
+}
+
 export function getNextOrderIdQuery(series = ''): string {
   const sanitizedSeries = sanitizeSql(series);
   if (sanitizedSeries) {
@@ -209,7 +229,7 @@ export function insertOrderLineQuery(
       line.name ||
       ''
   );
-  const memo = sanitizeSql(longDesc);
+  const memo = sanitizeSqlLiteral(longDesc, MAX_ACCESS_SQL_LITERAL);
   const qty = sanitizeFloat(line.quantity, 1).toFixed(2);
   const price = sanitizeFloat(line.unitPrice, 0).toFixed(4);
   const discount = sanitizeFloat(line.discountPercent, 0).toFixed(2);

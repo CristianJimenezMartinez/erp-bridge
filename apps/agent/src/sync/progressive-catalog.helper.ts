@@ -85,22 +85,24 @@ export class ProgressiveCatalogHelper {
     const config = ctx.configManager.get();
     const batchLimit = options.limit || this.MICRO_BATCH_SIZE;
 
-    // 1. Conectar a Factusol y leer artículos
-    let factusolConnector = ctx.factusolService.getConnector();
+    // 1. Conectar a Factusol y leer artículos (F1: conector siempre sobre el ejercicio activo)
+    let factusolConnector = await ctx.factusolService.ensureConnector();
     if (!factusolConnector) {
+      const fs0 = ctx.factusolService.getSettings();
       factusolConnector = new FactusolConnector();
       await factusolConnector.connect({
         configuration: {
           databasePath: options.dbPath,
-          orderSeries: config.factusol?.orderSeries || '1',
-          defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
-          tariffCode: config.factusol?.tariffCode || '1',
-          saleTariffCode: config.factusol?.saleTariffCode,
+          orderSeries: fs0.orderSeries,
+          defaultWarehouse: fs0.warehouseCode,
+          tariffCode: fs0.tariffCode,
+          saleTariffCode: fs0.saleTariffCode,
         },
       });
     }
 
-    const activeOnlyConfig = config.factusol?.activeOnly;
+    const activeOnlyConfig = ctx.factusolService.getSettings().activeOnly;
+
     let factusolProducts = await factusolConnector.readProducts({
       activeOnly: activeOnlyConfig !== false,
     });

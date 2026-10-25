@@ -486,8 +486,8 @@ export class LocalSyncEngine {
         // 3. SINCRONIZACIÓN INVERSA DE PEDIDOS CANCELADOS/REEMBOLSADOS (WooCommerce -> Factusol)
         if (isRealFactusolFile && driver) {
           try {
-            const cancelSeries = config.factusol?.orderSeries || '1';
-            const cancelWarehouse = config.factusol?.warehouseCode || 'GEN';
+            const cancelSeries = this.factusolService.getSettings().orderSeries;
+            const cancelWarehouse = this.factusolService.getSettings().warehouseCode;
             this.logger.debug('Comprobando pedidos cancelados/reembolsados en WooCommerce...');
             const tCancelStart = performance.now();
             const cancelRes = await CancellationSyncHelper.syncWooCommerceCancellations({
@@ -718,7 +718,7 @@ export class LocalSyncEngine {
     const series = (
       config.softwareErp?.providers?.[connector.providerId]?.orderSeries ||
       (connector.providerId === 'simplygest' ? config.simplygest?.orderSeries : config.factusol?.orderSeries) ||
-      'W'
+      '1' // F5: serie por defecto única en todo el stack (antes 'W' aquí y '1'/' ' en otros sitios)
     ).trim();
 
     try {
@@ -1010,8 +1010,8 @@ export class LocalSyncEngine {
             endpointUrl,
             headers,
             driver: cancelDriver,
-            orderSeries: config.factusol?.orderSeries || '1',
-            defaultWarehouse: config.factusol?.warehouseCode || 'GEN',
+            orderSeries: this.factusolService.getSettings().orderSeries,
+            defaultWarehouse: this.factusolService.getSettings().warehouseCode,
             eventBus: this.eventBus,
           });
           ordersCancelled = cancelRes.ordersCancelled;

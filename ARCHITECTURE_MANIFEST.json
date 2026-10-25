@@ -8,20 +8,21 @@
       "id": "connectors.factusol",
       "name": "Conector Factusol ERP (OLEDB Driver, SQL Queries & Relational Engine)",
       "status": "FROZEN",
-      "certifiedAt": "2026-10-22",
+      "certifiedAt": "2026-10-25",
       "certifiedCommit": "d82c20a",
       "description": "Driver OLEDB cscript.exe (32/64 bits, ACE/Jet), transacciones atómicas F_PCL/F_LPC/F_STO, consultas SQL saneadas, rollover de año fiscal y cuadre aritmético al céntimo.",
       "paths": [
         "packages/connectors/factusol/src"
       ],
-      "integrityTreeHash": "54d91c07a361d04b82304c95e6a5df7b7df48343939270d5a2b4327c258652b0",
+      "integrityTreeHash": "c91b69a7cbef7cf8427f44f9af27b997bce66b3a1a617da987665c02cdd5d012",
       "publicContract": "packages/connectors/factusol/src/index.ts",
       "testSuites": [
         "packages/connectors/factusol/test/connector.test.ts",
         "packages/connectors/factusol/test/queries.test.ts",
         "packages/connectors/factusol/test/adodb-driver.test.ts",
         "packages/connectors/factusol/test/integration/factusol-e2e.test.ts"
-      ]
+      ],
+      "lastRevision": "2026-10-25: correcciones F1-F17 de docs/audits/ERP_REVIEW_2026-10-25.md"
     },
     {
       "id": "core.licensing",
@@ -182,35 +183,37 @@
       "id": "agent.erp",
       "name": "Registro, Motor SQL Server Local y Adaptadores Polimórficos Multi-ERP (Strategy Pattern)",
       "status": "FROZEN",
-      "certifiedAt": "2026-10-22",
+      "certifiedAt": "2026-10-25",
       "certifiedCommit": "633f724",
       "description": "Patrón Strategy desacoplado (IErpConnector, ErpProviderRegistry y SqlServerBaseAdapter) para los 5 ERPs oficiales en España (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) con Modo Evaluación Sandbox.",
       "paths": [
         "apps/agent/src/erp"
       ],
-      "integrityTreeHash": "0f889ab28dfab17feb44d695260c95f9d100adc7dc8bfb1768a9ab634cd757e5",
+      "integrityTreeHash": "318be37b989ae873ccae98458d02ba9ef9a1fd5d7752970aa29397422caca9c1",
       "publicContract": "apps/agent/src/erp/index.ts",
       "testSuites": [
         "apps/agent/test/erp-provider-strategy.test.ts"
-      ]
+      ],
+      "lastRevision": "2026-10-25: correcciones F1-F17 de docs/audits/ERP_REVIEW_2026-10-25.md"
     },
     {
       "id": "agent.factusol.resolver_detector",
       "name": "Detector Factusol Multi-Unidad (HKCU\\Network UAC) y Resolutor de Rutas NAS/UNC",
       "status": "FROZEN",
-      "certifiedAt": "2026-10-22",
+      "certifiedAt": "2026-10-25",
       "certifiedCommit": "0fc7842",
       "description": "Escaneo de unidades locales y unidades de red mapeadas del usuario en HKCU\\Network (W:, X:, Y:, Z:), montaje automático en sesión elevada UAC, resolución UNC y normalización de directorio padre para OpenFileDialog.",
       "paths": [
         "apps/agent/src/detector.ts",
         "apps/agent/src/factusol/factusol.resolver.ts"
       ],
-      "integrityTreeHash": "e16d2a66b4c866a54034d7adab966cf20bd4303fddab8a82ebed1f63c6fab1e4",
+      "integrityTreeHash": "11a403d5423f08a71efd8d113b7bbe04aa4878826edc8f004059cf92e149cafa",
       "publicContract": "apps/agent/src/factusol/factusol.resolver.ts",
       "testSuites": [
         "apps/agent/test/gui-router.test.ts",
         "apps/agent/test/nas-dialog-e2e.test.ts"
-      ]
+      ],
+      "lastRevision": "2026-10-25: correcciones F1-F17 de docs/audits/ERP_REVIEW_2026-10-25.md"
     },
     {
       "id": "agent.lifecycle.zero_loss",
