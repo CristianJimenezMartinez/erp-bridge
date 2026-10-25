@@ -26,11 +26,11 @@ export function renderOverviewTab(): string {
             </div>
             <div>
               <div style="font-weight:600;font-size:14px;color:#fff;">¿No tienes tu ERP a mano? Prueba el Modo Demostración</div>
-              <div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Activa datos de prueba con 1 clic para ver la sincronización en vivo sin tocar bases de datos reales.</div>
+              <div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Abre el asistente y pulsa «Modo Evaluación» para probar con datos simulados, sin tocar tu base de datos real.</div>
             </div>
           </div>
-          <button onclick="switchTab('factusol')" class="btn" style="background:#4f46e5;color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
-            <span>Activar Modo Demo →</span>
+          <button onclick="openWizardModal()" class="btn" style="background:#4f46e5;color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+            <span>Abrir asistente →</span>
           </button>
         </div>
 

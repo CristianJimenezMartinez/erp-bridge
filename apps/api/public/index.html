@@ -945,10 +945,10 @@
               <span class="text-xs text-zinc-400">Tarifa fija predecible sin sorpresas</span>
             </td>
             <td class="py-4 px-6 bg-indigo-500/[0.03] border-x border-indigo-500/20 text-center text-emerald-400 font-semibold">
-              Tarifa plana sin comisiones por pedido (0 €/tx)
+              Tarifa plana, sin comisión por pedido
             </td>
             <td class="py-4 px-6 text-center text-zinc-400">
-              0,15 € - 0,50 € por pedido o cuota por tramos de facturación
+              Muchos servicios cobran por volumen de pedidos o por tramos (según proveedor)
             </td>
           </tr>
           <tr class="hover:bg-white/[0.02] transition">
@@ -972,7 +972,7 @@
               Buffer atómico offline con reintento y cero pérdida
             </td>
             <td class="py-4 px-6 text-center text-rose-400">
-              Pedidos rechazados o timeouts HTTP que obligan a conciliar a mano
+              Dependen de la conexión: un corte puede obligar a conciliar a mano
             </td>
           </tr>
           <tr class="hover:bg-white/[0.02] transition">
@@ -984,7 +984,7 @@
               Nativo para España (IVA + Recargo desglosado)
             </td>
             <td class="py-4 px-6 text-center text-zinc-400">
-              Parches en plugins foráneos que descuadran contabilidad
+              Depende del plugin: conviene comprobar IVA y recargo
             </td>
           </tr>
           <tr class="hover:bg-white/[0.02] transition">
@@ -993,10 +993,10 @@
               <span class="text-xs text-zinc-400">Si cambias de ERP en tu negocio</span>
             </td>
             <td class="py-4 px-6 bg-indigo-500/[0.03] border-x border-indigo-500/20 text-center text-emerald-400 font-semibold">
-              Soporta 12 ERPs sin rehacer la tienda online
+              Varios ERPs con la misma tienda online (según estado de cada conector)
             </td>
             <td class="py-4 px-6 text-center text-zinc-400">
-              Obliga a tirar el plugin y comprar una integración nueva
+              Normalmente ligado a un solo ERP
             </td>
           </tr>
         </tbody>
@@ -1907,15 +1907,15 @@
       <!-- Tarjeta de Resultados Dinámicos (5 cols) -->
       <div class="lg:col-span-5 bg-gradient-to-b from-[#181824] to-[#0e0e16] border border-indigo-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
         <div class="flex items-center justify-between mb-5">
-          <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+          <span id="checker-status-badge" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            100% Compatible
+            <span id="checker-status-text">Certificado en laboratorio</span>
           </span>
           <span class="text-xs text-zinc-400 font-mono" id="checker-summary-tag">Factusol + WooCommerce</span>
         </div>
 
         <h3 class="text-xl font-bold text-white mb-2" id="checker-result-title">
-          Conexión Certificada y Lista
+          Compatibilidad según el estado real de cada conector
         </h3>
         <p class="text-xs text-zinc-400 mb-6" id="checker-result-desc">
           Bentian sincroniza existencias en tiempo real y descarga pedidos automáticamente en tu ERP sin pisar tarifas.
@@ -1968,6 +1968,19 @@
     const erpName = selErp.toUpperCase();
     const chName = selChannel.charAt(0).toUpperCase() + selChannel.slice(1);
     
+    const STATUS = {
+      factusol: ['Certificado en laboratorio', 'emerald'],
+      simplygest: ['Certificado en laboratorio', 'emerald'],
+      odoo: ['Probado en vivo contra Odoo 17 real', 'emerald'],
+      facturascripts: ['Probado en vivo contra FacturaScripts real', 'emerald'],
+      sage50: ['Beta: validado en modo Sandbox', 'amber'],
+      a3erp: ['Beta: validado en modo Sandbox', 'amber']
+    };
+    const st = STATUS[selErp] || STATUS.factusol;
+    const stText = document.getElementById('checker-status-text');
+    const stBadge = document.getElementById('checker-status-badge');
+    if (stText) stText.textContent = st[0];
+    if (stBadge) stBadge.className = 'inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border ' + (st[1] === 'amber' ? 'text-amber-300 bg-amber-500/10 border-amber-500/20' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20');
     if (tag) tag.textContent = erpName + ' + ' + chName;
     if (title) title.textContent = 'Integración ' + erpName + ' con ' + chName;
     if (desc) {
@@ -2647,7 +2660,7 @@
           </div>
 
           <p class="text-xs text-zinc-400 leading-relaxed text-center">
-            Además de eliminar roturas de stock, evitar reclamaciones por sobreventas y garantizar el cumplimiento fiscal con facturas al día.
+            Estimación orientativa basada en los datos que introduces (no es una garantía de ahorro). Además de reducir roturas de stock, evitar reclamaciones por sobreventas y garantizar el cumplimiento fiscal con facturas al día.
           </p>
         </div>
 

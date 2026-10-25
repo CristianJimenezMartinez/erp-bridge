@@ -48,7 +48,15 @@
         "q": "¿Cómo puedo empezar a probarlo en mi empresa en Madrid?",
         "a": "Puedes descargar el agente en nuestra fase de Beta Pública sin necesidad de introducir tarjeta de crédito ni firmar permanencias. Se instala en 2 minutos y funciona de inmediato."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Madrid",
+      "totalEmpresas": 526588,
+      "conAsalariados": 229538,
+      "pymes1a49": 223472,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "barcelona",
@@ -99,7 +107,15 @@
         "q": "¿Requiere contratar el servicio cloud de DELSOL?",
         "a": "No. Bentian lee directamente tu base de datos local (.accdb / .mdb) de Factusol. No dependes de APIs externas lentas ni de suscripciones adicionales."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Barcelona",
+      "totalEmpresas": 458826,
+      "conAsalariados": 197987,
+      "pymes1a49": 193342,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "valencia",
@@ -150,7 +166,15 @@
         "q": "¿Es compatible con el nuevo Factusol 2024 / 2025 / 2026?",
         "a": "Sí, es 100% compatible con todas las versiones de Factusol desde Factusol 2018 hasta las versiones más recientes en formato .accdb y .mdb."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Valencia/València",
+      "totalEmpresas": 186970,
+      "conAsalariados": 85072,
+      "pymes1a49": 83474,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "sevilla",
@@ -201,7 +225,15 @@
         "q": "¿Se generan los pedidos de la web como pedidos de cliente (F_PCL) en Factusol?",
         "a": "Exacto. Cada compra realizada en tu tienda online se importa automáticamente como pedido de cliente en Factusol, con desglose de IVA, recargo de equivalencia y datos de facturación listos para emitir albarán o factura."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Sevilla",
+      "totalEmpresas": 121706,
+      "conAsalariados": 56543,
+      "pymes1a49": 55698,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "zaragoza",
@@ -252,7 +284,15 @@
         "q": "¿Requiere abrir puertos en el cortafuegos de la empresa en Zaragoza?",
         "a": "No. Bentian solo realiza conexiones seguras salientes por HTTPS (puerto 443). Cumple con los más estrictos estándares de ciberseguridad industrial sin necesidad de abrir puertos ni exponer tu base de datos a internet."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Zaragoza",
+      "totalEmpresas": 60739,
+      "conAsalariados": 28376,
+      "pymes1a49": 27774,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "malaga",
@@ -303,7 +343,15 @@
         "q": "¿Ofrecéis condiciones especiales para agencias de desarrollo web en Málaga?",
         "a": "Sí. Disponemos del Programa de Partners con un 25% de descuento mayorista directo (149,25 €/año) para agencias y técnicos informáticos que gestionen tiendas de clientes."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Málaga",
+      "totalEmpresas": 142401,
+      "conAsalariados": 61063,
+      "pymes1a49": 60391,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "alicante",
@@ -354,7 +402,15 @@
         "q": "¿Hay límite de artículos o de pedidos que se puedan sincronizar en Alicante?",
         "a": "Ninguno. La licencia de Bentian ofrece sincronizaciones ilimitadas de artículos, clientes, tarifas y pedidos sin tarifas variables por venta."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Alicante/Alacant",
+      "totalEmpresas": 145106,
+      "conAsalariados": 67254,
+      "pymes1a49": 66468,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "bilbao",
@@ -405,7 +461,15 @@
         "q": "¿Es compatible con la facturación y los tipos impositivos aplicables en el País Vasco?",
         "a": "Sí. Bentian traslada de forma íntegra los tipos de IVA, recargos y NIF/CIF de cada cliente a los pedidos de Factusol, facilitando la posterior emisión y registro contable oficial."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Vizcaya",
+      "totalEmpresas": 71086,
+      "conAsalariados": 33856,
+      "pymes1a49": 33110,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "murcia",
@@ -456,7 +520,15 @@
         "q": "¿Cómo se procesan los pedidos que entran desde la web?",
         "a": "Entran automáticamente en Factusol como Pedidos de Clientes (F_PCL) con todos los datos fiscales, recargo de equivalencia si aplica y la serie de facturación asignada."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Murcia",
+      "totalEmpresas": 93956,
+      "conAsalariados": 44561,
+      "pymes1a49": 43794,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "coruna",
@@ -507,7 +579,15 @@
         "q": "¿Qué requisitos de servidor web tiene en la tienda online?",
         "a": "Ninguno especial. Al procesar todo el trabajo pesado en Windows local, el servidor de la tienda online solo recibe peticiones REST estándar de actualización de stock, reduciendo el consumo de RAM a cero."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "A Coruña",
+      "totalEmpresas": 77760,
+      "conAsalariados": 36188,
+      "pymes1a49": 35644,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "vigo",
@@ -558,7 +638,15 @@
         "q": "¿Se requiere suscripción mensual en la nube para sincronizar?",
         "a": "No. Bentian funciona bajo licencia anual fija para tu empresa sin tramos por volumen de catálogo ni comisiones por pedido."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Pontevedra",
+      "totalEmpresas": 65757,
+      "conAsalariados": 31913,
+      "pymes1a49": 31476,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "valladolid",
@@ -609,7 +697,15 @@
         "q": "¿Cómo evita la saturación del servidor web de la tienda?",
         "a": "Bentian solo envía peticiones ligeras cuando detecta cambios en Factusol, evitando las sobrecargas de CPU habituales de los plugins de sincronización."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Valladolid",
+      "totalEmpresas": 31317,
+      "conAsalariados": 14645,
+      "pymes1a49": 14397,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "cordoba",
@@ -660,7 +756,15 @@
         "q": "¿Necesito pagar por cada pedido sincronizado?",
         "a": "No. En Bentian no hay costes por volumen de pedidos ni comisiones sobre tus ventas."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Córdoba",
+      "totalEmpresas": 46820,
+      "conAsalariados": 22101,
+      "pymes1a49": 21809,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "palma",
@@ -711,7 +815,15 @@
         "q": "¿Es fácil de instalar para una pyme en Palma?",
         "a": "Se instala en menos de 5 minutos mediante un instalador estándar de Windows y detecta automáticamente tu base de datos de Factusol."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Illes Balears",
+      "totalEmpresas": 103319,
+      "conAsalariados": 47097,
+      "pymes1a49": 46540,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "granada",
@@ -762,7 +874,15 @@
         "q": "¿Cómo empezar a usarlo en Granada?",
         "a": "Descarga el instalador desde la Beta Pública y en menos de 5 minutos tendrás tu catálogo sincronizado."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Granada",
+      "totalEmpresas": 61067,
+      "conAsalariados": 27195,
+      "pymes1a49": 26894,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "toledo",
@@ -813,7 +933,15 @@
         "q": "¿Es compatible con versiones recientes de Factusol?",
         "a": "Es compatible con todas las versiones de Factusol desde 2018 hasta 2026 en formato Access (.accdb y .mdb)."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Toledo",
+      "totalEmpresas": 43989,
+      "conAsalariados": 20753,
+      "pymes1a49": 20536,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "santander",
@@ -864,7 +992,15 @@
         "q": "¿Se puede probar gratis en Santander?",
         "a": "Sí, con la Beta Pública dispones de 60 días sin compromiso."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Cantabria",
+      "totalEmpresas": 38340,
+      "conAsalariados": 17964,
+      "pymes1a49": 17709,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "gijon",
@@ -915,7 +1051,15 @@
         "q": "¿Requiere abrir puertos en el router de la empresa?",
         "a": "No. Toda la comunicación se realiza por conexiones HTTPS salientes seguras."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Asturias",
+      "totalEmpresas": 64608,
+      "conAsalariados": 29223,
+      "pymes1a49": 28836,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "oviedo",
@@ -966,7 +1110,15 @@
         "q": "¿Hay permanencia?",
         "a": "Ninguna. Licencia anual transparente sin cuotas mensuales ni comisiones por ventas."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Asturias",
+      "totalEmpresas": 64608,
+      "conAsalariados": 29223,
+      "pymes1a49": 28836,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "pamplona",
@@ -1017,7 +1169,15 @@
         "q": "¿Cuánto tarda la sincronización de stock?",
         "a": "Las modificaciones de stock se trasladan en menos de un segundo gracias al algoritmo de detección delta."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Navarra",
+      "totalEmpresas": 42375,
+      "conAsalariados": 19353,
+      "pymes1a49": 18854,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "vitoria",
@@ -1068,7 +1228,15 @@
         "q": "¿Se pueden sincronizar fotos de productos?",
         "a": "Sí, sube y asocia automáticamente las fotografías de Factusol a los productos correspondientes en la tienda online."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Álava",
+      "totalEmpresas": 17557,
+      "conAsalariados": 9548,
+      "pymes1a49": 9329,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "castellon",
@@ -1119,7 +1287,15 @@
         "q": "¿Se instala fácilmente en un ordenador de oficina en Castellón?",
         "a": "Sí, el asistente de configuración detecta la base de datos de Factusol en pocos pasos guiados."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Castellón/Castelló",
+      "totalEmpresas": 40045,
+      "conAsalariados": 19907,
+      "pymes1a49": 19573,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "burgos",
@@ -1170,7 +1346,15 @@
         "q": "¿Se puede configurar la frecuencia de sincronización?",
         "a": "El agente monitoriza cambios en segundo plano y los traslada de manera continua o programada."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Burgos",
+      "totalEmpresas": 23976,
+      "conAsalariados": 10351,
+      "pymes1a49": 10174,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "salamanca",
@@ -1221,7 +1405,15 @@
         "q": "¿Es compatible con el nuevo instalador de la Beta Pública?",
         "a": "Sí, puedes descargarlo y probarlo gratis durante 60 días sin coste inicial ni tarjeta de crédito."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Salamanca",
+      "totalEmpresas": 20569,
+      "conAsalariados": 9596,
+      "pymes1a49": 9490,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "san-sebastian",
@@ -1272,7 +1464,15 @@
         "q": "¿Funciona en redes locales corporativas con unidades de red mapeadas o NAS?",
         "a": "Sí. Soporta rutas de red UNC y unidades compartidas con reconexión transparente ante caídas temporales de red local."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Guipúzcoa",
+      "totalEmpresas": 46310,
+      "conAsalariados": 22669,
+      "pymes1a49": 22153,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "tarragona",
@@ -1323,7 +1523,15 @@
         "q": "¿Se puede sincronizar únicamente una familia o selección de artículos?",
         "a": "Sí. Puedes filtrar qué productos se publican en la tienda online en función de campos de Factusol o secciones de catálogo definidas."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Tarragona",
+      "totalEmpresas": 53758,
+      "conAsalariados": 25109,
+      "pymes1a49": 24739,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "lleida",
@@ -1374,7 +1582,15 @@
         "q": "¿Requiere tener el ordenador encendido con Factusol abierto?",
         "a": "El agente de Bentian se ejecuta en segundo plano como servicio local de Windows y accede a la base de datos de Factusol aunque la interfaz de Factusol esté cerrada."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Lleida",
+      "totalEmpresas": 32176,
+      "conAsalariados": 15293,
+      "pymes1a49": 15030,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "girona",
@@ -1425,7 +1641,15 @@
         "q": "¿Es seguro instalar el agente de Bentian en nuestro servidor de Girona?",
         "a": "Totalmente seguro. Bentian es una aplicación Local-First que solo envía datos cifrados a tu propia tienda web, sin almacenar tu base de datos en servidores de terceros."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Girona",
+      "totalEmpresas": 65302,
+      "conAsalariados": 30254,
+      "pymes1a49": 29818,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "almeria",
@@ -1476,7 +1700,15 @@
         "q": "¿Sirve para tiendas con miles de piezas de recambio y accesorios de fontanería?",
         "a": "Sí. Su motor de sincronización diferencial compara miles de referencias en milisegundos y únicamente transmite los productos que han cambiado."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Almería",
+      "totalEmpresas": 44199,
+      "conAsalariados": 20913,
+      "pymes1a49": 20610,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "cadiz",
@@ -1527,7 +1759,15 @@
         "q": "¿Cómo se calculan los gastos de transporte y portes en los pedidos?",
         "a": "Los importes de portes registrados en el pedido web se desglosan en su línea correspondiente dentro del pedido de cliente de Factusol."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Cádiz",
+      "totalEmpresas": 64838,
+      "conAsalariados": 31958,
+      "pymes1a49": 31570,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "huelva",
@@ -1578,7 +1818,15 @@
         "q": "¿Se requiere algún pago mensual recurrente para mantener la sincronización?",
         "a": "No. Bentian se basa en una filosofía sin peajes recurrentes abusivos, permitiendo a las pymes onubenses rentabilizar su inversión desde el primer día."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Huelva",
+      "totalEmpresas": 25820,
+      "conAsalariados": 12785,
+      "pymes1a49": 12648,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "jaen",
@@ -1629,7 +1877,15 @@
         "q": "¿Funciona en redes locales con varios puestos de trabajo que usan Factusol a la vez?",
         "a": "Sí. Bentian realiza lecturas no bloqueantes de la base de datos de Factusol, por lo que tus empleados pueden seguir facturando simultáneamente sin notar ninguna ralentización."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Jaén",
+      "totalEmpresas": 33611,
+      "conAsalariados": 16440,
+      "pymes1a49": 16284,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "albacete",
@@ -1680,7 +1936,15 @@
         "q": "¿Se pueden sincronizar precios especiales para mayoristas de Campollano?",
         "a": "Totalmente. Puedes asignar diferentes tarifas de Factusol a grupos de distribuidores en PrestaShop o WooCommerce con precios específicos."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Albacete",
+      "totalEmpresas": 24853,
+      "conAsalariados": 11926,
+      "pymes1a49": 11772,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "ciudad-real",
@@ -1731,7 +1995,15 @@
         "q": "¿Qué pasa si se va la luz o se apaga el ordenador de la oficina?",
         "a": "Al reiniciar el equipo, el agente de Bentian se inicia automáticamente y procesa de forma segura cualquier pedido o cambio pendiente."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Ciudad Real",
+      "totalEmpresas": 28549,
+      "conAsalariados": 14166,
+      "pymes1a49": 14010,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "cuenca",
@@ -1782,7 +2054,15 @@
         "q": "¿Requiere conocimientos avanzados de informática para ponerlo en marcha?",
         "a": "No. Su instalador guiado para Windows detecta la ruta de Factusol y enlaza con las claves API de tu tienda en menos de 5 minutos."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Cuenca",
+      "totalEmpresas": 12972,
+      "conAsalariados": 6293,
+      "pymes1a49": 6236,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "guadalajara",
@@ -1833,7 +2113,15 @@
         "q": "¿Cómo traslada los pedidos de la web para su preparación en almacén?",
         "a": "Genera los pedidos en Factusol (F_PCL) de forma instantánea, permitiendo que tu equipo de picking empiece a preparar el albarán de inmediato."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Guadalajara",
+      "totalEmpresas": 13670,
+      "conAsalariados": 5952,
+      "pymes1a49": 5867,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "badajoz",
@@ -1884,7 +2172,15 @@
         "q": "¿Requiere suscripción mensual o pagar comisiones por volumen de ventas?",
         "a": "No. Bentian no cobra comisiones por pedidos ni cuotas abusivas en la nube, permitiendo un ahorro radical a las empresas extremeñas."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Badajoz",
+      "totalEmpresas": 40074,
+      "conAsalariados": 19011,
+      "pymes1a49": 18773,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "caceres",
@@ -1935,7 +2231,15 @@
         "q": "¿Se puede instalar si el Factusol está en un servidor Windows local antiguo?",
         "a": "Sí. Bentian es compatible con Windows 10, Windows 11 y Windows Server 2016 en adelante, requiriendo un consumo mínimo de CPU y memoria."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Cáceres",
+      "totalEmpresas": 24181,
+      "conAsalariados": 10980,
+      "pymes1a49": 10845,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "leon",
@@ -1986,7 +2290,15 @@
         "q": "¿Es compatible con tiendas online con miles de referencias de ferretería o farmacia?",
         "a": "Totalmente. El motor diferencial de Bentian está optimizado para procesar catálogos de más de 25.000 referencias con tiempos de sincronización inferiores a 1 segundo."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "León",
+      "totalEmpresas": 27811,
+      "conAsalariados": 12727,
+      "pymes1a49": 12571,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "palencia",
@@ -2037,7 +2349,15 @@
         "q": "¿Cómo se comprueba que el agente está funcionando correctamente?",
         "a": "El agente incluye un panel de control local en el navegador donde puedes ver el estado del conector, el historial de pedidos y los tiempos de respuesta en tiempo real."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Palencia",
+      "totalEmpresas": 8899,
+      "conAsalariados": 4223,
+      "pymes1a49": 4165,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "zamora",
@@ -2088,7 +2408,15 @@
         "q": "¿Es necesario pagar licencias mensuales o comisiones por producto vendido?",
         "a": "No. Bentian funciona sin cuotas mensuales en la nube, garantizando un coste predecible y el control total de tus datos."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Zamora",
+      "totalEmpresas": 10440,
+      "conAsalariados": 4963,
+      "pymes1a49": 4924,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "segovia",
@@ -2139,7 +2467,15 @@
         "q": "¿Es compatible con la versión de Factusol instalada en nuestro servidor local?",
         "a": "Es 100% compatible con versiones de Factusol en formato .accdb y .mdb desde 2018 hasta 2026."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Segovia",
+      "totalEmpresas": 10457,
+      "conAsalariados": 4879,
+      "pymes1a49": 4825,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "avila",
@@ -2190,7 +2526,15 @@
         "q": "¿Qué mantenimiento requiere el conector una vez instalado?",
         "a": "Prácticamente ninguno. El agente corre en segundo plano en Windows, reconecta automáticamente tras reinicios y gestiona los errores de red de forma autónoma."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Ávila",
+      "totalEmpresas": 9648,
+      "conAsalariados": 4493,
+      "pymes1a49": 4471,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "soria",
@@ -2241,7 +2585,15 @@
         "q": "¿Requiere abrir puertos o contratar servidores externos?",
         "a": "No. Bentian opera de manera Local-First comunicándose de forma segura mediante HTTPS hacia tu web, sin exponer la red interna de tu empresa."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Soria",
+      "totalEmpresas": 5562,
+      "conAsalariados": 2710,
+      "pymes1a49": 2671,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "logrono",
@@ -2292,7 +2644,15 @@
         "q": "¿Es compatible con envíos de pedidos dentro y fuera de España?",
         "a": "Sí. Traslada las direcciones de entrega y los desgloses impositivos adecuados para envíos nacionales e internacionales a Factusol."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "La Rioja",
+      "totalEmpresas": 21481,
+      "conAsalariados": 10330,
+      "pymes1a49": 10144,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "ourense",
@@ -2343,7 +2703,15 @@
         "q": "¿Funciona correctamente si tenemos Factusol en un servidor NAS en red local?",
         "a": "Sí. Soporta rutas de red compartidas UNC (\\\\NAS\\Factusol\\) con reconexión automática si se producen interrupciones temporales."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Ourense",
+      "totalEmpresas": 20870,
+      "conAsalariados": 9966,
+      "pymes1a49": 9879,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "lugo",
@@ -2394,7 +2762,15 @@
         "q": "¿Requiere conocimientos técnicos para su instalación en las oficinas de Lugo?",
         "a": "No. Su instalador paso a paso para Windows configura la conexión con Factusol y tu tienda en minutos con una interfaz gráfica muy sencilla."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Lugo",
+      "totalEmpresas": 22564,
+      "conAsalariados": 10708,
+      "pymes1a49": 10625,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "huesca",
@@ -2445,7 +2821,15 @@
         "q": "¿Es compatible con conexiones en polígonos industriales de Huesca?",
         "a": "Sí. Bentian comprime los datos de sincronización y tolera microcortes de conexión mediante su cola de reintentos automáticos."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Huesca",
+      "totalEmpresas": 15627,
+      "conAsalariados": 7894,
+      "pymes1a49": 7784,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "teruel",
@@ -2496,7 +2880,15 @@
         "q": "¿Funciona en ordenadores con Windows estándar sin necesidad de software adicional?",
         "a": "Sí. Bentian incluye todo lo necesario para conectarse a Factusol sin requerir software de terceros ni instalaciones complejas."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Teruel",
+      "totalEmpresas": 8642,
+      "conAsalariados": 4396,
+      "pymes1a49": 4354,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "las-palmas",
@@ -2547,7 +2939,15 @@
         "q": "¿Qué ventajas ofrece frente a conectores en la nube para empresas de Canarias?",
         "a": "Bentian funciona en tu propio equipo local, lee la base de datos de Factusol a velocidad nativa sin latencias causadas por la distancia geográfica y no cobra suscripciones recurrentes."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Las Palmas",
+      "totalEmpresas": 74168,
+      "conAsalariados": 33227,
+      "pymes1a49": 32659,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   },
   {
     "slug": "santa-cruz-de-tenerife",
@@ -2598,6 +2998,14 @@
         "q": "¿Requiere tener una tienda online alojada en servidores de Canarias?",
         "a": "No. Tu tienda WooCommerce o PrestaShop puede estar alojada en cualquier servidor del mundo; Bentian se comunica con ella de forma segura mediante su API REST oficial."
       }
-    ]
+    ],
+    "ineStats": {
+      "year": 2025,
+      "provincia": "Santa Cruz de Tenerife",
+      "totalEmpresas": 71833,
+      "conAsalariados": 32375,
+      "pymes1a49": 31910,
+      "source": "INE - DIRCE (Directorio Central de Empresas), tabla 73022, año 2025"
+    }
   }
 ]

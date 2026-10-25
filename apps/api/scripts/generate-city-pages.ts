@@ -31,6 +31,7 @@ interface CityData {
   industrialHubs: IndustrialHub[];
   sectors: string[];
   localContextParagraph: string;
+  ineStats?: { year: number; provincia: string; totalEmpresas: number; conAsalariados: number; pymes1a49: number; source: string };
   faqs: FaqItem[];
 }
 
@@ -85,6 +86,22 @@ function renderHeader(currentVersion: string): string {
       </nav>
     </div>
   </header>`;
+}
+
+function renderIneStats(city: CityData): string {
+  const s = city.ineStats;
+  if (!s) return '';
+  const fmt = (n: number) => n.toLocaleString('es-ES');
+  const pct = Math.round((s.conAsalariados / s.totalEmpresas) * 100);
+  return `<div class="mb-14 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+          <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-5 text-center">El tejido empresarial de la provincia de ${s.provincia}</h3>
+          <div class="grid sm:grid-cols-3 gap-4 text-center">
+            <div><div class="text-2xl font-extrabold text-white font-mono">${fmt(s.totalEmpresas)}</div><div class="text-xs text-zinc-400 mt-1">empresas activas</div></div>
+            <div><div class="text-2xl font-extrabold text-indigo-300 font-mono">${fmt(s.pymes1a49)}</div><div class="text-xs text-zinc-400 mt-1">con entre 1 y 49 asalariados (el perfil habitual de usuario de un ERP de gestión local)</div></div>
+            <div><div class="text-2xl font-extrabold text-emerald-300 font-mono">${pct}%</div><div class="text-xs text-zinc-400 mt-1">tiene al menos un asalariado</div></div>
+          </div>
+          <p class="mt-4 text-[11px] text-zinc-500 text-center">Fuente: ${s.source}. Datos provinciales: ${city.name} se incluye en la provincia de ${s.provincia}. <a href="/#calculadora-ahorro" class="text-indigo-400 hover:text-indigo-300 underline">Calcula cuánto podría ahorrar tu negocio</a>.</p>
+        </div>`;
 }
 
 function renderCityPage(city: CityData, allCities: CityData[], currentVersion: string): string {
@@ -371,6 +388,8 @@ ${renderHeader(currentVersion)}
           </p>
         </div>
 
+        ${renderIneStats(city)}
+
         <div class="mb-14">
           <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-6 text-center">Polígonos y Áreas de Distribución Principales</h3>
           <div class="grid md:grid-cols-3 gap-6">
@@ -379,7 +398,7 @@ ${renderHeader(currentVersion)}
         </div>
 
         <div>
-          <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-4 text-center">Sectores Empresariales con Mayor Adopción</h3>
+          <h3 class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-4 text-center">Sectores Habituales en la Zona</h3>
           <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             ${sectorsHtml}
           </div>
