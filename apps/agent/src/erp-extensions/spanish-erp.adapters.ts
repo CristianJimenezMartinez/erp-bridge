@@ -220,12 +220,17 @@ export class OdooErpAdapter extends SqlServerBaseAdapter {
       // 2. Construir comandos (0, 0, {...}) de líneas de pedido (sale.order.line)
       const orderLineCommands: any[] = [];
       for (const line of order.lines || []) {
-        const prodIds: number[] = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+        let prodIds: number[] = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
           dbName, uid, pass, 'product.product', 'search', [[['default_code', '=', line.sku]]], { limit: 1 },
         ]);
+        if (!Array.isArray(prodIds) || !prodIds[0]) {
+          prodIds = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+            dbName, uid, pass, 'product.product', 'search', [[['barcode', '=', line.sku]]], { limit: 1 },
+          ]);
+        }
         const prodId = Array.isArray(prodIds) && prodIds[0] ? Number(prodIds[0]) : false;
         if (!prodId) {
-          return { success: false, error: `SKU ${line.sku} no existe en Odoo (product.product.default_code); pedido no creado` };
+          return { success: false, error: `SKU ${line.sku} no existe en Odoo (product.product.default_code / barcode); pedido no creado` };
         }
         orderLineCommands.push([
           0,
@@ -256,7 +261,17 @@ export class OdooErpAdapter extends SqlServerBaseAdapter {
         ],
       ]);
 
-      return { success: true, orderNumber: orderId, externalId: `SO-${orderId}` };
+      let officialNumber = String(orderId);
+      try {
+        const orderInfo = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+          dbName, uid, pass, 'sale.order', 'read', [[orderId]], { fields: ['name'] },
+        ]);
+        if (Array.isArray(orderInfo) && orderInfo[0]?.name) {
+          officialNumber = orderInfo[0].name;
+        }
+      } catch {}
+
+      return { success: true, orderNumber: officialNumber, externalId: `SO-${orderId}` };
     } catch (err) {
       return { success: false, error: err instanceof Error ? err.message : String(err) };
     }
@@ -454,23 +469,88 @@ export class FacturaScriptsErpAdapter extends SqlServerBaseAdapter {
       const s = this.getProviderSettings();
       const baseUrl = this.getCleanBaseUrl(s.serverInstance);
       const apiKey = s.password || '';
+
+      // 1. Resolver o registrar cliente en FacturaScripts si no se especificó un ID explícito
+      let codcliente = order.customer?.id;
+      if (!codcliente || codcliente === '000001') {
+        const nif = (order.customer?.taxId || (order.customer as any)?.nif || (order.customer as any)?.cif || '').trim();
+        const email = (order.customer?.email || '').trim();
+        const clientName = (order.customer?.fiscalName || order.customer?.commercialName || 'Cliente Web').trim();
+
+        if (nif) {
+          try {
+            const findRes = await fetch(`${baseUrl}/api/3/clientes?cifnif=${encodeURIComponent(nif)}&limit=1`, {
+              headers: { Token: apiKey, Accept: 'application/json' },
+              signal: AbortSignal.timeout(4000),
+            });
+            if (findRes.ok) {
+              const matches: any[] = await findRes.json();
+              if (Array.isArray(matches) && matches[0]?.codcliente) {
+                codcliente = String(matches[0].codcliente);
+              }
+            }
+          } catch {}
+        }
+
+        if (!codcliente && (nif || clientName)) {
+          try {
+            const createParams = new URLSearchParams();
+            createParams.set('cifnif', nif || 'B00000000');
+            createParams.set('nombre', clientName);
+            if (email) createParams.set('email', email);
+            const createRes = await fetch(`${baseUrl}/api/3/clientes`, {
+              method: 'POST',
+              headers: { Token: apiKey, 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+              body: createParams.toString(),
+              signal: AbortSignal.timeout(4000),
+            });
+            if (createRes.ok) {
+              const createdData: any = await createRes.json();
+              if (createdData?.data?.codcliente) {
+                codcliente = String(createdData.data.codcliente);
+              }
+            }
+          } catch {}
+        }
+      }
+
+      // Si aún no tenemos codcliente, fallback al primer cliente disponible
+      if (!codcliente) {
+        try {
+          const listRes = await fetch(`${baseUrl}/api/3/clientes?limit=1`, {
+            headers: { Token: apiKey, Accept: 'application/json' },
+            signal: AbortSignal.timeout(4000),
+          });
+          if (listRes.ok) {
+            const list: any[] = await listRes.json();
+            if (Array.isArray(list) && list[0]?.codcliente) {
+              codcliente = String(list[0].codcliente);
+            }
+          }
+        } catch {}
+      }
+
       const bodyParams = new URLSearchParams();
-      bodyParams.set('codcliente', order.customer?.id || '000001');
+      bodyParams.set('codcliente', codcliente || '1');
       bodyParams.set('codserie', series || s.orderSeries || 'A');
       bodyParams.set('codalmacen', warehouse || s.warehouseCode || 'ALG');
-      bodyParams.set('observaciones', `Pedido Web #${order.orderNumber} - ${order.customer?.fiscalName || ''}`);
+      bodyParams.set('coddivisa', order.currency || 'EUR');
+      const pm = (order.paymentMethod || '').toLowerCase();
+      bodyParams.set('codpago', pm.includes('tarj') ? 'TARJETA' : (pm.includes('trans') ? 'TRANS' : (pm.includes('pay') ? 'PAYPAL' : 'CONT')));
+      bodyParams.set('observaciones', `Pedido Web #${order.orderNumber || order.id || ''} - ${order.customer?.fiscalName || ''}`.trim());
       bodyParams.set(
         'lineas',
         JSON.stringify(
           (order.lines || []).map((l) => ({
             referencia: l.sku,
-            descripcion: l.name,
-            cantidad: l.quantity,
-            pvpunitario: l.unitPrice,
-            dtopor: l.discountPercent || 0,
+            descripcion: l.name || l.sku,
+            cantidad: Number(l.quantity) || 1,
+            pvpunitario: Number(l.unitPrice) || 0,
+            dtopor: Number(l.discountPercent) || 0,
           }))
         )
       );
+
       const res = await fetch(`${baseUrl}/api/3/crearPedidoCliente`, {
         method: 'POST',
         headers: {
@@ -481,12 +561,14 @@ export class FacturaScriptsErpAdapter extends SqlServerBaseAdapter {
         body: bodyParams.toString(),
         signal: AbortSignal.timeout(8000),
       });
+
       if (!res.ok) {
-        return { success: false, error: `HTTP ${res.status} en FacturaScripts /api/3/crearPedidoCliente` };
+        const errorText = await res.text().catch(() => '');
+        return { success: false, error: `HTTP ${res.status} en FacturaScripts /api/3/crearPedidoCliente: ${errorText.slice(0, 150)}` };
       }
       const data: any = await res.json();
       const docCode = data?.doc?.codigo || data?.codigo || data?.idpedido || Math.floor(Date.now() / 1000);
-      return { success: true, orderNumber: docCode, externalId: docCode };
+      return { success: true, orderNumber: docCode, externalId: `FS-${docCode}` };
     } catch (err) {
       return { success: false, error: err instanceof Error ? err.message : String(err) };
     }

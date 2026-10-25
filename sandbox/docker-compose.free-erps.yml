@@ -1,0 +1,85 @@
+services:
+  fs-db:
+    image: mariadb:10.11
+    container_name: bentian-test-fs-db
+    restart: unless-stopped
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: fs_root_password_2026
+      MYSQL_DATABASE: facturascripts_test
+      MYSQL_USER: fs_user
+      MYSQL_PASSWORD: fs_password_2026
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pfs_root_password_2026"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+    networks:
+      - free-erps-net
+
+  facturascripts:
+    image: facturascripts/facturascripts:latest
+    container_name: bentian-test-fs-app
+    restart: unless-stopped
+    ports:
+      - "8096:80"
+    depends_on:
+      fs-db:
+        condition: service_healthy
+    environment:
+      FS_DB_HOST: fs-db
+      FS_DB_PORT: 3306
+      FS_DB_NAME: facturascripts_test
+      FS_DB_USER: fs_user
+      FS_DB_PASS: fs_password_2026
+      FS_INITIAL_USER: admin
+      FS_INITIAL_PASS: BentianAdmin2026!
+      FS_API_KEY: bentian_fs_api_token_test_123
+    networks:
+      - free-erps-net
+
+  odoo-db:
+    image: postgres:16-alpine
+    container_name: bentian-test-odoo-db
+    restart: unless-stopped
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo_pass_2026
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+    networks:
+      - free-erps-net
+
+  odoo:
+    image: odoo:17
+    container_name: bentian-test-odoo-app
+    restart: unless-stopped
+    ports:
+      - "8069:8069"
+    depends_on:
+      odoo-db:
+        condition: service_healthy
+    environment:
+      HOST: odoo-db
+      USER: odoo
+      PASSWORD: odoo_pass_2026
+    command: >
+      --db_host=odoo-db
+      --db_user=odoo
+      --db_password=odoo_pass_2026
+      -d bentian_odoo_test
+      -i base,sale_management,stock
+      --without-demo=False
+    networks:
+      - free-erps-net
+
+networks:
+  free-erps-net:
+    driver: bridge
