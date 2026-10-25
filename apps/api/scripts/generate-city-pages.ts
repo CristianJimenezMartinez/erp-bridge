@@ -269,7 +269,7 @@ function renderCityPage(city: CityData, allCities: CityData[], currentVersion: s
         "operatingSystem": "Windows 10, Windows 11, Windows Server",
         "applicationCategory": "BusinessApplication",
         "softwareVersion": "${currentVersion}",
-        "dateModified": "2026-10-21T19:00:00+02:00",
+        "dateModified": "${new Date().toISOString()}",
         "downloadUrl": "https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe",
         "image": "https://bridge.cristianjm.com/assets/screenshots/01-dashboard-overview.png",
         "brand": {
@@ -973,7 +973,7 @@ ${renderHeader(currentVersion)}
 }
 
 function updateSitemap(cities: CityData[]) {
-  const currentDate = '2026-10-21T19:00:00+02:00';
+  const currentDate = new Date().toISOString();
   const hubUrl = 'https://bridge.cristianjm.com/conector-factusol/';
 
   if (fs.existsSync(SITEMAP_FILE)) {
@@ -1064,10 +1064,10 @@ function updateSitemap(cities: CityData[]) {
     let idxXml = fs.readFileSync(SITEMAP_INDEX_FILE, 'utf8');
     idxXml = idxXml.replace(
       /(<loc>https:\/\/bridge\.cristianjm\.com\/sitemap-ciudades\.xml<\/loc>\s*<lastmod>)[^<]+(<\/lastmod>)/i,
-      `$12026-10-21$2`
+      `$1${currentDate.slice(0, 10)}$2`
     );
     fs.writeFileSync(SITEMAP_INDEX_FILE, idxXml, 'utf8');
-    console.log(`✓ [sitemap-index] Actualizado lastmod de sitemap-ciudades.xml a 2026-10-21.`);
+    console.log(`✓ [sitemap-index] Actualizado lastmod de sitemap-ciudades.xml a ${currentDate.slice(0, 10)}.`);
   }
 }
 
