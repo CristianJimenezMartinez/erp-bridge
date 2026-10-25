@@ -703,7 +703,7 @@ export class LocalSyncEngine {
     const bridgeSettings = config.universalBridge || {};
     if (!bridgeSettings.storeUrl) {
       const msg = 'URL del sitio web no configurada en Universal Bridge.';
-      this.eventBus.addEvent('warn', msg);
+      if (isManual) this.eventBus.addEvent('warn', msg); // el ciclo automático (30s) no repite el aviso
       return { success: false, message: msg };
     }
 

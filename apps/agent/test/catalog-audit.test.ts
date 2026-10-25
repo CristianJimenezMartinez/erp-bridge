@@ -161,7 +161,7 @@ async function runCatalogAuditTests() {
       req.on('data', (chunk) => (reqBody += chunk));
       req.on('end', () => {
         res.setHeader('Content-Type', 'application/json');
-        const u = req.url || '';
+        const u = (req.url || '').replace(/^\/api\/v2\.0(?=\/)/, '');
         // Odoo JSON-RPC
         if (u === '/jsonrpc') {
           const rpc = JSON.parse(reqBody || '{}');
@@ -194,6 +194,10 @@ async function runCatalogAuditTests() {
           }
           if (model === 'product.product' && op === 'search') {
             res.end(JSON.stringify({ jsonrpc: '2.0', id: rpc.id, result: [101] }));
+            return;
+          }
+          if (model === 'sale.order' && op === 'search') {
+            res.end(JSON.stringify({ jsonrpc: '2.0', id: rpc.id, result: [] }));
             return;
           }
           if (model === 'sale.order' && op === 'create') {

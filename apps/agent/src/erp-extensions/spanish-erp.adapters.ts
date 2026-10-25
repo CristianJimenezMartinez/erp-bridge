@@ -190,6 +190,17 @@ export class OdooErpAdapter extends SqlServerBaseAdapter {
         return { success: false, error: 'Autenticación fallida en Odoo JSON-RPC al crear pedido.' };
       }
 
+      // 0. Idempotencia: si ya existe un pedido con la misma referencia, devolverlo sin duplicar
+      const orderRef = String(order.orderNumber || order.id || '');
+      if (orderRef) {
+        const existing = await this.callOdooJsonRpc(baseUrl, 'object', 'execute_kw', [
+          dbName, uid, pass, 'sale.order', 'search', [[['client_order_ref', '=', orderRef]]], { limit: 1 },
+        ]);
+        if (Array.isArray(existing) && existing[0]) {
+          return { success: true, orderNumber: existing[0], externalId: `SO-${existing[0]}` };
+        }
+      }
+
       // 1. Resolver o crear cliente (res.partner)
       const custName = order.customer?.fiscalName || 'Cliente Web';
       const custEmail = order.customer?.email || '';
@@ -213,11 +224,14 @@ export class OdooErpAdapter extends SqlServerBaseAdapter {
           dbName, uid, pass, 'product.product', 'search', [[['default_code', '=', line.sku]]], { limit: 1 },
         ]);
         const prodId = Array.isArray(prodIds) && prodIds[0] ? Number(prodIds[0]) : false;
+        if (!prodId) {
+          return { success: false, error: `SKU ${line.sku} no existe en Odoo (product.product.default_code); pedido no creado` };
+        }
         orderLineCommands.push([
           0,
           0,
           {
-            ...(prodId ? { product_id: prodId } : {}),
+            product_id: prodId,
             name: line.name || line.sku,
             product_uom_qty: Number(line.quantity) || 1,
             price_unit: Number(line.unitPrice) || 0,

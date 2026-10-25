@@ -36,9 +36,14 @@ export class BusinessCentralErpAdapter extends SqlServerBaseAdapter {
   }
 
   private getCleanApiBase(instance?: string): string {
-    return String(instance || this.getProviderSettings().serverInstance || '')
+    const base = String(instance || this.getProviderSettings().serverInstance || '')
       .trim()
       .replace(/\/+$/, '');
+    // Si el usuario pegó solo el host/entorno, añadir la ruta estándar de la API v2.0.
+    if (/^https?:\/\//i.test(base) && !/\/api\//i.test(`${base}/`)) {
+      return `${base}/api/v2.0`;
+    }
+    return base;
   }
 
   private buildAuthHeaders(user?: string, pass?: string): Record<string, string> {
@@ -208,7 +213,7 @@ export class BusinessCentralErpAdapter extends SqlServerBaseAdapter {
       const docNumber = createdOrder.number || orderId;
 
       for (const line of order.lines || []) {
-        await fetch(`${baseUrl}/companies(${companyId})/salesOrders(${orderId})/salesOrderLines`, {
+        const lineRes = await fetch(`${baseUrl}/companies(${companyId})/salesOrders(${orderId})/salesOrderLines`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
@@ -220,6 +225,18 @@ export class BusinessCentralErpAdapter extends SqlServerBaseAdapter {
           }),
           signal: AbortSignal.timeout(8000),
         });
+        if (!lineRes.ok) {
+          // Evitar cabeceras huérfanas sin líneas: revertir el pedido (mejor esfuerzo).
+          await fetch(`${baseUrl}/companies(${companyId})/salesOrders(${orderId})`, {
+            method: 'DELETE',
+            headers: { ...headers, 'If-Match': '*' },
+            signal: AbortSignal.timeout(8000),
+          }).catch(() => undefined);
+          return {
+            success: false,
+            error: `HTTP ${lineRes.status} al crear la línea ${line.sku} en Business Central (pedido revertido)`,
+          };
+        }
       }
 
       return { success: true, orderNumber: docNumber, externalId: docNumber };
