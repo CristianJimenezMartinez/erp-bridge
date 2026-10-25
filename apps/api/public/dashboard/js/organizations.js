@@ -187,8 +187,8 @@ function filterAndRenderPartnerClients(targetPage) {
   const totalActiveLic = filtered.reduce((acc, c) => acc + Number(c.active_licenses || 0), 0);
   const commEl = document.getElementById('partner-commission-available');
   const commSubEl = document.getElementById('partner-commission-subtitle');
-  if (commEl) commEl.innerText = `${(totalActiveLic * 49.75).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-  if (commSubEl) commSubEl.innerText = `(${totalActiveLic} lic. activas × 49,75 €)`;
+  if (commEl) commEl.innerText = `${(totalActiveLic * 59.70).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  if (commSubEl) commSubEl.innerText = `(${totalActiveLic} lic. activas × 59,70 €)`;
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const page = Math.min(Math.max(1, targetPage || window._partnerClientsPage || 1), totalPages);
@@ -235,7 +235,7 @@ function filterAndRenderPartnerClients(targetPage) {
       <td class="p-3.5">${statusBadge}</td>
       <td class="p-3.5 text-right whitespace-nowrap space-x-1.5">
         <button type="button" onclick="openPartnerIssueModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-zinc-200 transition cursor-pointer" title="Emitir clave de evaluación de 15 días">Emitir 15d</button>
-        <button type="button" onclick="openPartnerBuyModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-emerald-300 transition cursor-pointer" title="Contratar licencia anual con descuento Partner (-25%)">Contratar (-25%)</button>
+        <button type="button" onclick="openPartnerBuyModal(${JSON.stringify(name).replace(/"/g, '&quot;')}, ${JSON.stringify(tax).replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-emerald-300 transition cursor-pointer" title="Contratar licencia anual con descuento Partner (-30%)">Contratar (-30%)</button>
         <button type="button" onclick="inspectPartnerClientOrg(${JSON.stringify(c.id || '').replace(/"/g, '&quot;')})" class="px-2.5 py-1 rounded-md bg-[#181c26] hover:bg-[#222736] border border-white/[0.14] text-[11px] font-medium text-indigo-300 transition cursor-pointer" title="Inspeccionar fichas y licencias de esta empresa">Inspeccionar</button>
       </td>
     </tr>`;

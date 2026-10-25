@@ -27,7 +27,7 @@ Durante la fase de **Beta Pública Abierta**, el conector se ofrece de forma 100
 | :--- | :--- | :---: | :---: | :--- |
 | `base_annual` | **Plan Base Todo Incluido (Anual)** | **199 €/año** | Suscripción | Tarifa pública oficial. 1 ERP Factusol ⇄ 1 Tienda Online. SKUs ilimitados. |
 | `founder_annual` | **Plan Fundador Beta (-30% Vitalicio)** | **139 €/año** | Suscripción | **Máximo 25 plazas**. Reservado a participantes de la Beta. Límite de 1 por cliente. |
-| `partner_reseller_annual` | **Licencia Mayorista Partner (-25%)** | **149,25 €/año** | Suscripción | Tarifa distribuidor B2B (margen retenido en origen de 49,75 € sobre 199 €). |
+| `partner_reseller_annual` | **Licencia Mayorista Partner (-30%)** | **139,30 €/año** | Suscripción | Tarifa distribuidor B2B (margen retenido en origen de 59,70 € sobre 199 €). |
 | `base_monthly` | **Plan Base Todo Incluido (Mensual)** | **29 €/mes** | Suscripción | Máxima flexibilidad mensual sin compromiso de permanencia. |
 | `setup_assisted` | **Puesta en Marcha Asistida** | **99 €** | Pago Único | Sesión remota de 45 min por AnyDesk con un ingeniero. |
 | `setup_vip` | **Implementación Completa & Mapeo VIP** | **249 €** | Pago Único | Mapeo de tallas/colores, tarifas B2B escalonadas y 30d soporte WhatsApp. |

@@ -344,7 +344,7 @@ billingRouter.post('/billing/create-checkout-session', async (req: Request, res:
 });
 
 /**
- * 2.1 Crear sesión de Stripe Checkout Mayorista para Partners (Tarifa Distribuidor -25%: 149,25 €)
+ * 2.1 Crear sesión de Stripe Checkout Mayorista para Partners (Tarifa Distribuidor -30%: 139,30 €)
  */
 billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESELLER', 'SUPERADMIN', 'ADMIN']), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
@@ -359,7 +359,7 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
     const cleanTaxId = clientTaxId.trim().toUpperCase();
     const targetEmail = (clientEmail || `${cleanTaxId.toLowerCase()}@cliente.cristianjm.com`).trim().toLowerCase();
     const orgId = `org_${crypto.createHash('md5').update(cleanTaxId).digest('hex').substring(0, 10)}`;
-    const wholesalePriceEur = 149.25;
+    const wholesalePriceEur = 139.30;
 
     if (STRIPE_SECRET_KEY && (STRIPE_SECRET_KEY.startsWith('sk_live_') || STRIPE_SECRET_KEY.startsWith('sk_test_'))) {
       const params = new URLSearchParams();
@@ -383,8 +383,8 @@ billingRouter.post('/billing/partner-checkout', requireAuth, requireRole(['RESEL
       params.append('line_items[0][price_data][currency]', 'eur');
       params.append('line_items[0][price_data][unit_amount]', String(Math.round(wholesalePriceEur * 100)));
       params.append('line_items[0][price_data][recurring][interval]', 'year');
-      params.append('line_items[0][price_data][product_data][name]', `Licencia Bentian ERP Bridge — Distribuidor Partner (-25%) [${clientName}]`);
-      params.append('line_items[0][price_data][product_data][description]', `Tarifa Mayorista Partner: 149,25 €/año. Cliente: ${clientName} (${cleanTaxId})`);
+      params.append('line_items[0][price_data][product_data][name]', `Licencia Bentian ERP Bridge — Distribuidor Partner (-30%) [${clientName}]`);
+      params.append('line_items[0][price_data][product_data][description]', `Tarifa Mayorista Partner: 139,30 €/año. Cliente: ${clientName} (${cleanTaxId})`);
       params.append('line_items[0][quantity]', '1');
 
       const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {

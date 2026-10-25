@@ -92,7 +92,7 @@
   - La tarifa de **Plan Fundador** (**139 €/año** vitalicio, -30%) está estrictamente limitada a un **cupo máximo de 25 claves** para participantes verificados de la Beta Pública.
   - **Blindaje Anti-Acaparamiento:** Ningún cliente o entidad puede adquirir más de 1 sola Licencia Fundador (`FOUNDER_LIMIT_PER_CUSTOMER_EXCEEDED`).
   - **Exclusividad Beta:** Los no participantes deben adquirir la Licencia Estándar de 199 €/año (`FOUNDER_BETA_PARTICIPANT_REQUIRED`).
-  - La tarifa de **Partner Mayorista** queda fijada en **149,25 €/año** (-25% margen directo sobre 199 €).
+  - La tarifa de **Partner Mayorista** queda fijada en **139,30 €/año** (-30% margen directo / 59,70 € comisión recurrente sobre 199 €).
 
 ---
 

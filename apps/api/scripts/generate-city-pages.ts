@@ -73,7 +73,7 @@ function renderHeader(currentVersion: string): string {
           <span>&larr; Web Principal</span>
         </a>
         <a href="/docs/" class="text-zinc-400 hover:text-white transition hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Docs</a>
-        <a href="/partners/" class="text-emerald-400 hover:text-emerald-300 transition hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 whitespace-nowrap shrink-0">Partners (25%)</a>
+        <a href="/partners/" class="text-emerald-400 hover:text-emerald-300 transition hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 whitespace-nowrap shrink-0">Partners (30%)</a>
         <a href="/conector-factusol/" class="text-zinc-400 hover:text-white transition hidden sm:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Ciudades</a>
         <a href="/seguridad/" class="text-zinc-400 hover:text-white transition hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Seguridad</a>
         <a href="/quien-esta-detras/" class="text-zinc-400 hover:text-white transition hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Equipo</a>

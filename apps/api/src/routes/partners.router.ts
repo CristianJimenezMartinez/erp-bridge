@@ -53,7 +53,7 @@ partnersRouter.post(
               data: {
                 partnerCode: row['partner_code'],
                 agencyName: row['agency_name'] || data.agencyName,
-                commissionRate: Number(row['commission_rate'] || 25),
+                commissionRate: Number(row['commission_rate'] || 30),
                 nfrLicenseKey: row['nfr_license_key'],
                 installerUrl: getLatestInstallerUrl(),
                 dossierUrl: '/partners/?print=1',
@@ -102,7 +102,7 @@ partnersRouter.post(
             ) VALUES (
               $1, $2, $3, true, 20,
               $4, $5, $6, $3, $7, $8,
-              $9, $10, $11, 25, 0,
+              $9, $10, $11, 30, 0,
               $12, $13, 'ACTIVE', $14, $15, NOW(), NOW()
             )
           `, [
@@ -130,11 +130,11 @@ partnersRouter.post(
         return res.status(201).json({
           success: true,
           alreadyRegistered: false,
-          message: '¡Bienvenido al Canal Oficial de Partners! Tu código de atribución del 25% y tu licencia NFR de demostración están activos.',
+          message: '¡Bienvenido al Canal Oficial de Partners! Tu código de atribución del 30% y tu licencia NFR de demostración están activos.',
           data: {
             partnerCode,
             agencyName: data.agencyName,
-            commissionRate: 25,
+            commissionRate: 30,
             nfrLicenseKey: nfrLicense.key,
             installerUrl: getLatestInstallerUrl(),
             dossierUrl: '/partners/?print=1',
@@ -171,7 +171,7 @@ partnersRouter.get('/admin/partners', requireAuth, requireRole(['SUPERADMIN', 'A
     const totalReferredClients = rows.reduce((acc: number, r: any) => acc + Number(r.referred_clients_count || 0), 0);
     const estimatedPartnerArr = totalReferredClients * 199;
     const estimatedPartnerCommissions = rows.reduce(
-      (acc: number, r: any) => acc + Number(r.referred_clients_count || 0) * 199 * (Number(r.commission_rate || 25) / 100),
+      (acc: number, r: any) => acc + Number(r.referred_clients_count || 0) * 199 * (Number(r.commission_rate || 30) / 100),
       0
     );
 

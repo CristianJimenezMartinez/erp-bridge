@@ -131,7 +131,7 @@ function filterAndRenderAdminPartners() {
     const erps = p.erps || 'Factusol / Multi-ERP';
     const nfrKey = p.nfr_license_key || '—';
     const clientsCount = Number(p.referred_clients_count || 0);
-    const commRate = Number(p.commission_rate || 25);
+    const commRate = Number(p.commission_rate || 30);
     const annualComm = (clientsCount * 199 * (commRate / 100)).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const status = p.status || (p.active === false ? 'SUSPENDED' : 'ACTIVE');
     const isAct = status === 'ACTIVE';

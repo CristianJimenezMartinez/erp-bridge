@@ -5,7 +5,7 @@
 function actualizarCalculadoraPartner() {
   var clients = parseInt(document.getElementById('calc-clients').value, 10) || 15;
   var setup = parseInt(document.getElementById('calc-setup').value, 10) || 300;
-  var annualCommissionPerClient = 199 * 0.25; // 49.75 EUR
+  var annualCommissionPerClient = 199 * 0.30; // 59.70 EUR
   var setupTotal = clients * setup;
   var recurringTotal = clients * annualCommissionPerClient;
   var year1Total = setupTotal + recurringTotal;

@@ -66,7 +66,7 @@ export async function ensurePartnersTable(): Promise<void> {
       partner_type VARCHAR(64) DEFAULT 'agencia_ecommerce',
       erps VARCHAR(255),
       estimated_clients VARCHAR(64),
-      commission_rate INTEGER NOT NULL DEFAULT 25,
+      commission_rate INTEGER NOT NULL DEFAULT 30,
       referred_clients_count INTEGER NOT NULL DEFAULT 0,
       nfr_license_key VARCHAR(128),
       nfr_license_id VARCHAR(64),
@@ -95,7 +95,7 @@ export async function ensurePartnersTable(): Promise<void> {
       ADD COLUMN IF NOT EXISTS partner_type VARCHAR(64) DEFAULT 'agencia_ecommerce',
       ADD COLUMN IF NOT EXISTS erps VARCHAR(255),
       ADD COLUMN IF NOT EXISTS estimated_clients VARCHAR(64),
-      ADD COLUMN IF NOT EXISTS commission_rate INTEGER NOT NULL DEFAULT 25,
+      ADD COLUMN IF NOT EXISTS commission_rate INTEGER NOT NULL DEFAULT 30,
       ADD COLUMN IF NOT EXISTS referred_clients_count INTEGER NOT NULL DEFAULT 0,
       ADD COLUMN IF NOT EXISTS nfr_license_key VARCHAR(128),
       ADD COLUMN IF NOT EXISTS nfr_license_id VARCHAR(64),
@@ -104,6 +104,9 @@ export async function ensurePartnersTable(): Promise<void> {
       ADD COLUMN IF NOT EXISTS ip_address VARCHAR(128),
       ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   `).catch(() => {});
+
+  await db.query(`ALTER TABLE partners ALTER COLUMN commission_rate SET DEFAULT 30`).catch(() => {});
+  await db.query(`UPDATE partners SET commission_rate = 30 WHERE commission_rate = 25`).catch(() => {});
 }
 
 export function dispatchPartnerOnboardingEmails(params: {
@@ -120,21 +123,21 @@ export function dispatchPartnerOnboardingEmails(params: {
   void MailerService.sendLicenseWelcomeEmail({
     customerEmail: email,
     licenseKey: nfrLicenseKey,
-    planName: `Partner Oficial Bentian (${partnerCode} · 25% Comisión Recurrente + Licencia NFR 2 Puestos)`,
+    planName: `Partner Oficial Bentian (${partnerCode} · 30% Comisión Recurrente + Licencia NFR 2 Puestos)`,
     alias: `Partner NFR (${partnerCode}) - ${agencyName}`,
     companyName: agencyName,
   }).catch(() => {});
 
   const adminHtml = MailerService.renderBrandedEmail({
     title: `Nuevo Partner B2B Registrado: ${escapeHtml(agencyName)} (${escapeHtml(partnerCode)})`,
-    badgeText: 'NUEVO PARTNER 25%',
+    badgeText: 'NUEVO PARTNER 30%',
     badgeType: 'success',
     contentHtml: `
       <h2 style="margin:0 0 12px 0;font-size:18px;color:#ffffff;">🤝 Alta de Nuevo Partner / Agente Digitalizador</h2>
       <p style="font-size:13px;color:#d4d4d8;line-height:1.6;">
         <strong>Agencia:</strong> ${escapeHtml(agencyName)}<br/>
         <strong>Contacto:</strong> ${escapeHtml(contactName)} (<a href="mailto:${escapeHtml(email)}" style="color:#818cf8;">${escapeHtml(email)}</a> · Tel: ${escapeHtml(phone)})<br/>
-        <strong>Código Partner:</strong> <code style="color:#34d399;font-weight:700;">${escapeHtml(partnerCode)}</code> (25% recurrente)<br/>
+        <strong>Código Partner:</strong> <code style="color:#34d399;font-weight:700;">${escapeHtml(partnerCode)}</code> (30% recurrente)<br/>
         <strong>ERPs:</strong> ${escapeHtml(erps)} (${escapeHtml(estimatedClients)})<br/>
         <strong>Licencia NFR (2 puestos / Clave acceso Portal):</strong> <code style="color:#818cf8;">${escapeHtml(nfrLicenseKey)}</code>
       </p>

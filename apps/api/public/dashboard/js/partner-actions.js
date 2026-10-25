@@ -50,7 +50,7 @@ function exportPartnerClientsCsv() {
   if (rows.length === 0) {
     return _partnerToast('No hay empresas en la vista actual para exportar', 'warning');
   }
-  const header = ['Empresa / Razon Social', 'CIF / NIF', 'Licencias Activas', 'Total Licencias', 'Fecha Alta', 'Estado', 'Comision Anual (25% EUR)'];
+  const header = ['Empresa / Razon Social', 'CIF / NIF', 'Licencias Activas', 'Total Licencias', 'Fecha Alta', 'Estado', 'Comision Anual (30% EUR)'];
   const csvLines = [
     header.join(';'),
     ...rows.map(c => {
@@ -60,7 +60,7 @@ function exportPartnerClientsCsv() {
       const total = Number(c.total_licenses || 0);
       const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('es-ES') : '—';
       const status = active > 0 ? 'ACTIVA' : 'SIN LICENCIA';
-      const comm = (active * 49.75).toFixed(2).replace('.', ',');
+      const comm = (active * 59.70).toFixed(2).replace('.', ',');
       return [name, tax, active, total, dateStr, status, comm].join(';');
     })
   ];
@@ -122,7 +122,7 @@ async function handlePartnerBuySubmit(e) {
   } catch (err) {
     _partnerToast('Error de conexión con la pasarela de pago', 'error');
   } finally {
-    if (btn) { btn.innerText = 'Pagar en Stripe (149,25 €) →'; btn.disabled = false; }
+    if (btn) { btn.innerText = 'Pagar en Stripe (139,30 €) →'; btn.disabled = false; }
   }
 }
 
