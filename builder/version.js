@@ -224,7 +224,9 @@ function syncPublicTemplates(targetVer) {
     'apps/api/scripts/build-landing.ts',
     'apps/api/scripts/build-dashboard.ts',
     'apps/api/scripts/generate-city-pages.ts',
-    'apps/api/scripts/build-docs.ts'
+    'apps/api/scripts/build-docs.ts',
+    'apps/api/scripts/generate-erp-pages.ts',
+    'apps/api/scripts/build-novedades.ts'
   ];
 
   for (const relScript of scriptsToRun) {

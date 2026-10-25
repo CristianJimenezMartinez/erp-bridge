@@ -1,0 +1,452 @@
+{
+  "_comment": "Fuente de datos de las 7 páginas SEO de conectores ERP en Beta. Se compila con apps/api/scripts/generate-erp-pages.ts. No incluir versiones: la versión se inyecta desde package.json / data-app-version.",
+  "pages": [
+    {
+      "slug": "conector-sage200",
+      "code": "SAGE200",
+      "name": "Sage 200",
+      "short": "Sage 200",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector Sage 200 WooCommerce (Beta): Sage 200 y tu tienda online | Bentian",
+      "description": "Conector Sage 200 (Sage Murano) para WooCommerce, PrestaShop y Shopify sobre SQL Server local. Beta en validación con clientes piloto: catálogo, stock y pedidos de venta.",
+      "keywords": "conector sage 200 woocommerce, sincronizar sage 200 con woocommerce, sage 200 prestashop, integración sage 200 tienda online, sage murano ecommerce, sage 200 sql server pedidos web",
+      "kicker": "Sage 200 (SQL Server local) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector de",
+      "h1b": "Sage 200 para tu tienda online",
+      "lead": "Bentian lee el catálogo y las existencias de la base de datos SQL Server de Sage 200 y registra los pedidos web como pedidos de cliente. El agente corre en tu servidor Windows y solo hace conexiones salientes hacia tu tienda.",
+      "badge": "SQL Server",
+      "statusNote": "Las tablas y columnas de Sage 200 (CabeceraPedidoCliente, LineasPedidoCliente, AcumuladosStock) proceden de nuestro perfil de integración y todavía no se han contrastado con una instalación real de Sage 200. Antes de usarlo con datos de producción, pruébalo en el Modo Evaluación y en una copia de tu base de datos.",
+      "howTitle": "Cómo se conecta Bentian a Sage 200",
+      "howIntro": "Sage 200 almacena sus datos en Microsoft SQL Server, así que el adaptador usa la misma vía que otros ERP SQL de Bentian: una conexión directa a la instancia desde dentro de tu red.",
+      "howSteps": [
+        "Instalas el agente de Bentian en el servidor (o en un PC con acceso a la instancia SQL de Sage 200). Las instancias que el asistente propone por defecto son .\\SAGE200 y .\\SQLEXPRESS.",
+        "Indicas la base de datos, un usuario SQL y la empresa. Las lecturas de catálogo y stock se lanzan con WITH (NOLOCK).",
+        "Eliges tarifa, almacén y serie de pedidos en el panel local del agente (http://127.0.0.1:39281).",
+        "Los pedidos de WooCommerce, PrestaShop o Shopify se escriben en la cabecera y las líneas de pedido de cliente de Sage 200."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de Sage 200",
+      "syncs": [
+        { "t": "Catálogo de artículos", "d": "Código, descripción, familia, precio de venta, precio de compra y código alternativo de los artículos no obsoletos." },
+        { "t": "Existencias", "d": "Unidades de saldo menos unidades reservadas, leídas de los acumulados de stock del periodo vigente." },
+        { "t": "Pedidos de cliente", "d": "Cabecera y líneas del pedido web con ejercicio, serie y número, más las observaciones del pedido." },
+        { "t": "Modo Evaluación", "d": "Un catálogo de ejemplo (compresores, polipastos, enrolladores) para probar el flujo sin conectar a tu Sage 200." }
+      ],
+      "schemaTitle": "Esquema previsto sobre Sage 200",
+      "schemaIntro": "Tablas que el perfil actual consulta o escribe. Es el esquema previsto, no uno verificado en producción:",
+      "schemaRows": [
+        { "n": "Articulos", "c": "CodigoArticulo, DescripcionArticulo, CodigoFamilia, PrecioVenta, PrecioCompra, CodigoAlternativo, Obsoleto", "o": "Lectura del maestro de artículos activos." },
+        { "n": "AcumuladosStock", "c": "CodigoArticulo, CodigoAlmacen, UnidadesSaldo, UnidadesReservadas, Periodo", "o": "Lectura de existencias disponibles." },
+        { "n": "CabeceraPedidoCliente", "c": "CodigoEmpresa, EjercicioPedido, SeriePedido, NumeroPedido, FechaPedido, CodigoCliente, RazonSocial, ImporteLiquido, ObservacionesPedido", "o": "Alta de la cabecera del pedido web." },
+        { "n": "LineasPedidoCliente", "c": "CodigoEmpresa, EjercicioPedido, SeriePedido, NumeroPedido, Orden, CodigoArticulo, UnidadesPedidas, Precio, ImporteLiquido", "o": "Alta de las líneas del pedido web." }
+      ],
+      "requirements": [
+        "Sage 200 sobre SQL Server accesible por red local desde el equipo del agente.",
+        "Usuario SQL con permiso de lectura y, para pedidos, de escritura en las tablas de pedidos.",
+        "Windows 10, Windows 11 o Windows Server para el agente.",
+        "Una copia de seguridad de la base de datos antes de la primera prueba con pedidos reales."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en Sage 200",
+      "limits": [
+        "El cliente del pedido y el código de empresa pueden no coincidir con tu configuración; hay que revisarlos en las pruebas.",
+        "Con varios almacenes, el comportamiento del descuento de stock por almacén está en revisión.",
+        "La numeración del pedido la calcula el conector; no usamos todavía el contador oficial de Sage 200.",
+        "El nombre de la columna de acumulados de stock se ha de confirmar con tu versión."
+      ],
+      "faq": [
+        { "q": "¿Sage 200 y Sage Murano son el mismo producto para Bentian?", "a": "Sí a efectos de conexión: el perfil se llama «Sage 200 (Sage Murano)» y trabaja sobre la base de datos SQL Server de la instalación. Lo que cambia entre versiones son los nombres exactos de tablas y columnas, y eso es lo que queremos contrastar con clientes piloto." },
+        { "q": "¿Funciona con Sage 200 en la nube?", "a": "No. El conector actual necesita llegar a la instancia SQL Server de Sage 200, por lo que está pensado para instalaciones locales o servidores propios. No hay conexión por API de Sage 200 Cloud." },
+        { "q": "¿Qué pasa con la empresa y el ejercicio al registrar un pedido?", "a": "El pedido se escribe con CodigoEmpresa y EjercicioPedido. El ejercicio se toma del año en curso. La detección automática de la empresa es uno de los puntos a validar, así que indícanos cuál usas durante el piloto." },
+        { "q": "¿Puedo probarlo sin tocar mi Sage 200?", "a": "Sí. El Modo Evaluación Sandbox del agente simula un catálogo de Sage 200 y permite comprobar la conexión con tu tienda de pruebas sin abrir tu base de datos real." },
+        { "q": "¿Cómo entro en el piloto de Sage 200?", "a": "Escríbenos desde el botón de contacto de esta página indicando tu versión de Sage 200 y tu tienda. Priorizamos a quienes puedan probar en una copia de la base de datos y compartir el esquema real de sus tablas de pedidos." }
+      ],
+      "related": [
+        { "slug": "sage50-woocommerce", "label": "Sage 50", "why": "Si usas Sage 50 en lugar de Sage 200, ese conector es el ya publicado y no está en beta." },
+        { "slug": "conector-business-central", "label": "Business Central", "why": "Otra solución del ámbito de empresa mediana con SQL Server; Business Central añade acceso por OData." },
+        { "slug": "conector-odoo", "label": "Odoo", "why": "Si tu empresa evalúa migrar de ERP, Odoo se conecta por API en vez de por SQL." }
+      ]
+    },
+    {
+      "slug": "conector-icg-manager",
+      "code": "ICGMANAGER",
+      "name": "ICG Manager / FrontRetail",
+      "short": "ICG Manager",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector ICG Manager WooCommerce (Beta): ICG y FrontRetail con tu tienda | Bentian",
+      "description": "Conector ICG Manager y FrontRetail para WooCommerce, PrestaShop y Shopify sobre SQL Server. Beta en validación con clientes piloto: artículos con talla y color, stock y pedidos de venta.",
+      "keywords": "conector icg manager woocommerce, sincronizar icg manager con tienda online, icg frontretail woocommerce, integración icg prestashop, icg hiopos ecommerce, icg manager stock web",
+      "kicker": "ICG Manager · FrontRetail (SQL Server) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector para",
+      "h1b": "ICG Manager y tu comercio online",
+      "lead": "Pensado para tiendas, hostelería y retail que gestionan sus artículos en ICG Manager o FrontRetail. Bentian lee artículos, precios y stock de SQL Server y escribe los pedidos web en las tablas de pedidos de venta.",
+      "badge": "SQL Server",
+      "statusNote": "Los nombres de tablas y columnas de ICG (PEDVENTACAB, PEDVENTALIN, STOCKS, PRECIOSVENTA…) no están verificados contra una instalación real. Hemos detectado diferencias entre el perfil de lectura y el de escritura que seguimos corrigiendo, por lo que no recomendamos pedidos reales sin una fase de pruebas.",
+      "howTitle": "Cómo se conecta Bentian a ICG Manager",
+      "howIntro": "ICG guarda sus datos en SQL Server. El agente se conecta desde la red local de la tienda o la oficina, sin exponer la base de datos a Internet.",
+      "howSteps": [
+        "Instalas el agente en un equipo Windows con acceso a la instancia de ICG. El asistente propone .\\ICG y .\\SQLEXPRESS.",
+        "Configuras la base de datos (por defecto ICGManager), el usuario SQL y la tarifa de venta que quieres publicar.",
+        "Eliges el almacén cuyo stock se envía a la web; en ICG los almacenes se identifican con códigos como 1 o 2.",
+        "El agente publica el catálogo y registra los pedidos web como pedidos de venta de ICG."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de ICG Manager",
+      "syncs": [
+        { "t": "Artículos y códigos de barras", "d": "Descripción, familia, último coste y código de barras desde las líneas de artículo." },
+        { "t": "Precios por tarifa", "d": "Precio neto por tarifa de venta (identificador de tarifa configurable)." },
+        { "t": "Stock por almacén", "d": "Stock menos unidades pendientes de servir, por almacén." },
+        { "t": "Pedidos de venta", "d": "Cabecera y líneas del pedido con serie, número y observaciones." }
+      ],
+      "schemaTitle": "Esquema previsto sobre ICG Manager",
+      "schemaIntro": "Tablas que el perfil actual consulta o escribe, sin verificar en producción:",
+      "schemaRows": [
+        { "n": "ARTICULOS / ARTICULOSLIN", "c": "CODARTICULO, DESCRIPCION, FAMILIA, ULTCOSTE, DESCATALOGADO, CODBARRAS", "o": "Lectura de artículos y códigos de barras." },
+        { "n": "PRECIOSVENTA", "c": "CODARTICULO, IDTARIFAV, PNETO", "o": "Lectura de precios por tarifa." },
+        { "n": "STOCKS", "c": "CODARTICULO, CODALMACEN, STOCK, ASERVIR", "o": "Lectura de existencias por almacén." },
+        { "n": "PEDVENTACAB / PEDVENTALIN", "c": "NUMSERIE, NUMPEDIDO, FECHA, CODCLIENTE, NUMLIN, CODARTICULO, UNIDADESTOTAL, PRECIO, TOTAL", "o": "Alta del pedido de venta y sus líneas." }
+      ],
+      "requirements": [
+        "ICG Manager o FrontRetail sobre SQL Server accesible desde la red local.",
+        "Usuario SQL de solo lectura para el catálogo y, para pedidos, permiso de escritura en pedidos de venta.",
+        "Conocer los códigos de tarifa y de almacén que quieres usar en la web.",
+        "Windows 10, Windows 11 o Windows Server para el agente."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en ICG",
+      "limits": [
+        "Los artículos con tallas y colores pueden aparecer repetidos en el catálogo: la agrupación por variante está pendiente.",
+        "Tarifa y almacén del catálogo aún no siguen siempre la configuración elegida en el panel.",
+        "El cliente asignado al pedido es genérico; el alta o búsqueda de cliente por NIF no está validada.",
+        "Si tus códigos de artículo contienen guiones, hay que comprobar cómo se interpretan en las líneas."
+      ],
+      "faq": [
+        { "q": "¿Sirve para FrontRetail y para ICG Manager o solo para uno?", "a": "El perfil se ha escrito para ambos porque comparten la base de datos de gestión, pero solo hemos trabajado con el esquema previsto. Si usas HIOPOS o FrontRetail con una base distinta, dínoslo en el piloto." },
+        { "q": "Vendo ropa con tallas y colores. ¿Lo gestiona?", "a": "Todavía no de forma fiable. Las tallas y colores se guardan en líneas de artículo y ahora mismo el catálogo puede generar filas repetidas. Es la mejora que más nos interesa validar con una tienda real de moda." },
+        { "q": "¿Se puede reservar stock cuando entra un pedido web?", "a": "El conector escribe el pedido y tiene prevista la reserva de stock, pero ICG distingue entre pendiente de servir y asignado, y estamos comprobando qué campo debe actualizarse. Por eso la reserva no está garantizada en esta fase." },
+        { "q": "¿Qué ocurre si mi servidor ICG está en otra tienda?", "a": "El agente debe llegar a la instancia SQL por red local o VPN de la empresa. No abrimos puertos hacia fuera. Si cada tienda tiene su propia base de datos, conviene un agente por base de datos." },
+        { "q": "¿Qué necesito para probarlo sin riesgo?", "a": "Usa el Modo Evaluación Sandbox (catálogo de ejemplo de hostelería y frío) y, después, una copia de tu base de datos en un servidor de pruebas. No lances pedidos reales contra la base en producción durante la beta." }
+      ],
+      "related": [
+        { "slug": "conector-visionwin", "label": "Visionwin", "why": "También orientado a comercio y ferretería, con modo SQL y modo archivo local." },
+        { "slug": "conector-aplifisa", "label": "Aplifisa", "why": "Otro ERP de comercio con SQL Server y archivo .mdb como alternativa." },
+        { "slug": "agora-pos-woocommerce", "label": "Ágora POS", "why": "Si tu TPV es Ágora y no ICG, ese conector ya está publicado." }
+      ]
+    },
+    {
+      "slug": "conector-visionwin",
+      "code": "VISIONWIN",
+      "name": "Visionwin Gestión",
+      "short": "Visionwin",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector Visionwin WooCommerce (Beta): Visionwin con tu tienda online | Bentian",
+      "description": "Conector Visionwin Gestión para WooCommerce, PrestaShop y Shopify con SQL Server o base de datos .mdb local. Beta en validación con clientes piloto: catálogo, stock y pedidos.",
+      "keywords": "conector visionwin woocommerce, sincronizar visionwin con tienda online, visionwin prestashop, integración visionwin ecommerce, visionwin gestión ferretería online, visionwin mdb stock",
+      "kicker": "Visionwin Gestión (SQL Server o .mdb local) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector de",
+      "h1b": "Visionwin para vender online",
+      "lead": "Visionwin se usa mucho en ferreterías y comercios de barrio. Bentian puede leer su base de datos tanto si corre en SQL Server Express como si está en un archivo .mdb local, y llevar artículos y pedidos hacia y desde tu tienda.",
+      "badge": ".mdb / SQL",
+      "statusNote": "Los esquemas de Visionwin (ARTICULOS, PEDIDOS_CLI, LINEAS_PEDIDOS_CLI) no están verificados contra una instalación real. Además, la versión SQL y la versión de archivo local no usan todavía exactamente los mismos nombres de columna, así que este conector necesita validación antes de usarlo en producción.",
+      "howTitle": "Cómo se conecta Bentian a Visionwin",
+      "howIntro": "Visionwin puede estar instalado con una base de datos de archivo o con SQL Server Express. El adaptador contempla las dos situaciones.",
+      "howSteps": [
+        "Si tu Visionwin usa SQL Server Express, el agente se conecta a la instancia (por ejemplo .\\SQLEXPRESS) con un usuario SQL.",
+        "Si usa una base de datos de archivo .mdb, el agente la abre por OLEDB desde el equipo donde está la carpeta de datos, incluida una ruta de red compartida.",
+        "Eliges la tarifa (PVP1, PVP2 o PVP3), el almacén y la serie de pedidos en el panel local.",
+        "Los pedidos de tu tienda se escriben como pedidos de cliente de Visionwin."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de Visionwin",
+      "syncs": [
+        { "t": "Artículos", "d": "Código, nombre, familia, coste, código de barras y observaciones de los artículos que no están dados de baja." },
+        { "t": "Precios PVP1, PVP2 y PVP3", "d": "Las tres tarifas del artículo; el perfil publica PVP1 por defecto." },
+        { "t": "Stock", "d": "El stock del artículo. Hay más de un origen posible de stock en Visionwin y estamos validando cuál usar." },
+        { "t": "Pedidos de cliente", "d": "Cabecera y líneas de pedido con serie, número y observaciones." }
+      ],
+      "schemaTitle": "Esquema previsto sobre Visionwin",
+      "schemaIntro": "Tablas que el perfil actual consulta o escribe. Esquema previsto, no verificado:",
+      "schemaRows": [
+        { "n": "ARTICULOS", "c": "CODIGO, NOMBRE, FAMILIA, STOCK, PVP1, PVP2, PVP3, COSTE, CODBARRAS, BAJA", "o": "Lectura del catálogo y del stock." },
+        { "n": "PEDIDOS_CLI", "c": "SERIE, NUMERO, FECHA, CLIENTE, NOMBRE_CLI, TOTAL, OBSERVACIONES", "o": "Alta de la cabecera del pedido." },
+        { "n": "LINEAS_PEDIDOS_CLI", "c": "SERIE, NUMERO, LINEA, ARTICULO, DESCRIPCION, CANTIDAD, PRECIO, IMPORTE", "o": "Alta de las líneas del pedido." }
+      ],
+      "requirements": [
+        "Visionwin con base de datos en SQL Server Express o en archivo .mdb.",
+        "Para .mdb: el controlador OLEDB de Access (ACE) instalado en el equipo del agente y permiso de escritura en la carpeta de datos.",
+        "Para SQL: usuario SQL con permisos de lectura y de escritura en pedidos.",
+        "Windows 10, Windows 11 o Windows Server."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en Visionwin",
+      "limits": [
+        "Los nombres de columnas de pedidos difieren entre el perfil SQL y el modo archivo; se están unificando.",
+        "El stock tiene varias fuentes posibles y la reserva al recibir un pedido no distingue almacenes.",
+        "La detección de pedidos ya registrados se apoya en el texto de observaciones, que es un método débil.",
+        "En modo archivo local, la numeración del pedido no está protegida frente a dos escrituras simultáneas."
+      ],
+      "faq": [
+        { "q": "Mi Visionwin está en un archivo .mdb en el servidor. ¿Puedo usarlo?", "a": "Es uno de los dos modos previstos. Se abre por OLEDB con el controlador de Access, igual que otros conectores de archivo de Bentian. En esta beta conviene trabajar sobre una copia, porque dos escrituras simultáneas a un .mdb compartido pueden dar problemas." },
+        { "q": "¿Qué tarifa se publica en la tienda?", "a": "Visionwin guarda PVP1, PVP2 y PVP3 en el propio artículo. El perfil publica PVP1 por defecto; seleccionar otra tarifa desde el panel es una de las pruebas pendientes del piloto." },
+        { "q": "Soy ferretería con muchas referencias. ¿Aguanta el catálogo?", "a": "No tenemos todavía una medición con un catálogo real de Visionwin. Las lecturas usan WITH (NOLOCK) en SQL, pero en modo archivo el rendimiento depende del disco y de la red. Por eso pedimos una copia para medir con tus datos." },
+        { "q": "¿Se pueden dar de baja artículos desde la web?", "a": "No. El flujo actual lee el catálogo y escribe pedidos. Los artículos con BAJA marcada se excluyen del catálogo, pero la baja se gestiona siempre en Visionwin." },
+        { "q": "¿Cómo participo en el piloto de Visionwin?", "a": "Escríbenos indicando si tu base de datos es SQL o .mdb y cuántas referencias tienes. Si puedes enviarnos la estructura de las tablas de pedidos (sin datos), acelera mucho la verificación del esquema." }
+      ],
+      "related": [
+        { "slug": "conector-aplifisa", "label": "Aplifisa", "why": "Comparte el doble modo SQL y archivo local; compara requisitos de ambos." },
+        { "slug": "conector-icg-manager", "label": "ICG Manager", "why": "Orientado a retail con SQL Server; útil si tu tienda tiene también TPV." },
+        { "slug": "factusol-woocommerce", "label": "Factusol", "why": "Factusol es el conector más maduro de Bentian y también usa una base de datos de archivo." }
+      ]
+    },
+    {
+      "slug": "conector-aplifisa",
+      "code": "APLIFISA",
+      "name": "Aplifisa (GestFuturo / Factus)",
+      "short": "Aplifisa",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector Aplifisa WooCommerce (Beta): GestFuturo y Factus con tu tienda | Bentian",
+      "description": "Conector Aplifisa (GestFuturo) para WooCommerce, PrestaShop y Shopify con SQL Server o archivo .mdb. Beta en validación con clientes piloto: artículos, existencias por almacén y pedidos.",
+      "keywords": "conector aplifisa woocommerce, aplifisa gestfuturo tienda online, sincronizar aplifisa con prestashop, integración aplifisa ecommerce, aplifisa factus woocommerce, aplifisa existencias reservado",
+      "kicker": "Aplifisa GestFuturo / Factus (SQL Server o .mdb) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector",
+      "h1b": "Aplifisa para tu tienda online",
+      "lead": "Para empresas que gestionan fontanería, climatización o suministros con Aplifisa. Bentian lee artículos y existencias con su reserva y registra los pedidos web en las tablas de pedidos de cliente.",
+      "badge": "SQL / .mdb",
+      "statusNote": "El perfil de Aplifisa contempla tres variantes de esquema (SQL, archivo local y catálogo) que todavía no coinciden entre sí y no se han contrastado con un Aplifisa real. Es el conector con más trabajo de armonización pendiente, así que lo ofrecemos solo para pilotos supervisados.",
+      "howTitle": "Cómo se conecta Bentian a Aplifisa",
+      "howIntro": "Según tu instalación, Aplifisa puede estar sobre SQL Server o sobre un archivo de base de datos. El adaptador acepta ambas vías.",
+      "howSteps": [
+        "Con SQL Server, el agente usa la instancia que propone el asistente (.\\APLIFISA o .\\SQLEXPRESS) y la base GESTFUTURO u otra que indiques.",
+        "Con archivo local, el agente abre la base .mdb o .accdb por OLEDB desde el equipo con acceso a la carpeta de datos.",
+        "Se leen artículos y existencias del almacén configurado (por defecto el almacén 01).",
+        "Los pedidos web se escriben en la cabecera y líneas de pedidos de cliente."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de Aplifisa",
+      "syncs": [
+        { "t": "Artículos", "d": "Código, nombre, familia, último coste, código de barras y artículos no dados de baja." },
+        { "t": "Existencias con reservado", "d": "Stock actual menos cantidad reservada por almacén." },
+        { "t": "Tarifas PVP1, PVP2 y PVP3", "d": "Tres tarifas disponibles; el perfil publica PVP1 por defecto." },
+        { "t": "Pedidos de cliente", "d": "Cabecera y líneas de pedido con serie, número y observaciones." }
+      ],
+      "schemaTitle": "Esquema previsto sobre Aplifisa",
+      "schemaIntro": "Tablas del perfil actual. Esquema previsto, no verificado con un Aplifisa real:",
+      "schemaRows": [
+        { "n": "ARTICULOS", "c": "CODART, NOMART, FAMART, PVP1, ULTCOSTE, CODBARRAS, BAJA", "o": "Lectura del catálogo." },
+        { "n": "EXISTENCIAS", "c": "CODART, CODALM, STOCKACTUAL, RESERVADO", "o": "Lectura de stock disponible por almacén." },
+        { "n": "PEDIDOSCLI_CAB", "c": "SERIE, NUMERO, FECHA, CODCLI, NOMCLI, TOTALPED, OBSERVACIONES", "o": "Alta de la cabecera del pedido." },
+        { "n": "PEDIDOSCLI_LIN", "c": "SERIE, NUMERO, LINEA, CODART, DESCRIPCION, UNIDADES, PRECIO, IMPORTE", "o": "Alta de las líneas del pedido." }
+      ],
+      "requirements": [
+        "Aplifisa (GestFuturo o Factus) con base de datos en SQL Server o archivo .mdb/.accdb accesible.",
+        "Controlador OLEDB de Access (ACE) si trabajas con archivo.",
+        "Usuario con permisos de lectura y de escritura en pedidos de cliente.",
+        "Windows 10, Windows 11 o Windows Server para el agente."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en Aplifisa",
+      "limits": [
+        "Los nombres de columnas del catálogo y de los pedidos varían entre el modo SQL y el modo archivo.",
+        "Al recibir un pedido, la reserva de stock puede afectar a todos los almacenes del artículo en vez de solo al elegido.",
+        "El modo archivo local no serializa escrituras simultáneas.",
+        "La asociación del pedido a un cliente concreto no está validada; se usa un cliente genérico."
+      ],
+      "faq": [
+        { "q": "¿Aplifisa, GestFuturo y Factus son lo mismo?", "a": "En el perfil de Bentian se agrupan bajo «Aplifisa (GestFuturo / Factus)» porque comparten esquema previsto, pero no hemos podido comprobar todavía que todas las ediciones usen idénticos nombres de tabla. Es una de las cosas que buscamos validar." },
+        { "q": "¿Por qué hablan de stock «reservado»?", "a": "Las existencias de Aplifisa incluyen una cantidad reservada para pedidos pendientes. El conector publica stock actual menos reservado, para evitar vender lo que ya está comprometido. Falta comprobar cómo recalcula Aplifisa esa reserva cuando entra un pedido externo." },
+        { "q": "¿Qué almacén se usa para el stock de la web?", "a": "La lectura del catálogo apunta hoy al almacén 01. Poder elegir otro almacén en el panel y que el catálogo lo respete es una de las mejoras en curso." },
+        { "q": "¿Puedo conectar un Aplifisa que está en un NAS?", "a": "En modo archivo, el agente admite rutas de red de Windows, incluidas UNC con espacios. Con ficheros compartidos entre varios puestos, hazlo primero sobre una copia: los bloqueos de acceso concurrente no están probados con Aplifisa." },
+        { "q": "¿Cuál es el proceso para entrar en el piloto?", "a": "Contacta con nosotros con tu versión de Aplifisa y el tipo de base de datos. Te pedimos una copia sin datos sensibles para contrastar los nombres de tablas y columnas antes de hacer ninguna prueba de pedido." }
+      ],
+      "related": [
+        { "slug": "conector-visionwin", "label": "Visionwin", "why": "Misma idea de doble modo SQL y archivo local, con otro modelo de datos." },
+        { "slug": "conector-sage200", "label": "Sage 200", "why": "Si tu negocio ha crecido y trabajas con un ERP SQL de gama media." },
+        { "slug": "a3erp-woocommerce", "label": "a3ERP", "why": "Conector SQL ya publicado, por si usas a3ERP en otra empresa del grupo." }
+      ]
+    },
+    {
+      "slug": "conector-odoo",
+      "code": "ODOO",
+      "name": "Odoo",
+      "short": "Odoo",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector Odoo WooCommerce (Beta): Odoo JSON-RPC con tu tienda online | Bentian",
+      "description": "Conector Odoo para WooCommerce, PrestaShop y Shopify mediante JSON-RPC. Beta en validación con clientes piloto: productos, stock libre y pedidos de venta (sale.order).",
+      "keywords": "conector odoo woocommerce, sincronizar odoo con woocommerce, odoo prestashop integración, odoo json-rpc tienda online, odoo sale.order pedidos web, odoo stock libre ecommerce",
+      "kicker": "Odoo (API JSON-RPC) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector de",
+      "h1b": "Odoo para tu tienda online",
+      "lead": "Bentian usa la API JSON-RPC de Odoo para leer productos y stock libre y para crear pedidos de venta. No toca la base de datos PostgreSQL de Odoo: todo pasa por los métodos oficiales del servidor.",
+      "badge": "JSON-RPC",
+      "statusNote": "El flujo JSON-RPC está implementado y probado con el Modo Evaluación y con revisión de código, pero todavía no se ha validado en una instancia real de Odoo. No hemos contrastado el tratamiento de impuestos, unidades de medida ni multiempresa, así que no lo recomendamos aún para producción sin supervisión.",
+      "howTitle": "Cómo se conecta Bentian a Odoo",
+      "howIntro": "A diferencia de los conectores SQL, aquí la conexión es por HTTP o HTTPS contra tu servidor Odoo, con los datos de acceso de un usuario.",
+      "howSteps": [
+        "Indicas la URL de tu Odoo (por ejemplo http://127.0.0.1:8069 o la de tu servidor), el nombre de la base de datos, el usuario y la contraseña.",
+        "El agente se autentica con el método common.authenticate del endpoint /jsonrpc.",
+        "El catálogo y el stock se leen con object.execute_kw y search_read; el pedido se crea con sale.order y sus líneas en una sola llamada.",
+        "Si tu Odoo está en tu red local, el agente trabaja desde dentro; si está en la nube, basta con salida HTTPS."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de Odoo",
+      "syncs": [
+        { "t": "Productos", "d": "Variantes de producto con referencia interna (default_code), nombre, categoría, precio de venta, coste y código de barras." },
+        { "t": "Stock libre", "d": "Cantidad libre (free_qty) del producto, no la cantidad física total." },
+        { "t": "Clientes", "d": "Búsqueda del contacto por correo electrónico y alta de un nuevo res.partner si no existe." },
+        { "t": "Pedidos de venta", "d": "Pedido sale.order con líneas sale.order.line y referencia del pedido web en client_order_ref." }
+      ],
+      "schemaTitle": "Modelos de Odoo que usa el conector",
+      "schemaIntro": "Modelos y campos consultados por JSON-RPC:",
+      "schemaRows": [
+        { "n": "product.product", "c": "default_code, barcode, standard_price, product_tmpl_id", "o": "Lectura del catálogo y resolución del SKU de cada línea." },
+        { "n": "product.template", "c": "name, list_price, categ_id", "o": "Nombre, categoría y precio de venta." },
+        { "n": "res.partner", "c": "name, email", "o": "Búsqueda por correo y alta de cliente." },
+        { "n": "sale.order / sale.order.line", "c": "partner_id, client_order_ref, note, product_id, product_uom_qty, price_unit", "o": "Alta del pedido de venta con sus líneas." }
+      ],
+      "requirements": [
+        "Odoo accesible por HTTP o HTTPS desde el equipo del agente (el adaptador está diseñado para las versiones 14 a 18, sin validar todavía en ninguna).",
+        "Usuario de Odoo con permisos de lectura de productos y de creación de pedidos de venta; si tu versión lo admite, puede usarse una clave de API como contraseña.",
+        "Módulos de Ventas e Inventario instalados.",
+        "Los SKU de la tienda deben existir como referencia interna en Odoo."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en Odoo",
+      "limits": [
+        "Un pedido con un SKU que no existe en Odoo no se crea; el cliente puede haberse dado de alta antes.",
+        "Impuestos, descuentos y unidad de medida de la línea no están mapeados todavía; revisa el precio con IVA.",
+        "Las lecturas no están paginadas para catálogos muy grandes y el tiempo de espera es corto.",
+        "El número que se devuelve al crear el pedido es el identificador interno, no el nombre tipo S00012."
+      ],
+      "faq": [
+        { "q": "¿Necesito instalar algún módulo en Odoo?", "a": "No hay módulo de Bentian que instalar. El conector usa la API JSON-RPC que Odoo ya incluye en el servidor. Lo único necesario es que los productos tengan referencia interna y que el usuario tenga permisos suficientes." },
+        { "q": "¿Funciona con Odoo Online (SaaS) y Odoo.sh?", "a": "Está pensado para cualquier URL que exponga /jsonrpc, así que en principio sí con HTTPS y credenciales válidas. Las instancias SaaS pueden limitar el acceso JSON-RPC según el plan; no lo hemos comprobado y es parte del piloto." },
+        { "q": "¿Se duplica el pedido si la tienda reintenta el envío?", "a": "El conector busca primero un pedido con la misma referencia web (client_order_ref) y, si existe, lo devuelve en vez de crear otro. Esta comprobación no es atómica, así que dos envíos simultáneos podrían pasar a la vez." },
+        { "q": "¿Qué stock se envía a la web: físico, previsto o libre?", "a": "Stock libre (free_qty), es decir, lo que se puede vender ahora. El perfil actual no filtra por almacén concreto ni por empresa; con varios almacenes u empresas hay que revisarlo." },
+        { "q": "¿Conecta directamente con la base de datos PostgreSQL?", "a": "No. Aunque aparezca un perfil SQL en la configuración, no lo usamos para Odoo: la ruta correcta es JSON-RPC. Evitamos así escribir directamente en las tablas internas de Odoo." }
+      ],
+      "related": [
+        { "slug": "conector-facturascripts", "label": "FacturaScripts", "why": "Otro ERP abierto conectado por API REST en lugar de SQL." },
+        { "slug": "conector-business-central", "label": "Business Central", "why": "Comparte el enfoque de API con autenticación y empresa, aunque con OData." },
+        { "slug": "conector-sage200", "label": "Sage 200", "why": "Alternativa SQL para quienes comparan ERP de empresa mediana." }
+      ]
+    },
+    {
+      "slug": "conector-facturascripts",
+      "code": "FACTURASCRIPTS",
+      "name": "FacturaScripts",
+      "short": "FacturaScripts",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector FacturaScripts WooCommerce (Beta): API REST v3 con tu tienda | Bentian",
+      "description": "Conector FacturaScripts para WooCommerce, PrestaShop y Shopify mediante su API REST v3. Beta en validación con clientes piloto: productos, variantes, stock y pedidos de cliente.",
+      "keywords": "conector facturascripts woocommerce, sincronizar facturascripts con tienda online, facturascripts api rest prestashop, integración facturascripts ecommerce, facturascripts pedidos web, facturascripts stock variantes",
+      "kicker": "FacturaScripts (API REST v3) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector de",
+      "h1b": "FacturaScripts con tu tienda",
+      "lead": "FacturaScripts es un ERP de código abierto muy usado por autónomos y pequeñas empresas. Bentian lo conecta mediante su API REST v3, con una clave de acceso, sin acceder a su base de datos MySQL o PostgreSQL.",
+      "badge": "API REST v3",
+      "statusNote": "El alta de pedidos usa el endpoint /api/3/crearPedidoCliente, cuya disponibilidad en cada versión de FacturaScripts aún no hemos confirmado; existe una alternativa con pedidoclientes y líneas que está pendiente de implementar. Si tu versión no lo ofrece, el catálogo y el stock sí pueden funcionar pero los pedidos no. Valida primero en un entorno de pruebas.",
+      "howTitle": "Cómo se conecta Bentian a FacturaScripts",
+      "howIntro": "La conexión es por HTTP o HTTPS contra la API REST v3 de tu instalación, autenticada con una clave API enviada en la cabecera Token.",
+      "howSteps": [
+        "Activas la API REST en tu FacturaScripts y generas una clave de acceso desde su administración.",
+        "En el agente indicas la URL base (por ejemplo http://127.0.0.1:8000) y pegas la clave API.",
+        "El agente consulta productos, variantes y stocks por la API.",
+        "Los pedidos de tu tienda se envían a la API como pedido de cliente con sus líneas."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de FacturaScripts",
+      "syncs": [
+        { "t": "Productos y variantes", "d": "Se combinan los productos (descripción y familia) con sus variantes (referencia, precio, coste y código de barras)." },
+        { "t": "Stock por almacén", "d": "Disponible por referencia y almacén, a partir del recurso stocks de la API." },
+        { "t": "Pedidos de cliente", "d": "Serie, almacén, observaciones y líneas con referencia, cantidad, precio y descuento." },
+        { "t": "Modo Evaluación", "d": "Catálogo de ejemplo de informática y redes (SAI, switches, racks) para probar sin servidor." }
+      ],
+      "schemaTitle": "Recursos de la API de FacturaScripts que usa el conector",
+      "schemaIntro": "Endpoints consultados bajo /api/3:",
+      "schemaRows": [
+        { "n": "GET /api/3/productos", "c": "descripcion, codfamilia, bloqueado", "o": "Lectura de productos activos." },
+        { "n": "GET /api/3/variantes", "c": "referencia, precio, coste, codbarras, stockfis", "o": "Lectura de variantes: precio, coste y código de barras." },
+        { "n": "GET /api/3/stocks", "c": "referencia, codalmacen, disponible", "o": "Lectura de stock por almacén." },
+        { "n": "POST /api/3/crearPedidoCliente", "c": "codcliente, codserie, codalmacen, observaciones, lineas", "o": "Alta del pedido (endpoint a confirmar en cada versión)." }
+      ],
+      "requirements": [
+        "FacturaScripts con la API REST v3 activada y accesible por HTTP o HTTPS.",
+        "Clave API con permisos sobre productos, stock y pedidos de cliente.",
+        "Clientes creados previamente en FacturaScripts con su código de cliente.",
+        "Windows 10, Windows 11 o Windows Server para el agente."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en FacturaScripts",
+      "limits": [
+        "El endpoint de creación de pedidos no está confirmado en todas las versiones.",
+        "Si el pedido no trae un cliente válido, se usa un código genérico que puede no existir.",
+        "Las consultas no están paginadas: en catálogos grandes pueden devolverse solo los primeros registros.",
+        "Falta comprobar si el precio unitario de la API incluye o no el IVA."
+      ],
+      "faq": [
+        { "q": "¿Dónde genero la clave API en FacturaScripts?", "a": "En la administración de tu instalación, en la sección de la API REST. Cada instalación decide qué recursos expone a cada clave; asegúrate de incluir productos, variantes, stocks y pedidos de cliente." },
+        { "q": "¿Funciona con FacturaScripts alojado por un tercero?", "a": "Sí, mientras la API sea accesible por HTTPS y tengas una clave. El agente solo necesita salida de red; no hay que abrir puertos en tu oficina. Si el alojamiento limita las peticiones, el conector puede recibir errores que hay que revisar." },
+        { "q": "¿Qué pasa si un producto tiene varias variantes?", "a": "La API de variantes devuelve cada referencia por separado, pero el soporte de varias variantes por producto en la tienda aún no está completo. Es un caso importante para el piloto." },
+        { "q": "¿Se evita duplicar pedidos?", "a": "No todavía. El alta de pedidos de FacturaScripts no consulta si ya existe uno con la misma referencia web. Es una de las correcciones prioritarias antes de recomendarlo en producción." },
+        { "q": "¿Puedo usarlo si mi FacturaScripts es local en el portátil del negocio?", "a": "Sí: el agente se conecta a la URL local de la instalación (por ejemplo http://127.0.0.1:8000). La tienda recibirá los datos por la conexión saliente del agente, por lo que el equipo debe estar encendido para sincronizar." }
+      ],
+      "related": [
+        { "slug": "conector-odoo", "label": "Odoo", "why": "También se conecta por API; comparar autenticación y datos de acceso." },
+        { "slug": "conector-business-central", "label": "Business Central", "why": "Otro ERP por API para empresas que ya han superado el tamaño de un ERP de autónomos." },
+        { "slug": "factusol-woocommerce", "label": "Factusol", "why": "El conector estable de Bentian para pequeñas empresas con Factusol." }
+      ]
+    },
+    {
+      "slug": "conector-business-central",
+      "code": "BUSINESSCENTRAL",
+      "name": "Microsoft Dynamics 365 Business Central",
+      "short": "Business Central",
+      "lastmod": "2026-10-25T21:30:00+01:00",
+      "title": "Conector Business Central WooCommerce (Beta): OData v4 o SQL con tu tienda | Bentian",
+      "description": "Conector Microsoft Dynamics 365 Business Central y NAV para WooCommerce, PrestaShop y Shopify mediante OData v4 o SQL Server. Beta en validación con clientes piloto.",
+      "keywords": "conector business central woocommerce, dynamics 365 business central tienda online, sincronizar business central con woocommerce, business central odata ecommerce, navision woocommerce conector, business central pedidos de venta api",
+      "kicker": "Business Central / NAV (OData v4 o SQL Server) ↔ WooCommerce · PrestaShop · Shopify",
+      "h1a": "Conector de",
+      "h1b": "Business Central para tu e-commerce",
+      "lead": "Bentian se conecta a Business Central por su API OData v2.0 (cloud o servidor propio) o, en instalaciones on-premises y Dynamics NAV, directamente a SQL Server. Lee artículos y stock y crea pedidos de venta con sus líneas.",
+      "badge": "OData v4 / SQL",
+      "statusNote": "La integración con Business Central no se ha validado todavía en un entorno real. El acceso por API usa autenticación básica o token Bearer, pero no incluye OAuth2 con Microsoft Entra ID, que es el método habitual en Business Central en la nube. Para el modo SQL tampoco hay validación del esquema real de tu empresa.",
+      "howTitle": "Cómo se conecta Bentian a Business Central",
+      "howIntro": "El adaptador decide la vía según el valor que pongas como servidor: una URL (OData) o una instancia SQL Server.",
+      "howSteps": [
+        "Con una URL http o https, el agente usa la API v2.0 de Business Central, busca tu empresa en /companies y trabaja con items, salesOrders y salesOrderLines.",
+        "La autenticación se hace con usuario y clave de servicio web en Basic, o con un token Bearer si lo introduces.",
+        "Con una instancia SQL Server (on-premises o NAV), el agente detecta el prefijo de tablas de tu empresa y trabaja con Item, Item Ledger Entry, Sales Header y Sales Line.",
+        "En ambos modos, el panel local del agente permite elegir serie y almacén."
+      ],
+      "syncsTitle": "Qué sincroniza el conector de Business Central",
+      "syncs": [
+        { "t": "Artículos (Item)", "d": "Número, descripción, categoría, precio unitario, coste unitario y GTIN." },
+        { "t": "Stock disponible", "d": "En modo OData, inventario del artículo; en modo SQL, suma de movimientos de producto con cantidad pendiente." },
+        { "t": "Pedidos de venta", "d": "Pedido y líneas con referencia externa del documento." },
+        { "t": "Dos vías de acceso", "d": "OData v4 para cloud o servidor propio, y SQL Server para instalaciones locales." }
+      ],
+      "schemaTitle": "Recursos y tablas que usa el conector",
+      "schemaIntro": "Vía OData (API v2.0) y vía SQL Server en instalaciones locales:",
+      "schemaRows": [
+        { "n": "/companies({id})/items", "c": "number, displayName, unitPrice, inventory", "o": "Lectura de artículos y stock por API." },
+        { "n": "/companies({id})/salesOrders", "c": "customerNumber, externalDocumentNumber", "o": "Alta de la cabecera del pedido por API." },
+        { "n": "/companies({id})/salesOrderLines", "c": "lineObjectNumber, quantity, unitPrice", "o": "Alta de las líneas del pedido por API." },
+        { "n": "[Empresa$Item] y [Empresa$Sales Header/Line]", "c": "No_, Description, Unit Price, Sell-to Customer No_", "o": "Vía SQL Server en on-premises o NAV." }
+      ],
+      "requirements": [
+        "Business Central con API v2.0 accesible o instancia SQL Server de Business Central/NAV.",
+        "Usuario de servicio web con su clave de acceso, o un token Bearer válido.",
+        "Cliente de venta predeterminado en Business Central para asignar los pedidos web.",
+        "Windows 10, Windows 11 o Windows Server para el agente."
+      ],
+      "limitsTitle": "Puntos que seguimos validando en Business Central",
+      "limits": [
+        "No hay autenticación OAuth2 con Microsoft Entra ID, necesaria en muchos entornos cloud.",
+        "El cliente asignado al pedido está fijo en el perfil y debe ajustarse a tu configuración.",
+        "En modo SQL, el pedido se escribe directamente en las tablas del ERP, algo que no es posible en la versión cloud.",
+        "Las lecturas por API no siguen todavía los enlaces de paginación, por lo que un catálogo grande puede cortarse."
+      ],
+      "faq": [
+        { "q": "¿Funciona con Business Central SaaS?", "a": "Parcialmente en teoría: la API OData v2.0 es la misma, pero SaaS exige OAuth2 con Microsoft Entra ID y Bentian todavía no lo incluye. Solo valdría con claves de servicio web o tokens Bearer que tu administrador haya habilitado." },
+        { "q": "¿Qué diferencia hay entre usar OData y SQL?", "a": "OData usa la API oficial y es la vía recomendable porque respeta la lógica de negocio de Business Central. SQL se reserva a instalaciones on-premises o Dynamics NAV y escribe directamente en tablas, por lo que exige más cuidado." },
+        { "q": "¿Y si tengo varias empresas en el mismo Business Central?", "a": "El conector busca la empresa por nombre y, si no la encuentra, puede tomar la primera de la lista. En entornos con varias empresas, revisa la configuración antes de crear pedidos de prueba." },
+        { "q": "¿Qué número de pedido recibe el pedido web?", "a": "En la vía de API, el conector devuelve el número que Business Central asigna al crear el pedido; no lo hemos contrastado con tus series de numeración. En SQL, el conector calcula uno propio, fuera de la serie numérica del ERP, que es otro motivo para no usar SQL en producción sin pruebas." },
+        { "q": "¿Se puede probar con la empresa de demostración?", "a": "Sí: el Modo Evaluación incluye un catálogo industrial de ejemplo y, en una instalación de pruebas con la empresa CRONUS, puedes comprobar lecturas y alta de pedido antes de pasar a tus datos reales." }
+      ],
+      "related": [
+        { "slug": "conector-odoo", "label": "Odoo", "why": "También usa API con autenticación propia y creación de pedido con líneas." },
+        { "slug": "conector-sage200", "label": "Sage 200", "why": "Alternativa on-premises sobre SQL Server para una empresa mediana." },
+        { "slug": "conector-facturascripts", "label": "FacturaScripts", "why": "API REST con clave de acceso, más sencilla y para empresas más pequeñas." }
+      ]
+    }
+  ]
+}

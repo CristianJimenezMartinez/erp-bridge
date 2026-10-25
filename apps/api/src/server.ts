@@ -466,6 +466,21 @@ export async function bootstrapApp(): Promise<Express> {
   app.get('/a3erp-woocommerce', (_req, res) => {
     res.redirect(301, '/a3erp-woocommerce/');
   });
+  // Conectores ERP en Beta y página de novedades (generadas por generate-erp-pages.ts y build-novedades.ts)
+  for (const slug of [
+    'conector-sage200',
+    'conector-icg-manager',
+    'conector-visionwin',
+    'conector-aplifisa',
+    'conector-odoo',
+    'conector-facturascripts',
+    'conector-business-central',
+    'novedades',
+  ]) {
+    app.get(`/${slug}`, (_req, res) => {
+      res.redirect(301, `/${slug}/`);
+    });
+  }
   app.get('/press', (_req, res) => {
     res.redirect(301, '/press/');
   });

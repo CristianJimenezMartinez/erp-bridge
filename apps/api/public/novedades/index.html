@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novedades y historial de versiones de Bentian ERP Bridge</title>
+  <meta name="description" content="Historial de versiones de Bentian ERP Bridge desde la serie 0.4: cambios del agente, conectores ERP, API y panel, agrupados por versión y fecha.">
+  <meta name="keywords" content="novedades bentian erp bridge, historial de versiones conector erp woocommerce, changelog bentian, notas de versión agente windows">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/novedades/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/novedades/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Novedades y historial de versiones de Bentian ERP Bridge">
+  <meta property="og:description" content="Historial de versiones de Bentian ERP Bridge desde la serie 0.4: cambios del agente, conectores ERP, API y panel, agrupados por versión y fecha.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Novedades y historial de versiones de Bentian ERP Bridge">
+  <meta name="twitter:description" content="Historial de versiones de Bentian ERP Bridge desde la serie 0.4: cambios del agente, conectores ERP, API y panel, agrupados por versión y fecha.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://bridge.cristianjm.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Novedades",
+          "item": "https://bridge.cristianjm.com/novedades/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Bentian ERP Bridge",
+      "softwareVersion": "0.5.3",
+      "operatingSystem": "Windows 10, Windows 11, Windows Server",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://bridge.cristianjm.com/novedades/",
+      "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+      "brand": {
+        "@type": "Brand",
+        "name": "Bentian"
+      },
+      "releaseNotes": "https://bridge.cristianjm.com/novedades/ — Revisión de código de los ERP y mejoras en Factusol: Revisión por lectura de código de los 12 motores ERP, documentada internamente. No se ha probado contra ERP reales; sirve para priorizar correcciones. Factusol: política única de stock entre catálogo y stock reactivo, cambio de ejercicio resuelto al abrir la base, reintentos de pedido con comprobación de idempotencia y errores de lectura que ya no se interpretan como catálogo vacío."
+    }
+  ]
+}
+  </script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-3 whitespace-nowrap shrink-0">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Novedades</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/requisitos-sistema/" class="hidden sm:inline text-sm text-zinc-400 hover:text-white transition whitespace-nowrap shrink-0">Requisitos</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition whitespace-nowrap shrink-0">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20 whitespace-nowrap shrink-0">
+          Descargar <span data-app-version>v0.5.3</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-16 flex-grow">
+    <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Historial de versiones</span>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-2 mb-4 leading-tight">Novedades de Bentian ERP Bridge</h1>
+    <p class="text-lg text-zinc-400 mb-4 leading-relaxed">Versión actual: <span class="text-white font-semibold" data-app-version>v0.5.3</span>. Cambios publicados desde la serie 0.4, ordenados de más reciente a más antigua.</p>
+    <p class="text-sm text-zinc-500 mb-10">Las notas se resumen del historial de cambios del proyecto. Los conectores marcados como Beta (<a href="/conector-sage200/" class="text-emerald-400 hover:underline">Sage 200</a>, <a href="/conector-icg-manager/" class="text-emerald-400 hover:underline">ICG Manager</a>, <a href="/conector-visionwin/" class="text-emerald-400 hover:underline">Visionwin</a>, <a href="/conector-aplifisa/" class="text-emerald-400 hover:underline">Aplifisa</a>, <a href="/conector-odoo/" class="text-emerald-400 hover:underline">Odoo</a>, <a href="/conector-facturascripts/" class="text-emerald-400 hover:underline">FacturaScripts</a> y <a href="/conector-business-central/" class="text-emerald-400 hover:underline">Business Central</a>) están en validación con clientes piloto. Consulta los <a href="/requisitos-sistema/" class="text-emerald-400 hover:underline">requisitos del sistema</a> antes de actualizar.</p>
+    <div class="mb-10">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <span>Descargar Instalador Windows (<span data-app-version>v0.5.3</span>)</span>
+      </a>
+    </div>
+
+    <article id="v0-5-3" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"><span data-app-version>v0.5.3</span></span>
+        <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Versión actual</span>
+        <time datetime="2026-10-25" class="text-xs text-zinc-500">25 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Revisión de código de los ERP y mejoras en Factusol</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Revisión por lectura de código de los 12 motores ERP, documentada internamente. No se ha probado contra ERP reales; sirve para priorizar correcciones.</li>
+          <li>• Factusol: política única de stock entre catálogo y stock reactivo, cambio de ejercicio resuelto al abrir la base, reintentos de pedido con comprobación de idempotencia y errores de lectura que ya no se interpretan como catálogo vacío.</li>
+          <li>• Programa de Partners: comisión recurrente del 30 % en web, portal, panel y API.</li>
+          <li>• Sincronización de versión y regeneración de las páginas públicas.</li>
+      </ul>
+    </article>
+
+    <article id="v0-5-2" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.5.2</span>
+        
+        <time datetime="2026-10-25" class="text-xs text-zinc-500">25 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Documentación y checklist de auditoría ERP</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Sincronización de versión y documentación.</li>
+          <li>• Correcciones en los conectores Beta: ruta /api/v2.0 y reversión de líneas fallidas en Business Central, validación de SKU e idempotencia en Odoo y columnas de pedido de Sage 200.</li>
+          <li>• Checklist de auditoría de los motores ERP con los puntos pendientes de validar.</li>
+      </ul>
+    </article>
+
+    <article id="v0-5-1" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.5.1</span>
+        
+        <time datetime="2026-10-24" class="text-xs text-zinc-500">24 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Flujos de pedidos para los 7 ERP nuevos (Beta)</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Alta de pedidos con cabecera y líneas para Sage 200, ICG Manager, Visionwin, Aplifisa, Odoo (JSON-RPC), FacturaScripts (API REST) y Business Central (OData v4).</li>
+          <li>• Modo de base de datos local .mdb para los ERP que lo admiten.</li>
+          <li>• Estos conectores siguen en Beta: sus esquemas no están verificados contra un ERP real.</li>
+      </ul>
+    </article>
+
+    <article id="v0-5-0" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.5.0</span>
+        
+        <time datetime="2026-10-24" class="text-xs text-zinc-500">24 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">12 motores ERP y pestaña de auditoría de catálogo</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• El agente pasa a soportar 12 motores ERP (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP y siete nuevos en Beta).</li>
+          <li>• Nueva pestaña de auditoría de catálogo Multi-ERP en el panel local del agente.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-15" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.15</span>
+        
+        <time datetime="2026-10-23" class="text-xs text-zinc-500">23 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Arranque automático en Windows</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Arranque automático obligatorio con Windows y tiempos de estabilidad fijados.</li>
+          <li>• Nuevo servicio de la API para auditar dominios con protección contra SSRF.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-14" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.14</span>
+        
+        <time datetime="2026-10-23" class="text-xs text-zinc-500">23 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Corrección de sincronización manual</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• El panel local envía ahora Content-Type application/json en las peticiones POST, lo que evita el error 415 al lanzar una sincronización manual.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-13" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.13</span>
+        
+        <time datetime="2026-10-22" class="text-xs text-zinc-500">22 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Aviso de primera activación y panel de partners</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Aviso por correo en la primera activación de una licencia.</li>
+          <li>• Panel de partners con buscador, filtros, paginación y exportación a CSV.</li>
+          <li>• Eliminación permanente de licencias y depuración de claves de prueba obsoletas en el panel.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-12" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.12</span>
+        
+        <time datetime="2026-10-22" class="text-xs text-zinc-500">22 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Persistencia sin pérdida de configuración</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Guardado completo de la configuración del agente en AppData.</li>
+          <li>• Detección de unidades de red mapeadas del usuario y selector de archivos nativo que abre en la carpeta correcta.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-11" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.11</span>
+        
+        <time datetime="2026-10-22" class="text-xs text-zinc-500">22 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Endurecimiento de seguridad</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Revisión de seguridad de módulos del agente, API cloud, conectores y SEO.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-10" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.10</span>
+        
+        <time datetime="2026-10-21" class="text-xs text-zinc-500">21 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Integración Multi-ERP SQL y Modo Evaluación</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Integración de extremo a extremo de los ERP sobre SQL Server con Modo Evaluación (Sandbox).</li>
+          <li>• Corrección de enlaces web y páginas de Sage 50, Ágora POS y a3ERP.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-9" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.9</span>
+        
+        <time datetime="2026-10-21" class="text-xs text-zinc-500">21 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Actualizador automático más robusto</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Corrección de tiempo de espera y reanudación del actualizador automático.</li>
+          <li>• Firma de actualizaciones con doble clave y mejoras en el panel Multi-ERP.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-8" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.8</span>
+        
+        <time datetime="2026-10-21" class="text-xs text-zinc-500">21 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Motor SQL Server local para Ágora POS, Sage 50 y a3ERP</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Nuevo motor ERP polimórfico con conexión a SQL Server local.</li>
+          <li>• Modo Evaluación Sandbox y asistente de configuración.</li>
+          <li>• Primera aparición de los conectores de Ágora POS, Sage 50 y a3ERP.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-4" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.4 – 0.4.7</span>
+        
+        <time datetime="2026-10-11" class="text-xs text-zinc-500">10 de octubre de 2026 al 11 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Versiones de mantenimiento 0.4.4 a 0.4.7</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Cuatro versiones publicadas entre el 10 y el 11 de octubre con cambios agrupados; no se mantiene un registro detallado por versión.</li>
+          <li>• En ese periodo: consola inferior desplegable y agrupación de registros en el panel, canal PrestaShop y sincronización directa con Shopify, y simulador de pedidos de prueba.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-3" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.3</span>
+        
+        <time datetime="2026-10-10" class="text-xs text-zinc-500">10 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Correcciones del panel local y marcas de Telegram y Discord</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• El panel recarga la interfaz al rotar el token tras reiniciar el agente.</li>
+          <li>• Integración de las marcas oficiales de Telegram y Discord.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-2" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.2</span>
+        
+        <time datetime="2026-10-10" class="text-xs text-zinc-500">10 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Notificaciones multicanal</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Vista de notificaciones por correo SMTP, Telegram y Discord.</li>
+          <li>• Asistente de configuración reducido a 4 pasos y navegación del dashboard simplificada.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-1" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.1</span>
+        
+        <time datetime="2026-10-10" class="text-xs text-zinc-500">10 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Asistente de primera configuración</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Activación de licencia beta con un clic en el asistente de escritorio y modo exploración sin bloqueo.</li>
+      </ul>
+    </article>
+
+    <article id="v0-4-0" class="border border-white/[0.08] rounded-2xl p-6 bg-[#121215] mb-5">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-mono px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">v0.4.0</span>
+        
+        <time datetime="2026-10-10" class="text-xs text-zinc-500">10 de octubre de 2026</time>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-3">Serie 0.4: conectores Holded y Shopify</h2>
+      <ul class="space-y-2 text-sm text-zinc-400 leading-relaxed">
+          <li>• Conector Holded y suite de pruebas de extremo a extremo con Shopify.</li>
+          <li>• Primeras páginas de canales Shopify y Holded en la web.</li>
+      </ul>
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol</a>
+        <a href="/simplygest-woocommerce/" class="hover:text-zinc-300 transition">SimplyGest</a>
+        <a href="/sage50-woocommerce/" class="hover:text-zinc-300 transition">Sage 50</a>
+        <a href="/agora-pos-woocommerce/" class="hover:text-zinc-300 transition">Ágora POS</a>
+        <a href="/a3erp-woocommerce/" class="hover:text-zinc-300 transition">a3ERP</a>
+        <a href="/conector-sage200/" class="hover:text-zinc-300 transition">Sage 200 (Beta)</a>
+        <a href="/conector-icg-manager/" class="hover:text-zinc-300 transition">ICG Manager (Beta)</a>
+        <a href="/conector-visionwin/" class="hover:text-zinc-300 transition">Visionwin (Beta)</a>
+        <a href="/conector-aplifisa/" class="hover:text-zinc-300 transition">Aplifisa (Beta)</a>
+        <a href="/conector-odoo/" class="hover:text-zinc-300 transition">Odoo (Beta)</a>
+        <a href="/conector-facturascripts/" class="hover:text-zinc-300 transition">FacturaScripts (Beta)</a>
+        <a href="/conector-business-central/" class="hover:text-zinc-300 transition">Business Central (Beta)</a>
+        <a href="/novedades/" class="hover:text-zinc-300 transition">Novedades</a>
+        <a href="/requisitos-sistema/" class="hover:text-zinc-300 transition">Requisitos del sistema</a>
+        <a href="/partners/" class="hover:text-zinc-300 transition">Partners</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>

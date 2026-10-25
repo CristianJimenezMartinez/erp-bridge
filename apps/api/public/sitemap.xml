@@ -1339,4 +1339,93 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/partners/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/partners/" />
   </url>
-</urlset>
+
+  <!-- Conector Sage 200 (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-sage200/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-sage200/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-sage200/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-sage200/" />
+  </url>
+
+  <!-- Conector ICG Manager / FrontRetail (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-icg-manager/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-icg-manager/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-icg-manager/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-icg-manager/" />
+  </url>
+
+  <!-- Conector Visionwin Gestión (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-visionwin/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-visionwin/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-visionwin/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-visionwin/" />
+  </url>
+
+  <!-- Conector Aplifisa (GestFuturo / Factus) (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-aplifisa/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-aplifisa/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-aplifisa/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-aplifisa/" />
+  </url>
+
+  <!-- Conector Odoo (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-odoo/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-odoo/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-odoo/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-odoo/" />
+  </url>
+
+  <!-- Conector FacturaScripts (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-facturascripts/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-facturascripts/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-facturascripts/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-facturascripts/" />
+  </url>
+
+  <!-- Conector Microsoft Dynamics 365 Business Central (Beta) para WooCommerce, PrestaShop y Shopify -->
+  <url>
+    <loc>https://bridge.cristianjm.com/conector-business-central/</loc>
+    <lastmod>2026-10-25T21:30:00+01:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/conector-business-central/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/conector-business-central/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/conector-business-central/" />
+  </url>
+
+  <!-- Novedades e historial de versiones -->
+  <url>
+    <loc>https://bridge.cristianjm.com/novedades/</loc>
+    <lastmod>2026-10-25T12:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/novedades/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/novedades/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/novedades/" />
+  </url>
+
+  </urlset>

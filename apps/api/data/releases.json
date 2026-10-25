@@ -1,0 +1,163 @@
+{
+  "_comment": "Historial de versiones de Bentian ERP Bridge. Fuente de apps/api/scripts/build-novedades.ts. Extraído de git log y docs/audits. Añade una entrada nueva al principio en cada release. No uses data-app-version aquí: el script lo aplica solo a la versión vigente.",
+  "releases": [
+    {
+      "version": "0.5.3",
+      "date": "2026-10-25",
+      "title": "Revisión de código de los ERP y mejoras en Factusol",
+      "items": [
+        "Revisión por lectura de código de los 12 motores ERP, documentada internamente. No se ha probado contra ERP reales; sirve para priorizar correcciones.",
+        "Factusol: política única de stock entre catálogo y stock reactivo, cambio de ejercicio resuelto al abrir la base, reintentos de pedido con comprobación de idempotencia y errores de lectura que ya no se interpretan como catálogo vacío.",
+        "Programa de Partners: comisión recurrente del 30 % en web, portal, panel y API.",
+        "Sincronización de versión y regeneración de las páginas públicas."
+      ]
+    },
+    {
+      "version": "0.5.2",
+      "date": "2026-10-25",
+      "title": "Documentación y checklist de auditoría ERP",
+      "items": [
+        "Sincronización de versión y documentación.",
+        "Correcciones en los conectores Beta: ruta /api/v2.0 y reversión de líneas fallidas en Business Central, validación de SKU e idempotencia en Odoo y columnas de pedido de Sage 200.",
+        "Checklist de auditoría de los motores ERP con los puntos pendientes de validar."
+      ]
+    },
+    {
+      "version": "0.5.1",
+      "date": "2026-10-24",
+      "title": "Flujos de pedidos para los 7 ERP nuevos (Beta)",
+      "items": [
+        "Alta de pedidos con cabecera y líneas para Sage 200, ICG Manager, Visionwin, Aplifisa, Odoo (JSON-RPC), FacturaScripts (API REST) y Business Central (OData v4).",
+        "Modo de base de datos local .mdb para los ERP que lo admiten.",
+        "Estos conectores siguen en Beta: sus esquemas no están verificados contra un ERP real."
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "date": "2026-10-24",
+      "title": "12 motores ERP y pestaña de auditoría de catálogo",
+      "items": [
+        "El agente pasa a soportar 12 motores ERP (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP y siete nuevos en Beta).",
+        "Nueva pestaña de auditoría de catálogo Multi-ERP en el panel local del agente."
+      ]
+    },
+    {
+      "version": "0.4.15",
+      "date": "2026-10-23",
+      "title": "Arranque automático en Windows",
+      "items": [
+        "Arranque automático obligatorio con Windows y tiempos de estabilidad fijados.",
+        "Nuevo servicio de la API para auditar dominios con protección contra SSRF."
+      ]
+    },
+    {
+      "version": "0.4.14",
+      "date": "2026-10-23",
+      "title": "Corrección de sincronización manual",
+      "items": [
+        "El panel local envía ahora Content-Type application/json en las peticiones POST, lo que evita el error 415 al lanzar una sincronización manual."
+      ]
+    },
+    {
+      "version": "0.4.13",
+      "date": "2026-10-22",
+      "title": "Aviso de primera activación y panel de partners",
+      "items": [
+        "Aviso por correo en la primera activación de una licencia.",
+        "Panel de partners con buscador, filtros, paginación y exportación a CSV.",
+        "Eliminación permanente de licencias y depuración de claves de prueba obsoletas en el panel."
+      ]
+    },
+    {
+      "version": "0.4.12",
+      "date": "2026-10-22",
+      "title": "Persistencia sin pérdida de configuración",
+      "items": [
+        "Guardado completo de la configuración del agente en AppData.",
+        "Detección de unidades de red mapeadas del usuario y selector de archivos nativo que abre en la carpeta correcta."
+      ]
+    },
+    {
+      "version": "0.4.11",
+      "date": "2026-10-22",
+      "title": "Endurecimiento de seguridad",
+      "items": [
+        "Revisión de seguridad de módulos del agente, API cloud, conectores y SEO."
+      ]
+    },
+    {
+      "version": "0.4.10",
+      "date": "2026-10-21",
+      "title": "Integración Multi-ERP SQL y Modo Evaluación",
+      "items": [
+        "Integración de extremo a extremo de los ERP sobre SQL Server con Modo Evaluación (Sandbox).",
+        "Corrección de enlaces web y páginas de Sage 50, Ágora POS y a3ERP."
+      ]
+    },
+    {
+      "version": "0.4.9",
+      "date": "2026-10-21",
+      "title": "Actualizador automático más robusto",
+      "items": [
+        "Corrección de tiempo de espera y reanudación del actualizador automático.",
+        "Firma de actualizaciones con doble clave y mejoras en el panel Multi-ERP."
+      ]
+    },
+    {
+      "version": "0.4.8",
+      "date": "2026-10-21",
+      "title": "Motor SQL Server local para Ágora POS, Sage 50 y a3ERP",
+      "items": [
+        "Nuevo motor ERP polimórfico con conexión a SQL Server local.",
+        "Modo Evaluación Sandbox y asistente de configuración.",
+        "Primera aparición de los conectores de Ágora POS, Sage 50 y a3ERP."
+      ]
+    },
+    {
+      "version": "0.4.4",
+      "versionTo": "0.4.7",
+      "date": "2026-10-11",
+      "dateFrom": "2026-10-10",
+      "title": "Versiones de mantenimiento 0.4.4 a 0.4.7",
+      "items": [
+        "Cuatro versiones publicadas entre el 10 y el 11 de octubre con cambios agrupados; no se mantiene un registro detallado por versión.",
+        "En ese periodo: consola inferior desplegable y agrupación de registros en el panel, canal PrestaShop y sincronización directa con Shopify, y simulador de pedidos de prueba."
+      ]
+    },
+    {
+      "version": "0.4.3",
+      "date": "2026-10-10",
+      "title": "Correcciones del panel local y marcas de Telegram y Discord",
+      "items": [
+        "El panel recarga la interfaz al rotar el token tras reiniciar el agente.",
+        "Integración de las marcas oficiales de Telegram y Discord."
+      ]
+    },
+    {
+      "version": "0.4.2",
+      "date": "2026-10-10",
+      "title": "Notificaciones multicanal",
+      "items": [
+        "Vista de notificaciones por correo SMTP, Telegram y Discord.",
+        "Asistente de configuración reducido a 4 pasos y navegación del dashboard simplificada."
+      ]
+    },
+    {
+      "version": "0.4.1",
+      "date": "2026-10-10",
+      "title": "Asistente de primera configuración",
+      "items": [
+        "Activación de licencia beta con un clic en el asistente de escritorio y modo exploración sin bloqueo."
+      ]
+    },
+    {
+      "version": "0.4.0",
+      "date": "2026-10-10",
+      "title": "Serie 0.4: conectores Holded y Shopify",
+      "items": [
+        "Conector Holded y suite de pruebas de extremo a extremo con Shopify.",
+        "Primeras páginas de canales Shopify y Holded en la web."
+      ]
+    }
+  ]
+}

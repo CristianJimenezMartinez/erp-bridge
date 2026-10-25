@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conector Aplifisa WooCommerce (Beta): GestFuturo y Factus con tu tienda | Bentian</title>
+  <meta name="description" content="Conector Aplifisa (GestFuturo) para WooCommerce, PrestaShop y Shopify con SQL Server o archivo .mdb. Beta en validación con clientes piloto: artículos, existencias por almacén y pedidos.">
+  <meta name="keywords" content="conector aplifisa woocommerce, aplifisa gestfuturo tienda online, sincronizar aplifisa con prestashop, integración aplifisa ecommerce, aplifisa factus woocommerce, aplifisa existencias reservado">
+  <meta name="author" content="Bentian">
+  <link rel="canonical" href="https://bridge.cristianjm.com/conector-aplifisa/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://bridge.cristianjm.com/conector-aplifisa/">
+  <meta property="og:site_name" content="Bentian ERP Bridge">
+  <meta property="og:title" content="Conector Aplifisa WooCommerce (Beta): GestFuturo y Factus con tu tienda | Bentian">
+  <meta property="og:description" content="Conector Aplifisa (GestFuturo) para WooCommerce, PrestaShop y Shopify con SQL Server o archivo .mdb. Beta en validación con clientes piloto: artículos, existencias por almacén y pedidos.">
+  <meta property="og:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Conector Aplifisa WooCommerce (Beta): GestFuturo y Factus con tu tienda | Bentian">
+  <meta name="twitter:description" content="Conector Aplifisa (GestFuturo) para WooCommerce, PrestaShop y Shopify con SQL Server o archivo .mdb. Beta en validación con clientes piloto: artículos, existencias por almacén y pedidos.">
+  <meta name="twitter:image" content="https://bridge.cristianjm.com/assets/og-preview.png">
+
+  <!-- Tailwind Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#10b981', 600: '#059669' }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://bridge.cristianjm.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Conector Aplifisa (Beta)",
+          "item": "https://bridge.cristianjm.com/conector-aplifisa/"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Bentian Conector Aplifisa (GestFuturo / Factus) (Beta)",
+      "softwareVersion": "0.5.3",
+      "operatingSystem": "Windows 10, Windows 11, Windows Server",
+      "applicationCategory": "BusinessApplication",
+      "image": "https://bridge.cristianjm.com/assets/og-preview.png",
+      "url": "https://bridge.cristianjm.com/conector-aplifisa/",
+      "description": "Conector en fase Beta entre Aplifisa (GestFuturo / Factus) y tiendas WooCommerce, PrestaShop y Shopify. En validación con clientes piloto.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Bentian"
+      },
+      "sku": "BENTIAN-ERP-BRIDGE-APLIFISA"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Aplifisa, GestFuturo y Factus son lo mismo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En el perfil de Bentian se agrupan bajo «Aplifisa (GestFuturo / Factus)» porque comparten esquema previsto, pero no hemos podido comprobar todavía que todas las ediciones usen idénticos nombres de tabla. Es una de las cosas que buscamos validar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Por qué hablan de stock «reservado»?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Las existencias de Aplifisa incluyen una cantidad reservada para pedidos pendientes. El conector publica stock actual menos reservado, para evitar vender lo que ya está comprometido. Falta comprobar cómo recalcula Aplifisa esa reserva cuando entra un pedido externo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué almacén se usa para el stock de la web?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La lectura del catálogo apunta hoy al almacén 01. Poder elegir otro almacén en el panel y que el catálogo lo respete es una de las mejoras en curso."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo conectar un Aplifisa que está en un NAS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En modo archivo, el agente admite rutas de red de Windows, incluidas UNC con espacios. Con ficheros compartidos entre varios puestos, hazlo primero sobre una copia: los bloqueos de acceso concurrente no están probados con Aplifisa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuál es el proceso para entrar en el piloto?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Contacta con nosotros con tu versión de Aplifisa y el tipo de base de datos. Te pedimos una copia sin datos sensibles para contrastar los nombres de tablas y columnas antes de hacer ninguna prueba de pedido."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Navbar -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-3 whitespace-nowrap shrink-0">
+        <img src="/assets/icon.svg" alt="Bentian" class="w-8 h-8">
+        <span class="font-bold text-lg text-white">Bentian <span class="text-zinc-500 font-normal">| Aplifisa (Beta)</span></span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/requisitos-sistema/" class="hidden sm:inline text-sm text-zinc-400 hover:text-white transition whitespace-nowrap shrink-0">Requisitos</a>
+        <a href="/#pricing" class="text-sm text-zinc-400 hover:text-white transition whitespace-nowrap shrink-0">Precios</a>
+        <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-600/20 whitespace-nowrap shrink-0">
+          Descargar <span data-app-version>v0.5.3</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-medium mb-6">
+      <span>Beta · Aplifisa GestFuturo / Factus (SQL Server o .mdb) ↔ WooCommerce · PrestaShop · Shopify</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+      Conector <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Aplifisa para tu tienda online</span>
+    </h1>
+
+    <p class="text-lg text-zinc-400 max-w-3xl mb-8 leading-relaxed">Para empresas que gestionan fontanería, climatización o suministros con Aplifisa. Bentian lee artículos y existencias con su reserva y registra los pedidos web en las tablas de pedidos de cliente.</p>
+
+    <!-- Aviso de estado (honestidad documental) -->
+    <div role="note" class="mb-10 rounded-2xl border border-amber-500/40 bg-amber-500/[0.06] p-5">
+      <p class="text-sm font-semibold text-amber-300 mb-1">Estado: Beta, en validación con clientes piloto</p>
+      <p class="text-sm text-zinc-300 leading-relaxed">El perfil de Aplifisa contempla tres variantes de esquema (SQL, archivo local y catálogo) que todavía no coinciden entre sí y no se han contrastado con un Aplifisa real. Es el conector con más trabajo de armonización pendiente, así que lo ofrecemos solo para pilotos supervisados.</p>
+      <p class="text-xs text-zinc-500 mt-3">No ofrecemos garantías de sincronización en producción para este conector hasta completar la validación. Los conectores de <a href="/factusol-woocommerce/" class="text-emerald-400 hover:underline">Factusol</a> y <a href="/sage50-woocommerce/" class="text-emerald-400 hover:underline">Sage 50</a> tienen su propia página de estado.</p>
+    </div>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-16">
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Descargar Instalador Windows (<span data-app-version>v0.5.3</span>)</span>
+      </a>
+      <a href="/requisitos-sistema/" class="inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-zinc-200 font-semibold px-6 py-3.5 rounded-xl transition text-sm">Requisitos del sistema &rarr;</a>
+    </div>
+
+    <!-- Cómo se conecta -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-12">
+      <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">SQL / .mdb</span>
+      <h2 class="text-2xl font-bold text-white mt-1 mb-3">Cómo se conecta Bentian a Aplifisa</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-5">Según tu instalación, Aplifisa puede estar sobre SQL Server o sobre un archivo de base de datos. El adaptador acepta ambas vías.</p>
+      <ol class="list-decimal pl-5 space-y-2.5 text-sm text-zinc-300 leading-relaxed">
+        <li>Con SQL Server, el agente usa la instancia que propone el asistente (.\APLIFISA o .\SQLEXPRESS) y la base GESTFUTURO u otra que indiques.</li>
+        <li>Con archivo local, el agente abre la base .mdb o .accdb por OLEDB desde el equipo con acceso a la carpeta de datos.</li>
+        <li>Se leen artículos y existencias del almacén configurado (por defecto el almacén 01).</li>
+        <li>Los pedidos web se escriben en la cabecera y líneas de pedidos de cliente.</li>
+      </ol>
+    </div>
+
+    <!-- Qué sincroniza -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-12">
+      <h2 class="text-2xl font-bold text-white mb-6">Qué sincroniza el conector de Aplifisa</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">1</div>
+          <h4 class="font-semibold text-white mb-1.5">Artículos</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Código, nombre, familia, último coste, código de barras y artículos no dados de baja.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">2</div>
+          <h4 class="font-semibold text-white mb-1.5">Existencias con reservado</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Stock actual menos cantidad reservada por almacén.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">3</div>
+          <h4 class="font-semibold text-white mb-1.5">Tarifas PVP1, PVP2 y PVP3</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Tres tarifas disponibles; el perfil publica PVP1 por defecto.</p>
+        </div>
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-3">4</div>
+          <h4 class="font-semibold text-white mb-1.5">Pedidos de cliente</h4>
+          <p class="text-xs text-zinc-400 leading-relaxed">Cabecera y líneas de pedido con serie, número y observaciones.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Esquema -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-12">
+      <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Esquema previsto</span>
+      <h2 class="text-2xl font-bold text-white mt-1 mb-3">Esquema previsto sobre Aplifisa</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-5">Tablas del perfil actual. Esquema previsto, no verificado con un Aplifisa real:</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border border-white/[0.08] rounded-xl overflow-hidden">
+          <thead class="bg-zinc-900/90 text-zinc-200 border-b border-white/[0.08]">
+            <tr><th class="px-4 py-3 font-semibold">Recurso</th><th class="px-4 py-3 font-semibold">Campos</th><th class="px-4 py-3 font-semibold">Uso en Bentian</th></tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.06] text-zinc-400">
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">ARTICULOS</td>
+              <td class="px-4 py-3 font-mono">CODART, NOMART, FAMART, PVP1, ULTCOSTE, CODBARRAS, BAJA</td>
+              <td class="px-4 py-3 text-zinc-300">Lectura del catálogo.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">EXISTENCIAS</td>
+              <td class="px-4 py-3 font-mono">CODART, CODALM, STOCKACTUAL, RESERVADO</td>
+              <td class="px-4 py-3 text-zinc-300">Lectura de stock disponible por almacén.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">PEDIDOSCLI_CAB</td>
+              <td class="px-4 py-3 font-mono">SERIE, NUMERO, FECHA, CODCLI, NOMCLI, TOTALPED, OBSERVACIONES</td>
+              <td class="px-4 py-3 text-zinc-300">Alta de la cabecera del pedido.</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-mono text-emerald-400 font-bold">PEDIDOSCLI_LIN</td>
+              <td class="px-4 py-3 font-mono">SERIE, NUMERO, LINEA, CODART, DESCRIPCION, UNIDADES, PRECIO, IMPORTE</td>
+              <td class="px-4 py-3 text-zinc-300">Alta de las líneas del pedido.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Requisitos y limitaciones -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div class="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+        <h2 class="text-lg font-bold text-emerald-400 mb-3">Requisitos para Aplifisa</h2>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+            <li class="">• Aplifisa (GestFuturo o Factus) con base de datos en SQL Server o archivo .mdb/.accdb accesible.</li>
+            <li class="">• Controlador OLEDB de Access (ACE) si trabajas con archivo.</li>
+            <li class="">• Usuario con permisos de lectura y de escritura en pedidos de cliente.</li>
+            <li class="">• Windows 10, Windows 11 o Windows Server para el agente.</li>
+        </ul>
+        <p class="text-xs text-zinc-500 mt-4">Requisitos generales del agente en <a href="/requisitos-sistema/" class="text-emerald-400 hover:underline">Requisitos del sistema</a>.</p>
+      </div>
+      <div class="p-6 rounded-2xl border border-amber-500/20 bg-amber-500/[0.03]">
+        <h2 class="text-lg font-bold text-amber-300 mb-3">Puntos que seguimos validando en Aplifisa</h2>
+        <ul class="space-y-2.5 text-sm text-zinc-300">
+            <li class="">• Los nombres de columnas del catálogo y de los pedidos varían entre el modo SQL y el modo archivo.</li>
+            <li class="">• Al recibir un pedido, la reserva de stock puede afectar a todos los almacenes del artículo en vez de solo al elegido.</li>
+            <li class="">• El modo archivo local no serializa escrituras simultáneas.</li>
+            <li class="">• La asociación del pedido a un cliente concreto no está validada; se usa un cliente genérico.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Piloto -->
+    <div class="border border-white/[0.08] rounded-2xl p-8 bg-[#121215] mb-12">
+      <h2 class="text-2xl font-bold text-white mb-3">Participa en el piloto de Aplifisa</h2>
+      <p class="text-sm text-zinc-400 leading-relaxed mb-5">Buscamos empresas dispuestas a probar el conector sobre una copia de sus datos y a compartir el esquema real de sus tablas o recursos. Puedes probar el flujo completo en Modo Evaluación sin conectar a tu ERP. Los planes de licencia están en la <a href="/#pricing" class="text-emerald-400 hover:underline">sección de precios</a>.</p>
+      <a href="mailto:cristianjimeneztrabajo@gmail.com?subject=Piloto%20Beta%20Aplifisa" class="inline-block text-center py-2.5 px-5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 text-xs font-semibold transition">Solicitar acceso al piloto de Aplifisa</a>
+    </div>
+
+    <!-- Enlaces cruzados -->
+    <div class="mb-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Conectores relacionados</span>
+          <h2 class="text-2xl font-bold text-white mt-1">Otros conectores de Bentian que pueden interesarte</h2>
+        </div>
+        <a href="/docs/arquitectura/arquitectura-polimorfica-multi-erp/" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">Arquitectura Multi-ERP &rarr;</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <a href="/conector-visionwin/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white mb-2">Visionwin</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Misma idea de doble modo SQL y archivo local, con otro modelo de datos.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4">Ver conector Visionwin &rarr;</span>
+        </a>
+        <a href="/conector-sage200/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white mb-2">Sage 200</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Si tu negocio ha crecido y trabajas con un ERP SQL de gama media.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4">Ver conector Sage 200 &rarr;</span>
+        </a>
+        <a href="/a3erp-woocommerce/" class="p-5 rounded-2xl border border-white/[0.08] hover:border-emerald-500/40 bg-[#121215] hover:bg-[#16161b] transition flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white mb-2">a3ERP</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">Conector SQL ya publicado, por si usas a3ERP en otra empresa del grupo.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-400 mt-4">Ver conector a3ERP &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="mb-16">
+      <h2 class="text-2xl font-bold text-white mb-6">Preguntas frecuentes sobre Aplifisa y comercio electrónico</h2>
+      <div class="space-y-4">
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Aplifisa, GestFuturo y Factus son lo mismo?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">En el perfil de Bentian se agrupan bajo «Aplifisa (GestFuturo / Factus)» porque comparten esquema previsto, pero no hemos podido comprobar todavía que todas las ediciones usen idénticos nombres de tabla. Es una de las cosas que buscamos validar.</p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Por qué hablan de stock «reservado»?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">Las existencias de Aplifisa incluyen una cantidad reservada para pedidos pendientes. El conector publica stock actual menos reservado, para evitar vender lo que ya está comprometido. Falta comprobar cómo recalcula Aplifisa esa reserva cuando entra un pedido externo.</p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Qué almacén se usa para el stock de la web?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">La lectura del catálogo apunta hoy al almacén 01. Poder elegir otro almacén en el panel y que el catálogo lo respete es una de las mejoras en curso.</p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Puedo conectar un Aplifisa que está en un NAS?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">En modo archivo, el agente admite rutas de red de Windows, incluidas UNC con espacios. Con ficheros compartidos entre varios puestos, hazlo primero sobre una copia: los bloqueos de acceso concurrente no están probados con Aplifisa.</p>
+        </details>
+
+        <details class="group border border-white/[0.08] rounded-xl p-5 bg-[#121215] cursor-pointer">
+          <summary class="font-semibold text-zinc-200 list-none flex justify-between items-center">
+            ¿Cuál es el proceso para entrar en el piloto?
+            <span class="text-emerald-400 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <p class="mt-3 text-sm text-zinc-400 leading-relaxed">Contacta con nosotros con tu versión de Aplifisa y el tipo de base de datos. Te pedimos una copia sin datos sensibles para contrastar los nombres de tablas y columnas antes de hacer ninguna prueba de pedido.</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-teal-950/60 border border-emerald-500/30 p-8 sm:p-12 text-center">
+      <h2 class="text-3xl font-extrabold text-white mb-4">Prueba el conector de Aplifisa en Modo Evaluación</h2>
+      <p class="text-zinc-300 max-w-xl mx-auto mb-8 text-sm">Descarga el instalador para Windows y comprueba el flujo con un catálogo de ejemplo antes de conectar tu ERP. Este conector sigue en Beta.</p>
+      <a data-download-installer href="/releases/latest/Bentian-Setup.exe" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-8 py-4 rounded-xl transition shadow-xl shadow-emerald-600/30 text-sm">
+        <span>Descargar Instalador Oficial Windows (<span data-app-version>v0.5.3</span>)</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 px-6 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <a href="/" class="hover:text-zinc-300 transition">Inicio</a>
+        <a href="/factusol-woocommerce/" class="hover:text-zinc-300 transition">Factusol</a>
+        <a href="/simplygest-woocommerce/" class="hover:text-zinc-300 transition">SimplyGest</a>
+        <a href="/sage50-woocommerce/" class="hover:text-zinc-300 transition">Sage 50</a>
+        <a href="/agora-pos-woocommerce/" class="hover:text-zinc-300 transition">Ágora POS</a>
+        <a href="/a3erp-woocommerce/" class="hover:text-zinc-300 transition">a3ERP</a>
+        <a href="/conector-sage200/" class="hover:text-zinc-300 transition">Sage 200 (Beta)</a>
+        <a href="/conector-icg-manager/" class="hover:text-zinc-300 transition">ICG Manager (Beta)</a>
+        <a href="/conector-visionwin/" class="hover:text-zinc-300 transition">Visionwin (Beta)</a>
+        <a href="/conector-aplifisa/" class="hover:text-zinc-300 transition">Aplifisa (Beta)</a>
+        <a href="/conector-odoo/" class="hover:text-zinc-300 transition">Odoo (Beta)</a>
+        <a href="/conector-facturascripts/" class="hover:text-zinc-300 transition">FacturaScripts (Beta)</a>
+        <a href="/conector-business-central/" class="hover:text-zinc-300 transition">Business Central (Beta)</a>
+        <a href="/novedades/" class="hover:text-zinc-300 transition">Novedades</a>
+        <a href="/requisitos-sistema/" class="hover:text-zinc-300 transition">Requisitos del sistema</a>
+        <a href="/partners/" class="hover:text-zinc-300 transition">Partners</a>
+        <a href="/dashboard" class="hover:text-zinc-300 transition">Dashboard</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/version-sync.js" defer></script>
+</body>
+</html>
