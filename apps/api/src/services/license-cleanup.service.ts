@@ -15,6 +15,13 @@ export const PROTECTED_PRODUCTION_KEYS = new Set<string>([
   'EB-8WEN2-W08N2-8KJAW-0AHCH',
   'EB-S6AB3-2MHWP-50DTT-72242',
   'EB-6RE3E-HXPS4-XYNRV-HVZWT',
+  'EB-7B34V-AX7ZC-GY1SK-MNAHE', // Agencia Partner: Lateral Comunicación (Murcia)
+  'EB-MA4P9-E89TZ-EH1GC-D7Z4X', // Agencia Partner: Inesferis Diseño y Marketing (Alicante)
+  'EB-5GX8M-9QZC3-ANQT5-50505', // Agencia Partner: Soluciones Web 365 (Valencia)
+  'EB-5RB8F-88A42-3XB7E-0QAMA', // Agencia Partner: Social 4U (Alicante)
+  'EB-62VRS-58V3D-HMCGA-593B3', // Agencia Partner: 4webs Diseño y Desarrollo Web (Valencia)
+  'EB-NB6QH-MNCX2-795JM-F9RCT', // Agencia Partner: INGENIA Soluciones Tecnológicas
+  'EB-76HJW-QAT6Y-G6YRE-7K6H6', // Agencia Partner: MikkSa Network
 ]);
 
 /**
@@ -163,30 +170,88 @@ export class LicenseCleanupService {
     }
 
     try {
-      // Garantizar en producción que la clave real enviada a Soy.es (EB-6RE3E-HXPS4-XYNRV-HVZWT) esté presente y activa
+      // Garantizar en producción que las claves reales enviadas a Soy.es y a las 7 agencias partners estén presentes y activas
       if (process.env.NODE_ENV === 'production') {
-        const soyOrgId = computeOrganizationIdFromEmail('info@nicripsia.com');
-        const soyLicId = '355494ee-b202-4026-8000-000000002026';
-        const soyKey = 'EB-6RE3E-HXPS4-XYNRV-HVZWT';
         const betaExpires = new Date('2026-12-31T23:59:59.999Z');
+        const outreachLeads = [
+          {
+            licId: '355494ee-b202-4026-8000-000000002026',
+            key: 'EB-6RE3E-HXPS4-XYNRV-HVZWT',
+            orgName: 'Soy.es',
+            alias: 'Beta 2026 - Soy.es',
+            email: 'info@nicripsia.com',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002027',
+            key: 'EB-7B34V-AX7ZC-GY1SK-MNAHE',
+            orgName: 'Lateral Comunicación',
+            alias: 'Partner Beta - Lateral Comunicación (Murcia)',
+            email: 'hola@somoslateral.es',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002028',
+            key: 'EB-MA4P9-E89TZ-EH1GC-D7Z4X',
+            orgName: 'Inesferis Diseño y Marketing',
+            alias: 'Partner Beta - Inesferis (Alicante)',
+            email: 'info@inesferisweb.com',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002029',
+            key: 'EB-5GX8M-9QZC3-ANQT5-50505',
+            orgName: 'Soluciones Web 365',
+            alias: 'Partner Beta - Soluciones Web 365 (Valencia)',
+            email: 'info@solucionesweb365.com',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002030',
+            key: 'EB-5RB8F-88A42-3XB7E-0QAMA',
+            orgName: 'Social 4U',
+            alias: 'Partner Beta - Social 4U (Alicante)',
+            email: 'hola@social4u.es',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002031',
+            key: 'EB-62VRS-58V3D-HMCGA-593B3',
+            orgName: '4webs Diseño y Desarrollo Web',
+            alias: 'Partner Beta - 4webs (Valencia)',
+            email: 'info@4webs.es',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002032',
+            key: 'EB-NB6QH-MNCX2-795JM-F9RCT',
+            orgName: 'INGENIA Soluciones Tecnológicas',
+            alias: 'Partner Beta - INGENIA Soluciones',
+            email: 'hola@ingeniast.com',
+          },
+          {
+            licId: '355494ee-b202-4026-8000-000000002033',
+            key: 'EB-76HJW-QAT6Y-G6YRE-7K6H6',
+            orgName: 'MikkSa Network',
+            alias: 'Partner Beta - MikkSa Network (Barcelona)',
+            email: 'info@mikksanetwork.com',
+          },
+        ];
 
-        await db
-          .query(
-            `INSERT INTO organizations (id, name, slug, status, plan, legal_name, created_at, updated_at)
-             VALUES ($1, 'Soy.es', 'info@nicripsia.com', 'ACTIVE', 'trial', 'Soy.es', NOW(), NOW())
-             ON CONFLICT (id) DO NOTHING`,
-            [soyOrgId]
-          )
-          .catch(() => {});
+        for (const lead of outreachLeads) {
+          const orgId = computeOrganizationIdFromEmail(lead.email);
+          await db
+            .query(
+              `INSERT INTO organizations (id, name, slug, status, plan, legal_name, created_at, updated_at)
+               VALUES ($1, $2, $3, 'ACTIVE', 'trial', $2, NOW(), NOW())
+               ON CONFLICT (id) DO NOTHING`,
+              [orgId, lead.orgName, lead.email]
+            )
+            .catch(() => {});
 
-        await db
-          .query(
-            `INSERT INTO licenses (id, key, organization_id, alias, plan, status, max_activations, current_activations, seat_type, billing_status, created_at, expires_at, trial_ends_at)
-             VALUES ($1, $2, $3, 'Beta 2026 - Soy.es', 'trial', 'active', 1, 0, 'BASE', 'TRIAL', NOW(), $4, $4)
-             ON CONFLICT (key) DO NOTHING`,
-            [soyLicId, soyKey, soyOrgId, betaExpires]
-          )
-          .catch(() => {});
+          await db
+            .query(
+              `INSERT INTO licenses (id, key, organization_id, alias, plan, status, max_activations, current_activations, seat_type, billing_status, created_at, expires_at, trial_ends_at)
+               VALUES ($1, $2, $3, $4, 'trial', 'active', 1, 0, 'BASE', 'TRIAL', NOW(), $5, $5)
+               ON CONFLICT (key) DO NOTHING`,
+              [lead.licId, lead.key, orgId, lead.alias, betaExpires]
+            )
+            .catch(() => {});
+        }
       }
 
       const allRows = await db
