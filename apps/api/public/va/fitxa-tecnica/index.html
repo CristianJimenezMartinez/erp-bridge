@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ca-valencia" class="h-full bg-[#09090b] text-[#f4f4f5] antialiased scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitxa Tècnica i Dossier Oficial del Programari — Bentian ERP Bridge</title>
+  <meta name="description" content="Fitxa tècnica oficial, homologació i especificacions de Bentian ERP Bridge per a la Comunitat Valenciana. Arquitectura local-first, seguretat Ed25519 i compliment RGPD.">
+  <link rel="canonical" href="https://bridge.cristianjm.com/va/fitxa-tecnica/">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icon.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
+
+  <meta name="robots" content="index, follow">
+  <link rel="alternate" hreflang="ca-ES" href="https://bridge.cristianjm.com/va/fitxa-tecnica/">
+  <link rel="alternate" hreflang="ca" href="https://bridge.cristianjm.com/va/fitxa-tecnica/">
+  <link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind.config.js"></script>
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Fitxa Tècnica Oficial de Bentian ERP Bridge",
+    "description": "Especificacions tècniques, requisits del sistema i arquitectura de seguretat de Bentian ERP Bridge.",
+    "inLanguage": "ca-valencia",
+    "version": "0.5.3",
+    "author": {
+      "@type": "Person",
+      "name": "Cristian Jiménez Martínez"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Bentian ERP Bridge",
+      "url": "https://bridge.cristianjm.com"
+    }
+  }
+  </script>
+</head>
+<body class="min-h-full flex flex-col bg-[#09090b] text-[#f4f4f5] font-sans antialiased selection:bg-indigo-500/30">
+
+  <!-- Capçalera amb Navegació -->
+  <header class="border-b border-white/[0.08] bg-[#09090b]/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="/va/" class="flex items-center gap-3">
+        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-7 h-7" width="28" height="28">
+        <span class="font-bold text-white text-base">Bentian ERP Bridge</span>
+        <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">Fitxa Oficial</span>
+      </a>
+      <div class="flex items-center gap-3 text-xs">
+        <a href="/va/" class="text-zinc-400 hover:text-white transition">&larr; Tornar a la Web en Valencià</a>
+        <a href="javascript:window.print()" class="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 hover:text-white transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Imprimir / PDF</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contingut de la Fitxa Tècnica -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-12 flex-1">
+    
+    <!-- Encapçalament Institucional -->
+    <div class="p-8 rounded-3xl bg-[#121215] border border-white/[0.1] mb-10">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-6 mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest text-indigo-400">Dossier Tècnic d'Acreditació Institucional</span>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white mt-1">Bentian ERP Bridge — Fitxa Tècnica Oficial</h1>
+          <p class="text-xs text-zinc-400 mt-1">Document homologat per a avaluació en catàlegs de programari, administracions públiques i pimes de la Comunitat Valenciana.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-md bg-emerald-950/80 border border-emerald-700/50 text-emerald-300 font-mono text-xs font-semibold">
+            Versió: v0.5.3
+          </span>
+          <span class="px-3 py-1 rounded-md bg-indigo-950/80 border border-indigo-700/50 text-indigo-300 text-xs font-semibold">
+            Softpedia 100% Clean
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-zinc-500 block">Titular / Autor:</span>
+          <span class="text-white font-medium">Cristian Jiménez Martínez</span>
+        </div>
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-zinc-500 block">Categoria de Programari:</span>
+          <span class="text-white font-medium">Integració ERP &amp; Comerç Electrònic</span>
+        </div>
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-zinc-500 block">Idiomes de la Interfície:</span>
+          <span class="text-white font-medium">Valencià, Castellà (i Francès)</span>
+        </div>
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+          <span class="text-zinc-500 block">Llicència del Programari:</span>
+          <span class="text-white font-medium">Propietària (Accés Beta Lliure)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taula de Seccions de la Fitxa -->
+    <div class="space-y-8 text-sm">
+      
+      <!-- Secció 1: Descripció Funcional -->
+      <section class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+        <h2 class="text-base font-bold text-white flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 rounded-md bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-xs">1</span>
+          Descripció Funcional i Resolució d'Ineficiències en la Pime
+        </h2>
+        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-4">
+          Bentian ERP Bridge és una passarel·la d'execució local (local-first) que automatitza el flux bidireccional de dades entre el programari de gestió comercial i comptable instal·lat a les empreses (com ara Factusol, SimplyGest, Ágora POS, FacturaScripts o Odoo) i els canals de venda digital (WooCommerce, PrestaShop i Shopify).
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
+            <span class="font-semibold text-emerald-400 block mb-1">✓ Sincronització d'Estoc DISSTO:</span>
+            Calcula automàticament l'estoc net restant les comandes pendents abans de pujar-lo a la web, evitant la sobreventa de referències.
+          </div>
+          <div class="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
+            <span class="font-semibold text-emerald-400 block mb-1">✓ Ingesta de Comandes F_PCL:</span>
+            Crea comandes de client directes a la base de dades amb desglossament automàtic d'IVA i Recàrrec d'Equivalència per al comerç minorista.
+          </div>
+        </div>
+      </section>
+
+      <!-- Secció 2: Especificacions Tècniques -->
+      <section class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+        <h2 class="text-base font-bold text-white flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 rounded-md bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-xs">2</span>
+          Especificacions Tècniques i Requisits de l'Entorn
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-white/[0.08] text-zinc-400">
+                <th class="py-2.5 font-medium">Component</th>
+                <th class="py-2.5 font-medium">Requisit Mínim</th>
+                <th class="py-2.5 font-medium">Entorn Recomanat</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/[0.04] text-zinc-300">
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Sistema Operatiu</td>
+                <td class="py-2">Windows 10 x64 / Windows 11</td>
+                <td class="py-2">Windows 11 Pro o Windows Server 2019/2022</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Arquitectura de CPU</td>
+                <td class="py-2">x64 (Intel o AMD de 64 bits)</td>
+                <td class="py-2">4 nuclis, suport de virtualització</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Memòria RAM</td>
+                <td class="py-2">4 GB RAM</td>
+                <td class="py-2">8 GB RAM o superior</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Espai en Disc</td>
+                <td class="py-2">120 MB disponibles</td>
+                <td class="py-2">Unitat d'estat sòlid (SSD)</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Motors de Dades Locals</td>
+                <td class="py-2">Access Database Engine (OLEDB), T-SQL</td>
+                <td class="py-2">Microsoft SQL Server 2014-2022, Access 2016+</td>
+              </tr>
+              <tr>
+                <td class="py-2 font-mono text-indigo-300">Xarxa i Ports</td>
+                <td class="py-2">Port salint HTTPS 443 estàndard</td>
+                <td class="py-2">Zero ports oberts al router d'entrada</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Secció 3: Seguretat Criptogràfica i Compliment RGPD -->
+      <section class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+        <h2 class="text-base font-bold text-white flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 rounded-md bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-xs">3</span>
+          Arquitectura de Seguretat Criptogràfica i Compliment RGPD (Local-First)
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <h3 class="font-semibold text-white mb-1.5">Signatura Ed25519 (RFC 8032)</h3>
+            <p class="text-zinc-400 leading-relaxed">
+              Totes les actualitzacions i proves criptogràfiques de llicència es validen mitjançant claus asimètriques d'alta seguretat abans de qualsevol canvi en el sistema.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <h3 class="font-semibold text-white mb-1.5">Protecció Anti-TOCTOU</h3>
+            <p class="text-zinc-400 leading-relaxed">
+              El motor de substitució atòmica (UpdateSwapper) valida el hash SHA-256 en memòria des d'un entorn aïllat amb permisos restringits UAC de Windows.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <h3 class="font-semibold text-white mb-1.5">Zero-Knowledge RGPD</h3>
+            <p class="text-zinc-400 leading-relaxed">
+              Cap dada fiscal, de facturació o de clients s'emmagatzema ni es reenvia a servidors aliens. La sobirania de la informació roman exclusivament en l'empresa.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Secció 4: Enllaços Oficials de Descàrrega -->
+      <section class="p-6 rounded-2xl bg-[#121215] border border-white/[0.08]">
+        <h2 class="text-base font-bold text-white flex items-center gap-2 mb-3">
+          <span class="w-6 h-6 rounded-md bg-indigo-600/30 text-indigo-400 flex items-center justify-center text-xs">4</span>
+          Punteres Canòniques de Descàrrega i Contacte Oficial
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-6">
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <span class="text-zinc-400 block mb-1">Instal·lador Oficial (.exe):</span>
+            <a href="/releases/latest/Bentian-Setup.exe" class="font-mono text-indigo-400 hover:underline break-all">
+              https://bridge.cristianjm.com/releases/latest/Bentian-Setup.exe
+            </a>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <span class="text-zinc-400 block mb-1">Versió Portable ZIP:</span>
+            <a href="/releases/latest/BentianAgent-Portable.zip" class="font-mono text-indigo-400 hover:underline break-all">
+              https://bridge.cristianjm.com/releases/latest/BentianAgent-Portable.zip
+            </a>
+          </div>
+        </div>
+        <div class="text-xs text-zinc-400 border-t border-white/[0.06] pt-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-zinc-500">Contacte Tècnic Institucional:</span>
+            <span class="text-zinc-300 font-medium ml-1">cristianjimeneztrabajo@gmail.com</span>
+          </div>
+          <div>
+            <span class="text-zinc-500">Punt d'accés principal:</span>
+            <a href="https://bridge.cristianjm.com" class="text-indigo-400 hover:underline ml-1">https://bridge.cristianjm.com</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-white/[0.08] bg-[#09090b] py-8 text-center text-xs text-zinc-500">
+    <p>&copy; 2026 Bentian ERP Bridge — Fitxa Tècnica Oficial per a Organismes i Pimes de la Comunitat Valenciana.</p>
+  </footer>
+
+</body>
+</html>

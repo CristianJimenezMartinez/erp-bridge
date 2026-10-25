@@ -59,6 +59,31 @@
         <a href="/seguridad/" class="text-zinc-400 hover:text-white transition hidden md:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Seguridad</a>
         <a href="/quien-esta-detras/" class="text-zinc-400 hover:text-white transition hidden lg:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Equipo</a>
         <a href="/dashboard/" class="text-zinc-400 hover:text-white transition hidden xl:inline px-2.5 py-1.5 rounded-lg hover:bg-white/[0.05] whitespace-nowrap shrink-0">Clientes</a>
+        
+        <!-- Selector de Idioma (ES | VA | FR) -->
+        <div class="relative inline-block text-left" id="city-lang-picker">
+          <button type="button" onclick="var m = document.getElementById('city-lang-dropdown'); m.classList.toggle('hidden');" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/[0.1] bg-[#121215] hover:bg-[#18181c] text-xs font-medium text-zinc-300 hover:text-white transition" aria-label="Seleccionar idioma">
+            <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+            <span class="font-semibold text-white">ES</span>
+            <svg class="w-3 h-3 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+          <div id="city-lang-dropdown" class="hidden absolute right-0 mt-2 w-44 rounded-xl border border-white/[0.12] bg-[#121215]/95 backdrop-blur-md shadow-2xl py-1.5 z-50 text-xs">
+            <a href="/" class="flex items-center justify-between px-3 py-2 text-zinc-200 hover:bg-white/[0.08] hover:text-white transition font-medium">
+              <span class="flex items-center gap-2"><span>🇪🇸</span> Castellano</span>
+              <span class="text-[10px] text-zinc-400 font-mono font-semibold">ES</span>
+            </a>
+            <a href="/va/" class="flex items-center justify-between px-3 py-2 text-zinc-200 hover:bg-white/[0.08] hover:text-white transition font-medium">
+              <span class="flex items-center gap-2"><span>🦇</span> Valencià</span>
+              <span class="text-[10px] text-zinc-400 font-mono font-semibold">VA</span>
+            </a>
+            <div class="my-1 border-t border-white/[0.06]"></div>
+            <div class="flex items-center justify-between px-3 py-2 text-zinc-500 opacity-60 cursor-not-allowed select-none" title="Français (bientôt disponible)">
+              <span class="flex items-center gap-2"><span>🇫🇷</span> Français</span>
+              <span class="text-[9px] bg-zinc-800 text-zinc-400 px-1 py-0.5 rounded font-mono">Próx</span>
+            </div>
+          </div>
+        </div>
+
         <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="px-4.5 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-sm hover:shadow-indigo-500/25 transition flex items-center gap-2 whitespace-nowrap text-xs sm:text-[13px] shrink-0">
           <span>Descargar Agente</span>
           <span class="text-[10px] font-mono bg-indigo-700/60 px-1.5 py-0.5 rounded text-indigo-200 hidden sm:inline" data-app-version>v0.5.3</span>

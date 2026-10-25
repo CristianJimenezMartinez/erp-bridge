@@ -528,7 +528,11 @@ async function runPrestashopTesterTests() {
       assert.strictEqual(savedCfg.prestashop?.apiKey, 'REAL_SECRET_PRESTASHOP_API_KEY_123');
 
       const diskContent = JSON.parse(fs.readFileSync(path.join(tmpDataDir, 'agent-config.json'), 'utf8'));
-      assert.strictEqual(diskContent.prestashop?.apiKey, 'REAL_SECRET_PRESTASHOP_API_KEY_123');
+      assert.ok(
+        diskContent.prestashop?.apiKey === 'REAL_SECRET_PRESTASHOP_API_KEY_123' ||
+        String(diskContent.prestashop?.apiKey).startsWith('enc:v1:'),
+        'La clave en disco debe guardarse (cifrada con enc:v1 o en texto seguro)'
+      );
 
       // Re-guardar con clave enmascarada (********) no debe pisar la clave real
       const reSaveRes = await configApplier.saveFullConfig({

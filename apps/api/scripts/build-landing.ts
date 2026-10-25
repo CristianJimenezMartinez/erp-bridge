@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { buildValencianoPages } from './build-valenciano';
 
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const LAYOUT_FILE = path.join(PUBLIC_DIR, 'layout/base.html');
@@ -184,6 +185,9 @@ export function buildLanding(): void {
     }
   }
   console.log('[Landing & Partners Build] All integrity and <= 250 LOC assertions PASSED.');
+
+  // Sincronització de la versió en valencià i fitxa tècnica oficial per a la Generalitat
+  buildValencianoPages();
 }
 
 if (require.main === module) {
