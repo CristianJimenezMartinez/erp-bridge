@@ -9,7 +9,7 @@
       "name": "Conector Factusol ERP (OLEDB Driver, SQL Queries & Relational Engine)",
       "status": "FROZEN",
       "certifiedAt": "2026-10-25",
-      "certifiedCommit": "d82c20a",
+      "certifiedCommit": "5913e01",
       "description": "Driver OLEDB cscript.exe (32/64 bits, ACE/Jet), transacciones atómicas F_PCL/F_LPC/F_STO, consultas SQL saneadas, rollover de año fiscal y cuadre aritmético al céntimo.",
       "paths": [
         "packages/connectors/factusol/src"
@@ -184,7 +184,7 @@
       "name": "Registro, Motor SQL Server Local y Adaptadores Polimórficos Multi-ERP (Strategy Pattern)",
       "status": "FROZEN",
       "certifiedAt": "2026-10-25",
-      "certifiedCommit": "633f724",
+      "certifiedCommit": "5913e01",
       "description": "Patrón Strategy desacoplado (IErpConnector, ErpProviderRegistry y SqlServerBaseAdapter) para los 5 ERPs oficiales en España (Factusol, SimplyGest, Ágora POS, Sage 50, a3ERP) con Modo Evaluación Sandbox.",
       "paths": [
         "apps/agent/src/erp"
@@ -201,7 +201,7 @@
       "name": "Detector Factusol Multi-Unidad (HKCU\\Network UAC) y Resolutor de Rutas NAS/UNC",
       "status": "FROZEN",
       "certifiedAt": "2026-10-25",
-      "certifiedCommit": "0fc7842",
+      "certifiedCommit": "5913e01",
       "description": "Escaneo de unidades locales y unidades de red mapeadas del usuario en HKCU\\Network (W:, X:, Y:, Z:), montaje automático en sesión elevada UAC, resolución UNC y normalización de directorio padre para OpenFileDialog.",
       "paths": [
         "apps/agent/src/detector.ts",
