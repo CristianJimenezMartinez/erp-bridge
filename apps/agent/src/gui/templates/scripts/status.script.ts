@@ -240,6 +240,11 @@ export function renderStatusScript(agentVersion: string = '0.2.0'): string {
         if (cardFWatcher) cardFWatcher.textContent = '○ Pendiente';
       }
 
+      const sandboxBanner = document.getElementById('overview-sandbox-banner');
+      if (sandboxBanner) {
+        sandboxBanner.style.display = (!erpInfo.configured && !erpInfo.connected) ? 'flex' : 'none';
+      }
+
       const chType = data.channelType || 'universal_bridge';
       const univ = data.universalBridgeSettings || {};
       const wc = data.woocommerceSettings || {};

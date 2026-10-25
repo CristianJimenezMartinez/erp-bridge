@@ -1428,4 +1428,25 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/novedades/" />
   </url>
 
-  </urlset>
+  <!-- Doc: Conector Odoo 17 Community: JSON-RPC 2.0, Catálogo y Pedidos Web -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/erps-libres/conector-odoo-community/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/erps-libres/conector-odoo-community/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/erps-libres/conector-odoo-community/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/erps-libres/conector-odoo-community/" />
+  </url>
+
+  <!-- Doc: Conector FacturaScripts API REST v3: Variantes, Stock y Pedidos en Tiempo Real -->
+  <url>
+    <loc>https://bridge.cristianjm.com/docs/erps-libres/conector-facturascripts-api/</loc>
+    <lastmod>2026-10-10T14:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://bridge.cristianjm.com/docs/erps-libres/conector-facturascripts-api/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://bridge.cristianjm.com/docs/erps-libres/conector-facturascripts-api/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bridge.cristianjm.com/docs/erps-libres/conector-facturascripts-api/" />
+  </url>
+</urlset>

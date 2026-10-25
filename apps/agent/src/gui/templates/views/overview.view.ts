@@ -18,6 +18,22 @@ export function renderOverviewTab(): string {
           </button>
         </div>
 
+        <!-- Banner Onboarding Modo Demo / Sandbox -->
+        <div id="overview-sandbox-banner" style="display:none;margin-bottom:1.5rem;padding:1.1rem 1.4rem;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:12px;align-items:center;justify-content:space-between;gap:1rem;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;color:#818cf8;flex-shrink:0;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:14px;color:#fff;">¿No tienes tu ERP a mano? Prueba el Modo Demostración</div>
+              <div style="font-size:12px;color:#cbd5e1;margin-top:2px;">Activa datos de prueba con 1 clic para ver la sincronización en vivo sin tocar bases de datos reales.</div>
+            </div>
+          </div>
+          <button onclick="switchTab('factusol')" class="btn" style="background:#4f46e5;color:#fff;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;flex-shrink:0;">
+            <span>Activar Modo Demo →</span>
+          </button>
+        </div>
+
         <!-- Banner de Incidencia y Resolución Rápida -->
         <div id="zen-alert-banner" class="zen-alert-banner" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
           <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">

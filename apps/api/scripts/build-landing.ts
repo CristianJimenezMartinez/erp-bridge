@@ -19,6 +19,7 @@ const CONTENT_SECTIONS = [
   '05-philosophy.html',
   '07-operational-safeguards.html',
   '07b-safeguards-comparison.html',
+  '07c-comparative-advantage.html',
   '06-pipeline.html',
   '07-data-in-flight.html',
   '08-agent.html',
@@ -27,9 +28,11 @@ const CONTENT_SECTIONS = [
   '10-connectors.html',
   '10b-connectors-matrix.html',
   '10c-connectors-tripartite.html',
+  '10d-compatibility-checker.html',
   '11-security.html',
   '11b-founder.html',
   '12-pricing.html',
+  '12b-roi-calculator.html',
   '13-faq.html',
 ];
 

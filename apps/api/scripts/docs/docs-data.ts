@@ -3,6 +3,7 @@ import { primerosPasosArticles } from './categories/01-primeros-pasos';
 import { factusolArticles } from './categories/02-factusol';
 import { simplygestArticles } from './categories/simplygest';
 import { sqlErpsArticles } from './categories/sql-erps';
+import { erpsLibresArticles } from './categories/erps-libres';
 import { canalesArticles } from './categories/03-canales';
 import { arquitecturaArticles } from './categories/04-arquitectura';
 import { benchmarkArticle } from './categories/arquitectura-benchmark';
@@ -40,6 +41,13 @@ export const DOC_CATEGORIES: DocCategory[] = [
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>',
     description: 'Integración SQL Server local no bloqueante para Sage 50, Ágora POS / Retail y Wolters Kluwer a3ERP.',
     order: 4,
+  },
+  {
+    slug: 'erps-libres',
+    title: 'Odoo & FacturaScripts',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>',
+    description: 'Integración oficial con Odoo 17 Community vía JSON-RPC 2.0 y FacturaScripts mediante API REST v3.',
+    order: 5,
   },
   {
     slug: 'canales',
@@ -90,6 +98,7 @@ export const DOC_ARTICLES: DocArticle[] = [
   ...factusolArticles,
   ...simplygestArticles,
   ...sqlErpsArticles,
+  ...erpsLibresArticles,
   ...canalesArticles,
   ...arquitecturaArticles,
   benchmarkArticle,
