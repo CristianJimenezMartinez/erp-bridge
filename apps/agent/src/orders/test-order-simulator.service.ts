@@ -3,6 +3,7 @@ import path from 'path';
 import { CanonicalOrder, Logger } from '@erp-bridge/shared';
 import {
   AccessDriver,
+  FactusolYearResolver,
   getNextOrderIdQuery,
   insertOrderHeaderQuery,
   insertOrderLineQuery,
@@ -328,14 +329,20 @@ export class TestOrderSimulatorService {
 
     // 1. Comprobar que el archivo de Factusol existe y es accesible mediante AccessDriver en modo Share Deny None
     let dbPath = options.dbPath;
-    if (!dbPath && this.configManager) {
+    const fsSettings = this.factusolService?.getSettings();
+    if (!dbPath && fsSettings?.databasePath) {
+      dbPath = fsSettings.databasePath;
+    } else if (!dbPath && this.configManager) {
       const cfg = this.configManager.get();
-      dbPath = cfg.factusol?.databasePath || cfg.factusolDbPath;
+      dbPath =
+        cfg.softwareErp?.providers?.factusol?.databasePath ||
+        cfg.factusol?.databasePath ||
+        cfg.factusolDbPath;
     }
 
     if (!options.customDriver && !this.defaultDriver) {
-      if (dbPath && /[\x00-\x1f;'"\x60]/.test(dbPath)) {
-        const errMsg = 'La ruta de base de datos Factusol contiene caracteres no permitidos (; \' " ` o caracteres de control).';
+      if (dbPath && /[\x00-\x1f"\x60]/.test(dbPath)) {
+        const errMsg = 'La ruta de base de datos Factusol contiene caracteres no permitidos (" ` o caracteres de control).';
         steps.push({ step: 1, name: 'Conexión con Factusol OLEDB', status: 'failed', details: errMsg });
         return this.buildFailureResult(steps, errMsg, dryRun, t0);
       }
@@ -355,6 +362,18 @@ export class TestOrderSimulatorService {
         if (unc && fs.existsSync(unc)) {
           dbPath = unc;
         }
+      }
+
+      const autoRollover = fsSettings
+        ? fsSettings.autoRollover
+        : (this.configManager?.get()?.factusol as Record<string, any> | undefined)?.['autoRollover'] !== false;
+      if (autoRollover && dbPath) {
+        try {
+          const yearRes = FactusolYearResolver.resolveActiveDatabase(dbPath, true);
+          if (yearRes.switched && yearRes.activePath && fs.existsSync(yearRes.activePath)) {
+            dbPath = yearRes.activePath;
+          }
+        } catch {}
       }
 
       if (!fs.existsSync(dbPath)) {
@@ -379,8 +398,19 @@ export class TestOrderSimulatorService {
     let artName = '';
     let artPrice = 14.50;
     let stockBefore = 10;
-    const warehouse = options.warehouse || this.configManager?.get()?.factusol?.warehouseCode || 'GEN';
-    const tariffCode = this.configManager?.get()?.factusol?.tariffCode || '1';
+    const cfgFact = this.configManager?.get();
+    const provFact = cfgFact?.softwareErp?.providers?.factusol;
+    const warehouse =
+      options.warehouse ||
+      fsSettings?.warehouseCode ||
+      provFact?.warehouseCode ||
+      cfgFact?.factusol?.warehouseCode ||
+      'GEN';
+    const tariffCode =
+      fsSettings?.tariffCode ||
+      provFact?.tariffCode ||
+      cfgFact?.factusol?.tariffCode ||
+      '1';
 
     try {
       let artRows: any[] = [];
@@ -486,7 +516,13 @@ export class TestOrderSimulatorService {
     }
 
     // 4. Generar objeto de pedido canónico (CanonicalOrder) con desglose fiscal exacto
-    const series = (options.orderSeries || this.configManager?.get()?.factusol?.orderSeries || '1').trim() || '1';
+    const series = (
+      options.orderSeries ||
+      fsSettings?.orderSeries ||
+      provFact?.orderSeries ||
+      cfgFact?.factusol?.orderSeries ||
+      '1'
+    ).trim() || '1';
     const netAmount = Math.round(artPrice * 100) / 100;
     const taxRate = 21;
     const taxAmount = Math.round(netAmount * (taxRate / 100) * 100) / 100;

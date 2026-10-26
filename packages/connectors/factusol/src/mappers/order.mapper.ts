@@ -67,7 +67,6 @@ export class FactusolOrderMapper {
       case 2:
         return 'completed';
       case 3:
-        return 'processing';
       case 4:
         return 'cancelled';
       default:
@@ -116,9 +115,16 @@ export class FactusolOrderMapper {
   }
 
   public static toCanonicalOrderLine(raw: FactusolOrderLineRaw): CanonicalOrderLine {
-    const qty = Number(raw.CANLPC) || 1;
-    const price = Number(raw.PRELPC) || 0;
-    const total = Number(raw.TOTLPC) || qty * price;
+    const qty = raw.CANLPC !== undefined && raw.CANLPC !== null && Number.isFinite(Number(raw.CANLPC))
+      ? Number(raw.CANLPC)
+      : 1;
+    const price = raw.PRELPC !== undefined && raw.PRELPC !== null && Number.isFinite(Number(raw.PRELPC))
+      ? Number(raw.PRELPC)
+      : 0;
+    const discount = Math.max(0, Math.min(100, Number(raw.DT1LPC) || 0));
+    const total = raw.TOTLPC !== undefined && raw.TOTLPC !== null && Number.isFinite(Number(raw.TOTLPC))
+      ? Number(raw.TOTLPC)
+      : Number((qty * price * (1 - discount / 100)).toFixed(2));
 
     return {
       id: `line_${raw.TIPLPC || '0'}_${raw.CODLPC}_${raw.POSLPC}`,

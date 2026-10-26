@@ -1,4 +1,4 @@
-import { AccessDriver } from '@erp-bridge/connector-factusol';
+import { AccessDatabaseTimeoutError, AccessDriver } from '@erp-bridge/connector-factusol';
 import {
   calculateOrderVatBreakdown,
   decrementStockQuery,
@@ -389,6 +389,15 @@ export class ShopifySyncHelper {
           const MAX_RETRIES = 5;
           for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
+              if (attempt > 1 && ref) {
+                const alreadyCommitted = await driver.query<any>(findOrderByReferenceQuery(ref)).catch(() => []);
+                if (alreadyCommitted && alreadyCommitted.length > 0 && alreadyCommitted[0].CODPCL) {
+                  createdOrderNumber = Number(alreadyCommitted[0].CODPCL);
+                  orderCreated = true;
+                  break;
+                }
+              }
+
               const maxRows = await driver.query<{ maxid: number }>(getNextOrderIdQuery(series));
               const nextOrderCode = (Number(maxRows[0]?.maxid) || 0) + 1;
               const headerSql = insertOrderHeaderQuery(safeOrder, nextOrderCode, customerCode, vatBreakdown, series);
@@ -402,9 +411,20 @@ export class ShopifySyncHelper {
               break;
             } catch (err) {
               ShopifySyncHelper.logger.warn(`Intento ${attempt}/${MAX_RETRIES} de inserción en Factusol falló`, { error: (err as any)?.message || String(err) });
+              if (err instanceof AccessDatabaseTimeoutError) {
+                break;
+              }
               if (attempt < MAX_RETRIES) {
                 await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, attempt - 1)));
               }
+            }
+          }
+
+          if (!orderCreated && ref) {
+            const committedAfterAll = await driver.query<any>(findOrderByReferenceQuery(ref)).catch(() => []);
+            if (committedAfterAll && committedAfterAll.length > 0 && committedAfterAll[0].CODPCL) {
+              createdOrderNumber = Number(committedAfterAll[0].CODPCL);
+              orderCreated = true;
             }
           }
         }

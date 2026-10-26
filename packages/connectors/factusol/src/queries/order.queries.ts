@@ -143,7 +143,7 @@ export function insertOrderHeaderQuery(
   const postalCode = sanitizeAndTruncate(shipAddr.postalCode || order.billingAddress?.postalCode || order.customer?.address?.postalCode || '', 10);
   const province = sanitizeAndTruncate(shipAddr.state || order.billingAddress?.state || order.customer?.address?.state || '', 40);
   const phone = sanitizeAndTruncate(shipAddr.phone || order.customer?.phone || '', 50);
-  const customerEmail = sanitizeAndTruncate(shipAddr.email || order.customer?.email || '', 255);
+  const customerEmail = sanitizeSqlLiteral(shipAddr.email || order.customer?.email || '', 255);
   const nif = sanitizeAndTruncate(normalizeTaxId(order.customer?.taxId) || order.customer?.taxId || '', 18);
   const warehouse = sanitizeAndTruncate(order.warehouse || 'GEN', 3);
   const orderNotes = sanitizeAndTruncate(order.notes || '', 50);

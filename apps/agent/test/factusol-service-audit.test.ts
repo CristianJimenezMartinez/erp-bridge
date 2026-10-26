@@ -6,6 +6,8 @@ import { ConfigManager } from '../src/config/config.manager';
 import { FactusolService, FactusolOfflineError } from '../src/factusol/factusol.service';
 import { FactusolAdapter } from '../src/erp/adapters/factusol.adapter';
 import { FactusolPathResolver } from '../src/factusol/factusol.resolver';
+import { PrestashopSyncHelper } from '../src/sync/prestashop-sync.helper';
+import { TestOrderSimulatorService } from '../src/orders/test-order-simulator.service';
 
 /**
  * Auditoría ERP 2026-10-25 · Factusol F1, F5, F9, F17 (capa del agente).
@@ -90,6 +92,62 @@ async function run() {
     const resolved = FactusolPathResolver.resolve(dataDir);
     assert.ok(resolved.success);
     assert.strictEqual(path.resolve(resolved.resolvedPath), path.resolve(curFile), 'F17: ejercicio más reciente de la empresa');
+
+    // PrestashopSyncHelper: fallback directo usa buildStockSumQuery (ARTSTO, nunca CODSTO inexistente)
+    {
+      let capturedSql = '';
+      let updatedBatch: any[] = [];
+      const psHelper = new PrestashopSyncHelper({
+        configManager,
+        prestashopFactory: () => ({
+          testConnection: async () => true,
+          updateStockBatch: async (items: any[]) => {
+            updatedBatch = items;
+            return { updated: items.length, skipped: 0, errors: [] };
+          },
+        } as any),
+        accessDriverFactory: () => ({
+          query: async (sql: string) => {
+            capturedSql = sql;
+            return [{ ARTSTO: '001', DISSTO: 7 }];
+          },
+        } as any),
+      });
+      configManager.update({
+        factusol: { databasePath: curFile, warehouseCode: '02' },
+        softwareErp: { activeProvider: 'factusol', provisioned: true, providers: { factusol: { databasePath: curFile, warehouseCode: '02' } } },
+        prestashop: { shopUrl: 'https://ps.test', apiKey: 'key123' },
+      } as any);
+      const psRes = await psHelper.syncStockToPrestashop();
+      assert.strictEqual(psRes.synced, 1);
+      assert.ok(!capturedSql.includes('CODSTO'), 'PrestashopSyncHelper no debe consultar columna inexistente CODSTO');
+      assert.ok(capturedSql.includes('ARTSTO') && capturedSql.includes("ALMSTO = '02'"), 'usa buildStockSumQuery con ARTSTO y almacén configurado');
+      assert.deepStrictEqual(updatedBatch, [{ sku: '001', quantity: 7 }]);
+    }
+
+    // TestOrderSimulatorService: respeta softwareErp.providers.factusol y autoRollover al ejercicio activo
+    {
+      configManager.update({
+        factusol: { databasePath: prevFile, orderSeries: 'Z', warehouseCode: 'GEN', autoRollover: true },
+        softwareErp: {
+          activeProvider: 'factusol',
+          provisioned: true,
+          providers: { factusol: { databasePath: prevFile, orderSeries: 'W', warehouseCode: '02' } },
+        },
+      } as any);
+      const simDriver = {
+        query: async (sql: string) => {
+          if (/MAX\(CODPCL\)/.test(sql)) return [{ maxid: 9 }];
+          return [];
+        },
+        executeTransaction: async () => {},
+      };
+      const sim = new TestOrderSimulatorService(configManager, undefined, undefined, service, simDriver as any);
+      const simRes = await sim.simulateOrder({ dryRun: true });
+      assert.strictEqual(simRes.success, true);
+      assert.strictEqual(simRes.series, 'W', 'TestOrderSimulator usa la serie prioritaria de providers.factusol');
+      assert.strictEqual(path.resolve(simRes.databasePath), path.resolve(curFile), 'TestOrderSimulator resuelve el ejercicio activo con FactusolYearResolver');
+    }
 
     console.log('✓ Factusol service audit tests passed');
   } finally {

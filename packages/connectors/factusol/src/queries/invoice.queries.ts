@@ -1,4 +1,4 @@
-import { sanitizeAndTruncate, sanitizeInt, sanitizeFloat } from './order.queries';
+import { sanitizeAndTruncate, sanitizeInt, sanitizeFloat, sanitizeSqlLiteral } from './order.queries';
 
 export { sanitizeAndTruncate };
 
@@ -97,7 +97,7 @@ export function insertInvoiceHeaderQuery(header: {
   const cprfacVal = header.cprfac ? `'${sanitizeAndTruncate(header.cprfac, 40)}'` : "''";
   const cnifacVal = header.cnifac ? `'${sanitizeAndTruncate(header.cnifac, 18)}'` : "''";
   const telfacVal = header.telfac ? `'${sanitizeAndTruncate(header.telfac, 50)}'` : "''";
-  const cemfacVal = header.cemfac ? `'${sanitizeAndTruncate(header.cemfac, 255)}'` : "''";
+  const cemfacVal = header.cemfac ? `'${sanitizeSqlLiteral(header.cemfac, 255)}'` : "''";
   const cpafacVal = header.cpafac ? `'${sanitizeAndTruncate(header.cpafac, 50)}'` : "'ESPAÑA'";
   const fopfacVal = header.fopfac ? `'${sanitizeAndTruncate(header.fopfac, 3).toUpperCase()}'` : "'TAR'";
   const bas1 = typeof header.bas1fac === 'number'

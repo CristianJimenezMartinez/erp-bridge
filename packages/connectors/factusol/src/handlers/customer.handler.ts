@@ -1,6 +1,6 @@
 import { CustomerMutationResult } from '@erp-bridge/sdk';
 import { CanonicalCustomer, Logger } from '@erp-bridge/shared';
-import { AccessDriver } from '../access-driver';
+import { AccessDatabaseTimeoutError, AccessDriver } from '../access-driver';
 import {
   findCustomerByEmailQuery,
   findCustomerByNifQuery,
@@ -11,6 +11,20 @@ import {
   insertDeliveryAddressQuery,
 } from '../queries';
 import { FactusolCustomerRaw, FactusolOrderMapper } from '../mappers';
+
+function isCustomerCollisionError(err: unknown): boolean {
+  const msg = ((err as { message?: string })?.message || String(err)).toLowerCase();
+  return (
+    msg.includes('duplicate') ||
+    msg.includes('duplicad') ||
+    msg.includes('primary key') ||
+    msg.includes('clave principal') ||
+    msg.includes('unique') ||
+    msg.includes('índice') ||
+    msg.includes('index') ||
+    msg.includes('3022')
+  );
+}
 
 export class FactusolCustomerHandler {
   constructor(
@@ -37,30 +51,55 @@ export class FactusolCustomerHandler {
   }
 
   public async createCustomer(customer: CanonicalCustomer): Promise<CustomerMutationResult> {
-    try {
-      const maxRows = await this.driver.query<{ maxid: number }>(getNextCustomerIdQuery());
-      const nextId = (Number(maxRows[0]?.maxid) || 0) + 1;
+    const MAX_RETRIES = 5;
+    let lastError: unknown = null;
 
-      const sql = insertCustomerQuery(customer, nextId);
-      await this.driver.execute(sql);
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 1 && (customer.taxId || customer.email)) {
+          const existing = await this.findCustomer({ taxId: customer.taxId, email: customer.email });
+          if (existing?.customerNumber) {
+            return {
+              success: true,
+              customerId: customer.id,
+              externalId: String(existing.customerNumber),
+            };
+          }
+        }
 
-      this.logger.info(`Cliente creado en Factusol (CODCLI=${nextId}): ${customer.fiscalName}`);
+        const maxRows = await this.driver.query<{ maxid: number }>(getNextCustomerIdQuery());
+        const nextId = (Number(maxRows[0]?.maxid) || 0) + 1;
 
-      return {
-        success: true,
-        customerId: customer.id,
-        externalId: String(nextId),
-      };
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error('Error al crear cliente en Factusol', error);
-      return {
-        success: false,
-        customerId: customer.id,
-        externalId: '',
-        error: msg,
-      };
+        const sql = insertCustomerQuery(customer, nextId);
+        await this.driver.execute(sql);
+
+        this.logger.info(`Cliente creado en Factusol (CODCLI=${nextId}): ${customer.fiscalName}`);
+
+        return {
+          success: true,
+          customerId: customer.id,
+          externalId: String(nextId),
+        };
+      } catch (error: unknown) {
+        lastError = error;
+        if (error instanceof AccessDatabaseTimeoutError || !isCustomerCollisionError(error)) {
+          break;
+        }
+        this.logger.warn(`Colisión de CODCLI al crear cliente (intento ${attempt}/${MAX_RETRIES}); reintentando...`);
+        if (attempt < MAX_RETRIES) {
+          await new Promise((r) => setTimeout(r, 60 * attempt));
+        }
+      }
     }
+
+    const msg = lastError instanceof Error ? lastError.message : String(lastError);
+    this.logger.error('Error al crear cliente en Factusol', lastError);
+    return {
+      success: false,
+      customerId: customer.id,
+      externalId: '',
+      error: msg,
+    };
   }
 
   public async ensureDeliveryAddress(

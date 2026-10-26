@@ -1,4 +1,4 @@
-import { sanitizeAndTruncate } from './order.queries';
+import { sanitizeAndTruncate, sanitizeFloat, sanitizeInt } from './order.queries';
 
 export { sanitizeAndTruncate };
 
@@ -18,11 +18,16 @@ export interface PaymentRecordParams {
   customerCode?: number;
 }
 
+function toValidDate(d: Date | string): Date {
+  const raw = typeof d === 'string' ? new Date(d) : d;
+  return raw instanceof Date && !isNaN(raw.getTime()) ? raw : new Date();
+}
+
 function formatAccessDate(d: Date | string): string {
-  if (typeof d === 'string' && d.startsWith('#') && d.endsWith('#')) {
-    return d;
+  if (typeof d === 'string' && /^#\d{4}-\d{2}-\d{2}#$/.test(d.trim())) {
+    return d.trim();
   }
-  const dateObj = typeof d === 'string' ? new Date(d) : d;
+  const dateObj = toValidDate(d);
   const year = dateObj.getFullYear();
   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -30,7 +35,7 @@ function formatAccessDate(d: Date | string): string {
 }
 
 function formatAccessTimestamp(d: Date | string): string {
-  const dateObj = typeof d === 'string' ? new Date(d) : d;
+  const dateObj = toValidDate(d);
   const year = dateObj.getFullYear();
   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -54,22 +59,24 @@ export const GET_NEXT_PAYMENT_ID_QUERY = `SELECT MAX(CODCOB) AS maxid FROM F_COB
  * Genera el INSERT para la tabla F_COB de Factusol con la fecha, importe y concepto formateados.
  */
 export function insertPaymentRecordQuery(params: PaymentRecordParams): string {
+  const safeId = sanitizeInt(params.id, 1, 1);
+  const safeInvoiceNum = sanitizeInt(params.invoiceNumber, 1, 1);
   const formattedDate = formatAccessDate(params.date);
   const seriesStr = sanitizeAndTruncate(params.series || '1', 1);
-  const invoiceNumPadded = String(params.invoiceNumber).padStart(6, '0');
+  const invoiceNumPadded = String(safeInvoiceNum).padStart(6, '0');
   const defaultConcept = `COBRO FACTURA Nº: ${seriesStr} - ${invoiceNumPadded}`;
   const concept = sanitizeAndTruncate(params.concept || defaultConcept, 40);
   const observations = sanitizeAndTruncate(params.observations || '', 50);
-  const conceptAccount = typeof params.conceptAccount === 'number' ? params.conceptAccount : 1;
-  const transferFlag = typeof params.transferFlag === 'number' ? params.transferFlag : 0;
-  const type = typeof params.type === 'number' ? params.type : 0;
-  const amount = Number(params.amount.toFixed(2));
+  const conceptAccount = typeof params.conceptAccount === 'number' ? sanitizeInt(params.conceptAccount, 1, 0) : 1;
+  const transferFlag = typeof params.transferFlag === 'number' ? sanitizeInt(params.transferFlag, 0, 0) : 0;
+  const type = typeof params.type === 'number' ? sanitizeInt(params.type, 0, 0) : 0;
+  const amount = Number(sanitizeFloat(params.amount).toFixed(2));
 
   return `
     INSERT INTO F_COB (
       CODCOB, FECCOB, IMPCOB, CPTCOB, CPACOB, OBSCOB, TRACOB, TIPCOB
     ) VALUES (
-      ${params.id},
+      ${safeId},
       ${formattedDate},
       ${amount},
       '${concept}',
@@ -86,15 +93,17 @@ export function insertPaymentRecordQuery(params: PaymentRecordParams): string {
  * Vincula la factura (TFALCO, CFALCO) con el apunte de cobro maestro en F_COB (MULLCO).
  */
 export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): string {
+  const safeId = sanitizeInt(params.id, 1, 1);
+  const safeInvoiceNum = sanitizeInt(params.invoiceNumber, 1, 1);
   const formattedDate = formatAccessDate(params.date);
   const nowTimestamp = formatAccessTimestamp(new Date());
   const seriesStr = sanitizeAndTruncate(params.series || '1', 1);
-  const invoiceNumPadded = String(params.invoiceNumber).padStart(6, '0');
+  const invoiceNumPadded = String(safeInvoiceNum).padStart(6, '0');
   const defaultConcept = `COBRO FACTURA Nº: ${seriesStr} - ${invoiceNumPadded}`;
   const concept = sanitizeAndTruncate(params.concept || defaultConcept, 40);
   const paymentMethod = sanitizeAndTruncate(params.paymentMethod || 'TAR', 3).toUpperCase();
   const observations = sanitizeAndTruncate(params.observations || '', 50);
-  const amount = Number(params.amount.toFixed(2));
+  const amount = Number(sanitizeFloat(params.amount).toFixed(2));
 
   return `
     INSERT INTO F_LCO (
@@ -103,7 +112,7 @@ export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): stri
       TERLCO, PROLCO, TIDLCO, FALLCO, UALLCO, FUMLCO, UUMLCO
     ) VALUES (
       '${seriesStr}',
-      ${params.invoiceNumber},
+      ${safeInvoiceNum},
       1,
       ${formattedDate},
       ${amount},
@@ -114,7 +123,7 @@ export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): stri
       0,
       '${paymentMethod}',
       '${observations}',
-      ${params.id},
+      ${safeId},
       0,
       0,
       '',
@@ -134,14 +143,16 @@ export function insertInvoicePaymentLineQuery(params: PaymentRecordParams): stri
  */
 export function selectPaymentsByInvoiceQuery(series: string, invoiceNumber: number): string {
   const cleanSeries = sanitizeAndTruncate(series, 1);
-  return `SELECT TFALCO, CFALCO, LINLCO, MULLCO, IMPLCO, FECLCO, FPALCO FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${invoiceNumber}`;
+  const safeInvoiceNum = sanitizeInt(invoiceNumber, 0, 0);
+  return `SELECT TFALCO, CFALCO, LINLCO, MULLCO, IMPLCO, FECLCO, FPALCO FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${safeInvoiceNum}`;
 }
 
 /**
  * Elimina un registro de cobro de F_COB por su ID (CODCOB).
  */
 export function deletePaymentByIdQuery(paymentId: number): string {
-  return `DELETE FROM F_COB WHERE CODCOB = ${paymentId}`;
+  const safePaymentId = sanitizeInt(paymentId, 0, 0);
+  return `DELETE FROM F_COB WHERE CODCOB = ${safePaymentId}`;
 }
 
 /**
@@ -149,5 +160,6 @@ export function deletePaymentByIdQuery(paymentId: number): string {
  */
 export function deleteInvoicePaymentLinesQuery(series: string, invoiceNumber: number): string {
   const cleanSeries = sanitizeAndTruncate(series, 1);
-  return `DELETE FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${invoiceNumber}`;
+  const safeInvoiceNum = sanitizeInt(invoiceNumber, 0, 0);
+  return `DELETE FROM F_LCO WHERE TFALCO = '${cleanSeries}' AND CFALCO = ${safeInvoiceNum}`;
 }

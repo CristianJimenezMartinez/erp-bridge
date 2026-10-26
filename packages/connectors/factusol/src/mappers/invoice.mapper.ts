@@ -68,9 +68,14 @@ export class FactusolInvoiceMapper {
       const pos = Number(ln['POSLFA'] || ln['poslfa'] || index + 1);
       const sku = String(ln['ARTLFA'] || ln['artlfa'] || '').trim();
       const desc = String(ln['DESLFA'] || ln['deslfa'] || '').trim();
-      const qty = Number(ln['CANLFA'] || ln['canlfa'] || 1);
-      const price = Number(ln['PRELFA'] || ln['prelfa'] || 0);
-      const lineTotal = Number(ln['TOTLFA'] || ln['totlfa'] || qty * price);
+      const rawQty = ln['CANLFA'] ?? ln['canlfa'];
+      const qty = rawQty !== undefined && rawQty !== null && Number.isFinite(Number(rawQty)) ? Number(rawQty) : 1;
+      const rawPrice = ln['PRELFA'] ?? ln['prelfa'];
+      const price = rawPrice !== undefined && rawPrice !== null && Number.isFinite(Number(rawPrice)) ? Number(rawPrice) : 0;
+      const rawTotal = ln['TOTLFA'] ?? ln['totlfa'];
+      const lineTotal = rawTotal !== undefined && rawTotal !== null && Number.isFinite(Number(rawTotal))
+        ? Number(rawTotal)
+        : Number((qty * price).toFixed(2));
 
       return {
         id: `${id}_line_${pos}`,
@@ -174,7 +179,8 @@ export class FactusolInvoiceMapper {
     net4fac?: number;
     totfac: number;
   } {
-    const d = invoice.issueDate ? new Date(invoice.issueDate) : new Date();
+    const rawDate = invoice.issueDate ? new Date(invoice.issueDate) : new Date();
+    const d = isNaN(rawDate.getTime()) ? new Date() : rawDate;
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -187,8 +193,11 @@ export class FactusolInvoiceMapper {
     const series = (invoice.series || '1').substring(0, 1);
     const clientCode = invoice.customer.customerCode ? parseInt(invoice.customer.customerCode, 10) : 1;
     const mainTaxRate = invoice.taxBreakdown && invoice.taxBreakdown[0] ? invoice.taxBreakdown[0].rate : 21;
-    const netAmount = invoice.netAmount || (invoice.totalAmount - (invoice.taxAmount || 0) - (invoice.shippingCost || 0));
-    const shippingCost = invoice.shippingCost || 0;
+    const netAmount =
+      invoice.netAmount !== undefined && invoice.netAmount !== null && Number.isFinite(Number(invoice.netAmount))
+        ? Number(invoice.netAmount)
+        : invoice.totalAmount - (invoice.taxAmount || 0) - (invoice.shippingCost || 0);
+    const shippingCost = Number(invoice.shippingCost) || 0;
     const bas1fac = Number((netAmount + shippingCost).toFixed(2));
     const rawPayment = (invoice as unknown as Record<string, unknown>).paymentMethod;
     const fopfac = typeof rawPayment === 'string' && rawPayment.trim() ? rawPayment.substring(0, 3).toUpperCase() : 'TAR';
@@ -222,9 +231,9 @@ export class FactusolInvoiceMapper {
         }
       }
       bas1 = net1 > 0 ? Number((net1 + shippingCost).toFixed(2)) : 0;
-      bas2 = Number(net2.toFixed(2));
-      bas3 = Number(net3.toFixed(2));
-      bas4 = Number(net4.toFixed(2));
+      bas2 = Number((net2 + (net1 <= 0 && net2 > 0 ? shippingCost : 0)).toFixed(2));
+      bas3 = Number((net3 + (net1 <= 0 && net2 <= 0 && net3 > 0 ? shippingCost : 0)).toFixed(2));
+      bas4 = Number((net4 + (net1 <= 0 && net2 <= 0 && net3 <= 0 && net4 > 0 ? shippingCost : 0)).toFixed(2));
     }
 
     const hasReq = (invoice.customer as any).hasEquivalenceSurcharge ? 1 : 0;
@@ -232,7 +241,7 @@ export class FactusolInvoiceMapper {
     return {
       tipfac: series,
       codfac: invoiceNumber,
-      reffac: (invoice.orderReference || invoice.invoiceNumber || '').substring(0, 20),
+      reffac: (invoice.orderReference || invoice.invoiceNumber || '').substring(0, 50),
       fecfac: accessDate,
       horfac: accessTime,
       usufac: 0,
@@ -240,14 +249,14 @@ export class FactusolInvoiceMapper {
       almfac: warehouse.substring(0, 3),
       agefac: null,
       clifac: isNaN(clientCode) ? 1 : clientCode,
-      cnofac: (invoice.customer.name || 'CLIENTE CONTADO').substring(0, 50),
-      cdofac: invoice.customer.billingAddress?.street ? invoice.customer.billingAddress.street.substring(0, 50) : null,
+      cnofac: (invoice.customer.name || 'CLIENTE CONTADO').substring(0, 100),
+      cdofac: invoice.customer.billingAddress?.street ? invoice.customer.billingAddress.street.substring(0, 100) : null,
       cpofac: invoice.customer.billingAddress?.city ? invoice.customer.billingAddress.city.substring(0, 30) : null,
       ccpfac: invoice.customer.billingAddress?.postalCode ? invoice.customer.billingAddress.postalCode.substring(0, 10) : null,
       cprfac: invoice.customer.billingAddress?.province ? invoice.customer.billingAddress.province.substring(0, 40) : null,
       cnifac: (invoice.customer.taxId || '').substring(0, 18),
-      telfac: invoice.customer.phone ? invoice.customer.phone.substring(0, 15) : null,
-      cemfac: invoice.customer.email ? invoice.customer.email.substring(0, 50) : null,
+      telfac: invoice.customer.phone ? invoice.customer.phone.substring(0, 50) : null,
+      cemfac: invoice.customer.email ? invoice.customer.email.substring(0, 255) : null,
       cpafac: invoice.customer.billingAddress?.country ? invoice.customer.billingAddress.country.substring(0, 30) : 'ESPAÑA',
       fopfac,
       tivfac: 0,
@@ -288,9 +297,16 @@ export class FactusolInvoiceMapper {
     const series = (invoice.series || '1').substring(0, 1);
 
     return invoice.lines.map((ln: any, index: number) => {
-      const qty = ln.quantity || 1;
-      const unitPrice = ln.unitPrice || 0;
-      const lineTotal = ln.lineTotal || qty * unitPrice;
+      const qty = ln.quantity !== undefined && ln.quantity !== null && Number.isFinite(Number(ln.quantity))
+        ? Number(ln.quantity)
+        : 1;
+      const unitPrice = ln.unitPrice !== undefined && ln.unitPrice !== null && Number.isFinite(Number(ln.unitPrice))
+        ? Number(ln.unitPrice)
+        : 0;
+      const discount = Math.max(0, Math.min(100, Number(ln.discountPercent) || 0));
+      const lineTotal = ln.lineTotal !== undefined && ln.lineTotal !== null && Number.isFinite(Number(ln.lineTotal))
+        ? Number(ln.lineTotal)
+        : Number((qty * unitPrice * (1 - discount / 100)).toFixed(2));
       const taxRate = Number(ln.taxRate ?? 21);
       let ivalfa = 0;
       if (taxRate === 10) ivalfa = 1;

@@ -1,4 +1,4 @@
-import { AccessDriver } from '@erp-bridge/connector-factusol';
+import { AccessDriver, buildStockSumQuery, normalizeStockQuantity } from '@erp-bridge/connector-factusol';
 import { Logger } from '@erp-bridge/shared';
 import { OrderSyncHelper } from './order-sync.helper';
 import { AgentDiskLogger } from '../diagnostics/disk-logger';
@@ -56,14 +56,19 @@ export class PrestashopSyncHelper {
     if (options?.erpConnector) {
       stockMap = await options.erpConnector.getStockMap(warehouse);
     } else if (driver) {
-      const rows = await driver.query<{ CODSTO: string; ACTSTO: number; DISSTO: number }>(
-        `SELECT CODSTO, ACTSTO, DISSTO FROM F_STO WHERE ALMSTO = '${warehouse}'`
+      const rows = await driver.query<{ ARTSTO?: string; CODSTO?: string; totalStock?: number; ACTSTO?: number; DISSTO?: number }>(
+        buildStockSumQuery(warehouse.replace(/''/g, "'"))
       );
       for (const r of Array.isArray(rows) ? rows : []) {
-        const code = (r.CODSTO || '').trim().toUpperCase();
+        const code = String(r.ARTSTO ?? r.CODSTO ?? '').trim().toUpperCase();
         if (!code) continue;
-        const rawAvail = r.DISSTO !== undefined && r.DISSTO !== null ? Number(r.DISSTO) : Number(r.ACTSTO || 0);
-        stockMap.set(code, Math.max(0, Math.round(rawAvail)));
+        const rawAvail =
+          r.totalStock !== undefined && r.totalStock !== null
+            ? r.totalStock
+            : r.DISSTO !== undefined && r.DISSTO !== null
+              ? r.DISSTO
+              : r.ACTSTO ?? 0;
+        stockMap.set(code, normalizeStockQuantity(rawAvail));
       }
     }
     if (!stockMap || stockMap.size === 0) return { itemsUpdated: 0 };

@@ -14,7 +14,7 @@
       "paths": [
         "packages/connectors/factusol/src"
       ],
-      "integrityTreeHash": "c91b69a7cbef7cf8427f44f9af27b997bce66b3a1a617da987665c02cdd5d012",
+      "integrityTreeHash": "6251ccafe317bb5f6f08706f5b461f533efafbbc7dd544b2a9edc6014fe21e01",
       "publicContract": "packages/connectors/factusol/src/index.ts",
       "testSuites": [
         "packages/connectors/factusol/test/connector.test.ts",
@@ -22,7 +22,7 @@
         "packages/connectors/factusol/test/adodb-driver.test.ts",
         "packages/connectors/factusol/test/integration/factusol-e2e.test.ts"
       ],
-      "lastRevision": "2026-10-25: correcciones F1-F17 de docs/audits/ERP_REVIEW_2026-10-25.md"
+      "lastRevision": "2026-10-26: correcciones F1-F18 de docs/audits/ERP_REVIEW_2026-10-25.md"
     },
     {
       "id": "core.licensing",

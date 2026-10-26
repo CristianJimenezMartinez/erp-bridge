@@ -271,7 +271,8 @@ export class FactusolOrderHandler {
 
     for (const header of rawHeaders) {
       const series = String(header.TIPPCL ?? '').trim();
-      const lines = await this.driver.query<FactusolOrderLineRaw>(readOrderLinesQuery(header.CODPCL, series)).catch(() => []);
+      // Sin .catch(() => []): un fallo de lectura en F_LPC se propaga en lugar de inventar una línea 'GENERIC'
+      const lines = await this.driver.query<FactusolOrderLineRaw>(readOrderLinesQuery(header.CODPCL, series));
       canonicalOrders.push(FactusolOrderMapper.toCanonicalOrder(header, lines));
     }
 
@@ -282,12 +283,25 @@ export class FactusolOrderHandler {
     orderId: string,
     status: OrderStatus | string
   ): Promise<OrderMutationResult> {
-    const orderCode = parseInt(orderId, 10);
-    if (isNaN(orderCode)) {
-      throw new ConnectionError(ErrorCode.VALIDATION_ERROR, `ID de pedido Factusol inválido: ${orderId}`);
+    let series = this.resolveSeries();
+    let parsedNum = NaN;
+    const rawId = String(orderId || '').trim();
+    const canonicalMatch = rawId.match(/^factusol_order_(?:([a-zA-Z0-9])_)?(\d+)$/i);
+    const dashMatch = rawId.match(/^([a-zA-Z0-9])-(\d+)$/);
+    if (canonicalMatch) {
+      if (canonicalMatch[1]) series = this.resolveSeries(canonicalMatch[1]);
+      parsedNum = parseInt(canonicalMatch[2]!, 10);
+    } else if (dashMatch) {
+      series = this.resolveSeries(dashMatch[1]);
+      parsedNum = parseInt(dashMatch[2]!, 10);
+    } else {
+      parsedNum = parseInt(rawId, 10);
     }
 
-    let series = this.resolveSeries();
+    if (isNaN(parsedNum) || parsedNum <= 0) {
+      throw new ConnectionError(ErrorCode.VALIDATION_ERROR, `ID de pedido Factusol inválido: ${orderId}`);
+    }
+    const orderCode = parsedNum;
     const statusCode = FactusolOrderMapper.mapOrderStatusToStatusCode(status);
 
     // Reposición atómica de stock si el nuevo estado es cancelled o refunded
@@ -349,6 +363,18 @@ export class FactusolOrderHandler {
         await this.driver.execute(updateStatusSql);
       }
     } else {
+      type HeaderRow = { ALMPCL: string; ESTPCL: number; TIPPCL?: string };
+      const headerRows = await this.driver.query<HeaderRow>(
+        `SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = ${orderCode} AND TIPPCL = '${sanitizeAndTruncate(series, 1)}'`
+      );
+      if (headerRows.length === 0) {
+        const anySeries = await this.driver.query<HeaderRow>(
+          `SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = ${orderCode}`
+        );
+        if (anySeries.length === 1 && anySeries[0]!.TIPPCL) {
+          series = String(anySeries[0]!.TIPPCL).trim().substring(0, 1) || series;
+        }
+      }
       await this.driver.execute(updateOrderStatusQuery(orderCode, series, statusCode));
     }
 

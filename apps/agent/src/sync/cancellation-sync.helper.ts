@@ -161,7 +161,7 @@ export class CancellationSyncHelper {
     await driver.executeTransaction(sqlStatements);
 
     CancellationSyncHelper.logger.info(
-      `✓ Pedido Factusol #${code} (Serie ${safeSeries}) cancelado: ${linesToRestore.length} artículos repuestos en almacén ${safeWarehouse}.`
+      `✓ Pedido Factusol #${code} (Serie ${matchedSeries}) cancelado: ${linesToRestore.length} artículos repuestos en almacén ${safeWarehouse}.`
     );
 
     return { alreadyCancelled: false, linesRestocked: linesToRestore.length };

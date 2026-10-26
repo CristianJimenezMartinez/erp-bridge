@@ -4,9 +4,13 @@ import { FACTUSOL_QUERIES, buildStockSumQuery, resolveStockWarehouse, normalizeS
 import { sanitizeSqlLiteral, insertOrderLineQuery } from '../src/queries/order.queries';
 import { buildSafeOledbConnectionString, sanitizeDatabasePath } from '../src/access-connection.helper';
 import { FactusolOrderHandler } from '../src/handlers/order.handler';
+import { FactusolInvoiceHandler } from '../src/handlers/invoice.handler';
 import { FactusolProductHandler } from '../src/handlers/product.handler';
 import { FactusolStockHandler } from '../src/handlers/stock.handler';
 import { FactusolCustomerHandler } from '../src/handlers/customer.handler';
+import { FactusolOrderMapper } from '../src/mappers/order.mapper';
+import { FactusolInvoiceMapper } from '../src/mappers/invoice.mapper';
+import { insertPaymentRecordQuery, insertInvoicePaymentLineQuery } from '../src/queries/payment.queries';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -323,6 +327,147 @@ async function run() {
     }
     console.log('V F10/F11/F12 AccessDriver');
   }
+
+  // ---------- F18: InvoiceHandler, OrderHandler, CustomerHandler, Mappers & Payment Queries ----------
+  {
+    // 1. OrderMapper & InvoiceMapper: líneas a 0 € (100% dto / regalo) y ESTPCL=3 cancelado
+    assert.strictEqual(FactusolOrderMapper.mapStatusCodeToOrderStatus(3), 'cancelled');
+    assert.strictEqual(FactusolOrderMapper.mapStatusCodeToOrderStatus(4), 'cancelled');
+    const freeOrderLine = FactusolOrderMapper.toCanonicalOrderLine({
+      TIPLPC: '1', CODLPC: 1, POSLPC: 1, ARTLPC: 'REGALO', DESLPC: 'Muestra gratis',
+      CANLPC: 2, PRELPC: 15, TOTLPC: 0, DT1LPC: 100, IVALPC: 21,
+    });
+    assert.strictEqual(freeOrderLine.total, 0, 'TOTLPC=0 debe respetarse como 0 y no recalcular qty*price');
+
+    const freeInvCanonical = FactusolInvoiceMapper.toCanonical(
+      { TIPFAC: '1', CODFAC: 10, REFFAC: 'REF-LONG-1234567890123456789012345', FECFAC: '2026-03-01', CLIFAC: 1, CNOFAC: 'C', TOTFAC: 0 },
+      [{ TIPLFA: '1', CODLFA: 10, POSLFA: 1, ARTLFA: 'REGALO', DESLFA: 'Gratis', CANLFA: 2, PRELFA: 10, TOTLFA: 0, DT1LFA: 100, IVALFA: 21 }]
+    );
+    assert.strictEqual(freeInvCanonical.lines[0]!.lineTotal, 0, 'TOTLFA=0 debe respetarse como 0 en factura canónica');
+    const freeFactusolLines = FactusolInvoiceMapper.toFactusolLines(freeInvCanonical, '1', 10);
+    assert.strictEqual(freeFactusolLines[0]!.totlfa, 0, 'lineTotal=0 debe respetarse como 0 al mapear a F_LFA');
+
+    // toFactusolHeader: reffac hasta 50 caracteres y portes en base reducida (net2) cuando net1 === 0
+    const longRef = 'SHOPIFY-INV-2026-000012345678901234567890-ABCDEF';
+    const mappedHeader = FactusolInvoiceMapper.toFactusolHeader({
+      ...freeInvCanonical,
+      reference: longRef,
+      shippingCost: 5,
+      lines: [{ lineNumber: 1, sku: 'IVA10', description: 'Prod 10%', quantity: 1, unitPrice: 20, taxRate: 10, lineTotal: 20 }],
+    } as any, '1', 10, 1);
+    assert.strictEqual(mappedHeader.reffac, longRef.substring(0, 50), 'reffac conserva hasta 50 caracteres');
+    assert.strictEqual(mappedHeader.net1fac, 0);
+    assert.strictEqual(mappedHeader.net2fac, 25, 'portes imputados a net2 cuando la factura solo tiene IVA 10%');
+
+    // 2. payment.queries.ts: fechas inválidas nunca producen #NaN-NaN-NaN#
+    const badDateSql = insertPaymentRecordQuery({
+      id: 1, invoiceSeries: '1', invoiceNumber: 10, customerId: 1,
+      date: new Date('invalid-date'), amount: 10, concept: 'Cobro', paymentMethod: 'Efectivo',
+    });
+    assert.ok(!badDateSql.includes('NaN'), 'insertPaymentRecordQuery nunca emite #NaN-NaN-NaN#');
+    const badLineDateSql = insertInvoicePaymentLineQuery({
+      invoiceSeries: '1', invoiceNumber: 10, lineNumber: 1,
+      date: new Date('invalid-date'), amount: 10, concept: 'Cobro', linkedPaymentId: 1,
+    });
+    assert.ok(!badLineDateSql.includes('NaN'), 'insertInvoicePaymentLineQuery nunca emite #NaN-NaN-NaN#');
+
+    // 3. readOrders / readInvoices: fallo en líneas F_LPC / F_LFA se propaga en lugar de fabricar línea GENERIC
+    const dOrderLinesFail = fakeDriver((sql) => {
+      if (/FROM F_PCL/.test(sql)) return [{ TIPPCL: '1', CODPCL: 1, FECPCL: '2026-03-01', CLIPCL: 1, TOTPCL: 10 }];
+      if (/FROM F_LPC/.test(sql)) throw new Error('F_LPC lock');
+      return [];
+    });
+    await assert.rejects(
+      new FactusolOrderHandler(dOrderLinesFail, cfg, mkCustomerHandler(dOrderLinesFail), logger).readOrders({}),
+      /F_LPC lock/,
+      'readOrders debe propagar fallos de lectura de F_LPC'
+    );
+
+    const dInvLinesFail = fakeDriver((sql) => {
+      if (/FROM F_FAC/.test(sql)) return [{ TIPFAC: '1', CODFAC: 1, FECFAC: '2026-03-01', CLIFAC: 1, TOTFAC: 10 }];
+      if (/FROM F_LFA/.test(sql)) throw new Error('F_LFA lock');
+      return [];
+    });
+    await assert.rejects(
+      new FactusolInvoiceHandler(dInvLinesFail, cfg, mkCustomerHandler(dInvLinesFail), logger).readInvoices({}),
+      /F_LFA lock/,
+      'readInvoices debe propagar fallos de lectura de F_LFA'
+    );
+
+    // 4. InvoiceHandler.createInvoice: timeout y colisión seguros con referencias largas (>20 chars)
+    const baseInvoice: any = {
+      id: 'inv1',
+      invoiceNumber: 'INV-2026-VERY-LONG-REFERENCE-000999',
+      reference: 'INV-2026-VERY-LONG-REFERENCE-000999',
+      issueDate: new Date('2026-03-01T10:00:00Z'),
+      status: 'issued',
+      customerId: '1',
+      customerName: 'Cliente Factura',
+      lines: [{ lineNumber: 1, sku: 'A1', description: 'Art 1', quantity: 1, unitPrice: 10, taxRate: 21, lineTotal: 10 }],
+      subtotal: 10,
+      totalTax: 2.1,
+      totalAmount: 12.1,
+    };
+    let invCommitted = false;
+    const dInvTimeout = fakeDriver(
+      (sql) => {
+        if (/FROM F_FAC WHERE REFFAC/.test(sql)) {
+          assert.ok(sql.includes('INV-2026-VERY-LONG-REFERENCE-000999'), 'busca REFFAC completo (>20 chars)');
+          return invCommitted ? [{ CODFAC: 77 }] : [];
+        }
+        if (/MAX\(CODFAC\)/.test(sql)) return [{ maxid: 76 }];
+        return [];
+      },
+      () => { invCommitted = true; throw new AccessDatabaseTimeoutError(); }
+    );
+    const invRes = await new FactusolInvoiceHandler(dInvTimeout, cfg, mkCustomerHandler(dInvTimeout), logger).createInvoice(baseInvoice);
+    assert.ok(invRes.success);
+    assert.strictEqual(invRes.externalId, '77', 'recupera factura tras timeout si quedó confirmada');
+    assert.strictEqual(dInvTimeout.txCount, 1, 'no reintenta a ciegas tras timeout');
+
+    // 5. updateOrderStatus y updateInvoiceStatus con ID canónico y resolución de serie
+    const dOrderSeries = fakeDriver((sql) => {
+      if (/SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE TIPPCL = '1'/.test(sql)) return [];
+      if (/SELECT ALMPCL, ESTPCL, TIPPCL FROM F_PCL WHERE CODPCL = 15/.test(sql)) return [{ ALMPCL: '01', ESTPCL: 0, TIPPCL: 'W' }];
+      return [];
+    });
+    const updOrd = await new FactusolOrderHandler(dOrderSeries, cfg, mkCustomerHandler(dOrderSeries), logger).updateOrderStatus('15', 'completed');
+    assert.ok(updOrd.success);
+    const execOrdSql = String(dOrderSeries.calls.find((c: Call) => c.kind === 'execute')?.sql);
+    assert.ok(execOrdSql.includes("TIPPCL = 'W'") && execOrdSql.includes('CODPCL = 15'), 'actualiza estado en la serie real W del pedido');
+
+    const dInvSeries = fakeDriver((sql) => {
+      if (/SELECT TIPFAC, ESTFAC, TOTFAC, CLIFAC, FECFAC FROM F_FAC WHERE TIPFAC = 'W'/.test(sql)) {
+        return [{ TIPFAC: 'W', ESTFAC: 0, TOTFAC: 12.1, CLIFAC: 1, FECFAC: '2026-03-01' }];
+      }
+      if (/FROM F_LCO/.test(sql)) return [];
+      if (/MAX\(CODCOB\)/.test(sql)) return [{ maxid: 50 }];
+      return [];
+    });
+    const updInv = await new FactusolInvoiceHandler(dInvSeries, cfg, mkCustomerHandler(dInvSeries), logger).updateInvoiceStatus('factusol_inv_W_88', 'paid');
+    assert.ok(updInv.success);
+    const txInvSqls = dInvSeries.calls.find((c: Call) => c.kind === 'transaction')?.sql as string[];
+    assert.ok(txInvSqls.some((s) => s.includes("TIPFAC = 'W'") && s.includes('CODFAC = 88')));
+
+    // 6. CustomerHandler.createCustomer: reintenta ante colisión de CODCLI
+    let cliAttempts = 0;
+    const dCliCollision = fakeDriver((sql) => {
+      if (/MAX\(CODCLI\)/.test(sql)) return [{ maxid: 100 + cliAttempts }];
+      return [];
+    });
+    dCliCollision.execute = async (sql: string) => {
+      dCliCollision.calls.push({ kind: 'execute', sql });
+      cliAttempts++;
+      if (cliAttempts === 1) throw new Error('Los valores duplicados en el índice, clave principal');
+    };
+    const newCodCli = await new FactusolCustomerHandler(dCliCollision, logger).createCustomer({
+      fiscalName: 'Cliente Colisión SL',
+      taxId: 'B12345678',
+    } as any);
+    assert.strictEqual(newCodCli, 102, 'reintenta con nuevo correlativo tras colisión de CODCLI');
+    assert.strictEqual(cliAttempts, 2);
+  }
+  console.log('V F18 InvoiceHandler, OrderHandler, CustomerHandler, Mappers & Payment Queries');
 
   console.log('✓ Factusol audit fixes tests passed');}
 
