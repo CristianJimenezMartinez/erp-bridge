@@ -114,73 +114,73 @@ export function renderValencianoLanding(currentVersion: string): string {
 
   <!-- 1. CAPÇALERA I NAVEGACIÓ -->
   <header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#09090b]/85 backdrop-blur-md">
-    <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 h-20 flex items-center justify-between">
+    <div class="w-full px-3 sm:px-5 lg:px-6 xl:px-8 h-16 flex items-center justify-between">
       
       <!-- Marca Principal -->
-      <a href="/va/" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-xl py-1.5 px-2 hover:bg-white/[0.03] transition shrink-0">
-        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0 group-hover:scale-105 transition-transform" width="36" height="36">
-        <span class="font-bold text-lg sm:text-xl tracking-tight text-white group-hover:text-indigo-200 transition" data-brand-name>Bentian</span>
+      <a href="/va/" class="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg py-1 px-1.5 hover:bg-white/[0.03] transition shrink-0">
+        <img src="/assets/icon.svg" alt="Bentian Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0 group-hover:scale-105 transition-transform" width="32" height="32">
+        <span class="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-indigo-200 transition" data-brand-name>Bentian</span>
       </a>
 
       <!-- Menú en Valencià -->
-      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-8 text-xs xl:text-[13px] 2xl:text-sm text-zinc-400 font-medium shrink-0">
-        <a href="#salvaguardes" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Salvaguardes</a>
-        <a href="#com-funciona" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Com Funciona</a>
-        <a href="#connectors" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Connectors</a>
-        <a href="#seguretat" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Seguretat</a>
-        <a href="/va/fitxa-tecnica/" class="px-2.5 py-1.5 rounded-lg text-indigo-300 hover:text-white hover:bg-indigo-500/10 transition flex items-center gap-1 whitespace-nowrap shrink-0 font-semibold">
+      <nav class="hidden lg:flex items-center gap-1.5 xl:gap-2.5 2xl:gap-4 text-[11px] xl:text-xs text-zinc-400 font-medium shrink-0">
+        <a href="#salvaguardes" class="hidden xl:inline-block px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Salvaguardes</a>
+        <a href="#com-funciona" class="px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Com Funciona</a>
+        <a href="#connectors" class="px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Connectors</a>
+        <a href="#seguretat" class="hidden xl:inline-block px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Seguretat</a>
+        <a href="/va/fitxa-tecnica/" class="px-2 py-1 rounded-md text-indigo-300 hover:text-white hover:bg-indigo-500/10 transition flex items-center gap-1 whitespace-nowrap shrink-0 font-semibold">
           <span>🏛️ Fitxa Oficial</span>
         </a>
-        <a href="/casos-de-exito/suministros-rubio/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition flex items-center gap-1.5 whitespace-nowrap shrink-0">
+        <a href="/casos-de-exito/suministros-rubio/" class="hidden xl:flex items-center gap-1.5 px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">
           <span>Casos d'Èxit</span>
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
         </a>
-        <a href="#tarifes" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Tarifes</a>
-        <a href="/partners/" class="px-2.5 py-1.5 rounded-lg text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition flex items-center gap-1 whitespace-nowrap shrink-0">
+        <a href="#tarifes" class="px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">Tarifes</a>
+        <a href="/partners/" class="px-2 py-1 rounded-md text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition flex items-center gap-1 whitespace-nowrap shrink-0">
           <span>Partners</span>
-          <span class="text-[10px] font-mono bg-emerald-950/80 border border-emerald-700/50 text-emerald-400 px-1.5 py-0.2 rounded">30%</span>
+          <span class="text-[9px] font-mono bg-emerald-950/80 border border-emerald-700/50 text-emerald-400 px-1 py-0.2 rounded">30%</span>
         </a>
-        <a href="#faq" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">FAQ</a>
+        <a href="#faq" class="hidden 2xl:inline-block px-2 py-1 rounded-md hover:text-white hover:bg-white/[0.05] transition whitespace-nowrap shrink-0">FAQ</a>
       </nav>
 
       <!-- Botons d'Acció i Selector d'Idioma -->
-      <div class="flex items-center gap-2.5 sm:gap-4 shrink-0 pl-3 sm:pl-6 lg:pl-8 border-l border-white/[0.1]">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0 pl-2 sm:pl-3.5 lg:pl-4 border-l border-white/[0.1]">
         
         <!-- Selector d'Idioma (ES | VA | FR) -->
         <div class="relative inline-block text-left" id="lang-selector-container">
-          <button type="button" id="lang-menu-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/[0.1] bg-[#121215] hover:bg-[#18181c] text-xs font-medium text-zinc-300 hover:text-white transition focus:outline-none focus:ring-1 focus:ring-indigo-500" aria-expanded="false" aria-haspopup="true" aria-label="Seleccionar idioma">
-            <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
-            <span id="current-lang-text" class="font-semibold text-indigo-300 tracking-wider">VA</span>
-            <svg id="lang-chevron-icon" class="w-3 h-3 text-zinc-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <button type="button" id="lang-menu-btn" class="flex items-center gap-1 px-2 py-1 rounded-md border border-white/[0.1] bg-[#121215] hover:bg-[#18181c] text-[11px] font-medium text-zinc-300 hover:text-white transition focus:outline-none focus:ring-1 focus:ring-indigo-500" aria-expanded="false" aria-haspopup="true" aria-label="Seleccionar idioma">
+            <svg class="w-3 h-3 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+            <span id="current-lang-text" class="font-bold text-indigo-300 tracking-wider text-[10px]">VA</span>
+            <svg id="lang-chevron-icon" class="w-2.5 h-2.5 text-zinc-400 transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
           </button>
           
-          <div id="lang-menu-dropdown" class="hidden absolute right-0 mt-2 w-44 rounded-xl border border-white/[0.12] bg-[#121215]/95 backdrop-blur-md shadow-2xl py-1.5 z-50 text-xs">
-            <a href="/" id="lang-link-es" class="flex items-center justify-between px-3 py-2 text-zinc-200 hover:bg-white/[0.08] hover:text-white transition font-medium">
+          <div id="lang-menu-dropdown" class="hidden absolute right-0 mt-2 w-40 rounded-xl border border-white/[0.12] bg-[#121215]/95 backdrop-blur-md shadow-2xl py-1.5 z-50 text-xs">
+            <a href="/" id="lang-link-es" class="flex items-center justify-between px-3 py-1.5 text-zinc-200 hover:bg-white/[0.08] hover:text-white transition font-medium">
               <span class="flex items-center gap-2"><span>🇪🇸</span> Castellano</span>
               <span class="text-[10px] text-zinc-400 font-mono font-semibold">ES</span>
             </a>
-            <a href="/va/" id="lang-link-va" class="flex items-center justify-between px-3 py-2 text-indigo-300 bg-white/[0.05] hover:bg-white/[0.08] hover:text-white transition font-medium">
+            <a href="/va/" id="lang-link-va" class="flex items-center justify-between px-3 py-1.5 text-indigo-300 bg-white/[0.05] hover:bg-white/[0.08] hover:text-white transition font-medium">
               <span class="flex items-center gap-2"><span>🦇</span> Valencià</span>
               <span class="text-[10px] text-indigo-400 font-mono font-semibold">VA</span>
             </a>
             <div class="my-1 border-t border-white/[0.06]"></div>
-            <div class="flex items-center justify-between px-3 py-2 text-zinc-500 opacity-60 cursor-not-allowed select-none" title="Français (bientôt disponible)">
+            <div class="flex items-center justify-between px-3 py-1.5 text-zinc-500 opacity-60 cursor-not-allowed select-none" title="Français (bientôt disponible)">
               <span class="flex items-center gap-2"><span>🇫🇷</span> Français</span>
               <span class="text-[9px] bg-zinc-800 text-zinc-400 px-1 py-0.5 rounded font-mono">Próx</span>
             </div>
           </div>
         </div>
 
-        <a href="/docs/" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3 sm:px-3.5 py-2 rounded-lg hover:bg-white/[0.06] transition flex items-center gap-1.5 whitespace-nowrap shrink-0">
-          <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        <a href="/docs/" class="text-xs font-medium text-zinc-300 hover:text-white px-2 sm:px-2.5 py-1 rounded-md hover:bg-white/[0.06] transition flex items-center gap-1 whitespace-nowrap shrink-0">
+          <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           <span class="inline">Docs</span>
         </a>
-        <a href="/dashboard" rel="nofollow" class="text-xs sm:text-[13px] font-medium text-zinc-300 hover:text-white px-3.5 sm:px-4 py-2 rounded-lg border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden sm:flex items-center gap-2 whitespace-nowrap shrink-0">
+        <a href="/dashboard" rel="nofollow" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1 rounded-md border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden xl:flex items-center gap-1.5 whitespace-nowrap shrink-0">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           Accés Clients
         </a>
-        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-xs sm:text-[13px] font-semibold px-4.5 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm hover:shadow-indigo-500/25 whitespace-nowrap shrink-0">
-          Descarregar Agent
+        <a href="/releases/latest/Bentian-Setup.exe" data-download-installer class="text-xs font-semibold px-3 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm hover:shadow-indigo-500/25 whitespace-nowrap shrink-0">
+          <span>Descarregar</span><span class="hidden sm:inline">&nbsp;Agent</span>
         </a>
       </div>
     </div>
