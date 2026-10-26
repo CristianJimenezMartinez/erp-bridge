@@ -451,6 +451,9 @@ export async function bootstrapApp(): Promise<Express> {
   app.get(['/precios', '/precios/', '/precios.html'], (_req, res) => {
     res.redirect(301, '/#precios');
   });
+  app.get(['/docs/canales/holded-cloud-erp', '/docs/canales/holded-cloud-erp/'], (_req, res) => {
+    res.redirect(301, '/docs/canales/holded/');
+  });
   app.get('/conector-simplygest', (_req, res) => {
     res.redirect(301, '/conector-simplygest/');
   });
