@@ -8,8 +8,11 @@ User-agent: *
 Allow: /
 Allow: /assets/
 Disallow: /api/
+Disallow: /dashboard
 Disallow: /dashboard/
+Disallow: /releases
 Disallow: /releases/
+Disallow: /health
 
 # 2. Permisos Explícitos para Motores de Inteligencia Artificial (GEO IA & LLMs)
 # Permite a ChatGPT, Perplexity, Claude y Google AI Overviews citar el conector
