@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.singleton.1.6.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.singleton.1.28.0.schema.json
 PackageIdentifier: Bentian.ERPBridge
 PackageVersion: 0.3.5
 PackageLocale: es-ES
@@ -37,4 +37,4 @@ Installers:
         DisplayVersion: 0.3.5
         ProductCode: '{8B23F40E-3F15-4D1E-97C5-C36B286E9559}_is1'
 ManifestType: singleton
-ManifestVersion: 1.6.0
+ManifestVersion: 1.28.0

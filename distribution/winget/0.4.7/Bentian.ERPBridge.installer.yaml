@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.28.0.schema.json
 
 PackageIdentifier: Bentian.ERPBridge
 PackageVersion: 0.4.7
@@ -23,4 +23,4 @@ Installers:
   InstallerUrl: https://bridge.cristianjm.com/releases/v0.4.7/Bentian-Setup-v0.4.7.exe
   InstallerSha256: E20FA745C14B1BDB3456168182DE31B96ED31243DE733368A739E41716513B3F
 ManifestType: installer
-ManifestVersion: 1.12.0
+ManifestVersion: 1.28.0

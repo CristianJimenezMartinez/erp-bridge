@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.28.0.schema.json
+
+PackageIdentifier: Bentian.ERPBridge
+PackageVersion: 0.5.3
+InstallerLocale: es-ES
+InstallerType: inno
+Scope: machine
+InstallModes:
+- interactive
+- silent
+InstallerSwitches:
+  Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+  SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+ProductCode: '{8B23F40E-3F15-4D1E-97C5-C36B286E9559}_is1'
+ReleaseDate: 2026-10-25
+AppsAndFeaturesEntries:
+- ProductCode: '{8B23F40E-3F15-4D1E-97C5-C36B286E9559}_is1'
+  DisplayName: Bentian Agent v0.5.3
+  Publisher: Bentian ERP Bridge
+  DisplayVersion: 0.5.3
+Installers:
+- Architecture: x64
+  InstallerUrl: https://bridge.cristianjm.com/releases/v0.5.3/Bentian-Setup-v0.5.3.exe
+  InstallerSha256: 1AE92E5DF522C78F12EB14B1067B9D09C83E0667BB788C34783A2F5ADC31A949
+ManifestType: installer
+ManifestVersion: 1.28.0
