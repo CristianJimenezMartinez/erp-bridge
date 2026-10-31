@@ -141,7 +141,7 @@
       {
         "param": "Capacidad de Catálogo y Tarifas",
         "value": "Probado en catálogos de +40.000 referencias en F_ART con sincronización selectiva de Tarifas 1 a 5 (F_LTA) para B2B y B2C",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Motor Reactivo por Deltas"
       },
       {
@@ -483,7 +483,7 @@
       {
         "param": "Sincronización de Imágenes (FOTOS\\)",
         "value": "Localización automática de imágenes de Factusol en disco o red local con subida incremental por hash MD5",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Subida Incremental"
       },
       {
@@ -813,7 +813,7 @@
       {
         "param": "Rendimiento en Catálogos Extensos",
         "value": "Lectura por lotes y caché de tarifas en memoria para procesar +30.000 artículos de F_ART sin penalizar el servidor Windows",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Optimización de Catálogo"
       },
       {
@@ -1161,7 +1161,7 @@
       {
         "param": "Tarifas Mayoristas y Minoristas",
         "value": "Publicación simultánea de tarifa base y tarifa de oferta desde F_LTA con protección contra precios a cero",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Sincronización de Tarifas"
       },
       {
@@ -1323,7 +1323,7 @@
       {
         "param": "Filtrado de Catálogo Industrial",
         "value": "Opción de sincronizar solo artículos marcados para web (SUWART) y selección de tarifa específica en F_LTA",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Control de Catálogo"
       },
       {
@@ -1456,7 +1456,7 @@
         "badge": "MOTOR POR DELTAS",
         "title": "Actualización Instantánea sin Saturar tu Hosting Web",
         "desc": "Aunque tu base de datos en el Polígono Oeste o Molina tenga 20.000 artículos, Bentian solo transmite por red las referencias cuyo stock o precio ha cambiado realmente.",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Sincronización Reactiva por Deltas"
       },
       {
@@ -1659,7 +1659,7 @@
       {
         "param": "Sincronización de Tarifas (F_LTA)",
         "value": "Selección de tarifa base y tarifa de oferta con actualización automática de precios con o sin IVA",
-        "docUrl": "/docs/arquitectura/sincronizacion-reactiva-vs-batch/",
+        "docUrl": "/docs/arquitectura/arquitectura-polimorfica-multi-erp/",
         "docLabel": "Motor de Tarifas"
       },
       {
@@ -1792,21 +1792,21 @@
         "badge": "PRECISIÓN DISSTO",
         "title": "Descuento Instantáneo de Albaranes de Muelle y Mostrador",
         "desc": "En el sector naval y pesquero de Vigo, la mercancía sale habitualmente con albarán pendiente de facturación mensual. Bentian descuenta en tiempo real las unidades comprometidas en F_ALB y F_LPC para que la tienda online refleje el stock físico real en estantería.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "COMERCIO LUSO-GALLEGO",
         "title": "Soporte para Ventas Transfronterizas a Portugal (VIES / Exención IVA)",
         "desc": "Clasifica automáticamente los pedidos procedentes de clientes empresariales portugueses con NIF validado en VIES, asignándolos a la serie de exportación intracomunitaria en Factusol sin aplicar el 21 % de IVA nacional.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "RESILIENCIA INDUSTRIAL",
         "title": "Tolerancia a Cortes de Red en Naves de O Porriño y Muelles",
         "desc": "El agente local mantiene su configuración blindada en AppData y reintenta la lectura OLEDB de forma resiliente si el NAS o servidor de la nave sufre microcortes eléctricos o de red.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -1827,7 +1827,7 @@
       {
         "param": "Operativa Fiscal",
         "value": "IVA general/reducido (10 % pesca/alimentación), exención VIES Portugal y recargo de equivalencia (Compatible con normativa Verifactu AEAT)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -1960,21 +1960,21 @@
         "badge": "CATÁLOGO TÉCNICO",
         "title": "Cruce de Referencias Equivalentes y Buscador OEM",
         "desc": "Extrae tanto el código interno de Factusol (CODART) como la referencia del fabricante (REFART) y códigos de barras adicionales (F_EAR), permitiendo que talleres y agricultores encuentren el recambio exacto en tu web.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CONTROL ENOLÓGICO",
         "title": "Gestión de Packs de Cajas para Bodegas y Mayoristas",
         "desc": "Sincroniza artículos compuestos o formatos de venta por caja (ej: estuche de 3 botellas o caja de 6 unidades) calculando automáticamente las existencias según el stock de botellas sueltas en Factusol.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "CERO BLOQUEOS",
         "title": "Respeto Absoluto a la Operativa de Mostrador",
         "desc": "Diseñado para almacenes con alta afluencia en mostrador a primera hora de la mañana: el conector consulta Access sin bloquear tablas ni ralentizar la impresión de tickets o albaranes.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -1995,7 +1995,7 @@
       {
         "param": "Tarifas Profesionales",
         "value": "Sincronización de hasta 10 tarifas de Factusol (PVP, Taller, Distribuidor, Mayorista, HORECA) (Actualización automática al cambiar precios de proveedor)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2128,21 +2128,21 @@
         "badge": "TARIFAS DINÁMICAS",
         "title": "Propagación Ultrarrápida de Cambios de Tarifa (Oro, Plata, Cobre y Aceite)",
         "desc": "Tanto en el Parque Joyero como en el mercado de aceite de oliva en origen o tubería frigorífica de cobre en Lucena, los precios fluctúan constantemente. Bentian detecta el cambio en F_LTA y actualiza miles de productos en segundos.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "VARIANTES EXACTAS",
         "title": "Sincronización Matricial de Tallas de Joyería y Formatos de Envase",
         "desc": "Mapea las tallas y variantes de Factusol con las variaciones de WooCommerce o combinaciones de PrestaShop, manteniendo el stock individual de cada medida de anillo, pulsera o formato de envase.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "FISCALIDAD B2B",
         "title": "Soporte para Recargo de Equivalencia en Joyerías y Comercios Minoristas",
         "desc": "Al recibir un pedido B2B de una joyería minorista o tienda de alimentación acogida a Recargo de Equivalencia, Bentian aplica automáticamente los tipos impositivos legales en el documento de Factusol.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -2163,7 +2163,7 @@
       {
         "param": "Gestión de Imágenes",
         "value": "Sincronización incremental con hash MD5 para fotografía de alta resolución de joyería y maquinaria (Optimización automática para carga rápida en móvil)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2296,21 +2296,21 @@
         "badge": "MULTI-ALMACÉN BALEAR",
         "title": "Consolidación o Separación de Stock Multi-Isla (F_STO)",
         "desc": "Si dispones de almacén central en Son Castelló y delegaciones en Manacor, Ibiza o Mahón dentro de Factusol, Bentian puede sumar las existencias o sincronizar el stock específico de cada almacén según tu estrategia logística.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "B2B HOTELERO",
         "title": "Precios por Contrato para Cadenas Hoteleras y Mantenedores",
         "desc": "Sincroniza las tarifas especiales de Factusol (F_LTA y F_PRC) para que cada jefe de compras de hotel, instalador o capitán de barco acceda a sus descuentos pactados al entrar en tu portal B2B.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "ALTA TEMPORADA",
         "title": "Estabilidad Garantizada bajo Picos Extremos de Verano",
         "desc": "Durante los meses de mayo a septiembre, cuando el tráfico de albaranes y tickets en Factusol se multiplica, el motor de Bentian mantiene consumos de CPU inferiores al 2 % sin bloquear la base de datos Access.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -2331,7 +2331,7 @@
       {
         "param": "Tiempo de Respuesta",
         "value": "Sincronización incremental en 30–45 segundos (Reflejo inmediato de ventas en mostrador y llamadas telefónicas)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2464,21 +2464,21 @@
         "badge": "RIGOR FISCAL SANITARIO",
         "title": "Precisión Multitasa de IVA (21 %, 10 %, 4 %) y Recargo para Farmacias",
         "desc": "En los sectores sanitario, ortopédico y agroalimentario de Granada conviven productos con distintos tipos de IVA en un mismo pedido. Bentian mapea cada línea de pedido con la configuración fiscal exacta de F_ART y F_CLI.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "MOTOR DELTA",
         "title": "Sincronización Diferencial para Grandes Catálogos de Juncaril",
         "desc": "Los mayoristas de Juncaril y Asegra manejan catálogos extensos con miles de referencias. Nuestro algoritmo delta detecta en milisegundos solo los productos que han cambiado de stock o tarifa.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "ANTI-WIPING NAS",
         "title": "Protección de Rutas de Red y Unidades Mapeadas (Z:\\)",
         "desc": "Si tu base de datos Factusol está alojada en un servidor central o NAS compartido por varios puestos de facturación y almacén, Bentian preserva la ruta UNC de forma permanente incluso ante microcortes de red.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -2499,7 +2499,7 @@
       {
         "param": "Gestión de Tarifas",
         "value": "Sincronización de PVP y tarifas profesionales (Clínicas, Talleres, Distribuidores, Cooperativas) (Lectura directa de F_LTA y F_PRC)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2632,21 +2632,21 @@
         "badge": "TALLAS Y MEDIDAS",
         "title": "Sincronización Nativa de Tallas de Calzado (Fuensalida) y Medidas de Carpintería",
         "desc": "Extrae el stock desglosado por talla, color o medida de Factusol y actualiza cada variación en WooCommerce o PrestaShop sin duplicar fichas ni perder posicionamiento SEO.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "TARIFAS MAYORISTAS",
         "title": "Escalados de Precio por Volumen para Embalaje y Mayoristas",
         "desc": "Permite trasladar las tarifas de Factusol (F_LTA) y precios especiales (F_PRC) para que tus clientes profesionales obtengan automáticamente su descuento por compra de cajas o palets.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "EXPEDICIÓN ÁGIL",
         "title": "Descarga Automática de Pedidos para Expedición Rápida en La Sagra",
         "desc": "Los pedidos pagados en la web entran en segundos en Factusol listos para imprimir el albarán de picking y la etiqueta de agencia de transporte antes de la hora de corte de la tarde.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -2667,7 +2667,7 @@
       {
         "param": "Control de Stock",
         "value": "Basado en DISSTO (descuenta pedidos de comerciales y reservas de fabricación) (Latencia de actualización < 45 segundos)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2800,21 +2800,21 @@
         "badge": "STOCK PROTEGIDO",
         "title": "Control Exacto de Stock Disponible (DISSTO) para Lotes Limitados",
         "desc": "Fundamental tanto para conserveras de campaña como para almacenes técnicos de Candina: Bentian descuenta al instante el material comprometido en pedidos de clientes (F_LPC) y albaranes abiertos (F_ALB).",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "MULTITARIFA",
         "title": "Doble Canal B2C y B2B (Gourmet / HORECA / Industrial)",
         "desc": "Publica tus productos con precio de venta al público general y muestra simultáneamente tarifas netas con descuento o formatos de hostelería/taller a tus clientes profesionales autenticados.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "FIABILIDAD TOTAL",
         "title": "Arranque Silencioso y Cero Mantenimiento en Windows",
         "desc": "El agente Bentian funciona en segundo plano en el puerto fijo local 39281 con reconexión automática, sin requerir conocimientos informáticos por parte del personal de oficina.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -2835,7 +2835,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante detección de cambios por hash en memoria (Consumo mínimo de red y CPU)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -2968,21 +2968,21 @@
         "badge": "CONTROL DE ALBARANES",
         "title": "Descuento Automático de Albaranes de Mostrador y Entregas a Planta",
         "desc": "En los polígonos de Tremañes y Roces, el 80 % de las ventas a talleres se entrega con albarán para facturar a fin de mes. Bentian lee las salidas en F_ALB y el stock disponible DISSTO para que la web nunca venda material ya retirado por un operario.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN TÉCNICA",
         "title": "Indexación de Normas DIN/ISO y Referencias de Fabricante (REFART)",
         "desc": "Sincroniza los códigos internos de Factusol junto con la referencia original del fabricante y el código EAN, permitiendo que los ingenieros y compradores industriales localicen cada pieza al instante.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "TARIFAS CONTRATO",
         "title": "Condiciones Especiales B2B por Cliente y Familia (F_PRC / F_LTA)",
         "desc": "Respeta los acuerdos comerciales históricos de tu empresa en Factusol, aplicando automáticamente la tarifa o descuento pactado a cada taller o contrata cuando accede a la tienda online.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3003,7 +3003,7 @@
       {
         "param": "Variantes Soportadas",
         "value": "Tallas de EPIs, métricas de tornillería (M4 a M36) y formatos de empaquetado (Sincronización individual de stock y código EAN por variante)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3136,21 +3136,21 @@
         "badge": "SINCRONIZACIÓN EN RUTA",
         "title": "Convivencia Perfecta con Rutas de Reparto y Preventa Comercial",
         "desc": "Cuando los comerciales introducen pedidos desde ruta o se preparan los camiones de reparto en Silvota/Asipo mediante F_PED o F_ALB, Bentian recalcula el stock disponible (DISSTO) al instante para la tienda online.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN FISCAL",
         "title": "Gestión Multitasa de Impuestos (4 %, 10 %, 21 %) y Recargo de Equivalencia",
         "desc": "Especialmente crítico para mayoristas de alimentación, droguería y farmacia/clínica: cada línea del pedido web se inyecta en Factusol respetando su tipo impositivo y el régimen fiscal de la tienda compradora.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOTES Y PACKS",
         "title": "Soporte para Packs, Lotes y Cestas de Productos Compuestos",
         "desc": "Permite comercializar estuches gastronómicos o kits de herramientas controlando la disponibilidad real en el almacén de Factusol.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3171,7 +3171,7 @@
       {
         "param": "Actualización de Stock",
         "value": "Tiempo real diferencial (30–60s) leyendo DISSTO o ACTSTO en F_STO (Soporte para selección de múltiples almacenes)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3304,21 +3304,21 @@
         "badge": "RIGOR FISCAL FORAL",
         "title": "Serie Documental Dedicada y Cuadre Contable para Hacienda Foral de Navarra",
         "desc": "Evita llevar dos facturaciones paralelas (una en el CMS web y otra en el ERP). Bentian vuelca todos los pedidos online a una serie exclusiva de Factusol, permitiendo que las facturas definitivas y libros registro se emitan desde un único sistema contable.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CERO SOBREVENTAS",
         "title": "Lectura en Tiempo Real de Stock Disponible (DISSTO)",
         "desc": "Descuenta de forma automática las reservas de proyectos industriales (F_LPC) y las entregas con albarán (F_ALB) en tus naves de Landaben, Agustinos o Noáin antes de publicar el stock en la web.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "PORTAL B2B NAVARRA",
         "title": "Sincronización de Tarifas y Descuentos B2B por Cliente (F_LTA / F_PRC)",
         "desc": "Traslada las condiciones comerciales de tus clientes industriales, instaladores o distribuidores desde Factusol a tu tienda online sin configuraciones manuales duplicadas.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3339,7 +3339,7 @@
       {
         "param": "Frecuencia de Sincronización",
         "value": "30–60 segundos mediante detección de cambios en memoria (motor Delta) (Sin impacto en el rendimiento de la red local)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3472,21 +3472,21 @@
         "badge": "TICKETBAI ARABA",
         "title": "Flujo Documental Compatible con TicketBAI Araba (Diputación Foral de Álava)",
         "desc": "Bentian evita que el ecommerce emita facturas sin firma TicketBAI. En su lugar, inyecta los pedidos pagados directamente en Factusol (en su propia serie documental) para que tu sistema emita el fichero XML y el código QR oficial.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN INDUSTRIAL",
         "title": "Sincronización de Stock Disponible (DISSTO) en Tiempo Real",
         "desc": "Descuenta al instante las unidades comprometidas en albaranes de mostrador (F_ALB) y pedidos de clientes industriales (F_LPC) en Júndiz o Betoño.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "MULTITARIFA B2B",
         "title": "Tarifas B2B y Precios Especiales por Cliente o Bodega (F_LTA / F_PRC)",
         "desc": "Tanto si vendes suministros a fábricas con descuentos por familia como si gestionas tarifas de distribuidor/HORECA en una bodega de Rioja Alavesa, Bentian sincroniza cada precio de forma automática.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3507,7 +3507,7 @@
       {
         "param": "Frecuencia de Polling",
         "value": "30–60 segundos por detección diferencial de hashes en memoria (Sin sobrecargar la base de datos Access)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3640,21 +3640,21 @@
         "badge": "LOGÍSTICA CERÁMICA",
         "title": "Precisión en Unidades de Venta (m² / Cajas) y Pesos para Transporte Pesado",
         "desc": "En cerámica, baño y suministros industriales el porte depende del peso en kilogramos. Bentian sincroniza los pesos y atributos técnicos de F_ART para que tu tienda online calcule automáticamente el envío por palet o paquetería.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CONTROL DE PARTIDAS",
         "title": "Protección de Partidas y Reservas de Obra mediante DISSTO",
         "desc": "En cuanto un comercial bloquea metros cuadrados en un Pedido de Cliente (F_LPC) o emite un Albarán (F_ALB), Bentian descuenta esas existencias de la web en segundos para no mezclar ni agotar tonos.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "B2B PROFESIONAL",
         "title": "Tarifas Profesionales para Reformistas, Arquitectos y Fábricas (F_LTA)",
         "desc": "Permite mostrar precios PVP con IVA en el catálogo público y precios netos de distribuidor, reformista o planta industrial en el área privada B2B.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3675,7 +3675,7 @@
       {
         "param": "Velocidad de Sincronización",
         "value": "Detección de cambios de stock y tarifa cada 30–45 segundos (Lectura incremental sin bloquear el archivo .accdb)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3808,21 +3808,21 @@
         "badge": "PRECISIÓN DISSTO",
         "title": "Lectura Instantánea de Stock Disponible (DISSTO) Multi-Canal",
         "desc": "Tanto si vendes suministros en el mostrador de Villalonquéjar como cajas de vino a distribuidores en Aranda, Bentian descuenta al instante el stock comprometido en F_LPC y F_ALB para proteger tu tienda online.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "B2B AUTOMÁTICO",
         "title": "Sincronización de Tarifas Profesionales y Descuentos por Cliente (F_LTA / F_PRC)",
         "desc": "Publica tu tarifa general para particulares y aplica automáticamente precios netos de fábrica, taller o distribuidor HORECA a los usuarios registrados en tu portal B2B.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "ANTI-WIPING NAS",
         "title": "Resiliencia en Redes Locales y Servidores de Polígono o Bodega",
         "desc": "El agente Bentian guarda su configuración de forma atómica en %APPDATA% y mantiene la ruta de red hacia la base de datos Factusol incluso si el servidor o NAS se reinicia por mantenimiento.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -3843,7 +3843,7 @@
       {
         "param": "Actualización de Stock",
         "value": "Cada 30–60 segundos mediante cálculo de hashes diferenciales (Sin ralentizar los terminales de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -3976,21 +3976,21 @@
         "badge": "CONTROL DE PESOS",
         "title": "Sincronización de Horquillas de Peso y Formatos de Corte (Pieza Entera vs Loncheado)",
         "desc": "Permite que cada rango de peso de jamón o paleta (y la opción de pieza entera o loncheada al vacío) descuente exactamente del artículo o variante correspondiente en Factusol.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "ALTA CAMPAÑA",
         "title": "Rendimiento Impecable en Picos de Black Friday y Campaña de Navidad",
         "desc": "Cuando en noviembre y diciembre se multiplica por diez el ritmo de pedidos en Guijuelo y Salamanca, el motor de Bentian procesa las colas de pedidos e inventario en segundos sin bloquear Factusol.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "EXACTITUD FISCAL",
         "title": "Facturación Automática con IVA Reducido (10 %) y Recargo para Charcuterías",
         "desc": "Distingue automáticamente entre un comprador particular (B2C) y una tienda gourmet o charcutería con Recargo de Equivalencia (10 % IVA + 1,4 % RE), además de ventas intracomunitarias a Portugal y resto de Europa.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4011,7 +4011,7 @@
       {
         "param": "Cálculo de Stock",
         "value": "Lectura de DISSTO (descuenta lotes de empresa comprometidos en F_LPC y F_ALB) (Actualización cada 30–45 segundos)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4144,21 +4144,21 @@
         "badge": "TICKETBAI GIPUZKOA",
         "title": "Integración Limpia con el Flujo TicketBAI Gipuzkoa (Diputación Foral)",
         "desc": "Evita sanciones y dobles contabilidades: Bentian inyecta cada venta de WooCommerce o PrestaShop directamente en Factusol para que el envío inmediato a la Hacienda Foral de Gipuzkoa y el código QR TBAI se generen desde tu ERP.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "TARIFAS MECANIZADO",
         "title": "Sincronización de Descuentos por Familia/Marca para Talleres de Mecanizado (F_PRC)",
         "desc": "En el sector industrial guipuzcoano cada taller negocia descuentos específicos según marca de herramienta o familia. Bentian lee F_LTA y F_PRC en Factusol y los traslada a tu portal B2B.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "COMERCIO TRANSFRONTERIZO",
         "title": "Soporte Nativo para Ventas Transfronterizas con Francia (VIES)",
         "desc": "Para empresas ubicadas en Irún, Oiartzun o Donostia que venden al otro lado de la muga, el conector registra automáticamente los pedidos B2B franceses exentos de IVA en su serie intracomunitaria de Factusol.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4179,7 +4179,7 @@
       {
         "param": "Capacidad de Catálogo",
         "value": "Más de 50.000 referencias técnicas DIN/ISO sincronizadas por motor Delta (Actualización de stock y tarifas en 30–60 segundos)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4312,21 +4312,21 @@
         "badge": "CONTROL DISSTO",
         "title": "Descuento Inmediato de Albaranes de Parada Técnica y Reparto HORECA",
         "desc": "Tanto en el mantenimiento petroquímico como en el reparto a hoteles de Salou y Cambrils, la mercancía sale con albarán (F_ALB). Bentian actualiza el stock disponible web al instante.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "MATRIZ DE VARIANTES",
         "title": "Gestión de Tallas de EPIs y Variantes de Mobiliario (F_TCO)",
         "desc": "Mapea las tallas de vestuario laboral o los acabados de muebles de La Sénia entre Factusol y las variaciones de WooCommerce o PrestaShop.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "PRECISIÓN COMERCIAL",
         "title": "Multitarifa B2B y Multitasa de IVA (4 %, 10 %, 21 %)",
         "desc": "Aplica automáticamente la tarifa de cada cliente profesional (F_LTA / F_PRC) y respeta los tipos impositivos de aceite, frutos secos, vino y suministros.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4347,7 +4347,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante detección diferencial por hash en memoria (Sin impacto en la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4480,21 +4480,21 @@
         "badge": "DISPONIBILIDAD DE CAMPAÑA",
         "title": "Descuento en Tiempo Real de Albaranes de Taller y Mostrador Agrícola",
         "desc": "En el campo leridano las reparaciones no pueden esperar y el material se retira con albarán (F_ALB). Bentian resta esas unidades del stock web en segundos para garantizar disponibilidad real.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CATÁLOGO DE DESPIECE",
         "title": "Buscador por Referencia Cruzada OEM y Código de Fabricante (REFART)",
         "desc": "Sincroniza tanto la referencia interna de Factusol como el código original de marcas agrícolas e hidráulicas, facilitando la compra rápida desde el móvil en el propio campo o taller.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "CAMPAÑA OLEÍCOLA",
         "title": "Automatización de Campañas de Aceite Nuevo (Les Garrigues) y Agroalimentación",
         "desc": "Cuando una cooperativa o almazara abre la preventa de aceite nuevo en otoño, cientos de pedidos online se descargan automáticamente en Factusol con su IVA del 4 % y pesos listos para la agencia de transporte.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4515,7 +4515,7 @@
       {
         "param": "Gestión de Tarifas",
         "value": "Sincronización de PVP, Tarifa Agricultor/Socio, Tarifa Taller y Distribuidor (Lectura directa de F_LTA y F_PRC)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4648,21 +4648,21 @@
         "badge": "PUERTA DE EUROPA",
         "title": "Automatización de Ventas Intracomunitarias con Francia (VIES)",
         "desc": "Para los distribuidores de Girona, Figueres y La Selva que venden habitualmente en Francia, Bentian detecta los pedidos exentos de IVA validados por VIES y los registra en la serie intracomunitaria de Factusol.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN DISSTO",
         "title": "Control de Stock en Tiempo Real ante Picos Estacionales en la Costa Brava",
         "desc": "Descuenta al instante los albaranes de reparto (F_ALB) y los pedidos de comerciales (F_LPC) para que tu tienda online muestre siempre las existencias reales disponibles en nave.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "MULTITARIFA B2B",
         "title": "Sincronización de Tarifas B2B para Hostelería, Campings e Industria (F_LTA / F_PRC)",
         "desc": "Muestra precios PVP al cliente particular y aplica automáticamente las tarifas profesionales y descuentos por volumen a tus clientes B2B registrados.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4683,7 +4683,7 @@
       {
         "param": "Frecuencia de Polling",
         "value": "30–60 segundos por detección diferencial en memoria (Sin bloquear la base de datos de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4816,21 +4816,21 @@
         "badge": "CONTROL DE CAMPAÑA",
         "title": "Sincronización Instantánea con el Mostrador de Albaranes (F_ALB)",
         "desc": "En los almacenes de suministros agrícolas de El Ejido, Vícar o Campohermoso, los agricultores y fincas retiran material a diario con albarán. Bentian descuenta esas salidas del stock web en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN AGRARIA",
         "title": "Rigor Fiscal en Insumos Agrarios (IVA 10 % vs 21 %) y Pesos de Envío",
         "desc": "Mantiene el tipo de IVA exacto de cada artículo (10 % en abonos, semillas y plásticos agrícolas; 21 % en herramientas y bombas) y sincroniza el peso de rollos y sacos para que la web calcule el porte real.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "MEDIDAS Y FORMATOS",
         "title": "Variantes de Medida para Riego (mm/Pulgadas) y Baño/Piedra de Macael (F_TCO)",
         "desc": "Mapea las distintas métricas de accesorios de polietileno/PVC o las medidas de platos de ducha y lavabos de Macael entre Factusol y las variaciones del ecommerce.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -4851,7 +4851,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante cálculo de hashes diferenciales en memoria (Cero ralentización en los puestos de mostrador de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -4984,21 +4984,21 @@
         "badge": "VARIANTES Y COLORES",
         "title": "Sincronización de Colores y Acabados de Piel (Ubrique) y Tallas de EPIs (F_TCO)",
         "desc": "Extrae el stock real de cada combinación de color, piel o talla en Factusol y actualiza individualmente cada variación en WooCommerce, PrestaShop o Shopify.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CONTROL PORTUARIO",
         "title": "Descuento Inmediato de Albaranes de Astillero, Puerto y Reparto HORECA (DISSTO)",
         "desc": "En la Bahía de Cádiz y Algeciras las entregas a buques y contratas se realizan con albarán (F_ALB). Bentian resta ese material comprometido del stock web al instante.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "ADUANAS Y FISCALIDAD",
         "title": "Soporte para Ventas B2B con Recargo de Equivalencia y Exportación (Gibraltar / Ceuta / Internacional)",
         "desc": "Clasifica automáticamente los pedidos según el régimen fiscal del cliente (IVA general/reducido, Recargo de Equivalencia para comercios o series de exportación exenta).",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5019,7 +5019,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante detección diferencial de cambios en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5152,21 +5152,21 @@
         "badge": "PRECISIÓN EN ALMACÉN",
         "title": "Descuento Instantáneo de Albaranes de Mostrador Industrial y Agrícola (DISSTO)",
         "desc": "En Huelva la mercancía sale mayoritariamente con albarán para facturación quincenal o mensual a fincas y contratas. Bentian resta esas unidades de la web en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PESOS Y CALIBRES",
         "title": "Control de Pesos en Jamón de Jabugo y Calibres en Marisco de la Costa (F_TCO)",
         "desc": "Sincroniza el stock individual de cada horquilla de peso de jamón ibérico o cada calibre de gamba y langostino congelado entre Factusol y las variaciones del ecommerce.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "PUENTE PORTUGAL",
         "title": "Comercio Transfronterizo con el Sur de Portugal (Algarve / Alentejo - VIES)",
         "desc": "Para empresas de Ayamonte, Lepe o Huelva capital que venden a empresas portuguesas por la A-49/A-22, Bentian gestiona automáticamente los pedidos intracomunitarios exentos de IVA.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5187,7 +5187,7 @@
       {
         "param": "Frecuencia de Polling",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar los terminales de Factusol en mostrador)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5320,21 +5320,21 @@
         "badge": "ESPECIAL ALMAZARA",
         "title": "Descarga Masiva e Instantánea de Pedidos en Campaña de Cosecha Temprana",
         "desc": "Cuando lanzas el aceite nuevo o promociones de campaña, Bentian inyecta cientos de pedidos diarios de WooCommerce o PrestaShop en Factusol sin duplicar clientes (los identifica por NIF o email) y listos para facturar en bloque.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "LOGÍSTICA PESADA",
         "title": "Control de Pesos de Garrafas/Cajas y Descuento de Albaranes en Mostrador",
         "desc": "Sincroniza el peso exacto de cada caja de 15 kg de aceite o maquinaria agrícola para el cálculo de portes en la web, y descuenta al instante los recambios retirados con albarán en el mostrador.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "FLEXIBILIDAD FISCAL",
         "title": "Adaptación Automática a Cambios Legales de IVA del Aceite de Oliva (0 % / 2 % / 4 % / 10 %)",
         "desc": "Bentian lee dinámicamente la tabla de impuestos de Factusol, adaptándose sin reprogramación a los tipos superreducidos o reducidos vigentes para el aceite de oliva virgen extra y el Recargo de Equivalencia.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5355,7 +5355,7 @@
       {
         "param": "Actualización de Stock",
         "value": "30–60 segundos leyendo DISSTO (descuenta reservas HORECA y distribuidores) (Protección de ediciones limitadas de cosecha temprana)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5488,21 +5488,21 @@
         "badge": "ESPECIAL CALZADO",
         "title": "Sincronización Milimétrica de Tallas y Medias Tallas para el Calzado de Almansa (F_TCO)",
         "desc": "En la industria del calzado de Almansa cada par cuenta: Bentian sincroniza en tiempo real las existencias de cada número y color entre Factusol y las combinaciones de tu tienda online.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "STOCK COMPROMETIDO",
         "title": "Convivencia con Redes de Representantes Comerciales mediante DISSTO",
         "desc": "Para fabricantes de cuchillería y mayoristas de Campollano con agentes comerciales en toda España, Bentian descuenta del stock web los pedidos en cartera (F_LPC) antes incluso de que se albaranen.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "B2B PROFESIONAL",
         "title": "Tarifas Escaladas y Recargo de Equivalencia para Ferreterías y Zapaterías",
         "desc": "Aplica automáticamente la tarifa de distribuidor o tienda (F_LTA / F_PRC) y añade el Recargo de Equivalencia (5,2 %) cuando compra un comercio minorista.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5523,7 +5523,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante detección diferencial de cambios en memoria (Sin bloquear la base de datos Access de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5656,21 +5656,21 @@
         "badge": "MULTITASA IVA",
         "title": "Gestión Perfecta de Carritos Mixtos (Vino al 21 %, Conservas al 10 % y Queso/Aceite al 4 %)",
         "desc": "En las tiendas agroalimentarias manchegas es habitual mezclar productos con los tres tipos de IVA en un único pedido. Bentian lee la configuración fiscal de cada artículo en F_ART y registra la factura en Factusol sin un solo céntimo de descuadre.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "STOCK REAL",
         "title": "Descuento Inmediato de Albaranes de Mostrador y Reservas de Lotes (DISSTO)",
         "desc": "Tanto en un suministro industrial de Puertollano como en una bodega de Tomelloso o Valdepeñas, Bentian resta del stock web todo el material comprometido en pedidos de clientes (F_LPC) y albaranes (F_ALB).",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOGÍSTICA EXACTA",
         "title": "Sincronización de Pesos para Cajas de Vino, Garrafas y Maquinaria",
         "desc": "Transfiere el peso exacto de cada formato desde Factusol para que tu ecommerce calcule automáticamente la tarifa de transporte por tramos de kilos o palet.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5691,7 +5691,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin bloquear el archivo .accdb de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5824,21 +5824,21 @@
         "badge": "CERO ROTURAS",
         "title": "Sincronización Instantánea con el Mostrador de Albaranes (DISSTO)",
         "desc": "Evita vender en internet lo que un agricultor o taller acaba de llevarse con albarán en Tarancón, Cuenca, Motilla o San Clemente.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PORTES EXACTOS",
         "title": "Cálculo de Pesos para Palets de Pellet, Madera y Cajas Agroalimentarias",
         "desc": "Sincroniza el peso unitario de cada artículo en F_ART para que WooCommerce o PrestaShop calculen exactamente el coste de transporte por paquetería o agencia de palets.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "ALTA RESILIENCIA",
         "title": "Tolerancia a Microcortes de Red y Persistencia Blindada en AppData",
         "desc": "Diseñado para funcionar 24/7 en polígonos y cooperativas sin desconfigurarse jamás tras reinicios eléctricos o caídas puntuales de internet.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -5859,7 +5859,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos mediante detección diferencial de cambios en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -5992,21 +5992,21 @@
         "badge": "RITMO LOGÍSTICO",
         "title": "Descuento en Tiempo Real de Albaranes de Suministro a Plataformas (DISSTO)",
         "desc": "En Azuqueca, Cabanillas y Marchamalo las entregas a naves vecinas se realizan con albarán diario (F_ALB). Bentian resta esas salidas del stock web en segundos.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECIOS MAYORISTAS",
         "title": "Gestión de Escalados de Precio y Tarifas por Contrato B2B (F_LTA / F_PRC)",
         "desc": "En consumibles logísticos e industriales el precio varía según se compre por paquete, caja o palet completo. Bentian traslada tus tarifas y condiciones de Factusol a tu tienda online.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "CERO DEMORA",
         "title": "Inyección Instantánea de Pedidos Web para Picking Inmediato",
         "desc": "En cuanto entra el pedido en WooCommerce o PrestaShop, aparece en Factusol listo para preparar en almacén y salir en la furgoneta de reparto de la tarde.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6027,7 +6027,7 @@
       {
         "param": "Plataformas Web",
         "value": "WooCommerce, PrestaShop 1.7 y 8, Shopify y portales B2B privados (Sincronización bidireccional completa)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -6160,21 +6160,21 @@
         "badge": "COMERCIO IBÉRICO",
         "title": "Facturación Intracomunitaria Automática con Portugal (VIES)",
         "desc": "Para las empresas de El Nevero, Mérida o Zafra que venden a clientes empresariales de Elvas, Évora o Lisboa, Bentian inyecta los pedidos VIES exentos de IVA en su serie específica de Factusol.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN TOTAL",
         "title": "Control de Pesos en Jamón Ibérico y Descuento de Albaranes Agrícolas (DISSTO)",
         "desc": "Mantiene sincronizado cada rango de peso de jamón en secaderos del sur de Badajoz y descuenta en tiempo real las salidas por albarán de los mostradores de recambios.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "RIGOR CONTABLE",
         "title": "Multitarifa B2B y Gestión de Carritos con IVA 4 %, 10 % y 21 %",
         "desc": "Aplica a cada profesional su tarifa de Factusol (F_LTA / F_PRC) y desglosa sin errores los distintos tipos de IVA en pedidos de alimentación, insumos agrarios y maquinaria.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6195,7 +6195,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -6328,21 +6328,21 @@
         "badge": "MULTICANAL D.O.P.",
         "title": "Gestión Simultánea de Venta Directa (D2C), Tiendas Gourmet (Recargo) e Industria (B2B)",
         "desc": "Permite que desde un mismo Factusol vendas formatos domésticos al público general y formatos de hostelería o sacos industriales a profesionales con su tarifa neta (F_LTA / F_PRC).",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CONTROL DE CAMPAÑA",
         "title": "Control de Cupos Diarios en Campañas Frescas (Jerte) y Stock Comprometido (DISSTO)",
         "desc": "Evita sobrevender calibres de cereza, partidas de Torta del Casar o lotes de jamón de Montánchez que ya han sido reservados para distribuidores en Factusol.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "RESILIENCIA EXTREMEÑA",
         "title": "Fiabilidad Total en Zonas Rurales y Polígonos Industriales",
         "desc": "El agente Bentian consume un ancho de banda mínimo, guarda su configuración de forma atómica en %APPDATA% y se reconecta automáticamente ante cualquier microcorte de línea.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6363,7 +6363,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar los ordenadores de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -6496,21 +6496,21 @@
         "badge": "EXACTITUD CONTABLE",
         "title": "Precisión Multitasa de IVA (4 %, 10 %, 21 %) en Cestas y Pedidos Agroalimentarios",
         "desc": "Permite mezclar en un mismo pedido web legumbres al 4 %, embutidos/cecina al 10 % y vinos al 21 %, inyectando en Factusol cada línea con su código de impuesto exacto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "STOCK REAL",
         "title": "Descuento Inmediato de Albaranes de Mostrador en Onzonilla y Ponferrada (DISSTO)",
         "desc": "Para almacenes de suministros industriales y agrícolas, Bentian resta del stock web todo el material entregado con albarán (F_ALB) o reservado en pedidos (F_LPC).",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOGÍSTICA DEL NOROESTE",
         "title": "Sincronización de Tallas de Vestuario Térmico/EPIs y Pesos para Transporte",
         "desc": "Mantiene actualizado el stock por talla en ropa laboral y calcula el peso total de sacos, cajas de vino o recambios para que la web aplique el porte correcto.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6531,7 +6531,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Cero impacto en la velocidad de red de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -6664,21 +6664,21 @@
         "badge": "CONTROL EN TIEMPO REAL",
         "title": "Descuento Instantáneo de Albaranes de Taller y Mostrador (DISSTO)",
         "desc": "En cuanto un agricultor o mecánico retira una pieza con albarán (F_ALB) en el polígono de Palencia, Bentian actualiza el stock de la web en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "B2B ALIMENTARIO",
         "title": "Soporte para Venta por Cajas/Palets y Recargo de Equivalencia en Alimentación",
         "desc": "Ideal para fabricantes de alimentación de Aguilar de Campoo, queserías del Cerrato y distribuidores: aplica tarifas mayoristas y recargo de equivalencia automáticamente.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "FIABILIDAD INDUSTRIAL",
         "title": "Persistencia Atómica en AppData y Cero Bloqueos en Red Local",
         "desc": "El agente Bentian funciona de forma silenciosa en el puerto fijo 39281 sin bloquear el archivo .laccdb de Factusol ni perder nunca la ruta del servidor.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6699,7 +6699,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar los puestos de mostrador)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -6832,21 +6832,21 @@
         "badge": "EXACTITUD FISCAL",
         "title": "Cuadre Automático de IVA Multitasa (Queso 4 %, Embutido 10 %, Vino 21 %)",
         "desc": "Lee el código de impuesto de cada artículo en Factusol y genera las líneas de factura sin un solo céntimo de descuadre, incluyendo el Recargo de Equivalencia cuando compra una tienda.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "STOCK PROTEGIDO",
         "title": "Descuento Inmediato de Albaranes de Reparto y Mostrador (DISSTO)",
         "desc": "Tanto si entregas recambios en Benavente como si reservas palets de queso o vino para un distribuidor, Bentian descuenta esas unidades de la web al instante.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "COMERCIO LUSO-ZAMORANO",
         "title": "Soporte para Ventas Transfronterizas con Portugal (Trás-os-Montes / Oporto)",
         "desc": "Para empresas zamoranas que venden en Portugal a través de la N-122/IP4 o desde Verín/Chaves, gestiona automáticamente los pedidos B2B exentos de IVA validados en VIES.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -6867,7 +6867,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7000,21 +7000,21 @@
         "badge": "CONTROL EN FRÍO Y NAVE",
         "title": "Priorización de Reservas HORECA y Descuento de Albaranes (DISSTO)",
         "desc": "En cuanto anotas el pedido de un restaurante o entregas material con albarán en Hontoria o Cuéllar, Bentian descuenta esas unidades de la tienda online en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PORTAL HORECA Y B2B",
         "title": "Tarifas Diferenciadas para Hostelería, Tiendas Gourmet y Particulares (F_LTA / F_PRC)",
         "desc": "Permite que los asadores, restaurantes y profesionales accedan con su usuario a la tienda online viendo sus precios netos de Factusol y formatos de caja profesional.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOGÍSTICA EXACTA",
         "title": "Cálculo Exacto de Pesos para Envíos en Frío (SEUR Frío / Integra2) y Paletería de Madera",
         "desc": "Sincroniza el peso de cada artículo de Factusol para que el carrito online aplique automáticamente el tramo de transporte refrigerado o de mercancía voluminosa.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7035,7 +7035,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7168,21 +7168,21 @@
         "badge": "STOCK AL SEGUNDO",
         "title": "Descuento en Tiempo Real de Albaranes de Reparto y Mostrador (DISSTO)",
         "desc": "En cuanto sale mercancía con albarán (F_ALB) para un restaurante, taller o explotación ganadera, Bentian resta esas unidades del stock de tu tienda online en segundos.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECISIÓN FISCAL",
         "title": "Gestión Multitasa de Impuestos (4 % Legumbres/Queso, 10 % Carne, 21 % Vino/Ferretería)",
         "desc": "Registra automáticamente cada pedido web en Factusol aplicando a cada línea su tipo impositivo legal y el Recargo de Equivalencia si el comprador es un comercio minorista.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "FIABILIDAD 24/7",
         "title": "Resiliencia Total en Polígonos y Entornos Rurales de Sierra",
         "desc": "El agente Bentian guarda su configuración de forma atómica en %APPDATA%, consume un ancho de banda mínimo y se reconecta solo si hay microcortes de luz o internet.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7203,7 +7203,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7336,21 +7336,21 @@
         "badge": "PRECISIÓN DE LOTE",
         "title": "Control de Stock en Tiempo Real para Productos de Curación, Temporada (Trufa/Setas) y Almacén (DISSTO)",
         "desc": "Cuando la producción es artesanal o de campaña (trufa negra de noviembre a marzo, lotes de torrezno o madera), Bentian descuenta al instante las reservas mayoristas en F_LPC y F_ALB.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CANAL HORECA + B2C",
         "title": "Doble Canal: Venta al Público (D2C) y Portal Profesional para Hostelería y Distribuidores",
         "desc": "Sincroniza las distintas tarifas de Factusol (F_LTA) para que un restaurante de Madrid o Zaragoza compre cajas de hostelería a su precio profesional mientras el cliente particular ve el PVP.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOGÍSTICA AUTOMÁTICA",
         "title": "Sincronización de Medidas de Madera/Mueble y Pesos para Agencias de Transporte",
         "desc": "Transfiere las variantes de medida/acabado (F_TCO) y los pesos en kilogramos de F_ART para calcular el envío exacto por SEUR Frío o agencia de paletería.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7371,7 +7371,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7504,21 +7504,21 @@
         "badge": "ESPECIAL BODEGAS RIOJA",
         "title": "Control de Añadas y Formatos de Caja en Bodegas de Rioja (DISSTO)",
         "desc": "Evita vender en la tienda online cajas de vino o formatos Magnum que acaban de comprometerse en un pedido de distribuidor o exportación en Factusol.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "CALZADO ARNEDO",
         "title": "Sincronización Matricial de Tallas para el Calzado de Arnedo (F_TCO)",
         "desc": "Lee el stock exacto de cada número de pie y color en Factusol y actualiza cada variación del zapato o bota de seguridad en tu tienda B2C o portal B2B de distribuidores.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "MULTICANAL Y EXPORTACIÓN",
         "title": "Multitarifa (PVP, Club de Socios, HORECA, Distribuidor) y Ventas UE (VIES)",
         "desc": "Traslada tus tarifas de Factusol (F_LTA / F_PRC) a los grupos de clientes de la web y gestiona tanto el Recargo de Equivalencia como las ventas intracomunitarias europeas.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7539,7 +7539,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin bloquear ni ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7672,21 +7672,21 @@
         "badge": "PRECISIÓN INDUSTRIAL",
         "title": "Descuento Inmediato de Albaranes de Mostrador en San Cibrao (DISSTO)",
         "desc": "En cuanto un operario o taller retira mercancía con albarán (F_ALB) en tu nave, Bentian resta esas unidades del stock de la tienda online en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "VARIANTES Y AÑADAS",
         "title": "Sincronización de Tallas Textil/EPIs (F_TCO) y Añadas de Vino (4 D.O.)",
         "desc": "Tanto para el sector textil ourensano como para las bodegas de Ribeiro, Valdeorras, Ribeira Sacra y Monterrei, mantiene cada variante y añada cuadrada al segundo.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "CONEXIÓN PORTUGAL",
         "title": "Operativa Transfronteriza Automática con Portugal (VIES)",
         "desc": "Registra los pedidos de empresas portuguesas validadas en VIES directamente en la serie intracomunitaria de Factusol sin aplicar el 21 % de IVA.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7707,7 +7707,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -7840,21 +7840,21 @@
         "badge": "CONTROL DE TALLER",
         "title": "Descuento Instantáneo de Albaranes de Taller Forestal/Agrícola y Mostrador (DISSTO)",
         "desc": "En O Ceao, Vilalba o Monforte las reparaciones y entregas a profesionales se anotan en albaranes (F_ALB). Bentian resta esas piezas del stock web en menos de un minuto.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "DESPIECE Y TALLAS",
         "title": "Búsqueda por Referencia Original OEM y Tallas de EPIs Anticorte (F_TCO)",
         "desc": "Sincroniza los códigos de fabricante (REFART) de recambios forestales/agrícolas y el stock por talla de pantalones y botas anticorte con las variaciones de tu tienda online.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "EXACTITUD CONTABLE",
         "title": "Rigor Fiscal Multitasa en Alimentación Gallega (Queso 4 %, Carne/Conserva 10 %, Vino 21 %)",
         "desc": "Ideal para queserías de San Simón, cárnicas y tiendas de productos gallegos: inyecta cada pedido en Factusol con el desglose exacto de IVA y Recargo de Equivalencia.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -7875,7 +7875,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -8008,21 +8008,21 @@
         "badge": "CONTROL DE ALBARANES",
         "title": "Descuento Inmediato de Albaranes de Taller y Mostrador (DISSTO / F_ALB)",
         "desc": "No esperes a facturar a final de mes para que baje el stock de la web: en cuanto entregas una pieza con albarán en Factusol, Bentian actualiza tu tienda online en segundos.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "TALLAS Y BODEGAS",
         "title": "Sincronización de Tallas Outdoor/EPIs (F_TCO) y Añadas D.O. Somontano",
         "desc": "Mantiene cuadrado el stock por talla y color en tiendas de montaña del Pirineo y el inventario de botellas y cajas en bodegas de Barbastro.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "LOGÍSTICA ALTO ARAGÓN",
         "title": "Multitarifa B2B y Gestión de Pesos para Envíos Pesados",
         "desc": "Aplica automáticamente la tarifa de taller, granja o restaurante (F_LTA / F_PRC) y transfiere el peso en kilos para que la web calcule el porte exacto.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -8043,7 +8043,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -8176,21 +8176,21 @@
         "badge": "PESOS Y CAMPAÑA",
         "title": "Sincronización de Horquillas de Peso en Jamón de Teruel y Gramajes de Trufa (F_TCO)",
         "desc": "Vincula cada peso de jamón (entero, deshuesado o loncheado) y cada formato de trufa o aceite con su referencia en Factusol, descontando al instante los pedidos mayoristas.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "PRECIOS EN VIVO",
         "title": "Propagación Rápida de Cambios de Tarifa (Lonja de la Trufa / Campaña de Aceite)",
         "desc": "Cuando actualizas los precios de la semana en Factusol (F_LTA), Bentian traslada las nuevas tarifas tanto al público general como a los restaurantes registrados en tu web en menos de un minuto.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "STOCK EXACTO",
         "title": "Descuento de Albaranes de Mostrador en Polígono La Paz y Alcañiz (DISSTO)",
         "desc": "Para almacenes de suministros industriales y agrícolas, resta del stock web todo el material entregado con albarán (F_ALB) para evitar roturas de stock.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -8211,7 +8211,7 @@
       {
         "param": "Latencia de Stock y Precios",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar la red local de Factusol)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -8344,21 +8344,21 @@
         "badge": "100 % NATIVO IGIC",
         "title": "Mapeo Exacto de Tipos de IGIC (0 %, 3 %, 7 %, 9,5 %, 15 %) y Comerciante Minorista",
         "desc": "A diferencia de conectores genéricos pensados solo para el 21 % de IVA peninsular, Bentian respeta los códigos impositivos de tu configuración de Factusol para Canarias y las exenciones de comerciante minorista o entregas a buques.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "LOGÍSTICA INTERINSULAR",
         "title": "Control de Stock Multi-Almacén entre Gran Canaria, Lanzarote y Fuerteventura (F_STO)",
         "desc": "Permite consolidar o separar el stock de tu nave principal en Arinaga/El Sebadal y tus delegaciones en otras islas, descontando al instante los albaranes abiertos (DISSTO).",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "STOCK EN ISLA REAL",
         "title": "Protección frente a Roturas de Stock por Tránsito Marítimo de Contenedores",
         "desc": "En las islas no existe la reposición en 24h desde fábrica: Bentian actualiza las existencias de tu web cada 30 segundos para que nunca comprometas mercancía que aún está en un buque portacontenedores.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -8379,7 +8379,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Reflejo inmediato de ventas en mostrador y albaranes de reparto)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {
@@ -8512,21 +8512,21 @@
         "badge": "FISCALIDAD CANARIA REF",
         "title": "Soporte 100 % Nativo para IGIC (0 %, 3 %, 7 %, 9,5 %, 15 %) y Comerciante Minorista",
         "desc": "Bentian lee directamente los tipos de impuesto configurados en tu Factusol en Tenerife y asocia cada línea del pedido web a su tipo de IGIC exacto, sin descuadres ni parches manuales.",
-        "docUrl": "/docs/factusol/esquema-tablas-campos/",
+        "docUrl": "/docs/factusol/calculo-stock-disponible/",
         "docLabel": "Tablas F_STO y DISSTO en Factusol"
       },
       {
         "badge": "MULTI-ALMACÉN TF",
         "title": "Gestión Multi-Almacén en Factusol (Zona Metropolitana + Zona Sur + Islas Occidentales)",
         "desc": "En Tenerife es muy habitual contar con almacén en La Campana/Los Majuelos y delegación en Las Chafiras/Granadilla o La Palma. Bentian lee la tabla F_STO para publicar el stock exacto de cada centro.",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Sincronización de Tarifas F_LTA"
       },
       {
         "badge": "PROTECCIÓN INSULAR",
         "title": "Descuento Inmediato de Albaranes de Mostrador y Reparto (DISSTO)",
         "desc": "Evita vender en la tienda online mercancía que acaba de entregarse con albarán (F_ALB) y cuya reposición en barco desde la Península puede tardar semanas.",
-        "docUrl": "/docs/arquitectura/modelo-seguridad-outbound/",
+        "docUrl": "/docs/seguridad/antivirus-edr-smartscreen/",
         "docLabel": "Seguridad Outbound y AppData"
       }
     ],
@@ -8547,7 +8547,7 @@
       {
         "param": "Latencia de Stock",
         "value": "30–60 segundos por detección diferencial en memoria (Sin ralentizar los terminales de Factusol en mostrador)",
-        "docUrl": "/docs/factusol/sincronizacion-tarifas-precios/",
+        "docUrl": "/docs/fiscalidad/recargo-de-equivalencia/",
         "docLabel": "Tarifas B2B y F_PRC"
       },
       {

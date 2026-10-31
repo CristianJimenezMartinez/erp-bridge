@@ -345,6 +345,10 @@ export async function bootstrapApp(): Promise<Express> {
     'canales/conector-universal': '/docs/canales/endpoint-universal/',
     'simplygest/localizacion-base-datos-mdb': '/docs/simplygest/localizacion-base-datos/',
     'simplygest/conexion-mdb': '/docs/simplygest/localizacion-base-datos/',
+    'arquitectura/sincronizacion-reactiva-vs-batch': '/docs/arquitectura/arquitectura-polimorfica-multi-erp/',
+    'factusol/esquema-tablas-campos': '/docs/factusol/calculo-stock-disponible/',
+    'factusol/sincronizacion-tarifas-precios': '/docs/fiscalidad/recargo-de-equivalencia/',
+    'arquitectura/modelo-seguridad-outbound': '/docs/seguridad/antivirus-edr-smartscreen/',
   };
 
   for (const [legacySlug, canonicalTarget] of Object.entries(legacyDocsMap)) {

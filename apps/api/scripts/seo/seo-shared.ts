@@ -127,7 +127,6 @@ const FOOTER_LINKS: Array<[string, string]> = [
   ['/novedades/', 'Novedades'],
   ['/requisitos-sistema/', 'Requisitos del sistema'],
   ['/partners/', 'Partners'],
-  ['/dashboard', 'Dashboard'],
 ];
 
 export function renderFooter(): string {
@@ -139,6 +138,7 @@ export function renderFooter(): string {
       <div>© 2026 Bentian ERP Bridge — Desarrollado por <a href="https://cristianjm.com" class="text-zinc-400 hover:text-white transition">Cristian Jiménez Martínez</a></div>
       <div class="flex items-center gap-4 flex-wrap">
 ${links}
+        <button type="button" onclick="window.location.assign('/dashboard/')" class="hover:text-zinc-300 transition bg-transparent border-0 p-0 text-xs text-zinc-500 cursor-pointer">Dashboard</button>
       </div>
     </div>
   </footer>

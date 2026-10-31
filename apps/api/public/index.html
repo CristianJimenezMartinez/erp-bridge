@@ -192,10 +192,10 @@
           <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           <span class="inline">Docs</span>
         </a>
-        <a href="/dashboard/" rel="nofollow" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1 rounded-md border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden xl:flex items-center gap-1.5 whitespace-nowrap shrink-0">
+        <button type="button" onclick="window.location.assign('/dashboard/')" class="text-xs font-medium text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1 rounded-md border border-white/[0.1] hover:border-white/[0.22] bg-[#121215] hover:bg-[#18181c] transition hidden xl:flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           Acceso Clientes
-        </a>
+        </button>
         <a href="#descargas" class="text-xs font-semibold px-3 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm hover:shadow-indigo-500/25 whitespace-nowrap shrink-0">
           <span>Descargar</span><span class="hidden sm:inline">&nbsp;Agente</span>
         </a>
@@ -1869,25 +1869,77 @@
         </div>
 
         <!-- Banner Cobertura Nacional y Mapa de España -->
-        <div class="mt-12 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-zinc-900/60 to-purple-950/30 border border-indigo-500/25 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-            </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-base sm:text-lg font-bold text-white">Red de Cobertura Nacional en 52 Áreas Industriales</h3>
-                <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold font-mono">52 Ciudades</span>
+        <div class="mt-12 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-zinc-900/60 to-purple-950/30 border border-indigo-500/25 p-6 sm:p-8 flex flex-col gap-6 shadow-xl">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               </div>
-              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
-                Diseñado para operar con bases de datos Factusol locales en cualquier polígono industrial de España: Cobo Calleja, Corredor del Henares, Zona Franca, Almussafes, Plaza Zaragoza y más.
-              </p>
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-base sm:text-lg font-bold text-white">Red de Cobertura Nacional en 52 Áreas Industriales</h3>
+                  <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold font-mono">52 Ciudades</span>
+                </div>
+                <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl">
+                  Diseñado para operar con bases de datos Factusol locales en cualquier polígono industrial de España: Cobo Calleja, Corredor del Henares, Zona Franca, Almussafes, Plaza Zaragoza y más.
+                </p>
+              </div>
+            </div>
+            <a href="/conector-factusol/" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition shrink-0 shadow-lg shadow-indigo-600/25 group">
+              <span>Ver Mapa Completo (52 Ciudades)</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
+
+          <!-- Nodos Industriales Clave (Crawl Depth 1-clic) -->
+          <div class="pt-6 border-t border-white/[0.08]">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">10 Nodos Industriales Destacados</span>
+              <a href="/conector-factusol/" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition">Ver Todas &rarr;</a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+              <a href="/conector-factusol/madrid/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Madrid</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Cobo Calleja y Corredor del Henares">Cobo Calleja / Henares</div>
+              </a>
+              <a href="/conector-factusol/barcelona/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Barcelona</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Zona Franca y ZAL Port">Zona Franca / ZAL</div>
+              </a>
+              <a href="/conector-factusol/valencia/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Valencia</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Almussafes y Fuente del Jarro">Almussafes / Fte. Jarro</div>
+              </a>
+              <a href="/conector-factusol/zaragoza/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Zaragoza</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="PLAZA y Malpica">PLAZA / Malpica</div>
+              </a>
+              <a href="/conector-factusol/sevilla/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Sevilla</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Ctra. Amarilla y La Isla">Ctra. Amarilla / La Isla</div>
+              </a>
+              <a href="/conector-factusol/bilbao/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Bilbao</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Gran Bilbao, Zamudio y Txorierri">Gran Bilbao / Zamudio</div>
+              </a>
+              <a href="/conector-factusol/alicante/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Alicante</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Las Atalayas y Foia de Castalla">Atalayas / Castalla</div>
+              </a>
+              <a href="/conector-factusol/murcia/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Murcia</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Polígono Oeste y Molina">Polígono Oeste / Molina</div>
+              </a>
+              <a href="/conector-factusol/malaga/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Málaga</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="Guadalhorce y Málaga TechPark PTA">Guadalhorce / TechPark</div>
+              </a>
+              <a href="/conector-factusol/valladolid/" class="p-2.5 rounded-xl bg-[#121217] border border-white/[0.06] hover:border-indigo-500/40 hover:bg-[#16161f] transition group">
+                <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition">Valladolid</div>
+                <div class="text-[11px] text-zinc-400 truncate mt-0.5" title="San Cristóbal y Argales">San Cristóbal / Argales</div>
+              </a>
             </div>
           </div>
-          <a href="/conector-factusol/" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition shrink-0 shadow-lg shadow-indigo-600/25 group">
-            <span>Ver Mapa de España y Polígonos</span>
-            <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-          </a>
         </div>
       </div>
     </section>
@@ -2996,10 +3048,10 @@
           Sincronizador local-first de Factusol con tiendas online. Sin intermediarios cloud ni comisiones por pedido.
         </p>
         <div class="mt-4 flex items-center gap-2">
-          <a href="/health" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400 hover:bg-emerald-500/15 transition">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             API Operativa
-          </a>
+          </span>
         </div>
       </div>
 
@@ -3057,7 +3109,7 @@
           <li><a href="/docs/factusol/matriz-compatibilidad/" class="text-zinc-400 hover:text-white transition">Matriz Factusol</a></li>
           <li><a href="/docs/" class="text-zinc-400 hover:text-white transition">Documentación Técnica</a></li>
           <li><a href="/va/" class="text-zinc-400 hover:text-white transition">Versió en Valencià</a></li>
-          <li><a href="/dashboard/" rel="nofollow" class="text-zinc-400 hover:text-white transition">Panel de Control</a></li>
+          <li><button type="button" onclick="window.location.assign('/dashboard/')" class="text-zinc-400 hover:text-white transition cursor-pointer text-left bg-transparent border-0 p-0 font-normal">Panel de Control</button></li>
         </ul>
       </div>
     </div>
