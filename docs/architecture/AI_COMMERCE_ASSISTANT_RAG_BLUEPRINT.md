@@ -12,10 +12,20 @@
 
 ## 1. Resumen Ejecutivo y Paradigma "Zero-Cost AI"
 
-### 1.1. El Dilema Económico de la IA en la PYME Española
-La integración de asistentes conversacionales de Inteligencia Artificial en el comercio electrónico y la gestión empresarial se ha enfrentado históricamente a dos barreras críticas:
-1. **Coste recurrente por token impredecible:** Los modelos comerciales de pago por uso (OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet) imponen facturas variables que asustan a los dueños de PYMEs y agencias web. Un catálogo de 15.000 productos consultado 5.000 veces al día por compradores online o empleados de mostrador puede generar cientos de euros mensuales en cuotas de API.
-2. **Riesgo de fuga de información y alucinaciones en stock:** Enviar catálogos crudos con márgenes de beneficio a modelos de lenguaje o confiar en que un LLM "recuerde" el stock mediante RAG puro genera desastres comerciales (venta de stock agotado, cotización de precios obsoletos o filtración involuntaria de costes a los clientes).
+### 1.1. Análisis Profundo de la Base de Código Existente de Bentian
+Este documento **no es un diseño genérico o teórico**: se fundamenta directamente en las interfaces, esquemas de datos y servicios reales ya verificados y en producción dentro del monorepo Bentian ERP Bridge:
+1. **Contratos Canónicos (`packages/shared/src/canonical/`):**
+   - Esquemas Zod [`CanonicalOrderSchema`](file:///c:/Proyectos/Bentian/erp-bridge/packages/shared/src/canonical/order.ts) y [`CanonicalCustomerSchema`](file:///c:/Proyectos/Bentian/erp-bridge/packages/shared/src/canonical/customer.ts), con soporte nativo de `trackingNumber`, `carrierName`, `status` (`pending`, `processing`, `completed`, `cancelled`), `hasEquivalenceSurcharge` y desglose fiscal al céntimo.
+2. **Motor Multi-ERP Polimórfico (`apps/agent/src/erp/`):**
+   - Interfaz maestra [`IErpConnector`](file:///c:/Proyectos/Bentian/erp-bridge/apps/agent/src/erp/erp-connector.interface.ts) y DTO [`ErpCatalogArticle`](file:///c:/Proyectos/Bentian/erp-bridge/apps/agent/src/erp/erp.types.ts) (`code`, `name`, `family`, `stock`, `price`, `costPrice`, `barcode`, `description`).
+   - Consultas optimizadas con `WITH (NOLOCK)` sobre SQL Server en [`sql-server-profiles.ts`](file:///c:/Proyectos/Bentian/erp-bridge/apps/agent/src/erp/sql-server-profiles.ts) para **Sage 50** (`articulo`, `pvp`, `stocks`, `c_pediven`), **a3ERP** (`ARTICULO`, `STOCKALM`, `CABEPEV`, `LINEPEV`) y **Ágora POS** (`SaleItem`, `PriceList`, `CustomerOrder`).
+   - Driver Access OLEDB no bloqueante con snapshot desconectado para **Factusol** (`F_ART`, `F_STO`, `F_LTA`, `F_PCL`, `F_LCL`) y **SimplyGest** (`ARTICULOS`, `STOCKS`, `PEDIDOS_CLI`).
+3. **Regla de Red Inmutable (Cero Puertos Abiertos en el Router):**
+   - Como establece la **Regla 7 de AGENTS.md**, el Agente de Windows corre en red local tras NAT y se comunica **exclusivamente mediante conexiones salientes seguras TLS 1.3** hacia `bridge.cristianjm.com`.
+   - Por tanto, la IA en la web de un comprador jamás intenta atacar una IP privada; opera mediante el canal de eventos saliente o mediante el índice de catálogo público ya sincronizado.
+4. **Persistencia Atómica y Blindaje de Módulos (Reglas 1 y 9):**
+   - Persistencia exclusiva en `%APPDATA%\Bentian Agent\` mediante escritura `.tmp` + `renameSync` y `.bak` (cero SQLite no probado).
+   - Los 13 módulos sellados (`FROZEN` en Gate 7) se mantienen intactos; la IA se estructura como un servicio desacoplado en la capa superior (`apps/agent/src/ai/`).
 
 ### 1.2. La Solución Arquitectónica de Bentian
 El módulo **Bentian AI Commerce Assistant** rompe definitivamente este dilema mediante una arquitectura de **Coste Cero Recurrente (0 €/mes en infraestructura de IA)**, combinando dos modalidades complementarias:
@@ -648,11 +658,10 @@ El asistente se ha diseñado para operar en dos escenarios complementarios:
 ### 9.2. Topología 2: Widget Web Embebible para Tienda Online (WooCommerce, Shopify, PrestaShop)
 * **Destinatarios:** Compradores finales en internet.
 * **Integración:** Un simple script `<script src="https://bridge.cristianjm.com/widgets/bentian-ai.js" data-tenant-id="..."></script>`.
-* **Flujo de Comunicación:**
-  1. El widget envía la consulta al gateway central de Bentian (`bridge.cristianjm.com`).
-  2. El gateway autentica la solicitud del tenant mediante JWT y la enruta al agente local del cliente a través del túnel seguro persistente.
-  3. El agente procesa la intención, ejecuta las herramientas y retorna la respuesta con las tarjetas de producto listas para comprar.
-  4. Los datos privados de compra y costes permanecen en todo momento retenidos dentro del PC de la empresa.
+* **Aprovechamiento del Ciclo Delta de Bentian (Cero Sobrecarga del PC del Cliente):**
+  Bentian ERP Bridge ya ejecuta una sincronización incremental (*Delta Sync*) bidireccional cada 30 segundos entre el ERP y la tienda web. Esto habilita dos modos de servicio de IA:
+  1. **Modo Caché Delta en la Nube (Respuesta en <100ms sin tocar el PC):** Para consultas de catálogo, preguntas de compatibilidad y comprobación de existencias generales, la IA consulta el índice seguro ya sincronizado en la tienda / cloud gateway. Esto garantiza que una avalancha de 1.000 usuarios en la tienda online **jamás sature la red ni bloquee el ordenador del almacén**.
+  2. **Modo Túnel Saliente TLS 1.3 (Para consultas vivas no sincronizadas):** Si el comprador consulta un pedido tramitado hace segundos o una reserva especial, la consulta viaja por el canal saliente seguro que el agente mantiene con `bridge.cristianjm.com`, ejecutando la consulta en el ERP con `WITH (NOLOCK)` o recordset desconectado y retornando el dato en tiempo real sin abrir puertos en el router del cliente.
 
 ---
 
