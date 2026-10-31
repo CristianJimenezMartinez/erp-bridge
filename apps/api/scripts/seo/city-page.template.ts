@@ -627,6 +627,7 @@ ${renderCityHeader(currentVersion)}
 ${renderNationalDirectoryFooter(allCities)}
 
   <script src="/js/version-sync.js"></script>
+  <script src="/js/omnichannel-widget.js" defer></script>
 </body>
 </html>`;
 }

@@ -1,0 +1,202 @@
+[
+  {
+    "company": "Equone Soluciones Tecnológicas",
+    "email": "equone@equone.com",
+    "phone": "+34 967 674 961",
+    "city": "Albacete",
+    "type": "MSP / Partner IT",
+    "subject": "Propuesta Partner 25% recurrente (Albacete) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"equone@equone.com\" \"equipo de Equone Soluciones Tecnológicas\" \"Equone Soluciones Tecnológicas\"",
+    "previewBody": "Hola equipo de Equone Soluciones Tecnológicas,\n\nHe visto vuestra trayectoria en Polígono Campollano (Albacete) (Albacete). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=albacete"
+  },
+  {
+    "company": "SITH / SSI Albacete",
+    "email": "info@ssialbacete.es",
+    "phone": "+34 967 61 24 50",
+    "city": "Albacete",
+    "type": "MSP / Partner IT",
+    "subject": "Propuesta Partner 25% recurrente (Albacete) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@ssialbacete.es\" \"equipo de SITH / SSI Albacete\" \"SITH / SSI Albacete\"",
+    "previewBody": "Hola equipo de SITH / SSI Albacete,\n\nHe visto vuestra trayectoria en Polígono Campollano (Albacete) (Albacete). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=albacete"
+  },
+  {
+    "company": "Informática24 (LTS24)",
+    "email": "info@informatica24.com",
+    "phone": "+34 967 600 808",
+    "city": "Albacete",
+    "type": "MSP / Partner IT",
+    "subject": "Propuesta Partner 25% recurrente (Albacete) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@informatica24.com\" \"equipo de Informática24 (LTS24)\" \"Informática24 (LTS24)\"",
+    "previewBody": "Hola equipo de Informática24 (LTS24),\n\nHe visto vuestra trayectoria en Polígono Romica (Albacete) (Albacete). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=albacete"
+  },
+  {
+    "company": "Nuteco Web",
+    "email": "contacto@nutecoweb.com",
+    "phone": "+34 967 24 19 53",
+    "city": "Albacete",
+    "type": "Agencia E-Commerce",
+    "subject": "Propuesta Partner 25% recurrente (Albacete) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"contacto@nutecoweb.com\" \"equipo de Nuteco Web\" \"Nuteco Web\"",
+    "previewBody": "Hola equipo de Nuteco Web,\n\nHe visto vuestra trayectoria en WooCommerce / PrestaShop / Kit Digital (Albacete). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=albacete"
+  },
+  {
+    "company": "Atalantic Soluciones Digitales",
+    "email": "info@atalantic.com",
+    "phone": "+34 967 66 99 55",
+    "city": "Albacete",
+    "type": "Agencia E-Commerce",
+    "subject": "Propuesta Partner 25% recurrente (Albacete) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@atalantic.com\" \"equipo de Atalantic Soluciones Digitales\" \"Atalantic Soluciones Digitales\"",
+    "previewBody": "Hola equipo de Atalantic Soluciones Digitales,\n\nHe visto vuestra trayectoria en Recambios / Maquinaria / WooCommerce (Albacete). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=albacete"
+  },
+  {
+    "company": "Grupo Odín Soluciones",
+    "email": "info@grupoodin.es",
+    "phone": "+34 963 14 60 37",
+    "city": "Valencia",
+    "type": "Gold Partner DELSOL",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@grupoodin.es\" \"equipo de Grupo Odín Soluciones\" \"Grupo Odín Soluciones\"",
+    "previewBody": "Hola equipo de Grupo Odín Soluciones,\n\nHe visto vuestra trayectoria en Distribuidor Oficial Factusol + Datacenter (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Grupo Telcia",
+    "email": "info@telcia.es",
+    "phone": "+34 960 805 300",
+    "city": "Valencia",
+    "type": "MSP Industrial",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@telcia.es\" \"equipo de Grupo Telcia\" \"Grupo Telcia\"",
+    "previewBody": "Hola equipo de Grupo Telcia,\n\nHe visto vuestra trayectoria en Polígono Fuente del Jarro (Paterna) (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Punt Sistemes",
+    "email": "puntsistemes@puntsistemes.es",
+    "phone": "+34 963 592 833",
+    "city": "Valencia",
+    "type": "Consultora ERP & IT",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"puntsistemes@puntsistemes.es\" \"equipo de Punt Sistemes\" \"Punt Sistemes\"",
+    "previewBody": "Hola equipo de Punt Sistemes,\n\nHe visto vuestra trayectoria en Parc Empresarial Tàctica (Paterna) (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Addis Network",
+    "email": "info@addis.es",
+    "phone": "+34 961 34 46 64",
+    "city": "Valencia",
+    "type": "Agencia Platinum PrestaShop",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@addis.es\" \"equipo de Addis Network\" \"Addis Network\"",
+    "previewBody": "Hola equipo de Addis Network,\n\nHe visto vuestra trayectoria en E-Commerce B2B / Tallas y Colores (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Cemac Ordenadores",
+    "email": "info@cemac.es",
+    "phone": "+34 962 77 02 85",
+    "city": "Valencia",
+    "type": "MSP Logística & Polígonos",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@cemac.es\" \"equipo de Cemac Ordenadores\" \"Cemac Ordenadores\"",
+    "previewBody": "Hola equipo de Cemac Ordenadores,\n\nHe visto vuestra trayectoria en Polígono El Oliveral (Riba-roja) (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Juanma Hoyo Servicio Técnico",
+    "email": "info@juanmahoyo.com",
+    "phone": "+34 622 41 84 94",
+    "city": "Valencia",
+    "type": "Distribuidor Oficial DELSOL",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@juanmahoyo.com\" \"equipo de Juanma Hoyo Servicio Técnico\" \"Juanma Hoyo Servicio Técnico\"",
+    "previewBody": "Hola equipo de Juanma Hoyo Servicio Técnico,\n\nHe visto vuestra trayectoria en Soporte Factusol & WordPress (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Cima Informática",
+    "email": "info@cimainformatica.com",
+    "phone": "+34 966 661 725",
+    "city": "Elche",
+    "type": "MSP & Software Gestión",
+    "subject": "Propuesta Partner 25% recurrente (Elche) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@cimainformatica.com\" \"equipo de Cima Informática\" \"Cima Informática\"",
+    "previewBody": "Hola equipo de Cima Informática,\n\nHe visto vuestra trayectoria en Elche Parque Empresarial (Torrellano) (Elche). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=elche"
+  },
+  {
+    "company": "Soy.es (Nicripsia Internet)",
+    "email": "info@soy.es",
+    "phone": "+34 965 68 92 21",
+    "city": "Elche",
+    "type": "Agencia E-Commerce Líder",
+    "subject": "Propuesta Partner 25% recurrente (Elche) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@soy.es\" \"equipo de Soy.es (Nicripsia Internet)\" \"Soy.es (Nicripsia Internet)\"",
+    "previewBody": "Hola equipo de Soy.es (Nicripsia Internet),\n\nHe visto vuestra trayectoria en PrestaShop / WooCommerce / Calzado (Elche). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=elche"
+  },
+  {
+    "company": "Micro K Informática",
+    "email": "info@microkinformatica.com",
+    "phone": "+34 966 68 00 11",
+    "city": "Elche",
+    "type": "MSP Sistemas Industriales",
+    "subject": "Propuesta Partner 25% recurrente (Elche) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@microkinformatica.com\" \"equipo de Micro K Informática\" \"Micro K Informática\"",
+    "previewBody": "Hola equipo de Micro K Informática,\n\nHe visto vuestra trayectoria en Torrellano / Polígonos Alicante (Elche). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=elche"
+  },
+  {
+    "company": "4webs E-Commerce",
+    "email": "info@4webs.es",
+    "phone": "+34 963 52 67 89",
+    "city": "Valencia",
+    "type": "Agencia PrestaShop B2B",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@4webs.es\" \"equipo de 4webs E-Commerce\" \"4webs E-Commerce\"",
+    "previewBody": "Hola equipo de 4webs E-Commerce,\n\nHe visto vuestra trayectoria en Recambios / Ferretería / Suministros (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Dusnic E-Commerce",
+    "email": "info@dusnic.es",
+    "phone": "+34 961 98 50 12",
+    "city": "Valencia",
+    "type": "PrestaShop & WooCommerce Expert",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@dusnic.es\" \"equipo de Dusnic E-Commerce\" \"Dusnic E-Commerce\"",
+    "previewBody": "Hola equipo de Dusnic E-Commerce,\n\nHe visto vuestra trayectoria en Automoción y Repuestos B2B (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "Bloo Media",
+    "email": "hola@bloo.media",
+    "phone": "+34 960 09 85 50",
+    "city": "Valencia",
+    "type": "Agencia B2B Industrial",
+    "subject": "Propuesta Partner 25% recurrente (Valencia) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"hola@bloo.media\" \"equipo de Bloo Media\" \"Bloo Media\"",
+    "previewBody": "Hola equipo de Bloo Media,\n\nHe visto vuestra trayectoria en Parque Empresarial Táctica (Paterna) (Valencia). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=valencia"
+  },
+  {
+    "company": "UNAE Comunicación",
+    "email": "info@unae.es",
+    "phone": "+34 965 68 55 48",
+    "city": "Elche",
+    "type": "Agencia E-Commerce Calzado",
+    "subject": "Propuesta Partner 25% recurrente (Elche) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@unae.es\" \"equipo de UNAE Comunicación\" \"UNAE Comunicación\"",
+    "previewBody": "Hola equipo de UNAE Comunicación,\n\nHe visto vuestra trayectoria en Elche Parque Empresarial (Elche). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=elche"
+  },
+  {
+    "company": "La Hormiga Digital",
+    "email": "hola@lahormigadigital.com",
+    "phone": "+34 966 23 45 10",
+    "city": "Elche",
+    "type": "Agencia WooCommerce & Retail",
+    "subject": "Propuesta Partner 25% recurrente (Elche) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"hola@lahormigadigital.com\" \"equipo de La Hormiga Digital\" \"La Hormiga Digital\"",
+    "previewBody": "Hola equipo de La Hormiga Digital,\n\nHe visto vuestra trayectoria en Calzado de Seguridad y Piel (Elche). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=elche"
+  },
+  {
+    "company": "Planatec Sistemas Informáticos",
+    "email": "info@planatec.es",
+    "phone": "+34 964 06 60 99",
+    "city": "Castellón",
+    "type": "MSP & E-Commerce Cerámico",
+    "subject": "Propuesta Partner 25% recurrente (Castellón) — Conector Factusol/ERP sin abrir puertos",
+    "commandToExecute": "node scripts/send-postcall-beta.js \"info@planatec.es\" \"equipo de Planatec Sistemas Informáticos\" \"Planatec Sistemas Informáticos\"",
+    "previewBody": "Hola equipo de Planatec Sistemas Informáticos,\n\nHe visto vuestra trayectoria en Ciudad del Transporte (Castellón) (Castellón). He desarrollado Bentian ERP Bridge (v0.5.3): una pasarela Local-First para Windows que sincroniza Factusol y SimplyGest con WooCommerce y PrestaShop en tiempo real sin abrir puertos en el router y sin bloqueos .ldb.\n\nA nuestras agencias y partners IT os entregamos el 100% de vuestro setup inicial (300-600€) + un 25% de comisión recurrente anual (62,25€/año por licencia).\nPodéis probarlo gratis en Modo Evaluación aquí: https://bridge.cristianjm.com/beta/?utm_source=autoprospect&utm_campaign=castell%C3%B3n"
+  }
+]

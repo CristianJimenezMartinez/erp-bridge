@@ -1,0 +1,254 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Bentian ERP Bridge (v0.5.3) — Feed Oficial de Ingeniería y Conectores ERP",
+  "home_page_url": "https://bridge.cristianjm.com/",
+  "feed_url": "https://bridge.cristianjm.com/feed.json",
+  "language": "es-ES",
+  "items": [
+    {
+      "id": "https://bridge.cristianjm.com/",
+      "url": "https://bridge.cristianjm.com/",
+      "title": "Bentian ERP Bridge v0.5.3 — Conector Local-First Factusol, SimplyGest y ERPs con WooCommerce y PrestaShop",
+      "content_text": "Sincroniza stock disponible (DISSTO), tarifas, tallas/colores y pedidos con IVA/Recargo sin abrir puertos en el router.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-woocommerce/",
+      "url": "https://bridge.cristianjm.com/factusol-woocommerce/",
+      "title": "Factusol Woocommerce — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Woocommerce. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-simplygest/",
+      "url": "https://bridge.cristianjm.com/conector-simplygest/",
+      "title": "Conector Simplygest — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Conector Simplygest. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/simplygest-woocommerce/",
+      "url": "https://bridge.cristianjm.com/simplygest-woocommerce/",
+      "title": "Simplygest Woocommerce — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Simplygest Woocommerce. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-prestashop/",
+      "url": "https://bridge.cristianjm.com/factusol-prestashop/",
+      "title": "Factusol Prestashop — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Prestashop. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/alternativa-delsol-conecta/",
+      "url": "https://bridge.cristianjm.com/alternativa-delsol-conecta/",
+      "title": "Alternativa Delsol Conecta — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Alternativa Delsol Conecta. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-tallas-colores/",
+      "url": "https://bridge.cristianjm.com/factusol-tallas-colores/",
+      "title": "Factusol Tallas Colores — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Tallas Colores. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-shopify/",
+      "url": "https://bridge.cristianjm.com/factusol-shopify/",
+      "title": "Factusol Shopify — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Shopify. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-ferreterias-suministros/",
+      "url": "https://bridge.cristianjm.com/factusol-ferreterias-suministros/",
+      "title": "Factusol Ferreterias Suministros — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Ferreterias Suministros. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/casos-de-exito/suministros-rubio/",
+      "url": "https://bridge.cristianjm.com/casos-de-exito/suministros-rubio/",
+      "title": "Suministros Rubio — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Suministros Rubio. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-recargo-equivalencia/",
+      "url": "https://bridge.cristianjm.com/factusol-recargo-equivalencia/",
+      "title": "Factusol Recargo Equivalencia — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Recargo Equivalencia. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/beta/",
+      "url": "https://bridge.cristianjm.com/beta/",
+      "title": "Beta — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Beta. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-verifactu-woocommerce/",
+      "url": "https://bridge.cristianjm.com/factusol-verifactu-woocommerce/",
+      "title": "Factusol Verifactu Woocommerce — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Verifactu Woocommerce. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-api-rest/",
+      "url": "https://bridge.cristianjm.com/factusol-api-rest/",
+      "title": "Factusol Api Rest — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Api Rest. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/docs/",
+      "url": "https://bridge.cristianjm.com/docs/",
+      "title": "Docs — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Docs. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/",
+      "url": "https://bridge.cristianjm.com/guias/conectar-factusol-local-con-woocommerce/",
+      "title": "Conectar Factusol Local Con Woocommerce — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Conectar Factusol Local Con Woocommerce. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/",
+      "url": "https://bridge.cristianjm.com/guias/solucionar-bloqueo-ficheros-ldb-factusol/",
+      "title": "Solucionar Bloqueo Ficheros Ldb Factusol — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Solucionar Bloqueo Ficheros Ldb Factusol. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/",
+      "url": "https://bridge.cristianjm.com/guias/pasar-pedidos-woocommerce-a-factusol-con-recargo/",
+      "title": "Pasar Pedidos Woocommerce A Factusol Con Recargo — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Pasar Pedidos Woocommerce A Factusol Con Recargo. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/comparativa-conector-windows-vs-plugin-wordpress/",
+      "url": "https://bridge.cristianjm.com/comparativa-conector-windows-vs-plugin-wordpress/",
+      "title": "Comparativa Conector Windows Vs Plugin Wordpress — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Comparativa Conector Windows Vs Plugin Wordpress. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/factusol-prestashop-8/",
+      "url": "https://bridge.cristianjm.com/factusol-prestashop-8/",
+      "title": "Factusol Prestashop 8 — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Factusol Prestashop 8. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/quien-esta-detras/",
+      "url": "https://bridge.cristianjm.com/quien-esta-detras/",
+      "title": "Quien Esta Detras — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Quien Esta Detras. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/seguridad/",
+      "url": "https://bridge.cristianjm.com/seguridad/",
+      "title": "Seguridad — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Seguridad. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/requisitos-sistema/",
+      "url": "https://bridge.cristianjm.com/requisitos-sistema/",
+      "title": "Requisitos Sistema — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Requisitos Sistema. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/",
+      "title": "Conector Factusol — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Conector Factusol. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/madrid/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/madrid/",
+      "title": "Madrid — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Madrid. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/barcelona/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/barcelona/",
+      "title": "Barcelona — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Barcelona. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/valencia/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/valencia/",
+      "title": "Valencia — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Valencia. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/sevilla/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/sevilla/",
+      "title": "Sevilla — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Sevilla. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/zaragoza/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/zaragoza/",
+      "title": "Zaragoza — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Zaragoza. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/malaga/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/malaga/",
+      "title": "Malaga — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Malaga. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/alicante/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/alicante/",
+      "title": "Alicante — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Alicante. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/bilbao/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/bilbao/",
+      "title": "Bilbao — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Bilbao. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/murcia/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/murcia/",
+      "title": "Murcia — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Murcia. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/coruna/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/coruna/",
+      "title": "Coruna — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Coruna. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    },
+    {
+      "id": "https://bridge.cristianjm.com/conector-factusol/vigo/",
+      "url": "https://bridge.cristianjm.com/conector-factusol/vigo/",
+      "title": "Vigo — Guía y Conector Oficial Bentian ERP Bridge (v0.5.3)",
+      "content_text": "Documentación técnica y solución Local-First para Vigo. Sincronización en tiempo real sin bloqueos .ldb y sin abrir puertos.",
+      "date_published": "2026-10-30T23:47:17.348Z"
+    }
+  ]
+}

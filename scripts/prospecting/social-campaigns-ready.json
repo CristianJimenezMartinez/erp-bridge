@@ -1,0 +1,41 @@
+[
+  {
+    "id": "factusol-ldb-zero-lock",
+    "title": "Cómo eliminar el Error 3045 (.ldb bloqueado) al conectar Factusol con WooCommerce y PrestaShop (v0.5.3)",
+    "canonicalUrl": "https://bridge.cristianjm.com/docs/troubleshooting/error-3045-base-datos-bloqueada/",
+    "tags": [
+      "ecommerce",
+      "woocommerce",
+      "prestashop",
+      "erp"
+    ],
+    "shortPost": "¿Clientes con Factusol en red local que sufren bloqueos .ldb/.laccdb o errores 500 en el hosting al sincronizar stock?\n\nEn Bentian ERP Bridge v0.5.3 lo resolvemos con ingeniería Local-First en Windows:\n• Vigilante en tiempo real con Debounce OLEDB de 5s\n• Lecturas ADODB Snapshot sin bloquear el mostrador\n• Stock disponible real (DISSTO) + Pedidos con IVA y Recargo al céntimo\n• Cero puertos abiertos en el router (TLS 1.3 saliente)\n\nPrueba Beta gratuita 14 días (con Modo Evaluación): https://bridge.cristianjm.com/beta/",
+    "devtoMarkdown": "Conectar un ERP de escritorio sobre Microsoft Access (como **Factusol**) o SQL Server local (**Sage 50, a3ERP, SimplyGest, Ágora POS**) con **WooCommerce, PrestaShop o Shopify** suele fallar por dos motivos clásicos:\n1. **Scripts PHP en el hosting** que hacen barridos masivos y provocan errores `500 max_execution_time`.\n2. **Bloqueos de archivo `.ldb / .laccdb` (Error 3045)** cuando un conector externo consulta Access mientras el mostrador está facturando.\n\n### Arquitectura Local-First de Bentian ERP Bridge (v0.5.3)\n- **Debounce OLEDB de 5 segundos + ADODB Snapshot:** Espera a que Access libere la escritura antes de leer en modo no bloqueante.\n- **Transacciones Atómicas (`F_PCL` / `F_LCL`):** Si la red parpadea al insertar un pedido web, ejecuta rollback automático.\n- **Delta Sync cada 30s + Reposición de Cancelados:** Solo envía hashes modificados y repone stock si un pedido se cancela en la tienda.\n- **Multi-ERP Real:** Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS y Holded.\n\nPuedes probar el instalador oficial de Windows con **Modo Evaluación Sandbox** (sin necesitar el ERP instalado) en [https://bridge.cristianjm.com/beta/](https://bridge.cristianjm.com/beta/)."
+  },
+  {
+    "id": "partner-channel-25-recurring",
+    "title": "Canal Partner para Agencias PrestaShop/WooCommerce y Empresas IT: 100% Setup + 25% Recurrente",
+    "canonicalUrl": "https://bridge.cristianjm.com/partners/",
+    "tags": [
+      "prestashop",
+      "woocommerce",
+      "b2b",
+      "saas"
+    ],
+    "shortPost": "Si tienes una Agencia E-Commerce (WooCommerce / PrestaShop) o llevas el Mantenimiento IT en polígonos industriales:\n\nDeja de perder horas no facturables manteniendo scripts de sincronización con Factusol, SimplyGest, Sage 50 o a3ERP.\n\nCon el Canal Partner de Bentian ERP Bridge:\n1) Facturas el 100% de tu instalación inicial al cliente (300€–600€ en 10 min)\n2) Recibes un 25% de comisión recurrente vitalicia (62,25€/año por licencia)\n3) Emites licencias Trial de 15 días en 1 clic desde tu panel\n\nDetalles y alta gratuita: https://bridge.cristianjm.com/partners/",
+    "devtoMarkdown": "Descubre cómo las agencias WooCommerce y PrestaShop externalizan la integración ERP local (Factusol, SimplyGest, Sage 50, a3ERP, Ágora POS) manteniendo el 100% de su setup inicial y generando ingresos recurrentes sin abrir puertos en el firewall del cliente: [Portal Oficial de Partners Bentian](https://bridge.cristianjm.com/partners/)."
+  },
+  {
+    "id": "multi-erp-sql-nolock",
+    "title": "Sincronizar Sage 50, a3ERP, SimplyGest y Ágora POS con WooCommerce/PrestaShop sin abrir puertos SQL",
+    "canonicalUrl": "https://bridge.cristianjm.com/sage50-woocommerce/",
+    "tags": [
+      "sqlserver",
+      "erp",
+      "woocommerce",
+      "security"
+    ],
+    "shortPost": "Abrir el puerto 1433 de SQL Server en el router de una nave industrial para conectar la tienda online es una invitación directa al ransomware.\n\nBentian ERP Bridge v0.5.3 corre dentro del Windows del cliente con tráfico 100% saliente TLS 1.3 y consultas WITH (NOLOCK) para:\n• Factusol & SimplyGest\n• Sage 50 & Sage 200\n• Wolters Kluwer a3ERP\n• Ágora POS & Holded\n\nTarifa plana 249€/año SKUs ilimitados. Prueba 14 días gratis: https://bridge.cristianjm.com/beta/",
+    "devtoMarkdown": "Arquitectura de sincronización SQL Server local (`WITH (NOLOCK)` y transacciones T-SQL) hacia WooCommerce, PrestaShop y Shopify sin abrir puertos NAT en el firewall perimetral: [Guía Sage 50 y Multi-ERP en Bentian](https://bridge.cristianjm.com/sage50-woocommerce/)."
+  }
+]

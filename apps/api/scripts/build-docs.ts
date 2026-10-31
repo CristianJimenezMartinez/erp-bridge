@@ -409,6 +409,7 @@ function renderDocArticlePage(article: DocArticle): string {
   </div>
 
   <script src="/js/version-sync.js" defer></script>
+  <script src="/js/omnichannel-widget.js" defer></script>
   <script>
     // 1. Mobile Menu Toggle
     const mobileBtn = document.getElementById('mobile-menu-btn');
@@ -755,6 +756,7 @@ function renderDocsHub(): string {
   </div>
 
   <script src="/js/version-sync.js" defer></script>
+  <script src="/js/omnichannel-widget.js" defer></script>
   <script>
     // 1. Mobile Menu Toggle
     const mobileBtn = document.getElementById('mobile-menu-btn');

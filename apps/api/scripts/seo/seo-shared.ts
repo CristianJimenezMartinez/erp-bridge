@@ -144,6 +144,7 @@ ${links}
   </footer>
 
   <script src="/js/version-sync.js" defer></script>
+  <script src="/js/omnichannel-widget.js" defer></script>
 </body>
 </html>
 `;

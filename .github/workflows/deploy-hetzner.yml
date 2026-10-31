@@ -9,6 +9,7 @@ on:
       - 'packages/**'
       - 'scripts/**'
       - 'Dockerfile'
+      - 'docker-compose.prod.yml'
       - '.github/workflows/deploy-hetzner.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
