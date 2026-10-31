@@ -47,7 +47,7 @@
 ## 4. ÍNDICE COMPLETO DE RECURSOS Y PÁGINAS CANÓNICAS
 
 - [Página Principal](https://bridge.cristianjm.com/): Presentación, características y descarga.
-- [Beta Pública Abierta](https://bridge.cristianjm.com/beta/): Acceso anticipado gratuito para empresas y comercios con Factusol.
+- [Licencia de Evaluación Gratuita](https://bridge.cristianjm.com/beta/): Acceso oficial de evaluación gratuita sin coste (Release Oficial en Producción) para empresas y comercios.
 - [SimplyGest WooCommerce](https://bridge.cristianjm.com/simplygest-woocommerce/): Conector nativo de escritorio para SimplyGest Desktop (Datos.mdb) con WordPress y WooCommerce.
 - [Factusol WooCommerce](https://bridge.cristianjm.com/factusol-woocommerce/): Conector específico para WordPress y WooCommerce.
 - [Factusol PrestaShop](https://bridge.cristianjm.com/factusol-prestashop/): Conector para comercios en PrestaShop.
@@ -88,7 +88,7 @@
 - [Guía Error Proveedor OLEDB Factusol](https://bridge.cristianjm.com/docs/troubleshooting/error-oledb-no-registrado/): Resolución de Microsoft.ACE.OLEDB no registrado en x86/x64.
 - [Guía Sincronización de Pedidos WooCommerce](https://bridge.cristianjm.com/docs/canales/woocommerce/): Importación automática en F_PCL y F_LPC con NIF y series.
 - [Guía Evitar Sobreventas con DISSTO](https://bridge.cristianjm.com/docs/factusol/calculo-stock-disponible/): Diferencias entre existencias físicas ACTSTO y disponibles DISSTO.
-- [Activación de Licencias y Plan Fundador](https://bridge.cristianjm.com/docs/primeros-pasos/activacion-de-licencias/): Cupo estricto de 25 licencias Founder (139 €/año), precio base canónico (199 €/año), anti-acaparamiento y ciclo de vida de la Beta.
+- [Activación de Licencias y Plan Fundador](https://bridge.cristianjm.com/docs/primeros-pasos/activacion-de-licencias/): Cupo estricto de 25 licencias Founder (139 €/año), precio base canónico (199 €/año), anti-acaparamiento y ciclo de vida de la evaluación gratuita.
 - [Caso de Éxito Suministros Rubio](https://bridge.cristianjm.com/casos-de-exito/suministros-rubio/): Sincronización real de +5.000 artículos con variantes, fotos, stock disponible DISSTO y cero bloqueos de Factusol.
 - [Estado de Salud de la API](https://bridge.cristianjm.com/health): Monitorización en vivo de la infraestructura.
 

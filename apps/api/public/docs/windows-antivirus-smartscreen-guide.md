@@ -21,7 +21,7 @@ Microsoft Defender SmartScreen no analiza el código binario buscando virus en e
 
 1. **Certificados Estándar (OV) vs Certificados EV (Extended Validation):**
    - Un certificado EV cuesta miles de euros anuales y requiere validación notarial e inserción de token físico HSM en un servidor. Otorga "reputación inmediata" en los servidores de Microsoft.
-   - Con firmas estándar o binarios de reciente compilación (cada vez que se lanza una nueva versión como `v0.3.8`), Microsoft SmartScreen considera que el archivo tiene "baja reputación acumulada" hasta que miles de usuarios de todo el mundo lo han descargado y ejecutado sin reportes de malware.
+   - Con firmas estándar o binarios de reciente compilación (cada vez que se lanza una nueva versión como `v0.5.3`), Microsoft SmartScreen considera que el archivo tiene "baja reputación acumulada" hasta que miles de usuarios de todo el mundo lo han descargado y ejecutado sin reportes de malware.
 2. **Seguridad Criptográfica Nativa de Bentian ERP Bridge:**
    - Todo el software de Bentian cuenta con un sistema criptográfico de verificación asimétrica interna con curvas elípticas **Ed25519** y hashes **SHA-256** auditados. No contiene adware, telemetría invasiva ni componentes de terceros no verificados. El instalador es 100% seguro y de código abierto en sus componentes de integración.
 

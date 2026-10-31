@@ -1,6 +1,6 @@
 # Bentian ERP Bridge — Official Technical Datasheet & Media Factsheet
 
-**Document Version:** 1.0 (Release 0.4.7)  
+**Document Version:** 1.1 (Release 0.5.3)  
 **Publication Date:** October 2026  
 **Canonical Reference:** https://bridge.cristianjm.com/press/  
 **Founder & Software Architect:** Cristian Jiménez Martínez  
@@ -57,10 +57,10 @@ Unlike conventional cloud-hosted integration connectors that require transferrin
 
 | Asset | Format / Filename | Canonical Download URL | SHA-256 Hash |
 | :--- | :--- | :--- | :--- |
-| **Official Installer** | Inno Setup `Bentian-Setup-v0.4.7.exe` | `https://bridge.cristianjm.com/releases/v0.4.7/Bentian-Setup-v0.4.7.exe` | `e20fa745c14b1bdb3456168182de31b96ed31243de733368a739e41716513b3f` |
-| **Setup Archive** | ZIP `Bentian-Setup-v0.4.7.zip` | `https://bridge.cristianjm.com/releases/v0.4.7/Bentian-Setup-v0.4.7.zip` | `89de8bc03007d7e551d59608a22676681b1066d4bb4084d6669d1e6b5ce6a9d3` |
-| **Portable Edition** | ZIP `BentianAgent-v0.4.7-Portable.zip` | `https://bridge.cristianjm.com/releases/v0.4.7/BentianAgent-v0.4.7-Portable.zip` | `b81056cd539470466a1c285a84ff97cbd1b53b9ce0e62d097cd145eb46361dc2` |
-| **Windows Package Manager** | WinGet Manifest `Bentian.ERPBridge` | `distribution/winget/0.4.7/` | Schema 1.12.0 verified |
+| **Official Installer** | Inno Setup `Bentian-Setup-v0.5.3.exe` | `https://bridge.cristianjm.com/releases/v0.5.3/Bentian-Setup-v0.5.3.exe` | `1ae92e5df522c78f12eb14b1067b9d09c83e0667bb788c34783a2f5adc31a949` |
+| **Setup Archive** | ZIP `Bentian-Setup-v0.5.3.zip` | `https://bridge.cristianjm.com/releases/v0.5.3/Bentian-Setup-v0.5.3.zip` | `91d0e4774cfd35160df1f24a94fdc7338007b9ab1150d4d1c27d42923ee3ad1f` |
+| **Portable Edition** | ZIP `BentianAgent-v0.5.3-Portable.zip` | `https://bridge.cristianjm.com/releases/v0.5.3/BentianAgent-v0.5.3-Portable.zip` | `65a3efde6a466b79ef1dc46864225400cb5b2a04716364238e75ee04648f21a0` |
+| **Windows Package Manager** | WinGet Manifest `Bentian.ERPBridge` | `distribution/winget/0.5.3/` | Schema 1.28.0 verified |
 
 ---
 
